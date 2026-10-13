@@ -246,7 +246,7 @@
             var h = mk('h3', 'sub', cname); h.setAttribute('role', 'button'); h.tabIndex = 0; h.onclick = function () { m.classList.toggle('open'); };
             var sp = mk('span', 'cnt', '0'); h.appendChild(sp); grid = mk('div', 'mgrid'); m.appendChild(h); m.appendChild(grid); root.appendChild(m);
           }
-          grid = grid || m.querySelector('.mgrid'); m.classList.remove('stm-empty'); var cc = p._g ? p._c : card(p); if (p._g) { if (p._g.rep === p) vfix(cc, p); else cc.classList.add('vhide'); } grid.appendChild(cc); bump(m);
+          grid = grid || m.querySelector('.mgrid'); m.classList.remove('stm-empty'); var cc = p._g ? p._c : card(p); if (p._g) { if (p._g.rep === p) vfix(cc, p); else { cc.classList.add('vhide'); cc._grp = p._g.map(function (x) { return x._c; }); } } grid.appendChild(cc); bump(m);
         }
         if ((p._g ? p._g.rep === p && p._g.some(function (x) { return x.featured; }) : p.featured)) { var row = D.querySelector('#featured .row'), cta = row && row.querySelector('.cta'); if (row) { var fc = card(p); if (p._g) { fc._p = p; fc.id = 'f-' + p.id; vfix(fc, p); fc.querySelector('.price'); } row.insertBefore(fc, cta); } }
       });

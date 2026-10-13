@@ -353,10 +353,51 @@
       '<p class="meta" style="margin:.4rem .2rem">Cancelled or declined orders were never counted as sales, so they are shown as lost sales and are not deducted from profit. Log returned goods with <b>Log loss → Returned</b> so they count as a loss.</p></details>';
   }
   function neg(n) { return n < 0 ? ' class="neg"' : ''; }
+  /* ---------- Dashboard insights + CSV backup (read-only; nothing here writes to the database) ---------- */
+  function insights(all) {
+    var per = S.range === 'all' ? 'all time' : RANGES.filter(function (r) { return r[0] === S.range; })[0][1].toLowerCase();
+    function tbl(title, rows, empty) {
+      return '<details class="cx-pl" open><summary>' + title + '</summary><table class="cx-t">' +
+        (rows.length ? rows.join('') : '<tr><td>' + empty + '</td><td></td></tr>') + '</table></details>';
+    }
+    function r2(a, b) { return '<tr><td>' + esc(a) + '</td><td>' + b + '</td></tr>'; }
+    var best = all.filter(function (p) { return stat(p).sold > 0; }).sort(function (a, b) { return stat(b).profit - stat(a).profit; }).slice(0, 5)
+      .map(function (p) { var s = stat(p); return r2(p.name + ' · ' + s.sold + ' sold', money(s.profit)); });
+    var idle = all.filter(function (p) { return p.active && p.stock > 0 && stat(p).sold === 0; }).sort(function (a, b) { return b.stock * b.cost - a.stock * a.cost; }).slice(0, 5)
+      .map(function (p) { return r2(p.name + ' · ' + p.stock + ' pcs', money(p.stock * p.cost)); });
+    var need = all.filter(function (p) { return p.active && p.stock < p.low_at; }).sort(function (a, b) { return stat(b).sold - stat(a).sold; }).slice(0, 5)
+      .map(function (p) { return r2(p.name + ' · ' + p.stock + ' left', stat(p).sold + ' sold'); });
+    var thin = all.filter(function (p) { return p.active && p.price && (p.price - p.cost) / p.price < 0.15; }).slice(0, 5)
+      .map(function (p) { return r2(p.name, Math.round((p.price - p.cost) / p.price * 100) + '% margin'); });
+    return '<h3 style="margin:.9rem 0 .3rem;font-size:1.05rem">📊 Insights (' + esc(per) + ')</h3>' +
+      tbl('🏆 Best sellers · profit', best, 'No sales yet in this period.') +
+      tbl('🛒 Restock now · sold', need, 'Nothing is low on stock.') +
+      tbl('💤 Not selling · money tied up in stock', idle, 'Every item in stock has sold.') +
+      tbl('⚠ Thin margin (under 15%)', thin, 'All margins look healthy.');
+  }
+  function csvCell(x) {
+    var t = x == null ? '' : String(x);
+    if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;   /* stops spreadsheet formula injection */
+    return /[",\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+  }
+  function exportCsv(all) {
+    var head = ['Item', 'Category', 'Pack size', 'Price', 'Cost', 'Margin %', 'Stock', 'Low-stock alert', 'Visible', 'Advert', 'Sold', 'Sales', 'COGS', 'Profit', 'Loss', 'Stock value', 'Description'];
+    var lines = [head.map(csvCell).join(',')];
+    all.forEach(function (p) {
+      var s = stat(p);
+      lines.push([p.base || p.name, catName(p.category_id), p.variant_label || '', p.price, p.cost, p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0, p.stock, p.low_at,
+        p.active ? 'yes' : 'no', p.featured ? 'yes' : 'no', s.sold, s.sales, s.cogs, s.profit, s.loss, p.stock * p.cost, p.description || ''].map(csvCell).join(','));
+    });
+    var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var a = D.createElement('a'), d = new Date(), pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    a.href = URL.createObjectURL(blob); a.download = 'stermont-backup-' + d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '.csv';
+    D.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    toast('Backup downloaded (' + all.length + ' items).');
+  }
   function render() {
     var all = S.prods, T = totals(all), X = cancelled(), rl = S.range === 'all' ? '' : ' · ' + RANGES.filter(function (r) { return r[0] === S.range; })[0][1].toUpperCase(), low = all.filter(function (p) { return p.active && p.stock < p.low_at; });
     var q = S.q.trim().toLowerCase();
-    var shown = all.filter(function (p) { return (S.cat === 'all' || String(p.category_id) === S.cat) && (!q || p.name.toLowerCase().indexOf(q) > -1); });
+    var shown = all.filter(function (p) { return (S.cat === 'all' || String(p.category_id) === S.cat) && (!q || matches(p, q)); });
     root.innerHTML = '<div class="err" id="cx-err" hidden></div><div class="tabs" id="cx-rg"></div>' +
       '<div class="cx-k"><div class="hi"><small>TOTAL SALES' + rl + '</small><b>' + money(T.sales) + '</b></div>' +
       '<div><small>COST OF GOODS SOLD (COGS)</small><b>' + money(T.cogs) + '</b></div>' +
@@ -366,9 +407,11 @@
       '<div><small>CANCELLED / DECLINED ORDERS</small><b>' + X.n + ' · ' + money(X.value) + '</b></div>' +
       '<div><small>PIECES LEFT · SOLD</small><b>' + T.stock + ' · ' + T.sold + '</b></div><div><small>STOCK VALUE (AT COST)</small><b>' + money(T.value) + '</b></div></div>' +
       plBox(T, X) +
+      insights(all) +
       (low.length ? '<div class="err" style="background:#fef3c7;color:#92400e">⚠ ' + low.length + ' item' + (low.length > 1 ? 's' : '') + ' low on stock: ' + low.slice(0, 4).map(function (p) { return esc(p.name) + ' (' + p.stock + ')'; }).join(', ') + (low.length > 4 ? '…' : '') + '</div>' : '') +
       '<p style="margin:0 0 .7rem"><button class="btn" id="cx-add" type="button" style="width:100%">＋ Add new item</button></p>' +
       '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-reprice" type="button" style="width:100%">↻ Recalculate all prices (cost + ' + PROFIT_PCT + '%)</button></p>' +
+      '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-export" type="button" style="width:100%">⬇ Download backup (CSV)</button></p>' +
       '<div class="tabs" id="cx-chips"></div><input id="cx-q" type="search" placeholder="Search items" value="' + esc(S.q) + '" style="width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit;margin-bottom:.8rem">' +
       '<div id="cx-list"></div><h2 style="font-size:1.05rem;margin:1.2rem 0 .5rem">Financial ledger' + (S.range === 'all' ? '' : ' · ' + RANGES.filter(function (r) { return r[0] === S.range; })[0][1]) + '</h2><div class="lg" id="cx-led"></div>';
     $('cx-add').onclick = function () { itemForm(); };
@@ -386,6 +429,7 @@
         .then(load).then(render).then(function () { toast('Updated ' + todo.length + ' price(s).'); })
         .catch(function (x) { b.disabled = false; b.textContent = '\u21bb Recalculate all prices'; toast('Could not update prices: ' + x.message); });
     };
+    $('cx-export').onclick = function () { exportCsv(all); };
     RANGES.forEach(function (r) { var b = el('button', S.range === r[0] ? 'on' : '', r[1]); b.type = 'button'; b.onclick = function () { S.range = r[0]; load().then(render).catch(function (x) { toast(x.message + ' (run setup-catalog-2.sql?)'); }); }; $('cx-rg').appendChild(b); });
     var chips = $('cx-chips'); [{ id: 'all', name: 'All (' + all.length + ')' }].concat(S.cats.map(function (c) { return { id: String(c.id), name: c.name }; })).forEach(function (c) {
       var cc = S.cats.filter(function (x) { return String(x.id) === c.id; })[0], b = el('button', S.cat === c.id ? 'on' : '', (cc && ICONS[cc.slug] ? ICONS[cc.slug] + ' ' : '') + esc(c.name)); b.type = 'button'; b.onclick = function () { S.cat = c.id; render(); }; chips.appendChild(b); });
@@ -477,21 +521,46 @@
   }
 
   /* ---------- Stock tab (live products: pieces left, restock, loss) ---------- */
+  /* every typed word must appear in the item name or its category, so "ultra 1l" or "hisense cooker" both work */
+  function matches(p, q) {
+    var h = (p.name + ' ' + catName(p.category_id)).toLowerCase();
+    return q.toLowerCase().split(/\s+/).filter(Boolean).every(function (w) { return h.indexOf(w) > -1; });
+  }
+  function stockState(p) { return p.stock <= 0 ? 'out' : p.stock < p.low_at ? 'low' : 'in'; }
   function renderStockView() {
     var all = S.prods.slice().sort(function (a, b) { return a.stock - b.stock; }), T = totals(all);
+    S.sq = S.sq || ''; S.sf = S.sf || 'all';
     root.innerHTML = '<div class="err" id="cx-err" hidden></div><p class="meta">Pieces left for every item on the website. An item shows <b>Sold out</b> to customers when it reaches 0. Use Restock when new stock arrives.</p>' +
-      '<div class="cx-k"><div><small>ITEMS</small><b>' + all.length + '</b></div><div><small>PIECES LEFT</small><b>' + T.stock + '</b></div></div><div id="cx-list"></div>';
-    var L = $('cx-list'); if (!all.length) L.appendChild(el('div', 'empty', 'No items yet. Add your first product in the Catalog tab.'));
-    all.forEach(function (p) {
-      var lowS = p.stock < p.low_at, c = el('div', 'card'), s = stat(p);
-      c.innerHTML = '<div class="cx-p">' + (p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '<div class="cx-ph">' + catIcon(p.category_id) + '</div>') +
-        '<div style="min-width:0"><div class="ref">' + esc(p.name) + '</div><div class="when">' + esc(catName(p.category_id)) + '</div><div style="margin-top:.3rem">' +
-        (p.stock <= 0 ? '<span class="badge b-declined">Sold out</span> ' : lowS ? '<span class="badge b-low">Low · ' + p.stock + ' left</span> ' : '<span class="badge b-paid">In stock · ' + p.stock + ' left</span> ') +
-        (p.active ? '' : '<span class="badge b-pending">Hidden</span>') + '</div><div class="meta" style="margin-top:.3rem">' + s.sold + ' sold · alert below ' + p.low_at + '</div></div></div>' +
-        '<div class="acts"><button class="btn ok sm" data-a="r" type="button">＋ Restock</button><button class="btn alt sm" data-a="l" type="button">Log loss</button><button class="btn alt sm" data-a="y" type="button">History</button></div>';
-      c.onclick = function (e) { var a = e.target.getAttribute && e.target.getAttribute('data-a'); if (a === 'r') restockForm(p); else if (a === 'l') lossForm(p); else if (a === 'y') history(p); };
-      L.appendChild(c);
-    });
+      '<div class="cx-k"><div><small>ITEMS</small><b>' + all.length + '</b></div><div><small>PIECES LEFT</small><b>' + T.stock + '</b></div></div>' +
+      '<input id="cx-sq" type="search" autocomplete="off" placeholder="Search an item to check stock" value="' + esc(S.sq) + '" style="width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit;margin:.2rem 0 .6rem">' +
+      '<div class="tabs" id="cx-sf"></div><p class="meta" id="cx-sum" style="margin:.2rem 0 .6rem"></p><div id="cx-list"></div>';
+    var FIL = [['all', 'All'], ['in', 'In stock'], ['low', 'Low'], ['out', 'Sold out']];
+    function draw() {
+      var q = S.sq.trim(), base = all.filter(function (p) { return !q || matches(p, q); });
+      var shown = base.filter(function (p) { return S.sf === 'all' || stockState(p) === S.sf; });
+      var C = $('cx-sf'); C.textContent = '';
+      FIL.forEach(function (f) {
+        var n = f[0] === 'all' ? base.length : base.filter(function (p) { return stockState(p) === f[0]; }).length;
+        var b = el('button', S.sf === f[0] ? 'on' : '', f[1] + ' (' + n + ')'); b.type = 'button';
+        b.onclick = function () { S.sf = f[0]; draw(); }; C.appendChild(b);
+      });
+      $('cx-sum').textContent = q || S.sf !== 'all' ? shown.length + ' of ' + all.length + ' items shown' : '';
+      var L = $('cx-list'); L.textContent = '';
+      if (!all.length) L.appendChild(el('div', 'empty', 'No items yet. Add your first product in the Catalog tab.'));
+      else if (!shown.length) L.appendChild(el('div', 'empty', 'No item matches “' + S.sq.trim() + '”. Try fewer letters.'));
+      shown.forEach(function (p) {
+        var lowS = p.stock < p.low_at, c = el('div', 'card'), s = stat(p);
+        c.innerHTML = '<div class="cx-p">' + (p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '<div class="cx-ph">' + catIcon(p.category_id) + '</div>') +
+          '<div style="min-width:0"><div class="ref">' + esc(p.name) + '</div><div class="when">' + esc(catName(p.category_id)) + '</div><div style="margin-top:.3rem">' +
+          (p.stock <= 0 ? '<span class="badge b-declined">Sold out</span> ' : lowS ? '<span class="badge b-low">Low · ' + p.stock + ' left</span> ' : '<span class="badge b-paid">In stock · ' + p.stock + ' left</span> ') +
+          (p.active ? '' : '<span class="badge b-pending">Hidden</span>') + '</div><div class="meta" style="margin-top:.3rem">' + s.sold + ' sold · alert below ' + p.low_at + '</div></div></div>' +
+          '<div class="acts"><button class="btn ok sm" data-a="r" type="button">＋ Restock</button><button class="btn alt sm" data-a="l" type="button">Log loss</button><button class="btn alt sm" data-a="y" type="button">History</button></div>';
+        c.onclick = function (e) { var a = e.target.getAttribute && e.target.getAttribute('data-a'); if (a === 'r') restockForm(p); else if (a === 'l') lossForm(p); else if (a === 'y') history(p); };
+        L.appendChild(c);
+      });
+    }
+    $('cx-sq').oninput = function (e) { S.sq = e.target.value; draw(); };
+    draw();
   }
 
   window.STMCatalog = {

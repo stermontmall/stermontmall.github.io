@@ -43,7 +43,7 @@
   function slide(p, i) {
     var s = mk('div', 'slide ad'), t = mk('div', 'ad-t'), im = mk('div', 'ad-i'), b = badge(p);
     s.style.background = GRAD[i % GRAD.length]; s.setAttribute('role', 'link'); s.tabIndex = 0; s.setAttribute('data-ad', p.id);
-    t.appendChild(mk('span', 'ad-b ' + b[1], b[0])); t.appendChild(mk('h2', '', p.name)); t.appendChild(mk('div', 'ad-p', money(p.price)));
+    t.appendChild(mk('span', 'ad-b ' + b[1], b[0])); t.appendChild(mk('h2', '', p.name)); t.appendChild(mk('div', 'ad-p', (p.from ? 'From ' : '') + money(p.price)));
     t.appendChild(mk('div', 'ad-s', 'Pay by M-Pesa · Delivery countrywide'));
     var a = mk('div', 'ad-a'), o = mk('button', 'ad-o', 'Order now'), c = mk('button', 'ad-c', '+ Cart'); o.type = c.type = 'button';
     o.onclick = function (e) { e.stopPropagation(); openProduct(p.id, p.name); };
@@ -86,6 +86,33 @@
     window.addEventListener('resize', paint);
   }
 
-  fetch(SB + '/rest/v1/products?active=eq.true&featured=eq.true&stock=gt.0&select=id,name,price,stock,images,created_at&order=created_at.desc&limit=' + MAX, { headers: { apikey: KEY } })
-    .then(function (r) { return r.ok ? r.json() : []; }).then(init).catch(function () {});
+  /* One slide per product (not per pack size). Sizes of the same product share a variant_group. */
+  function get(q) { return fetch(SB + '/rest/v1/products?' + q, { headers: { apikey: KEY } }); }
+  var BASE = 'active=eq.true&featured=eq.true&stock=gt.0&order=created_at.desc&limit=30&select=';
+  get(BASE + 'id,name,price,stock,images,created_at,variant_group,variant_label')
+    .then(function (r) { return r.ok ? r : get(BASE + 'id,name,price,stock,images,created_at'); })   /* pack-size columns not added yet */
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (rows) {
+      var seen = {}, out = [];
+      rows.forEach(function (p) {
+        var k = p.variant_group && p.variant_label ? p.variant_group : null;
+        if (!k) { out.push(p); return; }
+        if (seen[k]) { if (+p.price < +seen[k].price) { out[out.indexOf(seen[k])] = p; seen[k] = p; } return; }
+        seen[k] = p; out.push(p);
+      });
+      out = out.slice(0, MAX);
+      var groups = Object.keys(seen);
+      if (!groups.length) return out;
+      return get('active=eq.true&stock=gt.0&select=variant_group,price&variant_group=in.(' + groups.map(encodeURIComponent).join(',') + ')')
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (all) {
+          out.forEach(function (p) {
+            if (!p.variant_group || !p.variant_label) return;
+            var ps = all.filter(function (x) { return x.variant_group === p.variant_group; }).map(function (x) { return +x.price; });
+            if (ps.length > 1) { var lo = Math.min.apply(null, ps), hi = Math.max.apply(null, ps); if (lo !== hi) { p.price = lo; p.from = true; } }
+          });
+          return out;
+        }).catch(function () { return out; });
+    })
+    .then(function (rows) { if (rows) init(rows); }).catch(function () {});
 })();

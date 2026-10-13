@@ -49,7 +49,26 @@ const shell = ({ title, desc, path, og, body, ld }) => `<!doctype html>
 <footer>${BRAND} · The Sarit Centre (Westlands), Nairobi · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 748 888 230</a>
 · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns.html">Returns</a> · <a href="${SITE}/privacy.html">Privacy</a></footer></body></html>`;
 
-const products = (await getProducts()).filter(p => p && p.id && p.name);
+const rows = (await getProducts()).filter(p => p && p.id && p.name);
+// Pack sizes of one product share a variant_group. They become ONE page (the earliest-created size is the stable page address);
+// the other sizes get a small redirect page so old links keep working. This removes the "duplicate pages" Google reported.
+const gmap = {};
+rows.forEach(p => { if (p.variant_group && p.variant_label) (gmap[p.variant_group] = gmap[p.variant_group] || []).push(p); });
+const products = [], aliases = [], seenG = new Set();
+const inS = x => x.stock == null || Number(x.stock) > 0;
+for (const p of rows) {
+  const g = p.variant_group && p.variant_label ? gmap[p.variant_group] : null;
+  if (g && g.length > 1) {
+    if (seenG.has(p.variant_group)) continue;
+    seenG.add(p.variant_group);
+    const vs = [...g].sort((a, b) => Number(a.price) - Number(b.price)), live = vs.filter(inS), top = g[0];
+    products.push({ ...top, variants: vs, price: Number((live[0] || vs[0]).price), old_price: null, unit: null,
+      stock: g.reduce((n, x) => n + (Number(x.stock) || 0), 0),
+      images: [...new Set(g.flatMap(x => x.images || []).filter(Boolean))], description: g.map(x => x.description).find(Boolean) || '' });
+    g.slice(1).forEach(x => aliases.push({ id: x.id, to: top.id }));
+  } else products.push(g ? { ...p, name: `${p.name} \u2013 ${p.variant_label}` } : p);
+}
+const fileOf = path => `.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m));
 const byCat = {};
 products.forEach(p => { const s = p.categories?.slug; if (s) (byCat[s] = byCat[s] || { name: p.categories.name, items: [] }).items.push(p); });
 
@@ -57,17 +76,18 @@ rmSync('p', { recursive: true, force: true }); rmSync('c', { recursive: true, fo
 mkdirSync('p', { recursive: true }); mkdirSync('c', { recursive: true });
 const urls = [];
 
-const card = p => `<li><a href="/p/${encodeURIComponent(p.id)}.html">${esc(p.name)}</a><span>${money(p.price)}</span></li>`;
+const card = p => `<li><a href="/p/${encodeURIComponent(p.id)}.html">${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 for (const p of products) {
   const path = `/p/${encodeURIComponent(p.id)}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
   const plain = clip(p.description, 150);
-  const desc = clip(`Buy ${p.name} at ${money(p.price)} in Kenya. ${plain ? plain + ' ' : ''}Pay by M-Pesa, delivery to all 47 counties. ${BRAND}, Westlands Nairobi.`, 158);
-  const title = clip(`${p.name} Price in Kenya | Buy Online | ${BRAND}`, 70);
+  const sizes = p.variants ? ' Sizes: ' + p.variants.map(v => v.variant_label).join(', ') + '.' : '';
+  const desc = clip(`Buy ${p.name} ${p.variants ? 'from' : 'at'} ${money(p.price)} in Kenya.${sizes} ${plain ? plain + ' ' : ''}Pay by M-Pesa, delivery to all 47 counties. ${BRAND}, Westlands Nairobi.`, 158);
+  const title = clip(`${p.name} Price in Kenya | ${BRAND}`, 90);
   const related = cat ? (byCat[cat.slug]?.items || []).filter(x => x.id !== p.id).slice(0, 6) : [];
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} (${money(p.price)}) ${SITE}${path}`)}`;
-  const ld = jsonLd({
+  const ldOne = jsonLd({
     '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
     description: clip(p.description, 500) || `${p.name} available at ${BRAND}, Kenya.`, sku: String(p.id), category: cat?.name,
     brand: { '@type': 'Brand', name: BRAND },
@@ -75,16 +95,35 @@ for (const p of products) {
       availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition',
       seller: { '@type': 'Organization', name: BRAND } }
   });
+  const ldGroup = p.variants ? jsonLd({
+    '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
+    description: clip(p.description, 500) || `${p.name} available at ${BRAND}, Kenya.`, category: cat?.name, brand: { '@type': 'Brand', name: BRAND },
+    hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label,
+      image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
+      offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(v.price) || 0)),
+        availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition',
+        seller: { '@type': 'Organization', name: BRAND } } }))
+  }) : '';
+  const ld = p.variants ? ldGroup : ldOne;
+  const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
+    const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${SITE}${path}`)}`;
+    return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
   const body = `<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
 <div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.name)}" fetchpriority="high">` : ''}</div>
-<div><h1>${esc(p.name)}</h1><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${money(p.price)}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
+<div><h1>${esc(p.name)}</h1><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
 <p class="${inStock ? 'ok' : 'no'}">${inStock ? 'In stock' : 'Currently sold out'}</p>
 <a class="btn" href="${esc(wa)}">Order on WhatsApp</a><a class="btn alt" href="${SITE}/">Shop all products and add to cart</a>
 <div class="box">✔ Pay by M-Pesa &nbsp; ✔ Delivery to all 47 counties &nbsp; ✔ 48-hour returns on faulty items</div></div></div>
+${sizeBox}
 ${p.description ? `<div class="box"><h2 style="margin-top:0">Product details</h2><div class="desc">${esc(p.description)}</div></div>` : ''}
 ${related.length ? `<h2>More in ${esc(cat.name)}</h2><ul class="g">${related.map(card).join('')}</ul>` : ''}`;
   writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld }));
   urls.push(path);
+}
+
+for (const a of aliases) {
+  const from = `/p/${encodeURIComponent(a.id)}.html`, to = `${SITE}/p/${encodeURIComponent(a.to)}.html`;
+  writeFileSync(fileOf(from), `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Redirecting\u2026</title><link rel="canonical" href="${to}"><meta http-equiv="refresh" content="0;url=${to}"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><p>This product moved. <a href="${to}">Continue to the product page</a>.</p></body></html>`);
 }
 
 for (const [slug, c] of Object.entries(byCat)) {
