@@ -128,6 +128,7 @@
 
   /* ---------- generic modal ---------- */
   function modal(title, bodyHtml, okText, onOk, onMount) {
+    Array.prototype.slice.call(D.querySelectorAll('.modal')).forEach(function (x) { x.remove(); });   /* only one popup at a time, so field IDs never clash */
     var m = el('div', 'modal'), c = el('div', 'card');
     c.innerHTML = '<h2 style="margin-top:0">' + title + '</h2><div id="cx-mb">' + bodyHtml + '</div><div class="err" id="cx-me" hidden></div><div class="acts"><button class="btn alt" type="button" id="cx-mn">Cancel</button><button class="btn" type="button" id="cx-my">' + okText + '</button></div>';
     m.appendChild(c); D.body.appendChild(m);
