@@ -294,7 +294,7 @@
       '<div><label>Cost per unit (KSh)</label><input class="cx-f" id="cx-c" type="number" min="0" inputmode="decimal" value="' + p.cost + '"></div></div>' +
       '<label>Supplier</label><input class="cx-f" id="cx-s" maxlength="100"><label>Restock date</label><input class="cx-f" id="cx-d" type="date" value="' + today + '">' +
       '<div class="cx-pv" id="cx-pv">Enter pieces to preview new stock and average cost.</div>';
-    modal('Restock item', body, 'Save restock', function () {
+    modal('Restock item <small style="font-weight:400;color:#6b6785">· v8</small>', body, 'Save restock', function () {
       var q = parseInt(v('cx-pcs'), 10), c = num('cx-c'); if (!(q > 0)) throw new Error('Enter pieces to add'); if (!(c >= 0)) throw new Error('Enter the unit cost');
       return call('/rest/v1/rpc/restock_product', { m: 'POST', body: { p_id: p.id, p_qty: q, p_cost: c, p_supplier: v('cx-s').trim() || null, p_date: v('cx-d') || null } })
         .then(function () { return call('/rest/v1/products?select=id,cost,price,old_price&id=eq.' + encodeURIComponent(p.id)); })
