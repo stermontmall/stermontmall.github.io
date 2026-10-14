@@ -3,3 +3,4 @@ Allow: /
 Disallow: /admin.html
 Disallow: /account.html
 Sitemap: https://stermontarcade.co.ke/sitemap.xml
+Sitemap: https://stermontarcade.co.ke/sitemap-products.xml

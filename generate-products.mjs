@@ -7,6 +7,10 @@ const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
 const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
 const WHATSAPP = '254748888230';
 const BRAND = 'Stermont Arcade';
+// Real product brand for Google. Add more brands here any time; if none matches, the store name is used.
+const BRANDS = ['Kungu Nil', 'Greenlife', 'Zagro', 'Alonze', 'Pentagon', 'Absolute', 'Abasi', 'Hisense', 'Samsung', 'LG', 'Tecno', 'Infinix', 'Itel', 'Oppo', 'Xiaomi', 'Redmi', 'Apple', 'Nokia', 'Sony', 'JBL', 'TCL', 'Syinix', 'Vitron', 'Ramtons', 'Von', 'Mika', 'Nunix', 'Sayona', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Philips', 'Bruhm', 'Rockstar', 'Snake'];
+const brandOf = name => { const n = ` ${String(name).toLowerCase()} `; const hit = BRANDS.filter(b => n.includes(` ${b.toLowerCase()} `)).sort((a, b) => b.length - a.length)[0]; return hit || BRAND; };
+const RETURNS = { '@type': 'MerchantReturnPolicy', applicableCountry: 'KE', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 2, url: 'https://stermontarcade.co.ke/returns.html' };
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
@@ -47,9 +51,13 @@ const shell = ({ title, desc, path, og, body, ld }) => `<!doctype html>
 <meta name="theme-color" content="#7c3aed"><style>${CSS}</style>${ld || ''}</head><body>
 <header><a href="${SITE}/">${BRAND}</a></header><main>${body}</main>
 <footer>${BRAND} · The Sarit Centre (Westlands), Nairobi · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 748 888 230</a>
-· <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns.html">Returns</a> · <a href="${SITE}/privacy.html">Privacy</a></footer></body></html>`;
+· <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns.html">Returns</a> · <a href="${SITE}/privacy.html">Privacy</a></footer></body></html>`;
 
-const rows = (await getProducts()).filter(p => p && p.id && p.name);
+// Tidy names: drop a leftover "| Buy in Kenya" (the page title adds its own wording).
+const tidy = n => String(n).replace(/\s*\|\s*Buy in Kenya\s*$/i, '').replace(/\s+/g, ' ').trim();
+// When a product has several pack sizes, the shared name must not end in one size (e.g. "... 1L" on the 50 ml page).
+const SIZE_END = /\s+\d+(?:\.\d+)?\s?(?:ml|l|ltr|litres?|liters?|g|kg)\s*$/i;
+const rows = (await getProducts()).filter(p => p && p.id && p.name).map(p => ({ ...p, name: tidy(p.name) }));
 // Pack sizes of one product share a variant_group. They become ONE page (the earliest-created size is the stable page address);
 // the other sizes get a small redirect page so old links keep working. This removes the "duplicate pages" Google reported.
 const gmap = {};
@@ -62,7 +70,7 @@ for (const p of rows) {
     if (seenG.has(p.variant_group)) continue;
     seenG.add(p.variant_group);
     const vs = [...g].sort((a, b) => Number(a.price) - Number(b.price)), live = vs.filter(inS), top = g[0];
-    products.push({ ...top, variants: vs, price: Number((live[0] || vs[0]).price), old_price: null, unit: null,
+    products.push({ ...top, name: top.name.replace(SIZE_END, '') || top.name, variants: vs, price: Number((live[0] || vs[0]).price), old_price: null, unit: null,
       stock: g.reduce((n, x) => n + (Number(x.stock) || 0), 0),
       images: [...new Set(g.flatMap(x => x.images || []).filter(Boolean))], description: g.map(x => x.description).find(Boolean) || '' });
     g.slice(1).forEach(x => aliases.push({ id: x.id, to: top.id }));
@@ -71,6 +79,36 @@ for (const p of rows) {
 const fileOf = path => `.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m));
 const byCat = {};
 products.forEach(p => { const s = p.categories?.slug; if (s) (byCat[s] = byCat[s] || { name: p.categories.name, items: [] }).items.push(p); });
+
+// "Hub" categories gather the products of their child categories, so one strong page (e.g. Pest Control & Fumigation) ranks for the broad search.
+const HUBS = { 'pest-control-fumigation': { name: 'Pest Control & Fumigation', kids: ['bed-bug-killers', 'cockroach-ant-killers', 'mosquito-fly-control', 'rodent-control', 'termite-control', 'fumigation-chemicals', 'sprayers-equipment'] } };
+for (const [slug, h] of Object.entries(HUBS)) {
+  const items = [...(byCat[slug]?.items || [])];
+  h.kids.forEach(k => (byCat[k]?.items || []).forEach(x => { if (!items.includes(x)) items.push(x); }));
+  if (items.length) byCat[slug] = { name: h.name, items };
+}
+// Extra search-friendly text for category pages. Categories not listed here still get a normal page.
+const INFO = {
+  'pest-control-fumigation': { h1: 'Pest Control & Fumigation Products in Kenya', title: 'Pest Control & Fumigation Products in Kenya | Stermont Arcade',
+    desc: 'Buy bed bug killers, insecticides and fumigation products online in Kenya. Pay by M-Pesa, delivery to all 47 counties. Stermont Arcade, Westlands Nairobi.',
+    intro: 'Stermont Arcade stocks insecticides and pest control supplies for homes, hotels, hostels, offices, farms and public places. Look for a PCPB registration number on the label, read the label before use and keep chemicals away from children and pets. For large premises or fumigation of stores and grain, use a licensed pest control operator.' },
+  'bed-bug-killers': { h1: 'Bed Bug Killers in Kenya', title: 'Bed Bug Killer in Kenya | Buy Online | Stermont Arcade',
+    desc: 'Buy bed bug killer in Kenya. Registered insecticides for bed bug control in homes and public places. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Insecticides for control of bed bugs in homes, hostels, hotels and other public places. Check the PCPB registration on the label and follow the label directions.' },
+  'cockroach-ant-killers': { h1: 'Cockroach & Ant Killers in Kenya', title: 'Cockroach & Ant Killer in Kenya | Stermont Arcade',
+    desc: 'Buy cockroach and ant killers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Sprays, gels and baits for cockroaches and ants in kitchens, restaurants, stores and homes.' },
+  'mosquito-fly-control': { h1: 'Mosquito & Fly Control in Kenya', title: 'Mosquito & Fly Control Products in Kenya | Stermont Arcade',
+    desc: 'Buy mosquito and fly control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Sprays and treatments for mosquitoes and flies in homes, compounds, farms and animal housing.' },
+  'rodent-control': { h1: 'Rat & Mouse Control in Kenya', title: 'Rat & Mouse Control Products in Kenya | Stermont Arcade',
+    desc: 'Buy rat and mouse control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Rodent control products for homes, shops, stores and farms. Keep baits out of reach of children, pets and livestock.' },
+  'termite-control': { h1: 'Termite Control in Kenya', title: 'Termite Control Products in Kenya | Stermont Arcade',
+    desc: 'Buy termite control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Termiticides and treatments for buildings, fences and timber.' },
+  'fumigation-chemicals': { h1: 'Fumigation Chemicals in Kenya', title: 'Fumigation Chemicals in Kenya | Stermont Arcade',
+    desc: 'Buy fumigation chemicals online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Chemicals for fumigation of stores, grain and premises. Use only as directed on the label, and use a licensed operator for large jobs.' },
+  'sprayers-equipment': { h1: 'Pest Control Sprayers & Equipment in Kenya', title: 'Pest Control Sprayers & Equipment in Kenya | Stermont Arcade',
+    desc: 'Buy pest control sprayers, masks and gloves online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Sprayers, masks, gloves and protective wear for safe application of pest control products.' }
+};
+const crumbLd = items => jsonLd({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items.map(([name, url], i) => ({ '@type': 'ListItem', position: i + 1, name, item: url })) });
 
 rmSync('p', { recursive: true, force: true }); rmSync('c', { recursive: true, force: true });
 mkdirSync('p', { recursive: true }); mkdirSync('c', { recursive: true });
@@ -90,21 +128,21 @@ for (const p of products) {
   const ldOne = jsonLd({
     '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
     description: clip(p.description, 500) || `${p.name} available at ${BRAND}, Kenya.`, sku: String(p.id), category: cat?.name,
-    brand: { '@type': 'Brand', name: BRAND },
+    brand: { '@type': 'Brand', name: brandOf(p.name) },
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(p.price) || 0)),
-      availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition',
+      availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS,
       seller: { '@type': 'Organization', name: BRAND } }
   });
   const ldGroup = p.variants ? jsonLd({
     '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
-    description: clip(p.description, 500) || `${p.name} available at ${BRAND}, Kenya.`, category: cat?.name, brand: { '@type': 'Brand', name: BRAND },
+    description: clip(p.description, 500) || `${p.name} available at ${BRAND}, Kenya.`, category: cat?.name, brand: { '@type': 'Brand', name: brandOf(p.name) },
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label,
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
       offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(v.price) || 0)),
-        availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition',
+        availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS,
         seller: { '@type': 'Organization', name: BRAND } } }))
   }) : '';
-  const ld = p.variants ? ldGroup : ldOne;
+  const ld = (p.variants ? ldGroup : ldOne) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
     const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${SITE}${path}`)}`;
     return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
@@ -128,13 +166,27 @@ for (const a of aliases) {
 
 for (const [slug, c] of Object.entries(byCat)) {
   const path = `/c/${encodeURIComponent(slug)}.html`;
-  const title = clip(`Buy ${c.name} in Kenya | Prices &amp; Delivery | ${BRAND}`.replace(/&amp;/g, '&'), 70);
-  const desc = clip(`Shop ${c.name} online in Kenya. ${c.items.length} products, pay by M-Pesa, delivery to all 47 counties. ${BRAND}, Westlands Nairobi.`, 158);
+  const info = INFO[slug] || {};
+  const title = info.title || clip(`Buy ${c.name} in Kenya | Prices &amp; Delivery | ${BRAND}`.replace(/&amp;/g, '&'), 70);
+  const desc = info.desc || clip(`Shop ${c.name} online in Kenya. ${c.items.length} products, pay by M-Pesa, delivery to all 47 counties. ${BRAND}, Westlands Nairobi.`, 158);
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(p.id)}.html`, name: p.name })) });
-  const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(c.name)} in Kenya</h1>
-<p>Order online and pay by M-Pesa. We deliver to all 47 counties.</p><ul class="g">${c.items.map(card).join('')}</ul>`;
-  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, ld }));
+  const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
+<p>${esc(info.intro || 'Order online and pay by M-Pesa. We deliver to all 47 counties.')} Order online, pay by M-Pesa, delivery to all 47 counties.</p><ul class="g">${c.items.map(card).join('')}</ul>
+${HUBS[slug] ? '<h2>Pest control by type</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
+<p><a href="/c/">Browse all categories</a></p>`;
+  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, ld: ld + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]) }));
   urls.push(path);
+}
+
+// /c/ lists every category that has products, so Google and visitors can reach each category page from one place.
+{
+  const order = Object.entries(byCat).sort((a, b) => (b[0] === 'pest-control-fumigation') - (a[0] === 'pest-control-fumigation') || a[1].name.localeCompare(b[1].name));
+  const body = `<nav class="bc"><a href="${SITE}/">Home</a> › All categories</nav><h1>Shop by category in Kenya</h1>
+<p>Pest control and fumigation, agrovet, electronics, home goods and more. Pay by M-Pesa, delivery to all 47 counties.</p>
+<ul class="g">${order.map(([slug, c]) => `<li><a href="/c/${encodeURIComponent(slug)}.html">${esc(c.name)}</a><span>${c.items.length} product${c.items.length === 1 ? '' : 's'}</span></li>`).join('')}</ul>`;
+  writeFileSync('c/index.html', shell({ title: `Shop by Category in Kenya | ${BRAND}`, desc: `Browse all categories at ${BRAND}: pest control and fumigation, agrovet, electronics, home goods and more. Pay by M-Pesa, delivery to all 47 counties.`, path: '/c/', body,
+    ld: crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/']]) }));
+  urls.push('/c/');
 }
 
 const today = new Date().toISOString().slice(0, 10);
