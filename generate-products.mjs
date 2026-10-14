@@ -53,8 +53,8 @@ const shell = ({ title, desc, path, og, body, ld }) => `<!doctype html>
 <footer>${BRAND} · The Sarit Centre (Westlands), Nairobi · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 748 888 230</a>
 · <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns.html">Returns</a> · <a href="${SITE}/privacy.html">Privacy</a></footer></body></html>`;
 
-// Tidy names: drop a leftover "| Buy in Kenya" (the page title adds its own wording).
-const tidy = n => String(n).replace(/\s*\|\s*Buy in Kenya\s*$/i, '').replace(/\s+/g, ' ').trim();
+// Tidy names: drop any "| Stermont Arcade Kenya" / "| Buy in Kenya" tail (the page title adds its own wording).
+const tidy = n => String(n).replace(/\s*\|.*$/, '').replace(/\s+/g, ' ').trim();
 // When a product has several pack sizes, the shared name must not end in one size (e.g. "... 1L" on the 50 ml page).
 const SIZE_END = /\s+\d+(?:\.\d+)?\s?(?:ml|l|ltr|litres?|liters?|g|kg)\s*$/i;
 const rows = (await getProducts()).filter(p => p && p.id && p.name).map(p => ({ ...p, name: tidy(p.name) }));
