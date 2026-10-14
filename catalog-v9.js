@@ -89,8 +89,10 @@
     return null;
   }
   function statsCall() {
-    var b = bounds(); if (!b) return call('/rest/v1/product_stats?select=*');
-    return call('/rest/v1/rpc/product_stats_range', { m: 'POST', body: { p_from: b[0].toISOString(), p_to: b[1] ? b[1].toISOString() : null } });
+    var b = bounds(), req = !b ? call('/rest/v1/product_stats?select=*') :
+      call('/rest/v1/rpc/product_stats_range', { m: 'POST', body: { p_from: b[0].toISOString(), p_to: b[1] ? b[1].toISOString() : null } });
+    /* if the sales view/function is missing, still show the items (sales figures just stay at 0) */
+    return req.catch(function (e) { S.warn = 'Sales figures could not load (' + e.message + '). Items are still shown. Run setup-catalog.sql and setup-catalog-2.sql in Supabase.'; return []; });
   }
   function logsCall() {
     var b = bounds(), f = b ? '&created_at=gte.' + encodeURIComponent(b[0].toISOString()) : '';
@@ -101,6 +103,7 @@
     return call('/rest/v1/stock_restocks?select=product_id,qty,unit_cost,supplier,created_at' + f + '&order=created_at.desc&limit=2000').catch(function () { return []; });
   }
   function load() {
+    S.warn = '';
     return Promise.all([call('/rest/v1/categories?select=*&order=name'), call('/rest/v1/products?select=*&order=created_at.desc'), statsCall(), logsCall(), restCall()])
       .then(function (r) { S.cats = r[0]; S.prods = r[1].map(function (p) { p.base = p.name; if (p.variant_label) p.name = p.base + ' \u2013 ' + p.variant_label; return p; }); S.st = {}; r[2].forEach(function (x) { S.st[x.product_id] = x; }); S.logs = r[3] || []; S.rest = r[4] || []; });
   }
@@ -435,8 +438,10 @@
     RANGES.forEach(function (r) { var b = el('button', S.range === r[0] ? 'on' : '', r[1]); b.type = 'button'; b.onclick = function () { S.range = r[0]; load().then(render).catch(function (x) { toast(x.message + ' (run setup-catalog-2.sql?)'); }); }; $('cx-rg').appendChild(b); });
     var chips = $('cx-chips'); [{ id: 'all', name: 'All (' + all.length + ')' }].concat(S.cats.map(function (c) { return { id: String(c.id), name: c.name }; })).forEach(function (c) {
       var cc = S.cats.filter(function (x) { return String(x.id) === c.id; })[0], b = el('button', S.cat === c.id ? 'on' : '', (cc && ICONS[cc.slug] ? ICONS[cc.slug] + ' ' : '') + esc(c.name)); b.type = 'button'; b.onclick = function () { S.cat = c.id; render(); }; chips.appendChild(b); });
-    $('cx-q').oninput = function (e) { S.q = e.target.value; var pos = e.target.selectionStart; render(); var n = $('cx-q'); n.focus(); n.setSelectionRange(pos, pos); };
-    var L = $('cx-list'); if (!shown.length) L.appendChild(el('div', 'empty', all.length ? 'No items match.' : 'No items yet. Tap “Add new item” to publish your first product.'));
+    function drawList() {
+    var q2 = S.q.trim().toLowerCase();
+    var shown = all.filter(function (p) { return (S.cat === 'all' || String(p.category_id) === S.cat) && (!q2 || matches(p, q2)); });
+    var L = $('cx-list'); L.textContent = ''; if (!shown.length) L.appendChild(el('div', 'empty', all.length ? 'No items match.' : 'No items yet. Tap “Add new item” to publish your first product.'));
     shown.forEach(function (p) {
       var s = stat(p), lowS = p.stock < p.low_at, c = el('div', 'card'), margin = p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0;
       c.innerHTML = '<div class="cx-p">' + (p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '<div class="cx-ph">' + catIcon(p.category_id) + '</div>') +
@@ -455,6 +460,10 @@
         else { e.target.disabled = true; call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { active: !p.active } }).then(load).then(render).catch(function (x) { toast(x.message); }); } };
       L.appendChild(c);
     });
+    }
+    $('cx-q').oninput = function (e) { S.q = e.target.value; drawList(); };
+    drawList();
+    if (S.warn) toast(S.warn);
     ledger(all);
   }
   function ledger(all) {
@@ -563,6 +572,7 @@
     }
     $('cx-sq').oninput = function (e) { S.sq = e.target.value; draw(); };
     draw();
+    if (S.warn) toast(S.warn);
   }
 
   window.STMCatalog = {
