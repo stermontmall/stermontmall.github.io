@@ -189,6 +189,21 @@ ${HUBS[slug] ? '<h2>Pest control by type</h2><ul class="g">' + HUBS[slug].kids.f
   urls.push('/c/');
 }
 
+// /products.html: one crawlable page that lists every product, grouped by category, so Google and visitors can reach all of them from one place.
+{
+  const groups = {};
+  products.forEach(p => { const k = p.categories?.slug || '_'; (groups[k] = groups[k] || { name: p.categories?.name || 'Other products', slug: p.categories?.slug, items: [] }).items.push(p); });
+  const list = Object.values(groups).sort((a, b) => (a.slug ? 0 : 1) - (b.slug ? 0 : 1) || a.name.localeCompare(b.name));
+  const body = `<nav class="bc"><a href="${SITE}/">Home</a> › All products</nav><h1>All products at ${BRAND}</h1>
+<p>${products.length} product${products.length === 1 ? '' : 's'} to order online in Kenya. Pay by M-Pesa, delivery to all 47 counties. Cannot see what you need? <a href="https://wa.me/${WHATSAPP}">Ask us on WhatsApp</a> and we will source it.</p>
+${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html">${esc(g.name)}</a>` : esc(g.name)}</h2><ul class="g">${g.items.map(card).join('')}</ul>`).join('\n')}
+<p><a href="/c/">Browse all categories</a></p>`;
+  const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: `All products at ${BRAND}`, itemListElement: products.slice(0, 100).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(p.id)}.html`, name: p.name })) });
+  writeFileSync('products.html', shell({ title: `All Products | Buy Online in Kenya | ${BRAND}`, desc: `Browse every product at ${BRAND}: pest control, agrovet, appliances and more. Pay by M-Pesa, delivery to all 47 counties.`, path: '/products.html', body,
+    ld: ld + crumbLd([['Home', SITE + '/'], ['All products', SITE + '/products.html']]) }));
+  urls.push('/products.html');
+}
+
 const today = new Date().toISOString().slice(0, 10);
 writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
   urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join('\n') + `\n</urlset>\n`);
