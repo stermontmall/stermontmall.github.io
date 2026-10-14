@@ -290,12 +290,12 @@
   function restockForm(p) {
     var today = new Date().toISOString().slice(0, 10);
     var body = '<p class="meta"><b>' + esc(p.name) + '</b> · ' + p.stock + ' in stock at ' + money(p.cost) + ' each</p>' +
-      '<div class="cx-r"><div><label>+ Pieces</label><input class="cx-f" id="cx-q" type="number" min="1" inputmode="numeric"></div>' +
+      '<div class="cx-r"><div><label>+ Pieces</label><input class="cx-f" id="cx-pcs" type="number" min="1" inputmode="numeric"></div>' +
       '<div><label>Cost per unit (KSh)</label><input class="cx-f" id="cx-c" type="number" min="0" inputmode="decimal" value="' + p.cost + '"></div></div>' +
       '<label>Supplier</label><input class="cx-f" id="cx-s" maxlength="100"><label>Restock date</label><input class="cx-f" id="cx-d" type="date" value="' + today + '">' +
       '<div class="cx-pv" id="cx-pv">Enter pieces to preview new stock and average cost.</div>';
     modal('Restock item', body, 'Save restock', function () {
-      var q = parseInt(v('cx-q'), 10), c = num('cx-c'); if (!(q > 0)) throw new Error('Enter pieces to add'); if (!(c >= 0)) throw new Error('Enter the unit cost');
+      var q = parseInt(v('cx-pcs'), 10), c = num('cx-c'); if (!(q > 0)) throw new Error('Enter pieces to add'); if (!(c >= 0)) throw new Error('Enter the unit cost');
       return call('/rest/v1/rpc/restock_product', { m: 'POST', body: { p_id: p.id, p_qty: q, p_cost: c, p_supplier: v('cx-s').trim() || null, p_date: v('cx-d') || null } })
         .then(function () { return call('/rest/v1/products?select=id,cost,price,old_price&id=eq.' + encodeURIComponent(p.id)); })
         .then(function (r) {
@@ -303,22 +303,22 @@
           var np = autoPrice(x.cost); if (np && np !== Number(x.price)) return call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { price: np } });
         }).catch(function () {});
     }, function () {
-      function pv() { var q = parseInt(v('cx-q'), 10) || 0, c = num('cx-c') || 0; if (q < 1) return;
+      function pv() { var q = parseInt(v('cx-pcs'), 10) || 0, c = num('cx-c') || 0; if (q < 1) return;
         var avg = (p.stock * p.cost + q * c) / (p.stock + q); $('cx-pv').innerHTML = 'New stock: <b>' + (p.stock + q) + '</b> pcs · Average cost: <b>' + money(avg) + '</b> · Outlay: <b>' + money(q * c) + '</b>'; }
-      $('cx-q').oninput = $('cx-c').oninput = pv;
+      $('cx-pcs').oninput = $('cx-c').oninput = pv;
     });
   }
 
   /* ---------- Loss / write-off ---------- */
   function lossForm(p) {
     var body = '<p class="meta"><b>' + esc(p.name) + '</b> · ' + p.stock + ' in stock at ' + money(p.cost) + ' each</p>' +
-      '<div class="cx-r"><div><label>Pieces lost</label><input class="cx-f" id="cx-q" type="number" min="1" max="' + p.stock + '" inputmode="numeric"></div>' +
+      '<div class="cx-r"><div><label>Pieces lost</label><input class="cx-f" id="cx-pcs" type="number" min="1" max="' + p.stock + '" inputmode="numeric"></div>' +
       '<div><label>Reason</label><select class="cx-f" id="cx-r"><option>Damaged</option><option>Transit loss</option><option>Returned</option><option>Expired</option><option>Other</option></select></div></div>' +
       '<label>Note (optional)</label><input class="cx-f" id="cx-n" maxlength="200"><div class="cx-pv" id="cx-pv">Loss = pieces × cost</div>';
     modal('Log loss / write-off', body, 'Log loss', function () {
-      var q = parseInt(v('cx-q'), 10); if (!(q > 0)) throw new Error('Enter pieces lost'); if (q > p.stock) throw new Error('Only ' + p.stock + ' in stock');
+      var q = parseInt(v('cx-pcs'), 10); if (!(q > 0)) throw new Error('Enter pieces lost'); if (q > p.stock) throw new Error('Only ' + p.stock + ' in stock');
       return call('/rest/v1/rpc/record_loss', { m: 'POST', body: { p_id: p.id, p_qty: q, p_reason: v('cx-r'), p_note: v('cx-n').trim() || null } });
-    }, function () { $('cx-q').oninput = function () { var q = parseInt(v('cx-q'), 10) || 0; $('cx-pv').innerHTML = 'Write-off cost: <b>' + money(q * p.cost) + '</b>'; }; });
+    }, function () { $('cx-pcs').oninput = function () { var q = parseInt(v('cx-pcs'), 10) || 0; $('cx-pv').innerHTML = 'Write-off cost: <b>' + money(q * p.cost) + '</b>'; }; });
   }
 
   /* ---------- Restock & loss history ---------- */
