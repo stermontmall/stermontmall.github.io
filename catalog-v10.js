@@ -604,6 +604,7 @@
   }
 
   window.STMCatalog = {
+    autoPrice: autoPrice,
     mountStock: function (c) {
       root = c; view = renderStockView; if (!D.getElementById('cx-css')) { var s = el('style'); s.id = 'cx-css'; s.textContent = css; D.head.appendChild(s); }
       root.innerHTML = '<div class="empty">Loading stock…</div>';

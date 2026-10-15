@@ -161,5 +161,6 @@
     load();
   }
 
-  window.STMExtras = { mount: function (root, view) { ({ vouchers: vouchers, expenses: expenses, inbox: inbox, reviews: reviews })[view](root); } };
+  function bulk(root) { if (!window.STMBulk) { root.textContent = 'The bulk import script did not load. Refresh the page (Ctrl+F5).'; return; } STMBulk.mount(root); }
+  window.STMExtras = { mount: function (root, view) { ({ bulk: bulk, vouchers: vouchers, expenses: expenses, inbox: inbox, reviews: reviews })[view](root); } };
 })();
