@@ -58,6 +58,24 @@ const tidy = n => String(n).replace(/\s*\|.*$/, '').replace(/\s+/g, ' ').trim();
 // When a product has several pack sizes, the shared name must not end in one size (e.g. "... 1L" on the 50 ml page).
 const SIZE_END = /\s+\d+(?:\.\d+)?\s?(?:ml|l|ltr|litres?|liters?|g|kg)\s*$/i;
 const rows = (await getProducts()).filter(p => p && p.id && p.name).map(p => ({ ...p, name: tidy(p.name) }));
+// Approved customer reviews (public read). Failure or a missing table just means no review markup.
+async function getReviews() {
+  try {
+    if (process.env.REVIEWS_JSON) return JSON.parse(readFileSync(process.env.REVIEWS_JSON, 'utf8'));
+    const r = await fetch(`${SB}/rest/v1/reviews?status=eq.approved&select=product_name,rating,body,reviewer,created_at&order=created_at.desc&limit=1000`, { headers: { apikey: KEY } });
+    return r.ok ? await r.json() : [];
+  } catch { return []; }
+}
+const normName = n => tidy(n).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const reviewMap = {};
+(await getReviews()).forEach(r => { if (r && r.product_name && Number(r.rating) >= 1 && Number(r.rating) <= 5) (reviewMap[normName(r.product_name)] = reviewMap[normName(r.product_name)] || []).push(r); });
+const reviewsFor = p => [...new Set([p.name, ...(p.variants || []).map(v => v.name)].map(normName))].flatMap(k => reviewMap[k] || []);
+const reviewLd = list => list.length ? {
+  aggregateRating: { '@type': 'AggregateRating', ratingValue: (list.reduce((a, r) => a + Number(r.rating), 0) / list.length).toFixed(1), reviewCount: String(list.length), bestRating: '5', worstRating: '1' },
+  review: list.slice(0, 10).map(r => ({ '@type': 'Review', reviewRating: { '@type': 'Rating', ratingValue: String(r.rating), bestRating: '5', worstRating: '1' }, author: { '@type': 'Person', name: r.reviewer || 'Customer' },
+    datePublished: String(r.created_at || '').slice(0, 10) || undefined, reviewBody: r.body ? clip(r.body, 500) : undefined }))
+} : {};
+
 // Pack sizes of one product share a variant_group. They become ONE page (the earliest-created size is the stable page address);
 // the other sizes get a small redirect page so old links keep working. This removes the "duplicate pages" Google reported.
 const gmap = {};
@@ -119,6 +137,7 @@ const card = p => `<li><a href="/p/${encodeURIComponent(p.id)}.html">${esc(p.nam
 for (const p of products) {
   const path = `/p/${encodeURIComponent(p.id)}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
+  const revs = reviewsFor(p), rLd = reviewLd(revs);
   const plain = clip(p.description, 150);
   const sizes = p.variants ? ' Sizes: ' + p.variants.map(v => v.variant_label).join(', ') + '.' : '';
   const desc = clip(`Buy ${p.name} ${p.variants ? 'from' : 'at'} ${money(p.price)} in Kenya.${sizes} ${plain ? plain + ' ' : ''}Pay by M-Pesa, delivery to all 47 counties. ${BRAND}, Westlands Nairobi.`, 158);
@@ -131,11 +150,12 @@ for (const p of products) {
     brand: { '@type': 'Brand', name: brandOf(p.name) },
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(p.price) || 0)),
       availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS,
-      seller: { '@type': 'Organization', name: BRAND } }
+      seller: { '@type': 'Organization', name: BRAND } },
+    ...rLd
   });
   const ldGroup = p.variants ? jsonLd({
     '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
-    description: clip(p.description, 500) || `${p.name} available at ${BRAND}, Kenya.`, category: cat?.name, brand: { '@type': 'Brand', name: brandOf(p.name) },
+    description: clip(p.description, 500) || `${p.name} available at ${BRAND}, Kenya.`, category: cat?.name, brand: { '@type': 'Brand', name: brandOf(p.name) }, ...rLd,
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label,
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
       offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(v.price) || 0)),
@@ -154,6 +174,7 @@ for (const p of products) {
 <div class="box">✔ Pay by M-Pesa &nbsp; ✔ Delivery to all 47 counties &nbsp; ✔ 48-hour returns on faulty items</div></div></div>
 ${sizeBox}
 ${p.description ? `<div class="box"><h2 style="margin-top:0">Product details</h2><div class="desc">${esc(p.description)}</div></div>` : ''}
+${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
 ${related.length ? `<h2>More in ${esc(cat.name)}</h2><ul class="g">${related.map(card).join('')}</ul>` : ''}`;
   writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld }));
   urls.push(path);
@@ -202,6 +223,25 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
   writeFileSync('products.html', shell({ title: `All Products | Buy Online in Kenya | ${BRAND}`, desc: `Browse every product at ${BRAND}: pest control, agrovet, appliances and more. Pay by M-Pesa, delivery to all 47 counties.`, path: '/products.html', body,
     ld: ld + crumbLd([['Home', SITE + '/'], ['All products', SITE + '/products.html']]) }));
   urls.push('/products.html');
+}
+
+// Google Merchant Center product feed (free listings). One item per size/variant; submit https://stermontarcade.co.ke/merchant-feed.xml in Merchant Center.
+{
+  const pageOf = {}; aliases.forEach(a => { pageOf[a.id] = a.to; });
+  const feed = [];
+  for (const p of rows) {
+    const imgs = (p.images || []).filter(Boolean); if (!imgs.length || !(Number(p.price) > 0)) continue;
+    const grouped = p.variant_group && p.variant_label && gmap[p.variant_group]?.length > 1;
+    const title = clip(grouped ? `${p.name.replace(SIZE_END, '') || p.name} ${p.variant_label}` : p.name, 150);
+    const page = `${SITE}/p/${encodeURIComponent(pageOf[p.id] || p.id)}.html`;
+    const price = Math.round(Number(p.price)), old = Math.round(Number(p.old_price) || 0);
+    feed.push(`<item><g:id>${esc(p.id)}</g:id><title>${esc(title)}</title><description>${esc(clip(p.description, 4000) || `${title} available at ${BRAND}, Kenya. Pay by M-Pesa, delivery to all 47 counties.`)}</description>
+<link>${esc(page)}</link><g:image_link>${esc(imgs[0])}</g:image_link>${imgs.slice(1, 10).map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('')}
+<g:availability>${inS(p) ? 'in_stock' : 'out_of_stock'}</g:availability>${old > price ? `<g:price>${old} KES</g:price><g:sale_price>${price} KES</g:sale_price>` : `<g:price>${price} KES</g:price>`}
+<g:brand>${esc(brandOf(p.name))}</g:brand><g:condition>new</g:condition><g:identifier_exists>no</g:identifier_exists>${p.categories?.name ? `<g:product_type>${esc(p.categories.name)}</g:product_type>` : ''}${grouped ? `<g:item_group_id>${esc(p.variant_group)}</g:item_group_id>` : ''}</item>`);
+  }
+  writeFileSync('merchant-feed.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0"><channel><title>${BRAND}</title><link>${SITE}/</link><description>${BRAND} product feed</description>\n${feed.join('\n')}\n</channel></rss>\n`);
+  console.log(`Merchant feed: ${feed.length} items.`);
 }
 
 const today = new Date().toISOString().slice(0, 10);
