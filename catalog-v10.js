@@ -469,6 +469,7 @@
     }
     $('cx-q').oninput = function (e) { S.q = e.target.value; $('cx-qx').hidden = !S.q; drawList(); };
     $('cx-q').onkeydown = function (e) { if (e.key === 'Escape') { S.q = ''; e.target.value = ''; $('cx-qx').hidden = true; drawList(); } };
+    if (window.STMSuggest) STMSuggest.attach($('cx-q'), function (q) { return prodSuggest(q, S.cat); }, function (it) { S.q = it.value; $('cx-qx').hidden = false; drawList(); });
     $('cx-qx').onclick = function () { S.q = ''; $('cx-q').value = ''; $('cx-qx').hidden = true; drawList(); $('cx-q').focus(); };
     $('cx-rf').onclick = function () { var b = this; b.disabled = true; load().then(render).catch(function (x) { b.disabled = false; toast('Could not refresh: ' + x.message); }); };
     drawList();
@@ -546,6 +547,23 @@
     var h = [p.name, p.base, p.variant_label, catName(p.category_id), p.description, p.sku, p.barcode, p.price, p.cost].map(function (v) { return v == null ? '' : String(v); }).join(' ').toLowerCase();
     return String(q).toLowerCase().split(/\s+/).filter(Boolean).every(function (w) { return h.indexOf(w) > -1; });
   }
+  /* type-ahead suggestions for the Catalog and Stock search boxes (best name match first) */
+  function prodSuggest(q, onlyCat) {
+    var W = window.STMSuggest.words(q);
+    var pool = S.prods.filter(function (p) { return !onlyCat || onlyCat === 'all' || String(p.category_id) === onlyCat; });
+    var strict = pool.filter(function (p) {
+      var h = [p.name, p.base, p.variant_label, catName(p.category_id), p.sku, p.barcode].map(function (v) { return v == null ? '' : String(v); }).join(' ').toLowerCase();
+      return W.every(function (w) { return h.indexOf(w) > -1; });
+    });
+    var list = strict.length ? strict : pool.filter(function (p) { return matches(p, q); }), seen = {};
+    return list.map(function (p, i) { return { p: p, r: window.STMSuggest.rank(p.name, q), i: i }; })
+      .sort(function (a, b) { return a.r - b.r || a.i - b.i; })
+      .map(function (x) {
+        var p = x.p, st = p.stock <= 0 ? 'Out of stock' : p.stock + ' left';
+        return { label: p.name, sub: catName(p.category_id) + ' · ' + money(p.price) + ' · ' + st + (p.active ? '' : ' · Hidden'), value: p.name };
+      })
+      .filter(function (it) { var k = it.label + '|' + it.sub; if (seen[k]) return false; seen[k] = 1; return true; });
+  }
   function stockState(p) { return p.stock <= 0 ? 'out' : p.stock < p.low_at ? 'low' : 'in'; }
   function renderStockView() {
     var all = S.prods.slice().sort(function (a, b) { return a.stock - b.stock; }), T = totals(all);
@@ -580,6 +598,7 @@
       });
     }
     $('cx-sq').oninput = function (e) { S.sq = e.target.value; draw(); };
+    if (window.STMSuggest) STMSuggest.attach($('cx-sq'), function (q) { return prodSuggest(q, 'all'); }, function (it) { S.sq = it.value; draw(); });
     draw();
     if (S.warn) toast(S.warn);
   }
