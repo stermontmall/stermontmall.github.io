@@ -1,0 +1,31 @@
+# Stermont Arcade - weekly SEO health check. Opens a GitHub Issue with the problems found (GitHub emails you).
+# Runs every Monday 09:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
+name: Weekly SEO check
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run the check
+        run: node seo-check.mjs > seo-report.md
+      - name: Publish the report as an issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --search "Weekly SEO check in:title" --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Superseded by this week's report." || true
+          done
+          gh issue create --title "Weekly SEO check $(date +%F)" --body-file seo-report.md

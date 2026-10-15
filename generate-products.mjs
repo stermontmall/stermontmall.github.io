@@ -141,7 +141,7 @@ for (const p of products) {
   const plain = clip(p.description, 150);
   const sizes = p.variants ? ' Sizes: ' + p.variants.map(v => v.variant_label).join(', ') + '.' : '';
   const desc = clip(`Buy ${p.name} ${p.variants ? 'from' : 'at'} ${money(p.price)} in Kenya.${sizes} ${plain ? plain + ' ' : ''}Pay by M-Pesa, delivery to all 47 counties. ${BRAND}, Westlands Nairobi.`, 158);
-  const title = clip(`${p.name} Price in Kenya | ${BRAND}`, 90);
+  const title = [`${p.name} Price in Kenya | ${BRAND}`, `${p.name} | ${BRAND}`].find(t => t.length <= 70) || clip(`${p.name} | ${BRAND}`, 70);   // keep under ~70 characters so Google does not cut it off
   const related = cat ? (byCat[cat.slug]?.items || []).filter(x => x.id !== p.id).slice(0, 6) : [];
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} (${money(p.price)}) ${SITE}${path}`)}`;
   const ldOne = jsonLd({

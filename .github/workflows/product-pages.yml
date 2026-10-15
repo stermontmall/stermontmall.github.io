@@ -45,3 +45,20 @@ jobs:
             git commit -m "Update product pages and sitemap"
             git push
           fi
+
+      - name: Tell Bing and other search engines about changed pages (IndexNow)
+        run: |
+          if [ "$(git log -1 --format=%s)" != "Update product pages and sitemap" ]; then echo "No new commit - nothing to submit."; exit 0; fi
+          sleep 120   # give GitHub Pages time to publish the new files
+          git diff --name-only --diff-filter=AMD HEAD~1 HEAD | grep -E '^(p|c)/.*\.html$|^products\.html$' | sed 's#^#https://stermontarcade.co.ke/#' | head -9000 > urls.txt || true
+          if [ ! -s urls.txt ]; then echo "No page URLs changed."; exit 0; fi
+          python3 - <<'PY'
+          import json, urllib.request
+          urls = [u.strip() for u in open('urls.txt') if u.strip()]
+          body = {"host": "stermontarcade.co.ke", "key": "8f12b16c2962614f0cce8ada60431436", "keyLocation": "https://stermontarcade.co.ke/8f12b16c2962614f0cce8ada60431436.txt", "urlList": urls}
+          req = urllib.request.Request("https://api.indexnow.org/indexnow", json.dumps(body).encode(), {"Content-Type": "application/json; charset=utf-8"})
+          try:
+              print("IndexNow response:", urllib.request.urlopen(req, timeout=30).status, "for", len(urls), "URLs")
+          except Exception as e:
+              print("IndexNow submit failed (not critical):", e)
+          PY
