@@ -135,7 +135,7 @@
 
   /* ---------------- reviews ---------------- */
   function reviews(root) {
-    var c = shell(root, 'Reviews ⭐', 'New reviews wait here. Approve to show on the storefront, or hide.');
+    var c = shell(root, 'Reviews ⭐', '');
     var list = h('div'), flt = 'pending'; c.appendChild(list);
     var bar = h('div', 'tabs'); c.insertBefore(bar, list); var rows = [];
     function draw() {
@@ -153,6 +153,7 @@
         function set(s, label, cls) { var bt = h('button', 'btn ' + cls + ' sm', label); bt.type = 'button'; bt.onclick = function () { req('/rest/v1/reviews?id=eq.' + r.id, 'PATCH', { status: s }, 'return=minimal').then(load).catch(function (e) { msg(c, e.message); }); }; a.appendChild(bt); }
         if (r.status !== 'approved') set('approved', 'Approve ✅', 'ok');
         if (r.status !== 'hidden') set('hidden', 'Hide', 'no');
+        var del = h('button', 'btn alt sm', 'Delete'); del.type = 'button'; del.onclick = function () { confirmDo('Permanently delete this review? This cannot be undone.', function () { req('/rest/v1/reviews?id=eq.' + r.id, 'DELETE', null, 'return=minimal').then(function () { msg(c, 'Review deleted.', true); return load(); }).catch(function (e) { msg(c, e.message); }); }); }; a.appendChild(del);
         k.appendChild(a); list.appendChild(k);
       });
     }
