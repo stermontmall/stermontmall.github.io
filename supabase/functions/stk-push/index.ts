@@ -4,6 +4,9 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 // Starts an M-Pesa STK Push (Safaricom Daraja). Secrets (set in the Supabase dashboard):
 // MPESA_ENV (sandbox|production), MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET,
 // MPESA_SHORTCODE, MPESA_PASSKEY, MPESA_CALLBACK_SECRET, MPESA_TXN_TYPE (optional)
+// Paybill: leave MPESA_TXN_TYPE and MPESA_PARTYB unset.
+// Till (Buy Goods): MPESA_SHORTCODE = store/head office number used to sign the request,
+//   MPESA_PARTYB = the till number customers pay, MPESA_TXN_TYPE = CustomerBuyGoodsOnline
 
 const ALLOWED = [
   "https://stermontarcade.co.ke",
@@ -98,7 +101,7 @@ Deno.serve(async (req) => {
       TransactionType: env("MPESA_TXN_TYPE") || "CustomerPayBillOnline",
       Amount: amount,
       PartyA: phone,
-      PartyB: shortcode,
+      PartyB: env("MPESA_PARTYB") || shortcode,
       PhoneNumber: phone,
       CallBackURL: callback,
       AccountReference: ref,
