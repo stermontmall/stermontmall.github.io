@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsFor(req) });
   if (req.method !== "POST") return json(req, { error: "Method not allowed" }, 405);
 
-  const env = (k: string) => Deno.env.get(k) || "";
+  const env = (k: string) => (Deno.env.get(k) || "").trim();
   const need = ["MPESA_CONSUMER_KEY", "MPESA_CONSUMER_SECRET", "MPESA_SHORTCODE", "MPESA_PASSKEY", "MPESA_CALLBACK_SECRET"];
   if (need.some((k) => !env(k))) return json(req, { error: "M-Pesa is not configured yet." }, 503);
 
@@ -75,7 +75,11 @@ Deno.serve(async (req) => {
   const tokRes = await fetch(base + "/oauth/v1/generate?grant_type=client_credentials", {
     headers: { Authorization: "Basic " + btoa(env("MPESA_CONSUMER_KEY") + ":" + env("MPESA_CONSUMER_SECRET")) },
   });
-  if (!tokRes.ok) { console.error("Daraja token failed", tokRes.status); return json(req, { error: "M-Pesa is unavailable right now." }, 502); }
+  if (!tokRes.ok) {
+    const t = (await tokRes.text().catch(() => "")).slice(0, 200);
+    console.error("Daraja token failed", tokRes.status, "env=" + (env("MPESA_ENV") || "unset"), "keyLen=" + env("MPESA_CONSUMER_KEY").length, "secretLen=" + env("MPESA_CONSUMER_SECRET").length, t);
+    return json(req, { error: "M-Pesa is unavailable right now." }, 502);
+  }
   const { access_token } = await tokRes.json();
 
   const ts = stamp();
