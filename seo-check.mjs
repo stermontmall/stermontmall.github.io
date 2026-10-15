@@ -6,7 +6,7 @@ const SITE = 'https://stermontarcade.co.ke';
 const issues = {};   // problem -> [pages]
 const add = (what, page) => (issues[what] = issues[what] || []).push(page);
 const files = d => (existsSync(d) ? readdirSync(d).filter(f => f.endsWith('.html')).map(f => `${d}/${f}`) : []);
-const pages = [...files('p'), ...files('c'), 'products.html', 'index.html'].filter(existsSync);
+const pages = [...files('p'), ...files('c'), ...files('blog'), 'products.html', 'index.html'].filter(existsSync);
 const exists = path => { path = decodeURIComponent(path.split('#')[0].split('?')[0]); if (!path || path === '/') path = '/index.html'; if (path.endsWith('/')) path += 'index.html'; return existsSync('.' + path); };
 let redirects = 0, checked = 0;
 
@@ -15,20 +15,20 @@ for (const f of pages) {
   if (/http-equiv="refresh"/i.test(h)) { redirects++; continue; }   // size-variant redirect pages
   checked++;
   const title = (h.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || '';
-  const desc = (h.match(/<meta name="description" content="([^"]*)"/i) || [])[1] || '';
+  const dm = h.match(/<meta name=["']description["'] content=(?:"([^"]*)"|'([^']*)')/i), desc = dm ? (dm[1] || dm[2] || '') : '';   // blog posts use single quotes, product pages double
   if (!title.trim()) add('Missing page title', f); else if (title.length > 75) add('Title longer than 75 characters (Google cuts it off)', f);
   if (!desc.trim()) add('Missing meta description', f); else if (desc.length < 70) add('Meta description under 70 characters', f); else if (desc.length > 165) add('Meta description over 165 characters', f);
-  if (!/<link rel="canonical"/i.test(h)) add('Missing canonical link', f);
+  if (!/<link rel=["']canonical["']/i.test(h)) add('Missing canonical link', f);
   const h1 = (h.match(/<h1[\s>]/gi) || []).length;
   if (h1 !== 1) add(h1 ? 'More than one H1 heading' : 'Missing H1 heading', f);
   (h.match(/<img\b[^>]*>/gi) || []).forEach(t => { if (!/\balt=/i.test(t)) add('Image without alt text', f); });
-  for (const m of h.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi)) { try { JSON.parse(m[1]); } catch { add('Broken structured data (JSON-LD)', f); } }
+  for (const m of h.matchAll(/<script type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)) { try { JSON.parse(m[1]); } catch { add('Broken structured data (JSON-LD)', f); } }
   if (f.startsWith('p/')) {
     if (!/<img\b/i.test(h)) add('Product page has no photo (also left out of the Google Shopping feed)', f);
     if (!/Product details/.test(h)) add('Product has no description (short pages rank poorly)', f);
     if (!/"@type":"(Product|ProductGroup)"/.test(h)) add('Missing Product structured data', f);
   }
-  for (const m of h.matchAll(/href="([^"#]+)[^"]*"/gi)) {
+  for (const m of h.matchAll(/href=["']([^"'#]+)[^"']*["']/gi)) {
     let u = m[1]; if (u.startsWith(SITE)) u = u.slice(SITE.length) || '/';
     if (u.startsWith('/') && !u.startsWith('//') && !exists(u)) add(`Broken internal link ${u}`, f);
   }
