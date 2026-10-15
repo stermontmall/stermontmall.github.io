@@ -1,5 +1,5 @@
 -- Stermont Arcade · admin extras: vouchers, expenses, customer messages, reviews.
--- NOT APPLIED YET: run this once in Supabase (SQL Editor) or ask Claude to apply it. Safe to re-run.
+-- Applied to Supabase on 2026-10-15. Safe to re-run.
 
 -- ---------- vouchers ----------
 create table if not exists public.vouchers (
