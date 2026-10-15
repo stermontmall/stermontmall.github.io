@@ -1368,7 +1368,7 @@
       var CFG = { paybill: '714777', payAcct: '0748888230', wa: '254748888230',
         sbUrl: 'https://oewvtbnmyombbtggamor.supabase.co', sbKey: 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', sbRef: 'oewvtbnmyombbtggamor',
         /* M-Pesa STK Push (Daraja). Keep false while on sandbox; set true when production keys are live. Test any time with ?stk=1 in the page URL. */
-        stk: false,
+        stk: true,
         /* Free key from https://web3forms.com (enter the email that should receive order alerts) */
         mailKey: '2c55cbd0-5ec1-4603-a6a0-293b8a68faab',
         /* Optional second inbox: paste a key made with the other email here */
@@ -1589,7 +1589,7 @@
         box(b, 'Contact', [[form.name.trim()], ['+' + normPhone(form.phone)], [(form.email || '').trim()]], 'details');
         var amt = due(T); if (!form.payTouched) form.payAmt = String(amt);
         var mb = b;
-        if (stkOn()) { rStk(b, T); mb = h('details', 'man'); mb.appendChild(h('summary', null, 'Paid manually instead? Enter your M-Pesa code')); b.appendChild(mb); }
+        if (stkOn()) { rStk(b, T); mb = h('details', 'man'); if (stkMsg && !stkBusy) mb.open = true; mb.appendChild(h('summary', null, 'Paid manually instead? Enter your M-Pesa code')); b.appendChild(mb); }
         mb.appendChild(h('p', 'note', 'Step 1: pay with M-Pesa using the details below. Step 2: enter the code from your M-Pesa SMS. Your order is only placed after you enter it.'));
         payBox(mb, amt);
         var pc = h('div', 'fld'), pl = h('label', null, 'M-Pesa transaction code'); pl.htmlFor = 'paycode'; pc.appendChild(pl);
