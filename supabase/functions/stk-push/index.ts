@@ -81,6 +81,7 @@ Deno.serve(async (req) => {
     return json(req, { error: "M-Pesa is unavailable right now." }, 502);
   }
   const { access_token } = await tokRes.json();
+  const keyHint = env("MPESA_CONSUMER_KEY").slice(0, 4) + "..." + " shortcode=" + env("MPESA_SHORTCODE") + " env=" + (env("MPESA_ENV") || "unset") + " base=" + base;
 
   const ts = stamp();
   const shortcode = env("MPESA_SHORTCODE");
@@ -106,7 +107,7 @@ Deno.serve(async (req) => {
   });
   const out = await res.json().catch(() => ({}));
   if (!res.ok || out.ResponseCode !== "0" || !out.CheckoutRequestID) {
-    console.error("STK push rejected", res.status, JSON.stringify(out));
+    console.error("STK push rejected", res.status, keyHint, JSON.stringify(out));
     return json(req, { error: "Could not send the M-Pesa prompt. Check the number and try again." }, 502);
   }
 
