@@ -5,16 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#7c3aed">
-<title>Stermont Arcade | Orders (Customer care)</title>
+<title>Stermont Arcade | Admin console</title>
 <style>
   :root { --p:#7c3aed; --pd:#5b21b6; --bg:#f6f4fb; --card:#fff; --tx:#1c1830; --mu:#6b6785; --ln:#e6e2f2; --ok:#15803d; --okb:#dcfce7; --no:#b91c1c; --nob:#fee2e2; --wa:#f59e0b; --wab:#fef3c7; }
   * { box-sizing: border-box; }
   body { margin:0; font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--tx); }
-  header { background:var(--p); color:#fff; padding:.8rem 1rem; display:flex; align-items:center; justify-content:space-between; gap:.5rem; position:sticky; top:0; z-index:5; }
-  header h1 { font-size:1.05rem; margin:0; }
+  header { background:linear-gradient(135deg,#2a0e5c,#5b21b6); color:#fff; padding:0 1rem; height:56px; display:flex; align-items:center; justify-content:space-between; gap:.5rem; position:sticky; top:0; z-index:6; box-shadow:0 2px 10px rgba(42,14,92,.25); }
+  header h1 { font-size:1.02rem; margin:0; line-height:1.1; letter-spacing:.01em; }
   header button { background:rgba(255,255,255,.18); color:#fff; border:0; border-radius:8px; padding:.45rem .8rem; font:inherit; font-size:.9rem; }
-  main { max-width:760px; margin:0 auto; padding:1rem; }
-  .card { background:var(--card); border:1px solid var(--ln); border-radius:14px; padding:1rem; margin-bottom:.9rem; }
+  main { max-width:1180px; margin:0 auto; padding:1rem; }
+  #login { max-width:420px; margin:8vh auto 0; }
+  .card { background:var(--card); border:1px solid var(--ln); border-radius:14px; padding:1rem; margin-bottom:.9rem; box-shadow:0 1px 2px rgba(28,24,48,.04); }
   label { display:block; font-weight:600; margin:.7rem 0 .25rem; }
   input[type=email], input[type=password], input[type=search] { width:100%; padding:.7rem .8rem; border:1px solid var(--ln); border-radius:10px; font:inherit; background:#fff; }
   .btn { display:inline-block; border:0; border-radius:10px; padding:.7rem 1rem; font:inherit; font-weight:600; background:var(--p); color:#fff; cursor:pointer; text-decoration:none; text-align:center; }
@@ -48,6 +49,71 @@
   .tl .st { margin:.35rem 0; color:var(--mu); font-size:.92rem; } .tl .st b { display:block; font-weight:600; }
   .tl .st small { display:block; font-size:.8rem; }
   .tl .st.on { color:var(--ok); } .tl .st.on b { font-weight:700; }
+
+  /* ---------- admin layout ---------- */
+  .brand { display:flex; align-items:center; gap:.6rem; min-width:0; }
+  .brand small { display:block; font-size:.72rem; opacity:.75; letter-spacing:.06em; text-transform:uppercase; }
+  .logo { width:34px; height:34px; border-radius:10px; background:#fff; color:var(--pd); font-weight:800; display:grid; place-items:center; font-size:1.1rem; flex:none; }
+  .hact { display:flex; align-items:center; gap:.4rem; }
+  .who { font-size:.8rem; opacity:.8; max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:none; }
+  .shell { display:block; }
+  nav#nav { position:sticky; top:56px; z-index:5; margin:-1rem -1rem .8rem; padding:.5rem 1rem; background:var(--bg); border-bottom:1px solid var(--ln); }
+  #navg { display:flex; gap:.3rem; overflow-x:auto; align-items:center; scrollbar-width:none; }
+  #navg::-webkit-scrollbar { display:none; }
+  .ng { display:flex; align-items:center; gap:.3rem; flex:none; padding-right:.6rem; margin-right:.3rem; border-right:1px solid var(--ln); }
+  .ng:last-child { border-right:0; }
+  .ngl { font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--mu); margin-right:.2rem; }
+  .ni { border:1px solid var(--ln); background:#fff; border-radius:999px; padding:.4rem .8rem; font:inherit; font-size:.88rem; white-space:nowrap; cursor:pointer; color:var(--tx); display:inline-flex; align-items:center; gap:.4rem; }
+  .ni.on { background:var(--p); border-color:var(--p); color:#fff; }
+  .ni .ic { display:none; }
+  .cnt { font-size:.72rem; font-weight:800; min-width:1.35rem; padding:.05rem .4rem; border-radius:999px; background:#eceaf5; color:var(--pd); text-align:center; }
+  .ni.on .cnt { background:rgba(255,255,255,.25); color:#fff; }
+  .cnt.hot { background:var(--wa); color:#fff; }
+  nav#nav { display:flex; align-items:center; gap:.3rem; }
+  #navg { flex:1; min-width:0; }
+  .nfoot { display:flex; flex:none; }
+  .nfoot .btn { border-radius:999px; padding:.4rem .7rem; }
+  .nfoot .meta, .sgl { display:none; }
+  header button { white-space:nowrap; }
+  .hl { display:none; }
+  @media (min-width:520px) { .hl { display:inline; } }
+  .ptop { display:flex; justify-content:space-between; align-items:flex-start; gap:.6rem; margin:.2rem 0 .8rem; }
+  .ptop h2 { margin:0; font-size:1.3rem; letter-spacing:-.01em; }
+  .ptop .meta { margin:.15rem 0 0; }
+  #kpis { display:grid; grid-template-columns:repeat(2,1fr); gap:.5rem; margin-bottom:.9rem; }
+  #kpis:empty { display:none; }
+  .kp { background:#fff; border:1px solid var(--ln); border-radius:12px; padding:.65rem .8rem; }
+  .kp small { display:block; color:var(--mu); font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+  .kp b { font-size:1.15rem; }
+  .kp.hi { background:var(--p); border-color:var(--p); color:#fff; } .kp.hi small { color:#e9ddff; }
+  #q { width:100%; padding:.7rem .9rem; border:1px solid var(--ln); border-radius:12px; font:inherit; background:#fff; margin-bottom:.9rem; }
+  #q:focus, .card input:focus, .card textarea:focus, .card select:focus { outline:2px solid #c4b5fd; outline-offset:1px; }
+  #list > .card { transition:box-shadow .15s; } #list > .card:hover { box-shadow:0 4px 14px rgba(28,24,48,.08); }
+  #list h2 { letter-spacing:-.01em; }
+  .modal .card { box-shadow:0 20px 50px rgba(0,0,0,.35); }
+  @media (min-width:700px) { #kpis { grid-template-columns:repeat(4,1fr); } .who { display:block; } }
+  @media (min-width:900px) {
+    main { padding:1.4rem 1.2rem 3rem; }
+    .shell { display:grid; grid-template-columns:230px minmax(0,1fr); gap:1.4rem; align-items:start; }
+    nav#nav { top:76px; margin:0; padding:.7rem; background:#fff; border:1px solid var(--ln); border-radius:16px; box-shadow:0 1px 2px rgba(28,24,48,.04); }
+    #navg { display:block; overflow:visible; }
+    .ng { display:block; border:0; padding:0; margin:0 0 .5rem; }
+    .ngl { display:block; padding:.5rem .6rem .25rem; margin:0; }
+    .ni { display:flex; width:100%; justify-content:space-between; border:0; border-radius:10px; padding:.55rem .7rem; background:transparent; font-size:.93rem; }
+    .ni:hover { background:#f3eefc; }
+    .ni.on { background:#ede9fe; color:var(--pd); font-weight:700; box-shadow:inset 3px 0 0 var(--p); }
+    .ni.on .cnt { background:var(--p); color:#fff; }
+    .ni .ic { display:inline; margin-right:.5rem; }
+    .ni .lb { flex:1; text-align:left; }
+    nav#nav { display:block; }
+    .nfoot { display:block; border-top:1px solid var(--ln); margin-top:.4rem; padding:.7rem .4rem .2rem; }
+    .nfoot .btn { width:100%; border-radius:10px; padding:.45rem .7rem; }
+    .nfoot .meta { display:block; margin-top:.3rem; } .sgl { display:inline; }
+    .content { min-width:0; }
+    .ni .ic { width:1.3rem; }
+    #list > .card.ord-g { }
+  }
+  @media (min-width:700px) { .xform { display:grid; grid-template-columns:1fr 1fr; gap:0 1rem; align-content:start; } .xform .full { grid-column:1/-1; } }
   [hidden] { display:none !important; }
 </style>
 <link rel="manifest" href="/admin-manifest.json">
@@ -55,8 +121,8 @@
 </head>
 <body>
 <header>
-  <h1>Stermont Arcade · Orders</h1>
-  <span><button id="refresh" hidden>Refresh</button> <button id="out" hidden>Sign out</button></span>
+  <div class="brand"><span class="logo">S</span><div><h1>Stermont Arcade</h1><small>Admin console</small></div></div>
+  <span class="hact"><span id="who" class="who"></span><button id="refresh" hidden>↻<span class="hl"> Refresh</span></button><button id="out" hidden>Sign out</button></span>
 </header>
 <main>
   <section id="login" class="card" hidden>
@@ -71,11 +137,19 @@
   </section>
 
   <section id="app" hidden>
-    <p style="margin:0 0 .8rem"><button class="btn alt sm" id="sg-open" type="button">✍️ My signature</button> <span class="meta" id="sg-st"></span></p>
-    <div class="tabs" id="tabs"></div>
-    <input id="q" type="search" placeholder="Search reference, name or phone" style="margin-bottom:.8rem">
-    <div id="aerr" class="err" hidden></div>
-    <div id="list"></div>
+    <div class="shell">
+      <nav id="nav" aria-label="Admin sections">
+        <div id="navg"></div>
+        <div class="nfoot"><button class="btn alt sm" id="sg-open" type="button">✍️<span class="sgl"> My signature</span></button><span class="meta" id="sg-st"></span></div>
+      </nav>
+      <div class="content">
+        <div class="ptop"><div><h2 id="ptitle"></h2><p class="meta" id="psub"></p></div></div>
+        <div id="kpis"></div>
+        <input id="q" type="search" placeholder="Search reference, name or phone">
+        <div id="aerr" class="err" hidden></div>
+        <div id="list"></div>
+      </div>
+    </div>
   </section>
 </main>
 
@@ -140,7 +214,7 @@
   }
   function ready() { return sess && Date.now() > sess.exp ? refresh() : Promise.resolve(); }
 
-  function show(which) { $('login').hidden = which !== 'login'; $('app').hidden = which !== 'app'; $('out').hidden = $('refresh').hidden = which !== 'app'; }
+  function show(which) { $('login').hidden = which !== 'login'; $('app').hidden = which !== 'app'; $('out').hidden = $('refresh').hidden = which !== 'app'; $('who').textContent = (which === 'app' && sess && sess.email) || ''; }
 
   $('lf').addEventListener('submit', function (e) {
     e.preventDefault(); var b = $('lb'), er = $('lerr'); er.hidden = true; b.disabled = true; b.textContent = 'Signing in...';
@@ -176,16 +250,39 @@
   }
 
   function count(s) { return orders.filter(function (o) { return (o.status || 'pending') === s; }).length; }
+  var ORDER_TABS = ['pending', 'paid', 'declined', 'all'];
   var EXTRA = ['stock', 'catalog', 'vouchers', 'expenses', 'inbox', 'reviews'];
+  var NAV = [
+    ['Orders', [['pending', '🕒', 'Pending', 'Orders waiting for payment confirmation'], ['paid', '✅', 'Confirmed', 'Paid orders: packing, delivery and receipts'], ['declined', '🚫', 'Declined', 'Orders that were not paid'], ['all', '📋', 'All orders', 'Every order, newest first']]],
+    ['Store', [['catalog', '🛍️', 'Catalog & ledger', 'Products, prices, restocks, COGS, profit and the financial ledger'], ['stock', '📦', 'Stock', 'Switch products in or out of stock']]],
+    ['Finance', [['expenses', '💸', 'Expenses', 'Running costs, kept separate from product cost']]],
+    ['Customers', [['inbox', '💬', 'Messages', 'Questions from shoppers and your replies'], ['reviews', '⭐', 'Reviews', 'Approve or hide product reviews'], ['vouchers', '🎟️', 'Vouchers', 'Discount codes and public offers']]]
+  ];
   function renderTabs() {
-    var t = $('tabs'); t.textContent = '';
-    [['pending', 'Pending'], ['paid', 'Confirmed ✅'], ['declined', 'Declined'], ['all', 'All'], ['stock', 'Stock 📦'], ['catalog', 'Catalog 🛍️'], ['vouchers', 'Vouchers 🎟️'], ['expenses', 'Expenses 💸'], ['inbox', 'Messages 💬'], ['reviews', 'Reviews ⭐']].forEach(function (x) {
-      var b = h('button', tab === x[0] ? 'on' : '', x[1] + (EXTRA.indexOf(x[0]) > -1 ? '' : ' (' + (x[0] === 'all' ? orders.length : count(x[0])) + ')')); b.type = 'button';
-      b.onclick = function () { tab = x[0]; rememberTab(tab); render(); }; t.appendChild(b);
+    var t = $('navg'); t.textContent = '';
+    NAV.forEach(function (g) {
+      var box = h('div', 'ng'); box.appendChild(h('span', 'ngl', g[0]));
+      g[1].forEach(function (x) {
+        var b = h('button', 'ni' + (tab === x[0] ? ' on' : '')); b.type = 'button';
+        b.appendChild(h('span', 'ic', x[1])); b.appendChild(h('span', 'lb', x[2]));
+        if (ORDER_TABS.indexOf(x[0]) > -1) { var n = x[0] === 'all' ? orders.length : count(x[0]); b.appendChild(h('span', 'cnt' + (x[0] === 'pending' && n ? ' hot' : ''), String(n))); }
+        b.onclick = function () { tab = x[0]; rememberTab(tab); render(); window.scrollTo(0, 0); }; box.appendChild(b);
+        if (tab === x[0]) { $('ptitle').textContent = x[1] + ' ' + x[2]; $('psub').textContent = x[3]; }
+      });
+      t.appendChild(box);
+    });
+    var on = t.querySelector('.ni.on'); if (on && on.scrollIntoView) { try { on.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (e) {} }
+  }
+  function drawKpis() {
+    var k = $('kpis'); k.textContent = '';
+    if (ORDER_TABS.indexOf(tab) < 0) return;
+    var paid = orders.filter(function (o) { return o.status === 'paid'; }), val = paid.reduce(function (a, o) { return a + (+o.subtotal || 0); }, 0);
+    [['Pending', count('pending'), 'hi'], ['Confirmed', paid.length, ''], ['Declined', count('declined'), ''], ['Confirmed value', money(val), '']].forEach(function (x) {
+      var d = h('div', 'kp ' + x[2]); d.appendChild(h('small', null, x[0])); d.appendChild(h('b', null, String(x[1]))); k.appendChild(d);
     });
   }
   function render() {
-    renderTabs();
+    renderTabs(); drawKpis();
     var L = $('list'); L.textContent = '';
     $('q').hidden = EXTRA.indexOf(tab) > -1;
     if (['vouchers', 'expenses', 'inbox', 'reviews'].indexOf(tab) > -1) { if (!window.STMExtras) { L.innerHTML = '<div class="err">The extras script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMExtras.mount(L, tab); return; }

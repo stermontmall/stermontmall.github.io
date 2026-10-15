@@ -18,20 +18,20 @@
   }
   function msg(root, text, ok) { var e = root.querySelector('.xm') || root.insertBefore(h('div', 'err xm'), root.firstChild); e.textContent = text; e.style.color = ok ? '#15803d' : ''; e.style.background = ok ? '#dcfce7' : ''; e.hidden = !text; }
   function ymd(d) { return d.toISOString().slice(0, 10); }
-  function shell(root, title, hint) { root.textContent = ''; var c = h('div'); c.appendChild(h('h2', null, title)); c.lastChild.style.cssText = 'font-size:1.1rem;margin:.2rem 0 .3rem'; if (hint) c.appendChild(h('p', 'meta', hint)); root.appendChild(c); return c; }
+  function shell(root) { root.textContent = ''; var c = h('div'); root.appendChild(c); return c; } /* page title + hint come from admin.html */
   function confirmDo(text, fn) { if (window.confirm(text)) fn(); }
 
   /* ---------------- vouchers ---------------- */
   function vouchers(root) {
     var c = shell(root, 'Vouchers 🎟️', 'Discount codes shoppers type at checkout. Mark one "public offer" to show it on the storefront.');
-    var f = h('form', 'card'); c.appendChild(f);
+    var f = h('form', 'card xform'); c.appendChild(f);
     var code = inp('text', { maxlength: 24, placeholder: 'e.g. WELCOME10', required: '' }), kind = inp('select'), val = inp('number', { min: 1, step: 'any', required: '' }),
       min = inp('number', { min: 0, value: 0 }), max = inp('number', { min: 1, placeholder: 'Unlimited' }), exp = inp('date'), note = inp('text', { maxlength: 200, placeholder: 'Internal note (optional)' }),
       pub = inp('checkbox'); pub.style.width = 'auto';
     [['percent', '% off'], ['fixed', 'KSh off']].forEach(function (x) { var o = h('option', null, x[1]); o.value = x[0]; kind.appendChild(o); });
     [['Code', code], ['Type', kind], ['Value', val], ['Minimum order (KSh)', min], ['Max uses', max], ['Expires on', exp], ['Note', note]].forEach(function (x) { f.appendChild(field(x[0], x[1])); });
-    var pl = h('label'); pl.style.cssText = 'display:flex;gap:.5rem;align-items:center'; pl.appendChild(pub); pl.appendChild(D.createTextNode('Show as a public offer')); f.appendChild(pl);
-    var go = h('button', 'btn', 'Create voucher'); go.type = 'submit'; go.style.cssText = 'width:100%;margin-top:.8rem'; f.appendChild(go);
+    var pl = h('label', 'full'); pl.style.cssText = 'display:flex;gap:.5rem;align-items:center'; pl.appendChild(pub); pl.appendChild(D.createTextNode('Show as a public offer')); f.appendChild(pl);
+    var go = h('button', 'btn full', 'Create voucher'); go.type = 'submit'; go.style.cssText = 'width:100%;margin-top:.8rem'; f.appendChild(go);
     var list = h('div'); c.appendChild(list);
     function draw(rows) {
       list.textContent = '';
@@ -67,12 +67,12 @@
   /* ---------------- expenses ---------------- */
   function expenses(root) {
     var c = shell(root, 'Expenses 💸', 'Record running costs (transport, rent, airtime, packaging). They are kept separate from product cost (COGS).');
-    var f = h('form', 'card'); c.appendChild(f);
+    var f = h('form', 'card xform'); c.appendChild(f);
     var on = inp('date', { required: '' }); on.value = ymd(new Date());
     var cat = inp('text', { maxlength: 40, placeholder: 'e.g. Transport', required: '', list: 'xcats' }), amt = inp('number', { min: 1, step: 'any', required: '' }), note = inp('text', { maxlength: 200, placeholder: 'Optional' });
     var dl = h('datalist'); dl.id = 'xcats'; ['Transport', 'Rent', 'Airtime & data', 'Packaging', 'Salaries', 'Marketing', 'Licences & fees', 'Other'].forEach(function (x) { var o = h('option'); o.value = x; dl.appendChild(o); }); f.appendChild(dl);
     [['Date', on], ['Category', cat], ['Amount (KSh)', amt], ['Note', note]].forEach(function (x) { f.appendChild(field(x[0], x[1])); });
-    var go = h('button', 'btn', 'Add expense'); go.type = 'submit'; go.style.cssText = 'width:100%;margin-top:.8rem'; f.appendChild(go);
+    var go = h('button', 'btn full', 'Add expense'); go.type = 'submit'; go.style.cssText = 'width:100%;margin-top:.8rem'; f.appendChild(go);
     var sum = h('div', 'card'); c.appendChild(sum); var list = h('div'); c.appendChild(list);
     function draw(rows) {
       var now = new Date(), mk = now.toISOString().slice(0, 7), tm = 0, all = 0, by = {};
