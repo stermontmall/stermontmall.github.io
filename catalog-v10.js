@@ -446,6 +446,7 @@
     function drawList() {
     var q2 = S.q.trim().toLowerCase();
     var shown = all.filter(function (p) { return (S.cat === 'all' || String(p.category_id) === S.cat) && (!q2 || matches(p, q2)); });
+    if (q2 && window.STMSuggest) shown = byRelevance(shown, q2);   /* best match first */
     var L = $('cx-list'); L.textContent = ''; $('cx-cnt').textContent = (q2 || S.cat !== 'all') ? shown.length + ' of ' + all.length + ' items shown' : all.length + ' items';
     if (!shown.length) L.appendChild(el('div', 'empty', all.length ? 'No item matches' + (q2 ? ' “' + S.q.trim() + '”' : '') + '. Try fewer letters or choose All.' : 'No items yet. Tap “Add new item” to publish your first product.'));
     shown.forEach(function (p) {
@@ -548,6 +549,10 @@
     return String(q).toLowerCase().split(/\s+/).filter(Boolean).every(function (w) { return h.indexOf(w) > -1; });
   }
   /* type-ahead suggestions for the Catalog and Stock search boxes (best name match first) */
+  /* search results: exact / starts-with matches first, then the rest in their usual order */
+  function byRelevance(list, q) {
+    return list.map(function (p, i) { return { p: p, r: window.STMSuggest.rank(p.name, q), i: i }; }).sort(function (a, b) { return a.r - b.r || a.i - b.i; }).map(function (x) { return x.p; });
+  }
   function prodSuggest(q, onlyCat) {
     var W = window.STMSuggest.words(q);
     var pool = S.prods.filter(function (p) { return !onlyCat || onlyCat === 'all' || String(p.category_id) === onlyCat; });
@@ -575,6 +580,7 @@
     var FIL = [['all', 'All'], ['in', 'In stock'], ['low', 'Low'], ['out', 'Sold out']];
     function draw() {
       var q = S.sq.trim(), base = all.filter(function (p) { return !q || matches(p, q); });
+      if (q && window.STMSuggest) base = byRelevance(base, q);   /* best match first */
       var shown = base.filter(function (p) { return S.sf === 'all' || stockState(p) === S.sf; });
       var C = $('cx-sf'); C.textContent = '';
       FIL.forEach(function (f) {

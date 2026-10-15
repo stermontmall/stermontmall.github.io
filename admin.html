@@ -295,6 +295,8 @@
       if (tab !== 'all' && (o.status || 'pending') !== tab) return false;
       return !needle || ordMatch(o, needle);
     });
+    if (needle && window.STMSuggest) rows = rows.map(function (o, i) { return { o: o, r: STMSuggest.rank((o.customer_name || '') + ' ' + (o.ref || '') + ' ' + (o.phone || ''), needle), i: i }; })
+      .sort(function (x, y) { return x.r - y.r || x.i - y.i; }).map(function (x) { return x.o; });   /* best match first */
     if (!rows.length) { L.appendChild(h('div', 'empty', 'No orders here.')); return; }
     rows.forEach(function (o) { L.appendChild(card(o)); });
   }
