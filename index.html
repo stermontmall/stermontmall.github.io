@@ -1508,8 +1508,10 @@
       }
       function feeOf() { return form.method === 'delivery' ? (CFG.fees[form.county] || 0) : 0; }
       function due(T) { return T.s + feeOf(); }
-      var stkBusy = false, stkMsg = '', stkPhone = '';
-      function stkOn() { return CFG.stk === true || /[?&]stk=1\b/.test(location.search); }
+      var stkBusy = false, stkMsg = '', stkPhone = '', stkLive = false;
+      /* The backend reports whether M-Pesa is in production mode; sandbox keys keep the old Paybill flow for buyers. */
+      try { fetch(CFG.sbUrl + '/functions/v1/mpesa-mode', { headers: { apikey: CFG.sbKey } }).then(function (r) { return r.json(); }).then(function (j) { stkLive = !!(j && j.enabled); if (stkLive && isOpen) render(); }).catch(function () {}); } catch (e) {}
+      function stkOn() { return CFG.stk === true || stkLive || /[?&]stk=1\b/.test(location.search); }
       function stkFn(name, body) {
         return fetch(CFG.sbUrl + '/functions/v1/' + name, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.sbKey }, body: JSON.stringify(body) })
           .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || ('Error ' + r.status)); return j; }); });
@@ -1586,16 +1588,17 @@
         box(b, form.method === 'pickup' ? 'Collection' : 'Delivery', [[where()]], 'details');
         box(b, 'Contact', [[form.name.trim()], ['+' + normPhone(form.phone)], [(form.email || '').trim()]], 'details');
         var amt = due(T); if (!form.payTouched) form.payAmt = String(amt);
-        if (stkOn()) rStk(b, T);
-        b.appendChild(h('p', 'note', 'Step 1: pay with M-Pesa using the details below. Step 2: enter the code from your M-Pesa SMS. Your order is only placed after you enter it.'));
-        payBox(b, amt);
+        var mb = b;
+        if (stkOn()) { rStk(b, T); mb = h('details', 'man'); mb.appendChild(h('summary', null, 'Paid manually instead? Enter your M-Pesa code')); b.appendChild(mb); }
+        mb.appendChild(h('p', 'note', 'Step 1: pay with M-Pesa using the details below. Step 2: enter the code from your M-Pesa SMS. Your order is only placed after you enter it.'));
+        payBox(mb, amt);
         var pc = h('div', 'fld'), pl = h('label', null, 'M-Pesa transaction code'); pl.htmlFor = 'paycode'; pc.appendChild(pl);
         var pi = h('input'); pi.id = 'paycode'; pi.type = 'text'; pi.maxLength = 14; pi.autocomplete = 'off'; pi.spellcheck = false; pi.placeholder = 'e.g. SGH7A1B2C3'; pi.value = form.payCode || '';
         pi.setAttribute('autocapitalize', 'characters'); pi.style.cssText = 'text-transform:uppercase;letter-spacing:.08em;font-weight:700'; pc.appendChild(pi);
-        var pe = h('div', 'err', ''); pc.appendChild(pe); b.appendChild(pc);
+        var pe = h('div', 'err', ''); pc.appendChild(pe); mb.appendChild(pc);
         var ac = h('div', 'fld'), al = h('label', null, 'Amount you paid (KSh)'); al.htmlFor = 'payamt'; ac.appendChild(al);
         var ai = h('input'); ai.id = 'payamt'; ai.type = 'number'; ai.inputMode = 'numeric'; ai.min = '1'; ai.value = form.payAmt || ''; ac.appendChild(ai);
-        var ae = h('div', 'err', ''); ac.appendChild(ae); b.appendChild(ac);
+        var ae = h('div', 'err', ''); ac.appendChild(ae); mb.appendChild(ac);
         if (feeOf()) { row(f, 'Items total', money(T.s)); row(f, 'Delivery to ' + form.county, money(feeOf())); row(f, 'Total to pay', money(due(T)), 'big'); } else row(f, 'Items total', money(T.s), 'big'); f.appendChild(h('p', 'note', form.method === 'delivery' && !CFG.fees[form.county] ? 'The delivery fee to your county is confirmed on WhatsApp and paid separately.' : 'Delivery is included in the total above. Pay it in one M-Pesa payment.'));
         if (sendErr) f.appendChild(h('div', 'oerr', sendErr));
         var pb = btn(f, sending ? 'Placing your order...' : 'I have paid, place order', function () { place(T); });
