@@ -460,10 +460,23 @@
         '<div><span>Left / Sold</span><b>' + p.stock + ' / ' + s.sold + '</b></div><div><span>Margin</span><b>' + margin + '%</b></div>' +
         '<div><span>Sales</span><b>' + money(s.sales) + '</b></div><div><span>COGS (sold)</span><b>' + money(s.cogs) + '</b></div>' +
         '<div><span>Profit</span><b>' + money(s.profit) + '</b></div><div><span>Loss / returns</span><b' + (s.loss ? ' style="color:var(--no)"' : '') + '>' + money(s.loss) + '</b></div></div>' +
-        '<div class="acts"><button class="btn ok sm" data-a="r" type="button">＋ Restock</button><button class="btn alt sm" data-a="l" type="button">Log loss</button><button class="btn alt sm" data-a="y" type="button">History</button><button class="btn alt sm" data-a="f" type="button">' + (p.featured ? 'Remove advert' : '★ Advert') + '</button><button class="btn alt sm" data-a="e" type="button">Edit</button><button class="btn alt sm" data-a="v" type="button">＋ Pack size</button><button class="btn alt sm" data-a="h" type="button">' + (p.active ? 'Hide' : 'Show') + '</button></div>';
+        '<div class="acts"><button class="btn ok sm" data-a="r" type="button">＋ Restock</button><button class="btn alt sm" data-a="l" type="button">Log loss</button><button class="btn alt sm" data-a="y" type="button">History</button><button class="btn alt sm" data-a="f" type="button">' + (p.featured ? 'Remove advert' : '★ Advert') + '</button><button class="btn alt sm" data-a="e" type="button">Edit</button><button class="btn alt sm" data-a="v" type="button">＋ Pack size</button><button class="btn alt sm" data-a="h" type="button">' + (p.active ? 'Hide' : 'Show') + '</button><button class="btn alt sm" data-a="d" type="button" style="color:var(--no)">Delete</button></div>';
       c.onclick = function (e) { var a = e.target.getAttribute && e.target.getAttribute('data-a'); if (!a) return;
         if (a === 'r') restockForm(p); else if (a === 'l') lossForm(p); else if (a === 'e') itemForm(p); else if (a === 'v') itemForm(null, p); else if (a === 'y') history(p);
         else if (a === 'f') { e.target.disabled = true; call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { featured: !p.featured } }).then(load).then(render).catch(function (x) { toast(x.message); }); }
+        else if (a === 'd') {
+          if (!confirm('Permanently delete “' + p.name + '”?\n\nIt will disappear from the shop and cannot be brought back. To just stop selling it for now, use Hide instead.')) return;
+          var btn = e.target; btn.disabled = true; btn.textContent = 'Deleting…';
+          call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'DELETE', h: { Prefer: 'return=representation' } })
+            .then(function (rows) { if (!rows || !rows.length) throw new Error('NOROW'); return load(); }).then(render)
+            .catch(function (x) {
+              btn.disabled = false; btn.textContent = 'Delete';
+              var m = String(x && x.message || x);
+              if (/foreign key|violates|23503/i.test(m)) toast('“' + p.name + '” has sales, restock or loss history, so it can’t be deleted without breaking your financial records. Tap Hide instead to remove it from the shop.');
+              else if (m === 'NOROW') toast('Nothing was deleted. Your account may not have permission to delete items.');
+              else toast('Could not delete: ' + m);
+            });
+        }
         else { e.target.disabled = true; call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { active: !p.active } }).then(load).then(render).catch(function (x) { toast(x.message); }); } };
       L.appendChild(c);
     });
