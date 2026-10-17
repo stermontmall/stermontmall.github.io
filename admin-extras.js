@@ -118,7 +118,7 @@
         var b = h('p', null, m.body); b.style.whiteSpace = 'pre-wrap'; k.appendChild(b);
         if (m.reply) { var r = h('div', 'meta'); r.appendChild(h('b', null, 'Your reply: ')); r.appendChild(D.createTextNode(m.reply)); k.appendChild(r); }
         if (m.status !== 'closed') {
-          var ta = inp('textarea', { rows: 3, maxlength: 1000, placeholder: 'Type a reply' }); ta.value = m.reply || ''; k.appendChild(ta);
+          var ta = inp('textarea', { rows: 3, maxlength: 1000, placeholder: 'Type a reply' }); ta.value = m.reply || ''; ta.defaultValue = ta.value; k.appendChild(ta);
           var a = h('div', 'acts'), send = h('button', 'btn sm', m.reply ? 'Update reply' : 'Send reply'), cl = h('button', 'btn alt sm', 'Close'); send.type = cl.type = 'button';
           send.onclick = function () { var t = ta.value.trim(); if (t.length < 2) { msg(c, 'Write a reply first.'); return; }
             req('/rest/v1/messages?id=eq.' + m.id, 'PATCH', { reply: t, status: 'replied', replied_by: A().email(), replied_at: new Date().toISOString() }, 'return=minimal').then(function () { msg(c, 'Reply saved.', true); return load(); }).catch(function (e) { msg(c, e.message); }); };
@@ -131,6 +131,14 @@
     }
     function load() { return req('/rest/v1/messages?select=*&order=created_at.desc&limit=300').then(function (r) { rows = r; draw(); }).catch(function (e) { msg(c, e.message); }); }
     load();
+    /* live chat: refresh every 8s while this tab is open, but never while a reply is being typed */
+    var live = setInterval(function () {
+      if (!c.isConnected) { clearInterval(live); return; }
+      if (D.hidden) return;
+      var typing = [].some.call(list.querySelectorAll('textarea'), function (t) { return t === D.activeElement || t.value !== t.defaultValue; });
+      if (typing) return;
+      req('/rest/v1/messages?select=*&order=created_at.desc&limit=300').then(function (r) { rows = r; draw(); }).catch(function () {});
+    }, 8000);
   }
 
   /* ---------------- reviews ---------------- */
