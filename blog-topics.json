@@ -1,0 +1,53 @@
+{
+  "_how_to_use": "The blog writer drafts the first topic whose status is 'pending'. Add new topics at the end. 'facts' is the ONLY product information the writer may use, so put in only things you know are true. 'links' are store pages it may link to. Drafts arrive as pull requests for you to review.",
+  "topics": [
+    {
+      "slug": "how-to-choose-an-electric-kettle-kenya",
+      "title": "How to choose an electric kettle in Kenya",
+      "angle": "Simple buying guide: corded vs cordless, size for your household, safety features to look for, and care tips.",
+      "keywords": ["electric kettle Kenya", "cordless kettle", "kettle price in Kenya"],
+      "facts": [
+        "We list the Ramtons RM 399 corded electric kettle (1.7 litres) and the Sonar cordless electric kettle (2 litres).",
+        "Pay by M-Pesa. Delivery to all 47 counties. Faulty items can be returned within 48 hours of delivery."
+      ],
+      "links": ["/p/ramtons-rm-399-corded-electric-kettle-1-7l.html", "/p/sonar-2l-cordless-electric-kettle.html"],
+      "status": "pending"
+    },
+    {
+      "slug": "blender-buying-guide-kenya",
+      "title": "Blender buying guide for Kenyan homes and small businesses",
+      "angle": "How to choose between a home blender and a larger commercial blender: capacity, jug material, grinding, cleaning and safe use.",
+      "keywords": ["blender in Kenya", "commercial blender", "blender and grinder"],
+      "facts": [
+        "We list the EM 2-in-1 blender and grinder (1.5 litres) and the Globalstar commercial juice blender (2 litres, red).",
+        "Pay by M-Pesa. Delivery to all 47 counties. Faulty items can be returned within 48 hours of delivery."
+      ],
+      "links": ["/p/em-2-in-1-blender-and-grinder-1-5l.html", "/p/globalstar-juice-commercial-blender-2l-red.html"],
+      "status": "pending"
+    },
+    {
+      "slug": "how-to-disinfect-a-poultry-house-kenya",
+      "title": "How to clean and disinfect a poultry house between batches",
+      "angle": "General biosecurity steps: remove birds and litter, dry clean, wash, disinfect, dry and rest the house. No dilution rates: always follow the label.",
+      "keywords": ["poultry house disinfectant Kenya", "poultry biosecurity", "clean poultry house"],
+      "facts": [
+        "We list Zagro Ultraxide disinfectant for poultry and livestock farms (1 litre).",
+        "Pay by M-Pesa. Delivery to all 47 counties."
+      ],
+      "links": ["/p/zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre.html", "/blog/poultry-feed-premix-lysine-phosphate-kenya.html"],
+      "status": "pending"
+    },
+    {
+      "slug": "how-to-start-vegetable-seedlings-in-trays-kenya",
+      "title": "How to start vegetable seedlings in trays",
+      "angle": "Beginner guide to raising seedlings in trays: choosing a growing medium, sowing, watering, light, hardening off and transplanting.",
+      "keywords": ["seedling trays Kenya", "coco peat Kenya", "how to grow seedlings"],
+      "facts": [
+        "We list the Vetagro seedling tray starter for germination and the Osho coco peat block (5 kg).",
+        "Pay by M-Pesa. Delivery to all 47 counties."
+      ],
+      "links": ["/p/vetagro-seedling-tray-starter-germination.html", "/p/osho-coco-peat-block-5kg.html"],
+      "status": "pending"
+    }
+  ]
+}
