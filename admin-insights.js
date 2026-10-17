@@ -89,6 +89,29 @@
     }).catch(function () { return []; });
   }
 
+  /* ---------------- shared chart helpers ---------------- */
+  function bars(days, vals, lab) {
+    var NS = 'http://www.w3.org/2000/svg', W = 600, H = 170, pad = 22, mx = Math.max.apply(null, vals.concat([1]));
+    var svg = D.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + (H + 18)); svg.setAttribute('width', '100%'); svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', (lab ? 'Searches' : 'Revenue') + ' per ' + (days.length > 62 ? 'month' : 'day'));
+    var bw = (W - pad) / Math.max(days.length, 1);
+    vals.forEach(function (v, i) {
+      var bh = v ? Math.max(2, (v / mx) * (H - 14)) : 0, r = D.createElementNS(NS, 'rect');
+      r.setAttribute('x', String(pad + i * bw + 1)); r.setAttribute('width', String(Math.max(1, bw - 2))); r.setAttribute('y', String(H - bh)); r.setAttribute('height', String(bh)); r.setAttribute('rx', '2'); r.setAttribute('fill', '#5b21b6');
+      var t = D.createElementNS(NS, 'title'); t.textContent = days[i] + ': ' + (lab ? lab(v) : money(v)); r.appendChild(t); svg.appendChild(r);
+    });
+    function tx(x, y, s, a) { var t = D.createElementNS(NS, 'text'); t.setAttribute('x', String(x)); t.setAttribute('y', String(y)); t.setAttribute('font-size', '11'); t.setAttribute('fill', '#6b6b80'); if (a) t.setAttribute('text-anchor', a); t.textContent = s; svg.appendChild(t); }
+    tx(pad, H + 14, days[0] || '', 'start'); tx(W, H + 14, days[days.length - 1] || '', 'end'); tx(pad, 10, 'Peak ' + (lab ? lab(mx) : money(mx)), 'start');
+    return svg;
+  }
+  function rows(card, list, fmt) {
+    var mx = Math.max.apply(null, list.map(function (x) { return x.v; }).concat([1]));
+    list.forEach(function (x) {
+      var r = h('div', 'si-row'); var n = h('span', 'n', x.n); n.title = x.n; r.appendChild(n);
+      var b = h('span', 'bar'), f = h('span'); f.style.width = Math.max(3, x.v / mx * 100) + '%'; b.appendChild(f); r.appendChild(b); r.appendChild(h('span', 'v', fmt(x))); card.appendChild(r);
+    });
+  }
+
   /* ---------------- sales dashboard ---------------- */
   var RANGES = [['today', 'Today'], ['7', '7 days'], ['30', '30 days'], ['month', 'This month'], ['all', 'All time']];
   var S = { range: '30' };
@@ -116,27 +139,6 @@
     ]).then(function (r) { data = { orders: r[0], expenses: r[1] }; draw(); })
       .catch(function (e) { errBox(body, e.message === 'missing' ? 'Could not load orders.' : e.message); });
 
-    function bars(days, vals) {
-      var NS = 'http://www.w3.org/2000/svg', W = 600, H = 170, pad = 22, mx = Math.max.apply(null, vals.concat([1]));
-      var svg = D.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + (H + 18)); svg.setAttribute('width', '100%'); svg.setAttribute('role', 'img');
-      svg.setAttribute('aria-label', 'Revenue per ' + (days.length > 62 ? 'month' : 'day'));
-      var bw = (W - pad) / Math.max(days.length, 1);
-      vals.forEach(function (v, i) {
-        var bh = v ? Math.max(2, (v / mx) * (H - 14)) : 0, r = D.createElementNS(NS, 'rect');
-        r.setAttribute('x', String(pad + i * bw + 1)); r.setAttribute('width', String(Math.max(1, bw - 2))); r.setAttribute('y', String(H - bh)); r.setAttribute('height', String(bh)); r.setAttribute('rx', '2'); r.setAttribute('fill', '#5b21b6');
-        var t = D.createElementNS(NS, 'title'); t.textContent = days[i] + ': ' + money(v); r.appendChild(t); svg.appendChild(r);
-      });
-      function tx(x, y, s, a) { var t = D.createElementNS(NS, 'text'); t.setAttribute('x', String(x)); t.setAttribute('y', String(y)); t.setAttribute('font-size', '11'); t.setAttribute('fill', '#6b6b80'); if (a) t.setAttribute('text-anchor', a); t.textContent = s; svg.appendChild(t); }
-      tx(pad, H + 14, days[0] || '', 'start'); tx(W, H + 14, days[days.length - 1] || '', 'end'); tx(pad, 10, 'Peak ' + money(mx), 'start');
-      return svg;
-    }
-    function rows(card, list, fmt) {
-      var mx = Math.max.apply(null, list.map(function (x) { return x.v; }).concat([1]));
-      list.forEach(function (x) {
-        var r = h('div', 'si-row'); var n = h('span', 'n', x.n); n.title = x.n; r.appendChild(n);
-        var b = h('span', 'bar'), f = h('span'); f.style.width = Math.max(3, x.v / mx * 100) + '%'; b.appendChild(f); r.appendChild(b); r.appendChild(h('span', 'v', fmt(x))); card.appendChild(r);
-      });
-    }
     function draw() {
       body.textContent = '';
       var from = startOf(S.range), inR = data.orders.filter(function (o) { return kdate(o.created_at) >= from; });
@@ -194,6 +196,93 @@
       if (st.none) fc.appendChild(h('p', 'si-note si-warn', st.none + ' confirmed order' + (st.none === 1 ? ' is' : 's are') + ' waiting to be packed.'));
       body.appendChild(fc);
       if (data.orders.length >= 2000) body.appendChild(h('p', 'si-note', 'Showing the latest 2,000 orders.'));
+    }
+  }
+
+
+  /* ---------------- shopper searches ---------------- */
+  var SR = { range: '30' };
+  function searches(root) {
+    root.textContent = ''; var wrap = h('div'); root.appendChild(wrap);
+    wrap.appendChild(h('p', 'si-note', 'What shoppers type into the search box on your shop. Words only: no names, phones or accounts are stored.'));
+    var chips = h('div', 'si-chips'); wrap.appendChild(chips); var body = h('div'); wrap.appendChild(body);
+    var all = null;
+    RANGES.forEach(function (r) {
+      var b = h('button', 'si-chip' + (SR.range === r[0] ? ' on' : ''), r[1]); b.type = 'button';
+      b.onclick = function () { SR.range = r[0]; Array.prototype.forEach.call(chips.children, function (c) { c.className = 'si-chip'; }); b.className = 'si-chip on'; if (all) draw(); };
+      chips.appendChild(b);
+    });
+    body.appendChild(h('div', 'empty', 'Loading searches...'));
+    get('/rest/v1/search_logs?select=created_at,term,results,source,session_id&order=created_at.desc&limit=5000')
+      .then(function (r) { all = r; draw(); })
+      .catch(function (e) { errBox(body, e.message === 'missing' ? 'Search tracking is not set up yet. In Supabase, run setup-search.sql (in the root of your website repo). Searches will appear here after that.' : e.message); });
+
+    function group(list) {
+      var m = {}; list.forEach(function (x) {   /* list is newest first, so the first row seen holds the latest result count */
+        var g = m[x.term] || (m[x.term] = { t: x.term, n: 0, z: 0, last: +x.results || 0, v: {} }); g.n++; if (!(+x.results > 0)) g.z++; if (x.session_id) g.v[x.session_id] = 1; });
+      return Object.keys(m).map(function (k) { var g = m[k]; g.visits = Object.keys(g.v).length || g.n; return g; });
+    }
+    function csvCell(v) { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+    function draw() {
+      body.textContent = '';
+      var from = startOf(SR.range), cur = all.filter(function (x) { return kdate(x.created_at) >= from; });
+      if (!cur.length) { body.appendChild(h('div', 'empty', all.length ? 'No searches in this period.' : 'No searches recorded yet. They appear here once shoppers use the search box.')); return; }
+      var g = group(cur).sort(function (a, b) { return b.n - a.n; }), zeroTerms = g.filter(function (x) { return x.z / x.n >= 0.5; });
+      var zeroSearches = cur.filter(function (x) { return !(+x.results > 0); }).length, visits = {}; cur.forEach(function (x) { if (x.session_id) visits[x.session_id] = 1; });
+      var k = h('div', 'si-k');
+      [['Searches', String(cur.length), Object.keys(visits).length + ' visits searched'], ['Different terms', String(g.length), ''],
+       ['Found nothing', Math.round(zeroSearches / cur.length * 100) + '%', zeroSearches + ' searches'], ['Top search', g[0].t, g[0].n + ' times']].forEach(function (x) {
+        var c = h('div', 'si-kp'); c.appendChild(h('small', null, x[0])); c.appendChild(h('b', null, x[1])); if (x[2]) c.appendChild(h('i', null, x[2])); k.appendChild(c); });
+      body.appendChild(k);
+
+      var tc = h('div', 'si-card'); tc.appendChild(h('h3', null, 'Searches per day'));
+      var byDay = {}; cur.forEach(function (x) { var d = kdate(x.created_at); byDay[d] = (byDay[d] || 0) + 1; });
+      var keys = Object.keys(byDay).sort(), days = [], vals = [], a = new Date((SR.range === 'all' ? keys[0] : from) + 'T00:00:00Z'), z = new Date(kdate(new Date()) + 'T00:00:00Z');
+      for (var d = a; d <= z && days.length < 400; d = new Date(d.getTime() + 864e5)) { var ds = d.toISOString().slice(0, 10); days.push(ds); vals.push(byDay[ds] || 0); }
+      tc.appendChild(bars(days, vals, function (v) { return v + ' searches'; })); body.appendChild(tc);
+
+      var top = h('div', 'si-card'); top.appendChild(h('h3', null, 'Most searched'));
+      rows(top, g.slice(0, 12).map(function (x) { return { n: x.t, v: x.n, z: x.z / x.n >= 0.5 }; }), function (x) { return x.v + (x.z ? ' · not found' : ''); });
+      body.appendChild(top);
+
+      var nf = h('div', 'si-card'); nf.appendChild(h('h3', null, 'Searched but not found (lost sales)'));
+      if (zeroTerms.length) {
+        rows(nf, zeroTerms.slice(0, 15).map(function (x) { return { n: x.t, v: x.n }; }), function (x) { return x.v + ' search' + (x.v === 1 ? '' : 'es'); });
+        nf.appendChild(h('p', 'si-note', 'Shoppers wanted these and saw nothing. Stock them, or add them to the shop so the search finds them.'));
+        var cp = h('button', 'si-chip', 'Copy this list'); cp.type = 'button'; cp.style.marginTop = '.5rem';
+        cp.onclick = function () { var txt = zeroTerms.map(function (x) { return x.t + ' (' + x.n + ')'; }).join('\n'); try { navigator.clipboard.writeText(txt).then(function () { cp.textContent = 'Copied ✓'; }); } catch (e) { cp.textContent = 'Could not copy'; } };
+        nf.appendChild(cp);
+      } else nf.appendChild(h('p', 'si-note si-ok', 'Every search found something. 🎉'));
+      body.appendChild(nf);
+
+      /* trending: last 7 days against the 7 before, whatever range is chosen */
+      var t7 = kdate(new Date(Date.now() - 6 * 864e5)), t14 = kdate(new Date(Date.now() - 13 * 864e5));
+      var now7 = group(all.filter(function (x) { return kdate(x.created_at) >= t7; })), prev = {}; group(all.filter(function (x) { var d = kdate(x.created_at); return d >= t14 && d < t7; })).forEach(function (x) { prev[x.t] = x.n; });
+      var tr = now7.filter(function (x) { return x.n >= 2 && x.n > (prev[x.t] || 0); }).map(function (x) { return { n: x.t, v: x.n - (prev[x.t] || 0), now: x.n, was: prev[x.t] || 0 }; }).sort(function (a, b) { return b.v - a.v; }).slice(0, 6);
+      var tg = h('div', 'si-card'); tg.appendChild(h('h3', null, 'Rising this week'));
+      if (tr.length) rows(tg, tr, function (x) { return x.now + ' (was ' + x.was + ')'; }); else tg.appendChild(h('p', 'si-note', 'Nothing is climbing yet. This fills in after a couple of weeks of data.'));
+      body.appendChild(tg);
+
+      var src = { typed: 0, suggestion: 0, category: 0, list: 0 }; cur.forEach(function (x) { src[x.source] = (src[x.source] || 0) + 1; });
+      var sc = h('div', 'si-card'); sc.appendChild(h('h3', null, 'How shoppers searched'));
+      rows(sc, [{ n: 'Typed it', v: src.typed }, { n: 'Tapped a suggestion', v: src.suggestion }, { n: 'Tapped a category', v: src.category }, { n: 'Tapped a list item', v: src.list }], function (x) { return String(x.v); });
+      body.appendChild(sc);
+
+      var ac = h('div', 'acts');
+      var ex = h('button', 'btn alt sm', 'Download CSV'); ex.type = 'button';
+      ex.onclick = function () {
+        var csv = ['Search,Times,Visits,Not found'].concat(g.map(function (x) { return [x.t, x.n, x.visits, x.z].map(csvCell).join(','); })).join('\n');
+        var a2 = D.createElement('a'); a2.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a2.download = 'searches-' + kdate(new Date()) + '.csv'; D.body.appendChild(a2); a2.click(); setTimeout(function () { URL.revokeObjectURL(a2.href); a2.remove(); }, 500);
+      };
+      var cl = h('button', 'btn no sm', 'Delete searches older than 90 days'); cl.type = 'button';
+      cl.onclick = function () {
+        if (!window.confirm('Permanently delete search records older than 90 days?')) return;
+        var cut = new Date(Date.now() - 90 * 864e5).toISOString();
+        A().ready().then(function () { return A().api('/rest/v1/search_logs?created_at=lt.' + encodeURIComponent(cut), { method: 'DELETE', headers: { Prefer: 'return=minimal' } }); })
+          .then(function (r) { if (!r.ok) throw 0; cl.textContent = 'Old searches deleted ✓'; }).catch(function () { cl.textContent = 'Could not delete'; });
+      };
+      ac.appendChild(ex); ac.appendChild(cl); body.appendChild(ac);
+      if (all.length >= 5000) body.appendChild(h('p', 'si-note', 'Showing the latest 5,000 searches.'));
     }
   }
 
@@ -262,7 +351,7 @@
   }
 
   window.STMInsights = {
-    mount: function (root, tab) { if (tab === 'sales') sales(root); else if (tab === 'mpesa') mpesa(root); },
+    mount: function (root, tab) { if (tab === 'sales') sales(root); else if (tab === 'mpesa') mpesa(root); else if (tab === 'searches') searches(root); },
     verify: verify, suggestFor: suggestFor, payments: payments
   };
 })();

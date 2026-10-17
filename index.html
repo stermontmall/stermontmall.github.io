@@ -1048,6 +1048,15 @@
       var cats = document.querySelectorAll('#range .range > div');
       var base = 'https://wa.me/254748888230?text=';
 
+      var lastFound = 0, logT = 0, lastLogged = '';
+      /* record the search once the shopper pauses, submits, or taps a suggestion/category (words only) */
+      function logSearch(src) {
+        clearTimeout(logT);
+        var t = input.value.trim().toLowerCase().replace(/\s+/g, ' '), hint = input.getAttribute('data-src'); input.removeAttribute('data-src');
+        if (t.length < 2) { lastLogged = ''; return; }
+        if (t === lastLogged) return; lastLogged = t;
+        if (window.STM_searchLog) window.STM_searchLog(t, lastFound, hint || src);
+      }
       function run(scroll) {
         var q = input.value.trim().toLowerCase();
         var found = 0;
@@ -1088,6 +1097,7 @@
           c.classList.toggle('hidden', any === 0); if (any) c.classList.add('open');
           found += any;
         });
+        lastFound = found;
         if (found) {
           msg.textContent = 'Showing results for "' + input.value.trim() + '". Clear the box to see everything.';
           if (scroll) {
@@ -1104,8 +1114,8 @@
           msg.appendChild(a);
         }
       }
-      form.addEventListener('submit', function (e) { e.preventDefault(); run(true); });
-      input.addEventListener('input', function () { run(false); });
+      form.addEventListener('submit', function (e) { e.preventDefault(); run(true); logSearch('typed'); });
+      input.addEventListener('input', function () { run(false); clearTimeout(logT); logT = setTimeout(function () { logSearch('typed'); }, 1500); });
 
       /* ---- Live suggestions while typing ---- */
       var box = document.createElement('div'); box.className = 'sugg'; box.id = 'sugg'; box.setAttribute('role', 'listbox');
@@ -1120,7 +1130,7 @@
       });
       document.querySelectorAll('#music-gear .pcard h3').forEach(function (h) { add(h.textContent, 'Product'); });
       function hide() { box.classList.remove('on'); box.innerHTML = ''; act = -1; }
-      function pick(t) { input.value = t; hide(); run(true); input.blur(); }
+      function pick(t) { input.value = t; hide(); run(true); logSearch('suggestion'); input.blur(); }
       function esc(x) { return x.replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); }
       function suggest() {
         var q = input.value.trim().toLowerCase();
@@ -1169,7 +1179,7 @@
       var q = document.getElementById('q');
       document.querySelectorAll('.cat').forEach(function (b) {
         b.addEventListener('click', function () {
-          q.value = b.getAttribute('data-q');
+          q.value = b.getAttribute('data-q'); q.setAttribute('data-src', 'category');
           q.dispatchEvent(new Event('input'));
           document.getElementById('range').scrollIntoView({ behavior: 'smooth' });
         });
@@ -1221,7 +1231,7 @@
       var q = D.getElementById('q');
       D.querySelectorAll('.range li').forEach(function (li) {
         li.addEventListener('click', function () {
-          q.value = li.textContent; q.dispatchEvent(new Event('input'));
+          q.value = li.textContent; q.setAttribute('data-src', 'list'); q.dispatchEvent(new Event('input'));
           var m = D.getElementById('music-gear');
           (m.classList.contains('hidden') ? D.getElementById('range') : m).scrollIntoView({ behavior: 'smooth' });
         });
@@ -1883,6 +1893,7 @@
       sync();
     })();
   </script>
+<script src="search-log.js" defer></script>
 <script src="storefront-live.js" defer></script>
 <script src="img-protect.js" defer></script>
 <script src="account-panel.js?v=2" defer></script>
