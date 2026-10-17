@@ -18,3 +18,9 @@
   document.addEventListener('contextmenu', function (e) { if (isImg(e.target)) e.preventDefault(); });
   document.addEventListener('dragstart', function (e) { if (isImg(e.target)) e.preventDefault(); });
 })();
+
+/* Visitor analytics: loads /analytics.js, which does nothing until an ID is set inside it.
+   It is loaded from here only because this script is already on every public store and product page. */
+(function () {
+  try { var a = document.createElement('script'); a.src = '/analytics.js'; a.defer = true; document.head.appendChild(a); } catch (e) {}
+})();
