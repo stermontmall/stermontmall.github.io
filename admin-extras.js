@@ -170,5 +170,69 @@
   }
 
   function bulk(root) { if (!window.STMBulk) { root.textContent = 'The bulk import script did not load. Refresh the page (Ctrl+F5).'; return; } STMBulk.mount(root); }
-  window.STMExtras = { mount: function (root, view) { ({ bulk: bulk, vouchers: vouchers, expenses: expenses, inbox: inbox, reviews: reviews })[view](root); } };
+  /* ---------------- live chat (public.chat_messages: one conversation per logged-in customer) ---------------- */
+  function livechat(root) {
+    var c = shell(root), wrap = h('div'), rows = [], cur = null, busy = false; c.appendChild(wrap);
+    function pv(t) { t = String(t || ''); return t.length > 90 ? t.slice(0, 90) + '…' : t; }
+    function groups() {
+      var g = {};
+      rows.forEach(function (m) {
+        var x = g[m.user_id] || (g[m.user_id] = { id: m.user_id, name: '', msgs: [], unread: 0, last: null });
+        x.msgs.push(m); x.last = m;
+        if (m.sender === 'customer') { if (m.name) x.name = m.name; if (!m.read_by_staff) x.unread++; }
+      });
+      return Object.keys(g).map(function (k) { return g[k]; }).sort(function (a, b) { return Date.parse(b.last.created_at) - Date.parse(a.last.created_at); });
+    }
+    function typing() { return [].some.call(wrap.querySelectorAll('textarea'), function (t) { return t === D.activeElement || t.value !== ''; }); }
+    function markRead(g) {
+      if (!g || !g.unread) return;
+      req('/rest/v1/chat_messages?user_id=eq.' + g.id + '&sender=eq.customer&read_by_staff=eq.false', 'PATCH', { read_by_staff: true }, 'return=minimal')
+        .then(function () { g.msgs.forEach(function (m) { m.read_by_staff = true; }); g.unread = 0; }).catch(function () {});
+    }
+    function draw() {
+      wrap.textContent = '';
+      var gs = groups();
+      if (!cur) {
+        if (!gs.length) { wrap.appendChild(h('div', 'empty', 'No chats yet. When a logged-in customer writes from the shop, it shows here.')); return; }
+        gs.forEach(function (g) {
+          var k = h('div', 'card'), top = h('div', 'top'); top.appendChild(h('span', 'ref', g.name || 'Customer'));
+          if (g.unread) top.appendChild(h('span', 'badge b-pending', g.unread + ' new')); else if (g.last.sender === 'staff') top.appendChild(h('span', 'badge b-paid', 'replied'));
+          k.appendChild(top); k.appendChild(h('div', 'when', A().fmt(g.last.created_at)));
+          k.appendChild(h('div', 'meta', (g.last.sender === 'staff' ? 'You: ' : '') + pv(g.last.body)));
+          k.style.cursor = 'pointer'; k.onclick = function () { cur = g.id; markRead(g); draw(); }; wrap.appendChild(k);
+        });
+        return;
+      }
+      var g = gs.filter(function (x) { return x.id === cur; })[0];
+      if (!g) { cur = null; draw(); return; }
+      var back = h('button', 'btn alt sm', '← All chats'); back.type = 'button'; back.onclick = function () { cur = null; draw(); }; wrap.appendChild(back);
+      var card = h('div', 'card'); card.appendChild(h('div', 'ref', g.name || 'Customer')); wrap.appendChild(card);
+      var box = h('div'); box.style.cssText = 'display:flex;flex-direction:column;gap:.4rem;margin:.6rem 0;max-height:55vh;overflow-y:auto'; wrap.appendChild(box);
+      g.msgs.forEach(function (m) {
+        var mine = m.sender === 'staff', b = h('div', null, m.body);
+        b.style.cssText = 'max-width:85%;padding:.5rem .7rem;border-radius:12px;white-space:pre-wrap;word-wrap:break-word;' + (mine ? 'align-self:flex-end;background:#f68b1e;color:#fff' : 'align-self:flex-start;background:#fff;border:1px solid var(--ln)');
+        var sm = h('small', null, A().fmt(m.created_at) + (mine && m.staff_email ? ' · ' + m.staff_email.split('@')[0] : '')); sm.style.cssText = 'display:block;opacity:.7;font-size:.7rem;margin-top:.15rem'; b.appendChild(sm); box.appendChild(b);
+      });
+      box.scrollTop = box.scrollHeight;
+      var ta = inp('textarea', { rows: 2, maxlength: 1000, placeholder: 'Type a reply' }); wrap.appendChild(ta);
+      var send = h('button', 'btn sm', 'Send reply'); send.type = 'button'; send.style.marginTop = '.5rem'; wrap.appendChild(send);
+      function go() {
+        var t = ta.value.trim(); if (t.length < 1 || busy) return; busy = true; send.disabled = true;
+        req('/rest/v1/chat_messages', 'POST', { user_id: cur, sender: 'staff', staff_email: A().email() || null, body: t }, 'return=minimal')
+          .then(function () { ta.value = ''; return load(true); }).catch(function (e) { msg(c, e.message); }).then(function () { busy = false; send.disabled = false; });
+      }
+      send.onclick = go;
+      ta.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); go(); } });
+    }
+    function load(force) {
+      return req('/rest/v1/chat_messages?select=*&order=created_at.desc&limit=1000').then(function (r) {
+        rows = (r || []).slice().reverse();
+        if (force || !typing()) { draw(); if (cur) markRead(groups().filter(function (x) { return x.id === cur; })[0]); }
+      }).catch(function (e) { msg(c, e.message.indexOf('Table missing') > -1 ? 'Chat table missing. Run setup-chat.sql in Supabase.' : e.message); });
+    }
+    load(true);
+    var live = setInterval(function () { if (!c.isConnected) { clearInterval(live); return; } if (!D.hidden) load(false); }, 6000);
+  }
+
+  window.STMExtras = { mount: function (root, view) { ({ bulk: bulk, vouchers: vouchers, expenses: expenses, inbox: inbox, livechat: livechat, reviews: reviews })[view](root); } };
 })();

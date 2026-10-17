@@ -1,7 +1,7 @@
 /* Stermont Arcade · live chat for logged-in customers.
    Add at the end of index.html, AFTER account-panel.js:  <script src="chat.js?v=1" defer></script>
-   Uses the existing public.messages table (customer message + staff reply), so no database change is needed.
-   Customers only ever see their own messages (row security). Staff reply from admin > Customers > Messages.
+   Uses the public.chat_messages table (run setup-chat.sql once). One conversation per customer, back and forth.
+   Customers only ever see their own messages (row security). Staff reply from admin > Customers > Live chat.
    The screen refreshes every few seconds while the chat is open. All text is set with textContent. */
 (function () {
   var D = document, REF = 'oewvtbnmyombbtggamor', SBU = 'https://' + REF + '.supabase.co',
@@ -49,11 +49,11 @@
   D.head.appendChild(st);
 
   /* ---------- data ---------- */
-  function lastReplyAt() { var m = 0; rows.forEach(function (r) { if (r.replied_at) { var t = Date.parse(r.replied_at); if (t > m) m = t; } }); return m; }
+  function lastReplyAt() { var m = 0; rows.forEach(function (r) { if (r.sender === 'staff') { var t = Date.parse(r.created_at); if (t > m) m = t; } }); return m; }
   function refreshDot() { var seen = get(SEEN) || 0; DOT.style.display = (!isOpen && lastReplyAt() > seen) ? 'block' : 'none'; }
   function load() {
     if (!sess()) { rows = []; loadedOnce = true; draw(); return Promise.resolve(); }
-    return api('/rest/v1/messages?select=id,body,reply,replied_at,created_at,status&order=created_at.asc&limit=200')
+    return api('/rest/v1/chat_messages?select=id,sender,body,created_at&order=created_at.asc&limit=300')
       .then(function (r) { if (r.status === 401) throw new Error('login'); if (!r.ok) throw new Error('load'); return r.json(); })
       .then(function (j) { rows = Array.isArray(j) ? j : []; loadedOnce = true; ERR.textContent = ''; ERR.style.display = 'none'; if (isOpen) { put(SEEN, lastReplyAt() || Date.now()); } draw(); refreshDot(); })
       .catch(function (e) { loadedOnce = true; if (e && e.message === 'login') { rows = []; draw(); } else { ERR.textContent = 'Could not refresh. Check your connection.'; ERR.style.display = 'block'; } });
@@ -71,8 +71,8 @@
     if (!loadedOnce) { L.appendChild(el('div', 'stc-e', 'Loading…')); return; }
     if (!rows.length) { L.appendChild(el('div', 'stc-e', 'Hi 👋 Ask us anything about a product, your order or delivery. We reply here.')); return; }
     rows.forEach(function (m) {
-      var me = el('div', 'stc-m me', m.body); me.appendChild(el('small', null, hm(m.created_at))); L.appendChild(me);
-      if (m.reply) { var us = el('div', 'stc-m us', m.reply); us.appendChild(el('small', null, 'Stermont Arcade · ' + hm(m.replied_at))); L.appendChild(us); }
+      var mine = m.sender !== 'staff', b = el('div', 'stc-m ' + (mine ? 'me' : 'us'), m.body);
+      b.appendChild(el('small', null, (mine ? '' : 'Stermont Arcade · ') + hm(m.created_at))); L.appendChild(b);
     });
     if (near || first) L.scrollTop = L.scrollHeight;
   }
@@ -84,7 +84,7 @@
     if (!s) { draw(); return; }
     if (t.length < 2) { ERR.textContent = 'Type at least 2 characters.'; ERR.style.display = 'block'; return; }
     sending = true; S.disabled = true; ERR.style.display = 'none';
-    api('/rest/v1/messages', { method: 'POST', prefer: 'return=minimal', body: { name: nameOf(s), email: (s.user.email || '').slice(0, 200) || null, body: t.slice(0, 1000) } })
+    api('/rest/v1/chat_messages', { method: 'POST', prefer: 'return=minimal', body: { user_id: s.user.id, sender: 'customer', name: nameOf(s), body: t.slice(0, 1000) } })
       .then(function (r) {
         if (r.status === 401) throw new Error('Your session expired. Please log in again.');
         if (!r.ok) return r.text().then(function (x) { var m = ''; try { m = JSON.parse(x).message; } catch (e) {} throw new Error(m || 'Could not send. Try again.'); });

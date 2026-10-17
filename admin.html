@@ -179,12 +179,12 @@
 <script src="receipt.js?v=7"></script>
 <script src="admin-suggest.js?v=1"></script>
 <script src="catalog-v10.js?v=3"></script>
-<script src="admin-extras.js?v=4"></script>
+<script src="admin-extras.js?v=5"></script>
 <script src="admin-bulk.js?v=1"></script>
 <script>
 (function () {
   var D = document, SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
-  var TABS_OK = ['pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'reviews'], TK = 'stm_admin_tab';
+  var TABS_OK = ['pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews'], TK = 'stm_admin_tab';
   function savedTab() { try { var t = (location.hash || '').replace('#', '') || localStorage.getItem(TK); return TABS_OK.indexOf(t) > -1 ? t : 'pending'; } catch (e) { return 'pending'; } }
   function rememberTab(t) { try { localStorage.setItem(TK, t); history.replaceState(null, '', location.pathname + location.search + '#' + t); } catch (e) {} }
   var sess = null, orders = [], tab = savedTab(), q = '';
@@ -252,12 +252,12 @@
 
   function count(s) { return orders.filter(function (o) { return (o.status || 'pending') === s; }).length; }
   var ORDER_TABS = ['pending', 'paid', 'declined', 'all'];
-  var EXTRA = ['stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'reviews'];
+  var EXTRA = ['stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews'];
   var NAV = [
     ['Orders', [['pending', '🕒', 'Pending', 'Orders waiting for payment confirmation'], ['paid', '✅', 'Confirmed', 'Paid orders: packing, delivery and receipts'], ['declined', '🚫', 'Declined', 'Orders that were not paid'], ['all', '📋', 'All orders', 'Every order, newest first']]],
     ['Store', [['catalog', '🛍️', 'Catalog & ledger', 'Products, prices, restocks, COGS, profit and the financial ledger'], ['stock', '📦', 'Stock', 'Switch products in or out of stock'], ['bulk', '📥', 'Bulk import', 'Add many products from a spreadsheet, and attach photos to items that have none']]],
     ['Finance', [['expenses', '💸', 'Expenses', 'Running costs, kept separate from product cost']]],
-    ['Customers', [['inbox', '💬', 'Messages', 'Questions from shoppers and your replies'], ['reviews', '⭐', 'Reviews', 'Approve or hide product reviews'], ['vouchers', '🎟️', 'Vouchers', 'Discount codes and public offers']]]
+    ['Customers', [['livechat', '🗨️', 'Live chat', 'Chat with logged-in customers in real time'], ['inbox', '💬', 'Messages', 'Questions from shoppers and your replies'], ['reviews', '⭐', 'Reviews', 'Approve or hide product reviews'], ['vouchers', '🎟️', 'Vouchers', 'Discount codes and public offers']]]
   ];
   function renderTabs() {
     var t = $('navg'); t.textContent = '';
@@ -286,7 +286,7 @@
     renderTabs(); drawKpis();
     var L = $('list'); L.textContent = '';
     $('q').hidden = EXTRA.indexOf(tab) > -1;
-    if (['bulk', 'vouchers', 'expenses', 'inbox', 'reviews'].indexOf(tab) > -1) { if (!window.STMExtras) { L.innerHTML = '<div class="err">The extras script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMExtras.mount(L, tab); return; }
+    if (['bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews'].indexOf(tab) > -1) { if (!window.STMExtras) { L.innerHTML = '<div class="err">The extras script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMExtras.mount(L, tab); return; }
     if ((tab === 'stock' || tab === 'catalog') && !window.STMCatalog) { L.innerHTML = '<div class="err">The catalogue script did not load. Refresh the page (Ctrl+F5).</div>'; return; }
     if (tab === 'stock') { STMCatalog.mountStock(L); return; }
     if (tab === 'catalog') { STMCatalog.mount(L); return; }
