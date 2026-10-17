@@ -340,6 +340,7 @@
     if (st === 'paid' && o.stage === 'delivered') c.className += ' done';
     top.appendChild(l); top.appendChild(h('span', 'badge b-' + st, (st === 'paid' && o.stage && STAGE[o.stage]) || LABEL[st] || st)); c.appendChild(top);
     var ul = h('ul', 'items'); (o.items || []).forEach(function (i) { var li = h('li'); li.appendChild(h('span', null, i.qty + ' × ' + i.name)); li.appendChild(h('span', null, money(i.total))); ul.appendChild(li); }); c.appendChild(ul);
+    if (o.voucher_code && +o.discount > 0) { var vd = h('div', 'meta', '🎟️ Voucher ' + o.voucher_code + ': -' + money(o.discount) + ' (already taken off the total below)'); c.appendChild(vd); }
     var t = h('div', 'tot'); t.appendChild(h('span', null, 'Total')); t.appendChild(h('span', null, money(o.subtotal))); c.appendChild(t);
     function meta(k, v) { if (!v) return; var m = h('div', 'meta'); m.appendChild(h('b', null, k + ': ')); m.appendChild(D.createTextNode(v)); c.appendChild(m); }
     meta('Customer', o.customer_name); meta('Phone', o.phone);
