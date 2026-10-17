@@ -181,10 +181,11 @@
 <script src="catalog-v10.js?v=3"></script>
 <script src="admin-extras.js?v=5"></script>
 <script src="admin-bulk.js?v=1"></script>
+<script src="admin-insights.js?v=1"></script>
 <script>
 (function () {
   var D = document, SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
-  var TABS_OK = ['pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews'], TK = 'stm_admin_tab';
+  var TABS_OK = ['pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa'], TK = 'stm_admin_tab';
   function savedTab() { try { var t = (location.hash || '').replace('#', '') || localStorage.getItem(TK); return TABS_OK.indexOf(t) > -1 ? t : 'pending'; } catch (e) { return 'pending'; } }
   function rememberTab(t) { try { localStorage.setItem(TK, t); history.replaceState(null, '', location.pathname + location.search + '#' + t); } catch (e) {} }
   var sess = null, orders = [], tab = savedTab(), q = '';
@@ -200,7 +201,7 @@
   function load() { try { return JSON.parse(localStorage.getItem(SK)); } catch (e) { return null; } }
   function save(s) { try { if (s) localStorage.setItem(SK, JSON.stringify(s)); else localStorage.removeItem(SK); } catch (e) {} }
 
-  window.STMAdmin = { base: SB, raw: function (path, o) { o = o || {}; return ready().then(function () { var hd = { apikey: KEY }; if (sess) hd.Authorization = 'Bearer ' + sess.access_token; return fetch(SB + path, { method: o.method || 'GET', headers: Object.assign(hd, o.headers || {}), body: o.body }); }); }, api: function (p, o) { return api(p, o); }, ready: function () { return ready(); }, money: function (n) { return money(n); }, fmt: function (d) { return fmt(d); }, email: function () { return (sess && sess.email) || ''; } };
+  window.STMAdmin = { base: SB, raw: function (path, o) { o = o || {}; return ready().then(function () { var hd = { apikey: KEY }; if (sess) hd.Authorization = 'Bearer ' + sess.access_token; return fetch(SB + path, { method: o.method || 'GET', headers: Object.assign(hd, o.headers || {}), body: o.body }); }); }, api: function (p, o) { return api(p, o); }, ready: function () { return ready(); }, money: function (n) { return money(n); }, fmt: function (d) { return fmt(d); }, email: function () { return (sess && sess.email) || ''; }, approveWith: function (ref, code, amt) { approveWith(ref, code, amt); } };
   function api(path, opt) {
     opt = opt || {};
     var hd = { apikey: KEY, 'Content-Type': 'application/json' };
@@ -265,11 +266,11 @@
 
   function count(s) { return orders.filter(function (o) { return (o.status || 'pending') === s; }).length; }
   var ORDER_TABS = ['pending', 'paid', 'declined', 'all'];
-  var EXTRA = ['stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews'];
+  var EXTRA = ['stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa'];
   var NAV = [
     ['Orders', [['pending', '🕒', 'Pending', 'Orders waiting for payment confirmation'], ['paid', '✅', 'Confirmed', 'Paid orders: packing, delivery and receipts'], ['declined', '🚫', 'Declined', 'Orders that were not paid'], ['all', '📋', 'All orders', 'Every order, newest first']]],
     ['Store', [['catalog', '🛍️', 'Catalog & ledger', 'Products, prices, restocks, COGS, profit and the financial ledger'], ['stock', '📦', 'Stock', 'Switch products in or out of stock'], ['bulk', '📥', 'Bulk import', 'Add many products from a spreadsheet, and attach photos to items that have none']]],
-    ['Finance', [['expenses', '💸', 'Expenses', 'Running costs, kept separate from product cost']]],
+    ['Finance', [['sales', '📈', 'Sales dashboard', 'Revenue, best sellers, where orders go and what is waiting to be packed'], ['mpesa', '📲', 'M-Pesa payments', 'Payments received on your Paybill, matched to orders'], ['expenses', '💸', 'Expenses', 'Running costs, kept separate from product cost']]],
     ['Customers', [['livechat', '🗨️', 'Live chat', 'Chat with logged-in customers in real time'], ['inbox', '💬', 'Messages', 'Questions from shoppers and your replies'], ['reviews', '⭐', 'Reviews', 'Approve or hide product reviews'], ['vouchers', '🎟️', 'Vouchers', 'Discount codes and public offers']]]
   ];
   function renderTabs() {
@@ -299,6 +300,7 @@
     renderTabs(); drawKpis();
     var L = $('list'); L.textContent = '';
     $('q').hidden = EXTRA.indexOf(tab) > -1;
+    if (tab === 'sales' || tab === 'mpesa') { if (!window.STMInsights) { L.innerHTML = '<div class="err">The insights script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMInsights.mount(L, tab); return; }
     if (['bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews'].indexOf(tab) > -1) { if (!window.STMExtras) { L.innerHTML = '<div class="err">The extras script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMExtras.mount(L, tab); return; }
     if ((tab === 'stock' || tab === 'catalog') && !window.STMCatalog) { L.innerHTML = '<div class="err">The catalogue script did not load. Refresh the page (Ctrl+F5).</div>'; return; }
     if (tab === 'stock') { STMCatalog.mountStock(L); return; }
@@ -361,6 +363,11 @@
     meta('Notes', o.notes);
     if (o.handled_by && st !== 'pending') meta(LABEL[st] + ' by', o.handled_by + (o.handled_at ? ' on ' + new Date(o.handled_at).toLocaleString('en-KE') : ''));
     if (st === 'paid') meta('M-Pesa code', o.pay_code ? String(o.pay_code).toUpperCase() + (o.pay_amount != null ? ' (' + money(o.pay_amount) + ')' : '') : 'not recorded yet');
+    if (st === 'pending' && o.pay_code && window.STMInsights) { var vb = h('div', 'meta'); c.appendChild(vb); STMInsights.verify(o).then(function (v) {
+      if (v.state === 'ok') { vb.textContent = '✅ M-Pesa payment received for ' + money(v.got) + (v.test ? ' (test)' : ''); vb.style.color = '#15803d'; vb.style.fontWeight = '700'; }
+      else if (v.state === 'short') { vb.textContent = '⚠ Payment received is only ' + money(v.got) + ', total is ' + money(v.due); vb.style.color = '#b91c1c'; vb.style.fontWeight = '700'; }
+      else if (v.state === 'unseen') { vb.textContent = 'M-Pesa code not seen in received payments yet'; vb.style.color = '#b45309'; }
+    }); }
     var a = h('div', 'acts'), ph = String(o.phone || '').replace(/\D/g, '');
     if (ph) { var w = h('a', 'btn alt sm', 'WhatsApp customer'); w.href = 'https://wa.me/' + ph; w.target = '_blank'; w.rel = 'noopener'; a.appendChild(w); }
     if (st === 'pending') {
@@ -403,6 +410,13 @@
   var NEW = { approve: { status: 'paid', stage: null }, decline: { status: 'declined', stage: null }, pending: { status: 'pending', stage: null }, setcode: {},
     packed: { stage: 'packed' }, out_for_delivery: { stage: 'out_for_delivery' }, delivered: { stage: 'delivered' } };
   var TITLE = { approve: 'Confirm this order?', setcode: 'M-Pesa payment code', decline: 'Decline this order?', pending: 'Move back to pending?', packed: 'Mark as packed?', out_for_delivery: 'Mark as out for delivery?', delivered: 'Mark as delivered?', undo: 'Undo the last shipping step?' };
+  /* M-Pesa tab: open the approve box for an order with the matched payment filled in. Staff still tap Confirm. */
+  function approveWith(ref, code, amt) {
+    var o = orders.filter(function (x) { return x.ref === ref; })[0];
+    if (!o) { note('Order ' + ref + ' was not found. Refresh and try again.', false); return; }
+    if ((o.status || 'pending') !== 'pending') { note('Order ' + ref + ' is already ' + LABEL[o.status] + '.', false); return; }
+    confirmAct(o, 'approve'); var c = $('pc'), a = $('pa'); if (c) c.value = code; if (a) a.value = amt;
+  }
   function confirmAct(o, action) {
     $('cf-t').textContent = TITLE[action];
     var b = $('cf-b'); b.textContent = '';
@@ -418,8 +432,21 @@
       codeIn.placeholder = 'e.g. QGH7A1B2C3'; codeIn.value = o.pay_code ? String(o.pay_code).toUpperCase() : ''; codeIn.style.cssText = IS + 'text-transform:uppercase;letter-spacing:.08em;font-weight:700;font-family:ui-monospace,Menlo,monospace;'; b.appendChild(codeIn);
       var l2 = h('label', 'meta', 'Amount received (KSh) *'); l2.style.display = 'block'; b.appendChild(l2);
       amtIn = D.createElement('input'); amtIn.type = 'number'; amtIn.inputMode = 'decimal'; amtIn.min = '1'; amtIn.step = 'any';
-      amtIn.value = o.pay_amount != null ? o.pay_amount : (o.subtotal || ''); amtIn.style.cssText = IS; b.appendChild(amtIn);
+      amtIn.id = 'pa'; amtIn.value = o.pay_amount != null ? o.pay_amount : (o.subtotal || ''); amtIn.style.cssText = IS; b.appendChild(amtIn);
       cerr = h('div', 'err'); cerr.hidden = true; b.appendChild(cerr);
+      if (window.STMInsights) {   /* payments Safaricom reported that look like this order's */
+        var sg = h('div', 'si-sug'); b.appendChild(sg);
+        STMInsights.verify(o).then(function (v) {
+          if (v.state === 'ok') sg.appendChild(h('div', 'meta si-ok', '✅ The code on this order matches a payment received' + (v.test ? ' (test payment)' : '') + ': ' + money(v.got) + '.'));
+          else if (v.state === 'short') sg.appendChild(h('div', 'meta si-bad', '⚠ The code matches a payment of ' + money(v.got) + ' but the order total is ' + money(v.due) + '.'));
+          else if (v.state === 'unseen') sg.appendChild(h('div', 'meta si-warn', 'This code has not appeared in received payments yet. Check the SMS before approving.'));
+        });
+        if (action === 'approve' && !o.pay_code) STMInsights.suggestFor(o).then(function (list) {
+          if (!list.length) return; sg.appendChild(h('div', 'meta', 'Payments received that fit this order (tap to fill):'));
+          list.forEach(function (x) { var bt = h('button', null, String(x.p.trans_id).toUpperCase() + ' · ' + money(x.p.amount) + ' · ' + x.why.join(', ')); bt.type = 'button';
+            bt.onclick = function () { codeIn.value = String(x.p.trans_id).toUpperCase(); amtIn.value = x.p.amount; }; sg.appendChild(bt); });
+        });
+      }
     }
     var y = $('cf-y'); y.className = 'btn ' + (action === 'approve' ? 'ok' : action === 'decline' ? 'no' : ''); y.textContent = 'Confirm'; y.disabled = false;
     if (action === 'setcode') y.textContent = 'Save code';
