@@ -1507,7 +1507,34 @@
         });
       }
       function feeOf() { return form.method === 'delivery' ? (CFG.fees[form.county] || 0) : 0; }
-      function due(T) { return T.s + feeOf(); }
+      function vOff(T) { return form.vc && form.vc.base === T.s ? form.vc.discount : 0; }
+      function due(T) { return Math.max(0, T.s + feeOf() - vOff(T)); }
+      /* voucher codes: checked on the server (check_voucher), applied to the items total only */
+      function applyV(T, inp, er, ab) {
+        var c = (inp.value || '').trim().toUpperCase(); form.vcode = c;
+        if (c.length < 3) { er.textContent = 'Enter your voucher code.'; return; }
+        ab.disabled = true; er.textContent = '';
+        fetch(CFG.sbUrl + '/rest/v1/rpc/check_voucher', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.sbKey }, body: JSON.stringify({ p_code: c, p_subtotal: T.s }) })
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            if (j && j.ok && Number(j.discount) > 0) { form.vc = { code: String(j.code), discount: Math.round(Number(j.discount)), base: T.s }; form.vcode = ''; form.payTouched = false; render(); }
+            else { er.textContent = (j && j.reason) || 'That code is not valid.'; ab.disabled = false; }
+          })
+          .catch(function () { er.textContent = 'Could not check the code. Try again.'; ab.disabled = false; });
+      }
+      function vBox(b, T) {
+        var w = h('div', 'fld'), l = h('label', null, 'Voucher code (optional)'); l.htmlFor = 'vcode'; w.appendChild(l);
+        if (vOff(T)) {
+          var r = h('div', 'ln'); r.appendChild(h('span', null, '\uD83C\uDF9F\uFE0F ' + form.vc.code + ' applied')); r.appendChild(h('b', null, '-' + money(vOff(T)))); w.appendChild(r);
+          var x = h('button', 'btn btn-alt', 'Remove voucher'); x.type = 'button'; x.onclick = function () { form.vc = null; form.payTouched = false; render(); }; w.appendChild(x);
+        } else {
+          var i = h('input'); i.id = 'vcode'; i.type = 'text'; i.maxLength = 24; i.autocomplete = 'off'; i.spellcheck = false; i.placeholder = 'e.g. WELCOME10'; i.value = form.vcode || ''; i.style.cssText = 'text-transform:uppercase;letter-spacing:.06em'; w.appendChild(i);
+          var er = h('div', 'err', ''); w.appendChild(er);
+          var a = h('button', 'btn btn-alt', 'Apply voucher'); a.type = 'button'; a.onclick = function () { applyV(T, i, er, a); }; w.appendChild(a);
+          i.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); applyV(T, i, er, a); } });
+        }
+        b.appendChild(w);
+      }
       var stkBusy = false, stkMsg = '', stkPhone = '', stkLive = false;
       /* The backend reports whether M-Pesa is in production mode; sandbox keys keep the old Paybill flow for buyers. */
       try { fetch(CFG.sbUrl + '/functions/v1/mpesa-mode', { headers: { apikey: CFG.sbKey } }).then(function (r) { return r.json(); }).then(function (j) { stkLive = !!(j && j.enabled); if (stkLive && isOpen) render(); }).catch(function () {}); } catch (e) {}
@@ -1567,7 +1594,7 @@
       function message(T) {
         var L = ['Hello Stermont Arcade, I would like to place an order.', '', '*Order ' + (ref || doneRef) + '*'];
         T.L.forEach(function (i, k) { L.push((k + 1) + '. ' + i.name + ' x' + i.qty + ' = ' + money(i.total)); });
-        L.push('', '*Subtotal:* ' + money(T.s), feeOf() ? '*Delivery fee:* ' + money(feeOf()) : '', feeOf() ? '*Total to pay:* ' + money(due(T)) : '', '*Delivery:* ' + (form.method === 'pickup' ? where() : 'Deliver to ' + where() + (feeOf() ? '' : ' (fee to be confirmed)')), '', '*Name:* ' + form.name.trim(), '*Phone:* +' + normPhone(form.phone));
+        L.push('', '*Subtotal:* ' + money(T.s), vOff(T) ? '*Voucher ' + form.vc.code + ':* -' + money(vOff(T)) : '', feeOf() ? '*Delivery fee:* ' + money(feeOf()) : '', (feeOf() || vOff(T)) ? '*Total to pay:* ' + money(due(T)) : '', '*Delivery:* ' + (form.method === 'pickup' ? where() : 'Deliver to ' + where() + (feeOf() ? '' : ' (fee to be confirmed)')), '', '*Name:* ' + form.name.trim(), '*Phone:* +' + normPhone(form.phone));
         if (form.notes && form.notes.trim()) L.push('*Notes:* ' + form.notes.trim());
         L.push('*Payment:* M-Pesa Paybill ' + CFG.paybill + ', account ' + CFG.payAcct, '*M-Pesa code:* ' + (doneCode || cleanCode()) + ' (paid KSh ' + (doneAmt || Number(form.payAmt)) + ')', '', 'Please confirm availability and the delivery fee. Thank you!');
         return L.join('\n');
@@ -1587,6 +1614,7 @@
         box(b, 'Items', T.L.map(function (i) { return [i.qty + ' × ' + i.name, money(i.total)]; }), 'cart');
         box(b, form.method === 'pickup' ? 'Collection' : 'Delivery', [[where()]], 'details');
         box(b, 'Contact', [[form.name.trim()], ['+' + normPhone(form.phone)], [(form.email || '').trim()]], 'details');
+        vBox(b, T);
         var amt = due(T); if (!form.payTouched) form.payAmt = String(amt);
         var mb = b;
         if (stkOn()) { rStk(b, T); mb = h('details', 'man'); if (stkMsg && !stkBusy) mb.open = true; mb.appendChild(h('summary', null, 'Paid manually instead? Enter your M-Pesa code')); b.appendChild(mb); }
@@ -1599,7 +1627,7 @@
         var ac = h('div', 'fld'), al = h('label', null, 'Amount you paid (KSh)'); al.htmlFor = 'payamt'; ac.appendChild(al);
         var ai = h('input'); ai.id = 'payamt'; ai.type = 'number'; ai.inputMode = 'numeric'; ai.min = '1'; ai.value = form.payAmt || ''; ac.appendChild(ai);
         var ae = h('div', 'err', ''); ac.appendChild(ae); mb.appendChild(ac);
-        if (feeOf()) { row(f, 'Items total', money(T.s)); row(f, 'Delivery to ' + form.county, money(feeOf())); row(f, 'Total to pay', money(due(T)), 'big'); } else row(f, 'Items total', money(T.s), 'big'); f.appendChild(h('p', 'note', form.method === 'delivery' && !CFG.fees[form.county] ? 'The delivery fee to your county is confirmed on WhatsApp and paid separately.' : 'Delivery is included in the total above. Pay it in one M-Pesa payment.'));
+        if (feeOf() || vOff(T)) { row(f, 'Items total', money(T.s)); if (vOff(T)) row(f, 'Voucher ' + form.vc.code, '-' + money(vOff(T))); if (feeOf()) row(f, 'Delivery to ' + form.county, money(feeOf())); row(f, 'Total to pay', money(due(T)), 'big'); } else row(f, 'Items total', money(T.s), 'big'); f.appendChild(h('p', 'note', form.method === 'delivery' && !CFG.fees[form.county] ? 'The delivery fee to your county is confirmed on WhatsApp and paid separately.' : 'Delivery is included in the total above. Pay it in one M-Pesa payment.'));
         if (sendErr) f.appendChild(h('div', 'oerr', sendErr));
         var pb = btn(f, sending ? 'Placing your order...' : 'I have paid, place order', function () { place(T); });
         function check(show) {
@@ -1617,7 +1645,7 @@
         var adm = new URL('admin.html', location.href).href;
         var lines = T.L.map(function (i, k) { return (k + 1) + '. ' + i.name + ' x' + i.qty + ' = ' + money(i.total); });
         if (feeOf()) lines.push('Delivery to ' + form.county + ' = ' + money(feeOf()));
-        var msg = ['Order ' + ref, '', lines.join('\n'), '', 'Subtotal: ' + money(T.s) + (feeOf() ? ' + delivery ' + money(feeOf()) + ' = TOTAL ' + money(due(T)) : ''), form.method === 'pickup' ? 'Collection: ' + where() : 'Deliver to: ' + where(),
+        var msg = ['Order ' + ref, '', lines.join('\n'), '', 'Subtotal: ' + money(T.s) + (vOff(T) ? ' - voucher ' + form.vc.code + ' ' + money(vOff(T)) : '') + (feeOf() ? ' + delivery ' + money(feeOf()) : '') + ((feeOf() || vOff(T)) ? ' = TOTAL ' + money(due(T)) : ''), form.method === 'pickup' ? 'Collection: ' + where() : 'Deliver to: ' + where(),
           '', 'Customer: ' + form.name.trim(), 'Phone: +' + normPhone(form.phone), s && s.user && s.user.email ? 'Account email: ' + s.user.email : '',
           form.notes && form.notes.trim() ? 'Notes: ' + form.notes.trim() : '', '', 'Payment: M-Pesa Paybill ' + CFG.paybill + ', account ' + CFG.payAcct, 'M-Pesa CODE entered by customer: ' + (doneCode || cleanCode()) + ' (says paid KSh ' + (doneAmt || Number(form.payAmt)) + ')',
           'WhatsApp the customer: https://wa.me/' + normPhone(form.phone),
@@ -1772,7 +1800,8 @@
           ref: ref, user_id: s ? s.user.id : null, customer_name: form.name.trim().slice(0, 120), phone: '+' + normPhone(form.phone),
           email: (form.email || '').trim().toLowerCase().slice(0, 150) || (s && s.user.email) || null, method: method, county: method === 'delivery' ? form.county : null,
           address: method === 'delivery' ? form.addr.trim().slice(0, 200) : null, notes: form.notes && form.notes.trim() ? form.notes.trim().slice(0, 500) : null,
-          items: T.L.map(function (i) { return { name: i.name, qty: i.qty, price: i.price, total: i.total }; }).concat(feeOf() ? [{ name: 'Delivery fee (' + form.county + ')', qty: 1, price: feeOf(), total: feeOf() }] : []), subtotal: due(T), pay_code: code, pay_amount: paid
+          items: T.L.map(function (i) { return { name: i.name, qty: i.qty, price: i.price, total: i.total }; }).concat(feeOf() ? [{ name: 'Delivery fee (' + form.county + ')', qty: 1, price: feeOf(), total: feeOf() }] : []), subtotal: due(T), pay_code: code, pay_amount: paid,
+          voucher_code: vOff(T) ? form.vc.code : null, discount: vOff(T)
         };
         var hd = { 'Content-Type': 'application/json', apikey: CFG.sbKey, Prefer: 'return=minimal' };
         if (s) hd.Authorization = 'Bearer ' + s.access_token;
@@ -1794,7 +1823,7 @@
             lastMsg = message(T); lastUrl = 'https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(lastMsg);
             notify(T, s);
             ls('stm_cust', { name: form.name.trim(), phone: form.phone, email: (form.email || '').trim(), county: form.county, addr: form.addr, method: form.method });
-            doneRef = ref; doneTotal = due(T); ref = ''; cart = {}; store(); sending = false; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; step = 'done'; sync(); if (!isOpen) render();
+            doneRef = ref; doneTotal = due(T); form.vc = null; form.vcode = ''; ref = ''; cart = {}; store(); sending = false; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; step = 'done'; sync(); if (!isOpen) render();
           })
           .catch(function (err) {
             clearTimeout(to); sending = false;
@@ -1858,6 +1887,7 @@
 <script src="img-protect.js" defer></script>
 <script src="account-panel.js?v=2" defer></script>
 <script src="chat.js?v=1" defer></script>
+<script src="product-reviews.js?v=1" defer></script>
 <script>
 (function () {
   var t = document.getElementById('htabs'), q = document.getElementById('q'), cats = document.querySelectorAll('#cats .cat');
