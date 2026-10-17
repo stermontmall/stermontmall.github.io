@@ -371,6 +371,11 @@
             eb.onclick = function () { eb.disabled = true; sendReceipt(o).then(function () { eb.disabled = false; }); }; a.appendChild(eb); }
           if (ph) { var wr = h('a', 'btn alt sm', 'Receipt on WhatsApp'); wr.href = 'https://wa.me/' + ph + '?text=' + encodeURIComponent(STM_RECEIPT.text(o)); wr.target = '_blank'; wr.rel = 'noopener'; a.appendChild(wr); }
         }
+        if (o.stage === 'delivered' && ph) {
+          var fn = String(o.customer_name || '').trim().split(/\s+/)[0] || 'there';
+          var rq = 'Hi ' + fn + ', thank you for shopping at Stermont Arcade! 🙏\n\nHow was your order ' + o.ref + '? Please rate it, it takes a minute:\nhttps://stermontarcade.co.ke/account.html\n(Sign in, tap Ratings & Reviews, then rate your items.)\n\nYour review helps other customers shop with confidence. Asante!';
+          var rr = h('a', 'btn ok sm', 'Ask for review ⭐'); rr.href = 'https://wa.me/' + ph + '?text=' + encodeURIComponent(rq); rr.target = '_blank'; rr.rel = 'noopener'; a.appendChild(rr);
+        }
         [['packed', 'Mark packed'], ['out_for_delivery', 'Out for delivery'], ['delivered', 'Delivered']].forEach(function (x, i) {
           if (i < cur) return;
           var sb = h('button', 'btn alt sm', x[1]); sb.type = 'button'; sb.onclick = function () { confirmAct(o, x[0]); }; a.appendChild(sb);
