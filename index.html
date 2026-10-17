@@ -1514,7 +1514,7 @@
         var c = (inp.value || '').trim().toUpperCase(); form.vcode = c;
         if (c.length < 3) { er.textContent = 'Enter your voucher code.'; return; }
         ab.disabled = true; er.textContent = '';
-        fetch(CFG.sbUrl + '/rest/v1/rpc/check_voucher', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.sbKey }, body: JSON.stringify({ p_code: c, p_subtotal: T.s }) })
+        fetch(CFG.sbUrl + '/rest/v1/rpc/check_voucher', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.sbKey }, body: JSON.stringify({ p_code: c, p_subtotal: T.s, p_phone: form.phone || null }) })
           .then(function (r) { return r.json(); })
           .then(function (j) {
             if (j && j.ok && Number(j.discount) > 0) { form.vc = { code: String(j.code), discount: Math.round(Number(j.discount)), base: T.s }; form.vcode = ''; form.payTouched = false; render(); }
