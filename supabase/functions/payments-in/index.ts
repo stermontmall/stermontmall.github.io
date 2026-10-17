@@ -5,7 +5,7 @@
 //
 // URLs:  <project>.supabase.co/functions/v1/payments-in/<token>/<action>
 //   validate  (POST, from Safaricom)   always accepts
-//   confirm   (POST, from Safaricom)   records the payment in mpesa_payments
+//   confirm   (POST, from Safaricom)   records the payment in mpesa_c2b_payments
 //   check     (GET)                    tests the Daraja keys (sandbox or production)
 //   register  (GET ?sc=SHORTCODE)      registers the confirm/validate URLs with Daraja
 //   simulate  (GET ?sc=&amount=&ref=)  sandbox only: sends a fake test payment
@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
       const transId = clip(b.TransID, 40).toUpperCase();
       const amount = Number(b.TransAmount);
       if (transId.length >= 5 && Number.isFinite(amount) && amount >= 0) {
-        const { error } = await db.from("mpesa_payments").upsert({
+        const { error } = await db.from("mpesa_c2b_payments").upsert({
           trans_id: transId,
           trans_time: clip(b.TransTime, 20),
           amount,

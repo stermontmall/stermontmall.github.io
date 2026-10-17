@@ -1,6 +1,7 @@
 -- Stermont Arcade: M-Pesa Paybill payment notifications
 -- Run once in Supabase: SQL Editor -> New query -> paste -> Run
 -- Safe to run twice. It only ADDS two new, locked-down tables; it does not touch orders, products or anything else.
+-- NOTE: the table is called mpesa_c2b_payments because "mpesa_payments" already exists (used by the STK push checkout).
 
 -- 1) Private settings. Holds the secret token that is part of the webhook URL. Not readable from the website.
 create table if not exists public.payment_settings (
@@ -14,7 +15,7 @@ insert into public.payment_settings (key, value)
   on conflict (key) do nothing;
 
 -- 2) Payment confirmations received from Safaricom for your Paybill.
-create table if not exists public.mpesa_payments (
+create table if not exists public.mpesa_c2b_payments (
   id bigint generated always as identity primary key,
   created_at timestamptz not null default now(),
   trans_id text not null unique check (char_length(trans_id) between 5 and 40),  -- the M-Pesa code, e.g. SJK1ABC2DE
@@ -26,9 +27,9 @@ create table if not exists public.mpesa_payments (
   short_code text,
   env text not null default 'sandbox' check (env in ('sandbox', 'production'))
 );
-alter table public.mpesa_payments enable row level security;
-revoke all on public.mpesa_payments from anon, authenticated;
-grant select on public.mpesa_payments to authenticated;
-drop policy if exists "staff read payments" on public.mpesa_payments;
-create policy "staff read payments" on public.mpesa_payments
+alter table public.mpesa_c2b_payments enable row level security;
+revoke all on public.mpesa_c2b_payments from anon, authenticated;
+grant select on public.mpesa_c2b_payments to authenticated;
+drop policy if exists "staff read c2b payments" on public.mpesa_c2b_payments;
+create policy "staff read c2b payments" on public.mpesa_c2b_payments
   for select to authenticated using (public.is_staff());   -- only your signed-in staff can read payments
