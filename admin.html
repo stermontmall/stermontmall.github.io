@@ -213,7 +213,20 @@
     return fetch(SB + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: sess.refresh_token }) })
       .then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(setSession);
   }
-  function ready() { return sess && Date.now() > sess.exp ? refresh() : Promise.resolve(); }
+  /* One renewal at a time (several callers can ask at once; reusing a refresh token can revoke the session).
+     If the login cannot be renewed, go back to the sign-in screen instead of leaving dead buttons. */
+  var renewing = null;
+  function ready() {
+    if (!(sess && Date.now() > sess.exp)) return Promise.resolve();
+    if (!renewing) {
+      renewing = refresh().then(function () { renewing = null; }, function () {
+        renewing = null; sess = null; save(null); show('login');
+        var le = $('lerr'); if (le) { le.textContent = 'Your session expired. Please sign in again.'; le.hidden = false; }
+        throw new Error('expired');
+      });
+    }
+    return renewing;
+  }
 
   function show(which) { $('login').hidden = which !== 'login'; $('app').hidden = which !== 'app'; $('out').hidden = $('refresh').hidden = which !== 'app'; $('who').textContent = (which === 'app' && sess && sess.email) || ''; }
 
@@ -449,6 +462,7 @@
         })
         .catch(function (e) {
           $('cf').hidden = true; var er = $('aerr');
+          if (e === 401) { sess = null; save(null); show('login'); var le = $('lerr'); le.textContent = 'Your session expired. Please sign in again.'; le.hidden = false; return; }
           er.textContent = e === 409 ? 'That M-Pesa code is already used on another order.'
             : (e === 400 && needsCode) ? 'Could not save the payment code. Run setup-receipts.sql in Supabase first.'
             : 'Could not update the order. You may not have staff access.';
