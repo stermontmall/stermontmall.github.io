@@ -1,0 +1,36 @@
+# Stermont Arcade - daily sold-out / low-stock report. Opens a GitHub Issue only when something needs restocking (GitHub emails you).
+# Runs every day 08:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab. Read-only: it never changes products.
+name: Daily stock report
+
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build the report
+        id: rep
+        run: node stock-report.mjs > stock-report.md
+      - name: Open or refresh the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --search "Stock report in:title" --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Superseded by today's report." || true
+          done
+          if [ "${{ steps.rep.outputs.items }}" != "0" ]; then
+            gh issue create --title "Stock report $(date +%F)" --body-file stock-report.md
+          else
+            echo "Everything in stock - no issue needed."
+          fi

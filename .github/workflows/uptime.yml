@@ -1,0 +1,51 @@
+# Stermont Arcade - uptime monitor. Checks the shop, the product list and the sitemap every 30 minutes.
+# Opens a GitHub Issue ("Site check failed") the moment something is down and closes it automatically when it recovers.
+name: Uptime monitor
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the site and the catalog
+        id: chk
+        run: |
+          fails=""
+          for u in https://stermontarcade.co.ke/ https://stermontarcade.co.ke/products.html https://stermontarcade.co.ke/sitemap.xml https://stermontarcade.co.ke/account.html; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --retry 2 --retry-delay 5 --max-time 20 "$u" || echo 000)
+            echo "$u -> $code"
+            [ "$code" = "200" ] || fails="$fails\n- $u returned $code"
+          done
+          code=$(curl -s -o /dev/null -w '%{http_code}' --retry 2 --retry-delay 5 --max-time 20 \
+            -H "apikey: sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7" \
+            "https://oewvtbnmyombbtggamor.supabase.co/rest/v1/products?select=id&limit=1" || echo 000)
+          echo "catalog -> $code"
+          [ "$code" = "200" ] || fails="$fails\n- Product catalog (database) returned $code"
+          printf '%b\n' "$fails" > fails.txt
+          if [ -n "$fails" ]; then echo "down=true" >> "$GITHUB_OUTPUT"; else echo "down=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Open an issue if something is down
+        if: steps.chk.outputs.down == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if [ -z "$(gh issue list --state open --search 'Site check failed in:title' --json number --jq '.[].number')" ]; then
+            gh issue create --title "Site check failed $(date -u +%F\ %H:%M) UTC" --body-file fails.txt
+          fi
+      - name: Close the issue when everything is back
+        if: steps.chk.outputs.down == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          for n in $(gh issue list --state open --search 'Site check failed in:title' --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "The site and catalog are responding again."
+          done

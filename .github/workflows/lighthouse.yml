@@ -1,0 +1,42 @@
+# Stermont Arcade - weekly speed, accessibility, best-practice and SEO scores from Google Lighthouse (mobile) on the live site.
+# Opens a GitHub Issue with the scores and the biggest problems. Runs every Monday 10:00 Nairobi time, or tap "Run workflow".
+name: Weekly speed check
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run Lighthouse on key pages
+        run: |
+          npm install -g lighthouse
+          mkdir -p lh
+          i=0
+          for u in https://stermontarcade.co.ke/ https://stermontarcade.co.ke/products.html https://stermontarcade.co.ke/c/rodent-control.html https://stermontarcade.co.ke/p/air-chopper-7-5sc-insecticide-100-ml.html https://stermontarcade.co.ke/blog/; do
+            i=$((i+1))
+            lighthouse "$u" --quiet --output=json --output-path="lh/page$i.json" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --chrome-flags="--headless=new --no-sandbox" || echo "Lighthouse failed for $u"
+          done
+      - name: Build the report
+        run: node lighthouse-report.mjs lh > lh-report.md
+      - name: Publish as an issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --search "Weekly speed and quality check in:title" --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Superseded by this week's report." || true
+          done
+          gh issue create --title "Weekly speed and quality check $(date +%F)" --body-file lh-report.md
