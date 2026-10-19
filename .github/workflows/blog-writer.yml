@@ -1,0 +1,61 @@
+# Stermont Arcade - drafts one new blog post twice a week from the next "pending" topic in blog-topics.json.
+# It never publishes by itself: each draft arrives as a pull request for you to read and merge.
+# Needs the repository secret ANTHROPIC_API_KEY (Settings > Secrets and variables > Actions).
+# Also needs Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests" turned on.
+# Runs: Monday and Thursday 09:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
+name: Blog writer
+
+on:
+  schedule:
+    - cron: '0 6 * * 1,4'
+  workflow_dispatch:
+    inputs:
+      topic_slug:
+        description: 'Optional: write this specific pending topic (slug from blog-topics.json)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: blog-writer
+  cancel-in-progress: false
+
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the site files
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Draft the next post
+        id: draft
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TOPIC_SLUG: ${{ github.event.inputs.topic_slug }}
+        run: node blog-write.mjs
+
+      - name: Open a pull request for review
+        if: steps.draft.outputs.written == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLUG: ${{ steps.draft.outputs.slug }}
+          TITLE: ${{ steps.draft.outputs.title }}
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          branch="draft/$SLUG"
+          git checkout -b "$branch"
+          git add "blog/$SLUG.html" blog-topics.json
+          git commit -m "Draft blog post: $TITLE"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "Blog draft: $TITLE" \
+            --body "Automatic draft for review. Read it, check any product links, then merge to publish. Merging also updates the blog index and sitemap automatically. Close the PR to discard it."
