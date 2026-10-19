@@ -1,13 +1,13 @@
-# Stermont Arcade - drafts one new blog post twice a week from the next "pending" topic in blog-topics.json.
+# Stermont Arcade - drafts one new blog post every day from the next "pending" topic in blog-topics.json.
 # It never publishes by itself: each draft arrives as a pull request for you to read and merge.
 # Needs the repository secret ANTHROPIC_API_KEY (Settings > Secrets and variables > Actions).
 # Also needs Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests" turned on.
-# Runs: Monday and Thursday 09:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
+# Runs: every day 09:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
 name: Blog writer
 
 on:
   schedule:
-    - cron: '0 6 * * 1,4'
+    - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
       topic_slug:
