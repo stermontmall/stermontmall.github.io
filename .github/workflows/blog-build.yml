@@ -1,0 +1,45 @@
+# Stermont Arcade - keeps blog/index.html and sitemap.xml in step with the posts in /blog/ automatically.
+# Runs: whenever a blog post is added or edited on main, and whenever you tap "Run workflow" in the Actions tab.
+name: Build blog index and sitemap
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'blog/*.html'
+      - 'blog-build.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: blog-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the site files
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Rebuild blog index and sitemap entries
+        run: node blog-build.mjs
+
+      - name: Save changes (only if something changed)
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add blog/index.html sitemap.xml
+          if git diff --cached --quiet; then
+            echo "Nothing changed - no commit needed."
+          else
+            git commit -m "Update blog index and sitemap"
+            git push
+          fi
