@@ -1,6 +1,66 @@
 {
-  "_how_to_use": "The blog writer drafts the first topic whose status is 'pending'. Add new topics at the end. 'facts' is the ONLY product information the writer may use, so put in only things you know are true. 'links' are store pages it may link to. Drafts arrive as pull requests for you to review.",
+  "_how_to_use": "The blog writer drafts the first topic whose status is 'pending'. Add new topics at the end. 'facts' is the ONLY product information the writer may use, so put in only things you know are true. 'links' are store pages it may link to. Drafts arrive as pull requests for you to review. Topics with status 'paused' are skipped: set them back to 'pending' once their linked product pages are live again.",
   "topics": [
+    {
+      "slug": "where-to-buy-bed-bug-killer-in-kenya",
+      "title": "Where to buy bed bug killer in Kenya: what to check before you buy",
+      "angle": "Buyer guide for people searching to buy bed bug insecticide online in Kenya: check the PCPB registration on the pack, pack size for the room or building, the active ingredient and label directions, why a second treatment is needed, and when to call a licensed operator. No dilution rates or dosing: always follow the label.",
+      "keywords": ["bed bug killer Kenya", "buy bed bug spray Nairobi", "bed bug insecticide price Kenya"],
+      "facts": [
+        "We sell bed bug killers and other pest control products online in our Bed Bug Killers and Pest Control categories.",
+        "Pay by M-Pesa. Delivery to all 47 counties."
+      ],
+      "links": ["/c/bed-bug-killers.html", "/c/pest-control-fumigation.html", "/blog/how-to-get-rid-of-bed-bugs-kenya.html"],
+      "status": "pending"
+    },
+    {
+      "slug": "cockroach-gel-spray-or-powder-kenya",
+      "title": "Cockroach gel, spray or powder: which works best in Kenyan homes and kitchens?",
+      "angle": "Plain comparison of cockroach gel baits, residual sprays and powders: where each is used, speed, safety around food and children, and why cleaning and sealing gaps matters. Always follow the label.",
+      "keywords": ["cockroach killer Kenya", "cockroach gel bait", "best cockroach killer"],
+      "facts": [
+        "We sell pest control products online, including insecticides for cockroaches and bed bugs.",
+        "Pay by M-Pesa. Delivery to all 47 counties."
+      ],
+      "links": ["/c/pest-control-fumigation.html", "/blog/how-to-get-rid-of-cockroaches-kenya.html"],
+      "status": "pending"
+    },
+    {
+      "slug": "rat-poison-glue-board-or-trap-kenya",
+      "title": "Rat poison, glue board or snap trap: how to choose in Kenya",
+      "angle": "Compare the main rodent control options for homes, shops and farms: baits, glue boards and traps. Cover safety for children and pets, where each is suitable, placing and checking, and disposal. No dosing: follow the label.",
+      "keywords": ["rat poison Kenya", "rat glue board Kenya", "how to kill rats"],
+      "facts": [
+        "We sell rodent control products online in our Rodent Control category.",
+        "Pay by M-Pesa. Delivery to all 47 counties."
+      ],
+      "links": ["/c/rodent-control.html", "/blog/rat-and-mouse-control-kenya.html"],
+      "status": "pending"
+    },
+    {
+      "slug": "termite-control-at-home-kenya",
+      "title": "Termite control at home in Kenya: signs, prevention and treatment options",
+      "angle": "Signs of termites, why they are hard to remove, simple prevention (moisture, timber contact), the difference between do-it-yourself products and a professional soil treatment, and when to call a licensed operator. Follow the label.",
+      "keywords": ["termite control Kenya", "termiticide Kenya", "how to get rid of termites"],
+      "facts": [
+        "We sell termite control products online in our Termite Control category.",
+        "Pay by M-Pesa. Delivery to all 47 counties."
+      ],
+      "links": ["/c/termite-control.html", "/c/pest-control-fumigation.html"],
+      "status": "pending"
+    },
+    {
+      "slug": "pest-control-products-for-hotels-and-restaurants-kenya",
+      "title": "Pest control products for hotels, restaurants and rentals in Kenya",
+      "angle": "Practical guide for managers: common pests in food and hospitality premises, routine inspection and sanitation, which product types suit kitchens and guest rooms, record keeping, and when to bring in a licensed operator.",
+      "keywords": ["pest control products Kenya", "hotel pest control", "restaurant cockroach control"],
+      "facts": [
+        "We sell pest control products online for homes and businesses.",
+        "Pay by M-Pesa. Delivery to all 47 counties."
+      ],
+      "links": ["/c/pest-control-fumigation.html", "/c/bed-bug-killers.html", "/c/rodent-control.html"],
+      "status": "pending"
+    },
     {
       "slug": "how-to-choose-an-electric-kettle-kenya",
       "title": "How to choose an electric kettle in Kenya",
@@ -11,7 +71,7 @@
         "Pay by M-Pesa. Delivery to all 47 counties. Faulty items can be returned within 48 hours of delivery."
       ],
       "links": ["/p/ramtons-rm-399-corded-electric-kettle-1-7l.html", "/p/sonar-2l-cordless-electric-kettle.html"],
-      "status": "pending"
+      "status": "paused"
     },
     {
       "slug": "blender-buying-guide-kenya",
@@ -23,7 +83,7 @@
         "Pay by M-Pesa. Delivery to all 47 counties. Faulty items can be returned within 48 hours of delivery."
       ],
       "links": ["/p/em-2-in-1-blender-and-grinder-1-5l.html", "/p/globalstar-juice-commercial-blender-2l-red.html"],
-      "status": "pending"
+      "status": "paused"
     },
     {
       "slug": "how-to-disinfect-a-poultry-house-kenya",
@@ -47,7 +107,7 @@
         "Pay by M-Pesa. Delivery to all 47 counties."
       ],
       "links": ["/p/vetagro-seedling-tray-starter-germination.html", "/p/osho-coco-peat-block-5kg.html"],
-      "status": "pending"
+      "status": "paused"
     }
   ]
 }
