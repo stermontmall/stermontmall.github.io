@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><title>Photo upload</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:480px;margin:0 auto;padding:1rem;background:#faf9fd;color:#1f1b2e}
+h1{font-size:1.3rem}input,button{font:inherit;width:100%;padding:.8rem;margin:.4rem 0;border-radius:10px;border:1px solid #c9c2e6;box-sizing:border-box}
+button{background:#7c3aed;color:#fff;border:0;font-weight:700}ul{padding-left:1.1rem}.ok{color:#15803d}.no{color:#b91c1c}</style></head><body>
+<h1>Stermont product photo upload</h1>
+<p>Enter the passcode, choose the 8 product photos, then tap Upload.</p>
+<input id="pass" type="password" placeholder="Passcode" autocomplete="off">
+<input id="files" type="file" accept="image/*" multiple>
+<button id="go">Upload photos</button>
+<ul id="out"></ul>
+<script>
+document.getElementById('go').onclick = async () => {
+  const out = document.getElementById('out'), files = document.getElementById('files').files;
+  out.innerHTML = '';
+  if (!files.length) { out.innerHTML = '<li class="no">Choose the photos first.</li>'; return; }
+  const fd = new FormData(); fd.append('pass', document.getElementById('pass').value);
+  for (const f of files) fd.append('files', f, f.name);
+  out.innerHTML = '<li>Uploading...</li>';
+  try {
+    const r = await fetch('https://oewvtbnmyombbtggamor.supabase.co/functions/v1/upload-photos', { method: 'POST', body: fd });
+    const j = await r.json();
+    if (j.error) { out.innerHTML = '<li class="no">' + j.error + '</li>'; return; }
+    out.innerHTML = j.results.map(x => '<li class="' + (x.ok ? 'ok' : 'no') + '">' + x.file + (x.ok ? ' uploaded' : ' skipped: ' + x.reason) + '</li>').join('');
+  } catch (e) { out.innerHTML = '<li class="no">Upload failed. Check your connection and try again.</li>'; }
+};
+</script></body></html>
