@@ -7,7 +7,7 @@
    Also records taps on WhatsApp order links, so you can see which pages bring enquiries. */
 (function () {
   'use strict';
-  var CONFIG = { ga4: '', plausible: '', metaPixel: '' };
+  var CONFIG = { ga4: 'G-51B6TZQ0ZN', plausible: '', metaPixel: '' };
 
   if (!(CONFIG.ga4 || CONFIG.plausible || CONFIG.metaPixel)) return;
   if (/^\/(admin|account)/.test(location.pathname)) return;
