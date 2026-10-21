@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#7c3aed">
-  <title>Account | Stermont Mall</title>
+  <title>Account | Stermont Arcade</title>
   <meta name="robots" content="noindex, follow">
   <link rel="icon" type="image/png" href="favicon.png">
   <style>
@@ -76,7 +76,7 @@
 </head>
 <body>
   <header>
-    <a class="wm" href="index.html" aria-label="Stermont Mall home"><b>Stermont</b><i>Mall</i></a>
+    <a class="wm" href="index.html" aria-label="Stermont Arcade home"><b>Stermont</b><i>Arcade</i></a>
     <a class="back" href="index.html">&larr; Back to store</a>
   </header>
 
@@ -86,7 +86,7 @@
       <!-- LOG IN / CREATE ACCOUNT -->
       <section id="v-auth">
         <h1 id="auth-title">Welcome back</h1>
-        <p class="sub" id="auth-sub">Log in to your Stermont Mall account.</p>
+        <p class="sub" id="auth-sub">Log in to your Stermont Arcade account.</p>
         <div class="tabs" role="tablist">
           <button type="button" role="tab" id="tab-login" aria-selected="true">Log in</button>
           <button type="button" role="tab" id="tab-signup" aria-selected="false">Create account</button>
@@ -227,7 +227,7 @@
       $('tab-signup').setAttribute('aria-selected', !login);
       $('f-login').hidden = !login; $('f-signup').hidden = login;
       $('auth-title').textContent = login ? 'Welcome back' : 'Create your account';
-      $('auth-sub').textContent = login ? 'Log in to your Stermont Mall account.' : 'Sign up to save your details and order faster.';
+      $('auth-sub').textContent = login ? 'Log in to your Stermont Arcade account.' : 'Sign up to save your details and order faster.';
       document.querySelectorAll('.msg').forEach(function (m) { m.textContent = ''; m.className = 'msg'; });
     }
     $('tab-login').onclick = function () { tab('login'); };

@@ -1,5 +1,5 @@
-// Stermont Arcade - weekly SEO health check. Reads the built pages in this repo and prints a Markdown report.
-// Runs from .github/workflows/seo-weekly.yml (no installs needed, Node 18+).
+// Stermont Arcade - daily SEO health check. Reads the built pages in this repo and prints a Markdown report.
+// Runs from .github/workflows/seo-daily.yml (no installs needed, Node 18+).
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 
 const SITE = 'https://stermontarcade.co.ke';
@@ -24,7 +24,7 @@ for (const f of pages) {
   (h.match(/<img\b[^>]*>/gi) || []).forEach(t => { if (!/\balt=/i.test(t)) add('Image without alt text', f); });
   for (const m of h.matchAll(/<script type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)) { try { JSON.parse(m[1]); } catch { add('Broken structured data (JSON-LD)', f); } }
   if (f.startsWith('p/')) {
-    if (!/<img\b/i.test(h)) add('Product page has no photo (also left out of the Google Shopping feed)', f);
+    if (!/<img\b(?![^>]*placeholder\.svg)/i.test(h)) add('Product page has no photo (also left out of the Google Shopping feed)', f);
     if (!/Product details/.test(h)) add('Product has no description (short pages rank poorly)', f);
     if (!/"@type":"(Product|ProductGroup)"/.test(h)) add('Missing Product structured data', f);
   }
@@ -38,7 +38,7 @@ for (const sm of ['sitemap.xml', 'sitemap-products.xml']) if (existsSync(sm))
   for (const m of readFileSync(sm, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) { const u = m[1].replace(SITE, ''); if (u.startsWith('/') && !exists(u)) add('Sitemap lists a page that does not exist', `${sm}: ${u}`); }
 
 const total = Object.values(issues).reduce((n, a) => n + a.length, 0);
-let out = `# Weekly SEO check\n\nChecked ${checked} pages (${redirects} size-redirect pages skipped). ${total ? `Found **${total}** things to fix.` : 'No problems found. 🎉'}\n`;
+let out = `# Daily SEO check\n\nChecked ${checked} pages (${redirects} size-redirect pages skipped). ${total ? `Found **${total}** things to fix.` : 'No problems found. 🎉'}\n`;
 for (const [what, list] of Object.entries(issues).sort((a, b) => b[1].length - a[1].length)) {
   const u = [...new Set(list)];
   out += `\n### ${what} (${u.length})\n${u.slice(0, 15).map(x => `- ${x}`).join('\n')}${u.length > 15 ? `\n- …and ${u.length - 15} more` : ''}\n`;
