@@ -11,6 +11,7 @@ on:
     branches: [main]
     paths:
       - '*.html'
+      - 'analytics.js'
       - 'seo-auto-index.mjs'
       - 'sitemap.xml'
 
@@ -37,7 +38,7 @@ jobs:
         run: |
           git config user.name "bot"
           git config user.email "bot@users.noreply.github.com"
-          git add -- '*.html'
+          git add -- '*.html' p c blog
           if git diff --cached --quiet; then
             echo "Nothing changed - no commit needed."
           else

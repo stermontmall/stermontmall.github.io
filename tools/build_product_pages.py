@@ -157,6 +157,7 @@ def page_html(p, canon_id):
 </section>
 </main>
 <footer>Stermont Arcade, Kenya. Questions? support@stermontarcade.co.ke</footer>
+<script src="/analytics.js" defer></script>
 </body>
 </html>
 """

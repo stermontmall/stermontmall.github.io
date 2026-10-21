@@ -1,0 +1,106 @@
+# Stermont Arcade - weekly site audit with four free tools. Each tool is its own job, so one failing never stops the others.
+#   Lychee        broken links (pages, images, external links)
+#   Unlighthouse  Lighthouse scores for the whole site (static pages, categories, blog; product pages are sampled by the weekly speed check)
+#   Pa11y         accessibility problems on the key pages
+#   seo-analyzer  on-page SEO rules (titles, meta, social tags, alt text, canonicals)
+# Runs every Tuesday 10:00 Nairobi time, or tap "Run workflow" in the Actions tab. Reports are in the run's Summary and Artifacts.
+name: Site audit
+
+on:
+  schedule:
+    - cron: '0 7 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    name: Broken links (Lychee)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress --root-dir ${{ github.workspace }}
+            --accept 200,201,204,206,301,302,308,403,429
+            --exclude 'wa\.me' --exclude 'supabase\.co' --exclude '^mailto:' --exclude '^tel:'
+            --max-concurrency 8 --timeout 20 --max-retries 2
+            './*.html' './blog/*.html' './c/*.html'
+          output: ./lychee-report.md
+          fail: false
+          jobSummary: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lychee-report
+          path: lychee-report.md
+          if-no-files-found: ignore
+
+  lighthouse-all:
+    name: Whole-site scores (Unlighthouse)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run Unlighthouse
+        run: npx --yes unlighthouse-ci --site https://stermontarcade.co.ke --build-static --exclude-urls '^/p/' --samples 1 --no-cache
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unlighthouse-report
+          path: .unlighthouse
+          if-no-files-found: ignore
+
+  accessibility:
+    name: Accessibility (Pa11y)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run Pa11y on key pages
+        run: |
+          npx --yes pa11y-ci --config .pa11yci.json --json > pa11y-report.json || true
+          node -e "
+            const r = JSON.parse(require('fs').readFileSync('pa11y-report.json','utf8'));
+            let out = '## Accessibility (Pa11y, WCAG 2 AA)\n\n' + r.passes + ' of ' + r.total + ' pages passed.\n';
+            for (const [u, issues] of Object.entries(r.results)) if (issues.length) {
+              out += '\n### ' + u + ' (' + issues.length + ')\n' + issues.slice(0, 8).map(i => '- ' + i.message + ' \`' + (i.selector || '').slice(0, 80) + '\`').join('\n') + '\n';
+            }
+            require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY, out);
+          " || echo "Could not build the summary - see the artifact."
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pa11y-report
+          path: pa11y-report.json
+          if-no-files-found: ignore
+
+  seo-rules:
+    name: On-page SEO rules (seo-analyzer)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install seo-analyzer
+        run: npm install --no-save --no-package-lock seo-analyzer
+      - name: Run the rules
+        run: node seo-analyzer-run.mjs | tee seo-analyzer-report.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: seo-analyzer-report
+          path: seo-analyzer-report.txt
+          if-no-files-found: ignore

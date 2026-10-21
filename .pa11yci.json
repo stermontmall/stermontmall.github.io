@@ -1,0 +1,20 @@
+{
+  "defaults": {
+    "standard": "WCAG2AA",
+    "timeout": 60000,
+    "wait": 1500,
+    "chromeLaunchConfig": { "args": ["--no-sandbox", "--disable-setuid-sandbox"] }
+  },
+  "urls": [
+    "https://stermontarcade.co.ke/",
+    "https://stermontarcade.co.ke/products.html",
+    "https://stermontarcade.co.ke/c/rodent-control.html",
+    "https://stermontarcade.co.ke/p/air-chopper-7-5sc-insecticide-100-ml.html",
+    "https://stermontarcade.co.ke/blog/",
+    "https://stermontarcade.co.ke/about.html",
+    "https://stermontarcade.co.ke/contact.html",
+    "https://stermontarcade.co.ke/faq.html",
+    "https://stermontarcade.co.ke/shipping.html",
+    "https://stermontarcade.co.ke/returns.html"
+  ]
+}

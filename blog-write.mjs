@@ -113,7 +113,7 @@ ${art.closing ? para(art.closing) : ''}
 <a class="btn" href="/products.html">Browse all products</a>
 <div class="box"><a href="https://wa.me/254748888230?text=Hello%20Stermont%20Arcade">Questions? Chat with us on WhatsApp</a></div>
 </main>
-<footer>Stermont Arcade · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/254748888230">WhatsApp +254 748 888 230</a> · <a href="/shipping.html">Shipping</a> · <a href="/returns.html">Returns</a> · <a href="/privacy.html">Privacy</a></footer></body></html>
+<footer>Stermont Arcade · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/254748888230">WhatsApp +254 748 888 230</a> · <a href="/shipping.html">Shipping</a> · <a href="/returns.html">Returns</a> · <a href="/privacy.html">Privacy</a></footer><script src="/analytics.js" defer></script></body></html>
 `;
 writeFileSync(`blog/${topic.slug}.html`, html);
 topic.status = 'drafted'; topic.drafted = iso;

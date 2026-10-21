@@ -45,6 +45,32 @@
       window.fbq('track', 'PageView');
     }
 
+    // Real-visitor speed (Core Web Vitals) from Google's web-vitals library, sent to GA4 as events.
+    // In GA4 look for the events LCP, INP, CLS, FCP and TTFB (metric_rating = good / needs-improvement / poor).
+    if (CONFIG.ga4) {
+      var wv = document.createElement('script');
+      wv.async = true;
+      wv.src = 'https://cdn.jsdelivr.net/npm/web-vitals@4/dist/web-vitals.iife.js';
+      wv.onload = function () {
+        try {
+          var send = function (m) {
+            window.gtag('event', m.name, {
+              value: Math.round(m.name === 'CLS' ? m.delta * 1000 : m.delta),
+              metric_id: m.id,
+              metric_value: m.value,
+              metric_rating: m.rating,
+              page_path: location.pathname,
+              non_interaction: true
+            });
+          };
+          ['onLCP', 'onINP', 'onCLS', 'onFCP', 'onTTFB'].forEach(function (k) {
+            if (window.webVitals && window.webVitals[k]) window.webVitals[k](send);
+          });
+        } catch (err) {}
+      };
+      document.head.appendChild(wv);
+    }
+
     // Count taps on WhatsApp order / enquiry links.
     document.addEventListener('click', function (e) {
       var a = e.target && e.target.closest ? e.target.closest('a[href*="wa.me"]') : null;

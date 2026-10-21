@@ -93,6 +93,19 @@ for (const file of PAGES) {
     if (h !== before) { problems += notes.filter(n => !n.startsWith('BROKEN')).length; if (!CHECK) writeFileSync(file, h); }
   }
 }
+// ---- Tracking: every public page loads /analytics.js (GA4 + Core Web Vitals). Generators add it too; this heals any gap. ----
+const TRACK = '<script src="/analytics.js" defer></script>';
+const dirHtml = d => (existsSync(d) ? readdirSync(d).filter(f => f.endsWith('.html')).map(f => `${d}/${f}`) : []);
+const ALL = [...readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|upload-photos|google)/.test(f)), ...dirHtml('p'), ...dirHtml('c'), ...dirHtml('blog')];
+let tracked = 0;
+for (const f of ALL) {
+  const h = readFileSync(f, 'utf8');
+  if (/analytics\.js/.test(h) || /http-equiv=["']refresh["']/i.test(h) || !/<\/body>/i.test(h)) continue;   // redirect pages need no tracking
+  tracked++;
+  if (!CHECK) writeFileSync(f, h.replace(/<\/body>/i, `${TRACK}</body>`));
+}
+if (tracked) { console.log(`analytics.js ${CHECK ? 'missing on' : 'added to'} ${tracked} page(s)`); problems += tracked; }
+
 console.log(problems ? (CHECK ? `\n${problems} issue(s) found.` : '\nPages updated.') : 'All pages already standardized.');
 
 // ---- IndexNow submission ----
