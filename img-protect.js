@@ -24,3 +24,8 @@
 (function () {
   try { var a = document.createElement('script'); a.src = '/analytics.js'; a.defer = true; document.head.appendChild(a); } catch (e) {}
 })();
+
+/* Footer links to the About, FAQ, Contact and Terms pages (see /site-links.js). */
+(function () {
+  try { var l = document.createElement('script'); l.src = '/site-links.js'; l.defer = true; document.head.appendChild(l); } catch (e) {}
+})();
