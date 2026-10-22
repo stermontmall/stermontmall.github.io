@@ -1114,7 +1114,14 @@
           msg.appendChild(a);
         }
       }
-      form.addEventListener('submit', function (e) { e.preventDefault(); run(true); logSearch('typed'); });
+      form.addEventListener('submit', function (e) {
+        e.preventDefault(); run(true); logSearch('typed');
+        /* one matching product (or an exact name match) opens straight away */
+        var vis = [].filter.call(music.querySelectorAll('.pcard'), function (c) { return !c.classList.contains('hidden') && !c.classList.contains('vhide'); });
+        var qq = input.value.trim().toLowerCase();
+        var hit = vis.length === 1 ? vis[0] : vis.filter(function (c) { return c.querySelector('h3').textContent.trim().toLowerCase() === qq; })[0];
+        if (hit) { input.blur(); openCard(hit); }
+      });
       input.addEventListener('input', function () { run(false); clearTimeout(logT); logT = setTimeout(function () { logSearch('typed'); }, 1500); });
 
       /* ---- Live suggestions while typing ---- */
