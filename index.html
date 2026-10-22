@@ -1122,7 +1122,7 @@
       form.appendChild(box);
       input.setAttribute('aria-controls', 'sugg'); input.setAttribute('aria-autocomplete', 'list');
       var pool = [], seen = {}, act = -1, poolSig = '';
-      function add(t, c) { t = (t || '').replace(/\s+/g, ' ').trim(); var k = t.toLowerCase(); if (t && !seen[k]) { seen[k] = 1; pool.push({ t: t, c: c }); } }
+      function add(t, c, el) { t = (t || '').replace(/\s+/g, ' ').trim(); var k = t.toLowerCase(); if (t && !seen[k]) { seen[k] = 1; pool.push({ t: t, c: c, el: el || null }); } }
       /* rebuilt from the page each time, so products that load in later from the shop database are suggested too */
       function buildPool() {
         var n = document.querySelectorAll('#music-gear .pcard').length + document.querySelectorAll('#range li').length;
@@ -1135,7 +1135,7 @@
         document.querySelectorAll('#music-gear .mcat').forEach(function (m) {
           var cn = ((m.querySelector('h3.sub') || m.querySelector('h3') || {}).textContent || 'Product').replace(/\d+\s*$/, '').trim();
           add(cn, 'Category');
-          m.querySelectorAll('.pcard:not(.vhide) h3').forEach(function (h) { add(h.textContent, 'Product'); });
+          m.querySelectorAll('.pcard:not(.vhide) h3').forEach(function (h) { add(h.textContent, 'Product', h.closest('.pcard')); });
         });
       }
       /* typo helper: the typed word is within one slip (missing, extra, wrong or swapped letter) of the start of a product word */
@@ -1146,7 +1146,15 @@
       }
       function near(a, b) { return a.length >= 4 && (lev1(a, b.slice(0, a.length)) || lev1(a, b.slice(0, a.length + 1)) || lev1(a, b.slice(0, a.length - 1))); }
       function hide() { box.classList.remove('on'); box.innerHTML = ''; act = -1; }
-      function pick(t) { input.value = t; hide(); run(true); logSearch('suggestion'); input.blur(); }
+      function openCard(el) {
+        var g = el.closest('.mcat'); if (g) g.classList.add('open');
+        if (window.STM_openView && el._p) window.STM_openView(el);
+        else { var h = el.querySelector('h3'); if (h) h.click(); }
+      }
+      function pick(t, el) {
+        input.value = t; hide(); run(!el); logSearch('suggestion'); input.blur();
+        if (el) openCard(el);
+      }
       function esc(x) { return x.replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); }
       function suggest() {
         var q = input.value.trim().toLowerCase();
@@ -1166,7 +1174,7 @@
           return total;
         }
         var hits = [];
-        pool.forEach(function (o) { var sc = score(o); if (sc > -1) hits.push({ t: o.t, c: o.c, sc: sc }); });
+        pool.forEach(function (o) { var sc = score(o); if (sc > -1) hits.push({ t: o.t, c: o.c, sc: sc, el: o.el }); });
         hits.sort(function (a, b) { return a.sc - b.sc || (a.c === 'Category') - (b.c === 'Category') || a.t.length - b.t.length; });
         hits = hits.slice(0, 8);
         box.innerHTML = '';
@@ -1177,7 +1185,7 @@
           if (i > -1) label = esc(o.t.slice(0, i)) + '<mark>' + esc(o.t.slice(i, i + q.length)) + '</mark>' + esc(o.t.slice(i + q.length));
           b.innerHTML = '<span>' + label + '</span><small>' + esc(o.c) + '</small>';
           b.addEventListener('mousedown', function (e) { e.preventDefault(); });
-          b.addEventListener('click', function () { pick(o.t); });
+          b.addEventListener('click', function () { pick(o.t, o.el); });
           box.appendChild(b);
         });
         act = -1; box.classList.add('on');
