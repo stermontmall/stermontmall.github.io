@@ -1121,23 +1121,53 @@
       var box = document.createElement('div'); box.className = 'sugg'; box.id = 'sugg'; box.setAttribute('role', 'listbox');
       form.appendChild(box);
       input.setAttribute('aria-controls', 'sugg'); input.setAttribute('aria-autocomplete', 'list');
-      var pool = [], seen = {}, act = -1;
+      var pool = [], seen = {}, act = -1, poolSig = '';
       function add(t, c) { t = (t || '').replace(/\s+/g, ' ').trim(); var k = t.toLowerCase(); if (t && !seen[k]) { seen[k] = 1; pool.push({ t: t, c: c }); } }
-      document.querySelectorAll('#range .range > div').forEach(function (d) {
-        var cn = d.querySelector('h3').textContent.replace(/\d+\s*$/, '').trim();
-        add(cn, 'Category');
-        d.querySelectorAll('li').forEach(function (li) { add(li.textContent, cn); });
-      });
-      document.querySelectorAll('#music-gear .pcard h3').forEach(function (h) { add(h.textContent, 'Product'); });
+      /* rebuilt from the page each time, so products that load in later from the shop database are suggested too */
+      function buildPool() {
+        var n = document.querySelectorAll('#music-gear .pcard').length + document.querySelectorAll('#range li').length;
+        if (n === poolSig && pool.length) return; poolSig = n; pool = []; seen = {};
+        document.querySelectorAll('#range .range > div').forEach(function (d) {
+          var cn = d.querySelector('h3').textContent.replace(/\d+\s*$/, '').trim();
+          add(cn, 'Category');
+          d.querySelectorAll('li').forEach(function (li) { add(li.textContent, cn); });
+        });
+        document.querySelectorAll('#music-gear .mcat').forEach(function (m) {
+          var cn = ((m.querySelector('h3.sub') || m.querySelector('h3') || {}).textContent || 'Product').replace(/\d+\s*$/, '').trim();
+          add(cn, 'Category');
+          m.querySelectorAll('.pcard:not(.vhide) h3').forEach(function (h) { add(h.textContent, 'Product'); });
+        });
+      }
+      /* typo helper: the typed word is within one slip (missing, extra, wrong or swapped letter) of the start of a product word */
+      function lev1(a, b) {
+        if (a === b) return true; var la = a.length, lb = b.length; if (Math.abs(la - lb) > 1) return false;
+        var i = 0; while (i < la && i < lb && a[i] === b[i]) i++;
+        return a.slice(i + 1) === b.slice(i + 1) || a.slice(i + 1) === b.slice(i) || a.slice(i) === b.slice(i + 1) || (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2));
+      }
+      function near(a, b) { return a.length >= 4 && (lev1(a, b.slice(0, a.length)) || lev1(a, b.slice(0, a.length + 1)) || lev1(a, b.slice(0, a.length - 1))); }
       function hide() { box.classList.remove('on'); box.innerHTML = ''; act = -1; }
       function pick(t) { input.value = t; hide(); run(true); logSearch('suggestion'); input.blur(); }
       function esc(x) { return x.replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); }
       function suggest() {
         var q = input.value.trim().toLowerCase();
         if (q.length < 1 || document.activeElement !== input) { hide(); return; }
+        buildPool();
         var ws = q.split(/\s+/).filter(function (w) { return w !== 'and' && w !== '&'; }).map(function (w) { return w.replace(/s$/, ''); });
-        var hits = pool.filter(function (o) { var t = o.t.toLowerCase(); return ws.every(function (w) { return t.indexOf(w) !== -1; }); });
-        hits.sort(function (a, b) { return (a.t.toLowerCase().indexOf(q) === 0 ? 0 : 1) - (b.t.toLowerCase().indexOf(q) === 0 ? 0 : 1) || a.t.length - b.t.length; });
+        function score(o) {
+          var t = o.t.toLowerCase(), words = t.split(/[^a-z0-9]+/).filter(Boolean), total = 0;
+          for (var i = 0; i < ws.length; i++) {
+            var w = ws[i], best = 9;
+            if (t.indexOf(w) === 0) best = 0;
+            else if (words.some(function (x) { return x.indexOf(w) === 0; })) best = 1;
+            else if (t.indexOf(w) !== -1) best = 2;
+            else if (words.some(function (x) { return near(w, x); })) best = 3;
+            if (best === 9) return -1; total += best;
+          }
+          return total;
+        }
+        var hits = [];
+        pool.forEach(function (o) { var sc = score(o); if (sc > -1) hits.push({ t: o.t, c: o.c, sc: sc }); });
+        hits.sort(function (a, b) { return a.sc - b.sc || (a.c === 'Category') - (b.c === 'Category') || a.t.length - b.t.length; });
         hits = hits.slice(0, 8);
         box.innerHTML = '';
         if (!hits.length) { box.classList.remove('on'); return; }
