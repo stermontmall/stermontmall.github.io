@@ -422,6 +422,28 @@
     .range>div,.how>div{background:var(--card)}
     section h2.t{font-size:1.35rem}
     @media(min-width:760px){.cats{grid-auto-columns:calc(100% / 9);grid-template-rows:repeat(2,auto)}.tabs{gap:2rem}}
+
+    /* ===== Search: Jumia-style bar and suggestion list =====
+       The suggestion rows used to inherit the search BUTTON style (solid purple, centred, unreadable text).
+       Everything below is scoped to the search form so nothing else on the page is affected. */
+    .search{border-radius:8px}
+    .search input{padding:.8rem 0;font-size:1rem}
+    .search>button .sbtxt{display:none}
+    @media(min-width:760px){
+      .search>button{display:flex;align-items:center;gap:.5rem;padding:0 1.7rem}
+      .search>button .sbtxt{display:inline;font-weight:800;font-size:.9rem;letter-spacing:.05em;text-transform:uppercase}
+    }
+    .search .sugg{left:-2px;right:-2px;top:calc(100% + 2px);padding:0;border-radius:0 0 8px 8px;border:1px solid var(--line);border-top:0;background:var(--card);box-shadow:0 14px 28px rgba(0,0,0,.16);max-height:min(62vh,430px)}
+    .search .sugg button{display:flex;align-items:center;justify-content:flex-start;gap:.8rem;width:100%;margin:0;padding:.75rem 1rem;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:var(--ink);font:inherit;font-weight:400;text-align:left;align-self:auto;cursor:pointer}
+    .search .sugg button:last-child{border-bottom:0}
+    .search .sugg button:hover,.search .sugg button.act{background:var(--tint)}
+    .search .sugg button svg{display:block;flex:none;width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .search .sugg .sg-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .search .sugg .sg-t b{font-weight:700}
+    .search .sugg small{flex:none;max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:.78rem}
+    .search .sugg .sg-h{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem .35rem;font-size:.74rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-bottom:0}
+    .search .sugg .sg-h button{display:inline;width:auto;padding:0;border:0;background:transparent;color:var(--orange);font-size:.78rem;font-weight:700;letter-spacing:0;text-transform:none}
+    .search .sugg .sg-h button:hover{background:transparent;text-decoration:underline}
   </style>
 </head>
 <body>
@@ -436,8 +458,8 @@
       <form class="search" role="search" id="search-form">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>
         <label for="q" style="position:absolute;left:-9999px">Search products</label>
-        <input id="q" type="search" placeholder="Search Stermont Arcade" autocomplete="off">
-        <button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg></button>
+        <input id="q" type="search" placeholder="Search products &amp; categories" autocomplete="off">
+        <button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg><span class="sbtxt">Search</span></button>
       </form>
       <p class="search-msg" id="search-msg" aria-live="polite"></p>
       <div class="tabs" id="htabs" role="tablist" aria-label="Browse categories"></div>
@@ -1115,7 +1137,7 @@
         }
       }
       form.addEventListener('submit', function (e) {
-        e.preventDefault(); run(true); logSearch('typed');
+        e.preventDefault(); run(true); logSearch('typed'); saveRecent(input.value);
         /* one matching product (or an exact name match) opens straight away */
         var vis = [].filter.call(music.querySelectorAll('.pcard'), function (c) { return !c.classList.contains('hidden') && !c.classList.contains('vhide'); });
         var qq = input.value.trim().toLowerCase();
@@ -1158,14 +1180,52 @@
         if (window.STM_openView && el._p) window.STM_openView(el);
         else { var h = el.querySelector('h3'); if (h) h.click(); }
       }
+      var IC_S = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>';
+      var IC_R = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>';
+      /* the shopper's last few searches stay in their own browser only */
+      function getRecent() { try { var r = JSON.parse(localStorage.getItem('stm_recent') || '[]'); return Array.isArray(r) ? r.filter(function (x) { return typeof x === 'string'; }).slice(0, 5) : []; } catch (e) { return []; } }
+      function saveRecent(t) {
+        t = (t || '').replace(/\s+/g, ' ').trim(); if (t.length < 2) return;
+        try { var r = getRecent().filter(function (x) { return x.toLowerCase() !== t.toLowerCase(); }); r.unshift(t); localStorage.setItem('stm_recent', JSON.stringify(r.slice(0, 5))); } catch (e) {}
+      }
+      function clearRecent() { try { localStorage.removeItem('stm_recent'); } catch (e) {} }
       function pick(t, el) {
-        input.value = t; hide(); run(!el); logSearch('suggestion'); input.blur();
+        input.value = t; hide(); run(!el); logSearch('suggestion'); saveRecent(t); input.blur();
         if (el) openCard(el);
       }
       function esc(x) { return x.replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); }
+      /* empty box, tapped: show recent searches and popular categories (like big marketplaces do) */
+      function showStart() {
+        buildPool();
+        var rec = getRecent(), pop = [];
+        pool.forEach(function (o) { if (o.c === 'Category' && pop.length < 6) pop.push(o.t); });
+        box.innerHTML = '';
+        function row(t, icon) {
+          var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'option');
+          b.innerHTML = icon + '<span class="sg-t">' + esc(t) + '</span>';
+          b.addEventListener('mousedown', function (e) { e.preventDefault(); });
+          b.addEventListener('click', function () { pick(t, null); });
+          box.appendChild(b);
+        }
+        function head(txt, clearable) {
+          var h = document.createElement('div'); h.className = 'sg-h'; h.appendChild(document.createElement('span')).textContent = txt;
+          if (clearable) {
+            var c = document.createElement('button'); c.type = 'button'; c.textContent = 'Clear';
+            c.addEventListener('mousedown', function (e) { e.preventDefault(); });
+            c.addEventListener('click', function () { clearRecent(); showStart(); });
+            h.appendChild(c);
+          }
+          box.appendChild(h);
+        }
+        if (rec.length) { head('Recent searches', true); rec.forEach(function (t) { row(t, IC_R); }); }
+        if (pop.length) { head('Popular categories', false); pop.forEach(function (t) { row(t, IC_S); }); }
+        if (!box.children.length) { box.classList.remove('on'); return; }
+        act = -1; box.classList.add('on');
+      }
       function suggest() {
         var q = input.value.trim().toLowerCase();
-        if (q.length < 1 || document.activeElement !== input) { hide(); return; }
+        if (document.activeElement !== input) { hide(); return; }
+        if (q.length < 1) { showStart(); return; }
         buildPool();
         var ws = q.split(/\s+/).filter(function (w) { return w !== 'and' && w !== '&'; }).map(function (w) { return w.replace(/s$/, ''); });
         function score(o) {
@@ -1188,9 +1248,11 @@
         if (!hits.length) { box.classList.remove('on'); return; }
         hits.forEach(function (o) {
           var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'option');
-          var i = o.t.toLowerCase().indexOf(q), label = esc(o.t);
-          if (i > -1) label = esc(o.t.slice(0, i)) + '<mark>' + esc(o.t.slice(i, i + q.length)) + '</mark>' + esc(o.t.slice(i + q.length));
-          b.innerHTML = '<span>' + label + '</span><small>' + esc(o.c) + '</small>';
+          /* typed part in normal weight, the rest in bold - the way Jumia shows completions */
+          var i = o.t.toLowerCase().indexOf(q), label;
+          if (i > -1) label = (i ? '<b>' + esc(o.t.slice(0, i)) + '</b>' : '') + esc(o.t.slice(i, i + q.length)) + '<b>' + esc(o.t.slice(i + q.length)) + '</b>';
+          else label = '<b>' + esc(o.t) + '</b>';
+          b.innerHTML = IC_S + '<span class="sg-t">' + label + '</span><small>' + esc(o.c === 'Category' ? 'Category' : 'in ' + o.c) + '</small>';
           b.addEventListener('mousedown', function (e) { e.preventDefault(); });
           b.addEventListener('click', function () { pick(o.t, o.el); });
           box.appendChild(b);
@@ -1200,7 +1262,7 @@
       input.addEventListener('input', suggest);
       input.addEventListener('focus', suggest);
       input.addEventListener('keydown', function (e) {
-        var bs = box.querySelectorAll('button'); if (!bs.length || !box.classList.contains('on')) return;
+        var bs = box.querySelectorAll('button[role=option]'); if (!bs.length || !box.classList.contains('on')) return;
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
           e.preventDefault(); act = (act + (e.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length;
           bs.forEach(function (b, j) { b.classList.toggle('act', j === act); });
