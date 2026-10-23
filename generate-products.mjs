@@ -17,14 +17,20 @@ const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
 const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; };
 const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
 
+// Product photos saved in the catalog before the custom domain still point at the old github.io address.
+// The files are the same, so serve them from the main domain: one site for Google to index, nothing breaks if github.io is ever turned off.
+const OLD_HOST = /^https?:\/\/stermontmall\.github\.io\//i;
+const fixImg = u => (typeof u === 'string' ? u.replace(OLD_HOST, SITE + '/') : u);
+const fixProducts = list => list.map(p => (Array.isArray(p.images) ? { ...p, images: p.images.map(fixImg) } : p));
+
 async function getProducts() {
-  if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));   // for local testing only
+  if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
   const cols = ['id,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
                 'id,name,price,old_price,unit,stock,images,description,categories(name,slug)',
                 'id,name,price,stock,images,description,categories(name,slug)'];
   for (const c of cols) {
     const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=${c}&order=created_at.asc`, { headers: { apikey: KEY } });
-    if (r.ok) return r.json();
+    if (r.ok) return fixProducts(await r.json());
   }
   throw new Error('Could not read products from Supabase');
 }
