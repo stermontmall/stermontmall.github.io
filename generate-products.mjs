@@ -103,6 +103,13 @@ for (const p of rows) {
     g.slice(1).forEach(x => aliases.push({ id: x.id, to: top.id }));
   } else products.push(g ? { ...p, name: `${p.name} \u2013 ${p.variant_label}` } : p);
 }
+// Retired duplicate listings: their old URLs forward to the product we kept (so links and Google results keep working).
+const DUPES = {
+  'jembe-star-500-sl-herbicide-1-litre': 'jembe-star-500sl-herbicide-1-litre',
+  'kingcode-elite-50-ec-insecticide-1-litre': 'kingcode-elite-50ec-insecticide-1-litre',
+  'zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre-2': 'zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre'
+};
+Object.entries(DUPES).forEach(([id, to]) => { if (products.some(p => p.id === to) && !products.some(p => p.id === id)) aliases.push({ id, to }); });
 const fileOf = path => `.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m));
 const byCat = {};
 products.forEach(p => { const s = p.categories?.slug; if (s) (byCat[s] = byCat[s] || { name: p.categories.name, items: [] }).items.push(p); });
