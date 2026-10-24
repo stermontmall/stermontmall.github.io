@@ -126,6 +126,9 @@
     ['Packaging', ['pack', 'bag', '50 kg bag', 'bottle', 'carton', 'box', 'crate', 'sachet', 'tin']], ['Length', ['metre', 'roll']]];
   function catIcon(id) { var c = S.cats.filter(function (x) { return x.id === id; })[0]; return (c && ICONS[c.slug]) || '📦'; }
   function catName(id) { var c = S.cats.filter(function (x) { return x.id === id; })[0]; return c ? c.name : 'Uncategorised'; }
+  /* special admin "categories": items that are out of stock, and items hidden from the shop, each get their own list */
+  var CAT_OUT = '__out', CAT_HID = '__hid';
+  function inCat(p, c) { return c === 'all' || (c === CAT_OUT ? p.stock <= 0 : c === CAT_HID ? !p.active : String(p.category_id) === c); }
   function discPct(p) { var o = Number(p.old_price), n = Number(p.price); return o > n && n >= 0 ? Math.max(1, Math.round((o - n) / o * 100)) : 0; }
   function priceHtml(p) {
     var d = discPct(p);
@@ -134,8 +137,10 @@
 
   /* ---------- generic modal ---------- */
   function modal(title, bodyHtml, okText, onOk, onMount) {
-    Array.prototype.slice.call(D.querySelectorAll('.modal')).forEach(function (x) { x.remove(); });   /* only one popup at a time, so field IDs never clash */
-    var m = el('div', 'modal'), c = el('div', 'card');
+    /* only one catalog popup at a time, so field IDs never clash. Only remove OUR popups: the admin page has its own
+       Confirm (#cf) and Signature (#sg) popups that share the .modal class and must never be removed. */
+    Array.prototype.slice.call(D.querySelectorAll('.modal.cx-modal')).forEach(function (x) { x.remove(); });
+    var m = el('div', 'modal cx-modal'), c = el('div', 'card');
     c.innerHTML = '<h2 style="margin-top:0">' + title + '</h2><div id="cx-mb">' + bodyHtml + '</div><div class="err" id="cx-me" hidden></div><div class="acts"><button class="btn alt" type="button" id="cx-mn">Cancel</button><button class="btn" type="button" id="cx-my">' + okText + '</button></div>';
     m.appendChild(c); D.body.appendChild(m);
     var close = function () { m.remove(); }, ok = c.querySelector('#cx-my'), er = c.querySelector('#cx-me');
@@ -405,7 +410,7 @@
   function render() {
     var all = S.prods, T = totals(all), X = cancelled(), rl = S.range === 'all' ? '' : ' · ' + RANGES.filter(function (r) { return r[0] === S.range; })[0][1].toUpperCase(), low = all.filter(function (p) { return p.active && p.stock < p.low_at; });
     var q = S.q.trim().toLowerCase();
-    var shown = all.filter(function (p) { return (S.cat === 'all' || String(p.category_id) === S.cat) && (!q || matches(p, q)); });
+    var shown = all.filter(function (p) { return inCat(p, S.cat) && (!q || matches(p, q)); });
     root.innerHTML = '<div class="err" id="cx-err" hidden></div>' +
       '<div id="cx-sbar" style="position:sticky;top:0;z-index:5;background:var(--bg,#f6f4fb);padding:.4rem 0 .5rem;display:flex;gap:.4rem"><input id="cx-q" type="search" autocomplete="off" placeholder="Search items by name, category, price…" value="' + esc(S.q) + '" style="flex:1;min-width:0;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit"><button class="btn alt sm" id="cx-qx" type="button" aria-label="Clear search"' + (S.q ? '' : ' hidden') + '>✕</button><button class="btn alt sm" id="cx-rf" type="button" aria-label="Refresh items">⟳</button></div>' +
       '<div class="tabs" id="cx-rg"></div>' +
@@ -441,14 +446,15 @@
     };
     $('cx-export').onclick = function () { exportCsv(all); };
     RANGES.forEach(function (r) { var b = el('button', S.range === r[0] ? 'on' : '', r[1]); b.type = 'button'; b.onclick = function () { S.range = r[0]; load().then(render).catch(function (x) { toast(x.message + ' (run setup-catalog-2.sql?)'); }); }; $('cx-rg').appendChild(b); });
-    var chips = $('cx-chips'); [{ id: 'all', name: 'All (' + all.length + ')' }].concat(S.cats.map(function (c) { return { id: String(c.id), name: c.name }; })).forEach(function (c) {
+    var chips = $('cx-chips'), nOut = all.filter(function (p) { return p.stock <= 0; }).length, nHid = all.filter(function (p) { return !p.active; }).length;
+    [{ id: 'all', name: 'All (' + all.length + ')' }, { id: CAT_OUT, name: '📭 Out of stock (' + nOut + ')' }, { id: CAT_HID, name: '🙈 Hidden (' + nHid + ')' }].concat(S.cats.map(function (c) { return { id: String(c.id), name: c.name }; })).forEach(function (c) {
       var cc = S.cats.filter(function (x) { return String(x.id) === c.id; })[0], b = el('button', S.cat === c.id ? 'on' : '', (cc && ICONS[cc.slug] ? ICONS[cc.slug] + ' ' : '') + esc(c.name)); b.type = 'button'; b.onclick = function () { S.cat = c.id; render(); }; chips.appendChild(b); });
     function drawList() {
     var q2 = S.q.trim().toLowerCase();
-    var shown = all.filter(function (p) { return (S.cat === 'all' || String(p.category_id) === S.cat) && (!q2 || matches(p, q2)); });
+    var shown = all.filter(function (p) { return inCat(p, S.cat) && (!q2 || matches(p, q2)); });
     if (q2 && window.STMSuggest) shown = byRelevance(shown, q2);   /* best match first */
     var L = $('cx-list'); L.textContent = ''; $('cx-cnt').textContent = (q2 || S.cat !== 'all') ? shown.length + ' of ' + all.length + ' items shown' : all.length + ' items';
-    if (!shown.length) L.appendChild(el('div', 'empty', all.length ? 'No item matches' + (q2 ? ' “' + S.q.trim() + '”' : '') + '. Try fewer letters or choose All.' : 'No items yet. Tap “Add new item” to publish your first product.'));
+    if (!shown.length) L.appendChild(el('div', 'empty', !all.length ? 'No items yet. Tap “Add new item” to publish your first product.' : (!q2 && S.cat === CAT_OUT) ? 'Nothing is out of stock right now. 🎉' : (!q2 && S.cat === CAT_HID) ? 'No hidden items. Tap Hide on any item and it will be kept here for you.' : 'No item matches' + (q2 ? ' “' + S.q.trim() + '”' : '') + '. Try fewer letters or choose All.'));
     shown.forEach(function (p) {
       var s = stat(p), lowS = p.stock < p.low_at, c = el('div', 'card'), margin = p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0;
       c.innerHTML = '<div class="cx-p">' + (p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="" loading="lazy" onerror="this.outerHTML=&quot;<div class=cx-ph>📦</div>&quot;">' : '<div class="cx-ph">' + catIcon(p.category_id) + '</div>') +
@@ -463,7 +469,7 @@
         '<div class="acts"><button class="btn ok sm" data-a="r" type="button">＋ Restock</button><button class="btn alt sm" data-a="l" type="button">Log loss</button><button class="btn alt sm" data-a="y" type="button">History</button><button class="btn alt sm" data-a="f" type="button">' + (p.featured ? 'Remove advert' : '★ Advert') + '</button><button class="btn alt sm" data-a="e" type="button">Edit</button><button class="btn alt sm" data-a="v" type="button">＋ Pack size</button><button class="btn alt sm" data-a="h" type="button">' + (p.active ? 'Hide' : 'Show') + '</button><button class="btn alt sm" data-a="d" type="button" style="color:var(--no)">Delete</button></div>';
       c.onclick = function (e) { var a = e.target.getAttribute && e.target.getAttribute('data-a'); if (!a) return;
         if (a === 'r') restockForm(p); else if (a === 'l') lossForm(p); else if (a === 'e') itemForm(p); else if (a === 'v') itemForm(null, p); else if (a === 'y') history(p);
-        else if (a === 'f') { e.target.disabled = true; call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { featured: !p.featured } }).then(load).then(render).catch(function (x) { toast(x.message); }); }
+        else if (a === 'f') { var fb = e.target; fb.disabled = true; call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { featured: !p.featured } }).then(load).then(render).catch(function (x) { fb.disabled = false; toast(x.message); }); }
         else if (a === 'd') {
           if (!confirm('Permanently delete “' + p.name + '”?\n\nIt will disappear from the shop and cannot be brought back. To just stop selling it for now, use Hide instead.')) return;
           var btn = e.target; btn.disabled = true; btn.textContent = 'Deleting…';
@@ -477,7 +483,7 @@
               else toast('Could not delete: ' + m);
             });
         }
-        else { e.target.disabled = true; call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { active: !p.active } }).then(load).then(render).catch(function (x) { toast(x.message); }); } };
+        else { var hb = e.target; hb.disabled = true; call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { active: !p.active } }).then(load).then(render).catch(function (x) { hb.disabled = false; toast(x.message); }); } };
       L.appendChild(c);
     });
     }
@@ -568,7 +574,7 @@
   }
   function prodSuggest(q, onlyCat) {
     var W = window.STMSuggest.words(q);
-    var pool = S.prods.filter(function (p) { return !onlyCat || onlyCat === 'all' || String(p.category_id) === onlyCat; });
+    var pool = S.prods.filter(function (p) { return !onlyCat || inCat(p, onlyCat); });
     var strict = pool.filter(function (p) {
       var h = [p.name, p.base, p.variant_label, catName(p.category_id), p.sku, p.barcode].map(function (v) { return v == null ? '' : String(v); }).join(' ').toLowerCase();
       return W.every(function (w) { return h.indexOf(w) > -1; });
@@ -583,36 +589,38 @@
       .filter(function (it) { var k = it.label + '|' + it.sub; if (seen[k]) return false; seen[k] = 1; return true; });
   }
   function stockState(p) { return p.stock <= 0 ? 'out' : p.stock < p.low_at ? 'low' : 'in'; }
+  function sfMatch(p, f) { return f === 'all' || (f === 'hid' ? !p.active : stockState(p) === f); }
   function renderStockView() {
     var all = S.prods.slice().sort(function (a, b) { return a.stock - b.stock; }), T = totals(all);
     S.sq = S.sq || ''; S.sf = S.sf || 'all';
-    root.innerHTML = '<div class="err" id="cx-err" hidden></div><p class="meta">Pieces left for every item on the website. An item shows <b>Sold out</b> to customers when it reaches 0. Use Restock when new stock arrives.</p>' +
+    root.innerHTML = '<div class="err" id="cx-err" hidden></div><p class="meta">Pieces left for every item on the website. An item shows <b>Sold out</b> to customers when it reaches 0. Use Restock when new stock arrives. Use the <b>Sold out</b> and <b>Hidden</b> filters to work on those items separately.</p>' +
       '<div class="cx-k"><div><small>ITEMS</small><b>' + all.length + '</b></div><div><small>PIECES LEFT</small><b>' + T.stock + '</b></div></div>' +
       '<input id="cx-sq" type="search" autocomplete="off" placeholder="Search an item to check stock" value="' + esc(S.sq) + '" style="width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit;margin:.2rem 0 .6rem">' +
       '<div class="tabs" id="cx-sf"></div><p class="meta" id="cx-sum" style="margin:.2rem 0 .6rem"></p><div id="cx-list"></div>';
-    var FIL = [['all', 'All'], ['in', 'In stock'], ['low', 'Low'], ['out', 'Sold out']];
+    var FIL = [['all', 'All'], ['in', 'In stock'], ['low', 'Low'], ['out', '📭 Sold out'], ['hid', '🙈 Hidden']];
     function draw() {
       var q = S.sq.trim(), base = all.filter(function (p) { return !q || matches(p, q); });
       if (q && window.STMSuggest) base = byRelevance(base, q);   /* best match first */
-      var shown = base.filter(function (p) { return S.sf === 'all' || stockState(p) === S.sf; });
+      var shown = base.filter(function (p) { return sfMatch(p, S.sf); });
       var C = $('cx-sf'); C.textContent = '';
       FIL.forEach(function (f) {
-        var n = f[0] === 'all' ? base.length : base.filter(function (p) { return stockState(p) === f[0]; }).length;
+        var n = base.filter(function (p) { return sfMatch(p, f[0]); }).length;
         var b = el('button', S.sf === f[0] ? 'on' : '', f[1] + ' (' + n + ')'); b.type = 'button';
         b.onclick = function () { S.sf = f[0]; draw(); }; C.appendChild(b);
       });
       $('cx-sum').textContent = q || S.sf !== 'all' ? shown.length + ' of ' + all.length + ' items shown' : '';
       var L = $('cx-list'); L.textContent = '';
       if (!all.length) L.appendChild(el('div', 'empty', 'No items yet. Add your first product in the Catalog tab.'));
-      else if (!shown.length) L.appendChild(el('div', 'empty', 'No item matches “' + S.sq.trim() + '”. Try fewer letters.'));
+      else if (!shown.length) L.appendChild(el('div', 'empty', !q && S.sf === 'out' ? 'Nothing is sold out right now. 🎉' : !q && S.sf === 'hid' ? 'No hidden items.' : 'No item matches “' + S.sq.trim() + '”. Try fewer letters.'));
       shown.forEach(function (p) {
         var lowS = p.stock < p.low_at, c = el('div', 'card'), s = stat(p);
         c.innerHTML = '<div class="cx-p">' + (p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '<div class="cx-ph">' + catIcon(p.category_id) + '</div>') +
           '<div style="min-width:0"><div class="ref">' + esc(p.name) + '</div><div class="when">' + esc(catName(p.category_id)) + '</div><div style="margin-top:.3rem">' +
           (p.stock <= 0 ? '<span class="badge b-declined">Sold out</span> ' : lowS ? '<span class="badge b-low">Low · ' + p.stock + ' left</span> ' : '<span class="badge b-paid">In stock · ' + p.stock + ' left</span> ') +
           (p.active ? '' : '<span class="badge b-pending">Hidden</span>') + '</div><div class="meta" style="margin-top:.3rem">' + s.sold + ' sold · alert below ' + p.low_at + '</div></div></div>' +
-          '<div class="acts"><button class="btn ok sm" data-a="r" type="button">＋ Restock</button><button class="btn alt sm" data-a="l" type="button">Log loss</button><button class="btn alt sm" data-a="y" type="button">History</button></div>';
-        c.onclick = function (e) { var a = e.target.getAttribute && e.target.getAttribute('data-a'); if (a === 'r') restockForm(p); else if (a === 'l') lossForm(p); else if (a === 'y') history(p); };
+          '<div class="acts"><button class="btn ok sm" data-a="r" type="button">＋ Restock</button><button class="btn alt sm" data-a="l" type="button">Log loss</button><button class="btn alt sm" data-a="y" type="button">History</button><button class="btn alt sm" data-a="h" type="button">' + (p.active ? 'Hide' : 'Show') + '</button></div>';
+        c.onclick = function (e) { var a = e.target.getAttribute && e.target.getAttribute('data-a'); if (a === 'r') restockForm(p); else if (a === 'l') lossForm(p); else if (a === 'y') history(p);
+          else if (a === 'h') { var hb = e.target; hb.disabled = true; call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { active: !p.active } }).then(load).then(renderStockView).catch(function (x) { hb.disabled = false; toast(x.message); }); } };
         L.appendChild(c);
       });
     }
