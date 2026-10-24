@@ -118,7 +118,25 @@ const INFO = {
     intro: 'Stermont Arcade stocks insecticides and pest control supplies for homes, hotels, hostels, offices, farms and public places. Look for a PCPB registration number on the label, read the label before use and keep chemicals away from children and pets. For large premises or fumigation of stores and grain, use a licensed pest control operator.' },
   'bed-bug-killers': { h1: 'Bed Bug Killers in Kenya', title: 'Bed Bug Killer in Kenya | Buy Online | Stermont Arcade',
     desc: 'Buy bed bug killer in Kenya. Registered insecticides for bed bug control in homes and public places. Pay by M-Pesa, delivery to all 47 counties.',
-    intro: 'Insecticides for control of bed bugs in homes, hostels, hotels and other public places. Check the PCPB registration on the label and follow the label directions.' },
+    intro: 'Insecticides for control of bed bugs in homes, hostels, hotels and other public places. Check the PCPB registration on the label and follow the label directions.',
+    guide: `<h2>How to choose a bed bug killer in Kenya</h2>
+<p>Bed bugs hide in mattress seams, bed frames, headboards, skirting boards and cracks in walls, so the product has to reach those hiding places. Most bed bug killers sold in Kenya are liquid insecticide concentrates that you dilute and spray on those spots. Pick a product that is registered for bed bugs, buy the pack size that matches the number of rooms or beds, and compare the active ingredient on the label.</p>
+<ul>
+<li><b>Check the PCPB registration.</b> Legal products carry a Pest Control Products Board registration number on the label.</li>
+<li><b>Read the label for bed bugs.</b> Use only products whose label lists bed bugs and the surfaces you plan to treat.</li>
+<li><b>Match the pack size to the job.</b> A single bed needs far less than a hostel, hotel or rental block. Ask us on WhatsApp if you are unsure.</li>
+<li><b>Plan a second treatment.</b> Eggs can survive the first spray, so most infestations need a repeat after the interval given on the label.</li>
+<li><b>Add safety gear.</b> Gloves, a mask and a sprayer make application safer and more even. See <a href="/c/sprayers-equipment.html">sprayers and protective wear</a>.</li>
+</ul>
+<h2>Bed bug treatment tips</h2>
+<p>Wash bedding and clothes hot and dry them in strong sun or on high heat. Vacuum seams and floor edges and throw the dust away outside. Treat cracks, frame joints and furniture edges as the label directs, keep children, pets and food away during treatment, and never mix products. For a large or repeated infestation, a hotel or hostel, use a licensed pest control operator. Our full guide is here: <a href="/blog/how-to-get-rid-of-bed-bugs-kenya.html">how to get rid of bed bugs in Kenya, step by step</a>.</p>`,
+    faq: [
+      ['What is the best bed bug killer in Kenya?', 'There is no single best product. Choose an insecticide with a PCPB registration number whose label lists bed bugs, then match the pack size to your rooms. Compare the products above and message us on WhatsApp if you want help choosing.'],
+      ['Can I order a bed bug killer online and pay by M-Pesa?', 'Yes. Add the product to your cart on stermontarcade.co.ke, pay by M-Pesa Paybill and enter the M-Pesa code from your SMS. We confirm stock and delivery before dispatch.'],
+      ['Do you deliver bed bug killers outside Nairobi?', 'Yes. We deliver to all 47 counties, usually within 1 to 3 days. The delivery fee, if any, is confirmed before you pay.'],
+      ['How many times should I treat for bed bugs?', 'Eggs can hatch after the first treatment, so a repeat is usually needed. Follow the interval printed on the product label and keep checking for several weeks.'],
+      ['Is it safe to use bed bug spray at home?', 'Only if you follow the label. Wear gloves and a mask as advised, keep children, pets and food away during treatment, do not soak mattresses unless the label allows it and never mix products.']
+    ] },
   'cockroach-ant-killers': { h1: 'Cockroach & Ant Killers in Kenya', title: 'Cockroach & Ant Killer in Kenya | Stermont Arcade',
     desc: 'Buy cockroach and ant killers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Sprays, gels and baits for cockroaches and ants in kitchens, restaurants, stores and homes.' },
   'mosquito-fly-control': { h1: 'Mosquito & Fly Control in Kenya', title: 'Mosquito & Fly Control Products in Kenya | Stermont Arcade',
@@ -200,8 +218,11 @@ for (const [slug, c] of Object.entries(byCat)) {
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
 <p>${esc(info.intro || 'Order online and pay by M-Pesa. We deliver to all 47 counties.')} Order online, pay by M-Pesa, delivery to all 47 counties.</p><ul class="g">${c.items.map(card).join('')}</ul>
 ${HUBS[slug] ? '<h2>Pest control by type</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
+${info.guide || ''}
+${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<div class="box"><b>${esc(q)}</b><p>${esc(a)}</p></div>`).join('') : ''}
 <p><a href="/c/">Browse all categories</a></p>`;
-  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, ld: ld + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]) }));
+  const faqLd = info.faq ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: info.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
+  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]) }));
   urls.push(path);
 }
 
