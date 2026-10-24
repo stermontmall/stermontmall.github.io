@@ -1,0 +1,48 @@
+# Stermont Arcade - daily catalog health check.
+# Runs every day, and whenever you tap "Run workflow" in the Actions tab.
+# If it finds problems it opens (or updates) ONE GitHub issue called "Catalog health"; when everything is clean it closes that issue.
+# It only READS the public catalog. It never changes your products.
+name: Catalog health
+
+on:
+  schedule:
+    - cron: '15 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: data-health
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run the check
+        run: node data-health.mjs
+
+      - name: Open, update or close the issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COUNT=$(cat data-health-count.txt)
+          gh label create data-health --color 7c3aed --description "Automatic catalog health report" 2>/dev/null || true
+          NUM=$(gh issue list --label data-health --state open --json number --jq '.[0].number // empty')
+          if [ "$COUNT" -gt 0 ]; then
+            if [ -n "$NUM" ]; then
+              gh issue edit "$NUM" --body-file data-health-report.md
+            else
+              gh issue create --title "Catalog health" --label data-health --body-file data-health-report.md
+            fi
+          elif [ -n "$NUM" ]; then
+            gh issue close "$NUM" --comment "All catalog checks passed, closing automatically."
+          fi
