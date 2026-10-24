@@ -13,6 +13,7 @@
 
 ## Main pages
 - [Home](https://stermontarcade.co.ke)
+- [Shop in Nairobi](https://stermontarcade.co.ke/nairobi.html)
 - [All products](https://stermontarcade.co.ke/products.html)
 - [All categories](https://stermontarcade.co.ke/c/)
 - [Buying guides and how-tos](https://stermontarcade.co.ke/blog/)

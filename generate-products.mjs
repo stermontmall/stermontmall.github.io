@@ -245,7 +245,7 @@ const INFO = {
   'agrovet': { h1: 'Agrovet Supplies in Kenya', title: 'Agrovet Supplies in Kenya | Farm Inputs Online | Stermont Arcade',
     desc: 'Buy agrovet supplies online in Kenya: agrochemicals, fertilizers, veterinary drugs, animal feeds and farm disinfectants. Pay by M-Pesa, delivery to all 47 counties.',
     intro: 'Farm inputs for crops and livestock: agrochemicals, fertilizers, veterinary drugs, animal feeds and disinfectants. Look for a PCPB registration number on chemical labels and read the label before use.' },
-  'agrochemicals': { h1: 'Agrochemicals in Kenya', title: 'Agrochemicals in Kenya | Herbicides, Fungicides, Insecticides | Stermont Arcade',
+  'agrochemicals': { h1: 'Agrochemicals in Kenya', title: 'Agrochemicals in Kenya | Herbicides & Fungicides | Stermont Arcade',
     desc: 'Buy herbicides, fungicides and crop insecticides online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
     intro: 'Herbicides, fungicides, crop insecticides and spray additives for farms of every size. Check the PCPB registration on the label, read the label before use and wear the protective gear it recommends.' },
   'herbicides': { h1: 'Herbicides in Kenya', title: 'Herbicides in Kenya | Weed Killers | Stermont Arcade',
@@ -326,7 +326,7 @@ for (const a of aliases) {
 for (const [slug, c] of Object.entries(byCat)) {
   const path = `/c/${encodeURIComponent(slug)}.html`;
   const info = INFO[slug] || {};
-  const title = info.title || clip(`Buy ${c.name} in Kenya | Prices &amp; Delivery | ${BRAND}`.replace(/&amp;/g, '&'), 70);
+  const title = info.title || clip(`Buy ${c.name} in Kenya | Prices and Delivery | ${BRAND}`, 70);
   const desc = info.desc || clip(`Shop ${c.name} online in Kenya. ${c.items.length} products, pay by M-Pesa, delivery to all 47 counties. Order online at ${BRAND}.`, 158);
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(p.id)}.html`, name: p.name })) });
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>

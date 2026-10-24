@@ -48,7 +48,7 @@ t += `- Delivery: all 47 counties. Details: ${SITE}/shipping.html\n`;
 t += `- Returns: ${SITE}/returns.html\n`;
 t += `- Pest control and agrochemical products should carry a PCPB (Pest Control Products Board) registration number on the label\n\n`;
 t += `## Main pages\n`;
-for (const [u, n] of [['', 'Home'], ['/products.html', 'All products'], ['/c/', 'All categories'], ['/blog/', 'Buying guides and how-tos'], ['/about.html', 'About us'], ['/faq.html', 'FAQ'], ['/contact.html', 'Contact'], ['/track.html', 'Track an order']])
+for (const [u, n] of [['', 'Home'], ['/nairobi.html', 'Shop in Nairobi'], ['/products.html', 'All products'], ['/c/', 'All categories'], ['/blog/', 'Buying guides and how-tos'], ['/about.html', 'About us'], ['/faq.html', 'FAQ'], ['/contact.html', 'Contact'], ['/track.html', 'Track an order']])
   t += `- [${n}](${SITE}${u})\n`;
 t += `\n## Categories\n`;
 for (const { f, h } of cats) t += `- [${title(h).split('|')[0].trim()}](${SITE}/c/${f})${desc(h) ? `: ${desc(h)}` : ''}\n`;
