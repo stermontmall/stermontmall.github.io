@@ -1,0 +1,34 @@
+# Stermont Arcade - every Monday, opens a GitHub Issue (GitHub emails you) listing the searches where a small push
+# would move you onto Google page 1. Needs the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets.
+name: Ranking opportunities
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * 1'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build the report
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_PROPERTY: ${{ secrets.GSC_PROPERTY }}
+        run: node seo-opportunities.mjs > opportunities.md
+      - name: Publish as an issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --search "Ranking opportunities in:title" --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Superseded by this week's report." || true
+          done
+          gh issue create --title "Ranking opportunities $(date +%F)" --body-file opportunities.md

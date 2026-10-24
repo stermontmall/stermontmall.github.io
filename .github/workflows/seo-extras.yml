@@ -1,0 +1,35 @@
+# Stermont Arcade - rebuilds sitemap-images.xml and llms.txt from the pages in this repo, then commits them if they changed.
+# Runs: after product pages are rebuilt, every Monday 09:30 Nairobi time, or whenever you tap "Run workflow".
+name: SEO extras
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 6 * * 1'
+  workflow_run:
+    workflows: ['Build product pages']
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seo-extras
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build image sitemap and llms.txt
+        run: node seo-extras.mjs
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sitemap-images.xml llms.txt
+          if git diff --cached --quiet; then echo "No changes"; else git commit -m "Update image sitemap and llms.txt" && git pull --rebase origin main && git push; fi
