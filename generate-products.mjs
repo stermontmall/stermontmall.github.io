@@ -108,7 +108,14 @@ const byCat = {};
 products.forEach(p => { const s = p.categories?.slug; if (s) (byCat[s] = byCat[s] || { name: p.categories.name, items: [] }).items.push(p); });
 
 // "Hub" categories gather the products of their child categories, so one strong page (e.g. Pest Control & Fumigation) ranks for the broad search.
-const HUBS = { 'pest-control-fumigation': { name: 'Pest Control & Fumigation', kids: ['bed-bug-killers', 'cockroach-ant-killers', 'mosquito-fly-control', 'rodent-control', 'termite-control', 'fumigation-chemicals', 'sprayers-equipment'] } };
+// Order matters: a hub that lists another hub as a kid (agrovet -> agrochemicals) must come after it.
+const HUBS = {
+  'pest-control-fumigation': { name: 'Pest Control & Fumigation', label: 'Pest control by type', kids: ['bed-bug-killers', 'cockroach-ant-killers', 'mosquito-fly-control', 'rodent-control', 'termite-control', 'fumigation-chemicals', 'sprayers-equipment'] },
+  'agrochemicals': { name: 'Agrochemicals', label: 'Agrochemicals by type', kids: ['herbicides', 'fungicides', 'crop-insecticides', 'adjuvants-growth-regulators'] },
+  'agrovet': { name: 'Agrovet', label: 'Agrovet by type', kids: ['agrochemicals', 'fertilizers', 'veterinary-drugs', 'animal-feeds', 'disinfectants-hygiene'] },
+  'tvs-audio': { name: 'TVs & Audio', label: 'TVs and audio by type', kids: ['televisions', 'home-theatre', 'bluetooth-speakers', 'tv-mounts-accessories'] },
+  'appliances': { name: 'Appliances', label: 'Appliances by type', kids: ['washing-machines', 'fridges-freezers', 'kitchen-dining'] }
+};
 for (const [slug, h] of Object.entries(HUBS)) {
   const items = [...(byCat[slug]?.items || [])];
   h.kids.forEach(k => (byCat[k]?.items || []).forEach(x => { if (!items.includes(x)) items.push(x); }));
@@ -200,7 +207,55 @@ const INFO = {
     faq: [
       ['Which sprayer do I need for pest control?', 'Hand sprayers suit rooms and small jobs, and knapsack sprayers suit compounds and farms. Check the product label for any other requirements.'],
       ['Do I need a mask and gloves?', 'Yes, if the label says so, which is the case for most insecticides. Protective wear is sold here with the sprayers.']
-    ] }
+    ] },
+  'tvs-audio': { h1: 'TVs, Home Theatre & Audio in Kenya', title: 'TVs, Home Theatre & Speakers in Kenya | Stermont Arcade',
+    desc: 'Buy smart TVs, home theatre systems, Bluetooth speakers and TV wall mounts online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Smart TVs, home theatre systems, Bluetooth speakers and TV wall mounts from brands such as Hisense, TCL, Samsung, LG and Harman Kardon.' },
+  'televisions': { h1: 'Smart TVs in Kenya', title: 'Buy Smart TVs in Kenya | 4K, QLED & Mini LED | Stermont Arcade',
+    desc: 'Buy Hisense, TCL, Samsung and Vitron smart TVs online in Kenya. 4K UHD, QLED and Mini LED screens. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Smart TVs from 43 inch to 75 inch, including 4K UHD, QLED and QD-Mini LED models. Some come as a bundle with a TV guard and a wall mount.' },
+  'home-theatre': { h1: 'Home Theatre Systems in Kenya', title: 'Home Theatre Systems in Kenya | Stermont Arcade',
+    desc: 'Buy home theatre and surround sound systems online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Home theatre and surround sound systems for movies, music and sport in your living room.' },
+  'bluetooth-speakers': { h1: 'Bluetooth Speakers in Kenya', title: 'Bluetooth Speakers in Kenya | Stermont Arcade',
+    desc: 'Buy portable Bluetooth speakers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Portable Bluetooth speakers for the home, parties and travel.' },
+  'tv-mounts-accessories': { h1: 'TV Wall Mounts & Accessories in Kenya', title: 'TV Wall Mounts & Accessories in Kenya | Stermont Arcade',
+    desc: 'Buy TV wall mounts and brackets online in Kenya. Fixed and tilting mounts for 32 to 60 inch TVs. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Wall mount brackets and accessories for flat screen TVs. Check that the mount supports your TV size and weight before you order.' },
+  'appliances': { h1: 'Home Appliances in Kenya', title: 'Home Appliances in Kenya | Fridges, Washers & More | Stermont Arcade',
+    desc: 'Buy fridges, washing machines and kitchen appliances online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Fridges, washing machines and kitchen appliances for homes and small businesses.' },
+  'washing-machines': { h1: 'Washing Machines in Kenya', title: 'Washing Machines in Kenya | Stermont Arcade',
+    desc: 'Buy washing machines online in Kenya, including twin tub models. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Washing machines for family laundry, including semi-automatic twin tub models.' },
+  'fridges-freezers': { h1: 'Fridges & Freezers in Kenya', title: 'Fridges & Freezers in Kenya | Stermont Arcade',
+    desc: 'Buy fridges and freezers online in Kenya, including double door models with water dispensers. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Double door fridges and freezers for homes, shops and small businesses.' },
+  'kitchen-dining': { h1: 'Kitchen Appliances in Kenya', title: 'Kitchen Appliances in Kenya | Stermont Arcade',
+    desc: 'Buy pressure cookers, air fryers and other kitchen appliances online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Pressure cookers, air fryers and other kitchen appliances for everyday cooking.' },
+  'agrovet': { h1: 'Agrovet Supplies in Kenya', title: 'Agrovet Supplies in Kenya | Farm Inputs Online | Stermont Arcade',
+    desc: 'Buy agrovet supplies online in Kenya: agrochemicals, fertilizers, veterinary drugs, animal feeds and farm disinfectants. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Farm inputs for crops and livestock: agrochemicals, fertilizers, veterinary drugs, animal feeds and disinfectants. Look for a PCPB registration number on chemical labels and read the label before use.' },
+  'agrochemicals': { h1: 'Agrochemicals in Kenya', title: 'Agrochemicals in Kenya | Herbicides, Fungicides, Insecticides | Stermont Arcade',
+    desc: 'Buy herbicides, fungicides and crop insecticides online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Herbicides, fungicides, crop insecticides and spray additives for farms of every size. Check the PCPB registration on the label, read the label before use and wear the protective gear it recommends.' },
+  'herbicides': { h1: 'Herbicides in Kenya', title: 'Herbicides in Kenya | Weed Killers | Stermont Arcade',
+    desc: 'Buy herbicides and weed killers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Herbicides for weed control in crops and fields. Use only on the crops listed on the label and follow the label directions.' },
+  'fungicides': { h1: 'Fungicides in Kenya', title: 'Fungicides in Kenya | Crop Disease Control | Stermont Arcade',
+    desc: 'Buy fungicides for crop disease control online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Fungicides for control of fungal diseases such as blight and mildew in vegetables, fruits and field crops. Follow the label on crops, rates and spray intervals.' },
+  'crop-insecticides': { h1: 'Crop Insecticides in Kenya', title: 'Crop Insecticides in Kenya | Farm Pest Control | Stermont Arcade',
+    desc: 'Buy insecticides for crops and farms online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Insecticides for crop pests such as caterpillars, aphids and mites. For pests in homes and buildings, see our pest control categories.' },
+  'adjuvants-growth-regulators': { h1: 'Adjuvants & Growth Regulators in Kenya', title: 'Spray Adjuvants & Growth Regulators in Kenya | Stermont Arcade',
+    desc: 'Buy spreader stickers, wetters and rooting hormones online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Spray additives that help products spread and stick, and rooting hormones for cuttings and seedlings.' },
+  'disinfectants-hygiene': { h1: 'Disinfectants & Farm Hygiene Products in Kenya', title: 'Disinfectants for Farms & Homes in Kenya | Stermont Arcade',
+    desc: 'Buy disinfectants for poultry and livestock farms and general hygiene online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
+    intro: 'Disinfectants for poultry houses, livestock pens and general cleaning. Dilute as the label directs and keep animals and feed away during treatment.' }
 };
 const crumbLd = items => jsonLd({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items.map(([name, url], i) => ({ '@type': 'ListItem', position: i + 1, name, item: url })) });
 
@@ -269,7 +324,7 @@ for (const [slug, c] of Object.entries(byCat)) {
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(p.id)}.html`, name: p.name })) });
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
 <p>${esc(info.intro || 'Order online and pay by M-Pesa. We deliver to all 47 counties.')} Order online, pay by M-Pesa, delivery to all 47 counties.</p><ul class="g">${c.items.map(card).join('')}</ul>
-${HUBS[slug] ? '<h2>Pest control by type</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
+${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
 ${info.guide || ''}
 ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<div class="box"><b>${esc(q)}</b><p>${esc(a)}</p></div>`).join('') : ''}
 <p><a href="/c/">Browse all categories</a></p>`;
