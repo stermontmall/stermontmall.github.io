@@ -12,6 +12,8 @@ const BRAND = 'Stermont Arcade';
 const BRANDS = ['Kungu Nil', 'Greenlife', 'Zagro', 'Alonze', 'Pentagon', 'Absolute', 'Abasi', 'Hisense', 'Samsung', 'LG', 'Tecno', 'Infinix', 'Itel', 'Oppo', 'Xiaomi', 'Redmi', 'Apple', 'Nokia', 'Sony', 'JBL', 'TCL', 'Syinix', 'Vitron', 'Ramtons', 'Von', 'Mika', 'Nunix', 'Sayona', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Philips', 'Bruhm', 'Rockstar', 'Snake'];
 const brandOf = name => { const n = ` ${String(name).toLowerCase()} `; const hit = BRANDS.filter(b => n.includes(` ${b.toLowerCase()} `)).sort((a, b) => b.length - a.length)[0]; return hit || BRAND; };
 const RETURNS = { '@type': 'MerchantReturnPolicy', applicableCountry: 'KE', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 2, url: 'https://stermontarcade.co.ke/returns.html' };
+// Delivery facts from shipping.html: all of Kenya, usually 1 to 3 days. The fee depends on location and is confirmed before payment, so no fixed rate is claimed here.
+const SHIPPING = { '@type': 'OfferShippingDetails', shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'KE' }, deliveryTime: { '@type': 'ShippingDeliveryTime', transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' } } };
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
@@ -48,13 +50,13 @@ h1{font-size:1.5rem;line-height:1.25;margin:.2rem 0 .6rem}.pr{font-size:1.7rem;f
 ul.g li{background:#fff;border:1px solid #e6e1f5;border-radius:12px;padding:.7rem}ul.g a{text-decoration:none;font-weight:600;color:#1f1b2e}ul.g span{display:block;color:#5b21b6;font-weight:800}
 footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85rem;border-top:1px solid #e6e1f5}`;
 
-const shell = ({ title, desc, path, og, body, ld }) => `<!doctype html>
+const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '' }) => `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${SITE}${path}"><meta name="robots" content="index, follow, max-image-preview:large">
-<meta property="og:type" content="website"><meta property="og:site_name" content="${BRAND}"><meta property="og:locale" content="en_KE">
+<meta property="og:type" content="${ogType}"><meta property="og:site_name" content="${BRAND}"><meta property="og:locale" content="en_KE">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${SITE}${path}">
-<meta property="og:image" content="${esc(og || SITE + '/logo.png')}"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="${esc(og || SITE + '/logo.png')}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(og || SITE + '/logo.png')}">${extra}
 <meta name="theme-color" content="#7c3aed"><style>${CSS}</style>${ld || ''}</head><body>
 <header><a href="${SITE}/">${BRAND}</a></header><main>${body}</main>
 <footer>${BRAND} · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 748 888 230</a>
@@ -223,7 +225,7 @@ for (const p of products) {
     description: clip(p.description, 500) || `${p.name} available at ${BRAND}, Kenya.`, sku: String(p.id), category: cat?.name,
     brand: { '@type': 'Brand', name: brandOf(p.name) },
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(p.price) || 0)),
-      availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS,
+      availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
       seller: { '@type': 'Organization', name: BRAND } },
     ...rLd
   });
@@ -233,7 +235,7 @@ for (const p of products) {
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label,
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
       offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(v.price) || 0)),
-        availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS,
+        availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
         seller: { '@type': 'Organization', name: BRAND } } }))
   }) : '';
   const ld = (p.variants ? ldGroup : ldOne) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
@@ -250,7 +252,7 @@ ${sizeBox}
 ${p.description ? `<div class="box"><h2 style="margin-top:0">Product details</h2><div class="desc">${esc(p.description)}</div></div>` : ''}
 ${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
 ${related.length ? `<h2>More in ${esc(cat.name)}</h2><ul class="g">${related.map(card).join('')}</ul>` : ''}`;
-  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld }));
+  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld, ogType: 'product', extra: `<meta property="product:price:amount" content="${Math.round(Number(p.price) || 0)}"><meta property="product:price:currency" content="KES"><meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` }));
   urls.push(path);
 }
 
