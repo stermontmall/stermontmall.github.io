@@ -72,6 +72,6 @@
 - [Washing Machine Buying Guide Kenya: Front vs Top Load](https://stermontarcade.co.ke/blog/washing-machine-buying-guide-kenya.html): Choosing a washing machine in Kenya? Compare front load and top load, semi and fully automatic, capacity in kg, and what you need to install one.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 119 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 116 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
