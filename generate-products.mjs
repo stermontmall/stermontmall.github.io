@@ -1,6 +1,7 @@
 // Stermont Arcade - builds a real web page for every product + category, and a sitemap for Google.
 // Runs automatically on GitHub (see .github/workflows/product-pages.yml). No installs needed (Node 18+).
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -271,7 +272,17 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
   console.log(`Merchant feed: ${feed.length} items.`);
 }
 
+// lastmod only moves when a page's content really changed. Google ignores sitemaps whose dates change on every build.
 const today = new Date().toISOString().slice(0, 10);
+const STATE = 'sitemap-state.json';
+const prev = existsSync(STATE) ? JSON.parse(readFileSync(STATE, 'utf8')) : {};
+const next = {};
+for (const u of urls) {
+  const file = u.endsWith('/') ? `.${u}index.html` : fileOf(u);
+  const hash = existsSync(file) ? createHash('sha1').update(readFileSync(file)).digest('hex') : '';
+  next[u] = { hash, lastmod: prev[u] && prev[u].hash === hash ? prev[u].lastmod : today };
+}
+writeFileSync(STATE, JSON.stringify(next, null, 1));
 writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join('\n') + `\n</urlset>\n`);
+  urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${next[u].lastmod}</lastmod></url>`).join('\n') + `\n</urlset>\n`);
 console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages.`);
