@@ -139,17 +139,66 @@ const INFO = {
       ['Is it safe to use bed bug spray at home?', 'Only if you follow the label. Wear gloves and a mask as advised, keep children, pets and food away during treatment, do not soak mattresses unless the label allows it and never mix products.']
     ] },
   'cockroach-ant-killers': { h1: 'Cockroach & Ant Killers in Kenya', title: 'Cockroach & Ant Killer in Kenya | Stermont Arcade',
-    desc: 'Buy cockroach and ant killers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Sprays, gels and baits for cockroaches and ants in kitchens, restaurants, stores and homes.' },
+    desc: 'Buy cockroach and ant killers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Sprays, gels and baits for cockroaches and ants in kitchens, restaurants, stores and homes.',
+    guide: `<h2>How to choose a cockroach and ant killer in Kenya</h2>
+<p>Cockroaches and ants live in cracks, behind appliances, under sinks and in drains, so the product must reach those places. Sprays treat surfaces and hiding spots, while gels and baits are placed where the insects feed. Choose a product whose label lists cockroaches or ants and the surfaces you plan to treat, and check for a PCPB registration number.</p>
+<ul><li><b>Treat hiding places.</b> Focus on cracks, edges, drains, cupboards and behind fridges and cookers.</li><li><b>Clean first.</b> Remove food, grease and waste so the insects have less to eat.</li><li><b>Repeat if the label says so.</b> New insects hatch from eggs after treatment.</li><li><b>Food areas need extra care.</b> Follow the label on what to cover and when you can use the area again.</li></ul>
+<p>For restaurants, hotels or large premises, use a licensed pest control operator. See also our <a href="/c/bed-bug-killers.html">bed bug killers</a> and <a href="/c/sprayers-equipment.html">sprayers and protective wear</a>.</p>`,
+    faq: [
+      ['Which cockroach killer should I buy in Kenya?', 'Choose a PCPB-registered product whose label lists cockroaches. Sprays suit surfaces and cracks, and gels or baits suit places where roaches feed. Message us on WhatsApp if you need help matching a product to your premises.'],
+      ['Can I pay for cockroach and ant killers by M-Pesa?', 'Yes. Add the product to your cart, pay by M-Pesa Paybill and enter the M-Pesa code from your SMS. We confirm stock and delivery before dispatch.'],
+      ['Do you deliver cockroach killers countrywide?', 'Yes. We deliver to all 47 counties, usually within 1 to 3 days. The delivery fee, if any, is confirmed before you pay.'],
+      ['Is cockroach spray safe in a kitchen?', 'Only if you follow the label. Keep food, utensils, children and pets away during treatment and clean surfaces as the label directs before using the area again.']
+    ] },
   'mosquito-fly-control': { h1: 'Mosquito & Fly Control in Kenya', title: 'Mosquito & Fly Control Products in Kenya | Stermont Arcade',
-    desc: 'Buy mosquito and fly control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Sprays and treatments for mosquitoes and flies in homes, compounds, farms and animal housing.' },
+    desc: 'Buy mosquito and fly control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Sprays and treatments for mosquitoes and flies in homes, compounds, farms and animal housing.',
+    guide: `<h2>How to choose mosquito and fly control products in Kenya</h2>
+<p>Mosquitoes and flies breed in standing water, waste and animal manure, so control works best when you treat the insects and remove the places they breed. Pick a product whose label lists mosquitoes or flies and the setting you are treating, such as a home, compound or animal house, and check for a PCPB registration number.</p>
+<ul><li><b>Remove breeding sites.</b> Empty containers holding water, clear drains and clean animal housing regularly.</li><li><b>Match the product to the place.</b> Indoor sprays, compound treatments and farm products are not interchangeable.</li><li><b>Protect yourself.</b> Use the gloves and mask the label recommends and see <a href="/c/sprayers-equipment.html">sprayers and protective wear</a>.</li></ul>
+<p>Related guide: <a href="/blog/mosquito-control-at-home-kenya.html">mosquito control at home in Kenya</a>.</p>`,
+    faq: [
+      ['What is the best way to control mosquitoes at home?', 'Remove standing water, keep drains and gutters clear and treat resting places with a PCPB-registered product that lists mosquitoes on its label. Screens and nets add protection.'],
+      ['Can I order fly control products online in Kenya?', 'Yes. Order on stermontarcade.co.ke, pay by M-Pesa and we deliver to all 47 counties.'],
+      ['Are fly sprays safe around animals?', 'Only products labelled for animal housing should be used there, and only as directed. Read the label and keep animals, feed and water covered or away during application.']
+    ] },
   'rodent-control': { h1: 'Rat & Mouse Control in Kenya', title: 'Rat & Mouse Control Products in Kenya | Stermont Arcade',
-    desc: 'Buy rat and mouse control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Rodent control products for homes, shops, stores and farms. Keep baits out of reach of children, pets and livestock.' },
+    desc: 'Buy rat and mouse control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Rodent control products for homes, shops, stores and farms. Keep baits out of reach of children, pets and livestock.',
+    guide: `<h2>How to choose a rat and mouse killer in Kenya</h2>
+<p>Rats and mice follow food and shelter, so the best results come from blocking entry points, removing food and using a registered rodent control product where they travel, such as along walls and near burrows. Choose a PCPB-registered product and place baits where children, pets and livestock cannot reach them.</p>
+<ul><li><b>Seal gaps.</b> Close holes around pipes, doors and roofs.</li><li><b>Store food and feed in sealed containers.</b></li><li><b>Place baits safely.</b> Use covered bait stations or hidden spots as the label directs.</li><li><b>Remove dead rodents carefully</b> with gloves and dispose of them safely.</li></ul>
+<p>Related guide: <a href="/blog/rat-and-mouse-control-kenya.html">rat and mouse control in Kenya</a>.</p>`,
+    faq: [
+      ['What is the best rat killer in Kenya?', 'Choose a PCPB-registered rodent product suited to where you will use it. Safe placement matters as much as the product, so follow the label and keep baits away from children, pets and livestock.'],
+      ['Can I buy rat poison online and pay by M-Pesa?', 'Yes. Add it to your cart on stermontarcade.co.ke and pay by M-Pesa. We confirm stock and delivery before dispatch.'],
+      ['How do I use rodent bait safely?', 'Place it only where children, pets and livestock cannot reach, usually in covered stations along walls and runways, wear gloves and follow the label.']
+    ] },
   'termite-control': { h1: 'Termite Control in Kenya', title: 'Termite Control Products in Kenya | Stermont Arcade',
-    desc: 'Buy termite control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Termiticides and treatments for buildings, fences and timber.' },
+    desc: 'Buy termite control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Termiticides and treatments for buildings, fences and timber.',
+    guide: `<h2>How to choose a termite control product in Kenya</h2>
+<p>Termites damage timber, fences and buildings from the soil or from inside the structure. Treatment depends on where they are, so read the label to see whether a product is meant for soil, timber or existing buildings, and check for a PCPB registration number. Large or hidden infestations in buildings are best handled by a licensed pest control operator.</p>
+<ul><li><b>Find the source.</b> Look for mud tubes, hollow timber and soil mounds.</li><li><b>Reduce moisture and wood-to-soil contact.</b></li><li><b>Apply as the label directs</b>, using protective wear.</li></ul>
+<p>Protective gear: <a href="/c/sprayers-equipment.html">sprayers, masks and gloves</a>.</p>`,
+    faq: [
+      ['How do I get rid of termites in Kenya?', 'Locate the source, reduce moisture and apply a PCPB-registered termite product exactly as its label directs. For large infestations in buildings, call a licensed pest control operator.'],
+      ['Do you deliver termite products to all counties?', 'Yes. We deliver to all 47 counties, usually within 1 to 3 days, and confirm the delivery fee before you pay.']
+    ] },
   'fumigation-chemicals': { h1: 'Fumigation Chemicals in Kenya', title: 'Fumigation Chemicals in Kenya | Stermont Arcade',
-    desc: 'Buy fumigation chemicals online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Chemicals for fumigation of stores, grain and premises. Use only as directed on the label, and use a licensed operator for large jobs.' },
+    desc: 'Buy fumigation chemicals online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Chemicals for fumigation of stores, grain and premises. Use only as directed on the label, and use a licensed operator for large jobs.',
+    guide: `<h2>Buying fumigation chemicals in Kenya</h2>
+<p>Fumigation chemicals are hazardous and should be used only as the label directs. Check for a PCPB registration number, confirm the product is meant for your use, such as stores, grain or premises, and use a licensed operator for large jobs or enclosed spaces. Never enter a treated area until it is declared safe.</p>
+<ul><li><b>Use trained operators for large jobs.</b></li><li><b>Wear the protective gear the label requires</b> (see <a href="/c/sprayers-equipment.html">protective wear</a>).</li><li><b>Keep people, pets and food out</b> until the label says it is safe.</li></ul>`,
+    faq: [
+      ['Where can I buy fumigation chemicals in Kenya?', 'Order online at Stermont Arcade, pay by M-Pesa and we deliver to all 47 counties. Check the PCPB registration on each product.'],
+      ['Can I fumigate by myself?', 'Small jobs may be possible if the label allows it, but fumigation is hazardous. For large jobs, stores or enclosed spaces, use a licensed pest control operator.']
+    ] },
   'sprayers-equipment': { h1: 'Pest Control Sprayers & Equipment in Kenya', title: 'Pest Control Sprayers & Equipment in Kenya | Stermont Arcade',
-    desc: 'Buy pest control sprayers, masks and gloves online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Sprayers, masks, gloves and protective wear for safe application of pest control products.' }
+    desc: 'Buy pest control sprayers, masks and gloves online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Sprayers, masks, gloves and protective wear for safe application of pest control products.',
+    guide: `<h2>Choosing a sprayer and protective wear</h2>
+<p>A sprayer that suits the job spreads the product evenly, and protective wear keeps it off your skin and out of your lungs. Hand sprayers suit rooms and small areas, while knapsack sprayers suit compounds and farms. Always wear the gloves, mask and clothing the product label recommends.</p>`,
+    faq: [
+      ['Which sprayer do I need for pest control?', 'Hand sprayers suit rooms and small jobs, and knapsack sprayers suit compounds and farms. Check the product label for any other requirements.'],
+      ['Do I need a mask and gloves?', 'Yes, if the label says so, which is the case for most insecticides. Protective wear is sold here with the sprayers.']
+    ] }
 };
 const crumbLd = items => jsonLd({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items.map(([name, url], i) => ({ '@type': 'ListItem', position: i + 1, name, item: url })) });
 
