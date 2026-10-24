@@ -1,0 +1,30 @@
+# Stermont Arcade - tells Google to re-read the sitemaps after every page rebuild, daily, and on demand.
+# Needs the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets (see seo-google-sitemaps.mjs). Does nothing until they are added.
+name: Google sitemap ping
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 4 * * *'
+  workflow_run:
+    workflows: ['Build product pages']
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Wait for GitHub Pages to publish
+        run: sleep 120
+      - name: Submit sitemaps to Google Search Console
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_PROPERTY: ${{ secrets.GSC_PROPERTY }}
+        run: node seo-google-sitemaps.mjs
