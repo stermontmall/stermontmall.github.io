@@ -104,7 +104,7 @@
   function inbox(root) {
     var c = shell(root, 'Customer messages 💬', 'Questions sent from the shop. Your reply shows in the customer’s account.');
     var list = h('div'), show = 'open'; c.appendChild(list);
-    var bar = h('div', 'tabs'); c.insertBefore(bar, list); var rows = [];
+    var bar = h('div', 'tabs'); c.insertBefore(bar, list); var rows = [], firstLoad = true;
     function draw() {
       bar.textContent = '';
       [['open', 'Open'], ['closed', 'Closed']].forEach(function (x) { var b = h('button', show === x[0] ? 'on' : '', x[1]); b.type = 'button'; b.onclick = function () { show = x[0]; draw(); }; bar.appendChild(b); });
@@ -144,14 +144,17 @@
   /* ---------------- reviews ---------------- */
   function reviews(root) {
     var c = shell(root, 'Reviews ⭐', '');
-    var list = h('div'), flt = 'pending'; c.appendChild(list);
+    var list = h('div'), flt = 'all', sum = h('div', 'card'); c.appendChild(sum); c.appendChild(list);
     var bar = h('div', 'tabs'); c.insertBefore(bar, list); var rows = [];
     function draw() {
       bar.textContent = '';
-      [['pending', 'Pending'], ['approved', 'Approved'], ['hidden', 'Hidden']].forEach(function (x) {
-        var n = rows.filter(function (r) { return r.status === x[0]; }).length; var b = h('button', flt === x[0] ? 'on' : '', x[1] + ' (' + n + ')'); b.type = 'button'; b.onclick = function () { flt = x[0]; draw(); }; bar.appendChild(b); });
+      [['all', 'All'], ['pending', 'Pending'], ['approved', 'Approved'], ['hidden', 'Hidden']].forEach(function (x) {
+        var n = rows.filter(function (r) { return x[0] === 'all' || r.status === x[0]; }).length; var b = h('button', flt === x[0] ? 'on' : '', x[1] + ' (' + n + ')'); b.type = 'button'; b.onclick = function () { flt = x[0]; draw(); }; bar.appendChild(b); });
       list.textContent = '';
-      var vis = rows.filter(function (r) { return r.status === flt; });
+      var svc = rows.filter(function (r) { return r.product_name === 'Our service' && r.status !== 'hidden'; }), tot = 0; svc.forEach(function (r) { tot += r.rating; });
+      sum.textContent = ''; sum.style.display = svc.length ? '' : 'none';
+      if (svc.length) { sum.appendChild(h('div', 'ref', 'Service rating: ' + (tot / svc.length).toFixed(1) + ' / 5  ' + '★'.repeat(Math.round(tot / svc.length)) + '☆'.repeat(5 - Math.round(tot / svc.length)))); sum.appendChild(h('div', 'when', svc.length + (svc.length === 1 ? ' customer rating' : ' customer ratings') + ' of our service (not shown on product pages)')); }
+      var vis = rows.filter(function (r) { return flt === 'all' || r.status === flt; });
       if (!vis.length) { list.appendChild(h('div', 'empty', 'No reviews here.')); return; }
       vis.forEach(function (r) {
         var k = h('div', 'card'), top = h('div', 'top'); top.appendChild(h('span', 'ref', r.product_name)); top.appendChild(h('span', 'ref', '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating))); k.appendChild(top);
