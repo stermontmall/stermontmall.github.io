@@ -40,11 +40,29 @@
     d.parentNode.insertBefore(box, d.nextSibling);
   }
 
+
+  /* "What our customers say": approved ratings of our service, shown on the home page above the FAQ */
+  function serviceSection() {
+    var l = by['our service']; if (!l || !l.length || D.getElementById('svc-rev')) return;
+    var anchor = D.getElementById('faq') || D.querySelector('footer'); if (!anchor || !anchor.parentNode) return;
+    var s = stat(l), sec = el('section'); sec.id = 'svc-rev';
+    var st2 = el('style'); st2.textContent = '#svc-rev{max-width:980px;margin:1.6rem auto;padding:0 1rem}#svc-rev h2{margin:0 0 .3rem}#svc-rev .sv-top{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:.8rem}#svc-rev .sv-big{font-size:2rem;font-weight:800}#svc-rev .sv-st{color:#f6a800;font-size:1.4rem;letter-spacing:.06em}#svc-rev .sv-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.7rem}#svc-rev .sv-c{background:var(--panel,#f4f1fa);border-radius:12px;padding:.8rem .9rem;font-size:.92rem}#svc-rev .sv-c b{color:#f6a800;letter-spacing:.05em}#svc-rev .sv-c small{display:block;color:var(--muted,#6b6b6b);margin-top:.3rem}';
+    sec.appendChild(st2); sec.appendChild(el('h2', null, 'What our customers say'));
+    var top = el('div', 'sv-top'); top.appendChild(el('span', 'sv-big', s.avg.toFixed(1))); top.appendChild(el('span', 'sv-st', stars(s.avg)));
+    top.appendChild(el('span', null, 'from ' + s.n + (s.n === 1 ? ' customer rating' : ' customer ratings') + ' of our service')); sec.appendChild(top);
+    var g = el('div', 'sv-g');
+    l.slice(0, 6).forEach(function (r) {
+      var c = el('div', 'sv-c'); c.appendChild(el('b', null, stars(r.rating)));
+      c.appendChild(el('div', null, r.body || 'Great service!')); c.appendChild(el('small', null, (r.reviewer || 'Verified buyer') + ' \u00b7 ' + dmy(r.created_at))); g.appendChild(c);
+    });
+    sec.appendChild(g); anchor.parentNode.insertBefore(sec, anchor);
+  }
+
   fetch(SBU + '/rest/v1/reviews?select=product_name,rating,body,reviewer,created_at&status=eq.approved&order=created_at.desc&limit=1000', { headers: { apikey: KEY } })
     .then(function (r) { if (!r.ok) throw 0; return r.json(); })
     .then(function (rows) {
       (rows || []).forEach(function (r) { var k = key(r.product_name), n = Number(r.rating); if (!k || !(n >= 1 && n <= 5)) return; r.rating = n; (by[k] = by[k] || []).push(r); });
-      ready = true; cardStars(); popup();
+      ready = true; cardStars(); popup(); serviceSection();
     }).catch(function () {});
 
   /* refresh the popup block whenever a product is opened */
