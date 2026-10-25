@@ -83,3 +83,12 @@
     }, true);
   } catch (e) {}
 })();
+
+/* Floating WhatsApp button on every public page, including blog posts (see /wa-float.js).
+   Kept in this separate block so it still runs when analytics is switched off or Do Not Track is on. Safe to load more than once. */
+(function () {
+  try {
+    if (/^\/(admin|upload-photos)/.test(location.pathname) || document.getElementById('wa-float')) return;
+    var w = document.createElement('script'); w.src = '/wa-float.js?v=2'; w.defer = true; document.head.appendChild(w);
+  } catch (e) {}
+})();

@@ -25,6 +25,16 @@
   try { var a = document.createElement('script'); a.src = '/analytics.js'; a.defer = true; document.head.appendChild(a); } catch (e) {}
 })();
 
+/* Floating WhatsApp button on every store, product and category page (see /wa-float.js). Loading it twice is harmless. */
+(function () {
+  try { if (/admin|upload-photos/.test(location.pathname)) return; var w = document.createElement('script'); w.src = '/wa-float.js?v=2'; w.defer = true; document.head.appendChild(w); } catch (e) {}
+})();
+
+/* Delivery times and customer reviews on product pages and in the storefront product view (see /product-trust.js). */
+(function () {
+  try { if (/admin|upload-photos/.test(location.pathname)) return; var t = document.createElement('script'); t.src = '/product-trust.js?v=1'; t.defer = true; document.head.appendChild(t); } catch (e) {}
+})();
+
 /* Footer links to the About, FAQ, Contact and Terms pages (see /site-links.js). */
 (function () {
   try { var l = document.createElement('script'); l.src = '/site-links.js'; l.defer = true; document.head.appendChild(l); } catch (e) {}
