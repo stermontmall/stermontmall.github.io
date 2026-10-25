@@ -1,6 +1,5 @@
 # Stermont Arcade - drafts one new blog post every day from the next "pending" topic in blog-topics.json.
 # It never publishes by itself: each draft arrives as a pull request for you to read and merge.
-# When fewer than 10 topics are pending, blog-topics-seed.mjs first adds new topics from real in-stock product pages.
 # Needs the repository secret ANTHROPIC_API_KEY (Settings > Secrets and variables > Actions).
 # Also needs Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests" turned on.
 # Runs: every day at 09:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
@@ -35,9 +34,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Top up topics from real products
-        run: node blog-topics-seed.mjs
 
       - name: Draft the next post
         id: draft
