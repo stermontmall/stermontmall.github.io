@@ -163,6 +163,7 @@
      ['M-Pesa code', o.pay_code ? String(o.pay_code).toUpperCase() : ''], ['Notes', o.notes]].forEach(function (k) {
       if (!k[1]) return; var d = el('div', 'ac-sec2'); d.appendChild(el('small', null, k[0])); d.appendChild(el('b', null, k[1])); f.appendChild(d);
     });
+    if (kind(o) === 'ok' && sess()) f.appendChild(serviceBox(o, sess()));
     var a = el('a', 'ac-login', 'Ask about this order on WhatsApp'); a.target = '_blank'; a.rel = 'noopener';
     a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(orderMsg(o)); f.appendChild(a);
     return f;
@@ -198,9 +199,32 @@
       body: JSON.stringify({ order_ref: o.ref, product_name: String(i.name).slice(0, 200), rating: d.n, body: (d.t || '').trim().slice(0, 600) || null, reviewer: reviewerName(S) }) })
       .then(function (r) {
         if (r.ok) { myRev = (myRev || []).concat([{ order_ref: o.ref, product_name: i.name, rating: d.n, body: d.t || '', status: 'pending' }]); delete drafts[key]; delete revMsg[key]; }
-        else revMsg[key] = r.status === 409 ? 'You already reviewed this item.' : 'Could not send your review. Try again.';
+        else revMsg[key] = r.status === 409 ? 'You already rated this.' : 'Could not send your review. Try again.';
         render();
       }).catch(function () { revMsg[key] = 'Could not send your review. Check your connection.'; render(); });
+  }
+  /* ---- rate our service: one rating per delivered order, saved as a review named "Our service" ---- */
+  var SVC = 'Our service', SVC_L = ['', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent'];
+  function serviceBox(o, S) {
+    var d = el('div', 'ac-msg'), key = o.ref + '|' + SVC;
+    d.appendChild(el('b', null, 'Rate our service')); d.appendChild(el('small', null, 'How was your experience with Order #' + o.ref + '? (ordering, delivery and support)'));
+    if (myRev === null) { if (!revLoading) loadReviews(render); d.appendChild(el('small', null, 'Loading\u2026')); return d; }
+    var done = myRev.filter(function (r) { return r.order_ref === o.ref && r.product_name === SVC; })[0];
+    if (done) {
+      d.appendChild(el('div', 'ac-st', '\u2605'.repeat(done.rating) + '\u2606'.repeat(5 - done.rating)));
+      d.appendChild(el('small', null, SVC_L[done.rating] + (done.body ? ' \u00b7 \u201c' + done.body + '\u201d' : '')));
+      d.appendChild(el('small', null, 'Thank you for rating our service!'));
+      return d;
+    }
+    var dr = drafts[key] = drafts[key] || { n: 0, t: '' }, sw = el('div', 'ac-st');
+    for (var n = 1; n <= 5; n++) (function (k) { var b = el('button', k <= dr.n ? 'on' : '', '\u2605'); b.type = 'button'; b.setAttribute('aria-label', k + ' stars'); b.addEventListener('click', function () { dr.n = k; render(); }); sw.appendChild(b); })(n);
+    d.appendChild(sw);
+    if (dr.n) d.appendChild(el('small', null, SVC_L[dr.n]));
+    var ta = el('textarea'); ta.rows = 3; ta.maxLength = 600; ta.placeholder = 'Tell us how we did (optional)'; ta.value = dr.t; ta.style.cssText = 'width:100%;margin-top:.5rem;padding:.6rem;border:1px solid #ddd;border-radius:10px;font:inherit';
+    ta.addEventListener('input', function () { dr.t = ta.value; }); d.appendChild(ta);
+    var sb = el('button', 'ac-login', 'Submit rating'); sb.type = 'button'; sb.style.marginTop = '.5rem'; sb.addEventListener('click', function () { submitReview(o, { name: SVC }, key, S); }); d.appendChild(sb);
+    if (revMsg[key]) d.appendChild(el('small', null, revMsg[key]));
+    return d;
   }
   function vReviews() {
     var f = D.createDocumentFragment(), S = sess(); if (!S) return needLogin();
@@ -208,6 +232,7 @@
     if (myRev === null) { if (!revLoading) loadReviews(render); f.appendChild(el('p', 'ac-empty', 'Loading\u2026')); return f; }
     var any = false, ST = { pending: 'Waiting for approval', approved: 'Published', hidden: 'Not published' };
     orders.filter(function (o) { return kind(o) === 'ok'; }).forEach(function (o) {
+      any = true; f.appendChild(serviceBox(o, S));
       itemsOf(o).forEach(function (i) {
         any = true; var d = el('div', 'ac-msg'), key = o.ref + '|' + i.name;
         d.appendChild(el('b', null, i.name)); d.appendChild(el('small', null, 'Order #' + o.ref));
