@@ -1,0 +1,60 @@
+{
+  "_how_to_use": "Pillar (hub) guides, 1,500-2,500 words each. The blog writer drafts a pending pillar BEFORE any spoke post in blog-topics.json, and a spoke is only written once its pillar is live on the site. 'clusters' decides which pillar a spoke belongs to: by the category pages in its 'links' (or set 'pillar' on a topic to choose one yourself). 'keywords' put OLDER posts (without a cluster tag) into a cluster by their file name. 'facts' is the ONLY product information the writer may use, so put in only things you know are true.",
+  "pillars": [
+    {
+      "slug": "ultimate-guide-to-pest-control-in-kenya",
+      "title": "The ultimate guide to home and commercial pest control in Kenya",
+      "angle": "The main guide to pest control for Kenyan homes, shops, hotels and farms: the common pests (bed bugs, cockroaches, rats and mice, termites, mosquitoes, flies, ants), inspect first, prevention and sanitation, choosing between sprays, gel baits, traps and fumigation, reading labels and PCPB registration, safety around children, pets and food, and when to call a licensed operator. Give an overview of each pest and point to the matching category; detailed guides are listed on the page automatically. No dilution rates or dosing: always follow the label.",
+      "keywords": ["pest control Kenya", "pest control supplies Nairobi", "bed bug treatment Kenya", "dawa ya kunguni", "dawa ya mende", "dawa ya panya"],
+      "facts": [
+        "We sell pest control, bed bug, rodent, termite and fumigation products online.",
+        "Pay by M-Pesa. Delivery to all 47 counties."
+      ],
+      "links": [
+        "/c/pest-control-fumigation.html",
+        "/c/bed-bug-killers.html",
+        "/c/rodent-control.html",
+        "/c/termite-control.html",
+        "/c/cockroach-ant-killers.html",
+        "/c/mosquito-fly-control.html",
+        "/c/fumigation-chemicals.html",
+        "/blog/how-to-get-rid-of-bed-bugs-kenya.html",
+        "/blog/how-to-get-rid-of-cockroaches-kenya.html",
+        "/blog/rat-and-mouse-control-kenya.html"
+      ],
+      "status": "pending"
+    },
+    {
+      "slug": "complete-guide-to-agrovet-products-and-farm-health-kenya",
+      "title": "Complete guide to agrovet products, feeds and farm health in Kenya",
+      "angle": "The main guide for Kenyan farmers: buying agrovet products safely, feeds and premixes, veterinary drugs and vaccines (always with a vet), farm biosecurity and disinfectants, storing feed and chemicals, scouting for crop pests and diseases, and when to ask an extension officer. Overview style; detailed guides are listed on the page automatically. No dilution rates, dosing, schedules or feed formulations: always follow the label and ask a vet or extension officer.",
+      "keywords": ["agrovet products Kenya", "farm health Kenya", "animal feeds Kenya", "veterinary drugs online Kenya"],
+      "facts": [
+        "We sell agrovet products, animal feeds and premixes, and veterinary drugs and vaccines online.",
+        "Pay by M-Pesa. Delivery to all 47 counties."
+      ],
+      "links": [
+        "/c/agrovet.html",
+        "/c/animal-feeds.html",
+        "/c/veterinary-drugs.html",
+        "/c/disinfectants-hygiene.html",
+        "/c/agrochemicals.html",
+        "/c/sprayers-equipment.html",
+        "/blog/poultry-feed-premix-lysine-phosphate-kenya.html"
+      ],
+      "status": "pending"
+    }
+  ],
+  "clusters": [
+    {
+      "pillar": "ultimate-guide-to-pest-control-in-kenya",
+      "categories": ["/c/pest-control-fumigation.html", "/c/bed-bug-killers.html", "/c/rodent-control.html", "/c/termite-control.html", "/c/fumigation-chemicals.html", "/c/cockroach-ant-killers.html", "/c/mosquito-fly-control.html"],
+      "keywords": ["bug", "bugs", "bed", "cockroach", "cockroaches", "rat", "rats", "mouse", "mice", "mosquito", "mosquitoes", "termite", "termites", "pest", "pests", "fumigation", "fumigate", "ants", "flies", "fleas", "weevils", "rodent"]
+    },
+    {
+      "pillar": "complete-guide-to-agrovet-products-and-farm-health-kenya",
+      "categories": ["/c/agrovet.html", "/c/animal-feeds.html", "/c/veterinary-drugs.html", "/c/disinfectants-hygiene.html", "/c/agrochemicals.html"],
+      "keywords": ["agrovet", "poultry", "feed", "feeds", "premix", "premixes", "vaccination", "vaccines", "dairy", "livestock", "farm", "farms", "agrochemicals", "veterinary", "biosecurity"]
+    }
+  ]
+}
