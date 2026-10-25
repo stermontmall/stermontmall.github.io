@@ -37,10 +37,10 @@ if (!ONLY && openDrafts.length >= MAX_OPEN) stop(`${openDrafts.length} drafts ar
 const isPillar = t => pillars.includes(t);
 const pillarSlugOf = t => isPillar(t) ? '' : (t.pillar || (clusters.find(c => (t.links || []).some(l => (c.categories || []).includes(l))) || {}).pillar || '');
 const live = slug => existsSync(`blog/${slug}.html`);
-const ready = t => t.status === 'pending' && !openDrafts.includes(t.slug) && (!ONLY || t.slug === ONLY) && (isPillar(t) || !pillarSlugOf(t) || live(pillarSlugOf(t)));
+// A topic is ready when it is pending, has no page or open draft yet, and (for a spoke) its pillar guide is already live.
+const ready = t => t.status === 'pending' && !live(t.slug) && !openDrafts.includes(t.slug) && (!ONLY || t.slug === ONLY) && (isPillar(t) || !pillarSlugOf(t) || live(pillarSlugOf(t)));
 const topic = [...pillars, ...spokes].find(ready);
-if (!topic) stop(ONLY ? `Topic "${ONLY}" is not ready (not pending, already drafted, or its pillar guide is not live yet).` : 'Nothing ready to write: the remaining topics are waiting for a pillar guide to be reviewed and merged, or the list is empty.');
-if (live(topic.slug)) { console.error(`blog/${topic.slug}.html already exists. Change the slug or mark the topic done.`); process.exit(1); }
+if (!topic) stop(ONLY ? `Topic "${ONLY}" is not ready (not pending, already written, or its pillar guide is not live yet).` : 'Nothing ready to write: the remaining topics are waiting for a pillar guide to be reviewed and merged, or the list is empty.');
 
 // Pages the writer may link to: real product pages (not size-redirect pages), category pages, existing blog posts and a few fixed pages.
 const allowed = new Set(['/products.html', '/c/', '/shipping.html', '/returns.html']);
