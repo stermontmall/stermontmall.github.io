@@ -1,11 +1,12 @@
-// Stermont Arcade - keeps the blog index and sitemap.xml in step with the posts in /blog/.
+// Stermont Arcade - keeps the blog index, sitemap.xml and pillar-page series lists in step with the posts in /blog/.
 // Runs from .github/workflows/blog-build.yml whenever a blog post is added or edited (no installs needed, Node 18+).
-// Safe by design: it only rewrites the post list between the markers in blog/index.html and the /blog/ entries in sitemap.xml,
-// it never touches product pages, and it writes nothing when nothing changed.
+// Safe by design: it only rewrites the post list between the markers in blog/index.html, the /blog/ entries in sitemap.xml and the
+// "More guides in this series" list between the CLUSTER markers of pillar pages. It never touches product pages and writes nothing when nothing changed.
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const START = '<!--BLOG-POSTS-START-->', END = '<!--BLOG-POSTS-END-->';
+const CS = '<!--CLUSTER-START-->', CE = '<!--CLUSTER-END-->';
 // A post goes under the first group whose keywords appear in its file name. Anything else lands in "More guides".
 const GROUPS = [
   ['Shopping online', ['mpesa', 'delivery', 'order', 'shopping', 'payment', 'checkout']],
@@ -20,6 +21,10 @@ const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return
 
 if (!existsSync('blog')) { console.log('No blog folder - nothing to do.'); process.exit(0); }
 
+// Topic clusters (pillar page + the keywords that put older posts into its cluster).
+let PCFG = {};
+try { if (existsSync('blog-pillars.json')) PCFG = JSON.parse(readFileSync('blog-pillars.json', 'utf8')); } catch { console.log('blog-pillars.json could not be read - clusters skipped.'); }
+
 // ---- read every published post ----
 const posts = [];
 for (const f of readdirSync('blog').filter(f => f.endsWith('.html') && f !== 'index.html').sort()) {
@@ -33,7 +38,9 @@ for (const f of readdirSync('blog').filter(f => f.endsWith('.html') && f !== 'in
   const modified = (h.match(/"dateModified":"(\d{4}-\d{2}-\d{2})/) || [])[1] || published;
   const tokens = slug.split('-');
   const group = (GROUPS.find(([, keys]) => keys.some(k => tokens.includes(k))) || [OTHER])[0];
-  posts.push({ slug, loc: `${SITE}/blog/${f}`, title: unesc(h1.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()), desc: clip(desc, 160), published, modified, group });
+  const cluster = (h.match(/<meta name=["']cluster-pillar["'] content=["']([^"']+)["']/i) || [])[1]
+    || ((PCFG.clusters || []).find(c => (c.keywords || []).some(k => tokens.includes(k))) || {}).pillar || '';
+  posts.push({ slug, loc: `${SITE}/blog/${f}`, title: unesc(h1.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()), desc: clip(desc, 160), published, modified, group, cluster, isPillar: h.includes(CS) });
 }
 if (!posts.length) { console.log('No blog posts found - leaving index and sitemap alone.'); process.exit(0); }
 
@@ -53,6 +60,17 @@ if (!posts.length) { console.log('No blog posts found - leaving index and sitema
   }
 }
 
+// ---- pillar pages: keep the "More guides in this series" list in step with the posts in the cluster ----
+for (const pl of posts.filter(p => p.isPillar)) {
+  const members = posts.filter(p => p.cluster === pl.slug && p.slug !== pl.slug).sort((a, b) => a.title.localeCompare(b.title));
+  const section = members.length ? `<section id="series"><h2>More guides in this series</h2>\n<ul>\n${members.map(p => `<li><a href="/blog/${p.slug}.html">${esc(p.title)}</a></li>`).join('\n')}\n</ul></section>` : '';
+  const file = `blog/${pl.slug}.html`, h = readFileSync(file, 'utf8');
+  const a = h.indexOf(CS), b = h.indexOf(CE);
+  if (a < 0 || b < a) continue;
+  const next = h.slice(0, a + CS.length) + '\n' + section + '\n' + h.slice(b);
+  if (next !== h) { writeFileSync(file, next); console.log(`Updated the series list in ${file} (${members.length} guides).`); }
+}
+
 // ---- sitemap.xml: rewrite only the /blog/ entries ----
 if (existsSync('sitemap.xml')) {
   const sm0 = readFileSync('sitemap.xml', 'utf8'), oldMod = {}, MARK = '@@BLOG@@';
@@ -67,7 +85,7 @@ if (existsSync('sitemap.xml')) {
   if (!sm.includes(MARK)) sm = sm.replace('</urlset>', MARK + '</urlset>');
   const blk = (loc, mod, freq, pr) => `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${mod}</lastmod>\n    <changefreq>${freq}</changefreq>\n    <priority>${pr}</priority>\n  </url>\n`;
   const mods = posts.map(p => p.modified || oldMod[p.loc] || today);
-  const entries = blk(`${SITE}/blog/`, [...mods].sort().pop(), 'weekly', '0.7') + posts.map((p, i) => blk(p.loc, mods[i], 'monthly', '0.6')).join('');
+  const entries = blk(`${SITE}/blog/`, [...mods].sort().pop(), 'weekly', '0.7') + posts.map((p, i) => blk(p.loc, mods[i], 'monthly', p.isPillar ? '0.8' : '0.6')).join('');
   sm = sm.replace(MARK, () => entries);
   if (sm !== sm0) { writeFileSync('sitemap.xml', sm); console.log('Updated sitemap.xml.'); } else console.log('sitemap.xml already up to date.');
 }
