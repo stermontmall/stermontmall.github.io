@@ -1,0 +1,73 @@
+# Stermont Arcade - drafts one new blog post twice a week (Tuesday and Friday) from the next ready topic.
+# Pillar guides (blog-pillars.json) are written first; spoke posts (blog-topics.json) follow once their pillar is live.
+# It never publishes by itself: each draft arrives as a pull request for you to read and merge.
+# If 2 or more drafts are already waiting for review it writes nothing more, so posts never pile up and go out in a burst.
+# Needs the repository secret ANTHROPIC_API_KEY (Settings > Secrets and variables > Actions).
+# Also needs Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests" turned on.
+# Runs: Tuesday and Friday 09:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
+name: Blog writer
+
+on:
+  schedule:
+    - cron: '0 6 * * 2,5'
+  workflow_dispatch:
+    inputs:
+      topic_slug:
+        description: 'Optional: write this specific pending topic (slug from blog-topics.json or blog-pillars.json)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: blog-writer
+  cancel-in-progress: false
+
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the site files
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: List drafts still waiting for review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          touch open-drafts.txt
+          gh pr list --state open --limit 50 --json headRefName --jq '.[].headRefName' | grep '^draft/' | sed 's#^draft/##' > open-drafts.txt || true
+          echo "Open drafts:"; cat open-drafts.txt
+
+      - name: Draft the next post
+        id: draft
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TOPIC_SLUG: ${{ github.event.inputs.topic_slug }}
+        run: node blog-write.mjs
+
+      - name: Open a pull request for review
+        if: steps.draft.outputs.written == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLUG: ${{ steps.draft.outputs.slug }}
+          TITLE: ${{ steps.draft.outputs.title }}
+          KIND: ${{ steps.draft.outputs.kind }}
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          branch="draft/$SLUG"
+          git checkout -b "$branch"
+          git add "blog/$SLUG.html" blog-topics.json blog-pillars.json
+          git commit -m "Draft blog post: $TITLE"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "Blog draft ($KIND): $TITLE" \
+            --body "Automatic $KIND draft for review. Read it, check the product links, the safety section and the FAQs, then merge to publish. Merging also updates the blog index, the sitemap and the pillar page's series list automatically. Close the PR to discard it."

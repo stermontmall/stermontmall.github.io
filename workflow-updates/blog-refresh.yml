@@ -1,0 +1,84 @@
+# Stermont Arcade - keeps old posts fresh. Once a week it reviews the ONE published post that has gone longest without an update
+# (older than 90 days by default): fixes broken links, adds new FAQs, and bumps the date only if something really changed.
+# Changes arrive as a pull request with a checklist (fresh photo or video, price and stock check). A post with nothing to change is just logged.
+# Needs the repository secret ANTHROPIC_API_KEY (for the new FAQs) and "Allow GitHub Actions to create and approve pull requests".
+# Runs: Thursday 09:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
+name: Blog refresh
+
+on:
+  schedule:
+    - cron: '0 6 * * 4'
+  workflow_dispatch:
+    inputs:
+      post_slug:
+        description: 'Optional: refresh this specific post (file name in /blog/ without .html)'
+        required: false
+        default: ''
+      days:
+        description: 'Refresh posts not updated for this many days (default 90)'
+        required: false
+        default: '90'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: blog-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the site files
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: List refreshes still waiting for review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          touch open-refreshes.txt
+          gh pr list --state open --limit 50 --json headRefName --jq '.[].headRefName' | grep '^refresh/' > open-refreshes.txt || true
+          echo "Open refreshes:"; cat open-refreshes.txt
+
+      - name: Review the stalest post
+        id: refresh
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          POST_SLUG: ${{ github.event.inputs.post_slug }}
+          REFRESH_DAYS: ${{ github.event.inputs.days || '90' }}
+        run: node blog-refresh.mjs
+
+      - name: Open a pull request for review
+        if: steps.refresh.outputs.written == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLUG: ${{ steps.refresh.outputs.slug }}
+          TITLE: ${{ steps.refresh.outputs.title }}
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          branch="refresh/$SLUG-$(date +%Y%m%d)"
+          git checkout -b "$branch"
+          git add "blog/$SLUG.html" blog-refresh-log.json
+          git commit -m "Refresh blog post: $TITLE"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "Blog refresh: $TITLE" \
+            --body-file refresh-notes.md
+
+      - name: Record a review that needed no changes
+        if: steps.refresh.outputs.logged == 'true'
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add blog-refresh-log.json
+          git commit -m "Log blog review (no changes needed)"
+          git push
