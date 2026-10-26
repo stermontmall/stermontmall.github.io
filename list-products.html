@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#5b21b6">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://generativelanguage.googleapis.com https://oewvtbnmyombbtggamor.supabase.co; img-src 'self' data: https:; base-uri 'self'; form-action 'none'">
+<title>List products</title>
+<link rel="icon" href="/favicon.png">
+<style>
+:root{--p:#5b21b6;--pl:#f3eefc;--ink:#1f1b2e;--mu:#6b6785;--ln:#e3ddf3;--ok:#15803d;--no:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:#faf9fd;padding-bottom:110px}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:.5rem;padding:calc(.6rem + env(safe-area-inset-top)) .8rem .6rem;background:var(--p);color:#fff}
+header b{flex:1}header a{color:#fff;font-size:.85rem;margin-left:.6rem}
+main{max-width:860px;margin:0 auto;padding:.8rem}
+.card,.it{background:#fff;border:1px solid var(--ln);border-radius:14px;padding:.9rem;margin-bottom:.8rem}
+.card h2{margin:0 0 .4rem;font-size:1.05rem}
+label{display:block;font-weight:600;margin:.5rem 0 .2rem;font-size:.85rem}
+input,select,textarea{width:100%;font:inherit;font-size:16px;border:1px solid var(--ln);border-radius:10px;padding:.45rem .6rem;background:#fff;color:var(--ink)}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--p);background:#fff;color:var(--p);padding:.5rem .9rem;font-weight:600}
+button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-color:var(--ok);color:#fff}button.sm{padding:.25rem .6rem;font-size:.85rem}button:disabled{opacity:.5}
+.hint{color:var(--mu);font-size:.85rem;margin:.2rem 0}
+.m{padding:.6rem .8rem;border-radius:12px;margin-bottom:.6rem;font-size:.92rem}
+.m.err{background:#fef2f2;color:var(--no);border:1px solid #fecaca}.m.okm{background:#f0fdf4;border:1px solid #86efac}
+.it.bad{border-color:#fca5a5}.it.done{border-color:#86efac;background:#f0fdf4}
+.it .top{display:flex;gap:.6rem;align-items:flex-start}.it .top img{width:84px;height:84px;object-fit:cover;border-radius:10px;flex:none;background:var(--pl)}
+.it .top>div{flex:1;min-width:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 .6rem}.g2 .full{grid-column:1/-1}
+.er{color:var(--no);font-size:.85rem;font-weight:600;min-height:1.1rem}.it.done .er{color:var(--ok)}
+.chk{display:flex;gap:.5rem;align-items:center;font-weight:500;margin:.5rem 0 .2rem}.chk input{width:auto}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem}
+#bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);padding:.5rem .7rem calc(.5rem + env(safe-area-inset-bottom));z-index:6}
+#bar .in{max-width:860px;margin:0 auto;display:flex;gap:.5rem;align-items:center}#bar .in button{flex:1}
+#status{max-width:860px;margin:0 auto .3rem;font-size:.82rem;color:var(--mu);min-height:1.1rem}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><b>&#128230; List products</b><a href="/admin.html#catalog">Admin</a><a href="/builder.html">AI Builder</a></header>
+<main>
+  <div class="card"><h2>1. Photos and instructions</h2>
+    <p class="hint">Pick up to 30 product photos. Tell me the cost price and the pieces in stock for each product (I never guess them). I write the name, category and description the way the admin Catalog does, and work out the selling price (cost + 15%, rounded up to KSh 50).</p>
+    <input type="file" id="ph" accept="image/*" multiple>
+    <div id="cnt" class="hint"></div>
+    <label for="ins">Instructions</label>
+    <textarea id="ins" rows="7" placeholder="Example:&#10;Photo 1 Haier air fryer 7L: cost 9500, stock 5, previous price 14000, make it an advert.&#10;Photo 2 and 3 are the same kettle: cost 1800, stock 12.&#10;Photos 4 to 10 are in Supermarket: cost 120 each, stock 50 each."></textarea>
+    <div class="row"><button id="rd" type="button" class="pri">Read my photos</button><button id="clr" type="button">Clear photos</button></div>
+  </div>
+  <div id="msg"></div>
+  <div id="rows"></div>
+  <datalist id="cl"></datalist>
+</main>
+<div id="bar" hidden><div id="status"></div><div class="in"><button id="post" type="button" class="ok">Post</button></div></div>
+<script src="/catalog-v10.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (i) { return document.getElementById(i); };
+  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session', CK = 'stm_builder_cfg_v1';
+  var UNITS = ['g', 'kg', 'tonne', 'ml', 'litre', 'piece', 'pair', 'dozen', 'set', 'bundle', 'pack', 'bag', '50 kg bag', 'bottle', 'carton', 'box', 'crate', 'sachet', 'tin', 'metre', 'roll'];
+  var S = { photos: [], items: [], cats: [], ids: {}, busy: false };
+  var SYS = 'You help the owner of Stermont Arcade, a Kenyan online store (prices in KSh), list products from photos. Return one item for every product you can identify. Reply with ONLY JSON: {"items":[{"photos":[numbers of the photos that show this product],"name":"clear product name in Title Case: brand, product and size or model only if visible on the photo or stated by the owner","category":"best match from the category list, or a short new category name only if none fits","cost":buying price in KSh ONLY if the owner stated it for this product else 0,"stock":pieces ONLY if the owner stated it else null,"unit":"one of the units list or empty","pack_size":"size or variant such as 1 Litre only if visible or stated else empty","old_price":number only if the owner stated a previous price else 0,"description":"text in the store format","featured":true only if the owner asked for this product to be an advert or banner else false}]}. Description format: one point per line, no bullets or dashes; section titles on their own line such as Key Features, Specifications, What is in the box?; a Brand: line when the brand is visible. Use only what is visible on the photo or stated by the owner. Never invent specifications, prices, discounts, rankings, awards, guarantees, delivery times or stock. If unsure, leave it out. If the owner refers to products by photo number, file name or order, follow that. Reply in English unless the owner writes in another language.';
+
+  function h(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  function slug(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+  function norm(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+  function str(v, n) { return String(v == null ? '' : v).replace(/[ \t]+/g, ' ').trim().slice(0, n); }
+  function num(v) { v = parseFloat(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return v > 0 ? Math.round(v) : 0; }
+  function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
+  function auto(c) {
+    if (window.STMCatalog && STMCatalog.autoPrice) return STMCatalog.autoPrice(c);
+    c = Number(c); if (!(c > 0)) return 0; return Math.ceil((c + Math.max(c * 0.15, 150)) / 50 - 1e-9) * 50;
+  }
+  function say(t, c) { var d = h('div', 'm ' + (c || ''), t); $('msg').appendChild(d); d.scrollIntoView({ block: 'nearest' }); return d; }
+  function cfg() { var s = null; try { s = localStorage.getItem(CK) || sessionStorage.getItem(CK); } catch (e) {} try { return JSON.parse(s) || {}; } catch (e) { return {}; } }
+
+  /* ---------- admin sign-in (re-uses the admin console session on this phone) ---------- */
+  async function tok() {
+    var s; try { s = JSON.parse(localStorage.getItem(SK)); } catch (e) {}
+    if (!s) throw new Error('You are signed out. Open the Admin console, sign in, then come back here.');
+    if (Date.now() < s.exp) return s.access_token;
+    var r = await fetch(SB + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: s.refresh_token }) });
+    if (!r.ok) throw new Error('Your admin session expired. Open the Admin console, sign in again, then come back here.');
+    var j = await r.json(); s.access_token = j.access_token; s.refresh_token = j.refresh_token; s.exp = Date.now() + (j.expires_in || 3600) * 1000 - 60000;
+    localStorage.setItem(SK, JSON.stringify(s)); return s.access_token;
+  }
+  async function api(path, method, body, prefer) {
+    var t = await tok(), hd = { apikey: KEY, Authorization: 'Bearer ' + t };
+    if (body !== undefined) hd['Content-Type'] = 'application/json'; if (prefer) hd.Prefer = prefer;
+    var r = await fetch(SB + path, { method: method || 'GET', headers: hd, body: body !== undefined ? JSON.stringify(body) : undefined });
+    if (!r.ok) { var x = await r.text(), m = x; try { m = JSON.parse(x).message || x; } catch (e) {} throw new Error(m.slice(0, 220)); }
+    var tx = await r.text(); return tx ? JSON.parse(tx) : null;
+  }
+  async function loadShop() {
+    var r = await Promise.all([api('/rest/v1/categories?select=id,name,slug&order=name'), api('/rest/v1/products?select=id&limit=5000')]);
+    S.cats = r[0] || []; S.ids = {}; (r[1] || []).forEach(function (p) { S.ids[p.id] = 1; });
+    var dl = $('cl'); dl.textContent = ''; S.cats.forEach(function (c) { var o = h('option'); o.value = c.name; dl.appendChild(o); });
+  }
+
+  /* ---------- photos ---------- */
+  function loadImg(f) {
+    return new Promise(function (ok, no) { var u = URL.createObjectURL(f), i = new Image(); i.onload = function () { URL.revokeObjectURL(u); ok(i); }; i.onerror = function () { URL.revokeObjectURL(u); no(new Error(f.name + ' cannot be opened (HEIC photos: share as JPG)')); }; i.src = u; });
+  }
+  function enc(img, max, q) {
+    var k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+    var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+    return new Promise(function (ok, no) { c.toBlob(function (b) { b ? ok({ blob: b, url: c.toDataURL('image/jpeg', q) }) : no(new Error('Photo failed')); }, 'image/jpeg', q); });
+  }
+  $('ph').onchange = async function () {
+    var fs = [].slice.call(this.files); this.value = ''; var bad = [];
+    for (var i = 0; i < fs.length; i++) {
+      if (S.photos.length >= 30) { bad.push('Only 30 photos at a time.'); break; }
+      $('cnt').textContent = 'Preparing photo ' + (i + 1) + ' of ' + fs.length + '...';
+      try { var im = await loadImg(fs[i]), up = await enc(im, 1600, 0.9), ai = await enc(im, 800, 0.7); S.photos.push({ name: fs[i].name, blob: up.blob, b64: ai.url.split(',')[1], thumb: ai.url, url: '' }); }
+      catch (e) { bad.push(e.message); }
+    }
+    $('cnt').textContent = S.photos.length + ' photo' + (S.photos.length === 1 ? '' : 's') + ' ready' + (bad.length ? '. ' + bad.join(' ') : '.');
+  };
+  $('clr').onclick = function () { if (S.busy) return; S.photos = []; S.items = []; $('cnt').textContent = ''; $('rows').textContent = ''; $('msg').textContent = ''; $('bar').hidden = true; };
+
+  /* ---------- Gemini ---------- */
+  async function gem(parts) {
+    var c = cfg(), models = [c.model || 'gemini-flash-latest', 'gemini-flash-latest', 'gemini-flash-lite-latest'].filter(function (m, i, a) { return a.indexOf(m) === i; }), err = 'No reply', k = 0;
+    for (var i = 0; i < models.length; i++) {
+      var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 90000);
+      try {
+        var r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(models[i]) + ':generateContent', { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', 'x-goog-api-key': c.gkey }, body: JSON.stringify({ systemInstruction: { parts: [{ text: SYS }] }, contents: [{ role: 'user', parts: parts }], generationConfig: { responseMimeType: 'application/json' } }) });
+        if (r.ok) { var j = await r.json(), p = ((j.candidates || [])[0] || {}).content, tx = p && p.parts ? p.parts.map(function (x) { return x.text || ''; }).join('') : ''; if (tx) return tx; err = 'Empty reply'; continue; }
+        err = 'Gemini error ' + r.status + ': ' + (await r.text()).slice(0, 160);
+        if (r.status === 400 || r.status === 403) break;
+        if (r.status === 429 && k++ < 2) { await new Promise(function (ok) { setTimeout(ok, 5000); }); }
+      } catch (e) { err = e.name === 'AbortError' ? 'Gemini took too long' : String(e.message || e); }
+      finally { clearTimeout(t); }
+    }
+    throw new Error(err);
+  }
+  function fromAI(it) {
+    var ph = (Array.isArray(it.photos) ? it.photos : [it.photo]).map(Number).filter(function (n) { return n >= 1 && n <= S.photos.length; });
+    var st = it.stock == null || it.stock === '' ? null : parseInt(it.stock, 10);
+    return { name: str(it.name, 120), cat: str(it.category, 60), cost: num(it.cost), stock: st >= 0 ? st : null, unit: UNITS.indexOf(it.unit) > -1 ? it.unit : '', pack: str(it.pack_size, 30), old: num(it.old_price), desc: String(it.description || '').replace(/^[\s*\-\u2022]+/gm, '').slice(0, 4000).trim(), feat: !!it.featured, photos: ph, manual: false, price: auto(num(it.cost)), done: false };
+  }
+  $('rd').onclick = async function () {
+    if (S.busy) return; $('msg').textContent = '';
+    var c = cfg(); if (!c.gkey) { say('Open the AI Builder, tap Settings, add your Gemini key, tick "Remember my keys on this device" and tap Save and test. Then come back here.', 'err'); return; }
+    if (!S.photos.length) { say('Pick the product photos first.', 'err'); return; }
+    S.busy = true; $('rd').disabled = true;
+    try {
+      $('cnt').textContent = 'Checking your admin sign-in...'; await loadShop();
+      var ins = $('ins').value.trim(), out = [], BATCH = 5;
+      for (var b = 0; b < S.photos.length; b += BATCH) {
+        $('cnt').textContent = 'Reading photos ' + (b + 1) + ' to ' + Math.min(b + BATCH, S.photos.length) + ' of ' + S.photos.length + '...';
+        var parts = [{ text: 'Owner instructions (photo numbers are numbered across all photos):\n' + (ins || '(none, use the photos only)') + '\n\nCategory list: ' + S.cats.map(function (x) { return x.name; }).join(' | ') + '\nUnits list: ' + UNITS.join(', ') + '\nPhotos to read now: ' + S.photos.slice(b, b + BATCH).map(function (p, k) { return (b + k + 1) + '=' + p.name; }).join(', ') }];
+        S.photos.slice(b, b + BATCH).forEach(function (p, k) { parts.push({ text: 'Photo ' + (b + k + 1) + ': ' + p.name }); parts.push({ inlineData: { mimeType: 'image/jpeg', data: p.b64 } }); });
+        var j = JSON.parse((await gem(parts)).replace(/^\s*```(?:json)?|```\s*$/g, '').trim());
+        (j.items || []).forEach(function (it) { var m = fromAI(it); if (m.photos.length) out.push(m); });
+      }
+      var used = {}; out.forEach(function (m) { m.photos.forEach(function (n) { used[n] = 1; }); });
+      S.photos.forEach(function (p, i) { if (!used[i + 1]) out.push({ name: '', cat: '', cost: 0, stock: null, unit: '', pack: '', old: 0, desc: '', feat: false, photos: [i + 1], manual: false, price: 0, done: false }); });
+      out.sort(function (a, b2) { return a.photos[0] - b2.photos[0]; });
+      S.items = out; draw(); $('cnt').textContent = S.photos.length + ' photos read.';
+      say(out.length + ' item' + (out.length === 1 ? '' : 's') + ' ready to check. Fill in anything marked in red (cost and stock are never guessed), then tap Post.', 'okm');
+    } catch (e) { say('Could not read the photos: ' + String(e.message || e).slice(0, 260), 'err'); $('cnt').textContent = ''; }
+    S.busy = false; $('rd').disabled = false;
+  };
+
+  /* ---------- review cards ---------- */
+  function check(it) {
+    if (!it.name.trim()) return 'Needs a product name';
+    if (!it.cat.trim()) return 'Needs a category';
+    if (it.manual ? !(it.price > 0) : !(it.cost > 0)) return it.manual ? 'Enter the selling price' : 'Needs the cost price (the selling price is worked out from it)';
+    if (it.old && !(it.old > it.price)) return 'Previous price must be higher than the selling price (or leave it empty)';
+    if (it.stock == null || !(it.stock >= 0)) return 'Needs the pieces in stock';
+    return '';
+  }
+  function isNewCat(n) { return !!n.trim() && !S.cats.some(function (c) { return norm(c.name) === norm(n); }); }
+  function sync(it) {
+    if (!it.manual) it.price = auto(it.cost);
+    it.$price.value = it.price || '';
+    var pf = it.price - it.cost;
+    it.$info.textContent = it.cost > 0 && it.price > 0 ? 'Profit ' + money(pf) + ' (' + Math.round(pf / it.cost * 100) + '% on cost)' : '';
+    it.$cn.textContent = isNewCat(it.cat) ? 'New category: it will be created' : '';
+    var e = it.done ? '\u2713 Posted' : check(it); it.$er.textContent = e;
+    it.el.className = 'it' + (it.done ? ' done' : e ? ' bad' : '');
+    bar();
+  }
+  function bar() {
+    var ready = S.items.filter(function (i) { return !i.done && !check(i); }).length, todo = S.items.filter(function (i) { return !i.done; }).length;
+    $('bar').hidden = !S.items.length; $('post').disabled = S.busy || !ready;
+    $('post').textContent = ready ? 'Post ' + ready + ' item' + (ready === 1 ? '' : 's') + ' to my website' : 'Nothing ready to post yet';
+    if (!S.busy) $('status').textContent = todo > ready ? (todo - ready) + ' item' + (todo - ready === 1 ? '' : 's') + ' still need details (marked red)' : '';
+  }
+  function fld(label, el, cls) { var w = h('div', cls || ''); w.appendChild(h('label', '', label)); w.appendChild(el); return w; }
+  function inp(type, val, fn, ph) { var i = h('input'); i.type = type; i.value = val == null ? '' : val; if (ph) i.placeholder = ph; if (type === 'number') i.inputMode = 'decimal'; i.oninput = function () { fn(i.value); }; return i; }
+  function draw() {
+    var R = $('rows'); R.textContent = '';
+    S.items.forEach(function (it) {
+      var c = h('div', 'it'); it.el = c;
+      var top = h('div', 'top'), im = new Image(), p0 = S.photos[it.photos[0] - 1]; if (p0) im.src = p0.thumb; im.alt = ''; top.appendChild(im);
+      var tr = h('div'); tr.appendChild(fld('Product name', inp('text', it.name, function (v) { it.name = v; sync(it); }, 'e.g. Haier 7L Air Fryer')));
+      if (it.photos.length > 1) tr.appendChild(h('div', 'hint', it.photos.length + ' photos for this product'));
+      top.appendChild(tr); c.appendChild(top);
+      var g = h('div', 'g2');
+      g.appendChild(fld('Category', (function () { var i = inp('text', it.cat, function (v) { it.cat = v; sync(it); }, 'Pick or type'); i.setAttribute('list', 'cl'); return i; })()));
+      var us = h('select'); [''].concat(UNITS).forEach(function (u) { var o = h('option', '', u || 'No unit (per item)'); o.value = u; if (u === it.unit) o.selected = true; us.appendChild(o); }); us.onchange = function () { it.unit = us.value; };
+      g.appendChild(fld('Unit of sale', us));
+      g.appendChild(fld('Cost price per unit (KSh) *', inp('number', it.cost || '', function (v) { it.cost = num(v); sync(it); }, 'what you pay')));
+      it.$price = inp('number', it.price || '', function (v) { it.manual = true; it.price = num(v); sync(it); });
+      g.appendChild(fld('Selling price (auto)', it.$price));
+      g.appendChild(fld('Previous price (optional)', inp('number', it.old || '', function (v) { it.old = num(v); sync(it); })));
+      g.appendChild(fld('Pieces in stock *', inp('number', it.stock == null ? '' : it.stock, function (v) { it.stock = v === '' ? null : parseInt(v, 10); sync(it); })));
+      g.appendChild(fld('Pack size (optional)', inp('text', it.pack, function (v) { it.pack = v; }, 'e.g. 1 Litre'), 'full'));
+      c.appendChild(g);
+      it.$info = h('div', 'hint'); it.$cn = h('div', 'hint'); c.appendChild(it.$info); c.appendChild(it.$cn);
+      var ta = h('textarea'); ta.rows = 6; ta.value = it.desc; ta.oninput = function () { it.desc = ta.value; }; c.appendChild(fld('Description (one point per line)', ta));
+      var cl = h('label', 'chk'), cb = h('input'); cb.type = 'checkbox'; cb.checked = it.feat; cb.onchange = function () { it.feat = cb.checked; }; cl.appendChild(cb); cl.appendChild(document.createTextNode('Feature as advert / top banner')); c.appendChild(cl);
+      it.$er = h('div', 'er'); c.appendChild(it.$er);
+      var rm = h('button', 'sm', 'Remove this item'); rm.type = 'button'; rm.onclick = function () { if (S.busy) return; S.items = S.items.filter(function (x) { return x !== it; }); c.remove(); bar(); }; c.appendChild(rm);
+      R.appendChild(c); sync(it);
+    });
+    bar();
+  }
+
+  /* ---------- post (same rules and tables as the admin Catalog) ---------- */
+  async function up(p, base) {
+    if (p.url) return p.url;
+    var t = await tok(), path = slug(base).slice(0, 60) + '-' + Date.now() + Math.floor(Math.random() * 99) + '.jpg';
+    var r = await fetch(SB + '/storage/v1/object/product-images/' + path, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + t, 'Content-Type': 'image/jpeg' }, body: p.blob });
+    if (!r.ok) throw new Error('Photo upload failed (' + r.status + ')');
+    return (p.url = SB + '/storage/v1/object/public/product-images/' + path);
+  }
+  async function catId(name) {
+    var c = S.cats.filter(function (x) { return norm(x.name) === norm(name); })[0]; if (c) return c.id;
+    var r = await api('/rest/v1/categories?on_conflict=slug', 'POST', { name: name.trim(), slug: slug(name) }, 'resolution=merge-duplicates,return=representation');
+    S.cats.push({ id: r[0].id, name: name.trim(), slug: slug(name) }); return r[0].id;
+  }
+  $('post').onclick = async function () {
+    if (S.busy) return; var list = S.items.filter(function (i) { return !i.done && !check(i); }); if (!list.length) return;
+    S.busy = true; $('post').disabled = true; $('rd').disabled = true; $('msg').textContent = '';
+    var ok = 0, fails = 0;
+    try { await loadShop(); } catch (e) { say(String(e.message || e), 'err'); S.busy = false; $('rd').disabled = false; bar(); return; }
+    for (var i = 0; i < list.length; i++) {
+      var it = list[i]; $('status').textContent = 'Posting ' + (i + 1) + ' of ' + list.length + ': ' + it.name;
+      try {
+        var imgs = []; for (var k = 0; k < it.photos.length; k++) imgs.push(await up(S.photos[it.photos[k] - 1], it.name));
+        var cid = await catId(it.cat), pack = it.pack.trim(), id = slug(it.name + (pack ? ' ' + pack : '')) || 'item', base = id, n = 2;
+        while (S.ids[id]) id = base + '-' + n++;
+        var row = { id: id, category_id: cid, name: it.name.trim(), price: it.price, cost: it.cost, stock: it.stock, low_at: 5, featured: !!it.feat, active: true, images: imgs };
+        if (it.desc.trim()) row.description = it.desc.trim(); if (it.old) row.old_price = it.old; if (it.unit) row.unit = it.unit;
+        if (pack) { row.variant_label = pack; row.variant_group = slug(it.name); }
+        try { await api('/rest/v1/products', 'POST', row, 'return=minimal'); }
+        catch (e) {
+          var m = e.message || '';
+          if (/old_price/.test(m)) throw new Error('Run setup-pricing.sql in Supabase first to enable previous prices.');
+          if (/\bunit\b/.test(m)) throw new Error('Units are not set up yet. Run in the Supabase SQL editor: alter table products add column if not exists unit text;');
+          if (/variant_/.test(m)) throw new Error('Pack sizes are not set up yet. Run in the Supabase SQL editor: alter table products add column if not exists variant_group text, add column if not exists variant_label text;');
+          throw e;
+        }
+        S.ids[id] = 1; it.done = true; ok++; sync(it);
+      } catch (e) { fails++; it.$er.textContent = 'Not posted: ' + String(e.message || e).slice(0, 200); it.el.className = 'it bad'; }
+    }
+    S.busy = false; $('rd').disabled = false; bar();
+    var ad = list.filter(function (x) { return x.done && x.feat; }).length;
+    say(ok + ' of ' + list.length + ' item' + (list.length === 1 ? '' : 's') + ' posted to your shop.' + (ad ? ' ' + ad + ' marked as advert: the home page banner shows the newest 6 featured items that are in stock.' : '') + (fails ? ' ' + fails + ' failed: see the red items, fix them and tap Post again.' : ' The shop and Google feed refresh within about 3 hours.'), fails ? 'err' : 'okm');
+  };
+})();
+</script>
+</body>
+</html>
