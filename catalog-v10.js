@@ -457,7 +457,7 @@
     if (!shown.length) L.appendChild(el('div', 'empty', !all.length ? 'No items yet. Tap “Add new item” to publish your first product.' : (!q2 && S.cat === CAT_OUT) ? 'Nothing is out of stock right now. 🎉' : (!q2 && S.cat === CAT_HID) ? 'No hidden items. Tap Hide on any item and it will be kept here for you.' : 'No item matches' + (q2 ? ' “' + S.q.trim() + '”' : '') + '. Try fewer letters or choose All.'));
     shown.forEach(function (p) {
       var s = stat(p), lowS = p.stock < p.low_at, c = el('div', 'card'), margin = p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0;
-      c.innerHTML = '<div class="cx-p">' + (p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="" loading="lazy" onerror="this.outerHTML=&quot;<div class=cx-ph>📦</div>&quot;">' : '<div class="cx-ph">' + catIcon(p.category_id) + '</div>') +
+      c.innerHTML = '<div class="cx-p">' + (p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="' + esc(p.name) + '" loading="lazy" onerror="this.outerHTML=&quot;<div class=cx-ph>📦</div>&quot;">' : '<div class="cx-ph">' + catIcon(p.category_id) + '</div>') +
         '<div style="min-width:0"><div class="ref">' + esc(p.name) + '</div><div class="when">' + esc(catName(p.category_id)) + '</div><div style="margin-top:.3rem">' +
         (p.stock === 0 ? '<span class="badge b-declined">Out of stock</span> ' : lowS ? '<span class="badge b-low">Low · ' + p.stock + ' left</span> ' : '<span class="badge b-paid">In stock</span> ') +
         (p.featured ? '<span class="badge b-ad">Advert</span> ' : '') + (p.active ? '' : '<span class="badge b-pending">Hidden</span>') + '</div></div></div>' +
