@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#5b21b6">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src https://generativelanguage.googleapis.com https://api.github.com https://oewvtbnmyombbtggamor.supabase.co; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src about: blob:; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src https://generativelanguage.googleapis.com https://api.github.com https://oewvtbnmyombbtggamor.supabase.co; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src about: blob:; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
 <title>Stermont AI Builder</title>
 <link rel="icon" href="/favicon.png">
 <link rel="manifest" href="/builder-manifest.json">
@@ -37,6 +37,10 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
 .row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
 .row>input{flex:1;min-width:140px}
 .warn{background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:.5rem .7rem;font-size:.85rem;margin:.6rem 0}
+.warn.bad{background:#fef2f2;border-color:#fecaca;color:var(--no)}
+.warn ul{margin:.3rem 0 0;padding-left:1.1rem;list-style:disc}
+.warn li,.m.pub .warn li,#stg .warn li{display:list-item;padding:.1rem 0;border:0}
+.m.pub .warn ul{margin:.3rem 0 0;padding-left:1.1rem;list-style:disc}
 #log{display:flex;flex-direction:column;gap:.5rem}
 .m{padding:.6rem .8rem;border-radius:14px;max-width:94%;overflow-wrap:anywhere}
 .m.user{align-self:flex-end;background:var(--p);color:#fff;white-space:pre-wrap}
@@ -90,7 +94,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     <p class="hint">Fastest: a "flash-lite" model, for example <b>gemini-3.5-flash-lite</b>. Tap "Find models" to see what your key can use.</p>
     <label for="ghtoken">2. GitHub token (needed to edit and publish)</label>
     <input id="ghtoken" type="password" autocomplete="off" placeholder="github_pat_...">
-    <p class="hint">Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">fine-grained token</a>: only this repository, permission <b>Contents: Read and write</b>.</p>
+    <p class="hint">Easiest: a <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">classic token</a> with only the <b>repo</b> box ticked. Or a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">fine-grained token</a>: Resource owner = the account that owns the site, only this repository, <b>Contents: Read and write</b>. Tokens expire. If publishing says the token is bad or expired, make a new one and tap Save and test.</p>
     <label for="repo">Repository and branch</label>
     <div class="row"><input id="repo" type="text" autocomplete="off" placeholder="owner/repo"><input id="branch" type="text" autocomplete="off" placeholder="main" style="max-width:120px"></div>
     <label style="font-weight:500"><input id="remember" type="checkbox"> Remember my keys on this device</label>
@@ -123,7 +127,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   var S = { tree: null, map: {}, files: {}, staged: {}, hist: [], msgs: [], cur: '', pubCard: null, pubBtns: [], offeredSig: '', lastAsk: '', busy: false, stop: false, abort: null, tc: 0, timedOut: false, dog: 0 };
   var BLOCK = /^(\.git\/|\.github\/|CNAME$)/;
   var BIN = /\.(png|jpe?g|gif|webp|ico|svgz|woff2?|ttf|eot|pdf|zip|gz|mp4|mp3|webm)$/i;
-  var RO = { list_files: 1, read_file: 1, search_text: 1, shop_data: 1 };
+  var RO = { list_files: 1, read_file: 1, search_text: 1, shop_data: 1, check_work: 1 };
   var WAIT = 30000;
   var SB_URL = 'https://oewvtbnmyombbtggamor.supabase.co';
   var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ld3Z0Ym5teW9tYmJ0Z2dhbW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyNjM1MTIsImV4cCI6MjEwNjgzOTUxMn0.KmUI7jWPgSVY4KvPR5S53dcvtbOD2QutljiBg52cAWw';
@@ -217,8 +221,12 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
         var m = t; try { m = JSON.parse(t).message || t; } catch (e) {}
         if (r.status === 401) m = 'Bad or expired GitHub token (' + m + ')';
         if (r.status === 404) m = 'Not found. Check the repository name and token access (' + m + ')';
-        if (r.status === 403 && /not accessible by personal access token|Resource not accessible/i.test(String(m))) m = 'Your GitHub token can read the site but is not allowed to change it. Make a new token: Repository access = only ' + cfg.repo + ', and Repository permissions > Contents = Read and write. Paste it in Settings and tap Save and test. (' + m + ')';
-        throw new Error('GitHub ' + r.status + ': ' + String(m).slice(0, 300));
+        var sso = false; try { sso = !!r.headers.get('x-github-sso'); } catch (e) {}
+        if (r.status === 403 && (sso || /SAML|single sign-on|\bSSO\b/i.test(String(m)))) m = 'GitHub wants this token authorized for the organization. On GitHub open Settings > Personal access tokens, tap your token, then Configure SSO > Authorize. (' + m + ')';
+        else if (r.status === 403 && /rate limit/i.test(String(m))) m = 'GitHub is limiting requests right now. Wait a few minutes and try again.';
+        else if (r.status === 403 && /not accessible by personal access token|Resource not accessible/i.test(String(m))) m = 'Your GitHub token can read the site but is not allowed to change it. Make a new token. Classic token: tick the repo box. Fine-grained token: Resource owner = ' + cfg.repo.split('/')[0] + ', Repository access = only ' + cfg.repo + ', Repository permissions > Contents = Read and write. Paste it in Settings and tap Save and test. Your waiting changes are kept. (' + m + ')';
+        if (r.status === 422 && /fast.?forward/i.test(String(m))) m = 'The site changed while publishing. Press Publish again. (' + m + ')';
+        throw new Error('GitHub ' + r.status + ': ' + String(m).slice(0, 700));
       });
     });
   }
@@ -254,10 +262,21 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   }
 
   /* staging, diff, preview */
+  var STG = 'stm_builder_staged_v1';
+  /* waiting changes survive a refresh or a closed tab, so work is never lost */
+  function saveStaged() {
+    try {
+      try { localStorage.removeItem(STG); } catch (e) {} try { sessionStorage.removeItem(STG); } catch (e) {}
+      var keys = Object.keys(S.staged); if (!keys.length) return;
+      var o = {}; keys.forEach(function (p) { var s = S.staged[p]; o[p] = { orig: s.orig, text: s.text, isNew: !!s.isNew, deleted: !!s.deleted, sha: s.sha || null }; });
+      chatStore().setItem(STG, JSON.stringify({ repo: cfg.repo, branch: cfg.branch, staged: o }));
+    } catch (e) {}
+  }
+  function baseSha(path) { return S.map[path] ? S.map[path].sha : null; }
   function stageText(path, text, orig) {
     var cur = S.staged[path], base = cur ? cur.orig : orig;
     if (base != null && base === text) delete S.staged[path];
-    else S.staged[path] = { orig: base, text: text, isNew: base == null, deleted: false };
+    else S.staged[path] = { orig: base, text: text, isNew: base == null, deleted: false, sha: cur ? cur.sha : baseSha(path) };
     renderStaged();
   }
   function diffLines(a, b) {
@@ -313,13 +332,14 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   function preview(path) {
     var st = S.staged[path]; if (!st || st.deleted) return;
     var body = openDlg('Preview: ' + path);
-    var f = document.createElement('iframe'), base = '<base href="' + location.origin + '/">' + PV.replace('__ORIGIN__', function () { return JSON.stringify(location.origin); }), h = st.text;
+    var f = document.createElement('iframe'), base = '<base href="' + location.origin + '/">' + PV.replace('__ORIGIN__', function () { return JSON.stringify(location.origin); }), h = inlineStaged(st.text, path);
     f.setAttribute('sandbox', 'allow-scripts'); f.style.cssText = 'width:100%;height:78vh;border:0;background:#fff';
     f.srcdoc = /<head[^>]*>/i.test(h) ? h.replace(/<head[^>]*>/i, function (m) { return m + base; })
       : /<html[^>]*>/i.test(h) ? h.replace(/<html[^>]*>/i, function (m) { return m + base; }) : base + h;
     body.appendChild(f);
   }
   function renderStaged() {
+    saveStaged();
     var paths = Object.keys(S.staged).sort(), ul = $('stl'); ul.innerHTML = ''; $('stg').hidden = !paths.length || !!S.pubCard;
     if (!paths.length) { dropCard(); S.offeredSig = ''; } else if (S.pubCard && !S.busy) offerPublish();
     function mk(tag, cls, txt, fn) { var e = document.createElement(tag); if (cls) e.className = cls; e.textContent = txt; if (fn) { e.type = 'button'; e.onclick = fn; } return e; }
@@ -331,6 +351,102 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
       li.appendChild(mk('button', 'sm', 'Changes', function () { showDiff(p); }));
       li.appendChild(mk('button', 'sm', 'Undo', function () { delete S.staged[p]; renderStaged(); }));
       ul.appendChild(li);
+    });
+  }
+
+  /* ---- automatic check of waiting changes: catches what the AI most often gets wrong ----
+     (a page pointing at a file that was never created, broken code, secret keys, invented claims) */
+  var CLAIM = /(#\s?1\b|\bno\.?\s?1\b|number\s(?:one|1)\b|best in (?:kenya|the world|africa)|top[- ]rated|\branked\b|\branking\b|\bawards?\b|\bguarantee[ds]?\b|100%\s*(?:safe|effective|guaranteed|genuine|original|authentic|organic|natural)|\bcertified\b|official (?:distributor|dealer|partner))/i;
+  var SECRET = /(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AIza[0-9A-Za-z_-]{30,}|service_role|sk-[A-Za-z0-9]{20,})/;
+  function validJson(t) { try { JSON.parse(t); return true; } catch (e) { return false; } }
+  /* compiles code without running it (this is why the page policy allows unsafe-eval; if a browser refuses, the check is simply skipped) */
+  function jsError(code) { try { new Function(code); return ''; } catch (e) { return e instanceof SyntaxError ? String(e.message) : ''; } }
+  /* turns a link inside a page into a repository path; null means it is not a local file (web address, #anchor, tel:, template text) */
+  function refPath(ref, from) {
+    ref = String(ref == null ? '' : ref).trim();
+    if (!ref || /^(#|[a-z][a-z0-9+.-]*:|\/\/)/i.test(ref) || /[{}$<>'"+\\]/.test(ref)) return null;
+    var r = ref.replace(/[?#].*$/, ''); if (!r) return null;
+    var dir = r.charAt(0) === '/' ? '' : (from.indexOf('/') >= 0 ? from.slice(0, from.lastIndexOf('/') + 1) : ''), seg = [];
+    (dir + r.replace(/^\/+/, '')).split('/').forEach(function (s) { if (s === '' || s === '.') return; if (s === '..') seg.pop(); else seg.push(s); });
+    var p = seg.join('/'); try { p = decodeURIComponent(p); } catch (e) {}
+    return p;
+  }
+  function pathExists(p) {
+    if (p === '') return true;
+    function has(x) { var s = S.staged[x]; return s ? !s.deleted : !!S.map[x]; }
+    if (has(p) || has(p + '.html') || has(p + '/index.html')) return true;
+    var pre = p + '/';
+    return (S.tree || []).some(function (e) { return e.path.indexOf(pre) === 0 && !(S.staged[e.path] && S.staged[e.path].deleted); }) ||
+      Object.keys(S.staged).some(function (k) { return k.indexOf(pre) === 0 && !S.staged[k].deleted; });
+  }
+  function validate() {
+    var errors = [], claims = [];
+    function add(list, s, max) { if (list.length < (max || 10)) list.push(s); }
+    Object.keys(S.staged).sort().forEach(function (p) {
+      var st = S.staged[p]; if (st.deleted) return;
+      var text = st.text, ext = ((p.match(/\.([A-Za-z0-9]+)$/) || [])[1] || '').toLowerCase();
+      var added = st.orig == null ? text.split('\n') : diffLines(st.orig, text).ops.filter(function (o) { return o[0] === '+'; }).map(function (o) { return o[1]; });
+      var addedText = added.join('\n'), m = SECRET.exec(addedText);
+      if (m) add(errors, p + ': contains something that looks like a secret key (' + m[0].slice(0, 6) + '...). Remove it.');
+      if (ext === 'json' && !validJson(text) && (st.orig == null || validJson(st.orig))) add(errors, p + ': is not valid JSON.');
+      if (ext === 'js' && !/^\s*(import|export)\s/m.test(text)) {
+        var je = jsError(text);
+        if (je && (st.orig == null || !jsError(st.orig))) add(errors, p + ': the code has a mistake and would not run (' + je + ').');
+      }
+      if (ext === 'html' || ext === 'htm') {
+        if (/<html[\s>]/i.test(text) && !/<\/html>\s*$/i.test(text.trim()) && (st.orig == null || /<\/html>\s*$/i.test(st.orig.trim()))) add(errors, p + ': the page looks cut off (it does not end with </html>).');
+        ['script', 'style'].forEach(function (t) {
+          var op = new RegExp('<' + t + '\\b', 'gi'), cl = new RegExp('</' + t + '>', 'gi');
+          var o = (text.match(op) || []).length, c = (text.match(cl) || []).length;
+          var oo = st.orig == null ? 0 : (st.orig.match(op) || []).length, oc = st.orig == null ? 0 : (st.orig.match(cl) || []).length;
+          if (o !== c && (st.orig == null || oo === oc)) add(errors, p + ': has ' + o + ' <' + t + '> tags but ' + c + ' closing tags.');
+        });
+        var re = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi, b;
+        while ((b = re.exec(text))) {
+          var at = b[1], body = b[2];
+          if (/\bsrc\s*=/i.test(at) || !body.trim() || (st.orig != null && st.orig.indexOf(body) >= 0)) continue;
+          var ty = (/\btype\s*=\s*["']?([^"'\s>]+)/i.exec(at) || [])[1] || '';
+          if (/ld\+json/i.test(ty)) { if (!validJson(body)) add(errors, p + ': a JSON-LD block is not valid JSON.'); continue; }
+          if (ty && !/^(text|application)\/(x-)?(javascript|ecmascript)$/i.test(ty)) continue;
+          var je2 = jsError(body); if (je2) add(errors, p + ': a script on the page has a mistake (' + je2 + ').');
+        }
+        if (S.tree) {
+          var rr = /<(?:script|link|img|source|iframe|video|audio|a)\b[^>]*?\s(?:src|href)\s*=\s*["']([^"']*)["']/gi, x, seen = {};
+          while ((x = rr.exec(addedText))) {
+            var rp = refPath(x[1], p); if (rp === null || seen[rp]) continue; seen[rp] = 1;
+            if (!pathExists(rp)) add(errors, p + ': points to "' + x[1] + '" but that file does not exist. Create it with write_file, or remove the reference.');
+          }
+        }
+      }
+      if (/^(html?|md|txt)$/.test(ext)) {
+        added.forEach(function (l) {
+          var t = l.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(), c = CLAIM.exec(t);
+          if (c) add(claims, p + ': "' + t.slice(Math.max(0, c.index - 30), c.index + c[0].length + 40).trim() + '"', 6);
+        });
+      }
+    });
+    return { errors: errors, claims: claims };
+  }
+  function issueText(i) {
+    var t = '';
+    if (i.errors.length) t += 'PROBLEMS TO FIX:\n- ' + i.errors.join('\n- ');
+    if (i.claims.length) t += (t ? '\n\n' : '') + 'UNVERIFIED CLAIMS (remove them unless the owner gave you this exact claim; never invent rankings, awards, guarantees or statistics):\n- ' + i.claims.join('\n- ');
+    return t;
+  }
+  /* preview: use the waiting version of any script or stylesheet the page loads, so the preview shows the real work */
+  function inlineStaged(h, from) {
+    function pick(ref) { var p = refPath(ref, from), s = p != null ? S.staged[p] : null; return s && !s.deleted ? s : null; }
+    h = h.replace(/<script\b([^>]*)>\s*<\/script>/gi, function (m, at) {
+      var q = /\bsrc\s*=\s*["']([^"']+)["']/i.exec(at); if (!q) return m;
+      var s = pick(q[1]); if (!s) return m;
+      var attrs = at.replace(/\s*\bsrc\s*=\s*["'][^"']*["']/i, '').replace(/\s*\b(?:defer|async)\b/gi, ''), code = s.text.replace(/<\/script/gi, '<\\/script');
+      if (/\bdefer\b/i.test(at) && !/type\s*=\s*["']?module/i.test(at)) code = '(function(){var f=function(){' + code + '\n};if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",f);else f()})();';
+      return '<script' + attrs + '>' + code + '</scr' + 'ipt>';
+    });
+    return h.replace(/<link\b[^>]*>/gi, function (m) {
+      if (!/\brel\s*=\s*["']?stylesheet/i.test(m)) return m;
+      var q = /\bhref\s*=\s*["']([^"']+)["']/i.exec(m); if (!q) return m;
+      var s = pick(q[1]); return s ? '<style>' + s.text.replace(/<\/style/gi, '<\\/style') + '</style>' : m;
     });
   }
 
@@ -354,8 +470,17 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
       ul.appendChild(li);
     });
     d.appendChild(ul);
+    var iss = validate(); S.issues = iss;
+    if (iss.errors.length || iss.claims.length) {
+      var wb = document.createElement('div'); wb.className = 'warn' + (iss.errors.length ? ' bad' : '');
+      var wh = document.createElement('b'); wh.textContent = iss.errors.length ? 'The check found problems. Do not publish yet:' : 'Please check before publishing:'; wb.appendChild(wh);
+      var wl = document.createElement('ul');
+      iss.errors.concat(iss.claims.map(function (c) { return 'Claim to verify, ' + c; })).forEach(function (t) { var li = document.createElement('li'); li.textContent = t; wl.appendChild(li); });
+      wb.appendChild(wl); d.appendChild(wb);
+    }
     var row = document.createElement('div'); row.className = 'row';
-    row.appendChild(mk('button', 'ok', 'Publish to my website', publishFromCard));
+    if (iss.errors.length || iss.claims.length) row.appendChild(mk('button', 'pri', 'Ask AI to fix this', function () { $('inp').value = 'Please fix these problems found by the automatic check:\n' + issueText(iss); send(); }));
+    row.appendChild(mk('button', iss.errors.length ? '' : 'ok', iss.errors.length ? 'Publish anyway' : 'Publish to my website', publishFromCard));
     row.appendChild(mk('button', '', 'Discard', function () { if (confirm('Throw away all waiting changes?')) { S.staged = {}; renderStaged(); } }));
     row.appendChild(mk('button', '', 'Not now', function () { dropCard(); }));
     d.appendChild(row);
@@ -441,6 +566,14 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
         return { table: t, count: rows.length, rows: rows };
       });
     },
+    check_work: function () {
+      return loadTree().then(function () {
+        var n = Object.keys(S.staged).length;
+        if (!n) return { note: 'No changes are waiting, so there is nothing to check.' };
+        var i = validate();
+        return (i.errors.length || i.claims.length) ? { ok: false, report: issueText(i) } : { ok: true, files_checked: n, note: 'No problems found.' };
+      });
+    },
     edit_file: function (a) {
       var path = cleanPath(a.path); writable(path);
       var find = a.find == null ? '' : String(a.find), rep = a.replace == null ? '' : String(a.replace);
@@ -474,7 +607,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
         var st = S.staged[path];
         if (!S.map[path] && !(st && !st.isNew)) throw new Error('File not found: ' + path);
         var o = st ? Promise.resolve(st.orig) : BIN.test(path) ? Promise.resolve(null) : getFile(path).then(function (f) { return f.text; });
-        return o.then(function (orig) { S.staged[path] = { orig: orig, text: '', isNew: false, deleted: true }; renderStaged(); return { ok: true, path: path, staged_for_deletion: true }; });
+        return o.then(function (orig) { S.staged[path] = { orig: orig, text: '', isNew: false, deleted: true, sha: st ? st.sha : baseSha(path) }; renderStaged(); return { ok: true, path: path, staged_for_deletion: true }; });
       });
     }
   };
@@ -487,12 +620,16 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     { name: 'shop_data', description: 'Read live store data from Supabase (read-only, public info only): products (name, price in KSh, stock, image, category) or categories. Use it to see the real products before designing banners, pages or copy.', parameters: P({ table: T, search: T, category_id: { type: 'integer' }, featured: { type: 'boolean' }, limit: { type: 'integer' } }) },
     { name: 'edit_file', description: 'Replace exact text in a file (staged until the owner publishes). "find" must match exactly and be unique unless replace_all is true.', parameters: P({ path: T, find: T, replace: T, replace_all: { type: 'boolean' } }, ['path', 'find', 'replace']) },
     { name: 'write_file', description: 'Create a new text file, or fully replace a small one (staged until published). Use edit_file for existing files.', parameters: P({ path: T, content: T }, ['path', 'content']) },
-    { name: 'delete_file', description: 'Stage a file for deletion.', parameters: P({ path: T }, ['path']) }
+    { name: 'delete_file', description: 'Stage a file for deletion.', parameters: P({ path: T }, ['path']) },
+    { name: 'check_work', description: 'Check every waiting change for mistakes: pages pointing at files that do not exist, broken code, invalid JSON, secret keys and invented claims. Call it before you finish any change.' }
   ];
   var SYSTEM = 'You are Site Builder, a friendly, fast, all-round AI assistant for the owner of Stermont Arcade (stermontarcade.co.ke), a Kenyan online store: prices in KSh, customers pay by M-Pesa and ask questions on WhatsApp. The site is a static GitHub Pages site of plain HTML, CSS and JavaScript files. Product data and orders live in Supabase, not in the repository. The owner is not a programmer: talk like a friendly colleague, in short simple English (reply in the language the owner uses).\n' +
     'You do two jobs.\nJOB A, ANSWER ANYTHING: you can answer any question or chat about any topic: business and marketing advice, product descriptions, WhatsApp and customer replies, pricing ideas, Kenyan shipping, tax and M-Pesa questions, coding help, maths, writing, general knowledge. For a question or chat, just answer directly in plain text and do NOT use tools. Never say a question is outside your job.\nJOB B, BUILD AND FIX THE WEBSITE:\n' +
-    '1. Be fast and proactive. Do the whole job in one go instead of asking questions. When you need several files or searches, request them all in the same step so they run together. Ask one short question only if a wrong guess would be costly.\n2. Be creative: when asked for something new (banner, landing page, section, promo, layout), design it boldly and professionally, mobile first, matching the store look, with clear calls to action (WhatsApp, M-Pesa). You can also fix bugs, improve speed, SEO, accessibility and copywriting. Use shop_data to see the real products, prices and categories before writing product-related content.\n3. Read the relevant part of a file before editing. Make small exact changes with edit_file, copying "find" text exactly. Use write_file for new files or very small ones.\n4. Edits are only staged. When you finish, a green Publish card appears automatically in the chat with Preview, Changes and Publish buttons. Nothing goes live until the owner presses Publish.\n5. Do not hand-edit files in p/, sitemap*.xml, merchant-feed.xml, sitemap-state.json or llms.txt: workflows generate them. Edit the generator script instead and say so.\n6. If an HTML page loads a JS or CSS file with ?v=N, raise N when you change that file.\n7. Never add secret keys. Keep existing SEO tags valid. Never remove working features. Never show or guess product cost or profit figures publicly.\n8. The default admin profit percentage is the PROFIT_PCT constant in catalog-v10.js.\n9. If a tool fails, say what failed in one plain sentence and try another way. Never go silent.\n10. Keep replies short. After building, finish with a 2 or 3 sentence summary, tell the owner to check the Publish card below (Preview first if they like) and press Publish, and suggest one next idea.';
-  var NAMES = { list_files: 'Looking at files', read_file: 'Reading', search_text: 'Searching', shop_data: 'Checking the shop', edit_file: 'Editing', write_file: 'Writing', delete_file: 'Marking for deletion' };
+    '1. Be fast and proactive. Do the whole job in one go instead of asking questions. When you need several files or searches, request them all in the same step so they run together. Ask one short question only if a wrong guess would be costly.\n2. Be creative: when asked for something new (banner, landing page, section, promo, layout), design it boldly and professionally, mobile first, matching the store look, with clear calls to action (WhatsApp, M-Pesa). You can also fix bugs, improve speed, SEO, accessibility and copywriting. Use shop_data to see the real products, prices and categories before writing product-related content.\n3. Read the relevant part of a file before editing. Make small exact changes with edit_file, copying "find" text exactly. Use write_file for new files or very small ones.\n4. Edits are only staged. When you finish, a green Publish card appears automatically in the chat with Preview, Changes and Publish buttons. Nothing goes live until the owner presses Publish.\n5. Do not hand-edit files in p/, sitemap*.xml, merchant-feed.xml, sitemap-state.json or llms.txt: workflows generate them. Edit the generator script instead and say so.\n6. If an HTML page loads a JS or CSS file with ?v=N, raise N when you change that file.\n7. Never add secret keys. Keep existing SEO tags valid. Never remove working features. Never show or guess product cost or profit figures publicly.\n8. The default admin profit percentage is the PROFIT_PCT constant in catalog-v10.js.\n9. If a tool fails, say what failed in one plain sentence and try another way. Never go silent.\n10. Keep replies short. After building, finish with a 2 or 3 sentence summary, tell the owner to check the Publish card below (Preview first if they like) and press Publish, and suggest one next idea.\n' +
+    '11. NEVER invent or exaggerate facts: no rankings (like "#1"), awards, ratings, certifications, guarantees, statistics, testimonials, delivery times, discounts or stock claims unless they are in the site files, in shop_data, or the owner told you. Prices come only from shop_data.\n' +
+    '12. Make everything real. Every script, stylesheet, image or link you add must point to a file that exists. If you reference a new file, create it with write_file in the same job: a calculator or tool needs its real working code, not just a script tag that points nowhere. Never say you built something unless its code is actually staged.\n' +
+    '13. Before you finish any change, call check_work. If it reports problems, fix every one and call check_work again. Only then write your summary, and say truthfully what changed and anything you could not do. Nothing is live until the owner presses Publish, so never say it is live.';
+  var NAMES = { list_files: 'Looking at files', read_file: 'Reading', search_text: 'Searching', shop_data: 'Checking the shop', edit_file: 'Editing', write_file: 'Writing', delete_file: 'Marking for deletion', check_work: 'Checking my work' };
   function describe(n, a) { a = a || {}; return (NAMES[n] || n) + ' ' + (a.path || a.prefix || a.search || a.table || (a.query ? '"' + String(a.query).slice(0, 50) + '"' : '')); }
 
   /* Gemini (streaming) */
@@ -598,7 +735,18 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   }
   function runTurn(text) {
     S.hist.push({ role: 'user', parts: [{ text: text }] });
-    var steps = 0;
+    var steps = 0, repairs = 0, sig0 = stagedSig();
+    /* when the AI says it is done, the app checks the real files itself and sends any problem back to be fixed */
+    function finish() {
+      if (S.stop || repairs >= 2 || stagedSig() === sig0 || !Object.keys(S.staged).length) return Promise.resolve();
+      return loadTree().then(function () {
+        var iss = validate(); if (!iss.errors.length && !iss.claims.length) return;
+        repairs++;
+        addMsg('sys', 'Checking my work: ' + (iss.errors.length + iss.claims.length) + ' thing(s) to fix. Fixing now...', true);
+        S.hist.push({ role: 'user', parts: [{ text: '[Automatic check of your work, not written by the owner]\n' + issueText(iss) + '\n\nFix every item now with your tools: create missing files, correct the code, remove invented claims. Then reply to the owner in 2 or 3 plain sentences saying what is really done. Do not mention this check message.' }] });
+        return step();
+      });
+    }
     function step() {
       if (S.stop) return Promise.resolve();
       if (++steps > 40) { addMsg('sys', 'I paused after 40 steps. Type "continue" and I will carry on.'); return Promise.resolve(); }
@@ -627,7 +775,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
         if (!r.parts.length) throw new Error('The AI gave no answer (' + (r.reason || 'empty reply') + '). Try again or rephrase.');
         S.hist.push({ role: 'model', parts: r.parts });
         var calls = r.parts.filter(function (p) { return p.functionCall; });
-        if (!calls.length) return;
+        if (!calls.length) return finish();
         return runCalls(calls).then(function (resps) { S.hist.push({ role: 'user', parts: resps }); return step(); });
       });
     }
@@ -656,29 +804,49 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   function publish() {
     var paths = Object.keys(S.staged); if (!paths.length || S.busy) return;
     if (!ghReady()) { addMsg('err', 'Add your GitHub token in Settings to publish.', true); $('set').hidden = false; return; }
-    var msg = ($('cmsg').value || '').trim() || 'Site update via Site Builder', repo = cfg.repo, branch = cfg.branch, base, baseTree;
-    setBusy(true); setStatus('Publishing...');
-    return loadTree(true).then(function () {
-      var bad = paths.filter(function (p) { var st = S.staged[p]; return !st.isNew && S.files[p] && S.map[p] && S.map[p].sha !== S.files[p].sha; });
-      if (bad.length) throw new Error('These files changed on GitHub after you started, so I did not publish: ' + bad.join(', ') + '. Press Discard all and ask again.');
-      return gh('/repos/' + repo + '/git/ref/heads/' + branch);
-    }).then(function (r) { base = r.object.sha; return gh('/repos/' + repo + '/git/commits/' + base); })
-    .then(function (c) {
-      baseTree = c.tree.sha;
-      return Promise.all(paths.map(function (p) {
-        var st = S.staged[p];
-        if (st.deleted) return { path: p, mode: '100644', type: 'blob', sha: null };
-        return gh('/repos/' + repo + '/git/blobs', { method: 'POST', body: { content: st.text, encoding: 'utf-8' } }).then(function (b) { return { path: p, mode: '100644', type: 'blob', sha: b.sha }; });
-      }));
-    }).then(function (en) { return gh('/repos/' + repo + '/git/trees', { method: 'POST', body: { base_tree: baseTree, tree: en } }); })
-    .then(function (t) { return gh('/repos/' + repo + '/git/commits', { method: 'POST', body: { message: msg, tree: t.sha, parents: [base] } }); })
-    .then(function (cm) { return gh('/repos/' + repo + '/git/refs/heads/' + branch, { method: 'PATCH', body: { sha: cm.sha } }); })
-    .then(function () {
+    var iss = validate();
+    if (iss.errors.length && !confirm('The check found problems that could break your website:\n\n- ' + iss.errors.slice(0, 4).join('\n- ') + '\n\nPublish anyway?')) return;
+    var msg = ($('cmsg').value || '').trim() || 'Site update via Site Builder', repo = cfg.repo, branch = cfg.branch, tried = false;
+    clearPubErr(); setBusy(true); setStatus('Publishing...');
+    function run() {
+      var base, baseTree;
+      return loadTree(true).then(function () {
+        /* each waiting file remembers which GitHub version it was based on; if someone changed it since, stop instead of overwriting */
+        var bad = paths.filter(function (p) { var st = S.staged[p]; return !st.isNew && st.sha && (S.map[p] ? S.map[p].sha !== st.sha : !st.deleted); });
+        if (bad.length) throw new Error('These files changed on GitHub after you started, so I did not publish: ' + bad.join(', ') + '. Your waiting changes are kept. Press Discard and ask again so I rebuild them on the newest version.');
+        return gh('/repos/' + repo + '/git/ref/heads/' + branch);
+      }).then(function (r) { base = r.object.sha; return gh('/repos/' + repo + '/git/commits/' + base); })
+      .then(function (c) {
+        baseTree = c.tree.sha;
+        return Promise.all(paths.map(function (p) {
+          var st = S.staged[p];
+          if (st.deleted) return { path: p, mode: '100644', type: 'blob', sha: null };
+          return gh('/repos/' + repo + '/git/blobs', { method: 'POST', body: { content: st.text, encoding: 'utf-8' } }).then(function (b) { return { path: p, mode: '100644', type: 'blob', sha: b.sha }; });
+        }));
+      }).then(function (en) { return gh('/repos/' + repo + '/git/trees', { method: 'POST', body: { base_tree: baseTree, tree: en } }); })
+      .then(function (t) { return gh('/repos/' + repo + '/git/commits', { method: 'POST', body: { message: msg, tree: t.sha, parents: [base] } }); })
+      .then(function (cm) { return gh('/repos/' + repo + '/git/refs/heads/' + branch, { method: 'PATCH', body: { sha: cm.sha } }); });
+    }
+    return run().catch(function (e) {
+      /* one automatic retry for a busy branch or a dropped connection; the conflict check above runs again, so it is safe */
+      if (!tried && /fast.?forward|GitHub (409|422)|Failed to fetch|NetworkError|took too long/i.test(String(e && e.message || e))) {
+        tried = true; setStatus('Trying again...');
+        return new Promise(function (ok) { setTimeout(ok, 1500); }).then(run);
+      }
+      throw e;
+    }).then(function () {
       var n = paths.length; S.staged = {}; S.files = {}; S.tree = null; $('cmsg').value = ''; prefetch();
       S.hist.push({ role: 'user', parts: [{ text: '[The owner published the staged changes. Read files again before editing.]' }] });
       S.hist.push({ role: 'model', parts: [{ text: 'Understood.' }] });
-      addMsg('sys', 'Published ' + n + ' file' + (n === 1 ? '' : 's') + '. Your website updates in about a minute.');
-    }).catch(function (e) { addMsg('err', 'Could not publish: ' + String(e && e.message || e)); }).then(function () { setBusy(false); renderStaged(); saveChat(); });
+      addMsg('sys', 'Published ' + n + ' file' + (n === 1 ? '' : 's') + '. Your website updates in about a minute. Refresh the page (or open it in a private tab) to see it.');
+    }).catch(function (e) { S.pubErr = addMsg('err', 'Could not publish: ' + String(e && e.message || e), true); }).then(function () { setBusy(false); renderStaged(); saveChat(); });
+  }
+  /* an old publish error disappears once a new publish starts or succeeds, so the chat never shows a stale failure */
+  function clearPubErr() {
+    if (!S.pubErr) return;
+    try { S.pubErr.remove(); } catch (e) {}
+    if (S.pubErr._rec) S.msgs = S.msgs.filter(function (m) { return m !== S.pubErr._rec; });
+    S.pubErr = null;
   }
 
   /* settings actions */
@@ -706,6 +874,20 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
       });
       out.textContent = n + ' models found. Tap the Model box and choose one (flash-lite is fastest).';
     }).catch(function (e) { out.textContent = 'Could not list models (' + e.message + ').'; });
+  }
+
+  /* bring back changes that were waiting when the page was closed or refreshed */
+  function restoreStaged() {
+    var s = null; try { s = localStorage.getItem(STG) || sessionStorage.getItem(STG); } catch (e) {}
+    if (!s) return;
+    try {
+      var o = JSON.parse(s), k = Object.keys(o.staged || {});
+      if (o.repo !== cfg.repo || o.branch !== cfg.branch || !k.length) return;
+      k.forEach(function (p) { var e = o.staged[p]; S.staged[p] = { orig: e.orig, text: e.text, isNew: !!e.isNew, deleted: !!e.deleted, sha: e.sha || null }; });
+    } catch (e) { S.staged = {}; return; }
+    addMsg('sys', 'I kept your unpublished changes from last time. Check them, then press Publish or Discard.', true);
+    var show = function () { renderStaged(); offerPublish(); };
+    if (ghReady()) loadTree().then(show, show); else show();
   }
 
   /* wire up */
@@ -741,7 +923,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   $('bInst').onclick = function () { if (!deferred) return; deferred.prompt(); deferred.userChoice.then(function () { deferred = null; $('bInst').hidden = true; }, function () {}); };
   if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
   var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
-  loadCfg(); fillForm(); if (!loadChat()) welcome(); prefetch();
+  loadCfg(); fillForm(); if (!loadChat()) welcome(); prefetch(); restoreStaged();
   if (/iphone|ipad|ipod/i.test(navigator.userAgent || '') && !standalone) addMsg('sys', 'To install on iPhone: tap Share, then Add to Home Screen.', true);
   if (!ready()) $('set').hidden = false;
 })();

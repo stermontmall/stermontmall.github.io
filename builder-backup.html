@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#5b21b6">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src https://generativelanguage.googleapis.com https://api.github.com https://oewvtbnmyombbtggamor.supabase.co; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src about: blob:; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
+<title>Stermont AI Builder (backup)</title>
+<link rel="icon" href="/favicon.png">
+<link rel="manifest" href="/builder-manifest.json">
+<link rel="apple-touch-icon" href="/icon-builder-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AI Builder">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{--p:#5b21b6;--pl:#f3eefc;--ink:#1f1b2e;--mu:#6b6785;--ln:#e3ddf3;--ok:#15803d;--no:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:#faf9fd;padding-bottom:170px}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:.4rem;padding:calc(.6rem + env(safe-area-inset-top)) .8rem .6rem;background:var(--p);color:#fff}
+header b{flex:1;font-size:1rem;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--p);background:#fff;color:var(--p);padding:.45rem .8rem;font-weight:600}
+button.pri{background:var(--p);color:#fff}
+button.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+button.sm{padding:.25rem .6rem;font-size:.85rem}
+button:disabled{opacity:.5;cursor:default}
+header button{border-color:#fff;background:transparent;color:#fff;padding:.3rem .6rem;font-size:.85rem;white-space:nowrap}
+main{max-width:860px;margin:0 auto;padding:.8rem}
+.card{background:#fff;border:1px solid var(--ln);border-radius:14px;padding:.9rem;margin-bottom:.8rem}
+.card h2{margin:0 0 .4rem;font-size:1.05rem}
+label{display:block;font-weight:600;margin:.6rem 0 .2rem;font-size:.92rem}
+input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size:16px;border:1px solid var(--ln);border-radius:10px;padding:.55rem .7rem;background:#fff;color:var(--ink)}
+.hint{color:var(--mu);font-size:.85rem;margin:.2rem 0}
+.hint a{color:var(--p)}
+.row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.row>input{flex:1;min-width:140px}
+.warn{background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:.5rem .7rem;font-size:.85rem;margin:.6rem 0}
+#log{display:flex;flex-direction:column;gap:.5rem}
+.m{padding:.6rem .8rem;border-radius:14px;max-width:94%;overflow-wrap:anywhere}
+.m.user{align-self:flex-end;background:var(--p);color:#fff;white-space:pre-wrap}
+.m.ai{align-self:flex-start;background:#fff;border:1px solid var(--ln)}
+.m.tool{align-self:flex-start;color:var(--mu);font-size:.82rem;padding:.1rem .4rem}
+.m.sys{align-self:center;background:var(--pl);color:var(--p);font-size:.88rem;text-align:center}
+.m.pub{align-self:stretch;max-width:100%;background:#f0fdf4;border:1px solid #86efac}
+.m.pub b{display:block;margin-bottom:.3rem}
+.m.pub ul{list-style:none;margin:.2rem 0 .6rem;padding:0;font-size:.88rem}
+.m.pub li{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;padding:.2rem 0}
+.m.pub li .f{flex:1;min-width:140px;word-break:break-all}
+.m.err{align-self:center;background:#fef2f2;color:var(--no);font-size:.9rem;border:1px solid #fecaca}
+.m pre{background:#1f1b2e;color:#e9e4f7;padding:.6rem;border-radius:8px;overflow-x:auto;font-size:.82rem;margin:.4rem 0}
+.m code{background:var(--pl);padding:.05rem .3rem;border-radius:5px;font-size:.9em}
+.m a{color:var(--p)}
+.chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:.5rem 0}
+.chip{border:1px solid #d9c9fb;border-radius:999px;padding:.3rem .75rem;font-size:.88rem}
+#stg ul{list-style:none;margin:.3rem 0 .6rem;padding:0}
+#stg li{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;padding:.4rem 0;border-bottom:1px solid var(--ln)}
+#stg li .f{flex:1;min-width:150px;word-break:break-all;font-size:.9rem}
+.add{color:var(--ok);font-weight:700}.del{color:var(--no);font-weight:700}
+#bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);padding:.5rem .7rem calc(.5rem + env(safe-area-inset-bottom));z-index:6}
+#bar .in{max-width:860px;margin:0 auto;display:flex;gap:.5rem;align-items:flex-end}
+#bar textarea{flex:1;resize:none;height:44px;max-height:140px}
+#status{max-width:860px;margin:0 auto .3rem;font-size:.82rem;color:var(--mu);min-height:1.1rem}
+#dlg{position:fixed;inset:0;background:rgba(20,15,40,.55);z-index:20;display:flex;align-items:center;justify-content:center;padding:.8rem}
+.dbox{background:#fff;border-radius:14px;max-width:900px;width:100%;max-height:92vh;display:flex;flex-direction:column}
+.dh{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.7rem .9rem;border-bottom:1px solid var(--ln)}
+#dbody{overflow:auto;font:12.5px/1.45 ui-monospace,Menlo,Consolas,monospace}
+#dbody div{padding:0 .8rem;white-space:pre-wrap;word-break:break-all}
+#dbody .a{background:#dcfce7}#dbody .r{background:#fee2e2}#dbody .c{color:#6b6785}#dbody .n{color:#6b6785;font-style:italic;padding:.3rem .8rem}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <b>&#128736; AI Builder</b>
+  <button id="bInst" type="button" hidden>Install app</button>
+  <button id="bSet" type="button">Settings</button>
+  <button id="bNew" type="button">New chat</button>
+</header>
+<main>
+  <section id="set" class="card" hidden>
+    <h2>Settings</h2>
+    <label for="gkey">1. Gemini API key (free)</label>
+    <input id="gkey" type="password" autocomplete="off" placeholder="Paste your Gemini API key">
+    <p class="hint">Get one free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a></p>
+    <label for="model">Model</label>
+    <div class="row"><input id="model" type="text" list="models" autocomplete="off" placeholder="gemini-flash-latest"><button id="bFind" type="button" class="sm">Find models</button></div>
+    <datalist id="models"></datalist>
+    <p class="hint">Fastest: a "flash-lite" model, for example <b>gemini-3.5-flash-lite</b>. Tap "Find models" to see what your key can use.</p>
+    <label for="ghtoken">2. GitHub token (needed to edit and publish)</label>
+    <input id="ghtoken" type="password" autocomplete="off" placeholder="github_pat_...">
+    <p class="hint">Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">fine-grained token</a>: only this repository, permission <b>Contents: Read and write</b>.</p>
+    <label for="repo">Repository and branch</label>
+    <div class="row"><input id="repo" type="text" autocomplete="off" placeholder="owner/repo"><input id="branch" type="text" autocomplete="off" placeholder="main" style="max-width:120px"></div>
+    <label style="font-weight:500"><input id="remember" type="checkbox"> Remember my keys on this device</label>
+    <div class="warn">Keys stay in this browser and are only sent to Google and GitHub. Shop data is read from Supabase (read-only, public info only). Never paste customer data or passwords into the chat.</div>
+    <div class="row"><button id="bSave" type="button" class="pri">Save and test</button><button id="bClear" type="button">Clear saved keys</button></div>
+    <div id="setOut" class="hint"></div>
+  </section>
+  <div id="log" aria-live="polite"></div>
+  <section id="stg" class="card" hidden>
+    <h2>Changes waiting to go live</h2>
+    <ul id="stl"></ul>
+    <label for="cmsg">Short note about this update</label>
+    <input id="cmsg" type="text" placeholder="e.g. New Black Friday banner" autocomplete="off">
+    <div class="row" style="margin-top:.6rem"><button id="bPub" type="button" class="ok">Publish to my website</button><button id="bDisc" type="button">Discard all</button></div>
+    <p class="hint">Nothing changes on your site until you press Publish. GitHub Pages then takes about a minute to update.</p>
+  </section>
+</main>
+<div id="bar">
+  <div id="status"></div>
+  <div class="in"><textarea id="inp" rows="1" placeholder="Tell me what to build or change..."></textarea><button id="bSend" type="button" class="pri">Send</button><button id="bStop" type="button" hidden>Stop</button></div>
+</div>
+<div id="dlg" hidden><div class="dbox"><div class="dh"><b id="dt"></b><button id="dx" type="button" class="sm">Close</button></div><div id="dbody"></div></div></div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var LS = 'stm_builder_cfg_v1';
+  var cfg = { gkey: '', model: 'gemini-flash-latest', gh: '', repo: 'stermontmall/stermontmall.github.io', branch: 'main', remember: false };
+  var S = { tree: null, map: {}, files: {}, staged: {}, hist: [], msgs: [], cur: '', pubCard: null, pubBtns: [], offeredSig: '', lastAsk: '', busy: false, stop: false, abort: null, tc: 0, timedOut: false, dog: 0 };
+  var BLOCK = /^(\.git\/|\.github\/|CNAME$)/;
+  var BIN = /\.(png|jpe?g|gif|webp|ico|svgz|woff2?|ttf|eot|pdf|zip|gz|mp4|mp3|webm)$/i;
+  var RO = { list_files: 1, read_file: 1, search_text: 1, shop_data: 1 };
+  var WAIT = 30000;
+  var SB_URL = 'https://oewvtbnmyombbtggamor.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ld3Z0Ym5teW9tYmJ0Z2dhbW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyNjM1MTIsImV4cCI6MjEwNjgzOTUxMn0.KmUI7jWPgSVY4KvPR5S53dcvtbOD2QutljiBg52cAWw';
+  var FALLBACK = ['gemini-flash-latest', 'gemini-flash-lite-latest'];
+  var CHAT = 'stm_builder_chat_v1';
+  /* thinking settings, fastest first. Newer Gemini models use levels, older ones a budget; the next one is tried automatically if rejected. No temperature is sent because new models refuse it. */
+  var TC = [{ thinkingConfig: { thinkingLevel: 'minimal' } }, { thinkingConfig: { thinkingLevel: 'low' } }, { thinkingConfig: { thinkingBudget: 0 } }, {}];
+
+  /* settings */
+  function loadCfg() {
+    var s = null;
+    try { s = localStorage.getItem(LS); if (s) cfg.remember = true; } catch (e) {}
+    if (!s) { try { s = sessionStorage.getItem(LS); } catch (e) {} }
+    if (s) { try { var o = JSON.parse(s); for (var k in o) if (o.hasOwnProperty(k) && k !== 'remember') cfg[k] = o[k]; } catch (e) {} }
+  }
+  function saveCfg() {
+    var s = JSON.stringify(cfg);
+    try { localStorage.removeItem(LS); } catch (e) {}
+    try { sessionStorage.removeItem(LS); } catch (e) {}
+    try { (cfg.remember ? localStorage : sessionStorage).setItem(LS, s); } catch (e) {}
+  }
+  function chatStore() { return cfg.remember ? localStorage : sessionStorage; }
+  function saveChat() {
+    try {
+      var h = S.hist.slice(-40);
+      while (h.length && (h[0].role !== 'user' || !h[0].parts || !h[0].parts[0] || h[0].parts[0].text == null)) h.shift();
+      var o = JSON.stringify({ hist: h, msgs: S.msgs.slice(-80) });
+      if (o.length > 900000) o = JSON.stringify({ hist: [], msgs: S.msgs.slice(-30) });
+      chatStore().setItem(CHAT, o);
+    } catch (e) {}
+  }
+  function loadChat() {
+    try {
+      var s = localStorage.getItem(CHAT) || sessionStorage.getItem(CHAT); if (!s) return false;
+      var o = JSON.parse(s); S.hist = o.hist || []; S.msgs = [];
+      (o.msgs || []).forEach(function (m) { addMsg(m.k, m.t); });
+      return S.msgs.length > 0;
+    } catch (e) { return false; }
+  }
+  function clearChat() { try { localStorage.removeItem(CHAT); } catch (e) {} try { sessionStorage.removeItem(CHAT); } catch (e) {} }
+  function fillForm() { $('gkey').value = cfg.gkey; $('model').value = cfg.model; $('ghtoken').value = cfg.gh; $('repo').value = cfg.repo; $('branch').value = cfg.branch; $('remember').checked = !!cfg.remember; }
+  function readForm() {
+    cfg.gkey = $('gkey').value.trim(); cfg.model = ($('model').value.trim() || 'gemini-flash-latest').replace(/^models\//, '');
+    cfg.gh = $('ghtoken').value.trim(); cfg.repo = $('repo').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\/+$/, '');
+    cfg.branch = $('branch').value.trim() || 'main'; cfg.remember = $('remember').checked; S.tc = 0;
+  }
+  function ready() { return !!cfg.gkey; }
+  function ghReady() { return !!(cfg.gh && /^[^\/\s]+\/[^\/\s]+$/.test(cfg.repo)); }
+
+  /* helpers */
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function md(s) {
+    var b = [];
+    s = String(s).replace(/```([\s\S]*?)(```|$)/g, function (_, c) { b.push(c.replace(/^[\w-]*\n/, '')); return '\u0000' + (b.length - 1) + '\u0000'; });
+    s = esc(s).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>').replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/^#{1,4} (.+)$/gm, '<b>$1</b>').replace(/^[-*] /gm, '\u2022 ').replace(/\n/g, '<br>');
+    return s.replace(/\u0000(\d+)\u0000/g, function (_, i) { return '<pre>' + esc(b[+i]) + '</pre>'; });
+  }
+  function down() { window.scrollTo(0, document.body.scrollHeight); }
+  function addMsg(kind, text, quiet) {
+    var d = document.createElement('div'); d.className = 'm ' + kind;
+    if (kind === 'ai') d.innerHTML = md(text); else d.textContent = text;
+    $('log').appendChild(d); down();
+    if (kind !== 'tool' && !quiet) { d._rec = { k: kind, t: text }; S.msgs.push(d._rec); }
+    return d;
+  }
+  function setStatus(t) { $('status').textContent = t || ''; }
+  function setBusy(b) { S.busy = b; $('bSend').hidden = b; $('bStop').hidden = !b; $('bPub').disabled = b; if (!b) setStatus(''); }
+  function cleanPath(p) {
+    p = String(p == null ? '' : p).replace(/^\/+/, '').replace(/^\.\//, '');
+    if (!p || p.length > 200 || /(^|\/)\.\.(\/|$)/.test(p) || /[\u0000-\u001f]/.test(p)) throw new Error('Invalid file path');
+    return p;
+  }
+  function writable(p) { if (BLOCK.test(p)) throw new Error('This path is protected: ' + p); }
+  function countOf(t, f) { var n = 0, i = 0; while ((i = t.indexOf(f, i)) !== -1) { n++; i += f.length; } return n; }
+
+  /* network helper: every request gets a time limit so nothing hangs forever */
+  function tfetch(url, o, ms) {
+    var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms || 30000); o = o || {}; o.signal = c.signal;
+    return fetch(url, o).then(function (r) { clearTimeout(t); return r; }, function (e) { clearTimeout(t); throw (e && e.name === 'AbortError' ? new Error('The request took too long. Check your internet and try again.') : e); });
+  }
+
+  /* GitHub */
+  function gh(path, o) {
+    o = o || {};
+    if (!ghReady()) return Promise.reject(new Error('Add your GitHub token and repository in Settings to work on the website files.'));
+    var h = { Authorization: 'Bearer ' + cfg.gh, 'X-GitHub-Api-Version': '2022-11-28', Accept: o.accept || 'application/vnd.github+json' };
+    if (o.body) h['Content-Type'] = 'application/json';
+    return tfetch('https://api.github.com' + path, { method: o.method || 'GET', headers: h, body: o.body ? JSON.stringify(o.body) : undefined }, 30000).then(function (r) {
+      if (r.ok) return o.raw ? r.text() : r.json();
+      return r.text().then(function (t) {
+        var m = t; try { m = JSON.parse(t).message || t; } catch (e) {}
+        if (r.status === 401) m = 'Bad or expired GitHub token (' + m + ')';
+        if (r.status === 404) m = 'Not found. Check the repository name and token access (' + m + ')';
+        if (r.status === 403 && /not accessible by personal access token|Resource not accessible/i.test(String(m))) m = 'Your GitHub token can read the site but is not allowed to change it. Make a new token: Repository access = only ' + cfg.repo + ', and Repository permissions > Contents = Read and write. Paste it in Settings and tap Save and test. (' + m + ')';
+        throw new Error('GitHub ' + r.status + ': ' + String(m).slice(0, 300));
+      });
+    });
+  }
+  var treeP = null;
+  function loadTree(force) {
+    if (S.tree && !force) return Promise.resolve(S.tree);
+    if (treeP && !force) return treeP;
+    treeP = gh('/repos/' + cfg.repo + '/git/trees/' + encodeURIComponent(cfg.branch) + '?recursive=1').then(function (j) {
+      treeP = null;
+      S.tree = (j.tree || []).filter(function (e) { return e.type === 'blob'; });
+      S.map = {}; S.tree.forEach(function (e) { S.map[e.path] = e; });
+      return S.tree;
+    }, function (e) { treeP = null; throw e; });
+    return treeP;
+  }
+  function prefetch() { if (ghReady()) loadTree().catch(function () {}); }
+  function treeInfo() {
+    if (!S.tree) return '';
+    var roots = [], fo = {};
+    S.tree.forEach(function (e) { var i = e.path.indexOf('/'); if (i < 0) roots.push(e.path); else { var f = e.path.slice(0, i) + '/'; fo[f] = (fo[f] || 0) + 1; } });
+    return '\n\nThe repository root is already listed here, so do not call list_files for it. Root files: ' + roots.join(', ') + '\nFolders: ' + Object.keys(fo).map(function (k) { return k + ' (' + fo[k] + ' files)'; }).join(', ');
+  }
+  function getFile(path) {
+    var st = S.staged[path];
+    if (st) return st.deleted ? Promise.reject(new Error('That file is staged for deletion: ' + path)) : Promise.resolve({ text: st.text });
+    if (S.files[path]) return Promise.resolve(S.files[path]);
+    return loadTree().then(function () {
+      var e = S.map[path]; if (!e) throw new Error('File not found: ' + path);
+      if (BIN.test(path)) throw new Error('Binary file, cannot be read as text: ' + path);
+      var url = '/repos/' + cfg.repo + '/contents/' + path.split('/').map(encodeURIComponent).join('/') + '?ref=' + encodeURIComponent(cfg.branch);
+      return gh(url, { accept: 'application/vnd.github.raw+json', raw: true }).then(function (t) { var f = { text: t, sha: e.sha }; S.files[path] = f; return f; });
+    });
+  }
+
+  /* staging, diff, preview */
+  function stageText(path, text, orig) {
+    var cur = S.staged[path], base = cur ? cur.orig : orig;
+    if (base != null && base === text) delete S.staged[path];
+    else S.staged[path] = { orig: base, text: text, isNew: base == null, deleted: false };
+    renderStaged();
+  }
+  function diffLines(a, b) {
+    var A = a.split('\n'), B = b.split('\n'), s = 0;
+    while (s < A.length && s < B.length && A[s] === B[s]) s++;
+    var ea = A.length, eb = B.length;
+    while (ea > s && eb > s && A[ea - 1] === B[eb - 1]) { ea--; eb--; }
+    var MA = A.slice(s, ea), MB = B.slice(s, eb), ops = [], i, j, n = MA.length, m = MB.length;
+    if (n * m > 4000000) { MA.forEach(function (l) { ops.push(['-', l]); }); MB.forEach(function (l) { ops.push(['+', l]); }); }
+    else {
+      var W = m + 1, dp = new Uint32Array((n + 1) * W);
+      for (i = n - 1; i >= 0; i--) for (j = m - 1; j >= 0; j--) dp[i * W + j] = MA[i] === MB[j] ? dp[(i + 1) * W + j + 1] + 1 : Math.max(dp[(i + 1) * W + j], dp[i * W + j + 1]);
+      i = 0; j = 0;
+      while (i < n && j < m) {
+        if (MA[i] === MB[j]) { ops.push([' ', MA[i]]); i++; j++; }
+        else if (dp[(i + 1) * W + j] >= dp[i * W + j + 1]) ops.push(['-', MA[i++]]);
+        else ops.push(['+', MB[j++]]);
+      }
+      while (i < n) ops.push(['-', MA[i++]]); while (j < m) ops.push(['+', MB[j++]]);
+    }
+    return { ops: ops, before: A.slice(Math.max(0, s - 3), s), after: A.slice(ea, ea + 3) };
+  }
+  function counts(st) {
+    if (st.deleted) return { a: 0, r: st.orig == null ? 0 : String(st.orig).split('\n').length };
+    if (st.orig == null) return { a: st.text.split('\n').length, r: 0 };
+    var a = 0, r = 0; diffLines(st.orig, st.text).ops.forEach(function (o) { if (o[0] === '+') a++; else if (o[0] === '-') r++; });
+    return { a: a, r: r };
+  }
+  function openDlg(title) { $('dt').textContent = title; $('dbody').innerHTML = ''; $('dlg').hidden = false; return $('dbody'); }
+  function showDiff(path) {
+    var st = S.staged[path]; if (!st) return;
+    var body = openDlg(path + (st.isNew ? ' (new file)' : st.deleted ? ' (will be deleted)' : ''));
+    function line(c, pre, t) { var d = document.createElement('div'); d.className = c; d.textContent = pre + (t.length > 400 ? t.slice(0, 400) + ' ...' : t); body.appendChild(d); }
+    if (st.deleted) { String(st.orig || '').split('\n').slice(0, 200).forEach(function (l) { line('r', '- ', l); }); return; }
+    var d = diffLines(st.orig == null ? '' : st.orig, st.text), shown = 0, hid = 0;
+    d.before.forEach(function (l) { line('c', '  ', l); });
+    d.ops.forEach(function (o) { if (shown < 500) { line(o[0] === '+' ? 'a' : o[0] === '-' ? 'r' : 'c', o[0] + ' ', o[1]); shown++; } else hid++; });
+    if (hid) { var n = document.createElement('div'); n.className = 'n'; n.textContent = '... ' + hid + ' more lines not shown'; body.appendChild(n); }
+    d.after.forEach(function (l) { line('c', '  ', l); });
+  }
+  /* Runs first inside the preview frame. The frame is sandboxed (no access to your keys), so browser storage
+     is replaced by an in-memory copy, links are switched off, and any script problem is shown instead of a blank page. */
+  var PV = '<scr' + 'ipt>(function(){var O=__ORIGIN__;' +
+    'function mem(){var d={};return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v)},removeItem:function(k){delete d[k]},clear:function(){d={}},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}' +
+    '["localStorage","sessionStorage"].forEach(function(n){try{void window[n]}catch(e){try{Object.defineProperty(window,n,{value:mem(),configurable:true})}catch(e2){}}});' +
+    'try{void document.cookie}catch(e){try{Object.defineProperty(document,"cookie",{get:function(){return""},set:function(){},configurable:true})}catch(e2){}}' +
+    'try{void navigator.serviceWorker}catch(e){try{Object.defineProperty(navigator,"serviceWorker",{value:{register:function(){return Promise.resolve({})},getRegistrations:function(){return Promise.resolve([])},ready:new Promise(function(){})},configurable:true})}catch(e2){}}' +
+    'function bar(t,c){var b=document.getElementById("__pv");if(!b){b=document.createElement("div");b.id="__pv";b.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:2147483647;padding:6px 10px;font:12px/1.4 system-ui,sans-serif;border-top:1px solid #ccc";(document.body||document.documentElement).appendChild(b)}b.style.background=c||"#fef2f2";b.style.color=c?"#5b21b6":"#b91c1c";b.textContent=t;if(c)setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b)},2500)}' +
+    'window.addEventListener("error",function(e){var t=e.target;if(t&&t!==window&&t.tagName){if((t.tagName==="SCRIPT"||t.tagName==="LINK")&&String(t.src||t.href).indexOf(O)===0)bar("Preview problem: could not load "+(t.src||t.href));return}bar("Preview problem: "+(e.message||"script error")+(e.lineno?" (line "+e.lineno+")":""))},true);' +
+    'window.addEventListener("unhandledrejection",function(e){bar("Preview problem: "+String(e.reason&&e.reason.message||e.reason))});' +
+    'document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&e.target.closest("a[href]");if(!a)return;var h=a.getAttribute("href")||"";if(h.charAt(0)==="#"||/^javascript:/i.test(h))return;e.preventDefault();bar("Links are switched off in preview","#f3eefc")},true);' +
+    '})();</scr' + 'ipt>';
+  function preview(path) {
+    var st = S.staged[path]; if (!st || st.deleted) return;
+    var body = openDlg('Preview: ' + path);
+    var f = document.createElement('iframe'), base = '<base href="' + location.origin + '/">' + PV.replace('__ORIGIN__', function () { return JSON.stringify(location.origin); }), h = st.text;
+    f.setAttribute('sandbox', 'allow-scripts'); f.style.cssText = 'width:100%;height:78vh;border:0;background:#fff';
+    f.srcdoc = /<head[^>]*>/i.test(h) ? h.replace(/<head[^>]*>/i, function (m) { return m + base; })
+      : /<html[^>]*>/i.test(h) ? h.replace(/<html[^>]*>/i, function (m) { return m + base; }) : base + h;
+    body.appendChild(f);
+  }
+  function renderStaged() {
+    var paths = Object.keys(S.staged).sort(), ul = $('stl'); ul.innerHTML = ''; $('stg').hidden = !paths.length || !!S.pubCard;
+    if (!paths.length) { dropCard(); S.offeredSig = ''; } else if (S.pubCard && !S.busy) offerPublish();
+    function mk(tag, cls, txt, fn) { var e = document.createElement(tag); if (cls) e.className = cls; e.textContent = txt; if (fn) { e.type = 'button'; e.onclick = fn; } return e; }
+    paths.forEach(function (p) {
+      var st = S.staged[p], c = st.c || (st.c = counts(st)), li = document.createElement('li');
+      li.appendChild(mk('span', 'f', (st.isNew ? 'NEW ' : st.deleted ? 'DELETE ' : '') + p));
+      li.appendChild(mk('span', 'add', '+' + c.a)); li.appendChild(mk('span', 'del', '-' + c.r));
+      if (!st.deleted && /\.html?$/i.test(p)) li.appendChild(mk('button', 'sm pri', 'Preview', function () { preview(p); }));
+      li.appendChild(mk('button', 'sm', 'Changes', function () { showDiff(p); }));
+      li.appendChild(mk('button', 'sm', 'Undo', function () { delete S.staged[p]; renderStaged(); }));
+      ul.appendChild(li);
+    });
+  }
+
+  /* the Publish card that appears right in the chat */
+  function stagedSig() {
+    return Object.keys(S.staged).sort().map(function (p) { var st = S.staged[p]; return p + ':' + (st.deleted ? 'd' : st.text.length); }).join('|');
+  }
+  function dropCard() { if (S.pubCard) { try { S.pubCard.remove(); } catch (e) {} S.pubCard = null; S.pubBtns = []; $('stg').hidden = !Object.keys(S.staged).length; } }
+  function offerPublish() {
+    var paths = Object.keys(S.staged).sort(); dropCard(); if (!paths.length) return;
+    var d = addMsg('pub', '', true), btns = [];
+    function mk(tag, cls, txt, fn) { var e = document.createElement(tag); if (cls) e.className = cls; e.textContent = txt; if (fn) { e.type = 'button'; e.onclick = fn; btns.push(e); } return e; }
+    var h = document.createElement('b'); h.textContent = 'Ready to publish: ' + paths.length + ' file' + (paths.length === 1 ? '' : 's'); d.appendChild(h);
+    var ul = document.createElement('ul');
+    paths.forEach(function (p) {
+      var st = S.staged[p], c = st.c || (st.c = counts(st)), li = document.createElement('li');
+      li.appendChild(mk('span', 'f', (st.isNew ? 'NEW ' : st.deleted ? 'DELETE ' : '') + p));
+      li.appendChild(mk('span', 'add', '+' + c.a)); li.appendChild(mk('span', 'del', '-' + c.r));
+      if (!st.deleted && /\.html?$/i.test(p)) li.appendChild(mk('button', 'sm pri', 'Preview', function () { preview(p); }));
+      li.appendChild(mk('button', 'sm', 'Changes', function () { showDiff(p); }));
+      ul.appendChild(li);
+    });
+    d.appendChild(ul);
+    var row = document.createElement('div'); row.className = 'row';
+    row.appendChild(mk('button', 'ok', 'Publish to my website', publishFromCard));
+    row.appendChild(mk('button', '', 'Discard', function () { if (confirm('Throw away all waiting changes?')) { S.staged = {}; renderStaged(); } }));
+    row.appendChild(mk('button', '', 'Not now', function () { dropCard(); }));
+    d.appendChild(row);
+    var hint = document.createElement('p'); hint.className = 'hint'; hint.textContent = 'Nothing changes on your site until you press Publish. It goes live in about a minute.'; d.appendChild(hint);
+    S.pubCard = d; S.pubBtns = btns; S.offeredSig = stagedSig(); $('stg').hidden = true; down();
+  }
+  function publishFromCard() {
+    if (S.busy) return;
+    var cm = $('cmsg'); if (!cm.value.trim() && S.lastAsk) cm.value = S.lastAsk.slice(0, 72);
+    S.pubBtns.forEach(function (b) { b.disabled = true; });
+    Promise.resolve(publish()).then(function () { if (Object.keys(S.staged).length) offerPublish(); else dropCard(); });
+  }
+
+  /* tools the AI can use */
+  var TOOLS = {
+    list_files: function (a) {
+      return loadTree().then(function () {
+        var pre = String(a.prefix || '').replace(/^\/+/, '');
+        if (!pre) {
+          var roots = [], folders = {};
+          S.tree.forEach(function (e) { var i = e.path.indexOf('/'); if (i < 0) roots.push(e.path + ' (' + e.size + ' bytes)'); else { var f = e.path.slice(0, i) + '/'; folders[f] = (folders[f] || 0) + 1; } });
+          Object.keys(S.staged).forEach(function (p) { if (S.staged[p].isNew && p.indexOf('/') < 0) roots.push(p + ' (new, staged)'); });
+          return { root_files: roots, folders: folders, note: 'Use prefix such as "c/" to list a folder.' };
+        }
+        var list = S.tree.filter(function (e) { return e.path.indexOf(pre) === 0; }).map(function (e) { return e.path + ' (' + e.size + ' bytes)'; });
+        return { files: list.slice(0, 300), total: list.length };
+      });
+    },
+    read_file: function (a) {
+      var path = cleanPath(a.path);
+      return getFile(path).then(function (f) {
+        var lines = f.text.split('\n'), s = Math.max(1, parseInt(a.start_line, 10) || 1), e = Math.min(lines.length, parseInt(a.end_line, 10) || (s + 399));
+        if (e - s > 599) e = s + 599;
+        var out = [], chars = 0;
+        for (var i = s; i <= e; i++) {
+          var l = lines[i - 1]; if (l.length > 1500) l = l.slice(0, 1500) + ' ...[cut, ' + lines[i - 1].length + ' chars]';
+          chars += l.length; if (chars > 40000) { e = i - 1; break; } out.push(i + ': ' + l);
+        }
+        return { path: path, total_lines: lines.length, start_line: s, end_line: e, content: out.join('\n'), more_below: e < lines.length };
+      });
+    },
+    search_text: function (a) {
+      var q = String(a.query || ''); if (!q) throw new Error('query is required');
+      var re = a.regex ? new RegExp(q, 'i') : null, lower = q.toLowerCase();
+      return loadTree().then(function () {
+        var paths, pre = String(a.prefix || '').replace(/^\/+/, '');
+        if (a.path) paths = [cleanPath(a.path)];
+        else paths = S.tree.filter(function (e) { return e.path.indexOf(pre) === 0 && !BIN.test(e.path) && e.size < 400000 && (pre || e.path.indexOf('/') < 0); }).map(function (e) { return e.path; }).slice(0, 40);
+        var res = [], skipped = [], idx = 0;
+        function worker() {
+          if (idx >= paths.length || res.length >= 40) return Promise.resolve();
+          var p = paths[idx++];
+          return getFile(p).then(function (f) {
+            var lines = f.text.split('\n');
+            for (var i = 0; i < lines.length && res.length < 40; i++) {
+              var l = lines[i], at = re ? l.search(re) : l.toLowerCase().indexOf(lower);
+              if (at >= 0) res.push({ path: p, line: i + 1, snippet: l.slice(Math.max(0, at - 80), at + q.length + 140) });
+            }
+          }, function () { skipped.push(p); }).then(worker);
+        }
+        var ws = []; for (var k = 0; k < 8; k++) ws.push(worker());
+        return Promise.all(ws).then(function () { return { matches: res, files_searched: paths.length, skipped: skipped }; });
+      });
+    },
+    shop_data: function (a) {
+      var t = String(a.table || 'products');
+      if (t !== 'products' && t !== 'categories') return Promise.reject(new Error('table must be "products" or "categories"'));
+      var cols = t === 'products' ? 'id,name,slug,price,old_price,unit,stock,featured,active,category_id,images,description' : 'id,name,slug';
+      var lim = Math.max(1, Math.min(parseInt(a.limit, 10) || 20, 60));
+      var url = SB_URL + '/rest/v1/' + t + '?select=' + cols + '&limit=' + lim;
+      if (t === 'products') {
+        url += '&active=eq.true';
+        if (a.featured) url += '&featured=eq.true';
+        if (a.category_id) url += '&category_id=eq.' + (parseInt(a.category_id, 10) || 0);
+      }
+      if (a.search) url += '&name=ilike.' + encodeURIComponent('*' + String(a.search).replace(/[*%,()]/g, ' ').trim() + '*');
+      url += t === 'products' ? '&order=created_at.desc' : '&order=name.asc';
+      return tfetch(url, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } }, 20000).then(function (r) {
+        if (!r.ok) return r.text().then(function (x) { throw new Error('Supabase ' + r.status + ': ' + x.slice(0, 200)); });
+        return r.json();
+      }).then(function (rows) {
+        rows.forEach(function (p) { if (p.description) p.description = String(p.description).slice(0, 200); if (p.images) p.images = p.images.slice(0, 1); });
+        return { table: t, count: rows.length, rows: rows };
+      });
+    },
+    edit_file: function (a) {
+      var path = cleanPath(a.path); writable(path);
+      var find = a.find == null ? '' : String(a.find), rep = a.replace == null ? '' : String(a.replace);
+      if (!find) throw new Error('"find" must not be empty');
+      return getFile(path).then(function (f) {
+        var n = countOf(f.text, find);
+        if (!n) throw new Error('Text to find not found. Read the file again and copy the exact text.');
+        if (n > 1 && !a.replace_all) throw new Error('Found ' + n + ' matches. Add more surrounding text, or set replace_all to true.');
+        var out = a.replace_all ? f.text.split(find).join(rep) : f.text.replace(find, function () { return rep; });
+        stageText(path, out, S.staged[path] ? S.staged[path].orig : f.text);
+        return { ok: true, path: path, replacements: a.replace_all ? n : 1, staged: true };
+      });
+    },
+    write_file: function (a) {
+      var path = cleanPath(a.path); writable(path);
+      if (BIN.test(path)) throw new Error('Binary files cannot be written here');
+      var content = a.content == null ? '' : String(a.content);
+      return loadTree().then(function () {
+        if (S.staged[path]) return S.staged[path].orig;
+        if (S.map[path]) return getFile(path).then(function (f) { return f.text; });
+        return null;
+      }).then(function (orig) {
+        if (orig != null && orig.length > 20000 && content.length < orig.length * 0.5) throw new Error('That would delete most of a large file. Use edit_file for targeted changes.');
+        stageText(path, content, orig);
+        return { ok: true, path: path, bytes: content.length, created: orig == null, staged: true };
+      });
+    },
+    delete_file: function (a) {
+      var path = cleanPath(a.path); writable(path);
+      return loadTree().then(function () {
+        var st = S.staged[path];
+        if (!S.map[path] && !(st && !st.isNew)) throw new Error('File not found: ' + path);
+        var o = st ? Promise.resolve(st.orig) : BIN.test(path) ? Promise.resolve(null) : getFile(path).then(function (f) { return f.text; });
+        return o.then(function (orig) { S.staged[path] = { orig: orig, text: '', isNew: false, deleted: true }; renderStaged(); return { ok: true, path: path, staged_for_deletion: true }; });
+      });
+    }
+  };
+  var P = function (props, req) { return { type: 'object', properties: props, required: req || [] }; };
+  var T = { type: 'string' };
+  var DECLS = [
+    { name: 'list_files', description: 'List files in a repository folder. Prefix like "c/" lists that folder. The root is already known.', parameters: P({ prefix: T }) },
+    { name: 'read_file', description: 'Read a text file with line numbers (up to 400 lines per call; use start_line/end_line to page). Request several files in one go when you need them.', parameters: P({ path: T, start_line: { type: 'integer' }, end_line: { type: 'integer' } }, ['path']) },
+    { name: 'search_text', description: 'Find text. Give path for one file or prefix for a folder; with neither it searches root-level files.', parameters: P({ query: T, path: T, prefix: T, regex: { type: 'boolean' } }, ['query']) },
+    { name: 'shop_data', description: 'Read live store data from Supabase (read-only, public info only): products (name, price in KSh, stock, image, category) or categories. Use it to see the real products before designing banners, pages or copy.', parameters: P({ table: T, search: T, category_id: { type: 'integer' }, featured: { type: 'boolean' }, limit: { type: 'integer' } }) },
+    { name: 'edit_file', description: 'Replace exact text in a file (staged until the owner publishes). "find" must match exactly and be unique unless replace_all is true.', parameters: P({ path: T, find: T, replace: T, replace_all: { type: 'boolean' } }, ['path', 'find', 'replace']) },
+    { name: 'write_file', description: 'Create a new text file, or fully replace a small one (staged until published). Use edit_file for existing files.', parameters: P({ path: T, content: T }, ['path', 'content']) },
+    { name: 'delete_file', description: 'Stage a file for deletion.', parameters: P({ path: T }, ['path']) }
+  ];
+  var SYSTEM = 'You are Site Builder, a friendly, fast, all-round AI assistant for the owner of Stermont Arcade (stermontarcade.co.ke), a Kenyan online store: prices in KSh, customers pay by M-Pesa and ask questions on WhatsApp. The site is a static GitHub Pages site of plain HTML, CSS and JavaScript files. Product data and orders live in Supabase, not in the repository. The owner is not a programmer: talk like a friendly colleague, in short simple English (reply in the language the owner uses).\n' +
+    'You do two jobs.\nJOB A, ANSWER ANYTHING: you can answer any question or chat about any topic: business and marketing advice, product descriptions, WhatsApp and customer replies, pricing ideas, Kenyan shipping, tax and M-Pesa questions, coding help, maths, writing, general knowledge. For a question or chat, just answer directly in plain text and do NOT use tools. Never say a question is outside your job.\nJOB B, BUILD AND FIX THE WEBSITE:\n' +
+    '1. Be fast and proactive. Do the whole job in one go instead of asking questions. When you need several files or searches, request them all in the same step so they run together. Ask one short question only if a wrong guess would be costly.\n2. Be creative: when asked for something new (banner, landing page, section, promo, layout), design it boldly and professionally, mobile first, matching the store look, with clear calls to action (WhatsApp, M-Pesa). You can also fix bugs, improve speed, SEO, accessibility and copywriting. Use shop_data to see the real products, prices and categories before writing product-related content.\n3. Read the relevant part of a file before editing. Make small exact changes with edit_file, copying "find" text exactly. Use write_file for new files or very small ones.\n4. Edits are only staged. When you finish, a green Publish card appears automatically in the chat with Preview, Changes and Publish buttons. Nothing goes live until the owner presses Publish.\n5. Do not hand-edit files in p/, sitemap*.xml, merchant-feed.xml, sitemap-state.json or llms.txt: workflows generate them. Edit the generator script instead and say so.\n6. If an HTML page loads a JS or CSS file with ?v=N, raise N when you change that file.\n7. Never add secret keys. Keep existing SEO tags valid. Never remove working features. Never show or guess product cost or profit figures publicly.\n8. The default admin profit percentage is the PROFIT_PCT constant in catalog-v10.js.\n9. If a tool fails, say what failed in one plain sentence and try another way. Never go silent.\n10. Keep replies short. After building, finish with a 2 or 3 sentence summary, tell the owner to check the Publish card below (Preview first if they like) and press Publish, and suggest one next idea.';
+  var NAMES = { list_files: 'Looking at files', read_file: 'Reading', search_text: 'Searching', shop_data: 'Checking the shop', edit_file: 'Editing', write_file: 'Writing', delete_file: 'Marking for deletion' };
+  function describe(n, a) { a = a || {}; return (NAMES[n] || n) + ' ' + (a.path || a.prefix || a.search || a.table || (a.query ? '"' + String(a.query).slice(0, 50) + '"' : '')); }
+
+  /* Gemini (streaming) */
+  function friendly(st, msg) {
+    if (st === 429) return 'The free Gemini limit is reached for now. Wait a little, or pick another model in Settings. (' + String(msg).slice(0, 160) + ')';
+    if (st === 400 && /API key/i.test(msg)) return 'Gemini rejected the API key. Check it in Settings.';
+    if (st === 403) return 'Gemini refused the request (403). Check the API key. ' + String(msg).slice(0, 160);
+    if (st === 404) return 'Model "' + cfg.model + '" was not found. Open Settings, tap "Find models" and pick one.';
+    return 'Gemini error ' + st + ': ' + String(msg).slice(0, 300);
+  }
+  function curModel() { return S.cur || cfg.model; }
+  function nextModel() {
+    var list = [cfg.model].concat(FALLBACK).filter(function (m, i, arr) { return m && arr.indexOf(m) === i; });
+    var i = list.indexOf(curModel()); S.cur = list[(i + 1) % list.length]; return S.cur;
+  }
+  function gem(onParts) {
+    var sys = SYSTEM + treeInfo(), t0 = Date.now(), tick = 0, ctl = null, dog = 0;
+    function onStop() { if (ctl) ctl.abort(); }
+    function stopWait() { clearTimeout(dog); clearInterval(tick); if (S.abort) S.abort.signal.removeEventListener('abort', onStop); }
+    function arm() { clearTimeout(dog); dog = setTimeout(function () { S.timedOut = true; if (ctl) ctl.abort(); }, WAIT); }
+    if (S.abort) S.abort.signal.addEventListener('abort', onStop);
+    tick = setInterval(function () { setStatus('Waiting for Gemini... ' + Math.round((Date.now() - t0) / 1000) + 's'); }, 1000);
+    function go(tries) {
+      var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(curModel()) + ':streamGenerateContent?alt=sse';
+      var body = JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: S.hist, tools: [{ functionDeclarations: DECLS }], generationConfig: TC[S.tc] });
+      ctl = new AbortController(); S.timedOut = false; arm();
+      return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': cfg.gkey }, body: body, signal: ctl.signal }).then(function (r) {
+        if (r.ok) return r;
+        clearTimeout(dog);
+        return r.text().then(function (t) {
+          var m = t; try { m = JSON.parse(t).error.message || t; } catch (e) {}
+          if (r.status === 400 && /think|budget|level/i.test(m) && S.tc < TC.length - 1) { S.tc++; return go(tries); }
+          if ((r.status === 404 || r.status === 429 || r.status >= 500) && tries > 0 && !S.stop) {
+            var wait = r.status === 429 ? 3000 : r.status === 404 ? 0 : 1500;
+            nextModel(); setStatus('Gemini is busy (' + r.status + '), trying ' + curModel() + '...');
+            return new Promise(function (ok) { setTimeout(ok, wait); }).then(function () { return go(tries - 1); });
+          }
+          throw new Error(friendly(r.status, m));
+        });
+      }, function (e) {
+        if (S.stop) throw e;
+        if (e && e.name === 'AbortError' && S.timedOut && tries > 0) { nextModel(); setStatus('No reply yet, trying ' + curModel() + '...'); return go(tries - 1); }
+        if (e instanceof TypeError && tries > 0) { setStatus('Connection hiccup, trying again...'); return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return go(tries - 1); }); }
+        throw e;
+      });
+    }
+    return go(3).then(function (r) {
+      var rd = r.body.getReader(), dec = new TextDecoder(), buf = '', parts = [], reason = '', got = false;
+      function add(p) {
+        if (p.thought) return;
+        var l = parts[parts.length - 1];
+        if (p.text != null && !p.functionCall && l && l.text != null && !l.functionCall) { l.text += p.text; if (p.thoughtSignature) l.thoughtSignature = p.thoughtSignature; }
+        else parts.push(p);
+      }
+      function line(s) {
+        s = s.trim(); if (s.indexOf('data:') !== 0) return;
+        var j; try { j = JSON.parse(s.slice(5)); } catch (e) { return; }
+        if (j.promptFeedback && j.promptFeedback.blockReason) reason = j.promptFeedback.blockReason;
+        var c = j.candidates && j.candidates[0]; if (!c) return;
+        if (c.finishReason) reason = reason || c.finishReason;
+        ((c.content && c.content.parts) || []).forEach(add); onParts(parts);
+      }
+      function pump() {
+        return rd.read().then(function (x) {
+          if (!got) { got = true; clearInterval(tick); setStatus('Writing...'); }
+          arm();
+          if (x.done) { buf.split('\n').forEach(line); return; }
+          buf += dec.decode(x.value, { stream: true });
+          var i; while ((i = buf.indexOf('\n')) >= 0) { line(buf.slice(0, i)); buf = buf.slice(i + 1); }
+          return pump();
+        });
+      }
+      function fin() { stopWait(); return { parts: parts.filter(function (p) { return p.functionCall || p.text || p.thoughtSignature; }), reason: reason }; }
+      return pump().then(fin, function (e) {
+        /* a stream that stalls after it already produced something: keep what we have instead of failing */
+        if (e && e.name === 'AbortError' && S.timedOut && !S.stop && parts.length) return fin();
+        throw e;
+      });
+    }).catch(function (e) { stopWait(); throw e; });
+  }
+  function trimHist() {
+    var size = function () { return JSON.stringify(S.hist).length; };
+    if (size() < 120000) return;
+    for (var i = 0; i < S.hist.length - 6 && size() >= 80000; i++) {
+      var h = S.hist[i];
+      if (h.role === 'user' && h.parts) h.parts.forEach(function (p) { if (p.functionResponse) p.functionResponse.response = { result: '[older tool output removed to save space]' }; });
+    }
+  }
+  function runOne(c) {
+    var nm = c.functionCall.name, a = c.functionCall.args || {};
+    if (S.stop) return Promise.resolve({ functionResponse: { name: nm, response: { error: 'Stopped by the owner' } } });
+    addMsg('tool', describe(nm, a)); setStatus(describe(nm, a) + '...');
+    return Promise.resolve().then(function () { if (!TOOLS[nm]) throw new Error('Unknown tool ' + nm); return TOOLS[nm](a); })
+      .then(function (r) { return { result: r }; }, function (e) { return { error: String(e && e.message || e) }; })
+      .then(function (x) { return { functionResponse: { name: nm, response: x } }; });
+  }
+  function runCalls(calls) {
+    /* read-only calls run together; anything that changes files runs in order */
+    if (calls.every(function (c) { return RO[c.functionCall.name]; })) return Promise.all(calls.map(runOne));
+    var out = [], p = Promise.resolve();
+    calls.forEach(function (c) { p = p.then(function () { return runOne(c); }).then(function (x) { out.push(x); }); });
+    return p.then(function () { return out; });
+  }
+  function runTurn(text) {
+    S.hist.push({ role: 'user', parts: [{ text: text }] });
+    var steps = 0;
+    function step() {
+      if (S.stop) return Promise.resolve();
+      if (++steps > 40) { addMsg('sys', 'I paused after 40 steps. Type "continue" and I will carry on.'); return Promise.resolve(); }
+      trimHist();
+      var bub = null, raf = 0, lastT = '';
+      function paint() { raf = 0; if (bub) { bub.innerHTML = md(lastT); down(); } }
+      function onParts(parts) {
+        var t = parts.filter(function (p) { return p.text; }).map(function (p) { return p.text; }).join('');
+        if (!t) return;
+        if (!bub) bub = addMsg('ai', '');
+        lastT = t; if (bub._rec) bub._rec.t = t;
+        if (!raf) raf = requestAnimationFrame(paint);
+      }
+      function ask(n) {
+        return gem(onParts).then(function (r) {
+          if (!r.parts.length && n < 2 && !S.stop) { nextModel(); setStatus('Empty reply, trying again...'); return ask(n + 1); }
+          return r;
+        }, function (e) {
+          if (e && e.name === 'AbortError' && S.timedOut && !S.stop && n < 2) { nextModel(); S.abort = new AbortController(); S.timedOut = false; setStatus('No reply, trying ' + curModel() + '...'); return ask(n + 1); }
+          throw e;
+        });
+      }
+      return ask(0).then(function (r) {
+        if (raf) cancelAnimationFrame(raf);
+        if (bub) bub.innerHTML = md(lastT);
+        if (!r.parts.length) throw new Error('The AI gave no answer (' + (r.reason || 'empty reply') + '). Try again or rephrase.');
+        S.hist.push({ role: 'model', parts: r.parts });
+        var calls = r.parts.filter(function (p) { return p.functionCall; });
+        if (!calls.length) return;
+        return runCalls(calls).then(function (resps) { S.hist.push({ role: 'user', parts: resps }); return step(); });
+      });
+    }
+    return step();
+  }
+  function send() {
+    if (S.busy) return;
+    var text = $('inp').value.trim(); if (!text) return;
+    if (!ready()) { $('set').hidden = false; addMsg('err', 'Please add your Gemini key in Settings first.', true); return; }
+    $('inp').value = ''; $('inp').style.height = ''; addMsg('user', text); S.lastAsk = text.replace(/\s+/g, ' ');
+    S.stop = false; S.timedOut = false; S.cur = ''; S.abort = new AbortController();
+    var mark = S.hist.length;
+    setBusy(true); setStatus('Starting...');
+    var load = ghReady() ? loadTree().catch(function (e) { addMsg('sys', 'I could not read your website files (' + String(e && e.message || e).slice(0, 120) + '). I can still answer questions.', true); }) : Promise.resolve();
+    load.then(function () { return runTurn(text); }).catch(function (e) {
+      if (e && e.name === 'AbortError') addMsg(S.timedOut ? 'err' : 'sys', S.timedOut ? 'Gemini did not answer after several tries. Open Settings, tap "Find models", pick another model such as gemini-flash-lite-latest, then send again.' : 'Stopped.');
+      else addMsg('err', String(e && e.message || e));
+      S.hist.length = mark; /* drop the half-finished turn so the next message never hits a broken history */
+    }).then(function () {
+      setBusy(false); renderStaged(); saveChat();
+      var sig = stagedSig(); if (sig && (sig !== S.offeredSig || S.pubCard)) offerPublish();
+    });
+  }
+
+  /* publish */
+  function publish() {
+    var paths = Object.keys(S.staged); if (!paths.length || S.busy) return;
+    if (!ghReady()) { addMsg('err', 'Add your GitHub token in Settings to publish.', true); $('set').hidden = false; return; }
+    var msg = ($('cmsg').value || '').trim() || 'Site update via Site Builder', repo = cfg.repo, branch = cfg.branch, base, baseTree;
+    setBusy(true); setStatus('Publishing...');
+    return loadTree(true).then(function () {
+      var bad = paths.filter(function (p) { var st = S.staged[p]; return !st.isNew && S.files[p] && S.map[p] && S.map[p].sha !== S.files[p].sha; });
+      if (bad.length) throw new Error('These files changed on GitHub after you started, so I did not publish: ' + bad.join(', ') + '. Press Discard all and ask again.');
+      return gh('/repos/' + repo + '/git/ref/heads/' + branch);
+    }).then(function (r) { base = r.object.sha; return gh('/repos/' + repo + '/git/commits/' + base); })
+    .then(function (c) {
+      baseTree = c.tree.sha;
+      return Promise.all(paths.map(function (p) {
+        var st = S.staged[p];
+        if (st.deleted) return { path: p, mode: '100644', type: 'blob', sha: null };
+        return gh('/repos/' + repo + '/git/blobs', { method: 'POST', body: { content: st.text, encoding: 'utf-8' } }).then(function (b) { return { path: p, mode: '100644', type: 'blob', sha: b.sha }; });
+      }));
+    }).then(function (en) { return gh('/repos/' + repo + '/git/trees', { method: 'POST', body: { base_tree: baseTree, tree: en } }); })
+    .then(function (t) { return gh('/repos/' + repo + '/git/commits', { method: 'POST', body: { message: msg, tree: t.sha, parents: [base] } }); })
+    .then(function (cm) { return gh('/repos/' + repo + '/git/refs/heads/' + branch, { method: 'PATCH', body: { sha: cm.sha } }); })
+    .then(function () {
+      var n = paths.length; S.staged = {}; S.files = {}; S.tree = null; $('cmsg').value = ''; prefetch();
+      S.hist.push({ role: 'user', parts: [{ text: '[The owner published the staged changes. Read files again before editing.]' }] });
+      S.hist.push({ role: 'model', parts: [{ text: 'Understood.' }] });
+      addMsg('sys', 'Published ' + n + ' file' + (n === 1 ? '' : 's') + '. Your website updates in about a minute.');
+    }).catch(function (e) { addMsg('err', 'Could not publish: ' + String(e && e.message || e)); }).then(function () { setBusy(false); renderStaged(); saveChat(); });
+  }
+
+  /* settings actions */
+  function saveAndTest() {
+    readForm(); saveCfg(); S.tree = null; S.files = {};
+    var out = $('setOut'), lines = []; out.textContent = 'Testing...';
+    var g = tfetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=5', { headers: { 'x-goog-api-key': cfg.gkey } }, 15000).then(function (r) { lines.push(r.ok ? 'Gemini key works.' : 'Gemini key problem (error ' + r.status + ').'); }, function () { lines.push('Could not reach Gemini.'); });
+    var h = gh('/repos/' + cfg.repo).then(function (j) {
+      /* a harmless unused test object proves the token can really write, so a bad token is caught here and not at Publish time */
+      return gh('/repos/' + cfg.repo + '/git/blobs', { method: 'POST', body: { content: 'builder write test', encoding: 'utf-8' } }).then(
+        function () { lines.push('GitHub works and can publish: ' + j.full_name + '.'); },
+        function (e) { lines.push('GitHub can read ' + j.full_name + ' but cannot publish. ' + String(e.message)); });
+    }, function (e) { lines.push(String(e.message)); });
+    var sb = tfetch(SB_URL + '/rest/v1/categories?select=id&limit=1', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } }, 15000).then(function (r) { lines.push(r.ok ? 'Supabase shop data works.' : 'Supabase problem (error ' + r.status + ').'); }, function () { lines.push('Could not reach Supabase.'); });
+    return Promise.all([g, h, sb]).then(function () { out.textContent = lines.join(' '); prefetch(); });
+  }
+  function findModels() {
+    readForm(); var out = $('setOut');
+    if (!cfg.gkey) { out.textContent = 'Paste your Gemini key first.'; return; }
+    out.textContent = 'Looking up models...';
+    fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': cfg.gkey } }).then(function (r) { if (!r.ok) throw new Error('error ' + r.status); return r.json(); }).then(function (j) {
+      var dl = $('models'); dl.innerHTML = ''; var n = 0;
+      (j.models || []).forEach(function (m) {
+        if (/gemini/i.test(m.name) && !/(tts|image|live|embed|robotics|audio)/i.test(m.name) && (m.supportedGenerationMethods || []).indexOf('generateContent') >= 0) { var o = document.createElement('option'); o.value = m.name.replace(/^models\//, ''); dl.appendChild(o); n++; }
+      });
+      out.textContent = n + ' models found. Tap the Model box and choose one (flash-lite is fastest).';
+    }).catch(function (e) { out.textContent = 'Could not list models (' + e.message + ').'; });
+  }
+
+  /* wire up */
+  function welcome() {
+    addMsg('ai', 'Hi! Ask me anything, or tell me what to build or change on your website and I will do it: new banners, pages, fixes, speed, SEO, product text, anything. You can **Preview** my work and nothing goes live until you press **Publish**.', true);
+    var w = document.createElement('div'); w.className = 'chips';
+    ['Design a new Black Friday promo banner using my real products', 'Check my homepage for errors and fix them', 'Write a WhatsApp reply for a customer asking about delivery'].forEach(function (t) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t; b.onclick = function () { $('inp').value = t; $('inp').focus(); }; w.appendChild(b);
+    });
+    $('log').appendChild(w);
+  }
+  $('bSet').onclick = function () { $('set').hidden = !$('set').hidden; };
+  $('bSave').onclick = saveAndTest;
+  $('bFind').onclick = findModels;
+  $('bClear').onclick = function () { cfg.gkey = ''; cfg.gh = ''; saveCfg(); fillForm(); $('setOut').textContent = 'Saved keys removed.'; };
+  $('bNew').onclick = function () { if (S.busy) return; S.hist = []; S.msgs = []; clearChat(); $('log').innerHTML = ''; welcome(); };
+  $('bSend').onclick = send;
+  $('bStop').onclick = function () { S.stop = true; if (S.abort) S.abort.abort(); };
+  $('bPub').onclick = publish;
+  $('bDisc').onclick = function () { if (confirm('Throw away all waiting changes?')) { S.staged = {}; renderStaged(); } };
+  function closeDlg() { $('dlg').hidden = true; $('dbody').innerHTML = ''; }
+  $('dx').onclick = closeDlg;
+  $('dlg').onclick = function (e) { if (e.target === $('dlg')) closeDlg(); };
+  $('inp').addEventListener('input', function () { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 140) + 'px'; });
+  $('inp').addEventListener('keydown', function (e) {
+    var fine = window.matchMedia && window.matchMedia('(pointer:fine)').matches;
+    if (e.key === 'Enter' && !e.isComposing && (e.ctrlKey || e.metaKey || (fine && !e.shiftKey))) { e.preventDefault(); send(); }
+  });
+
+  var deferred = null;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; $('bInst').hidden = false; });
+  window.addEventListener('appinstalled', function () { deferred = null; $('bInst').hidden = true; });
+  $('bInst').onclick = function () { if (!deferred) return; deferred.prompt(); deferred.userChoice.then(function () { deferred = null; $('bInst').hidden = true; }, function () {}); };
+  if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
+  var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  loadCfg(); fillForm(); if (!loadChat()) welcome(); prefetch();
+  if (/iphone|ipad|ipod/i.test(navigator.userAgent || '') && !standalone) addMsg('sys', 'To install on iPhone: tap Share, then Add to Home Screen.', true);
+  if (!ready()) $('set').hidden = false;
+})();
+</script>
+</body>
+</html>
