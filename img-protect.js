@@ -47,5 +47,5 @@
 
 /* "Someone just bought" popup showing real recent orders (see /purchase-popup.js). Loading it twice is harmless. */
 (function () {
-  try { if (/admin|upload-photos/.test(location.pathname)) return; var b = document.createElement('script'); b.src = '/purchase-popup.js?v=3'; b.defer = true; document.head.appendChild(b); } catch (e) {}
+  try { if (/admin|upload-photos/.test(location.pathname)) return; var b = document.createElement('script'); b.src = '/purchase-popup.js?v=4'; b.defer = true; document.head.appendChild(b); } catch (e) {}
 })();
