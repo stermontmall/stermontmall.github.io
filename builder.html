@@ -217,6 +217,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
         var m = t; try { m = JSON.parse(t).message || t; } catch (e) {}
         if (r.status === 401) m = 'Bad or expired GitHub token (' + m + ')';
         if (r.status === 404) m = 'Not found. Check the repository name and token access (' + m + ')';
+        if (r.status === 403 && /not accessible by personal access token|Resource not accessible/i.test(String(m))) m = 'Your GitHub token can read the site but is not allowed to change it. Make a new token: Repository access = only ' + cfg.repo + ', and Repository permissions > Contents = Read and write. Paste it in Settings and tap Save and test. (' + m + ')';
         throw new Error('GitHub ' + r.status + ': ' + String(m).slice(0, 300));
       });
     });
@@ -319,7 +320,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     body.appendChild(f);
   }
   function renderStaged() {
-    var paths = Object.keys(S.staged).sort(), ul = $('stl'); ul.innerHTML = ''; $('stg').hidden = !paths.length;
+    var paths = Object.keys(S.staged).sort(), ul = $('stl'); ul.innerHTML = ''; $('stg').hidden = !paths.length || !!S.pubCard;
     if (!paths.length) { dropCard(); S.offeredSig = ''; } else if (S.pubCard && !S.busy) offerPublish();
     function mk(tag, cls, txt, fn) { var e = document.createElement(tag); if (cls) e.className = cls; e.textContent = txt; if (fn) { e.type = 'button'; e.onclick = fn; } return e; }
     paths.forEach(function (p) {
@@ -337,7 +338,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   function stagedSig() {
     return Object.keys(S.staged).sort().map(function (p) { var st = S.staged[p]; return p + ':' + (st.deleted ? 'd' : st.text.length); }).join('|');
   }
-  function dropCard() { if (S.pubCard) { try { S.pubCard.remove(); } catch (e) {} S.pubCard = null; S.pubBtns = []; } }
+  function dropCard() { if (S.pubCard) { try { S.pubCard.remove(); } catch (e) {} S.pubCard = null; S.pubBtns = []; $('stg').hidden = !Object.keys(S.staged).length; } }
   function offerPublish() {
     var paths = Object.keys(S.staged).sort(); dropCard(); if (!paths.length) return;
     var d = addMsg('pub', '', true), btns = [];
@@ -359,7 +360,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     row.appendChild(mk('button', '', 'Not now', function () { dropCard(); }));
     d.appendChild(row);
     var hint = document.createElement('p'); hint.className = 'hint'; hint.textContent = 'Nothing changes on your site until you press Publish. It goes live in about a minute.'; d.appendChild(hint);
-    S.pubCard = d; S.pubBtns = btns; S.offeredSig = stagedSig(); down();
+    S.pubCard = d; S.pubBtns = btns; S.offeredSig = stagedSig(); $('stg').hidden = true; down();
   }
   function publishFromCard() {
     if (S.busy) return;
@@ -685,7 +686,12 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     readForm(); saveCfg(); S.tree = null; S.files = {};
     var out = $('setOut'), lines = []; out.textContent = 'Testing...';
     var g = tfetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=5', { headers: { 'x-goog-api-key': cfg.gkey } }, 15000).then(function (r) { lines.push(r.ok ? 'Gemini key works.' : 'Gemini key problem (error ' + r.status + ').'); }, function () { lines.push('Could not reach Gemini.'); });
-    var h = gh('/repos/' + cfg.repo).then(function (j) { lines.push('GitHub works: ' + j.full_name + (j.permissions && j.permissions.push === false ? ' (read only: token needs Contents: Read and write)' : '') + '.'); }, function (e) { lines.push(String(e.message)); });
+    var h = gh('/repos/' + cfg.repo).then(function (j) {
+      /* a harmless unused test object proves the token can really write, so a bad token is caught here and not at Publish time */
+      return gh('/repos/' + cfg.repo + '/git/blobs', { method: 'POST', body: { content: 'builder write test', encoding: 'utf-8' } }).then(
+        function () { lines.push('GitHub works and can publish: ' + j.full_name + '.'); },
+        function (e) { lines.push('GitHub can read ' + j.full_name + ' but cannot publish. ' + String(e.message)); });
+    }, function (e) { lines.push(String(e.message)); });
     var sb = tfetch(SB_URL + '/rest/v1/categories?select=id&limit=1', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } }, 15000).then(function (r) { lines.push(r.ok ? 'Supabase shop data works.' : 'Supabase problem (error ' + r.status + ').'); }, function () { lines.push('Could not reach Supabase.'); });
     return Promise.all([g, h, sb]).then(function () { out.textContent = lines.join(' '); prefetch(); });
   }
