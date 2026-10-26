@@ -268,6 +268,9 @@
         paint();
       }
       var ec = c.querySelector('#cx-cost'), em = c.querySelector('#cx-man'), ea = c.querySelector('#cx-auto');
+      if (edit && p.cost > 0 && Math.abs(Number(p.price) - autoPrice(p.cost)) > 1) {
+        em.checked = true;
+      }
       function auto() {
         var cs = parseFloat(ec.value), np = em.checked ? 0 : priceFor(cs);
         ep.readOnly = !em.checked;
@@ -277,7 +280,9 @@
           : '<span class="meta">Type the cost price. The selling price is worked out automatically (cost + ' + PROFIT_PCT + '%, minimum KSh ' + MIN_PROFIT + ' profit).</span>';
         onPrices();
       }
-      ec.oninput = auto; em.onchange = function () { auto(); if (em.checked) ep.focus(); }; ep.oninput = function () { auto(); };
+      ec.oninput = auto; em.onchange = function () { auto(); if (em.checked) ep.focus(); };
+      ep.onfocus = function () { if (!em.checked) { em.checked = true; auto(); } };
+      ep.oninput = function () { if (!em.checked) { em.checked = true; } auto(); };
       eo.oninput = onPrices; eq.oninput = function () { fromPct(eq.value); };
       [5, 10, 15, 20, 25, 30, 40, 50].forEach(function (d) { var b = el('button', 'cx-chip', d + '% off'); b.type = 'button'; b.onclick = function () { eq.value = d; fromPct(d); }; qk.appendChild(b); });
       var nd = el('button', 'cx-chip alt', 'No discount'); nd.type = 'button'; nd.onclick = function () { eo.value = ''; eq.value = ''; paint(); }; qk.appendChild(nd);
