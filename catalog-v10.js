@@ -4,8 +4,8 @@
   var S = { cats: [], prods: [], st: {}, cat: 'all', q: '', range: 'all' }, root, D = document, view = function () { render(); };
   var LIME = '#84cc16';
   /* ---------- AUTO PRICING: change these 3 numbers to change pricing everywhere ---------- */
-  var PROFIT_PCT = 30, MIN_PROFIT = 150, ROUND_TO = 50;
-  /* selling price = cost + 30% (at least KSh 150 profit), rounded UP to the next KSh 50 so profit is never below target */
+  var PROFIT_PCT = 15, MIN_PROFIT = 150, ROUND_TO = 50;
+  /* selling price = cost + 15% (at least KSh 150 profit), rounded UP to the next KSh 50 so profit is never below target */
   function autoPrice(cost) {
     cost = Number(cost); if (!(cost > 0)) return 0;
     var target = cost + Math.max(cost * PROFIT_PCT / 100, MIN_PROFIT);
@@ -108,7 +108,7 @@
     var catsP = retry(function () { return call('/rest/v1/categories?select=*&order=name'); }).catch(function (e) { S.warn = 'Categories could not load (' + e.message + '). Items are still shown.'; return S.cats || []; });
     var prodP = retry(function () { return call('/rest/v1/products?select=*&order=created_at.desc'); }).catch(function () { return call('/rest/v1/products?select=*'); });
     return Promise.all([catsP, prodP, statsCall(), logsCall(), restCall()])
-      .then(function (r) { r[1] = Array.isArray(r[1]) ? r[1] : []; r[2] = Array.isArray(r[2]) ? r[2] : []; S.cats = Array.isArray(r[0]) ? r[0] : []; S.prods = r[1].map(function (p) { if (typeof p.images === 'string') { try { p.images = JSON.parse(p.images); } catch (e) { p.images = p.images ? [p.images] : []; } } if (!Array.isArray(p.images)) p.images = []; p.name = p.name || 'Unnamed item'; p.stock = Number(p.stock) || 0; p.low_at = Number(p.low_at) || 0; p.price = Number(p.price) || 0; p.cost = Number(p.cost) || 0; p.base = p.name; if (p.variant_label) p.name = p.base + ' \u2013 ' + p.variant_label; return p; }); S.st = {}; r[2].forEach(function (x) { S.st[x.product_id] = x; }); S.logs = r[3] || []; S.rest = r[4] || []; });
+      .then(function (r) { r[1] = Array.isArray(r[1]) ? r[1] : []; r[2] = Array.isArray(r[2]) ? r[2] : []; S.cats = Array.isArray(r[0]) ? r[0] : []; S.prods = r[1].map(function (p) { if (typeof p.images === 'string') { try { p.images = JSON.parse(p.images); } catch (e) { p.images = p.images ? [p.images] : []; } } if (!Array.isArray(p.images)) p.images = []; p.name = p.name || 'Unnamed item'; p.stock = Number(p.stock) || 0; p.low_at = Number(p.low_at) || 0; p.price = Number(p.price) || 0; p.cost = Number(p.cost) || 0; p.base = p.name; if (p.variant_label) p.name = p.base + ' – ' + p.variant_label; return p; }); S.st = {}; r[2].forEach(function (x) { S.st[x.product_id] = x; }); S.logs = r[3] || []; S.rest = r[4] || []; });
   }
   /* orders the admin declined / cancelled in the chosen period (never counted as sales) */
   function cancelled() {
@@ -184,9 +184,9 @@
       '<option value="__custom"' + (curU && !knownU ? ' selected' : '') + '>Custom…</option></select>' +
       '<input class="cx-f" id="cx-unitc" maxlength="30" placeholder="Type the unit, e.g. 250 g tin" value="' + esc(curU && !knownU ? curU : '') + '"' + (curU && !knownU ? '' : ' hidden') + ' style="margin-top:.4rem">' +
       '<div class="meta">Customers see it next to the price, e.g. "Per kg" or "Per litre".</div>';
-    var packHtml = (tpl && !tpl.variant_label ? '<div class="cx-pr" style="margin-top:.6rem"><div class="cx-pt">\ud83d\udce6 Pack size of the existing item</div><input class="cx-f" id="cx-vl0" maxlength="30" placeholder="e.g. 1 Litre"><div class="meta">The item you are copying (' + esc(tpl.name) + ') has no pack size yet. Type its size so buyers can choose between the two.</div></div>' : '') +
-      '<div class="cx-pr" style="margin-top:.6rem"><div class="cx-pt">\ud83d\udce6 Pack size (what buyers choose)</div><input class="cx-f" id="cx-vl" maxlength="30" placeholder="e.g. 1 Litre, 250 mL, 50 kg bag" value="' + esc(edit && p.variant_label ? p.variant_label : '') + '">' +
-      '<div class="meta">Leave empty if this item has only one size. To sell the same product in other sizes, save it, then tap <b>\uff0b Pack size</b> on its card. Each size has its own price, cost and stock below.</div></div>';
+    var packHtml = (tpl && !tpl.variant_label ? '<div class="cx-pr" style="margin-top:.6rem"><div class="cx-pt">📦 Pack size of the existing item</div><input class="cx-f" id="cx-vl0" maxlength="30" placeholder="e.g. 1 Litre"><div class="meta">The item you are copying (' + esc(tpl.name) + ') has no pack size yet. Type its size so buyers can choose between the two.</div></div>' : '') +
+      '<div class="cx-pr" style="margin-top:.6rem"><div class="cx-pt">📦 Pack size (what buyers choose)</div><input class="cx-f" id="cx-vl" maxlength="30" placeholder="e.g. 1 Litre, 250 mL, 50 kg bag" value="' + esc(edit && p.variant_label ? p.variant_label : '') + '">' +
+      '<div class="meta">Leave empty if this item has only one size. To sell the same product in other sizes, save it, then tap <b>＋ Pack size</b> on its card. Each size has its own price, cost and stock below.</div></div>';
     var body = '<label>Category</label><select class="cx-f" id="cx-cat">' + opts + '<option value="__new">＋ Create new category…</option></select>' +
       '<input class="cx-f" id="cx-newcat" placeholder="New category name" hidden style="margin-top:.4rem">' +
       '<label>Item name</label><input class="cx-f" id="cx-name" maxlength="120" value="' + esc(edit ? (p.base || p.name) : '') + '">' + packHtml +
@@ -273,7 +273,7 @@
         ep.readOnly = !em.checked;
         if (!em.checked) { ep.value = np || ''; }
         var pr = parseFloat(ep.value), pf = pr - cs;
-        ea.innerHTML = cs > 0 && pr > 0 ? 'Cost <b>' + money(cs) + '</b> \u2192 Selling price <b>' + money(pr) + '</b><div class="meta">Profit ' + money(pf) + ' (' + Math.round(pf / cs * 100) + '% on cost)</div>'
+        ea.innerHTML = cs > 0 && pr > 0 ? 'Cost <b>' + money(cs) + '</b> → Selling price <b>' + money(pr) + '</b><div class="meta">Profit ' + money(pf) + ' (' + Math.round(pf / cs * 100) + '% on cost)</div>'
           : '<span class="meta">Type the cost price. The selling price is worked out automatically (cost + ' + PROFIT_PCT + '%, minimum KSh ' + MIN_PROFIT + ' profit).</span>';
         onPrices();
       }
@@ -401,7 +401,7 @@
       lines.push([p.base || p.name, catName(p.category_id), p.variant_label || '', p.price, p.cost, p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0, p.stock, p.low_at,
         p.active ? 'yes' : 'no', p.featured ? 'yes' : 'no', s.sold, s.sales, s.cogs, s.profit, s.loss, p.stock * p.cost, p.description || ''].map(csvCell).join(','));
     });
-    var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
     var a = D.createElement('a'), d = new Date(), pad = function (n) { return (n < 10 ? '0' : '') + n; };
     a.href = URL.createObjectURL(blob); a.download = 'stermont-backup-' + d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '.csv';
     D.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
@@ -439,10 +439,10 @@
       });
       if (!todo.length) { toast('All prices already match cost + ' + PROFIT_PCT + '%.' + (disc ? ' ' + disc + ' discounted item(s) were left alone.' : '')); return; }
       if (!confirm('Update the selling price of ' + todo.length + ' item(s) to cost + ' + PROFIT_PCT + '% (min KSh ' + MIN_PROFIT + ' profit)?' + (disc ? '\n' + disc + ' discounted item(s) will be skipped.' : '') + (nocost ? '\n' + nocost + ' item(s) with no cost will be skipped.' : ''))) return;
-      var b = $('cx-reprice'); b.disabled = true; b.textContent = 'Updating prices\u2026';
+      var b = $('cx-reprice'); b.disabled = true; b.textContent = 'Updating prices…';
       todo.reduce(function (pr, t) { return pr.then(function () { return call('/rest/v1/products?id=eq.' + encodeURIComponent(t[0].id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { price: t[1] } }); }); }, Promise.resolve())
         .then(load).then(render).then(function () { toast('Updated ' + todo.length + ' price(s).'); })
-        .catch(function (x) { b.disabled = false; b.textContent = '\u21bb Recalculate all prices'; toast('Could not update prices: ' + x.message); });
+        .catch(function (x) { b.disabled = false; b.textContent = '↻ Recalculate all prices'; toast('Could not update prices: ' + x.message); });
     };
     $('cx-export').onclick = function () { exportCsv(all); };
     RANGES.forEach(function (r) { var b = el('button', S.range === r[0] ? 'on' : '', r[1]); b.type = 'button'; b.onclick = function () { S.range = r[0]; load().then(render).catch(function (x) { toast(x.message + ' (run setup-catalog-2.sql?)'); }); }; $('cx-rg').appendChild(b); });
