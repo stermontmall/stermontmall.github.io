@@ -49,7 +49,11 @@ h1{font-size:1.5rem;line-height:1.25;margin:.2rem 0 .6rem}.pr{font-size:1.7rem;f
 .btn.alt{background:#fff;color:#6d28d9;border:2px solid #7c3aed}.btn.ask{margin:.2rem 0 .8rem;font-size:1.02rem;box-shadow:0 2px 8px rgba(22,163,74,.3)}.box{background:#fff;border:1px solid #e6e1f5;border-radius:14px;padding:.9rem 1rem;margin:1rem 0}
 .desc{white-space:pre-line}ul.g{list-style:none;padding:0;display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
 ul.g img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:.5rem}ul.g li{background:#fff;border:1px solid #e6e1f5;border-radius:12px;padding:.7rem}ul.g a{text-decoration:none;font-weight:600;color:#1f1b2e}ul.g span{display:block;color:#5b21b6;font-weight:800}
-footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85rem;border-top:1px solid #e6e1f5}`;
+footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85rem;border-top:1px solid #e6e1f5}
+.stk{display:none}
+@media(max-width:700px){main{padding-bottom:5.5rem}.stk{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;align-items:center;gap:.6rem;padding:.6rem .8rem calc(.6rem + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e6e1f5;box-shadow:0 -2px 10px rgba(31,27,46,.12)}
+.stk b{flex:1;min-width:0;font-size:.95rem;line-height:1.2;color:#5b21b6}.stk b small{display:block;color:#1f1b2e;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stk a{flex:none;text-decoration:none;font-weight:800;border-radius:10px;padding:.7rem .9rem;background:#16a34a;color:#fff}.stk a.call{background:#fff;color:#6d28d9;border:2px solid #7c3aed;padding:.6rem .8rem}}`;
 
 const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '' }) => `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -324,7 +328,8 @@ for (const p of products) {
 ${sizeBox}
 ${p.description ? `<div class="box"><h2 style="margin-top:0">Product details</h2><div class="desc">${esc(p.description)}</div></div>` : ''}
 ${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
-${related.length ? `<h2>More in ${esc(cat.name)}</h2><ul class="g">${related.map(card).join('')}</ul>` : ''}`;
+${related.length ? `<h2>More in ${esc(cat.name)}</h2><ul class="g">${related.map(card).join('')}</ul>` : ''}
+<div class="stk" role="complementary" aria-label="Order this product"><b>${p.variants ? 'From ' : ''}${money(p.price)}<small>${esc(p.name)}</small></b><a class="call" href="tel:+${WHATSAPP}" aria-label="Call ${BRAND}">Call</a><a href="${esc(inStock ? wa : ask)}">${inStock ? 'Order on WhatsApp' : 'Ask on WhatsApp'}</a></div>`;
   writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld, ogType: 'product', extra: `<meta property="product:price:amount" content="${Math.round(Number(p.price) || 0)}"><meta property="product:price:currency" content="KES"><meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` }));
   urls.push(path);
 }
