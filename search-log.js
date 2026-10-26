@@ -19,3 +19,11 @@
     } catch (e) {}
   };
 })();
+
+/* Loads the Jumia-style search behaviour (search-jumia.js) on the page that has the homepage search box. */
+(function () {
+  try {
+    if (!document.getElementById('search-form') || !document.getElementById('sugg')) return;
+    var s = document.createElement('script'); s.src = 'search-jumia.js?v=1'; document.head.appendChild(s);
+  } catch (e) {}
+})();
