@@ -1,12 +1,12 @@
 # Stermont Arcade - asks Google which of your pages are indexed, and why the rest are not.
-# Opens a GitHub Issue (GitHub emails you) every Monday after the product pages rebuild, or whenever you tap "Run workflow" in the Actions tab.
+# Opens a GitHub Issue (GitHub emails you) every day after the product pages rebuild, or whenever you tap "Run workflow" in the Actions tab.
 # Needs the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets (same ones as the sitemap ping).
 name: Google indexing status
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 7 * * 1'
+    - cron: '30 7 * * *'
 
 permissions:
   contents: read
