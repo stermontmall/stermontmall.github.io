@@ -32,7 +32,7 @@
 
 /* Delivery times and customer reviews on product pages and in the storefront product view (see /product-trust.js). */
 (function () {
-  try { if (/admin|upload-photos/.test(location.pathname)) return; var t = document.createElement('script'); t.src = '/product-trust.js?v=1'; t.defer = true; document.head.appendChild(t); } catch (e) {}
+  try { if (/admin|upload-photos/.test(location.pathname)) return; var t = document.createElement('script'); t.src = '/product-trust.js?v=2'; t.defer = true; document.head.appendChild(t); } catch (e) {}
 })();
 
 /* Footer links to the About, FAQ, Contact and Terms pages (see /site-links.js). */

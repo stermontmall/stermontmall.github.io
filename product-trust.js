@@ -78,6 +78,19 @@
     return c;
   }
 
+  /* ---------- shop service rating (reviews saved against "Our service") ---------- */
+  function serviceCard(map) {
+    var l = map['our service']; if (!l || !l.length) return null;
+    var t = 0; l.forEach(function (r) { t += r.rating; });
+    var c = mk('div', 'stt-card'); c.setAttribute('data-stt', 'service');
+    var h = mk('h3'); h.appendChild(mk('span', 'stt-st', stars(t / l.length)));
+    h.appendChild(D.createTextNode(' ' + (t / l.length).toFixed(1) + ' / 5 from ' + l.length + (l.length === 1 ? ' customer rating' : ' customer ratings') + ' of our service'));
+    c.appendChild(h);
+    var r0 = l.filter(function (r) { return r.body; })[0];
+    if (r0) { var it = mk('div', 'stt-it'); it.appendChild(mk('div', null, r0.body)); var d = dmy(r0.created_at); it.appendChild(mk('small', null, (r0.reviewer || 'Verified buyer') + (d ? ' \u00B7 ' + d : ''))); c.appendChild(it); }
+    return c;
+  }
+
   /* ---------- static product pages (/p/...) ---------- */
   function productPage() {
     if (!/^\/p\/[^/]+\.html$/.test(location.pathname)) return;
@@ -86,6 +99,8 @@
     var name = h1.textContent.trim();
     if (col) col.appendChild(delivery(name));
     var hasRev = [].some.call(main.querySelectorAll('h2'), function (h) { return /^Customer reviews/.test(h.textContent); });
+    /* Approved ratings of the shop's service ("Our service") show on every product page, so shoppers see real feedback. */
+    loadReviews(function (map) { var sv = serviceCard(map); if (sv && col && !D.querySelector('[data-stt="service"]')) { var d = col.querySelector('[data-stt="delivery"]'); col.insertBefore(sv, d || null); } });
     if (hasRev) return;   /* the page already lists approved reviews */
     loadReviews(function (map) {
       var box = reviewBox(match(map, name)), more = [].filter.call(main.querySelectorAll('h2'), function (h) { return /^More in /.test(h.textContent); })[0];
