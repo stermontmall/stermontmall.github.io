@@ -1,6 +1,6 @@
 /* Stermont Arcade · Advert banner.
    Every product marked "Feature as advert / top banner" in the admin Catalog becomes a slide at the top of the home page
-   (photo, badge, price, Order now + Add to cart). Auto-rotates, pauses when touched, updates the dots.
+   (photo, badge, price with old price and % off, Order now + Add to cart). Auto-rotates, pauses when touched, updates the dots.
    Add at the end of index.html, after account-panel.js:  <script src="advert-banner.js" defer></script> */
 (function () {
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', D = document, WA = '254748888230';
@@ -14,6 +14,8 @@
     '.slide.ad .ad-b.hot{background:#ff6b3d;color:#fff}' +
     '.slide.ad h2{font-size:1.15rem;line-height:1.2;margin:.1rem 0;max-width:none;font-weight:800;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}' +
     '.slide.ad .ad-p{font-size:1.55rem;font-weight:900;color:#c8f31d;line-height:1.1}.slide.ad .ad-s{font-size:.78rem;opacity:.85;font-weight:600}' +
+    '.slide.ad .ad-o2{font-size:.85rem;font-weight:600;color:#fff;opacity:.8;text-decoration:line-through;margin-left:.45rem}' +
+    '.slide.ad .ad-d{display:inline-block;background:#ff6b3d;color:#fff;border-radius:6px;padding:.05rem .4rem;font-size:.75rem;font-weight:800;margin-left:.4rem;vertical-align:middle}' +
     '.slide.ad .ad-a{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.45rem}' +
     '.slide.ad .ad-a button{border:0;border-radius:999px;font:inherit;font-weight:800;font-size:.82rem;padding:.55rem .95rem;cursor:pointer}' +
     '.slide.ad .ad-o{background:#c8f31d;color:#1a2e05}.slide.ad .ad-c{background:rgba(255,255,255,.18);color:#fff}' +
@@ -43,7 +45,12 @@
   function slide(p, i) {
     var s = mk('div', 'slide ad'), t = mk('div', 'ad-t'), im = mk('div', 'ad-i'), b = badge(p);
     s.style.background = GRAD[i % GRAD.length]; s.setAttribute('role', 'link'); s.tabIndex = 0; s.setAttribute('data-ad', p.id);
-    t.appendChild(mk('span', 'ad-b ' + b[1], b[0])); t.appendChild(mk('h2', '', p.name)); t.appendChild(mk('div', 'ad-p', (p.from ? 'From ' : '') + money(p.price)));
+    var pr = mk('div', 'ad-p', (p.from ? 'From ' : '') + money(p.price));
+    if (!p.from && +p.old_price > +p.price) {
+      pr.appendChild(mk('s', 'ad-o2', money(p.old_price)));
+      pr.appendChild(mk('span', 'ad-d', '-' + Math.max(1, Math.round((p.old_price - p.price) / p.old_price * 100)) + '%'));
+    }
+    t.appendChild(mk('span', 'ad-b ' + b[1], b[0])); t.appendChild(mk('h2', '', p.name)); t.appendChild(pr);
     t.appendChild(mk('div', 'ad-s', 'Pay by M-Pesa · Delivery countrywide'));
     var a = mk('div', 'ad-a'), o = mk('button', 'ad-o', 'Order now'), c = mk('button', 'ad-c', '+ Cart'); o.type = c.type = 'button';
     o.onclick = function (e) { e.stopPropagation(); openProduct(p.id, p.name); };
@@ -89,7 +96,8 @@
   /* One slide per product (not per pack size). Sizes of the same product share a variant_group. */
   function get(q) { return fetch(SB + '/rest/v1/products?' + q, { headers: { apikey: KEY } }); }
   var BASE = 'active=eq.true&featured=eq.true&stock=gt.0&order=created_at.desc&limit=30&select=';
-  get(BASE + 'id,name,price,stock,images,created_at,variant_group,variant_label')
+  get(BASE + 'id,name,price,old_price,stock,images,created_at,variant_group,variant_label')
+    .then(function (r) { return r.ok ? r : get(BASE + 'id,name,price,stock,images,created_at,variant_group,variant_label'); })   /* old_price column not added yet */
     .then(function (r) { return r.ok ? r : get(BASE + 'id,name,price,stock,images,created_at'); })   /* pack-size columns not added yet */
     .then(function (r) { return r.ok ? r.json() : []; })
     .then(function (rows) {
