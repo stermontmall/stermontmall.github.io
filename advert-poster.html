@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#5b21b6">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://generativelanguage.googleapis.com https://api.github.com; img-src 'self' data: https:; base-uri 'self'; form-action 'none'">
+<title>Post an advert</title>
+<link rel="icon" href="/favicon.png">
+<style>
+:root{--p:#5b21b6;--pl:#f3eefc;--ink:#1f1b2e;--mu:#6b6785;--ln:#e3ddf3;--ok:#15803d;--no:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:#faf9fd;padding-bottom:170px}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:.5rem;padding:calc(.6rem + env(safe-area-inset-top)) .8rem .6rem;background:var(--p);color:#fff}
+header b{flex:1}header a{color:#fff;font-size:.85rem}
+main{max-width:860px;margin:0 auto;padding:.8rem}
+.card{background:#fff;border:1px solid var(--ln);border-radius:14px;padding:.9rem;margin-bottom:.8rem}
+.card h2{margin:0 0 .4rem;font-size:1.05rem}
+label{display:block;font-weight:600;margin:.6rem 0 .2rem;font-size:.9rem}
+input,textarea{width:100%;font:inherit;font-size:16px;border:1px solid var(--ln);border-radius:10px;padding:.5rem .7rem;background:#fff;color:var(--ink)}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--p);background:#fff;color:var(--p);padding:.5rem .9rem;font-weight:600}
+button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-color:var(--ok);color:#fff}button.sm{padding:.25rem .6rem;font-size:.85rem}button:disabled{opacity:.5}
+.hint{color:var(--mu);font-size:.88rem;margin:.2rem 0}
+.m{padding:.6rem .8rem;border-radius:12px;margin-bottom:.6rem;font-size:.92rem}
+.m.err{background:#fef2f2;color:var(--no);border:1px solid #fecaca}.m.okm{background:#f0fdf4;border:1px solid #86efac}
+.pv .slide{display:flex;border-radius:18px;overflow:hidden;position:relative;width:100%}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem}
+.lv{display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--ln)}.lv img{width:44px;height:44px;object-fit:cover;border-radius:8px}.lv span{flex:1;min-width:0;font-size:.9rem}
+#bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);padding:.5rem .7rem calc(.5rem + env(safe-area-inset-bottom));z-index:6}
+#bar .in{max-width:860px;margin:0 auto;display:flex;gap:.5rem;align-items:flex-end}
+#bar textarea{flex:1;resize:none;height:44px;max-height:140px}
+#status{max-width:860px;margin:0 auto .3rem;font-size:.82rem;color:var(--mu);min-height:1.1rem}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><b>&#128227; Post an advert</b><a href="/builder.html">AI Builder</a></header>
+<main>
+  <div class="card"><h2>How it works</h2>
+    <p class="hint">1. Tap the paperclip and add your product photo (or a PDF or file). 2. Type what the advert should say: the offer, price, who it is for. 3. Tap Make advert, check the preview, change any words, then Post. It goes on your home page in about a minute.</p></div>
+  <div id="out"></div>
+  <div class="card"><h2>Adverts on my website</h2><div id="live" class="hint">Loading...</div></div>
+</main>
+<div id="bar"><div id="status"></div>
+  <div class="in"><textarea id="inp" rows="1" placeholder="e.g. Black Friday offer on this blender, KSh 4,500 was 6,000"></textarea><button id="go" type="button" class="pri">Make advert</button></div></div>
+<script>window.STM_ADS_NORUN = true;</script>
+<script src="/adverts.js"></script>
+<script src="/builder-attach.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (i) { return document.getElementById(i); }, K = 'stm_builder_cfg_v1', S = { ad: null, img: null, busy: false };
+  var SYS = 'You write short advert copy for Stermont Arcade, a Kenyan online store (prices in KSh, customers pay by M-Pesa and order on WhatsApp). Look at the product photo(s) and the owner\'s instructions. Reply with ONLY a JSON object: {"headline": max 7 words, "text": max 14 words, "badge": max 3 words or empty, "price": number in KSh only if the owner stated it else 0, "old_price": number only if the owner stated it else 0, "cta": max 3 words}. Never invent prices, discounts, rankings, awards, guarantees, delivery times, stock claims or statistics. Write in the language the owner used.';
+  var st = document.createElement('style'); st.textContent = window.STMAds.css; document.head.appendChild(st);
+
+  function cfg() { var s = null; try { s = localStorage.getItem(K) || sessionStorage.getItem(K); } catch (e) {} try { return JSON.parse(s) || {}; } catch (e) { return {}; } }
+  function str(v, n) { return String(v == null ? '' : v).replace(/\s+/g, ' ').trim().slice(0, n); }
+  function num(v) { v = parseFloat(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return v > 0 ? Math.round(v) : 0; }
+  function say(t, c) { var d = document.createElement('div'); d.className = 'm ' + (c || ''); d.textContent = t; $('out').appendChild(d); d.scrollIntoView({ block: 'nearest' }); return d; }
+  function busy(b, t) { S.busy = b; $('go').disabled = b; $('status').textContent = t || ''; }
+
+  async function gem(parts) {
+    var c = cfg(), models = [c.model || 'gemini-flash-latest', 'gemini-flash-latest', 'gemini-flash-lite-latest'].filter(function (m, i, a) { return a.indexOf(m) === i; }), err = 'No reply';
+    for (var i = 0; i < models.length; i++) {
+      var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 60000);
+      try {
+        var r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(models[i]) + ':generateContent', { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', 'x-goog-api-key': c.gkey }, body: JSON.stringify({ systemInstruction: { parts: [{ text: SYS }] }, contents: [{ role: 'user', parts: parts }], generationConfig: { responseMimeType: 'application/json' } }) });
+        if (r.ok) { var j = await r.json(), p = ((j.candidates || [])[0] || {}).content, tx = p && p.parts ? p.parts.map(function (x) { return x.text || ''; }).join('') : ''; if (tx) return tx; err = 'Empty reply'; continue; }
+        err = 'Gemini error ' + r.status + ': ' + (await r.text()).slice(0, 160);
+        if (r.status === 400 || r.status === 403) break;
+      } catch (e) { err = e.name === 'AbortError' ? 'Gemini took too long' : String(e.message || e); }
+      finally { clearTimeout(t); }
+    }
+    throw new Error(err);
+  }
+  async function gh(p, o) {
+    o = o || {}; var c = cfg(), h = { Authorization: 'Bearer ' + c.gh, 'X-GitHub-Api-Version': '2022-11-28', Accept: o.raw ? 'application/vnd.github.raw+json' : 'application/vnd.github+json' };
+    if (o.b) h['Content-Type'] = 'application/json';
+    var r = await fetch('https://api.github.com' + p, { method: o.m || 'GET', headers: h, body: o.b ? JSON.stringify(o.b) : undefined });
+    if (r.status === 404 && o.soft) return null;
+    if (!r.ok) { var t = await r.text(); throw new Error('GitHub ' + r.status + ': ' + t.slice(0, 200)); }
+    return o.raw ? r.text() : r.json();
+  }
+  function fpath(f) { var c = cfg(); return '/repos/' + c.repo + '/contents/' + f + '?ref=' + encodeURIComponent(c.branch || 'main'); }
+  async function commit(files, msg) {
+    var c = cfg(), R = '/repos/' + c.repo, br = c.branch || 'main';
+    var ref = await gh(R + '/git/ref/heads/' + br), cm = await gh(R + '/git/commits/' + ref.object.sha), en = [];
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      if (f.del) { en.push({ path: f.path, mode: '100644', type: 'blob', sha: null }); continue; }
+      var b = await gh(R + '/git/blobs', { m: 'POST', b: { content: f.b64 || f.text, encoding: f.b64 ? 'base64' : 'utf-8' } });
+      en.push({ path: f.path, mode: '100644', type: 'blob', sha: b.sha });
+    }
+    var t = await gh(R + '/git/trees', { m: 'POST', b: { base_tree: cm.tree.sha, tree: en } });
+    var n = await gh(R + '/git/commits', { m: 'POST', b: { message: msg, tree: t.sha, parents: [ref.object.sha] } });
+    await gh(R + '/git/refs/heads/' + br, { m: 'PATCH', b: { sha: n.sha } });
+  }
+  async function readAds() { var raw = await gh(fpath('adverts.json'), { raw: true, soft: true }); return raw ? (JSON.parse(raw).adverts || []) : []; }
+
+  async function make() {
+    if (S.busy) return;
+    var c = cfg(), txt = $('inp').value.trim();
+    if (!c.gkey || !c.gh || !c.repo) { say('Open the AI Builder, tap Settings, add your Gemini key and GitHub token, tick "Remember my keys on this device" and tap Save and test. Then come back here.', 'err'); return; }
+    if (BuilderAttach.busy()) { say('Your photo is still getting ready. Try again in a second.', 'err'); return; }
+    var att = BuilderAttach.take();
+    if (!txt && !att) { say('Add a photo or type what the advert should say.', 'err'); return; }
+    busy(true, 'Making your advert...'); $('out').textContent = '';
+    try {
+      var parts = [{ text: 'Owner instructions: ' + (txt || '(none, use the photo)') }].concat(att ? att.parts : []);
+      var j = JSON.parse((await gem(parts)).replace(/^\s*```(?:json)?|```\s*$/g, '').trim());
+      S.img = att ? (att.items.filter(function (i) { return i.kind === 'image'; })[0] || null) : null;
+      S.ad = { headline: str(j.headline, 60), text: str(j.text, 120), badge: str(j.badge, 24), price: num(j.price), old_price: num(j.old_price), cta: str(j.cta, 24) || 'Order on WhatsApp' };
+      if (!S.ad.headline) throw new Error('The AI did not write a headline. Try again with more detail.');
+      $('inp').value = ''; show();
+      if (att && att.items.filter(function (i) { return i.kind === 'image'; }).length > 1) say('You added more than one photo. The first photo is used for this advert.', 'okm');
+    } catch (e) { if (att) BuilderAttach.restore(att); say('Could not make the advert: ' + String(e.message || e).slice(0, 220), 'err'); }
+    busy(false);
+  }
+  function show() {
+    var o = $('out'); o.textContent = '';
+    var box = document.createElement('div'); box.className = 'card'; o.appendChild(box);
+    var h = document.createElement('h2'); h.textContent = 'Preview'; box.appendChild(h);
+    var pv = document.createElement('div'); pv.className = 'pv'; box.appendChild(pv);
+    function paint() { pv.textContent = ''; pv.appendChild(STMAds.card(Object.assign({}, S.ad, { id: 'preview', image: S.img ? 'data:' + S.img.mime + ';base64,' + S.img.data : '' }), 0)); }
+    [['headline', 'Headline'], ['text', 'Short line'], ['badge', 'Badge (optional)'], ['price', 'Price in KSh (optional)'], ['old_price', 'Old price in KSh (optional)'], ['cta', 'Button words']].forEach(function (f) {
+      var l = document.createElement('label'), i = document.createElement('input'), pr = /price/.test(f[0]);
+      l.textContent = f[1]; i.type = 'text'; i.value = S.ad[f[0]] || ''; if (pr) i.inputMode = 'numeric';
+      i.oninput = function () { S.ad[f[0]] = pr ? num(i.value) : i.value; paint(); };
+      box.appendChild(l); box.appendChild(i);
+    });
+    var row = document.createElement('div'); row.className = 'row'; box.appendChild(row);
+    var pb = document.createElement('button'); pb.type = 'button'; pb.className = 'ok'; pb.textContent = 'Post to my website'; pb.onclick = function () { post(pb); }; row.appendChild(pb);
+    var nb = document.createElement('button'); nb.type = 'button'; nb.textContent = 'Start again'; nb.onclick = function () { S.ad = null; S.img = null; o.textContent = ''; }; row.appendChild(nb);
+    paint(); box.scrollIntoView({ block: 'start' });
+  }
+  async function post(btn) {
+    if (S.busy) return;
+    if (!str(S.ad.headline, 60)) { say('The headline cannot be empty.', 'err'); return; }
+    busy(true, 'Posting...'); btn.disabled = true;
+    try {
+      var id = 'ad' + Date.now().toString(36), files = [], ad = Object.assign({}, S.ad, { id: id, created: new Date().toISOString().slice(0, 10), active: true });
+      if (S.img) {
+        var ext = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }[S.img.mime];
+        if (!ext) throw new Error('This photo type cannot be shown on the website. Use a JPG or PNG photo, or take a screenshot of it.');
+        ad.image = 'adverts/' + (str(ad.headline, 30).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'advert') + '-' + id + '.' + ext;
+        files.push({ path: ad.image, b64: S.img.data });
+      }
+      var list = await readAds(); list.unshift(ad);
+      files.push({ path: 'adverts.json', text: JSON.stringify({ adverts: list }, null, 1) });
+      var ix = await gh(fpath('index.html'), { raw: true }), mark = '<script src="advert-banner.js" defer></script>';
+      if (ix.indexOf('adverts.js') < 0) {
+        if (ix.indexOf(mark) < 0) throw new Error('I could not find the place in index.html to switch adverts on. Ask the AI Builder to add adverts.js to the home page.');
+        files.push({ path: 'index.html', text: ix.replace(mark, function () { return mark + '\n<script src="adverts.js" defer></script>'; }) });
+      }
+      await commit(files, 'New advert: ' + ad.headline.slice(0, 50));
+      $('out').textContent = ''; S.ad = null; S.img = null;
+      say('Posted! Your advert is on the home page in about a minute. Refresh the home page (or open it in a private tab) to see it.', 'okm');
+      live();
+    } catch (e) { btn.disabled = false; say('Could not post: ' + String(e.message || e).slice(0, 300), 'err'); }
+    busy(false);
+  }
+  async function remove(a, b) {
+    if (S.busy || !confirm('Remove this advert from the website?')) return;
+    busy(true, 'Removing...'); b.disabled = true;
+    try {
+      var list = (await readAds()).filter(function (x) { return x.id !== a.id; }), f = [{ path: 'adverts.json', text: JSON.stringify({ adverts: list }, null, 1) }];
+      if (a.image) f.push({ path: a.image, del: true });
+      await commit(f, 'Remove advert: ' + str(a.headline, 40));
+      say('Removed. It disappears from the home page in about a minute.', 'okm'); live();
+    } catch (e) { b.disabled = false; say('Could not remove: ' + String(e.message || e).slice(0, 300), 'err'); }
+    busy(false);
+  }
+  async function live() {
+    var box = $('live'); if (!cfg().gh) { box.textContent = 'Add your keys in the AI Builder first (Settings).'; return; }
+    try {
+      var list = await readAds(); box.textContent = '';
+      if (!list.length) { box.textContent = 'No adverts yet. Make your first one below.'; return; }
+      list.forEach(function (a) {
+        var r = document.createElement('div'); r.className = 'lv';
+        if (a.image) { var g = new Image(); g.src = '/' + a.image; g.alt = ''; r.appendChild(g); }
+        var s = document.createElement('span'); s.textContent = a.headline; r.appendChild(s);
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'sm'; b.textContent = 'Remove'; b.onclick = function () { remove(a, b); }; r.appendChild(b); box.appendChild(r);
+      });
+    } catch (e) { box.textContent = 'Could not load adverts (' + String(e.message || e).slice(0, 120) + ')'; }
+  }
+  $('go').onclick = make;
+  $('inp').addEventListener('input', function () { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 140) + 'px'; });
+  live();
+})();
+</script>
+</body>
+</html>
