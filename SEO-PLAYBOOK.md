@@ -61,3 +61,4 @@ No one can guarantee the #1 spot on Google. These moves are ordered by how much 
 | `seo-google-sitemaps.mjs` | Tells Google to re-read the sitemaps | Daily |
 | `seo-extras.mjs` | Builds `sitemap-images.xml` and `llms.txt` | Mondays and after page builds |
 | `seo-opportunities.mjs` | Lists searches ready to reach page 1 | Mondays |
+| `seo-index-status.mjs` | Asks Google which pages are indexed and why the rest are not, then opens an issue | Mondays |

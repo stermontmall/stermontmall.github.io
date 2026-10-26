@@ -1,0 +1,35 @@
+# Stermont Arcade - asks Google which of your pages are indexed, and why the rest are not.
+# Opens a GitHub Issue (GitHub emails you) every Monday after the product pages rebuild, or whenever you tap "Run workflow" in the Actions tab.
+# Needs the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets (same ones as the sitemap ping).
+name: Google indexing status
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 7 * * 1'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check every page with Google
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_PROPERTY: ${{ secrets.GSC_PROPERTY }}
+        run: node seo-index-status.mjs > index-status.md
+      - name: Publish as an issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --search "Google indexing status in:title" --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Superseded by the newer report." || true
+          done
+          gh issue create --title "Google indexing status $(date +%F)" --body-file index-status.md
