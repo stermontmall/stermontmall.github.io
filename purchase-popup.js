@@ -10,7 +10,8 @@
   try { if (sessionStorage.getItem('stm_buypop_off') === '1') return; } catch (e) {}
 
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
-  var D = document, FIRST_DELAY = 7000, SHOW_FOR = 6500, GAP = 22000;
+  /* The popup appears every INTERVAL ms (start to start): visible for SHOW_FOR ms, hidden for the rest. */
+  var D = document, FIRST_DELAY = 7000, SHOW_FOR = 6500, INTERVAL = 15000;
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   function ago(iso) {
@@ -60,7 +61,7 @@
     if (D.hidden) { timer = setTimeout(cycle, 4000); return; }
     paint(list[i % list.length]); i++;
     box.classList.add('on');
-    timer = setTimeout(function () { box.classList.remove('on'); timer = setTimeout(cycle, GAP); }, SHOW_FOR);
+    timer = setTimeout(function () { box.classList.remove('on'); timer = setTimeout(cycle, INTERVAL - SHOW_FOR); }, SHOW_FOR);
   }
 
   function hdr() { return { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' }; }
