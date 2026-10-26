@@ -389,6 +389,36 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
   console.log(`Merchant feed: ${feed.length} items.`);
 }
 
+// Homepage: the storefront loads its products with JavaScript, so give crawlers plain links to every category and a spread of products.
+// Only the part between the two markers in index.html is rewritten on each build.
+{
+  const HOME = 'index.html', A = '<!-- seo-links:start -->', B = '<!-- seo-links:end -->';
+  if (existsSync(HOME) && readFileSync(HOME, 'utf8').includes(A) && readFileSync(HOME, 'utf8').includes(B)) {
+    const catsAll = Object.entries(byCat).sort((a, b) => (b[0] === 'pest-control-fumigation') - (a[0] === 'pest-control-fumigation') || a[1].name.localeCompare(b[1].name));
+    const seen = new Set(), picks = [];
+    for (const p of products) {
+      const k = p.categories?.slug, ok = p.stock == null || Number(p.stock) > 0;
+      if (!k || seen.has(k) || !ok || !(p.images || []).filter(Boolean).length) continue;
+      seen.add(k); picks.push(p);
+    }
+    picks.sort((a, b) => (b.categories.slug === 'pest-control-fumigation') - (a.categories.slug === 'pest-control-fumigation'));
+    const html = `${A}
+<section class="seo-links" aria-labelledby="seo-cats"><div class="wrap">
+<style>.seo-links{padding:1.5rem 0 .5rem}.seo-links h2{font-size:1.25rem;margin:0 0 .6rem}.seo-links ul{list-style:none;display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 1.2rem;padding:0}.seo-links li a{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem;font-size:.92rem;color:var(--ink);text-decoration:none}.seo-links li a:hover{border-color:currentColor}</style>
+<h2 id="seo-cats">Shop by category</h2>
+<ul>${catsAll.map(([slug, c]) => `<li><a href="/c/${encodeURIComponent(slug)}.html">${esc(c.name)}</a></li>`).join('')}</ul>
+<h2>Popular products</h2>
+<ul>${picks.slice(0, 12).map(p => `<li><a href="/p/${encodeURIComponent(p.id)}.html">${esc(p.name)}</a></li>`).join('')}</ul>
+<p><a href="/products.html">View all ${products.length} products</a> &middot; <a href="/c/">All categories</a></p>
+</div></section>
+${B}`;
+    const cur = readFileSync(HOME, 'utf8');
+    const out = cur.slice(0, cur.indexOf(A)) + html + cur.slice(cur.indexOf(B) + B.length);
+    if (out !== cur) writeFileSync(HOME, out);
+    console.log(`Homepage links: ${catsAll.length} categories, ${Math.min(picks.length, 12)} products.`);
+  } else console.log('Homepage markers not found - skipped homepage links.');
+}
+
 // lastmod only moves when a page's content really changed. Google ignores sitemaps whose dates change on every build.
 const today = new Date().toISOString().slice(0, 10);
 const STATE = 'sitemap-state.json';
