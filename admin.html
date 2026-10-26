@@ -345,6 +345,10 @@
     return STM_RECEIPT.email(o).then(function () { note('Receipt emailed to ' + o.email + '.', true); })
       .catch(function (e) { note('Receipt not emailed: ' + e.message, false); });
   }
+  function sendReview(o) {
+    return STM_RECEIPT.review(o).then(function () { note('Review request emailed to ' + o.email + '.', true); })
+      .catch(function (e) { note('Review request not emailed: ' + e.message, false); });
+  }
   function paid0(o) { return Object.assign({}, o, { status: 'paid' }); }
   function sendStatus(o, stage) {
     if (!o.email) { note('No email on this order, so the customer was not notified.', false); return Promise.resolve(); }
@@ -394,10 +398,15 @@
             eb.onclick = function () { eb.disabled = true; sendReceipt(o).then(function () { eb.disabled = false; }); }; a.appendChild(eb); }
           if (ph) { var wr = h('a', 'btn alt sm', 'Receipt on WhatsApp'); wr.href = 'https://wa.me/' + ph + '?text=' + encodeURIComponent(STM_RECEIPT.text(o)); wr.target = '_blank'; wr.rel = 'noopener'; a.appendChild(wr); }
         }
-        if (o.stage === 'delivered' && ph) {
-          var fn = String(o.customer_name || '').trim().split(/\s+/)[0] || 'there';
-          var rq = 'Hi ' + fn + ', thank you for shopping at Stermont Arcade! 🙏\n\nHow was your order ' + o.ref + '? Please rate it, it takes a minute:\nhttps://stermontarcade.co.ke/account.html\n(Sign in, tap Ratings & Reviews, then rate your items.)\n\nYour review helps other customers shop with confidence. Asante!';
-          var rr = h('a', 'btn ok sm', 'Ask for review ⭐'); rr.href = 'https://wa.me/' + ph + '?text=' + encodeURIComponent(rq); rr.target = '_blank'; rr.rel = 'noopener'; a.appendChild(rr);
+        if (o.stage === 'delivered') {
+          if (o.email) {
+            var rr = h('button', 'btn ok sm', 'Email review request \u2B50'); rr.type = 'button';
+            rr.onclick = function () { rr.disabled = true; sendReview(o).then(function () { rr.disabled = false; }); }; a.appendChild(rr);
+          } else if (ph) {
+            var fn = String(o.customer_name || '').trim().split(/\s+/)[0] || 'there';
+            var rq = 'Hi ' + fn + ', thank you for shopping at Stermont Arcade! \uD83D\uDE4F\n\nHow was your order ' + o.ref + '? Please rate it, it takes a minute:\nhttps://stermontarcade.co.ke/account.html\n(Sign in, tap Ratings & Reviews, then rate your items.)\n\nYour review helps other customers shop with confidence. Asante!';
+            var rw = h('a', 'btn alt sm', 'No email: ask on WhatsApp'); rw.href = 'https://wa.me/' + ph + '?text=' + encodeURIComponent(rq); rw.target = '_blank'; rw.rel = 'noopener'; a.appendChild(rw);
+          }
         }
         [['packed', 'Mark packed'], ['out_for_delivery', 'Out for delivery'], ['delivered', 'Delivered']].forEach(function (x, i) {
           if (i < cur) return;

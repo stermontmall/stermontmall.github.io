@@ -535,7 +535,7 @@
         '<td width="50%" valign="top" style="padding-left:6px;"><div style="background:#efe7ff;border-radius:16px;padding:14px 16px;">' + rightTile + '</div></td>' +
       '</tr></table></td></tr>' +
       '<tr><td align="center" style="padding:20px 26px 24px;">' + btn('https://wa.me/' + String(BIZ.phone).replace(/\D/g, '') + '?text=' + encodeURIComponent('Hello Stermont Arcade, about my order ' + o.ref), 'Chat on WhatsApp', '#7c3aed', '#ffffff') +
-        (stage === 'out_for_delivery' && !pickup ? btn('tel:' + String(BIZ.phone).replace(/[^\d+]/g, ''), 'Call us', '#c8f31d', '#2a0e5c') : btn('https://' + BIZ.web, 'Keep shopping', '#c8f31d', '#2a0e5c')) + '</td></tr>' +
+        (stage === 'delivered' ? btn('https://' + BIZ.web + '/account.html', 'Rate your order &#11088;', '#f6a800', '#2a0e5c') : '') + (stage === 'out_for_delivery' && !pickup ? btn('tel:' + String(BIZ.phone).replace(/[^\d+]/g, ''), 'Call us', '#c8f31d', '#2a0e5c') : btn('https://' + BIZ.web, 'Keep shopping', '#c8f31d', '#2a0e5c')) + '</td></tr>' +
       '<tr><td align="center" bgcolor="#2a0e5c" style="background:#2a0e5c;padding:22px 24px;"><div style="' + F + 'font-size:14px;font-weight:700;color:#ffffff;">Thank you for shopping with Stermont Arcade</div>' +
         '<div style="' + F + 'font-size:12px;line-height:1.7;color:#cdbdf3;padding-top:6px;">Faulty or wrong item? Message us on WhatsApp within 48 hours of delivery with photos.<br>Call ' + hx(BIZ.phone) + ' &middot; <a href="https://' + BIZ.web + '" style="color:#c8f31d;text-decoration:none;">' + hx(BIZ.web) + '</a><br>The Sarit Centre, Westlands, Nairobi</div></td></tr>' +
       '</table></div>';
@@ -562,5 +562,45 @@
     }).then(function (r) { if (!r.ok) return r.text().then(function (t) { throw new Error('EmailJS: ' + (t || r.status)); }); });
   }
 
-  window.STM_RECEIPT = { pdf: pdf, email: email, text: text, notify: notify };
+  /* Review request email: sent straight to the buyer's inbox (same EmailJS template as the status emails, body is {{{html_body}}}). */
+  function reviewHtml(o) {
+    var F = 'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Arial,sans-serif;';
+    var link = 'https://' + BIZ.web + '/account.html';
+    var rows = (o.items || []).map(function (i) {
+      return '<tr><td style="padding:12px 0;border-bottom:1px solid #eee7fb;' + F + 'font-size:15px;color:#1b1230;">' + hx(i.name) + '</td><td align="right" style="padding:12px 0;border-bottom:1px solid #eee7fb;' + F + 'font-size:18px;color:#f6a800;letter-spacing:2px;">&#9734;&#9734;&#9734;&#9734;&#9734;</td></tr>';
+    }).join('');
+    return '<div style="background:#efe7ff;padding:28px 12px;">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;border-radius:24px;overflow:hidden;background:#ffffff;">' +
+      '<tr><td align="center" bgcolor="#5b21b6" style="background:#5b21b6;padding:32px 24px 26px;">' +
+        '<div style="' + F + 'font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#e9ddff;">Stermont <span style="background:#c8f31d;color:#2a0e5c;padding:1px 7px;border-radius:5px;">Arcade</span></div>' +
+        '<div style="' + F + 'font-size:46px;line-height:1.2;padding-top:14px;color:#f6a800;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>' +
+        '<div style="' + F + 'font-size:27px;font-weight:900;line-height:1.2;color:#ffffff;padding-top:6px;">How was your order?</div>' +
+        '<div style="' + F + 'font-size:15px;color:#e9ddff;padding-top:8px;">Order <b style="color:#c8f31d;">' + hx(o.ref) + '</b></div>' +
+      '</td></tr>' +
+      '<tr><td style="padding:26px 26px 4px;"><div style="' + F + 'font-size:18px;font-weight:800;color:#1b1230;">Hi ' + hx(String(o.customer_name || 'there').trim().split(/\s+/)[0]) + ',</div>' +
+        '<p style="' + F + 'font-size:15px;line-height:1.65;color:#4a4163;margin:10px 0 0;">Thank you for shopping with Stermont Arcade. It takes about a minute to rate what you bought, and your review helps other customers in Kenya shop with confidence.</p></td></tr>' +
+      (rows ? '<tr><td style="padding:14px 26px 4px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5ff;border:1px solid #e6dcfb;border-radius:18px;"><tr><td style="padding:6px 18px 8px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + rows + '</table></td></tr></table></td></tr>' : '') +
+      '<tr><td align="center" style="padding:22px 26px 6px;"><a href="' + link + '" style="display:inline-block;background:#f6a800;color:#2a0e5c;' + F + 'font-size:16px;font-weight:800;text-decoration:none;padding:15px 28px;border-radius:14px;">Rate your items &#11088;</a></td></tr>' +
+      '<tr><td align="center" style="padding:6px 26px 22px;"><div style="' + F + 'font-size:13px;line-height:1.6;color:#8a7fa8;">Sign in to your account, tap <b>Ratings &amp; Reviews</b>, then rate each item.</div></td></tr>' +
+      '<tr><td align="center" bgcolor="#2a0e5c" style="background:#2a0e5c;padding:20px 24px;"><div style="' + F + 'font-size:14px;font-weight:700;color:#ffffff;">Thank you for choosing Stermont Arcade</div>' +
+        '<div style="' + F + 'font-size:12px;line-height:1.7;color:#cdbdf3;padding-top:6px;">Something not right with your order? Reply to this email or call ' + hx(BIZ.phone) + ' and we will make it right.</div></td></tr>' +
+      '</table></div>';
+  }
+  function review(o) {
+    if (!EMAILJS.serviceId || !EMAILJS.statusTemplateId || !EMAILJS.publicKey) return Promise.reject(new Error('Email is not set up yet'));
+    if (!o.email) return Promise.reject(new Error('This order has no customer email.'));
+    var nm = o.customer_name || 'Customer';
+    var params = {
+      to_email: o.email, reply_to: BIZ.email, from_email: BIZ.email, support_email: BIZ.email, to_name: nm, name: nm, customer_name: nm, user_name: nm, email: o.email,
+      order_id: o.ref, order_ref: o.ref, status: 'Review request', subject: BIZ.name + ': How was your order ' + o.ref + '?',
+      headline: 'How was your order?', message: 'Please rate the items you bought. It takes about a minute.', items: lines(o).join('\n'), date: when(new Date()),
+      html_body: reviewHtml(o)
+    };
+    return fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ service_id: EMAILJS.serviceId, template_id: EMAILJS.statusTemplateId, user_id: EMAILJS.publicKey, template_params: params })
+    }).then(function (x) { if (!x.ok) return x.text().then(function (t) { throw new Error('EmailJS: ' + (t || x.status)); }); });
+  }
+
+  window.STM_RECEIPT = { pdf: pdf, email: email, text: text, notify: notify, review: review };
 })();
