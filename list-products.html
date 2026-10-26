@@ -42,26 +42,38 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
 <header><b>&#128230; List products</b><a href="/admin.html#catalog">Admin</a><a href="/builder.html">AI Builder</a></header>
 <main>
   <div class="card"><h2>1. Photos and instructions</h2>
-    <p class="hint">Pick up to 30 product photos. Tell me the cost price and the pieces in stock for each product (I never guess them). I write the name, category and description the way the admin Catalog does, and work out the selling price (cost + 15%, rounded up to KSh 50).</p>
+    <p class="hint">Pick up to 30 product photos. Tell me the cost price (COGS) of each product. I never guess costs. I write the name, category, pack size and description the way the admin Catalog does, and work out prices from your settings below.</p>
     <input type="file" id="ph" accept="image/*" multiple>
     <div id="cnt" class="hint"></div>
     <label for="ins">Instructions</label>
-    <textarea id="ins" rows="7" placeholder="Example:&#10;Photo 1 Haier air fryer 7L: cost 9500, stock 5, previous price 14000, make it an advert.&#10;Photo 2 and 3 are the same kettle: cost 1800, stock 12.&#10;Photos 4 to 10 are in Supermarket: cost 120 each, stock 50 each."></textarea>
+    <textarea id="ins" rows="7" placeholder="Example:&#10;Photo 1 Kungu Nil bed bug killer 1 Litre: cost 2200.&#10;Photo 2 is the same product, 100 ml: cost 800.&#10;Photos 3 to 10 are Supermarket items: cost 120 each."></textarea>
     <div class="row"><button id="rd" type="button" class="pri">Read my photos</button><button id="clr" type="button">Clear photos</button></div>
+  </div>
+  <div class="card"><h2>2. Your standard settings</h2>
+    <div class="g2">
+      <div><label for="pm">Profit %</label><input id="pm" type="number" inputmode="decimal" value="30"></div>
+      <div><label for="pmode">Profit is worked out</label><select id="pmode"><option value="cost">on cost (cost + %)</option><option value="margin">of selling price (margin)</option></select></div>
+      <div><label for="dmin">Discount from (%)</label><input id="dmin" type="number" inputmode="numeric" value="6"></div>
+      <div><label for="dmax">Discount up to (%)</label><input id="dmax" type="number" inputmode="numeric" value="12"></div>
+      <div><label for="dst">Pieces in stock (each item)</label><input id="dst" type="number" inputmode="numeric" value="1000"></div>
+      <div><label for="dlow">Low-stock alert below</label><input id="dlow" type="number" inputmode="numeric" value="20"></div>
+    </div>
+    <label class="chk"><input id="disc" type="checkbox" checked> Show a previous price (crossed out) using that discount</label>
+    <label class="chk"><input id="dfeat" type="checkbox" checked> Feature every item as advert / top banner</label>
+    <p class="hint">Selling prices are rounded up to the next KSh 50 with at least KSh 150 profit, like the Catalog. The previous price should be a price you really charged or will honour, so customers are not misled. You can change anything on each item before posting.</p>
   </div>
   <div id="msg"></div>
   <div id="rows"></div>
   <datalist id="cl"></datalist>
 </main>
 <div id="bar" hidden><div id="status"></div><div class="in"><button id="post" type="button" class="ok">Post</button></div></div>
-<script src="/catalog-v10.js"></script>
 <script>
 (function () {
   'use strict';
   var $ = function (i) { return document.getElementById(i); };
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session', CK = 'stm_builder_cfg_v1';
   var UNITS = ['g', 'kg', 'tonne', 'ml', 'litre', 'piece', 'pair', 'dozen', 'set', 'bundle', 'pack', 'bag', '50 kg bag', 'bottle', 'carton', 'box', 'crate', 'sachet', 'tin', 'metre', 'roll'];
-  var S = { photos: [], items: [], cats: [], ids: {}, busy: false };
+  var S = { photos: [], items: [], cats: [], ids: {}, busy: false, opt: { pm: 30, mode: 'cost', dmin: 6, dmax: 12, disc: true, stock: 1000, low: 20, feat: true } };
   var SYS = 'You help the owner of Stermont Arcade, a Kenyan online store (prices in KSh), list products from photos. Return one item for every product you can identify. Reply with ONLY JSON: {"items":[{"photos":[numbers of the photos that show this product],"name":"clear product name in Title Case: brand, product and size or model only if visible on the photo or stated by the owner","category":"best match from the category list, or a short new category name only if none fits","cost":buying price in KSh ONLY if the owner stated it for this product else 0,"stock":pieces ONLY if the owner stated it else null,"unit":"one of the units list or empty","pack_size":"size or variant such as 1 Litre only if visible or stated else empty","old_price":number only if the owner stated a previous price else 0,"description":"text in the store format","featured":true only if the owner asked for this product to be an advert or banner else false}]}. Description format: one point per line, no bullets or dashes; section titles on their own line such as Key Features, Specifications, What is in the box?; a Brand: line when the brand is visible. Use only what is visible on the photo or stated by the owner. Never invent specifications, prices, discounts, rankings, awards, guarantees, delivery times or stock. If unsure, leave it out. If the owner refers to products by photo number, file name or order, follow that. Reply in English unless the owner writes in another language.';
 
   function h(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
@@ -70,9 +82,17 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
   function str(v, n) { return String(v == null ? '' : v).replace(/[ \t]+/g, ' ').trim().slice(0, n); }
   function num(v) { v = parseFloat(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return v > 0 ? Math.round(v) : 0; }
   function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
+  /* same method as the admin Catalog (profit added, at least KSh 150, rounded UP to KSh 50), using the profit % set on this page */
   function auto(c) {
-    if (window.STMCatalog && STMCatalog.autoPrice) return STMCatalog.autoPrice(c);
-    c = Number(c); if (!(c > 0)) return 0; return Math.ceil((c + Math.max(c * 0.15, 150)) / 50 - 1e-9) * 50;
+    c = Number(c); if (!(c > 0)) return 0;
+    var o = S.opt, t = o.mode === 'margin' && o.pm < 95 ? Math.max(c / (1 - o.pm / 100), c + 150) : c + Math.max(c * o.pm / 100, 150);
+    return Math.ceil(t / 50 - 1e-9) * 50;
+  }
+  function autoOld(it) { return S.opt.disc && it.price > 0 ? Math.ceil(it.price / (1 - it.d / 100) / 10) * 10 : 0; }
+  function readOpt() {
+    var n = function (id, d) { var v = parseFloat($(id).value); return v >= 0 ? v : d; };
+    var lo = Math.min(n('dmin', 6), n('dmax', 12)), hi = Math.max(n('dmin', 6), n('dmax', 12));
+    S.opt = { pm: n('pm', 30), mode: $('pmode').value, dmin: Math.min(lo, 90), dmax: Math.min(hi, 90), disc: $('disc').checked, stock: $('dst').value === '' ? null : Math.round(n('dst', 0)), low: Math.round(n('dlow', 5)), feat: $('dfeat').checked };
   }
   function say(t, c) { var d = h('div', 'm ' + (c || ''), t); $('msg').appendChild(d); d.scrollIntoView({ block: 'nearest' }); return d; }
   function cfg() { var s = null; try { s = localStorage.getItem(CK) || sessionStorage.getItem(CK); } catch (e) {} try { return JSON.parse(s) || {}; } catch (e) { return {}; } }
@@ -138,12 +158,14 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
     throw new Error(err);
   }
   function fromAI(it) {
-    var ph = (Array.isArray(it.photos) ? it.photos : [it.photo]).map(Number).filter(function (n) { return n >= 1 && n <= S.photos.length; });
-    var st = it.stock == null || it.stock === '' ? null : parseInt(it.stock, 10);
-    return { name: str(it.name, 120), cat: str(it.category, 60), cost: num(it.cost), stock: st >= 0 ? st : null, unit: UNITS.indexOf(it.unit) > -1 ? it.unit : '', pack: str(it.pack_size, 30), old: num(it.old_price), desc: String(it.description || '').replace(/^[\s*\-\u2022]+/gm, '').slice(0, 4000).trim(), feat: !!it.featured, photos: ph, manual: false, price: auto(num(it.cost)), done: false };
+    var o = S.opt, ph = (Array.isArray(it.photos) ? it.photos : [it.photo]).map(Number).filter(function (n) { return n >= 1 && n <= S.photos.length; });
+    var st = it.stock == null || it.stock === '' ? null : parseInt(it.stock, 10), cost = num(it.cost), old = num(it.old_price);
+    var m = { name: str(it.name, 120), cat: str(it.category, 60), cost: cost, stock: st >= 0 ? st : o.stock, low: o.low, unit: UNITS.indexOf(it.unit) > -1 ? it.unit : '', pack: str(it.pack_size, 30), old: old, oldManual: !!old, d: Math.round(o.dmin + Math.random() * (o.dmax - o.dmin)) || 1, desc: String(it.description || '').replace(/^[\s*\-\u2022]+/gm, '').slice(0, 4000).trim(), feat: !!it.featured || o.feat, photos: ph, manual: false, price: auto(cost), done: false };
+    if (!m.oldManual) m.old = autoOld(m);
+    return m;
   }
   $('rd').onclick = async function () {
-    if (S.busy) return; $('msg').textContent = '';
+    if (S.busy) return; $('msg').textContent = ''; readOpt();
     var c = cfg(); if (!c.gkey) { say('Open the AI Builder, tap Settings, add your Gemini key, tick "Remember my keys on this device" and tap Save and test. Then come back here.', 'err'); return; }
     if (!S.photos.length) { say('Pick the product photos first.', 'err'); return; }
     S.busy = true; $('rd').disabled = true;
@@ -158,10 +180,10 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
         (j.items || []).forEach(function (it) { var m = fromAI(it); if (m.photos.length) out.push(m); });
       }
       var used = {}; out.forEach(function (m) { m.photos.forEach(function (n) { used[n] = 1; }); });
-      S.photos.forEach(function (p, i) { if (!used[i + 1]) out.push({ name: '', cat: '', cost: 0, stock: null, unit: '', pack: '', old: 0, desc: '', feat: false, photos: [i + 1], manual: false, price: 0, done: false }); });
+      S.photos.forEach(function (p, i) { if (!used[i + 1]) out.push(fromAI({ photos: [i + 1] })); });
       out.sort(function (a, b2) { return a.photos[0] - b2.photos[0]; });
       S.items = out; draw(); $('cnt').textContent = S.photos.length + ' photos read.';
-      say(out.length + ' item' + (out.length === 1 ? '' : 's') + ' ready to check. Fill in anything marked in red (cost and stock are never guessed), then tap Post.', 'okm');
+      say(out.length + ' item' + (out.length === 1 ? '' : 's') + ' ready to check. Fill in anything marked in red (cost is never guessed), then tap Post.', 'okm');
     } catch (e) { say('Could not read the photos: ' + String(e.message || e).slice(0, 260), 'err'); $('cnt').textContent = ''; }
     S.busy = false; $('rd').disabled = false;
   };
@@ -178,9 +200,10 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
   function isNewCat(n) { return !!n.trim() && !S.cats.some(function (c) { return norm(c.name) === norm(n); }); }
   function sync(it) {
     if (!it.manual) it.price = auto(it.cost);
+    if (!it.oldManual) { it.old = autoOld(it); it.$old.value = it.old || ''; }
     it.$price.value = it.price || '';
     var pf = it.price - it.cost;
-    it.$info.textContent = it.cost > 0 && it.price > 0 ? 'Profit ' + money(pf) + ' (' + Math.round(pf / it.cost * 100) + '% on cost)' : '';
+    it.$info.textContent = it.cost > 0 && it.price > 0 ? 'Profit ' + money(pf) + ' (' + Math.round(pf / it.cost * 100) + '% on cost, ' + Math.round(pf / it.price * 100) + '% of selling price)' + (it.old > it.price ? ' · shows ' + Math.round((it.old - it.price) / it.old * 100) + '% off' : '') : '';
     it.$cn.textContent = isNewCat(it.cat) ? 'New category: it will be created' : '';
     var e = it.done ? '\u2713 Posted' : check(it); it.$er.textContent = e;
     it.el.className = 'it' + (it.done ? ' done' : e ? ' bad' : '');
@@ -206,12 +229,14 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
       g.appendChild(fld('Category', (function () { var i = inp('text', it.cat, function (v) { it.cat = v; sync(it); }, 'Pick or type'); i.setAttribute('list', 'cl'); return i; })()));
       var us = h('select'); [''].concat(UNITS).forEach(function (u) { var o = h('option', '', u || 'No unit (per item)'); o.value = u; if (u === it.unit) o.selected = true; us.appendChild(o); }); us.onchange = function () { it.unit = us.value; };
       g.appendChild(fld('Unit of sale', us));
-      g.appendChild(fld('Cost price per unit (KSh) *', inp('number', it.cost || '', function (v) { it.cost = num(v); sync(it); }, 'what you pay')));
+      g.appendChild(fld('Cost price per unit (COGS, KSh) *', inp('number', it.cost || '', function (v) { it.cost = num(v); sync(it); }, 'what you pay')));
       it.$price = inp('number', it.price || '', function (v) { it.manual = true; it.price = num(v); sync(it); });
       g.appendChild(fld('Selling price (auto)', it.$price));
-      g.appendChild(fld('Previous price (optional)', inp('number', it.old || '', function (v) { it.old = num(v); sync(it); })));
+      it.$old = inp('number', it.old || '', function (v) { it.old = num(v); it.oldManual = true; sync(it); });
+      g.appendChild(fld('Previous price (optional)', it.$old));
       g.appendChild(fld('Pieces in stock *', inp('number', it.stock == null ? '' : it.stock, function (v) { it.stock = v === '' ? null : parseInt(v, 10); sync(it); })));
-      g.appendChild(fld('Pack size (optional)', inp('text', it.pack, function (v) { it.pack = v; }, 'e.g. 1 Litre'), 'full'));
+      g.appendChild(fld('Low-stock alert below', inp('number', it.low, function (v) { it.low = parseInt(v, 10) >= 0 ? parseInt(v, 10) : 5; })));
+      g.appendChild(fld('Pack size (optional)', inp('text', it.pack, function (v) { it.pack = v; }, 'e.g. 1 Litre'), ''));
       c.appendChild(g);
       it.$info = h('div', 'hint'); it.$cn = h('div', 'hint'); c.appendChild(it.$info); c.appendChild(it.$cn);
       var ta = h('textarea'); ta.rows = 6; ta.value = it.desc; ta.oninput = function () { it.desc = ta.value; }; c.appendChild(fld('Description (one point per line)', ta));
@@ -247,7 +272,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
         var imgs = []; for (var k = 0; k < it.photos.length; k++) imgs.push(await up(S.photos[it.photos[k] - 1], it.name));
         var cid = await catId(it.cat), pack = it.pack.trim(), id = slug(it.name + (pack ? ' ' + pack : '')) || 'item', base = id, n = 2;
         while (S.ids[id]) id = base + '-' + n++;
-        var row = { id: id, category_id: cid, name: it.name.trim(), price: it.price, cost: it.cost, stock: it.stock, low_at: 5, featured: !!it.feat, active: true, images: imgs };
+        var row = { id: id, category_id: cid, name: it.name.trim(), price: it.price, cost: it.cost, stock: it.stock, low_at: it.low >= 0 ? it.low : 5, featured: !!it.feat, active: true, images: imgs };
         if (it.desc.trim()) row.description = it.desc.trim(); if (it.old) row.old_price = it.old; if (it.unit) row.unit = it.unit;
         if (pack) { row.variant_label = pack; row.variant_group = slug(it.name); }
         try { await api('/rest/v1/products', 'POST', row, 'return=minimal'); }
