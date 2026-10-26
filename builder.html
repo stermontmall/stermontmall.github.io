@@ -6,21 +6,27 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#5b21b6">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://generativelanguage.googleapis.com https://api.github.com; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://generativelanguage.googleapis.com https://api.github.com; img-src 'self' data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Site Builder</title>
 <link rel="icon" href="/favicon.png">
+<link rel="manifest" href="/builder-manifest.json">
+<link rel="apple-touch-icon" href="/icon-builder-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Site Builder">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 :root{--p:#5b21b6;--pl:#f3eefc;--ink:#1f1b2e;--mu:#6b6785;--ln:#e3ddf3;--ok:#15803d;--no:#b91c1c;--bg:#faf9fd}
 *{box-sizing:border-box}
 body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);padding-bottom:190px}
-header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;background:var(--p);color:#fff}
-header b{flex:1;font-size:1.05rem}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:.4rem;padding:calc(.6rem + env(safe-area-inset-top)) .8rem .6rem;background:var(--p);color:#fff}
+header b{flex:1;font-size:1rem;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--p);background:#fff;color:var(--p);padding:.45rem .8rem;font-weight:600}
 button.pri{background:var(--p);color:#fff}
 button.ok{background:var(--ok);border-color:var(--ok);color:#fff}
 button.sm{padding:.25rem .6rem;font-size:.85rem}
 button:disabled{opacity:.5;cursor:default}
-header button{border-color:#fff;background:transparent;color:#fff;padding:.3rem .7rem;font-size:.9rem}
+header button{border-color:#fff;background:transparent;color:#fff;padding:.3rem .6rem;font-size:.85rem;white-space:nowrap}
 main{max-width:860px;margin:0 auto;padding:.8rem}
 .card{background:#fff;border:1px solid var(--ln);border-radius:14px;padding:.9rem;margin-bottom:.8rem}
 .card h2{margin:0 0 .4rem;font-size:1.05rem}
@@ -62,7 +68,8 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
 </head>
 <body>
 <header>
-  <b>&#128736; Site Builder</b>
+  <b>&#128736; Builder</b>
+  <button id="bInst" type="button" hidden>Install app</button>
   <button id="bSet" type="button">Settings</button>
   <button id="bNew" type="button">New chat</button>
 </header>
@@ -561,7 +568,16 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     });
     $('log').appendChild(wrap);
   }
+
+  var deferred = null;
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; $('bInst').hidden = false; });
+  window.addEventListener('appinstalled', function () { deferred = null; $('bInst').hidden = true; });
+  $('bInst').onclick = function () { if (!deferred) return; deferred.prompt(); deferred.userChoice.then(function () { deferred = null; $('bInst').hidden = true; }, function () {}); };
+  if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
+  var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent || '');
   loadCfg(); fillForm(); welcome();
+  if (isIOS && !standalone) addMsg('sys', 'To install this as an app on iPhone: tap the Share button, then Add to Home Screen.');
   if (!ready()) $('set').hidden = false;
 })();
 </script>
