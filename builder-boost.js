@@ -110,3 +110,5 @@
   }
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', hint); else hint();
 })();
+/* automatic publishing (optional: the builder works without it) */
+try { var as = document.createElement('script'); as.src = '/builder-auto.js?v=1'; as.async = true; (document.head || document.documentElement).appendChild(as); } catch (e) {}
