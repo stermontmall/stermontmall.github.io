@@ -74,6 +74,7 @@
     '#stm-pd h2{font-size:1.25rem;line-height:1.3;margin:.9rem 0 .35rem}#stm-pd .pr{font-size:1.7rem;font-weight:800;color:#5b21b6;margin:.1rem 0 .4rem}' +
     '#stm-pd .st{display:inline-block;font-size:.8rem;font-weight:700;border-radius:999px;padding:.25rem .7rem;background:#dcfce7;color:#166534}#stm-pd .st.low{background:#fef3c7;color:#92400e}#stm-pd .st.out{background:#fee2e2;color:#991b1b}' +
     '#stm-pd .wa{display:inline-block;margin:.7rem 0 0;color:#166534;font-weight:700;font-size:.92rem;text-decoration:none}' +
+    '#stm-pd .wat{display:block;box-sizing:border-box;max-width:calc(100% - 1.8rem);margin:.7rem auto 0;text-align:center;background:#16a34a;color:#fff;font-weight:800;font-size:1rem;text-decoration:none;padding:.8rem 1rem;border-radius:12px;box-shadow:0 2px 8px rgba(22,163,74,.3)}#stm-pd .wat:focus-visible{outline:3px solid #7c3aed;outline-offset:2px}@media(min-width:760px){#stm-pd .wat{max-width:min(940px,calc(100% - 3rem))}}' +
     '#stm-pd .dh{font-size:1.05rem;margin:1.1rem 0 .4rem;padding-top:.9rem;border-top:1px solid #ece8f6}' +
     '#stm-pd .desc{position:relative;overflow:hidden;font-size:.95rem;line-height:1.55}#stm-pd .desc.clip{max-height:230px}' +
     '#stm-pd .desc.clip::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(rgba(255,255,255,0),#fff)}' +
@@ -90,7 +91,7 @@
     if (pd) return;
     var st = mk('style'); st.textContent = CSS; D.head.appendChild(st);
     pd = mk('div'); pd.id = 'stm-pd'; pd.setAttribute('role', 'dialog'); pd.setAttribute('aria-modal', 'true');
-    pd.innerHTML = '<div class="pd"><div class="bar"><button type="button" class="back">← Back</button><b></b></div><div class="body"><div class="gal"><div class="main"></div><div class="thumbs"></div></div>' +
+    pd.innerHTML = '<div class="pd"><div class="bar"><button type="button" class="back">← Back</button><b></b></div><a class="wat" target="_blank" rel="noopener">\uD83D\uDCAC Ask about this item on WhatsApp</a><div class="body"><div class="gal"><div class="main"></div><div class="thumbs"></div></div>' +
       '<div class="info"><h2></h2><div class="pr"></div><div class="vopts" hidden></div><div class="unit-l" hidden style="color:#6b6b6b;font-size:.9rem;margin:-.2rem 0 .5rem"></div><div class="pdw" hidden></div><span class="st"></span><div><a class="wa" target="_blank" rel="noopener">Ask about this item on WhatsApp</a></div></div>' +
       '<div class="full"><h3 class="dh">Product details</h3><div class="desc"></div><button type="button" class="more" hidden>Show more ▾</button></div></div>' +
       '<div class="act"><div class="q"><button type="button" class="mn" aria-label="Less">−</button><span>1</span><button type="button" class="pl" aria-label="More">+</button></div><button type="button" class="add">Add to cart</button><button type="button" class="cart">🛒 Cart</button></div></div>';
@@ -146,7 +147,10 @@
     if (dd) { pw.appendChild(mk('s', '', money(dd.was))); pw.appendChild(badge(dd)); pw.appendChild(mk('span', 'sv', 'You save ' + money(dd.save))); }
     var s = q('.st'), sold = p.stock <= 0; s.className = 'st' + (sold ? ' out' : p.stock <= 5 ? ' low' : '');
     s.textContent = sold ? 'Sold out' : p.stock <= 5 ? 'Only ' + p.stock + ' left' : 'In stock';
-    q('.wa').href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Hello Stermont Arcade, I have a question about: ' + p.name);
+    var avail = sold ? 'Currently sold out' : p.stock <= 5 ? 'Only ' + p.stock + ' left' : 'In stock';
+    var sum = ['Hello Stermont Arcade, I would like to enquire about this item:', '', 'Product: ' + p.name, 'Price: ' + money(p.price) + (p.unit && !p.variant_label ? ' / ' + p.unit : ''),
+      'Availability: ' + avail].concat(p.categories && p.categories.name ? ['Category: ' + p.categories.name] : [], ['Ref: ' + p.id, 'Link: ' + location.origin + '/#p-' + p.id, '', 'Please confirm availability and the delivery fee to my location.']).join('\n');
+    var wl = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(sum); q('.wa').href = wl; q('.wat').href = wl;
     var th = q('.thumbs'); th.textContent = ''; th.hidden = imgs.length < 2;
     imgs.forEach(function (u, k) { var t = new Image(); t.src = u; t.alt = ''; t.onclick = function () { show(k); }; th.appendChild(t); });
     var d = q('.desc'), full = q('.full'); d.textContent = ''; full.hidden = !p.description;
