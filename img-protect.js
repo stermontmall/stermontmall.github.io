@@ -44,3 +44,8 @@
 (function () {
   try { if (!document.getElementById('cats')) return; var n = document.createElement('script'); n.src = '/nav-modern.js?v=1'; n.defer = true; document.head.appendChild(n); } catch (e) {}
 })();
+
+/* "Someone just bought" popup showing real recent orders (see /purchase-popup.js). Loading it twice is harmless. */
+(function () {
+  try { if (/admin|upload-photos/.test(location.pathname)) return; var b = document.createElement('script'); b.src = '/purchase-popup.js?v=1'; b.defer = true; document.head.appendChild(b); } catch (e) {}
+})();
