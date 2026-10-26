@@ -4,7 +4,7 @@ import { readdirSync, existsSync, appendFileSync } from 'node:fs';
 
 const dir = d => (existsSync(d) ? readdirSync(d).filter(f => f.endsWith('.html')).map(f => `${d}/${f}`) : []);
 const files = [
-  ...readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|account|track|404|upload-photos|google)/.test(f)),
+  ...readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|account|track|404|upload-photos|google|builder)/.test(f)),
   ...dir('c'), ...dir('blog'),
 ];
 

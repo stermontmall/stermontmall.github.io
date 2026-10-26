@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 Disallow: /account.html
+Disallow: /builder.html
 Sitemap: https://stermontarcade.co.ke/sitemap.xml
 Sitemap: https://stermontarcade.co.ke/sitemap-products.xml
 Sitemap: https://stermontarcade.co.ke/sitemap-images.xml

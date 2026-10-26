@@ -15,7 +15,7 @@ const args = new Set(process.argv.slice(2));
 const CHECK = args.has('--check');
 
 // Generated pages (p/, c/, blog/, products.html) are owned by their own build scripts and already complete.
-const PAGES = readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|upload-photos|google|index\.html|products\.html)/.test(f));
+const PAGES = readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|upload-photos|google|builder|index\.html|products\.html)/.test(f));
 const TITLES = { 'about.html': 'About', 'contact.html': 'Contact', 'faq.html': 'FAQ', 'privacy.html': 'Privacy', 'returns.html': 'Returns', 'shipping.html': 'Shipping', 'terms.html': 'Terms' };
 
 const esc = s => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
@@ -96,7 +96,7 @@ for (const file of PAGES) {
 // ---- Tracking: every public page loads /analytics.js (GA4 + Core Web Vitals). Generators add it too; this heals any gap. ----
 const TRACK = '<script src="/analytics.js" defer></script>';
 const dirHtml = d => (existsSync(d) ? readdirSync(d).filter(f => f.endsWith('.html')).map(f => `${d}/${f}`) : []);
-const ALL = [...readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|upload-photos|google)/.test(f)), ...dirHtml('p'), ...dirHtml('c'), ...dirHtml('blog')];
+const ALL = [...readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|upload-photos|google|builder)/.test(f)), ...dirHtml('p'), ...dirHtml('c'), ...dirHtml('blog')];
 let tracked = 0;
 for (const f of ALL) {
   const h = readFileSync(f, 'utf8');
