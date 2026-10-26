@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#5b21b6">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://generativelanguage.googleapis.com https://api.github.com https://oewvtbnmyombbtggamor.supabase.co; img-src 'self' data: https:; font-src 'self' data:; frame-src about: blob:; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src https://generativelanguage.googleapis.com https://api.github.com https://oewvtbnmyombbtggamor.supabase.co; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src about: blob:; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
 <title>Stermont AI Builder</title>
 <link rel="icon" href="/favicon.png">
 <link rel="manifest" href="/builder-manifest.json">
@@ -297,12 +297,25 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     if (hid) { var n = document.createElement('div'); n.className = 'n'; n.textContent = '... ' + hid + ' more lines not shown'; body.appendChild(n); }
     d.after.forEach(function (l) { line('c', '  ', l); });
   }
+  /* Runs first inside the preview frame. The frame is sandboxed (no access to your keys), so browser storage
+     is replaced by an in-memory copy, links are switched off, and any script problem is shown instead of a blank page. */
+  var PV = '<scr' + 'ipt>(function(){var O=__ORIGIN__;' +
+    'function mem(){var d={};return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v)},removeItem:function(k){delete d[k]},clear:function(){d={}},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}' +
+    '["localStorage","sessionStorage"].forEach(function(n){try{void window[n]}catch(e){try{Object.defineProperty(window,n,{value:mem(),configurable:true})}catch(e2){}}});' +
+    'try{void document.cookie}catch(e){try{Object.defineProperty(document,"cookie",{get:function(){return""},set:function(){},configurable:true})}catch(e2){}}' +
+    'try{void navigator.serviceWorker}catch(e){try{Object.defineProperty(navigator,"serviceWorker",{value:{register:function(){return Promise.resolve({})},getRegistrations:function(){return Promise.resolve([])},ready:new Promise(function(){})},configurable:true})}catch(e2){}}' +
+    'function bar(t,c){var b=document.getElementById("__pv");if(!b){b=document.createElement("div");b.id="__pv";b.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:2147483647;padding:6px 10px;font:12px/1.4 system-ui,sans-serif;border-top:1px solid #ccc";(document.body||document.documentElement).appendChild(b)}b.style.background=c||"#fef2f2";b.style.color=c?"#5b21b6":"#b91c1c";b.textContent=t;if(c)setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b)},2500)}' +
+    'window.addEventListener("error",function(e){var t=e.target;if(t&&t!==window&&t.tagName){if((t.tagName==="SCRIPT"||t.tagName==="LINK")&&String(t.src||t.href).indexOf(O)===0)bar("Preview problem: could not load "+(t.src||t.href));return}bar("Preview problem: "+(e.message||"script error")+(e.lineno?" (line "+e.lineno+")":""))},true);' +
+    'window.addEventListener("unhandledrejection",function(e){bar("Preview problem: "+String(e.reason&&e.reason.message||e.reason))});' +
+    'document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&e.target.closest("a[href]");if(!a)return;var h=a.getAttribute("href")||"";if(h.charAt(0)==="#"||/^javascript:/i.test(h))return;e.preventDefault();bar("Links are switched off in preview","#f3eefc")},true);' +
+    '})();</scr' + 'ipt>';
   function preview(path) {
     var st = S.staged[path]; if (!st || st.deleted) return;
-    var body = openDlg('Preview: ' + path + ' (shop data may not load here)');
-    var f = document.createElement('iframe'), base = '<base href="' + location.origin + '/">', h = st.text;
+    var body = openDlg('Preview: ' + path);
+    var f = document.createElement('iframe'), base = '<base href="' + location.origin + '/">' + PV.replace('__ORIGIN__', function () { return JSON.stringify(location.origin); }), h = st.text;
     f.setAttribute('sandbox', 'allow-scripts'); f.style.cssText = 'width:100%;height:78vh;border:0;background:#fff';
-    f.srcdoc = /<head[^>]*>/i.test(h) ? h.replace(/<head[^>]*>/i, function (m) { return m + base; }) : base + h;
+    f.srcdoc = /<head[^>]*>/i.test(h) ? h.replace(/<head[^>]*>/i, function (m) { return m + base; })
+      : /<html[^>]*>/i.test(h) ? h.replace(/<html[^>]*>/i, function (m) { return m + base; }) : base + h;
     body.appendChild(f);
   }
   function renderStaged() {
