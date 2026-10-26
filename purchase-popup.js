@@ -28,14 +28,15 @@
   function norm(s) { return String(s || '').toLowerCase().replace(/[\u2013\u2014]/g, '-').replace(/\s+/g, ' ').trim(); }
 
   var css = D.createElement('style');
-  css.textContent = '#stm-buy{box-sizing:border-box;position:fixed;left:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9998;display:flex;align-items:center;gap:.7rem;max-width:min(330px,calc(100vw - 96px));padding:.6rem .8rem .6rem .6rem;border-radius:16px;background:#fff;color:#1b1230;border:1px solid #e6def8;box-shadow:0 10px 30px rgba(42,14,92,.22);font:500 13px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;transform:translateY(24px);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s}' +
+  css.textContent = '#stm-buy{box-sizing:border-box;position:fixed;left:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9998;display:flex;align-items:center;gap:.7rem;max-width:min(340px,calc(100vw - 96px));padding:.65rem .8rem .65rem .65rem;border-radius:16px;background:#fff;color:#1b1230;border:1px solid #e6def8;box-shadow:0 10px 30px rgba(42,14,92,.22);font:500 13px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;transform:translateY(24px);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s}' +
     '#stm-buy.on{transform:none;opacity:1;pointer-events:auto}#stm-buy.lnk{cursor:pointer}#stm-buy.lnk:hover{border-color:#7c3aed}#stm-buy:focus-visible{outline:3px solid #7c3aed;outline-offset:2px}' +
     '#stm-buy .bi{flex:none;width:46px;height:46px;border-radius:12px;background:#f1ecfc;display:grid;place-items:center;font-size:22px;overflow:hidden;position:relative}' +
     '#stm-buy .bi img{width:100%;height:100%;object-fit:cover;display:block}' +
     '#stm-buy .bi i{position:absolute;right:-2px;bottom:-2px;width:18px;height:18px;border-radius:50%;background:#16a34a;color:#fff;font:700 11px/18px system-ui;text-align:center;border:2px solid #fff;box-sizing:content-box;font-style:normal}' +
-    '#stm-buy .bt{min-width:0}#stm-buy .bt b{display:block;font-weight:700;color:#5b21b6;font-size:11.5px;letter-spacing:.01em;text-transform:uppercase}' +
-    '#stm-buy .bt span{display:block;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-weight:600}' +
-    '#stm-buy .bt small{display:block;color:#6b6585;font-size:11.5px;margin-top:1px}' +
+    /* Buyer name: the first and boldest line */
+    '#stm-buy .bt{min-width:0}#stm-buy .bt b{display:block;font-weight:800;color:#5b21b6;font-size:15px;line-height:1.25;text-transform:none;letter-spacing:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+    '#stm-buy .bt span{display:-webkit-box;overflow:hidden;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-weight:600;color:#1b1230;margin-top:1px}' +
+    '#stm-buy .bt small{display:block;color:#6b6585;font-size:11.5px;margin-top:2px}' +
     '#stm-buy .bt em{display:none;font-style:normal;font-weight:800;font-size:12px;color:#7c3aed;margin-top:2px}#stm-buy.lnk .bt em{display:block}' +
     '#stm-buy button{flex:none;border:0;background:none;color:#8b86a0;font-size:18px;line-height:1;padding:4px;cursor:pointer;align-self:flex-start;border-radius:8px}#stm-buy button:focus-visible{outline:3px solid #7c3aed}' +
     '@media(prefers-reduced-motion:reduce){#stm-buy{transition:opacity .2s;transform:none}}' +
@@ -43,7 +44,7 @@
   D.head.appendChild(css);
 
   var box = mk('div'); box.id = 'stm-buy'; box.setAttribute('role', 'status'); box.setAttribute('aria-live', 'polite');
-  var ic = mk('div', 'bi'), tx = mk('div', 'bt'), head = mk('b', '', 'Just bought'), nm = mk('span'), tm = mk('small'), cta = mk('em', '', 'View & buy \u2192'), x = mk('button', '', '\u00D7');
+  var ic = mk('div', 'bi'), tx = mk('div', 'bt'), head = mk('b'), nm = mk('span'), tm = mk('small'), cta = mk('em', '', 'View & buy \u2192'), x = mk('button', '', '\u00D7');
   x.type = 'button'; x.setAttribute('aria-label', 'Close purchase notifications');
   tx.appendChild(head); tx.appendChild(nm); tx.appendChild(tm); tx.appendChild(cta);
   box.appendChild(ic); box.appendChild(tx); box.appendChild(x);
@@ -68,11 +69,12 @@
     var src = curProd && curProd.img;
     if (src) { var im = new Image(); im.src = src; im.alt = ''; im.width = im.height = 46; ic.appendChild(im); } else { ic.appendChild(D.createTextNode('\uD83D\uDECD\uFE0F')); }
     ic.appendChild(mk('i', '', '\u2713'));
-    nm.textContent = p.item;
-    var who = p.buyer || 'A customer';
-    tm.textContent = who + (p.area ? ' from ' + p.area : '') + ' \u00B7 ' + ago(p.created_at);
+    var who = (p.buyer && String(p.buyer).trim()) || 'A customer';
+    head.textContent = who + (p.area ? ' from ' + p.area : '');
+    nm.textContent = 'just bought ' + p.item;
+    tm.textContent = ago(p.created_at);
     box.classList.toggle('lnk', !!curProd);
-    if (curProd) { box.setAttribute('role', 'link'); box.tabIndex = 0; box.setAttribute('aria-label', 'View ' + p.item + ' and order it'); }
+    if (curProd) { box.setAttribute('role', 'link'); box.tabIndex = 0; box.setAttribute('aria-label', who + ' bought ' + p.item + '. View and order it.'); }
     else { box.setAttribute('role', 'status'); box.removeAttribute('tabindex'); box.removeAttribute('aria-label'); }
   }
 
@@ -106,7 +108,7 @@
   }
 
   function hdr() { return { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' }; }
-  fetch(SB + '/rest/v1/rpc/recent_purchases', { method: 'POST', headers: hdr(), body: '{}' })
+  fetch(SB + '/rest/v1/rpc/recent_purchases', { method: 'POST', headers: hdr(), body: '{}', cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : []; })
     .then(function (rows) {
       list = (rows || []).filter(function (p) { return p && p.item && p.created_at; });
