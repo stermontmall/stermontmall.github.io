@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#5b21b6">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://generativelanguage.googleapis.com https://api.github.com; img-src 'self' data: https:; font-src 'self' data:; frame-src about: blob:; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://generativelanguage.googleapis.com https://api.github.com https://oewvtbnmyombbtggamor.supabase.co; img-src 'self' data: https:; font-src 'self' data:; frame-src about: blob:; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
 <title>Stermont AI Builder</title>
 <link rel="icon" href="/favicon.png">
 <link rel="manifest" href="/builder-manifest.json">
@@ -46,6 +46,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
 .m.err{align-self:center;background:#fef2f2;color:var(--no);font-size:.9rem;border:1px solid #fecaca}
 .m pre{background:#1f1b2e;color:#e9e4f7;padding:.6rem;border-radius:8px;overflow-x:auto;font-size:.82rem;margin:.4rem 0}
 .m code{background:var(--pl);padding:.05rem .3rem;border-radius:5px;font-size:.9em}
+.m a{color:var(--p)}
 .chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:.5rem 0}
 .chip{border:1px solid #d9c9fb;border-radius:999px;padding:.3rem .75rem;font-size:.88rem}
 #stg ul{list-style:none;margin:.3rem 0 .6rem;padding:0}
@@ -82,13 +83,13 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     <div class="row"><input id="model" type="text" list="models" autocomplete="off" placeholder="gemini-flash-latest"><button id="bFind" type="button" class="sm">Find models</button></div>
     <datalist id="models"></datalist>
     <p class="hint">Fastest: a "flash-lite" model, for example <b>gemini-3.5-flash-lite</b>. Tap "Find models" to see what your key can use.</p>
-    <label for="ghtoken">2. GitHub token</label>
+    <label for="ghtoken">2. GitHub token (needed to edit and publish)</label>
     <input id="ghtoken" type="password" autocomplete="off" placeholder="github_pat_...">
     <p class="hint">Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">fine-grained token</a>: only this repository, permission <b>Contents: Read and write</b>.</p>
     <label for="repo">Repository and branch</label>
     <div class="row"><input id="repo" type="text" autocomplete="off" placeholder="owner/repo"><input id="branch" type="text" autocomplete="off" placeholder="main" style="max-width:120px"></div>
     <label style="font-weight:500"><input id="remember" type="checkbox"> Remember my keys on this device</label>
-    <div class="warn">Keys stay in this browser and are only sent to Google and GitHub. Never paste customer data or passwords into the chat.</div>
+    <div class="warn">Keys stay in this browser and are only sent to Google and GitHub. Shop data is read from Supabase (read-only, public info only). Never paste customer data or passwords into the chat.</div>
     <div class="row"><button id="bSave" type="button" class="pri">Save and test</button><button id="bClear" type="button">Clear saved keys</button></div>
     <div id="setOut" class="hint"></div>
   </section>
@@ -114,11 +115,15 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   var $ = function (id) { return document.getElementById(id); };
   var LS = 'stm_builder_cfg_v1';
   var cfg = { gkey: '', model: 'gemini-flash-latest', gh: '', repo: 'stermontmall/stermontmall.github.io', branch: 'main', remember: false };
-  var S = { tree: null, map: {}, files: {}, staged: {}, hist: [], busy: false, stop: false, abort: null, tc: 0, timedOut: false, dog: 0 };
+  var S = { tree: null, map: {}, files: {}, staged: {}, hist: [], msgs: [], cur: '', busy: false, stop: false, abort: null, tc: 0, timedOut: false, dog: 0 };
   var BLOCK = /^(\.git\/|\.github\/|CNAME$)/;
   var BIN = /\.(png|jpe?g|gif|webp|ico|svgz|woff2?|ttf|eot|pdf|zip|gz|mp4|mp3|webm)$/i;
-  var RO = { list_files: 1, read_file: 1, search_text: 1 };
-  var WAIT = 40000;
+  var RO = { list_files: 1, read_file: 1, search_text: 1, shop_data: 1 };
+  var WAIT = 30000;
+  var SB_URL = 'https://oewvtbnmyombbtggamor.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ld3Z0Ym5teW9tYmJ0Z2dhbW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyNjM1MTIsImV4cCI6MjEwNjgzOTUxMn0.KmUI7jWPgSVY4KvPR5S53dcvtbOD2QutljiBg52cAWw';
+  var FALLBACK = ['gemini-flash-latest', 'gemini-flash-lite-latest'];
+  var CHAT = 'stm_builder_chat_v1';
   /* thinking settings, fastest first. Newer Gemini models use levels, older ones a budget; the next one is tried automatically if rejected. No temperature is sent because new models refuse it. */
   var TC = [{ thinkingConfig: { thinkingLevel: 'minimal' } }, { thinkingConfig: { thinkingLevel: 'low' } }, { thinkingConfig: { thinkingBudget: 0 } }, {}];
 
@@ -135,27 +140,49 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     try { sessionStorage.removeItem(LS); } catch (e) {}
     try { (cfg.remember ? localStorage : sessionStorage).setItem(LS, s); } catch (e) {}
   }
+  function chatStore() { return cfg.remember ? localStorage : sessionStorage; }
+  function saveChat() {
+    try {
+      var h = S.hist.slice(-40);
+      while (h.length && (h[0].role !== 'user' || !h[0].parts || !h[0].parts[0] || h[0].parts[0].text == null)) h.shift();
+      var o = JSON.stringify({ hist: h, msgs: S.msgs.slice(-80) });
+      if (o.length > 900000) o = JSON.stringify({ hist: [], msgs: S.msgs.slice(-30) });
+      chatStore().setItem(CHAT, o);
+    } catch (e) {}
+  }
+  function loadChat() {
+    try {
+      var s = localStorage.getItem(CHAT) || sessionStorage.getItem(CHAT); if (!s) return false;
+      var o = JSON.parse(s); S.hist = o.hist || []; S.msgs = [];
+      (o.msgs || []).forEach(function (m) { addMsg(m.k, m.t); });
+      return S.msgs.length > 0;
+    } catch (e) { return false; }
+  }
+  function clearChat() { try { localStorage.removeItem(CHAT); } catch (e) {} try { sessionStorage.removeItem(CHAT); } catch (e) {} }
   function fillForm() { $('gkey').value = cfg.gkey; $('model').value = cfg.model; $('ghtoken').value = cfg.gh; $('repo').value = cfg.repo; $('branch').value = cfg.branch; $('remember').checked = !!cfg.remember; }
   function readForm() {
     cfg.gkey = $('gkey').value.trim(); cfg.model = ($('model').value.trim() || 'gemini-flash-latest').replace(/^models\//, '');
     cfg.gh = $('ghtoken').value.trim(); cfg.repo = $('repo').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\/+$/, '');
     cfg.branch = $('branch').value.trim() || 'main'; cfg.remember = $('remember').checked; S.tc = 0;
   }
-  function ready() { return cfg.gkey && cfg.gh && /^[^\/\s]+\/[^\/\s]+$/.test(cfg.repo); }
+  function ready() { return !!cfg.gkey; }
+  function ghReady() { return !!(cfg.gh && /^[^\/\s]+\/[^\/\s]+$/.test(cfg.repo)); }
 
   /* helpers */
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function md(s) {
     var b = [];
     s = String(s).replace(/```([\s\S]*?)(```|$)/g, function (_, c) { b.push(c.replace(/^[\w-]*\n/, '')); return '\u0000' + (b.length - 1) + '\u0000'; });
-    s = esc(s).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/^#{1,4} (.+)$/gm, '<b>$1</b>').replace(/^[-*] /gm, '\u2022 ').replace(/\n/g, '<br>');
+    s = esc(s).replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>').replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/^#{1,4} (.+)$/gm, '<b>$1</b>').replace(/^[-*] /gm, '\u2022 ').replace(/\n/g, '<br>');
     return s.replace(/\u0000(\d+)\u0000/g, function (_, i) { return '<pre>' + esc(b[+i]) + '</pre>'; });
   }
   function down() { window.scrollTo(0, document.body.scrollHeight); }
-  function addMsg(kind, text) {
+  function addMsg(kind, text, quiet) {
     var d = document.createElement('div'); d.className = 'm ' + kind;
     if (kind === 'ai') d.innerHTML = md(text); else d.textContent = text;
-    $('log').appendChild(d); down(); return d;
+    $('log').appendChild(d); down();
+    if (kind !== 'tool' && !quiet) { d._rec = { k: kind, t: text }; S.msgs.push(d._rec); }
+    return d;
   }
   function setStatus(t) { $('status').textContent = t || ''; }
   function setBusy(b) { S.busy = b; $('bSend').hidden = b; $('bStop').hidden = !b; $('bPub').disabled = b; if (!b) setStatus(''); }
@@ -167,12 +194,19 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   function writable(p) { if (BLOCK.test(p)) throw new Error('This path is protected: ' + p); }
   function countOf(t, f) { var n = 0, i = 0; while ((i = t.indexOf(f, i)) !== -1) { n++; i += f.length; } return n; }
 
+  /* network helper: every request gets a time limit so nothing hangs forever */
+  function tfetch(url, o, ms) {
+    var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms || 30000); o = o || {}; o.signal = c.signal;
+    return fetch(url, o).then(function (r) { clearTimeout(t); return r; }, function (e) { clearTimeout(t); throw (e && e.name === 'AbortError' ? new Error('The request took too long. Check your internet and try again.') : e); });
+  }
+
   /* GitHub */
   function gh(path, o) {
     o = o || {};
+    if (!ghReady()) return Promise.reject(new Error('Add your GitHub token and repository in Settings to work on the website files.'));
     var h = { Authorization: 'Bearer ' + cfg.gh, 'X-GitHub-Api-Version': '2022-11-28', Accept: o.accept || 'application/vnd.github+json' };
     if (o.body) h['Content-Type'] = 'application/json';
-    return fetch('https://api.github.com' + path, { method: o.method || 'GET', headers: h, body: o.body ? JSON.stringify(o.body) : undefined }).then(function (r) {
+    return tfetch('https://api.github.com' + path, { method: o.method || 'GET', headers: h, body: o.body ? JSON.stringify(o.body) : undefined }, 30000).then(function (r) {
       if (r.ok) return o.raw ? r.text() : r.json();
       return r.text().then(function (t) {
         var m = t; try { m = JSON.parse(t).message || t; } catch (e) {}
@@ -194,7 +228,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     }, function (e) { treeP = null; throw e; });
     return treeP;
   }
-  function prefetch() { if (ready()) loadTree().catch(function () {}); }
+  function prefetch() { if (ghReady()) loadTree().catch(function () {}); }
   function treeInfo() {
     if (!S.tree) return '';
     var roots = [], fo = {};
@@ -270,7 +304,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     var paths = Object.keys(S.staged).sort(), ul = $('stl'); ul.innerHTML = ''; $('stg').hidden = !paths.length;
     function mk(tag, cls, txt, fn) { var e = document.createElement(tag); if (cls) e.className = cls; e.textContent = txt; if (fn) { e.type = 'button'; e.onclick = fn; } return e; }
     paths.forEach(function (p) {
-      var st = S.staged[p], c = counts(st), li = document.createElement('li');
+      var st = S.staged[p], c = st.c || (st.c = counts(st)), li = document.createElement('li');
       li.appendChild(mk('span', 'f', (st.isNew ? 'NEW ' : st.deleted ? 'DELETE ' : '') + p));
       li.appendChild(mk('span', 'add', '+' + c.a)); li.appendChild(mk('span', 'del', '-' + c.r));
       if (!st.deleted && /\.html?$/i.test(p)) li.appendChild(mk('button', 'sm pri', 'Preview', function () { preview(p); }));
@@ -298,12 +332,12 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     read_file: function (a) {
       var path = cleanPath(a.path);
       return getFile(path).then(function (f) {
-        var lines = f.text.split('\n'), s = Math.max(1, parseInt(a.start_line, 10) || 1), e = Math.min(lines.length, parseInt(a.end_line, 10) || (s + 799));
-        if (e - s > 999) e = s + 999;
+        var lines = f.text.split('\n'), s = Math.max(1, parseInt(a.start_line, 10) || 1), e = Math.min(lines.length, parseInt(a.end_line, 10) || (s + 399));
+        if (e - s > 599) e = s + 599;
         var out = [], chars = 0;
         for (var i = s; i <= e; i++) {
           var l = lines[i - 1]; if (l.length > 1500) l = l.slice(0, 1500) + ' ...[cut, ' + lines[i - 1].length + ' chars]';
-          chars += l.length; if (chars > 60000) { e = i - 1; break; } out.push(i + ': ' + l);
+          chars += l.length; if (chars > 40000) { e = i - 1; break; } out.push(i + ': ' + l);
         }
         return { path: path, total_lines: lines.length, start_line: s, end_line: e, content: out.join('\n'), more_below: e < lines.length };
       });
@@ -329,6 +363,27 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
         }
         var ws = []; for (var k = 0; k < 8; k++) ws.push(worker());
         return Promise.all(ws).then(function () { return { matches: res, files_searched: paths.length, skipped: skipped }; });
+      });
+    },
+    shop_data: function (a) {
+      var t = String(a.table || 'products');
+      if (t !== 'products' && t !== 'categories') return Promise.reject(new Error('table must be "products" or "categories"'));
+      var cols = t === 'products' ? 'id,name,slug,price,old_price,unit,stock,featured,active,category_id,images,description' : 'id,name,slug';
+      var lim = Math.max(1, Math.min(parseInt(a.limit, 10) || 20, 60));
+      var url = SB_URL + '/rest/v1/' + t + '?select=' + cols + '&limit=' + lim;
+      if (t === 'products') {
+        url += '&active=eq.true';
+        if (a.featured) url += '&featured=eq.true';
+        if (a.category_id) url += '&category_id=eq.' + (parseInt(a.category_id, 10) || 0);
+      }
+      if (a.search) url += '&name=ilike.' + encodeURIComponent('*' + String(a.search).replace(/[*%,()]/g, ' ').trim() + '*');
+      url += t === 'products' ? '&order=created_at.desc' : '&order=name.asc';
+      return tfetch(url, { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } }, 20000).then(function (r) {
+        if (!r.ok) return r.text().then(function (x) { throw new Error('Supabase ' + r.status + ': ' + x.slice(0, 200)); });
+        return r.json();
+      }).then(function (rows) {
+        rows.forEach(function (p) { if (p.description) p.description = String(p.description).slice(0, 200); if (p.images) p.images = p.images.slice(0, 1); });
+        return { table: t, count: rows.length, rows: rows };
       });
     },
     edit_file: function (a) {
@@ -372,16 +427,18 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   var T = { type: 'string' };
   var DECLS = [
     { name: 'list_files', description: 'List files in a repository folder. Prefix like "c/" lists that folder. The root is already known.', parameters: P({ prefix: T }) },
-    { name: 'read_file', description: 'Read a text file with line numbers (up to 800 lines per call; use start_line/end_line to page). Request several files in one go when you need them.', parameters: P({ path: T, start_line: { type: 'integer' }, end_line: { type: 'integer' } }, ['path']) },
+    { name: 'read_file', description: 'Read a text file with line numbers (up to 400 lines per call; use start_line/end_line to page). Request several files in one go when you need them.', parameters: P({ path: T, start_line: { type: 'integer' }, end_line: { type: 'integer' } }, ['path']) },
     { name: 'search_text', description: 'Find text. Give path for one file or prefix for a folder; with neither it searches root-level files.', parameters: P({ query: T, path: T, prefix: T, regex: { type: 'boolean' } }, ['query']) },
+    { name: 'shop_data', description: 'Read live store data from Supabase (read-only, public info only): products (name, price in KSh, stock, image, category) or categories. Use it to see the real products before designing banners, pages or copy.', parameters: P({ table: T, search: T, category_id: { type: 'integer' }, featured: { type: 'boolean' }, limit: { type: 'integer' } }) },
     { name: 'edit_file', description: 'Replace exact text in a file (staged until the owner publishes). "find" must match exactly and be unique unless replace_all is true.', parameters: P({ path: T, find: T, replace: T, replace_all: { type: 'boolean' } }, ['path', 'find', 'replace']) },
     { name: 'write_file', description: 'Create a new text file, or fully replace a small one (staged until published). Use edit_file for existing files.', parameters: P({ path: T, content: T }, ['path', 'content']) },
     { name: 'delete_file', description: 'Stage a file for deletion.', parameters: P({ path: T }, ['path']) }
   ];
-  var SYSTEM = 'You are Site Builder, a fast, creative, all-round web developer and designer working with the owner of Stermont Arcade (stermontarcade.co.ke), a Kenyan online store: prices in KSh, customers pay by M-Pesa and ask questions on WhatsApp. The site is a static GitHub Pages site of plain HTML, CSS and JavaScript files. Product data and orders live in Supabase, not in the repository. The owner is not a programmer: talk like a friendly colleague, in short simple English.\n' +
-    'How to work:\n1. Be fast and proactive. Do the whole job in one go instead of asking questions. When you need several files or searches, request them all in the same step so they run together. Ask one short question only if a wrong guess would be costly.\n2. Be creative: when asked for something new (banner, landing page, section, promo, layout), design it boldly and professionally, mobile first, matching the store look, with clear calls to action (WhatsApp, M-Pesa). You can also fix bugs, improve speed, SEO, accessibility and copywriting.\n3. Read the relevant part of a file before editing. Make small exact changes with edit_file, copying "find" text exactly. Use write_file for new files or very small ones.\n4. Edits are only staged. The owner can press Preview on any staged page, then Publish. Nothing goes live before that.\n5. Do not hand-edit files in p/, sitemap*.xml, merchant-feed.xml, sitemap-state.json or llms.txt: workflows generate them. Edit the generator script instead and say so.\n6. If an HTML page loads a JS or CSS file with ?v=N, raise N when you change that file.\n7. Never add secret keys. Keep existing SEO tags valid. Never remove working features.\n8. The default admin profit percentage is the PROFIT_PCT constant in catalog-v10.js.\n9. Keep replies short. Finish with a 2 or 3 sentence summary, tell the owner to tap Preview and Publish, and suggest one next idea.';
-  var NAMES = { list_files: 'Looking at files', read_file: 'Reading', search_text: 'Searching', edit_file: 'Editing', write_file: 'Writing', delete_file: 'Marking for deletion' };
-  function describe(n, a) { a = a || {}; return (NAMES[n] || n) + ' ' + (a.path || a.prefix || (a.query ? '"' + String(a.query).slice(0, 50) + '"' : '')); }
+  var SYSTEM = 'You are Site Builder, a friendly, fast, all-round AI assistant for the owner of Stermont Arcade (stermontarcade.co.ke), a Kenyan online store: prices in KSh, customers pay by M-Pesa and ask questions on WhatsApp. The site is a static GitHub Pages site of plain HTML, CSS and JavaScript files. Product data and orders live in Supabase, not in the repository. The owner is not a programmer: talk like a friendly colleague, in short simple English (reply in the language the owner uses).\n' +
+    'You do two jobs.\nJOB A, ANSWER ANYTHING: you can answer any question or chat about any topic: business and marketing advice, product descriptions, WhatsApp and customer replies, pricing ideas, Kenyan shipping, tax and M-Pesa questions, coding help, maths, writing, general knowledge. For a question or chat, just answer directly in plain text and do NOT use tools. Never say a question is outside your job.\nJOB B, BUILD AND FIX THE WEBSITE:\n' +
+    '1. Be fast and proactive. Do the whole job in one go instead of asking questions. When you need several files or searches, request them all in the same step so they run together. Ask one short question only if a wrong guess would be costly.\n2. Be creative: when asked for something new (banner, landing page, section, promo, layout), design it boldly and professionally, mobile first, matching the store look, with clear calls to action (WhatsApp, M-Pesa). You can also fix bugs, improve speed, SEO, accessibility and copywriting. Use shop_data to see the real products, prices and categories before writing product-related content.\n3. Read the relevant part of a file before editing. Make small exact changes with edit_file, copying "find" text exactly. Use write_file for new files or very small ones.\n4. Edits are only staged. The owner can press Preview on any staged page, then Publish. Nothing goes live before that.\n5. Do not hand-edit files in p/, sitemap*.xml, merchant-feed.xml, sitemap-state.json or llms.txt: workflows generate them. Edit the generator script instead and say so.\n6. If an HTML page loads a JS or CSS file with ?v=N, raise N when you change that file.\n7. Never add secret keys. Keep existing SEO tags valid. Never remove working features. Never show or guess product cost or profit figures publicly.\n8. The default admin profit percentage is the PROFIT_PCT constant in catalog-v10.js.\n9. If a tool fails, say what failed in one plain sentence and try another way. Never go silent.\n10. Keep replies short. After building, finish with a 2 or 3 sentence summary, tell the owner to tap Preview and Publish, and suggest one next idea.';
+  var NAMES = { list_files: 'Looking at files', read_file: 'Reading', search_text: 'Searching', shop_data: 'Checking the shop', edit_file: 'Editing', write_file: 'Writing', delete_file: 'Marking for deletion' };
+  function describe(n, a) { a = a || {}; return (NAMES[n] || n) + ' ' + (a.path || a.prefix || a.search || a.table || (a.query ? '"' + String(a.query).slice(0, 50) + '"' : '')); }
 
   /* Gemini (streaming) */
   function friendly(st, msg) {
@@ -391,27 +448,40 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     if (st === 404) return 'Model "' + cfg.model + '" was not found. Open Settings, tap "Find models" and pick one.';
     return 'Gemini error ' + st + ': ' + String(msg).slice(0, 300);
   }
+  function curModel() { return S.cur || cfg.model; }
+  function nextModel() {
+    var list = [cfg.model].concat(FALLBACK).filter(function (m, i, arr) { return m && arr.indexOf(m) === i; });
+    var i = list.indexOf(curModel()); S.cur = list[(i + 1) % list.length]; return S.cur;
+  }
   function gem(onParts) {
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(cfg.model) + ':streamGenerateContent?alt=sse';
-    var sys = SYSTEM + treeInfo(), t0 = Date.now(), tick = 0;
-    function stopWait() { clearTimeout(S.dog); clearInterval(tick); }
-    function arm() { clearTimeout(S.dog); S.dog = setTimeout(function () { S.timedOut = true; if (S.abort) S.abort.abort(); }, WAIT); }
+    var sys = SYSTEM + treeInfo(), t0 = Date.now(), tick = 0, ctl = null, dog = 0;
+    function onStop() { if (ctl) ctl.abort(); }
+    function stopWait() { clearTimeout(dog); clearInterval(tick); if (S.abort) S.abort.signal.removeEventListener('abort', onStop); }
+    function arm() { clearTimeout(dog); dog = setTimeout(function () { S.timedOut = true; if (ctl) ctl.abort(); }, WAIT); }
+    if (S.abort) S.abort.signal.addEventListener('abort', onStop);
     tick = setInterval(function () { setStatus('Waiting for Gemini... ' + Math.round((Date.now() - t0) / 1000) + 's'); }, 1000);
     function go(tries) {
+      var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(curModel()) + ':streamGenerateContent?alt=sse';
       var body = JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: S.hist, tools: [{ functionDeclarations: DECLS }], generationConfig: TC[S.tc] });
-      arm();
-      return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': cfg.gkey }, body: body, signal: S.abort.signal }).then(function (r) {
+      ctl = new AbortController(); S.timedOut = false; arm();
+      return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': cfg.gkey }, body: body, signal: ctl.signal }).then(function (r) {
         if (r.ok) return r;
-        clearTimeout(S.dog);
+        clearTimeout(dog);
         return r.text().then(function (t) {
           var m = t; try { m = JSON.parse(t).error.message || t; } catch (e) {}
           if (r.status === 400 && /think|budget|level/i.test(m) && S.tc < TC.length - 1) { S.tc++; return go(tries); }
-          if ((r.status === 429 || r.status >= 500) && tries > 0 && !S.stop) {
-            setStatus('Gemini is busy (' + r.status + '), trying again...');
-            return new Promise(function (ok) { setTimeout(ok, r.status === 429 ? 6000 : 2000); }).then(function () { return go(tries - 1); });
+          if ((r.status === 404 || r.status === 429 || r.status >= 500) && tries > 0 && !S.stop) {
+            var wait = r.status === 429 ? 3000 : r.status === 404 ? 0 : 1500;
+            nextModel(); setStatus('Gemini is busy (' + r.status + '), trying ' + curModel() + '...');
+            return new Promise(function (ok) { setTimeout(ok, wait); }).then(function () { return go(tries - 1); });
           }
           throw new Error(friendly(r.status, m));
         });
+      }, function (e) {
+        if (S.stop) throw e;
+        if (e && e.name === 'AbortError' && S.timedOut && tries > 0) { nextModel(); setStatus('No reply yet, trying ' + curModel() + '...'); return go(tries - 1); }
+        if (e instanceof TypeError && tries > 0) { setStatus('Connection hiccup, trying again...'); return new Promise(function (ok) { setTimeout(ok, 1200); }).then(function () { return go(tries - 1); }); }
+        throw e;
       });
     }
     return go(3).then(function (r) {
@@ -440,13 +510,18 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
           return pump();
         });
       }
-      return pump().then(function () { stopWait(); return { parts: parts.filter(function (p) { return p.functionCall || p.text || p.thoughtSignature; }), reason: reason }; });
+      function fin() { stopWait(); return { parts: parts.filter(function (p) { return p.functionCall || p.text || p.thoughtSignature; }), reason: reason }; }
+      return pump().then(fin, function (e) {
+        /* a stream that stalls after it already produced something: keep what we have instead of failing */
+        if (e && e.name === 'AbortError' && S.timedOut && !S.stop && parts.length) return fin();
+        throw e;
+      });
     }).catch(function (e) { stopWait(); throw e; });
   }
   function trimHist() {
     var size = function () { return JSON.stringify(S.hist).length; };
-    if (size() < 200000) return;
-    for (var i = 0; i < S.hist.length - 6 && size() >= 120000; i++) {
+    if (size() < 120000) return;
+    for (var i = 0; i < S.hist.length - 6 && size() >= 80000; i++) {
       var h = S.hist[i];
       if (h.role === 'user' && h.parts) h.parts.forEach(function (p) { if (p.functionResponse) p.functionResponse.response = { result: '[older tool output removed to save space]' }; });
     }
@@ -473,11 +548,27 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
       if (S.stop) return Promise.resolve();
       if (++steps > 40) { addMsg('sys', 'I paused after 40 steps. Type "continue" and I will carry on.'); return Promise.resolve(); }
       trimHist();
-      var bub = null;
-      return gem(function (parts) {
+      var bub = null, raf = 0, lastT = '';
+      function paint() { raf = 0; if (bub) { bub.innerHTML = md(lastT); down(); } }
+      function onParts(parts) {
         var t = parts.filter(function (p) { return p.text; }).map(function (p) { return p.text; }).join('');
-        if (t) { if (!bub) bub = addMsg('ai', ''); bub.innerHTML = md(t); down(); }
-      }).then(function (r) {
+        if (!t) return;
+        if (!bub) bub = addMsg('ai', '');
+        lastT = t; if (bub._rec) bub._rec.t = t;
+        if (!raf) raf = requestAnimationFrame(paint);
+      }
+      function ask(n) {
+        return gem(onParts).then(function (r) {
+          if (!r.parts.length && n < 2 && !S.stop) { nextModel(); setStatus('Empty reply, trying again...'); return ask(n + 1); }
+          return r;
+        }, function (e) {
+          if (e && e.name === 'AbortError' && S.timedOut && !S.stop && n < 2) { nextModel(); S.abort = new AbortController(); S.timedOut = false; setStatus('No reply, trying ' + curModel() + '...'); return ask(n + 1); }
+          throw e;
+        });
+      }
+      return ask(0).then(function (r) {
+        if (raf) cancelAnimationFrame(raf);
+        if (bub) bub.innerHTML = md(lastT);
         if (!r.parts.length) throw new Error('The AI gave no answer (' + (r.reason || 'empty reply') + '). Try again or rephrase.');
         S.hist.push({ role: 'model', parts: r.parts });
         var calls = r.parts.filter(function (p) { return p.functionCall; });
@@ -490,19 +581,23 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   function send() {
     if (S.busy) return;
     var text = $('inp').value.trim(); if (!text) return;
-    if (!ready()) { $('set').hidden = false; addMsg('err', 'Please add your Gemini key and GitHub token in Settings first.'); return; }
-    $('inp').value = ''; $('inp').style.height = ''; addMsg('user', text); S.stop = false; S.timedOut = false; S.abort = new AbortController(); setBusy(true); setStatus('Starting...');
-    loadTree().then(function () { return runTurn(text); }).catch(function (e) {
-      if (e && e.name === 'AbortError') addMsg(S.timedOut ? 'err' : 'sys', S.timedOut ? 'Gemini did not answer for ' + (WAIT / 1000) + ' seconds. Open Settings and try the model gemini-3.5-flash-lite (tap "Find models" to see your list), then send again.' : 'Stopped.');
+    if (!ready()) { $('set').hidden = false; addMsg('err', 'Please add your Gemini key in Settings first.', true); return; }
+    $('inp').value = ''; $('inp').style.height = ''; addMsg('user', text);
+    S.stop = false; S.timedOut = false; S.cur = ''; S.abort = new AbortController();
+    var mark = S.hist.length;
+    setBusy(true); setStatus('Starting...');
+    var load = ghReady() ? loadTree().catch(function (e) { addMsg('sys', 'I could not read your website files (' + String(e && e.message || e).slice(0, 120) + '). I can still answer questions.', true); }) : Promise.resolve();
+    load.then(function () { return runTurn(text); }).catch(function (e) {
+      if (e && e.name === 'AbortError') addMsg(S.timedOut ? 'err' : 'sys', S.timedOut ? 'Gemini did not answer after several tries. Open Settings, tap "Find models", pick another model such as gemini-flash-lite-latest, then send again.' : 'Stopped.');
       else addMsg('err', String(e && e.message || e));
-      var last = S.hist[S.hist.length - 1];
-      if (last && last.role === 'user' && last.parts[0] && last.parts[0].text === text) S.hist.pop();
-    }).then(function () { clearTimeout(S.dog); setBusy(false); renderStaged(); });
+      S.hist.length = mark; /* drop the half-finished turn so the next message never hits a broken history */
+    }).then(function () { setBusy(false); renderStaged(); saveChat(); });
   }
 
   /* publish */
   function publish() {
     var paths = Object.keys(S.staged); if (!paths.length || S.busy) return;
+    if (!ghReady()) { addMsg('err', 'Add your GitHub token in Settings to publish.', true); $('set').hidden = false; return; }
     var msg = ($('cmsg').value || '').trim() || 'Site update via Site Builder', repo = cfg.repo, branch = cfg.branch, base, baseTree;
     setBusy(true); setStatus('Publishing...');
     return loadTree(true).then(function () {
@@ -525,16 +620,17 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
       S.hist.push({ role: 'user', parts: [{ text: '[The owner published the staged changes. Read files again before editing.]' }] });
       S.hist.push({ role: 'model', parts: [{ text: 'Understood.' }] });
       addMsg('sys', 'Published ' + n + ' file' + (n === 1 ? '' : 's') + '. Your website updates in about a minute.');
-    }).catch(function (e) { addMsg('err', 'Could not publish: ' + String(e && e.message || e)); }).then(function () { setBusy(false); renderStaged(); });
+    }).catch(function (e) { addMsg('err', 'Could not publish: ' + String(e && e.message || e)); }).then(function () { setBusy(false); renderStaged(); saveChat(); });
   }
 
   /* settings actions */
   function saveAndTest() {
     readForm(); saveCfg(); S.tree = null; S.files = {};
     var out = $('setOut'), lines = []; out.textContent = 'Testing...';
-    var g = fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=5', { headers: { 'x-goog-api-key': cfg.gkey } }).then(function (r) { lines.push(r.ok ? 'Gemini key works.' : 'Gemini key problem (error ' + r.status + ').'); }, function () { lines.push('Could not reach Gemini.'); });
+    var g = tfetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=5', { headers: { 'x-goog-api-key': cfg.gkey } }, 15000).then(function (r) { lines.push(r.ok ? 'Gemini key works.' : 'Gemini key problem (error ' + r.status + ').'); }, function () { lines.push('Could not reach Gemini.'); });
     var h = gh('/repos/' + cfg.repo).then(function (j) { lines.push('GitHub works: ' + j.full_name + (j.permissions && j.permissions.push === false ? ' (read only: token needs Contents: Read and write)' : '') + '.'); }, function (e) { lines.push(String(e.message)); });
-    return Promise.all([g, h]).then(function () { out.textContent = lines.join(' '); prefetch(); });
+    var sb = tfetch(SB_URL + '/rest/v1/categories?select=id&limit=1', { headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY } }, 15000).then(function (r) { lines.push(r.ok ? 'Supabase shop data works.' : 'Supabase problem (error ' + r.status + ').'); }, function () { lines.push('Could not reach Supabase.'); });
+    return Promise.all([g, h, sb]).then(function () { out.textContent = lines.join(' '); prefetch(); });
   }
   function findModels() {
     readForm(); var out = $('setOut');
@@ -551,9 +647,9 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
 
   /* wire up */
   function welcome() {
-    addMsg('ai', 'Hi! Tell me what to build or change on your website and I will do it. Think of it like chatting with a web designer: new banners, pages, fixes, speed, SEO, anything. You can **Preview** my work and nothing goes live until you press **Publish**.');
+    addMsg('ai', 'Hi! Ask me anything, or tell me what to build or change on your website and I will do it: new banners, pages, fixes, speed, SEO, product text, anything. You can **Preview** my work and nothing goes live until you press **Publish**.', true);
     var w = document.createElement('div'); w.className = 'chips';
-    ['Design a new Black Friday promo banner for my homepage', 'Show me the files that make up my homepage', 'Make the WhatsApp button stand out on phones'].forEach(function (t) {
+    ['Design a new Black Friday promo banner using my real products', 'Check my homepage for errors and fix them', 'Write a WhatsApp reply for a customer asking about delivery'].forEach(function (t) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t; b.onclick = function () { $('inp').value = t; $('inp').focus(); }; w.appendChild(b);
     });
     $('log').appendChild(w);
@@ -562,7 +658,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   $('bSave').onclick = saveAndTest;
   $('bFind').onclick = findModels;
   $('bClear').onclick = function () { cfg.gkey = ''; cfg.gh = ''; saveCfg(); fillForm(); $('setOut').textContent = 'Saved keys removed.'; };
-  $('bNew').onclick = function () { if (S.busy) return; S.hist = []; $('log').innerHTML = ''; welcome(); };
+  $('bNew').onclick = function () { if (S.busy) return; S.hist = []; S.msgs = []; clearChat(); $('log').innerHTML = ''; welcome(); };
   $('bSend').onclick = send;
   $('bStop').onclick = function () { S.stop = true; if (S.abort) S.abort.abort(); };
   $('bPub').onclick = publish;
@@ -582,8 +678,8 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   $('bInst').onclick = function () { if (!deferred) return; deferred.prompt(); deferred.userChoice.then(function () { deferred = null; $('bInst').hidden = true; }, function () {}); };
   if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
   var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
-  loadCfg(); fillForm(); welcome(); prefetch();
-  if (/iphone|ipad|ipod/i.test(navigator.userAgent || '') && !standalone) addMsg('sys', 'To install on iPhone: tap Share, then Add to Home Screen.');
+  loadCfg(); fillForm(); if (!loadChat()) welcome(); prefetch();
+  if (/iphone|ipad|ipod/i.test(navigator.userAgent || '') && !standalone) addMsg('sys', 'To install on iPhone: tap Share, then Add to Home Screen.', true);
   if (!ready()) $('set').hidden = false;
 })();
 </script>
