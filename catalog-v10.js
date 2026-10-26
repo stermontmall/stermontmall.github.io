@@ -4,8 +4,8 @@
   var S = { cats: [], prods: [], st: {}, cat: 'all', q: '', range: 'all' }, root, D = document, view = function () { render(); };
   var LIME = '#84cc16';
   /* ---------- AUTO PRICING: change these 3 numbers to change pricing everywhere ---------- */
-  var PROFIT_PCT = 30, MIN_PROFIT = 150, ROUND_TO = 50;
-  /* selling price = cost + 30% (at least KSh 150 profit), rounded UP to the next KSh 50 so profit is never below target */
+  var PROFIT_PCT = 15, MIN_PROFIT = 150, ROUND_TO = 50;
+  /* selling price = cost + 15% (at least KSh 150 profit), rounded UP to the next KSh 50 so profit is never below target */
   function autoPrice(cost) {
     cost = Number(cost); if (!(cost > 0)) return 0;
     var target = cost + Math.max(cost * PROFIT_PCT / 100, MIN_PROFIT);
