@@ -118,6 +118,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
 </div>
 <div id="dlg" hidden><div class="dbox"><div class="dh"><b id="dt"></b><button id="dx" type="button" class="sm">Close</button></div><div id="dbody"></div></div></div>
 
+<script src="/builder-attach.js"></script>
 <script>
 (function () {
   'use strict';
@@ -153,6 +154,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   function saveChat() {
     try {
       var h = S.hist.slice(-40);
+      if (window.BuilderAttach) h = window.BuilderAttach.safeHist(h);
       while (h.length && (h[0].role !== 'user' || !h[0].parts || !h[0].parts[0] || h[0].parts[0].text == null)) h.shift();
       var o = JSON.stringify({ hist: h, msgs: S.msgs.slice(-80) });
       if (o.length > 900000) o = JSON.stringify({ hist: [], msgs: S.msgs.slice(-30) });
@@ -628,7 +630,8 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     '1. Be fast and proactive. Do the whole job in one go instead of asking questions. When you need several files or searches, request them all in the same step so they run together. Ask one short question only if a wrong guess would be costly.\n2. Be creative: when asked for something new (banner, landing page, section, promo, layout), design it boldly and professionally, mobile first, matching the store look, with clear calls to action (WhatsApp, M-Pesa). You can also fix bugs, improve speed, SEO, accessibility and copywriting. Use shop_data to see the real products, prices and categories before writing product-related content.\n3. Read the relevant part of a file before editing. Make small exact changes with edit_file, copying "find" text exactly. Use write_file for new files or very small ones.\n4. Edits are only staged. When you finish, a green Publish card appears automatically in the chat with Preview, Changes and Publish buttons. Nothing goes live until the owner presses Publish.\n5. Do not hand-edit files in p/, sitemap*.xml, merchant-feed.xml, sitemap-state.json or llms.txt: workflows generate them. Edit the generator script instead and say so.\n6. If an HTML page loads a JS or CSS file with ?v=N, raise N when you change that file.\n7. Never add secret keys. Keep existing SEO tags valid. Never remove working features. Never show or guess product cost or profit figures publicly.\n8. The default admin profit percentage is the PROFIT_PCT constant in catalog-v10.js.\n9. If a tool fails, say what failed in one plain sentence and try another way. Never go silent.\n10. Keep replies short. After building, finish with a 2 or 3 sentence summary, tell the owner to check the Publish card below (Preview first if they like) and press Publish, and suggest one next idea.\n' +
     '11. NEVER invent or exaggerate facts: no rankings (like "#1"), awards, ratings, certifications, guarantees, statistics, testimonials, delivery times, discounts or stock claims unless they are in the site files, in shop_data, or the owner told you. Prices come only from shop_data.\n' +
     '12. Make everything real. Every script, stylesheet, image or link you add must point to a file that exists. If you reference a new file, create it with write_file in the same job: a calculator or tool needs its real working code, not just a script tag that points nowhere. Never say you built something unless its code is actually staged.\n' +
-    '13. Before you finish any change, call check_work. If it reports problems, fix every one and call check_work again. Only then write your summary, and say truthfully what changed and anything you could not do. Nothing is live until the owner presses Publish, so never say it is live.';
+    '13. Before you finish any change, call check_work. If it reports problems, fix every one and call check_work again. Only then write your summary, and say truthfully what changed and anything you could not do. Nothing is live until the owner presses Publish, so never say it is live.\n' +
+    '14. The owner can attach photos, screenshots, PDFs and text or code files to a message. Look at them carefully and use them (for example copy a design from a screenshot, read a PDF price list, fix an attached file). You cannot save attached photos into the website files. If the owner wants a product photo posted as an advert on the home page, tell them to open /advert-poster.html.';
   var NAMES = { list_files: 'Looking at files', read_file: 'Reading', search_text: 'Searching', shop_data: 'Checking the shop', edit_file: 'Editing', write_file: 'Writing', delete_file: 'Marking for deletion', check_work: 'Checking my work' };
   function describe(n, a) { a = a || {}; return (NAMES[n] || n) + ' ' + (a.path || a.prefix || a.search || a.table || (a.query ? '"' + String(a.query).slice(0, 50) + '"' : '')); }
 
@@ -733,8 +736,9 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     calls.forEach(function (c) { p = p.then(function () { return runOne(c); }).then(function (x) { out.push(x); }); });
     return p.then(function () { return out; });
   }
-  function runTurn(text) {
-    S.hist.push({ role: 'user', parts: [{ text: text }] });
+  function runTurn(text, att) {
+    S.hist.push({ role: 'user', parts: att ? [{ text: text }].concat(att.parts) : [{ text: text }] });
+    if (window.BuilderAttach) window.BuilderAttach.stripOld(S.hist, !!att);
     var steps = 0, repairs = 0, sig0 = stagedSig();
     /* when the AI says it is done, the app checks the real files itself and sends any problem back to be fixed */
     function finish() {
@@ -783,17 +787,23 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   }
   function send() {
     if (S.busy) return;
-    var text = $('inp').value.trim(); if (!text) return;
+    var BA = window.BuilderAttach;
+    if (BA && BA.busy()) { addMsg('sys', 'Your file is still getting ready. Send again in a second.', true); return; }
+    var text = $('inp').value.trim();
+    if (!text && !(BA && BA.has())) return;
     if (!ready()) { $('set').hidden = false; addMsg('err', 'Please add your Gemini key in Settings first.', true); return; }
-    $('inp').value = ''; $('inp').style.height = ''; addMsg('user', text); S.lastAsk = text.replace(/\s+/g, ' ');
+    var att = BA ? BA.take() : null;
+    if (!text) text = 'Please look at the attached file(s).';
+    $('inp').value = ''; $('inp').style.height = ''; var um = addMsg('user', text + (att ? att.label : '')); if (att) BA.render(um, att); S.lastAsk = text.replace(/\s+/g, ' ');
     S.stop = false; S.timedOut = false; S.cur = ''; S.abort = new AbortController();
     var mark = S.hist.length;
     setBusy(true); setStatus('Starting...');
     var load = ghReady() ? loadTree().catch(function (e) { addMsg('sys', 'I could not read your website files (' + String(e && e.message || e).slice(0, 120) + '). I can still answer questions.', true); }) : Promise.resolve();
-    load.then(function () { return runTurn(text); }).catch(function (e) {
+    load.then(function () { return runTurn(text, att); }).catch(function (e) {
       if (e && e.name === 'AbortError') addMsg(S.timedOut ? 'err' : 'sys', S.timedOut ? 'Gemini did not answer after several tries. Open Settings, tap "Find models", pick another model such as gemini-flash-lite-latest, then send again.' : 'Stopped.');
       else addMsg('err', String(e && e.message || e));
       S.hist.length = mark; /* drop the half-finished turn so the next message never hits a broken history */
+      if (att && BA) BA.restore(att); /* give the attached files back so nothing has to be picked again */
     }).then(function () {
       setBusy(false); renderStaged(); saveChat();
       var sig = stagedSig(); if (sig && (sig !== S.offeredSig || S.pubCard)) offerPublish();
@@ -892,7 +902,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
 
   /* wire up */
   function welcome() {
-    addMsg('ai', 'Hi! Ask me anything, or tell me what to build or change on your website and I will do it: new banners, pages, fixes, speed, SEO, product text, anything. You can **Preview** my work and nothing goes live until you press **Publish**.', true);
+    addMsg('ai', 'Hi! Ask me anything, or tell me what to build or change on your website and I will do it: new banners, pages, fixes, speed, SEO, product text, anything. Tap the paperclip to attach a photo, screenshot, PDF or file. You can **Preview** my work and nothing goes live until you press **Publish**.', true);
     var w = document.createElement('div'); w.className = 'chips';
     ['Design a new Black Friday promo banner using my real products', 'Check my homepage for errors and fix them', 'Write a WhatsApp reply for a customer asking about delivery'].forEach(function (t) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = t; b.onclick = function () { $('inp').value = t; $('inp').focus(); }; w.appendChild(b);
