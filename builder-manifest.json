@@ -1,6 +1,6 @@
 {
-  "name": "Stermont Site Builder",
-  "short_name": "Site Builder",
+  "name": "Stermont AI Builder",
+  "short_name": "AI Builder",
   "description": "Chat with an AI to edit and publish your Stermont Arcade website.",
   "id": "/builder.html",
   "start_url": "/builder.html",
@@ -10,9 +10,29 @@
   "background_color": "#5b21b6",
   "theme_color": "#5b21b6",
   "icons": [
-    {"src": "icon-builder-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "icon-builder-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-    {"src": "icon-builder-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
-    {"src": "icon-builder-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+    {
+      "src": "icon-builder-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-builder-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-builder-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-builder-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
