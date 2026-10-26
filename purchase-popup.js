@@ -1,6 +1,6 @@
 /* "Someone just bought" popup: shows REAL recent purchases so shoppers see that others are buying and feel confident to order.
-   Data comes from the Supabase function public.recent_purchases(), which returns ONLY the first item name, the county and the
-   time of purchase (never a customer name, phone, email or address). If there are no recent orders, nothing is shown.
+   Data comes from the Supabase function public.recent_purchases(), which returns ONLY the first item name, the county, the
+   buyer's FIRST NAME and the time of purchase (never a surname, phone, email or address). If there are no recent orders, nothing is shown.
    Loaded from /img-protect.js on every public store, product, category and blog page. Loading it twice is harmless. */
 (function () {
   'use strict';
@@ -54,7 +54,8 @@
     if (src) { var im = new Image(); im.src = src; im.alt = ''; im.width = im.height = 46; ic.appendChild(im); } else { ic.appendChild(D.createTextNode('\uD83D\uDECD\uFE0F')); }
     ic.appendChild(mk('i', '', '\u2713'));
     nm.textContent = p.item;
-    tm.textContent = (p.area ? 'Someone in ' + p.area + ' \u00B7 ' : 'A customer \u00B7 ') + ago(p.created_at);
+    var who = p.buyer || 'A customer';
+    tm.textContent = who + (p.area ? ' from ' + p.area : '') + ' \u00B7 ' + ago(p.created_at);
   }
   function cycle() {
     if (dead || !list.length) return;
