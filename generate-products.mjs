@@ -436,7 +436,16 @@ ${B}`;
 // lastmod only moves when a page's content really changed. Google ignores sitemaps whose dates change on every build.
 const today = new Date().toISOString().slice(0, 10);
 const STATE = 'sitemap-state.json';
-const prev = existsSync(STATE) ? JSON.parse(readFileSync(STATE, 'utf8')) : {};
+let prev = {};
+try {
+  if (existsSync(STATE)) {
+    const rawState = readFileSync(STATE, 'utf8').trim();
+    if (rawState) prev = JSON.parse(rawState);
+  }
+} catch (e) {
+  console.log('Warning: could not parse sitemap-state.json, resetting state.', e.message);
+  prev = {};
+}
 const next = {};
 for (const u of urls) {
   const file = u.endsWith('/') ? `.${u}index.html` : fileOf(u);
