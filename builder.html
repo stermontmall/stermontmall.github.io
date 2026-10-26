@@ -81,7 +81,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     <label for="model">Model</label>
     <div class="row"><input id="model" type="text" list="models" autocomplete="off" placeholder="gemini-flash-latest"><button id="bFind" type="button" class="sm">Find models</button></div>
     <datalist id="models"></datalist>
-    <p class="hint">Names with "flash" are the fastest. Avoid "pro" models for speed.</p>
+    <p class="hint">Fastest: a "flash-lite" model, for example <b>gemini-3.5-flash-lite</b>. Tap "Find models" to see what your key can use.</p>
     <label for="ghtoken">2. GitHub token</label>
     <input id="ghtoken" type="password" autocomplete="off" placeholder="github_pat_...">
     <p class="hint">Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">fine-grained token</a>: only this repository, permission <b>Contents: Read and write</b>.</p>
@@ -114,12 +114,13 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   var $ = function (id) { return document.getElementById(id); };
   var LS = 'stm_builder_cfg_v1';
   var cfg = { gkey: '', model: 'gemini-flash-latest', gh: '', repo: 'stermontmall/stermontmall.github.io', branch: 'main', remember: false };
-  var S = { tree: null, map: {}, files: {}, staged: {}, hist: [], busy: false, stop: false, abort: null, tc: 0 };
+  var S = { tree: null, map: {}, files: {}, staged: {}, hist: [], busy: false, stop: false, abort: null, tc: 0, timedOut: false, dog: 0 };
   var BLOCK = /^(\.git\/|\.github\/|CNAME$)/;
   var BIN = /\.(png|jpe?g|gif|webp|ico|svgz|woff2?|ttf|eot|pdf|zip|gz|mp4|mp3|webm)$/i;
   var RO = { list_files: 1, read_file: 1, search_text: 1 };
-  /* thinking settings, fastest first; falls back automatically if a model rejects one */
-  var TC = [{ thinkingConfig: { thinkingBudget: 0 } }, { thinkingConfig: { thinkingLevel: 'low' } }, {}];
+  var WAIT = 40000;
+  /* thinking settings, fastest first. Newer Gemini models use levels, older ones a budget; the next one is tried automatically if rejected. No temperature is sent because new models refuse it. */
+  var TC = [{ thinkingConfig: { thinkingLevel: 'minimal' } }, { thinkingConfig: { thinkingLevel: 'low' } }, { thinkingConfig: { thinkingBudget: 0 } }, {}];
 
   /* settings */
   function loadCfg() {
@@ -387,19 +388,24 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     if (st === 429) return 'The free Gemini limit is reached for now. Wait a little, or pick another model in Settings. (' + String(msg).slice(0, 160) + ')';
     if (st === 400 && /API key/i.test(msg)) return 'Gemini rejected the API key. Check it in Settings.';
     if (st === 403) return 'Gemini refused the request (403). Check the API key. ' + String(msg).slice(0, 160);
-    if (st === 404) return 'Model not found. Open Settings, tap "Find models" and pick one.';
+    if (st === 404) return 'Model "' + cfg.model + '" was not found. Open Settings, tap "Find models" and pick one.';
     return 'Gemini error ' + st + ': ' + String(msg).slice(0, 300);
   }
   function gem(onParts) {
     var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(cfg.model) + ':streamGenerateContent?alt=sse';
-    var sys = SYSTEM + treeInfo();
+    var sys = SYSTEM + treeInfo(), t0 = Date.now(), tick = 0;
+    function stopWait() { clearTimeout(S.dog); clearInterval(tick); }
+    function arm() { clearTimeout(S.dog); S.dog = setTimeout(function () { S.timedOut = true; if (S.abort) S.abort.abort(); }, WAIT); }
+    tick = setInterval(function () { setStatus('Waiting for Gemini... ' + Math.round((Date.now() - t0) / 1000) + 's'); }, 1000);
     function go(tries) {
-      var body = JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: S.hist, tools: [{ functionDeclarations: DECLS }], generationConfig: Object.assign({ temperature: 0.6 }, TC[S.tc]) });
+      var body = JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: S.hist, tools: [{ functionDeclarations: DECLS }], generationConfig: TC[S.tc] });
+      arm();
       return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': cfg.gkey }, body: body, signal: S.abort.signal }).then(function (r) {
         if (r.ok) return r;
+        clearTimeout(S.dog);
         return r.text().then(function (t) {
           var m = t; try { m = JSON.parse(t).error.message || t; } catch (e) {}
-          if (r.status === 400 && /think/i.test(m) && S.tc < TC.length - 1) { S.tc++; return go(tries); }
+          if (r.status === 400 && /think|budget|level/i.test(m) && S.tc < TC.length - 1) { S.tc++; return go(tries); }
           if ((r.status === 429 || r.status >= 500) && tries > 0 && !S.stop) {
             setStatus('Gemini is busy (' + r.status + '), trying again...');
             return new Promise(function (ok) { setTimeout(ok, r.status === 429 ? 6000 : 2000); }).then(function () { return go(tries - 1); });
@@ -409,7 +415,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
       });
     }
     return go(3).then(function (r) {
-      var rd = r.body.getReader(), dec = new TextDecoder(), buf = '', parts = [], reason = '';
+      var rd = r.body.getReader(), dec = new TextDecoder(), buf = '', parts = [], reason = '', got = false;
       function add(p) {
         if (p.thought) return;
         var l = parts[parts.length - 1];
@@ -426,14 +432,16 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
       }
       function pump() {
         return rd.read().then(function (x) {
+          if (!got) { got = true; clearInterval(tick); setStatus('Writing...'); }
+          arm();
           if (x.done) { buf.split('\n').forEach(line); return; }
           buf += dec.decode(x.value, { stream: true });
           var i; while ((i = buf.indexOf('\n')) >= 0) { line(buf.slice(0, i)); buf = buf.slice(i + 1); }
           return pump();
         });
       }
-      return pump().then(function () { return { parts: parts.filter(function (p) { return p.functionCall || p.text || p.thoughtSignature; }), reason: reason }; });
-    });
+      return pump().then(function () { stopWait(); return { parts: parts.filter(function (p) { return p.functionCall || p.text || p.thoughtSignature; }), reason: reason }; });
+    }).catch(function (e) { stopWait(); throw e; });
   }
   function trimHist() {
     var size = function () { return JSON.stringify(S.hist).length; };
@@ -464,11 +472,11 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     function step() {
       if (S.stop) return Promise.resolve();
       if (++steps > 40) { addMsg('sys', 'I paused after 40 steps. Type "continue" and I will carry on.'); return Promise.resolve(); }
-      trimHist(); setStatus('Thinking...');
+      trimHist();
       var bub = null;
       return gem(function (parts) {
         var t = parts.filter(function (p) { return p.text; }).map(function (p) { return p.text; }).join('');
-        if (t) { if (!bub) bub = addMsg('ai', ''); bub.innerHTML = md(t); down(); setStatus('Writing...'); }
+        if (t) { if (!bub) bub = addMsg('ai', ''); bub.innerHTML = md(t); down(); }
       }).then(function (r) {
         if (!r.parts.length) throw new Error('The AI gave no answer (' + (r.reason || 'empty reply') + '). Try again or rephrase.');
         S.hist.push({ role: 'model', parts: r.parts });
@@ -483,12 +491,13 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     if (S.busy) return;
     var text = $('inp').value.trim(); if (!text) return;
     if (!ready()) { $('set').hidden = false; addMsg('err', 'Please add your Gemini key and GitHub token in Settings first.'); return; }
-    $('inp').value = ''; $('inp').style.height = ''; addMsg('user', text); S.stop = false; S.abort = new AbortController(); setBusy(true); setStatus('Thinking...');
+    $('inp').value = ''; $('inp').style.height = ''; addMsg('user', text); S.stop = false; S.timedOut = false; S.abort = new AbortController(); setBusy(true); setStatus('Starting...');
     loadTree().then(function () { return runTurn(text); }).catch(function (e) {
-      addMsg(e && e.name === 'AbortError' ? 'sys' : 'err', e && e.name === 'AbortError' ? 'Stopped.' : String(e && e.message || e));
+      if (e && e.name === 'AbortError') addMsg(S.timedOut ? 'err' : 'sys', S.timedOut ? 'Gemini did not answer for ' + (WAIT / 1000) + ' seconds. Open Settings and try the model gemini-3.5-flash-lite (tap "Find models" to see your list), then send again.' : 'Stopped.');
+      else addMsg('err', String(e && e.message || e));
       var last = S.hist[S.hist.length - 1];
       if (last && last.role === 'user' && last.parts[0] && last.parts[0].text === text) S.hist.pop();
-    }).then(function () { setBusy(false); renderStaged(); });
+    }).then(function () { clearTimeout(S.dog); setBusy(false); renderStaged(); });
   }
 
   /* publish */
@@ -534,9 +543,9 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': cfg.gkey } }).then(function (r) { if (!r.ok) throw new Error('error ' + r.status); return r.json(); }).then(function (j) {
       var dl = $('models'); dl.innerHTML = ''; var n = 0;
       (j.models || []).forEach(function (m) {
-        if (/gemini/i.test(m.name) && (m.supportedGenerationMethods || []).indexOf('generateContent') >= 0) { var o = document.createElement('option'); o.value = m.name.replace(/^models\//, ''); dl.appendChild(o); n++; }
+        if (/gemini/i.test(m.name) && !/(tts|image|live|embed|robotics|audio)/i.test(m.name) && (m.supportedGenerationMethods || []).indexOf('generateContent') >= 0) { var o = document.createElement('option'); o.value = m.name.replace(/^models\//, ''); dl.appendChild(o); n++; }
       });
-      out.textContent = n + ' models found. Tap the Model box and choose one.';
+      out.textContent = n + ' models found. Tap the Model box and choose one (flash-lite is fastest).';
     }).catch(function (e) { out.textContent = 'Could not list models (' + e.message + ').'; });
   }
 
