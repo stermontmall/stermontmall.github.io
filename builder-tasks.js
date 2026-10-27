@@ -1,14 +1,22 @@
-/* Stermont AI Builder: task queue (up to 200 tasks).
+/* Stermont AI Builder: task queue (up to 500 tasks), saved in Supabase.
    Adds a Tasks button next to Settings. Paste a list (one task per line), press Start, and the builder does the tasks one after another
    by sending each one to the AI as if you had typed it. It keeps going on its own:
    - when the AI pauses after 40 steps it sends "continue" for you
    - when the free Gemini limit is reached it waits 5 minutes and tries again (the tab must stay open)
    - each task can start in a fresh chat (page reload), which saves quota and loads the newest code
-   The queue is saved on this device, so it survives a refresh. Website changes are published by the automatic publishing,
-   product edits save straight to the shop. If this file fails to load, the builder works as before. */
+   Extras:
+   - Supabase: the queue is saved in the shop database (table builder_tasks, see setup-builder-tasks.sql), so it survives clearing the browser
+     and can be opened on another device. It uses the same admin sign-in as /admin.html. If you are signed out, the queue still works and is
+     saved on this device, and it is uploaded the next time you are signed in.
+   - Template: write "Write a better description for {item}" and paste a list of items, and one task is made per item.
+   - Import: load tasks from a .txt or .csv file. Report: download what was done and what failed.
+   - Run the queue on ONE device at a time, otherwise two devices will do the same task.
+   Website changes are published by the automatic publishing, product edits save straight to the shop.
+   If this file fails to load, the builder works as before. */
 (function () {
   'use strict';
-  var D = document, KEY = 'stm_builder_tasks_v1', CHAT = 'stm_builder_chat_v1', MAX = 200;
+  var D = document, KEY = 'stm_builder_tasks_v1', CHAT = 'stm_builder_chat_v1', MAX = 500;
+  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', PK = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
   if (window.__stmTasks) return;
   window.__stmTasks = 1;
   var SUFFIX = ' (Queued task: do the whole job now without asking questions. If something essential is missing, say exactly what in one sentence and stop.)';
@@ -16,9 +24,11 @@
   function load() {
     var o = null; try { o = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
     if (!o || !Array.isArray(o.items)) o = { run: false, fresh: true, items: [], retryAt: 0 };
+    if (!Array.isArray(o.del)) o.del = [];
     return o;
   }
-  var st = load(), working = false, panel = null, listEl = null, infoEl = null, btn = null, startBtn = null, freshCb = null, toast = null, toastT = 0;
+  var st = load(), working = false, panel = null, listEl = null, infoEl = null, cloudEl = null, barEl = null, btn = null, startBtn = null, freshCb = null, toast = null, toastT = 0;
+  var cloud = 'connecting', cloudMsg = '', synced = false, renewing = null;
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
   function count(s) { return st.items.filter(function (i) { return i.s === s; }).length; }
   function first(s) { for (var i = 0; i < st.items.length; i++) if (st.items[i].s === s) return i; return -1; }
@@ -35,12 +45,82 @@
     if (ms) toastT = setTimeout(function () { toast.hidden = true; }, ms);
   }
 
+  /* ---------- Supabase (same admin sign-in as /admin.html and builder-products.js) ---------- */
+  var SIGNED_OUT = 'Signed out of the Admin console on this device. Open /admin.html, sign in, then come back.';
+  function tok() {
+    var s; try { s = JSON.parse(localStorage.getItem(SK)); } catch (e) {}
+    if (!s || !s.access_token) return Promise.reject(new Error(SIGNED_OUT));
+    if (Date.now() < s.exp) return Promise.resolve(s.access_token);
+    if (!renewing) {
+      renewing = fetch(SB + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: PK, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: s.refresh_token }) }).then(function (r) {
+        if (!r.ok) throw new Error('The admin session expired. Open /admin.html and sign in again.');
+        return r.json();
+      }).then(function (j) {
+        s.access_token = j.access_token; s.refresh_token = j.refresh_token; s.exp = Date.now() + (j.expires_in || 3600) * 1000 - 60000;
+        try { localStorage.setItem(SK, JSON.stringify(s)); } catch (e) {}
+        renewing = null; return s.access_token;
+      }, function (e) { renewing = null; throw e; });
+    }
+    return renewing;
+  }
+  function api(path, method, body, prefer) {
+    return tok().then(function (t) {
+      var hd = { apikey: PK, Authorization: 'Bearer ' + t }, ac = typeof AbortController === 'function' ? new AbortController() : null, to = ac ? setTimeout(function () { ac.abort(); }, 15000) : 0;
+      if (body !== undefined) hd['Content-Type'] = 'application/json';
+      if (prefer) hd.Prefer = prefer;
+      return fetch(SB + path, { method: method || 'GET', headers: hd, body: body !== undefined ? JSON.stringify(body) : undefined, signal: ac ? ac.signal : undefined }).then(function (r) { clearTimeout(to); return r; }, function (e) { clearTimeout(to); throw new Error('Could not reach Supabase.'); });
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function (x) { var m = x; try { m = JSON.parse(x).message || x; } catch (e) {} throw new Error(String(m).slice(0, 200)); });
+      return r.text().then(function (tx) { return tx ? JSON.parse(tx) : null; });
+    });
+  }
+  function cloudFail(e) { cloud = 'off'; cloudMsg = String(e && e.message || e || '').slice(0, 160); render(); }
+  function cloudGood() { if (cloud !== 'on') { cloud = 'on'; cloudMsg = ''; render(); } }
+
+  /* send tasks that have no cloud id yet (added while signed out or offline) */
+  function pushNew(list) {
+    var todo = list.filter(function (i) { return !i.id; }), chunks = [];
+    for (var k = 0; k < todo.length; k += 100) chunks.push(todo.slice(k, k + 100));
+    return chunks.reduce(function (p, ch) {
+      return p.then(function () {
+        return api('/rest/v1/builder_tasks?select=id', 'POST', ch.map(function (i) { return { text: i.t, status: i.s, tries: i.n || 0, result: i.r ? String(i.r).slice(0, 600) : null }; }), 'return=representation').then(function (rows) {
+          (rows || []).forEach(function (r, j) { if (ch[j]) ch[j].id = r.id; });
+          save();
+        });
+      });
+    }, Promise.resolve());
+  }
+  /* send removals and changed tasks. Changes stay marked on the task until Supabase confirms them, so nothing is lost if the network drops. */
+  function flush() {
+    if (cloud === 'off' && !st.del.length && !st.items.some(function (i) { return i.x; })) return Promise.resolve();
+    var dels = st.del.slice(), p = Promise.resolve();
+    if (dels.length) p = p.then(function () { return api('/rest/v1/builder_tasks?id=in.(' + dels.join(',') + ')', 'DELETE'); }).then(function () { st.del = st.del.filter(function (x) { return dels.indexOf(x) < 0; }); save(); });
+    var dirty = st.items.filter(function (i) { return i.id && i.x; });
+    return p.then(function () {
+      return Promise.all(dirty.map(function (i) {
+        var v = i.v || 0;
+        return api('/rest/v1/builder_tasks?id=eq.' + i.id, 'PATCH', { status: i.s, tries: i.n || 0, result: i.r ? String(i.r).slice(0, 600) : null }).then(function () { if ((i.v || 0) === v) i.x = 0; });
+      }));
+    }).then(function () { save(); cloudGood(); }, cloudFail);
+  }
+  function touch(it) { it.x = 1; it.v = (it.v || 0) + 1; save(); if (cloud === 'on') flush(); }
+  function pull() {
+    return api('/rest/v1/builder_tasks?select=id,text,status,tries,result&order=id.asc&limit=' + MAX).then(function (rows) {
+      st.items = (rows || []).map(function (r) { return { id: r.id, t: r.text, s: r.status, n: r.tries || 0, r: r.result || '' }; });
+      save();
+    });
+  }
+  function syncStart() {
+    cloud = 'connecting'; render();
+    return tok().then(function () { return flush(); }).then(function () { return pushNew(st.items); }).then(pull).then(function () { cloudGood(); }, cloudFail).then(function () { synced = true; render(); });
+  }
+
   /* clear the saved chat and reload, so the next task starts with an empty chat and the newest code */
   function wipe() { try { localStorage.removeItem(CHAT); } catch (e) {} try { sessionStorage.removeItem(CHAT); } catch (e) {} }
   function fresh() { wipe(); window.addEventListener('pagehide', wipe); setTimeout(function () { try { location.reload(); } catch (e) {} }, 200); }
 
   function parse(txt) {
-    return String(txt || '').split(/\r?\n/).map(function (l) { return l.replace(/^\s*(?:[-*\u2022]|\d{1,3}[.)])\s+/, '').trim(); }).filter(Boolean).map(function (l) { return l.slice(0, 2000); });
+    return String(txt || '').split(/\r?\n/).map(function (l) { return l.replace(/^\s*(?:[-*•]|\d{1,3}[.)])\s+/, '').trim(); }).filter(Boolean).map(function (l) { return l.slice(0, 2000); });
   }
 
   /* send one task to the builder and report how it went */
@@ -80,50 +160,69 @@
   }
 
   function step() {
-    if (working || !st.run) return;
+    if (working || !st.run || !synced) return;
     if (st.retryAt > Date.now()) { render(); return; }
     if (!ready() || busy()) return;
     var i = first('p');
     if (i < 0) { st.run = false; save(); render(); say('All tasks are finished.', 6000); return; }
     var it = st.items[i];
     if (!($('gkey') && $('gkey').value.trim())) { st.run = false; save(); render(); try { $('set').hidden = false; } catch (e) {} say('Add your Gemini key in Settings, then press Start.', 7000); return; }
-    if (it.n >= 3) { it.s = 'f'; it.r = it.r || 'Gave up after 3 tries'; save(); render(); return; }
-    working = true; it.n++; save(); render();
+    if (it.n >= 3) { it.s = 'f'; it.r = it.r || 'Gave up after 3 tries'; touch(it); render(); return; }
+    working = true; it.n++; touch(it); render();
     var more = 0;
     function go(msg) {
       sendTask(msg).then(function (r) {
-        if (r.stopped) { st.run = false; it.n--; save(); working = false; render(); return; }
+        if (r.stopped) { st.run = false; it.n--; touch(it); working = false; render(); return; }
         if (r.err) {
           working = false;
           if (/limit|quota|429/i.test(r.err)) { it.n--; it.r = 'Waiting for the Gemini limit, trying again later'; st.retryAt = Date.now() + 5 * 60000; }
           else { it.r = r.err.slice(0, 160); st.retryAt = Date.now() + 20000; }
-          save(); render(); return;
+          touch(it); render(); return;
         }
         if (r.more && more < 6) { more++; go('continue'); return; }
-        it.s = 'd'; it.r = String(r.reply || 'Done').replace(/\s+/g, ' ').slice(0, 300); st.retryAt = 0; save(); render();
-        settle(function () { working = false; if (st.run && st.fresh && first('p') >= 0) fresh(); else render(); });
+        it.s = 'd'; it.r = String(r.reply || 'Done').replace(/\s+/g, ' ').slice(0, 300); st.retryAt = 0; touch(it); render();
+        settle(function () { (cloud === 'on' ? flush() : Promise.resolve()).then(function () { working = false; if (st.run && st.fresh && first('p') >= 0) fresh(); else render(); }); });
       });
     }
     go(it.t + SUFFIX);
   }
 
   function render() {
-    var p = count('p'), d = count('d'), f = count('f');
-    if (btn) btn.textContent = (st.run ? '\u25B6 ' : '') + 'Tasks' + (p ? ' (' + p + ')' : '');
+    var p = count('p'), d = count('d'), f = count('f'), n = st.items.length;
+    if (btn) btn.textContent = (st.run ? '▶ ' : '') + 'Tasks' + (p ? ' (' + p + ')' : '');
     if (!panel) return;
     var wait = st.run && st.retryAt > Date.now() ? ' Waiting until ' + new Date(st.retryAt).toTimeString().slice(0, 5) + ', then trying again.' : '';
-    infoEl.textContent = (st.run ? 'Running.' : 'Paused.') + ' ' + p + ' waiting, ' + d + ' done, ' + f + ' failed. The queue holds up to ' + MAX + ' tasks.' + wait;
+    infoEl.textContent = (st.run ? 'Running.' : 'Paused.') + ' ' + p + ' waiting, ' + d + ' done, ' + f + ' failed. ' + n + ' of ' + MAX + ' places used.' + wait;
+    barEl.firstChild.style.width = (n ? Math.round((d + f) * 100 / n) : 0) + '%';
+    cloudEl.textContent = cloud === 'on' ? '☁ Saved in Supabase. You can open this queue on another device.' : cloud === 'connecting' ? '☁ Connecting to Supabase...' : '☁ Supabase is off (' + (cloudMsg || 'not connected') + '). The queue is still saved on this device and uploads when you are signed in.';
+    cloudEl.style.color = cloud === 'off' ? 'var(--no)' : '';
     startBtn.textContent = st.run ? 'Pause' : 'Start';
     freshCb.checked = !!st.fresh;
     listEl.innerHTML = '';
     var cur = first('p');
     st.items.forEach(function (it, i) {
       var li = D.createElement('li'), sp = D.createElement('span');
-      var tag = it.s === 'd' ? '\u2713' : it.s === 'f' ? '\u2717' : (working && i === cur ? '\u25B6' : '\u00B7');
-      sp.textContent = tag + ' ' + (i + 1) + '. ' + it.t.slice(0, 160) + (it.r ? ' \u2014 ' + it.r.slice(0, 160) : '');
+      var tag = it.s === 'd' ? '✓' : it.s === 'f' ? '✗' : (working && i === cur ? '▶' : '·');
+      sp.textContent = tag + ' ' + (i + 1) + '. ' + it.t.slice(0, 160) + (it.r ? ' — ' + it.r.slice(0, 160) : '');
       sp.style.color = it.s === 'f' ? 'var(--no)' : it.s === 'd' ? 'var(--ok)' : '';
-      li.appendChild(sp); listEl.appendChild(li);
+      li.appendChild(sp);
+      if (it.s === 'f') { var rb = mk('↻', 'sm', function () { it.s = 'p'; it.n = 0; it.r = ''; st.retryAt = 0; touch(it); render(); }); rb.title = 'Try again'; rb.style.marginLeft = '.4rem'; li.appendChild(rb); }
+      if (!(working && i === cur)) { var xb = mk('✕', 'sm', function () { var k = st.items.indexOf(it); if (k < 0) return; st.items.splice(k, 1); if (it.id) st.del.push(it.id); save(); render(); flush(); }); xb.title = 'Remove'; xb.style.marginLeft = '.3rem'; li.appendChild(xb); }
+      listEl.appendChild(li);
     });
+  }
+
+  function report() {
+    var lines = ['Stermont AI Builder task report, ' + new Date().toLocaleString(), count('d') + ' done, ' + count('f') + ' failed, ' + count('p') + ' waiting', ''];
+    st.items.forEach(function (it, i) { lines.push((i + 1) + '. [' + (it.s === 'd' ? 'DONE' : it.s === 'f' ? 'FAILED' : 'WAITING') + '] ' + it.t + (it.r ? '\n     ' + it.r : '')); });
+    var txt = lines.join('\n');
+    try {
+      var a = D.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' }));
+      a.download = 'builder-task-report.txt'; D.body.appendChild(a); a.click(); D.body.removeChild(a);
+      say('Report downloaded.', 3000);
+    } catch (e) {
+      try { navigator.clipboard.writeText(txt); say('Report copied. Paste it into a note.', 4000); } catch (e2) { say('Could not make the report on this browser.', 4000); }
+    }
   }
 
   function mk(txt, cls, fn) { var b = D.createElement('button'); b.type = 'button'; b.className = cls || ''; b.textContent = txt; b.onclick = fn; return b; }
@@ -135,16 +234,21 @@
     bSet.parentNode.insertBefore(btn, bSet);
     panel = D.createElement('section'); panel.className = 'card'; panel.hidden = true;
     var h = D.createElement('h2'); h.textContent = 'Task queue (up to ' + MAX + ' tasks)'; panel.appendChild(h);
-    var ta = D.createElement('textarea'); ta.rows = 6; ta.placeholder = 'One task per line, for example:\nFix typos on the About page\nWrite a banner for the weekend offer\nCheck all pages for broken links';
+    var tpl = D.createElement('input'); tpl.type = 'text'; tpl.autocomplete = 'off'; tpl.placeholder = 'Optional template, for example: Write a better description for {item}'; tpl.style.marginBottom = '.4rem';
+    panel.appendChild(tpl);
+    var ta = D.createElement('textarea'); ta.rows = 6; ta.placeholder = 'One task per line, for example:\nFix typos on the About page\nWrite a banner for the weekend offer\nCheck all pages for broken links\n\nWith a template above, put one item per line (product names, page names...) and each line becomes its own task.';
     panel.appendChild(ta);
     var row = D.createElement('div'); row.className = 'row'; row.style.marginTop = '.5rem';
     row.appendChild(mk('Add to queue', 'pri', function () {
-      var tasks = parse(ta.value), room = MAX - st.items.length;
-      if (!tasks.length) { say('Type or paste some tasks first.', 3000); return; }
-      var add = tasks.slice(0, Math.max(0, room));
-      add.forEach(function (t) { st.items.push({ t: t, s: 'p', n: 0, r: '' }); });
+      if (!synced) { say('Connecting to Supabase, try again in a moment.', 3000); return; }
+      var lines = parse(ta.value), t = tpl.value.trim(), room = MAX - st.items.length;
+      if (!lines.length) { say('Type or paste some tasks first.', 3000); return; }
+      var tasks = /\{item\}/i.test(t) ? lines.map(function (l) { return t.replace(/\{item\}/gi, l).slice(0, 2000); }) : lines;
+      var add = tasks.slice(0, Math.max(0, room)), made = add.map(function (x) { return { t: x, s: 'p', n: 0, r: '' }; });
+      made.forEach(function (it) { st.items.push(it); });
       ta.value = ''; save(); render();
       say(add.length < tasks.length ? 'Added ' + add.length + '. The queue is full at ' + MAX + ' tasks. Clear finished ones to make room.' : 'Added ' + add.length + ' task' + (add.length === 1 ? '' : 's') + '.', 5000);
+      if (made.length && cloud !== 'off') pushNew(made).then(cloudGood, cloudFail);
     }));
     startBtn = mk('Start', 'ok', function () {
       if (st.run) { st.run = false; save(); render(); return; }
@@ -153,18 +257,43 @@
       if (st.fresh && D.querySelector('#log .m.user') && !busy()) fresh();
     });
     row.appendChild(startBtn);
-    row.appendChild(mk('Retry failed', '', function () { st.items.forEach(function (i) { if (i.s === 'f') { i.s = 'p'; i.n = 0; i.r = ''; } }); st.retryAt = 0; save(); render(); }));
-    row.appendChild(mk('Clear finished', '', function () { st.items = st.items.filter(function (i) { return i.s === 'p'; }); save(); render(); }));
-    row.appendChild(mk('Clear all', '', function () { if (confirm('Remove every task from the queue?')) { st.items = []; st.run = false; save(); render(); } }));
+    row.appendChild(mk('Retry failed', '', function () { st.items.forEach(function (i) { if (i.s === 'f') { i.s = 'p'; i.n = 0; i.r = ''; touch(i); } }); st.retryAt = 0; save(); render(); }));
+    row.appendChild(mk('Clear finished', '', function () {
+      st.items.forEach(function (i) { if (i.s !== 'p' && i.id) st.del.push(i.id); });
+      st.items = st.items.filter(function (i) { return i.s === 'p'; }); save(); render(); flush();
+    }));
+    row.appendChild(mk('Clear all', '', function () {
+      if (!confirm('Remove every task from the queue?')) return;
+      st.items.forEach(function (i) { if (i.id) st.del.push(i.id); });
+      st.items = []; st.run = false; save(); render(); flush();
+    }));
     panel.appendChild(row);
+    var row2 = D.createElement('div'); row2.className = 'row'; row2.style.marginTop = '.4rem';
+    var fi = D.createElement('input'); fi.type = 'file'; fi.accept = '.txt,.csv,.md,text/plain'; fi.hidden = true;
+    fi.onchange = function () {
+      var f = fi.files && fi.files[0]; if (!f) return;
+      if (f.size > 400000) { say('That file is too big. Use a list of up to ' + MAX + ' lines.', 4000); fi.value = ''; return; }
+      var rd = new FileReader();
+      rd.onload = function () { ta.value = (ta.value ? ta.value + '\n' : '') + String(rd.result || ''); say('Loaded ' + parse(ta.value).length + ' lines. Check them, then press Add to queue.', 5000); fi.value = ''; };
+      rd.readAsText(f);
+    };
+    row2.appendChild(fi);
+    row2.appendChild(mk('Import list from file', 'sm', function () { fi.click(); }));
+    row2.appendChild(mk('Download report', 'sm', report));
+    row2.appendChild(mk('Sync now', 'sm', function () { if (working) { say('Wait until the current task finishes.', 3000); return; } synced = false; syncStart(); }));
+    panel.appendChild(row2);
     var lab = D.createElement('label'); lab.style.fontWeight = '500'; freshCb = D.createElement('input'); freshCb.type = 'checkbox';
     freshCb.onchange = function () { st.fresh = freshCb.checked; save(); };
     lab.appendChild(freshCb); lab.appendChild(D.createTextNode(' Start every task in a fresh chat (saves quota, recommended)')); panel.appendChild(lab);
+    barEl = D.createElement('div'); barEl.style.cssText = 'height:8px;border-radius:99px;background:rgba(127,127,127,.25);overflow:hidden;margin:.5rem 0 .3rem';
+    var fill = D.createElement('div'); fill.style.cssText = 'height:100%;width:0;background:var(--ok,#15803d);transition:width .3s'; barEl.appendChild(fill); panel.appendChild(barEl);
     infoEl = D.createElement('p'); infoEl.className = 'hint'; panel.appendChild(infoEl);
+    cloudEl = D.createElement('p'); cloudEl.className = 'hint'; panel.appendChild(cloudEl);
     listEl = D.createElement('ul'); listEl.style.cssText = 'list-style:none;margin:.4rem 0 0;padding:0;font-size:.85rem;max-height:40vh;overflow:auto'; panel.appendChild(listEl);
-    var hint = D.createElement('p'); hint.className = 'hint'; hint.textContent = 'Keep this page open while the queue runs. It carries on through the 40-step pause, waits out Gemini limits, and resumes after a refresh. Pause stops it after the current task.'; panel.appendChild(hint);
+    var hint = D.createElement('p'); hint.className = 'hint'; hint.textContent = 'Keep this page open while the queue runs. It carries on through the 40-step pause, waits out Gemini limits, and resumes after a refresh. Pause stops it after the current task. Run the queue on one device at a time.'; panel.appendChild(hint);
     log.parentNode.insertBefore(panel, log);
     render();
+    syncStart();
     setInterval(step, 1500);
   }
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', init); else init();
