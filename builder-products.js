@@ -90,13 +90,13 @@
     }
     return renewing;
   }
-  function api(path, method, body, prefer, anon) {
+  function api(path, method, body, prefer, anon, sig) {
     return (anon ? Promise.resolve('') : tok()).then(function (t) {
       var hd = { apikey: KEY };
       if (t) hd.Authorization = 'Bearer ' + t;
       if (body !== undefined) hd['Content-Type'] = 'application/json';
       if (prefer) hd.Prefer = prefer;
-      return fetch(SB + path, { method: method || 'GET', headers: hd, body: body !== undefined ? JSON.stringify(body) : undefined });
+      return fetch(SB + path, { method: method || 'GET', headers: hd, body: body !== undefined ? JSON.stringify(body) : undefined, signal: sig || undefined });
     }).then(function (r) {
       if (!r.ok) return r.text().then(function (x) { var m = x; try { m = JSON.parse(x).message || x; } catch (e) {} throw new Error(String(m).slice(0, 220)); });
       return r.text().then(function (tx) { return tx ? JSON.parse(tx) : null; });
@@ -134,14 +134,17 @@
       im.src = 'data:' + p.mime + ';base64,' + p.data;
     });
   }
-  function upload(p, base) {
+  function stopErr() { var e = new Error('Stopped'); e.name = 'AbortError'; return e; }
+  function upload(p, base, sig) {
     if (p.url) return Promise.resolve(p.url);
+    if (sig && sig.aborted) return Promise.reject(stopErr());
     /* several packs of one product share the same photo: it is uploaded once and every pack re-uses the same web address */
     if (p.pending) return p.pending;
     p.pending = toBlob(p).then(function (b) {
+      if (sig && sig.aborted) throw stopErr();
       return tok().then(function (t) {
         var path = slug(base).slice(0, 60) + '-' + Date.now() + Math.floor(Math.random() * 99) + '.jpg';
-        return fetch(SB + '/storage/v1/object/product-images/' + path, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + t, 'Content-Type': 'image/jpeg' }, body: b }).then(function (r) {
+        return fetch(SB + '/storage/v1/object/product-images/' + path, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + t, 'Content-Type': 'image/jpeg' }, body: b, signal: sig || undefined }).then(function (r) {
           if (!r.ok) throw new Error('Photo upload failed (' + r.status + ')');
           p.url = SB + '/storage/v1/object/public/product-images/' + path; p.pending = null; return p.url;
         });
@@ -149,14 +152,14 @@
     }).then(function (u) { return u; }, function (e) { p.pending = null; throw e; });
     return p.pending;
   }
-  function uploadAll(q) {
+  function uploadAll(q, sig) {
     var urls = [], chain = Promise.resolve();
-    q.files.forEach(function (p) { chain = chain.then(function () { return upload(p, q.name); }).then(function (u) { urls.push(u); }); });
+    q.files.forEach(function (p) { chain = chain.then(function () { return upload(p, q.name, sig); }).then(function (u) { urls.push(u); }); });
     return chain.then(function () { return urls; });
   }
-  function catId(name) {
+  function catId(name, sig) {
     var c = findCat(name); if (c) return Promise.resolve(c.id);
-    return api('/rest/v1/categories?on_conflict=slug', 'POST', { name: name.trim(), slug: slug(name) }, 'resolution=merge-duplicates,return=representation').then(function (r) {
+    return api('/rest/v1/categories?on_conflict=slug', 'POST', { name: name.trim(), slug: slug(name) }, 'resolution=merge-duplicates,return=representation', false, sig).then(function (r) {
       cats.push({ id: r[0].id, name: name.trim(), slug: slug(name) }); return r[0].id;
     });
   }
@@ -235,49 +238,76 @@
       f.style.wordBreak = 'normal'; li.appendChild(f); ul.appendChild(li);
     });
     d.appendChild(ul);
-    var row = h('div', 'row'), go = h('button', 'ok', 'Post all ' + queue.length + ' to my website'), no = h('button', '', 'Not now');
-    go.type = 'button'; no.type = 'button'; btns.push(go, no);
-    go.onclick = function () { post(btns, st); };
-    no.onclick = function () { queue = []; dropCard(); };
-    row.appendChild(go); row.appendChild(no); d.appendChild(row);
+    var row = h('div', 'row'), go = h('button', 'ok', 'Post all ' + queue.length + ' to my website'), no = h('button', '', 'Not now'), stp = h('button', '', 'Stop');
+    go.type = 'button'; no.type = 'button'; stp.type = 'button'; stp.hidden = true; btns.push(go, no);
+    go.onclick = function () { post(btns, st, stp); };
+    no.onclick = function () { if (posting) return; queue = []; dropCard(); };
+    stp.onclick = function () { stopPost(st, stp); };
+    row.appendChild(go); row.appendChild(no); row.appendChild(stp); d.appendChild(row);
     st.textContent = 'Nothing is in your shop until you tap Post. All items are posted at the same time. Packs of the same product are joined under one item, each with its own price. Prices come from your standard settings. The shop and Google feed refresh within about 3 hours.'; d.appendChild(st);
     log.appendChild(d); down();
   }
-  function one(q) {
+  function one(q, sig) {
+    if (sig && sig.aborted) return Promise.reject(stopErr());
     if (hasId(q.id)) return Promise.reject(new Error('already in the shop'));
-    return uploadAll(q).then(function (imgs) {
-      return catId(q.cat).then(function (cid) {
+    return uploadAll(q, sig).then(function (imgs) {
+      if (sig && sig.aborted) throw stopErr();
+      return catId(q.cat, sig).then(function (cid) {
         var row = { id: q.id, category_id: cid, name: q.name, price: q.price, cost: q.cost, stock: q.stock, low_at: q.low, featured: !!q.feat, active: true, images: imgs };
         if (q.desc) row.description = q.desc; if (q.old) row.old_price = q.old; if (q.unit) row.unit = q.unit;
         if (q.pack) { row.variant_label = q.pack; row.variant_group = q.group; }
-        return api('/rest/v1/products', 'POST', row, 'return=minimal');
+        return api('/rest/v1/products', 'POST', row, 'return=minimal', false, sig);
       });
     }).then(function () { shop.push({ id: q.id, name: q.name, variant_group: q.group || null, variant_label: q.pack || null }); });
   }
-  function post(btns, st) {
+  /* Posting runs a few items at a time (POSTERS), not all at once: resizing and uploading 30 photos together froze phones.
+     The Stop button on the card cancels the work in flight; items already saved stay posted and the rest stay on the card. */
+  var POSTERS = 3, posting = null;
+  function stopPost(st, stp) {
+    if (!posting) return;
+    try { posting.abort(); } catch (e) {}
+    if (stp) stp.disabled = true;
+    if (st) st.textContent = 'Stopping...';
+  }
+  function post(btns, st, stp) {
+    if (posting) return;
     if (H.busy()) { st.textContent = 'The AI is still working. Tap Post again in a moment.'; return; }
     var list = queue.slice(); if (!list.length) return;
-    btns.forEach(function (b) { b.disabled = true; }); st.textContent = 'Checking your admin sign-in...';
+    var ctl = typeof AbortController === 'function' ? new AbortController() : { signal: { aborted: false }, abort: function () { this.signal.aborted = true; } }, sig = ctl.signal;
+    posting = ctl;
+    function idle() { posting = null; if (stp) { stp.hidden = true; stp.disabled = false; } }
+    btns.forEach(function (b) { b.disabled = true; }); if (stp) { stp.hidden = false; stp.disabled = false; } st.textContent = 'Checking your admin sign-in...';
     tok().then(loadShop).then(function () {
-      var done = [], fails = [], finished = 0, seq = Promise.resolve();
-      st.textContent = 'Posting all ' + list.length + ' items at once...';
+      var done = [], fails = [], finished = 0, seq = Promise.resolve(), next = 0;
+      if (sig.aborted) return finish(list, done, fails, true, idle);
+      st.textContent = 'Posting ' + list.length + ' item' + (list.length === 1 ? '' : 's') + ', ' + Math.min(POSTERS, list.length) + ' at a time...';
       /* new categories are created first, one at a time, so two items never create the same category twice */
-      list.forEach(function (q) { if (q.cat && !findCat(q.cat)) seq = seq.then(function () { return catId(q.cat); }).then(function () {}, function () {}); });
+      list.forEach(function (q) { if (q.cat && !findCat(q.cat)) seq = seq.then(function () { return sig.aborted ? null : catId(q.cat, sig); }).then(function () {}, function () {}); });
+      /* a few workers take items from the list; each lets the page breathe between items so the screen never freezes */
+      function worker() {
+        if (sig.aborted || next >= list.length) return Promise.resolve();
+        var q = list[next++];
+        return one(q, sig).then(function () { done.push(q); }, function (e) {
+          if (!(sig.aborted || (e && e.name === 'AbortError'))) fails.push(q.name + (q.pack ? ' ' + q.pack : '') + ': ' + String(e && e.message || e).slice(0, 160));
+        }).then(function () {
+          finished++; if (!sig.aborted) st.textContent = 'Posted ' + done.length + ' of ' + list.length + '...';
+          return new Promise(function (ok) { setTimeout(ok, 30); });
+        }).then(worker);
+      }
       return seq.then(function () {
-        /* every item is uploaded and saved at the same time instead of one after another */
-        return Promise.all(list.map(function (q) {
-          return one(q).then(function () { done.push(q); }, function (e) { fails.push(q.name + (q.pack ? ' ' + q.pack : '') + ': ' + String(e && e.message || e).slice(0, 160)); })
-            .then(function () { finished++; st.textContent = 'Posted ' + finished + ' of ' + list.length + '...'; });
-        }));
-      }).then(function () { finish(list, done, fails); });
-    }, function (e) { st.textContent = String(e && e.message || e).replace(/^The owner is signed out/, 'You are signed out').replace(/Tell them to/, 'Please').replace(/ask again \(or tap Post\)\./, 'tap Post again.'); btns.forEach(function (b) { b.disabled = false; }); });
+        var ws = []; for (var i = 0; i < Math.min(POSTERS, list.length); i++) ws.push(worker());
+        return Promise.all(ws);
+      }).then(function () { finish(list, done, fails, sig.aborted, idle); });
+    }, function (e) { idle(); st.textContent = String(e && e.message || e).replace(/^The owner is signed out/, 'You are signed out').replace(/Tell them to/, 'Please').replace(/ask again \(or tap Post\)\./, 'tap Post again.'); btns.forEach(function (b) { b.disabled = false; }); })
+    .then(null, function (e) { idle(); st.textContent = 'Posting stopped: ' + String(e && e.message || e).slice(0, 160); btns.forEach(function (b) { b.disabled = false; }); });
   }
-  function finish(list, done, fails) {
+  function finish(list, done, fails, stopped, idle) {
+    if (idle) idle();
     var dn = {}; done.forEach(function (q) { dn[q.id] = 1; });
     queue = queue.filter(function (q) { return !dn[q.id]; });
     dropCard();
     var names = done.map(function (q) { return q.name + (q.pack ? ' ' + q.pack : ''); });
-    H.say(done.length + ' of ' + list.length + ' item' + (list.length === 1 ? '' : 's') + ' posted to your shop.' + (done.some(function (q) { return q.feat; }) ? ' Items marked as advert show in the home page banner (newest 6 featured items that are in stock).' : '') + (fails.length ? ' Not posted: ' + fails.join(' | ') : ' The shop and Google feed refresh within about 3 hours.'), fails.length ? 'err' : 'sys');
+    H.say((stopped ? 'Stopped. ' : '') + done.length + ' of ' + list.length + ' item' + (list.length === 1 ? '' : 's') + ' posted to your shop.' + (stopped && queue.length ? ' The rest are still on the green card, tap Post to carry on.' : '') + (done.some(function (q) { return q.feat; }) ? ' Items marked as advert show in the home page banner (newest 6 featured items that are in stock).' : '') + (fails.length ? ' Not posted: ' + fails.join(' | ') : ' The shop and Google feed refresh within about 3 hours.'), fails.length ? 'err' : 'sys');
     H.note('[The owner tapped Post. Posted to the shop: ' + (names.join('; ') || 'none') + '.' + (fails.length ? ' Failed: ' + fails.join(' | ') + '.' : '') + ' Photos are still attached in the tool, so failed items can be posted again.]');
     if (queue.length) drawCard();
   }
