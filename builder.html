@@ -529,9 +529,15 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
       var q = String(a.query || ''); if (!q) throw new Error('query is required');
       var re = a.regex ? new RegExp(q, 'i') : null, lower = q.toLowerCase();
       return loadTree().then(function () {
-        var paths, pre = String(a.prefix || '').replace(/^\/+/, '');
-        if (a.path) paths = [cleanPath(a.path)];
-        else paths = S.tree.filter(function (e) { return e.path.indexOf(pre) === 0 && !BIN.test(e.path) && e.size < 400000 && (pre || e.path.indexOf('/') < 0); }).map(function (e) { return e.path; }).slice(0, 40);
+        var paths, total = 0, truncated = false, pre = String(a.prefix || '').replace(/^\/+/, '');
+        /* generated files are skipped when searching a whole folder: they are huge and not meant to be edited by hand */
+        var GEN = /^(sitemap[^\/]*\.xml|merchant-feed\.xml|blog-topics\.json|sitemap-state\.json)$/;
+        if (a.path) { paths = [cleanPath(a.path)]; total = 1; }
+        else {
+          paths = S.tree.filter(function (e) { return e.path.indexOf(pre) === 0 && !BIN.test(e.path) && e.size < 400000 && (pre || e.path.indexOf('/') < 0) && !GEN.test(e.path); }).map(function (e) { return e.path; });
+          total = paths.length;
+          if (total > 120) { paths = paths.slice(0, 120); truncated = true; }
+        }
         var res = [], skipped = [], idx = 0;
         function worker() {
           if (idx >= paths.length || res.length >= 40) return Promise.resolve();
@@ -545,7 +551,11 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
           }, function () { skipped.push(p); }).then(worker);
         }
         var ws = []; for (var k = 0; k < 8; k++) ws.push(worker());
-        return Promise.all(ws).then(function () { return { matches: res, files_searched: paths.length, skipped: skipped }; });
+        return Promise.all(ws).then(function () {
+          var out = { matches: res, files_searched: paths.length, files_total: total, skipped: skipped };
+          if (truncated) { out.truncated = true; out.note = 'Only the first 120 of ' + total + ' files were searched. Give a more specific prefix or path to search the rest.'; }
+          return out;
+        });
       });
     },
     shop_data: function (a) {
@@ -619,7 +629,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   var DECLS = [
     { name: 'list_files', description: 'List files in a repository folder. Prefix like "c/" lists that folder. The root is already known.', parameters: P({ prefix: T }) },
     { name: 'read_file', description: 'Read a text file with line numbers (up to 400 lines per call; use start_line/end_line to page). Request several files in one go when you need them.', parameters: P({ path: T, start_line: { type: 'integer' }, end_line: { type: 'integer' } }, ['path']) },
-    { name: 'search_text', description: 'Find text. Give path for one file or prefix for a folder; with neither it searches root-level files.', parameters: P({ query: T, path: T, prefix: T, regex: { type: 'boolean' } }, ['query']) },
+    { name: 'search_text', description: 'Find text. Give path for one file or prefix for a folder; with neither it searches the root-level text files (up to 120, and the result says if it was cut short).', parameters: P({ query: T, path: T, prefix: T, regex: { type: 'boolean' } }, ['query']) },
     { name: 'shop_data', description: 'Read live store data from Supabase (read-only, public info only): products (name, price in KSh, stock, image, category) or categories. Use it to see the real products before designing banners, pages or copy.', parameters: P({ table: T, search: T, category_id: { type: 'integer' }, featured: { type: 'boolean' }, limit: { type: 'integer' } }) },
     { name: 'edit_file', description: 'Replace exact text in a file (staged until the owner publishes). "find" must match exactly and be unique unless replace_all is true.', parameters: P({ path: T, find: T, replace: T, replace_all: { type: 'boolean' } }, ['path', 'find', 'replace']) },
     { name: 'write_file', description: 'Create a new text file, or fully replace a small one (staged until published). Use edit_file for existing files.', parameters: P({ path: T, content: T }, ['path', 'content']) },
