@@ -261,7 +261,7 @@
   }
 
   function report() {
-    var lines = ['Stermont I.T task report, ' + new Date().toLocaleString(), count('d') + ' done, ' + count('f') + ' failed, ' + count('p') + ' waiting', ''];
+    var lines = ['Stermont Office task report, ' + new Date().toLocaleString(), count('d') + ' done, ' + count('f') + ' failed, ' + count('p') + ' waiting', ''];
     st.items.forEach(function (it, i) { lines.push((i + 1) + '. [' + (it.s === 'd' ? 'DONE' : it.s === 'f' ? 'FAILED' : 'WAITING') + '] ' + it.t + (it.r ? '\n     ' + it.r : '')); });
     var txt = lines.join('\n');
     try {
