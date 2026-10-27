@@ -463,5 +463,5 @@
 
   /* More tool files. A file written here runs right now, before the builder reads its tool list, so it can add tools to BuilderProducts.
      Add a new tool by creating its own file and listing it here. If a file is missing the builder simply works without it. */
-  if (D.readyState === 'loading') { try { D.write('<scr' + 'ipt src="/builder-sitepacks.js?v=2"></scr' + 'ipt><scr' + 'ipt src="/builder-tasks.js?v=5"></scr' + 'ipt>'); } catch (e) {} }
+  if (D.readyState === 'loading') { try { D.write('<scr' + 'ipt src="/builder-sitepacks.js?v=3"></scr' + 'ipt><scr' + 'ipt src="/builder-tasks.js?v=5"></scr' + 'ipt>'); } catch (e) {} }
 })();

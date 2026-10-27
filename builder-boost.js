@@ -128,4 +128,4 @@ try { var bk = document.createElement('script'); bk.src = '/builder-backup.js?v=
 /* limit tools: usage meter, reset countdown, backups-first switch, lean mode (optional) */
 try { var lm = document.createElement('script'); lm.src = '/builder-limits.js?v=1'; lm.async = true; (document.head || document.documentElement).appendChild(lm); } catch (e) {}
 /* automatic publishing (optional: the builder works without it) */
-try { var as = document.createElement('script'); as.src = '/builder-auto.js?v=1'; as.async = true; (document.head || document.documentElement).appendChild(as); } catch (e) {}
+try { var as = document.createElement('script'); as.src = '/builder-auto.js?v=2'; as.async = true; (document.head || document.documentElement).appendChild(as); } catch (e) {}
