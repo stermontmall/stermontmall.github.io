@@ -119,7 +119,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
 <div id="dlg" hidden><div class="dbox"><div class="dh"><b id="dt"></b><button id="dx" type="button" class="sm">Close</button></div><div id="dbody"></div></div></div>
 
 <script src="/builder-attach.js?v=5"></script>
-<script src="/builder-products.js?v=8"></script>
+<script src="/builder-products.js?v=9"></script>
 <script>
 (function () {
   'use strict';
@@ -641,8 +641,8 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     try {
       BP.decls.forEach(function (d) { DECLS.push(d); });
       Object.keys(BP.tools).forEach(function (k) { TOOLS[k] = BP.tools[k]; });
-      RO.list_products = 1;
-      NAMES.list_products = 'Checking the shop items'; NAMES.post_products = 'Preparing items to post';
+      RO.list_products = 1; RO.read_product_page = 1;
+      NAMES.list_products = 'Checking the shop items'; NAMES.read_product_page = 'Reading the Jumia page'; NAMES.post_products = 'Preparing items to post';
       BP.bind({
         busy: function () { return S.busy; },
         note: function (t) { S.hist.push({ role: 'user', parts: [{ text: t }] }); S.hist.push({ role: 'model', parts: [{ text: 'Understood.' }] }); saveChat(); },
