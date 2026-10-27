@@ -1,4 +1,4 @@
-/* Stermont AI Builder: task queue (up to 500 tasks), saved in Supabase.
+/* Stermont AI Builder: task queue (up to 1000 tasks), saved in Supabase.
    Adds a Tasks button next to Settings. Paste a list (one task per line), press Start, and the builder does the tasks one after another
    by sending each one to the AI as if you had typed it. It keeps going on its own:
    - when the AI pauses after 40 steps it sends "continue" for you
@@ -15,7 +15,7 @@
    If this file fails to load, the builder works as before. */
 (function () {
   'use strict';
-  var D = document, KEY = 'stm_builder_tasks_v1', CHAT = 'stm_builder_chat_v1', MAX = 500;
+  var D = document, KEY = 'stm_builder_tasks_v1', CHAT = 'stm_builder_chat_v1', MAX = 1000;
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', PK = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
   if (window.__stmTasks) return;
   window.__stmTasks = 1;
@@ -28,7 +28,7 @@
     return o;
   }
   var st = load(), working = false, panel = null, listEl = null, infoEl = null, cloudEl = null, barEl = null, btn = null, startBtn = null, freshCb = null, toast = null, toastT = 0;
-  var cloud = 'connecting', cloudMsg = '', synced = false, renewing = null;
+  var cloud = 'connecting', cloudMsg = '', synced = false, renewing = null, view = 'all', shown = 150;
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
   function count(s) { return st.items.filter(function (i) { return i.s === s; }).length; }
   function first(s) { for (var i = 0; i < st.items.length; i++) if (st.items[i].s === s) return i; return -1; }
@@ -199,9 +199,10 @@
     startBtn.textContent = st.run ? 'Pause' : 'Start';
     freshCb.checked = !!st.fresh;
     listEl.innerHTML = '';
-    var cur = first('p');
-    st.items.forEach(function (it, i) {
-      var li = D.createElement('li'), sp = D.createElement('span');
+    var cur = first('p'), rows = [];
+    st.items.forEach(function (x, k) { if (view === 'all' || x.s === view) rows.push(k); });
+    rows.slice(0, shown).forEach(function (i) {
+      var it = st.items[i], li = D.createElement('li'), sp = D.createElement('span');
       var tag = it.s === 'd' ? '✓' : it.s === 'f' ? '✗' : (working && i === cur ? '▶' : '·');
       sp.textContent = tag + ' ' + (i + 1) + '. ' + it.t.slice(0, 160) + (it.r ? ' — ' + it.r.slice(0, 160) : '');
       sp.style.color = it.s === 'f' ? 'var(--no)' : it.s === 'd' ? 'var(--ok)' : '';
@@ -210,6 +211,7 @@
       if (!(working && i === cur)) { var xb = mk('✕', 'sm', function () { var k = st.items.indexOf(it); if (k < 0) return; st.items.splice(k, 1); if (it.id) st.del.push(it.id); save(); render(); flush(); }); xb.title = 'Remove'; xb.style.marginLeft = '.3rem'; li.appendChild(xb); }
       listEl.appendChild(li);
     });
+    if (rows.length > shown) { var mo = D.createElement('li'); mo.appendChild(mk('Show 200 more (' + (rows.length - shown) + ' hidden)', 'sm', function () { shown += 200; render(); })); listEl.appendChild(mo); }
   }
 
   function report() {
@@ -280,6 +282,10 @@
     row2.appendChild(fi);
     row2.appendChild(mk('Import list from file', 'sm', function () { fi.click(); }));
     row2.appendChild(mk('Download report', 'sm', report));
+    var sel = D.createElement('select'); sel.title = 'Show which tasks';
+    [['all', 'Show all'], ['p', 'Waiting'], ['d', 'Done'], ['f', 'Failed']].forEach(function (o) { var op = D.createElement('option'); op.value = o[0]; op.textContent = o[1]; sel.appendChild(op); });
+    sel.onchange = function () { view = sel.value; shown = 150; render(); };
+    row2.appendChild(sel);
     row2.appendChild(mk('Sync now', 'sm', function () { if (working) { say('Wait until the current task finishes.', 3000); return; } synced = false; syncStart(); }));
     panel.appendChild(row2);
     var lab = D.createElement('label'); lab.style.fontWeight = '500'; freshCb = D.createElement('input'); freshCb.type = 'checkbox';

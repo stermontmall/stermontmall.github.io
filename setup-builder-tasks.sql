@@ -1,4 +1,4 @@
--- Stermont Arcade · AI Builder task queue (up to 500 tasks), saved in Supabase.
+-- Stermont Arcade · AI Builder task queue (up to 1000 tasks), saved in Supabase.
 -- Applied to Supabase on 2026-10-27. Safe to re-run.
 -- Only signed-in staff (public.is_staff()) can read or change it. Shoppers and anonymous visitors get nothing.
 
@@ -18,13 +18,13 @@ revoke all on public.builder_tasks from anon;
 drop policy if exists bt_staff on public.builder_tasks;
 create policy bt_staff on public.builder_tasks for all using (public.is_staff()) with check (public.is_staff());
 
--- the queue holds at most 500 tasks, and updated_at follows every change
+-- the queue holds at most 1000 tasks, and updated_at follows every change
 create or replace function public.builder_tasks_guard() returns trigger
 language plpgsql set search_path = public as $$
 begin
   if tg_op = 'INSERT' then
-    if (select count(*) from public.builder_tasks) >= 500 then
-      raise exception 'The builder queue is full (500 tasks). Clear finished tasks first.';
+    if (select count(*) from public.builder_tasks) >= 1000 then
+      raise exception 'The builder queue is full (1000 tasks). Clear finished tasks first.';
     end if;
   else
     new.updated_at := now();
