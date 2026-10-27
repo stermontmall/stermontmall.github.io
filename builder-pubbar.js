@@ -31,14 +31,18 @@
     bar.onclick = press;
     D.body.appendChild(bar);
   }
+  var wasBusy = null;
   function refresh() {
     if (!bar) return;
     var w = waiting();
-    if (!w) { bar.hidden = true; return; }
-    var c = card(), warn = c && c.querySelector('.warn'), k = c ? count(c.querySelector('ul')) : 0;
-    bar.textContent = warn ? 'Check the warning' : 'Publish' + (k ? ' (' + k + ')' : '') + ' to my website';
-    bar.style.background = warn ? '#b45309' : '#15803d';
-    bar.disabled = !!(D.getElementById('bPub') && D.getElementById('bPub').disabled && !c);
+    if (!w) { bar.hidden = true; wasBusy = null; return; }
+    var c = card(), pb = D.getElementById('bPub'), busy = !!(pb && pb.disabled && !c), warn = c && c.querySelector('.warn');
+    var k = c ? count(c.querySelector('ul')) : count(D.getElementById('stl'));
+    bar.textContent = warn ? 'Check the warning' : busy ? 'Changes waiting' + (k ? ' (' + k + ')' : '') + ' - Publish ready when the AI finishes' : 'Publish' + (k ? ' (' + k + ')' : '') + ' to my website';
+    bar.style.background = warn ? '#b45309' : busy ? '#6b7280' : '#15803d';
+    bar.disabled = busy;
+    if (wasBusy === true && !busy && !warn) { bar.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 600, iterations: 2 }); }
+    wasBusy = busy;
     bar.hidden = false;
   }
   function init() {
@@ -46,6 +50,8 @@
     make();
     new MutationObserver(function () { clearTimeout(n); n = setTimeout(refresh, 80); }).observe(log, { childList: true, subtree: true });
     if (stg) new MutationObserver(function () { clearTimeout(n); n = setTimeout(refresh, 80); }).observe(stg, { attributes: true, attributeFilter: ['hidden'], childList: true, subtree: true });
+    var pbn = D.getElementById('bPub');
+    if (pbn) new MutationObserver(function () { clearTimeout(n); n = setTimeout(refresh, 50); }).observe(pbn, { attributes: true, attributeFilter: ['disabled'] });
     refresh();
   }
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', init); else init();

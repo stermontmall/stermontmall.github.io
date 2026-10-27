@@ -66,4 +66,4 @@
 /* task queue (optional: the builder works without it) */
 try { var ts = document.createElement('script'); ts.src = '/builder-tasks.js?v=5'; ts.async = true; (document.head || document.documentElement).appendChild(ts); } catch (e) {}
 /* always-visible Publish button (optional: the builder works without it) */
-try { var pb = document.createElement('script'); pb.src = '/builder-pubbar.js?v=1'; pb.async = true; (document.head || document.documentElement).appendChild(pb); } catch (e) {}
+try { var pb = document.createElement('script'); pb.src = '/builder-pubbar.js?v=2'; pb.async = true; (document.head || document.documentElement).appendChild(pb); } catch (e) {}
