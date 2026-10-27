@@ -4,7 +4,8 @@
 (function () {
   'use strict';
   var W = window, D = document;
-  var MAX_FILES = 12, MAX_BYTES = 14 * 1024 * 1024, MAX_PDF = 6 * 1024 * 1024, MAX_RAW_IMG = 1200 * 1024, MAX_HEIC = 4 * 1024 * 1024, MAX_SIDE = 1600, MAX_TEXT = 60000;
+  /* 30 files per message (was 12) so one upload can post 15 or more shop items in a single go. The size cap stays under Gemini's 20 MB request limit. */
+  var MAX_FILES = 30, MAX_BYTES = 18 * 1024 * 1024, MAX_PDF = 6 * 1024 * 1024, MAX_RAW_IMG = 1200 * 1024, MAX_HEIC = 4 * 1024 * 1024, MAX_SIDE = 1600, MAX_TEXT = 60000;
   var TEXT_EXT = /\.(txt|md|markdown|json|csv|tsv|log|js|mjs|cjs|ts|tsx|jsx|css|scss|html?|xml|svg|sql|ya?ml|toml|ini|sh|py|php|rb|go|java|c|h|cpp|cs|rs|vue|conf|diff|patch)$/i;
   var IMG_EXT = /\.(png|jpe?g|webp|gif|heic|heif)$/i;
   var NOGO_NAME = /(^|\/)\.env(\.|$)|\.(pem|key|p12|pfx)$/i;
