@@ -4,6 +4,7 @@
    Existing items: update_products saves straight to the shop (no card), because the owner asked for it. Old values are kept in a backup on this device.
    Description length is enforced by the tools: at least 300 words by default, or whatever minimum and maximum the owner asks for.
    new_chat: clears the saved chat and reloads the builder so it starts fresh on the newest code. The header New chat button does the same.
+   More tools live in their own files (see the end of this file), so new tools can be added without touching this one.
    If this file fails to load, the builder keeps working without these tools. */
 (function () {
   'use strict';
@@ -46,10 +47,11 @@
     reloadSoon(300);
     return { ok: true, note: 'The chat is cleared and the builder is reloading on the newest code. Changes that were waiting to be published are kept. The page reloads in a moment, so reply with at most one short sentence such as "Starting fresh..." and nothing more.' };
   }
-  /* the header New chat button: the builder clears the chat itself (it does nothing while the AI is working); this then reloads so the newest code is used */
+  /* the header New chat button: the builder clears the chat itself (it does nothing while the AI is working); this then reloads so the newest code is used.
+     The task queue sets __stmNoReload when it clears a long chat between two tasks, because that must not reload the page. */
   (function () {
     var b = D.getElementById('bNew'); if (!b) return;
-    b.addEventListener('click', function () { if (H.busy()) return; reloadSoon(150); });
+    b.addEventListener('click', function () { if (H.busy() || W.__stmNoReload) return; reloadSoon(150); });
   })();
 
   /* ---------- standard settings and prices (same method as the admin Catalog) ---------- */
@@ -436,4 +438,8 @@
     bind: function (o) { if (o) { if (o.busy) H.busy = o.busy; if (o.note) H.note = o.note; if (o.say) H.say = o.say; } },
     _t: { auto: auto, autoOld: autoOld, settings: settings, prepare: prepare, setCats: function (c) { cats = c; }, setShop: function (s) { shop = s; }, queue: function () { return queue; } }
   };
+
+  /* More tool files. A file written here runs right now, before the builder reads its tool list, so it can add tools to BuilderProducts.
+     Add a new tool by creating its own file and listing it here. If a file is missing the builder simply works without it. */
+  if (D.readyState === 'loading') { try { D.write('<scr' + 'ipt src="/builder-tasks.js?v=1"></scr' + 'ipt>'); } catch (e) {} }
 })();
