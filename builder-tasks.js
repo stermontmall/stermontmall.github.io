@@ -1,4 +1,4 @@
-/* Stermont AI Builder: task queue (up to 1000 tasks), saved in Supabase.
+/* Stermont AI Builder: task queue (up to 6000 tasks), saved in Supabase.
    Adds a Tasks button next to Settings. Paste a list (one task per line), press Start, and the builder does the tasks one after another
    by sending each one to the AI as if you had typed it. It keeps going on its own:
    - when the AI pauses after 40 steps it sends "continue" for you
@@ -15,7 +15,7 @@
    If this file fails to load, the builder works as before. */
 (function () {
   'use strict';
-  var D = document, KEY = 'stm_builder_tasks_v1', CHAT = 'stm_builder_chat_v1', MAX = 1000;
+  var D = document, KEY = 'stm_builder_tasks_v1', CHAT = 'stm_builder_chat_v1', MAX = 6000;
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', PK = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
   if (window.__stmTasks) return;
   window.__stmTasks = 1;
@@ -25,11 +25,18 @@
     var o = null; try { o = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
     if (!o || !Array.isArray(o.items)) o = { run: false, fresh: true, items: [], retryAt: 0 };
     if (!Array.isArray(o.del)) o.del = [];
+    o.items = o.items.filter(function (i) { return i && typeof i.t === 'string'; });
     return o;
   }
   var st = load(), working = false, panel = null, listEl = null, infoEl = null, cloudEl = null, barEl = null, btn = null, startBtn = null, freshCb = null, toast = null, toastT = 0;
   var cloud = 'connecting', cloudMsg = '', synced = false, renewing = null, view = 'all', shown = 150;
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(st)); return; } catch (e) {}
+    /* browser storage is full (thousands of long tasks): keep only what Supabase does not have yet. The rest is read back from Supabase on the next load. */
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ run: st.run, fresh: st.fresh, retryAt: st.retryAt, del: st.del, syncedAt: 0, items: st.items.map(function (i) { return i.id && !i.x ? { id: i.id, s: i.s, n: i.n, r: '' } : i; }) }));
+    } catch (e) {}
+  }
   function count(s) { return st.items.filter(function (i) { return i.s === s; }).length; }
   function first(s) { for (var i = 0; i < st.items.length; i++) if (st.items[i].s === s) return i; return -1; }
   function busy() { var s = $('bStop'); return !!(s && !s.hidden); }
@@ -91,28 +98,48 @@
     }, Promise.resolve());
   }
   /* send removals and changed tasks. Changes stay marked on the task until Supabase confirms them, so nothing is lost if the network drops. */
+  function chunks(a, n) { var o = []; for (var k = 0; k < a.length; k += n) o.push(a.slice(k, k + n)); return o; }
   function flush() {
     if (cloud === 'off' && !st.del.length && !st.items.some(function (i) { return i.x; })) return Promise.resolve();
-    var dels = st.del.slice(), p = Promise.resolve();
-    if (dels.length) p = p.then(function () { return api('/rest/v1/builder_tasks?id=in.(' + dels.join(',') + ')', 'DELETE'); }).then(function () { st.del = st.del.filter(function (x) { return dels.indexOf(x) < 0; }); save(); });
-    var dirty = st.items.filter(function (i) { return i.id && i.x; });
-    return p.then(function () {
-      return Promise.all(dirty.map(function (i) {
-        var v = i.v || 0;
-        return api('/rest/v1/builder_tasks?id=eq.' + i.id, 'PATCH', { status: i.s, tries: i.n || 0, result: i.r ? String(i.r).slice(0, 600) : null }).then(function () { if ((i.v || 0) === v) i.x = 0; });
-      }));
-    }).then(function () { save(); cloudGood(); }, cloudFail);
+    /* big queues: removals and changes go in groups of 200 (a long list of ids will not fit in one web address), and tasks with the same new status share one request */
+    var dels = st.del.slice(), p = Promise.resolve(), groups = {};
+    chunks(dels, 200).forEach(function (ch) {
+      p = p.then(function () { return api('/rest/v1/builder_tasks?id=in.(' + ch.join(',') + ')', 'DELETE'); }).then(function () { var gone = {}; ch.forEach(function (x) { gone[x] = 1; }); st.del = st.del.filter(function (x) { return !gone[x]; }); save(); });
+    });
+    st.items.forEach(function (i) {
+      if (!i.id || !i.x) return;
+      var b = { status: i.s, tries: i.n || 0, result: i.r ? String(i.r).slice(0, 600) : null }, k = JSON.stringify(b);
+      (groups[k] = groups[k] || { b: b, its: [] }).its.push({ it: i, v: i.v || 0 });
+    });
+    Object.keys(groups).forEach(function (k) {
+      chunks(groups[k].its, 200).forEach(function (ch) {
+        p = p.then(function () { return api('/rest/v1/builder_tasks?id=in.(' + ch.map(function (z) { return z.it.id; }).join(',') + ')', 'PATCH', groups[k].b); }).then(function () { ch.forEach(function (z) { if ((z.it.v || 0) === z.v) z.it.x = 0; }); });
+      });
+    });
+    return p.then(function () { save(); cloudGood(); }, cloudFail);
   }
   function touch(it) { it.x = 1; it.v = (it.v || 0) + 1; save(); if (cloud === 'on') flush(); }
+  /* Supabase hands out at most 1000 rows per request, so a big queue is read page by page */
   function pull() {
-    return api('/rest/v1/builder_tasks?select=id,text,status,tries,result&order=id.asc&limit=' + MAX).then(function (rows) {
-      st.items = (rows || []).map(function (r) { return { id: r.id, t: r.text, s: r.status, n: r.tries || 0, r: r.result || '' }; });
-      save();
+    var all = [];
+    function page(off) {
+      return api('/rest/v1/builder_tasks?select=id,text,status,tries,result&order=id.asc&limit=1000&offset=' + off).then(function (rows) {
+        rows = rows || []; all = all.concat(rows);
+        if (rows.length === 1000 && all.length < MAX) return page(off + 1000);
+      });
+    }
+    return page(0).then(function () {
+      st.items = all.map(function (r) { return { id: r.id, t: r.text, s: r.status, n: r.tries || 0, r: r.result || '' }; });
+      st.syncedAt = Date.now(); save();
     });
   }
-  function syncStart() {
+  /* every page load checks the queue with Supabase, but a big queue that was read less than 10 minutes ago is not downloaded again for each fresh-chat reload. "Sync now" always reads it. */
+  function syncStart(force) {
     cloud = 'connecting'; render();
-    return tok().then(function () { return flush(); }).then(function () { return pushNew(st.items); }).then(pull).then(function () { cloudGood(); }, cloudFail).then(function () { synced = true; render(); });
+    return tok().then(function () { return flush(); }).then(function () { return pushNew(st.items); }).then(function () {
+      if (!force && st.syncedAt && Date.now() - st.syncedAt < 600000 && st.items.length) return;
+      return pull();
+    }).then(function () { cloudGood(); }, cloudFail).then(function () { synced = true; render(); });
   }
 
   /* clear the saved chat and reload, so the next task starts with an empty chat and the newest code */
@@ -286,7 +313,7 @@
     [['all', 'Show all'], ['p', 'Waiting'], ['d', 'Done'], ['f', 'Failed']].forEach(function (o) { var op = D.createElement('option'); op.value = o[0]; op.textContent = o[1]; sel.appendChild(op); });
     sel.onchange = function () { view = sel.value; shown = 150; render(); };
     row2.appendChild(sel);
-    row2.appendChild(mk('Sync now', 'sm', function () { if (working) { say('Wait until the current task finishes.', 3000); return; } synced = false; syncStart(); }));
+    row2.appendChild(mk('Sync now', 'sm', function () { if (working) { say('Wait until the current task finishes.', 3000); return; } synced = false; syncStart(true); }));
     panel.appendChild(row2);
     var lab = D.createElement('label'); lab.style.fontWeight = '500'; freshCb = D.createElement('input'); freshCb.type = 'checkbox';
     freshCb.onchange = function () { st.fresh = freshCb.checked; save(); };
