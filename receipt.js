@@ -252,7 +252,7 @@
     var delivery = o.method === 'delivery';
     var cols = [
       { t: 'BILLED TO', e: [['Customer', o.customer_name], ['Phone', o.phone], ['Email', o.email]] },
-      { t: 'PAYMENT', e: [['Order reference', o.ref], ['Paid via', 'M-Pesa Paybill ' + BIZ.paybill], ['Account number', BIZ.account]] },
+      { t: 'PAYMENT', e: [['Order reference', o.ref], ['Business No. (M-Pesa Paybill)', BIZ.paybill], ['Account No.', BIZ.account]] },
       { t: delivery ? 'DELIVERY' : 'COLLECTION', e: [['Method', delivery ? 'Home delivery' : 'Store pickup'], [delivery ? 'Deliver to' : 'Pickup point', delivery ? [o.address, o.county].filter(Boolean).join(', ') : 'Stermont Arcade store'], ['Order placed', when(o.created_at)]] }
     ];
     var maxH = 0;
@@ -451,7 +451,7 @@
       '*Items*', lines(o).join('\n'), '',
       '*Total paid: ' + money(paidAmount(o)) + '*',
       '*M-Pesa code: ' + (code(o) || '-') + '*',
-      'Paybill ' + BIZ.paybill + ', account ' + BIZ.account,
+      'Business No. ' + BIZ.paybill + ', Account No. ' + BIZ.account,
       bal > 0 ? 'Balance due: ' + money(bal) : 'Balance due: KSh 0', '',
       '\uD83D\uDC64 ' + (o.customer_name || ''),
       o.method === 'delivery' ? '\uD83D\uDE9A Delivery to: ' + [o.address, o.county].filter(Boolean).join(', ') : '\uD83C\uDFEC Store pickup', '',
