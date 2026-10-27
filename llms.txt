@@ -32,6 +32,7 @@
 - [Bed Bug Killer in Kenya](https://stermontarcade.co.ke/c/bed-bug-killers.html): Buy bed bug killer in Kenya. Registered insecticides for bed bug control in homes and public places. Pay by M-Pesa, delivery to all 47 counties.
 - [Bluetooth Speakers in Kenya](https://stermontarcade.co.ke/c/bluetooth-speakers.html): Buy portable Bluetooth speakers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
 - [Cockroach & Ant Killer in Kenya](https://stermontarcade.co.ke/c/cockroach-ant-killers.html): Buy cockroach and ant killers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
+- [Buy Computing in Kenya](https://stermontarcade.co.ke/c/computing.html): Shop Computing online in Kenya. 1 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Crop Insecticides in Kenya](https://stermontarcade.co.ke/c/crop-insecticides.html): Buy insecticides for crops and farms online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
 - [Disinfectants for Farms & Homes in Kenya](https://stermontarcade.co.ke/c/disinfectants-hygiene.html): Buy disinfectants for poultry and livestock farms and general hygiene online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
 - [Buy Electrical & Lighting in Kenya](https://stermontarcade.co.ke/c/electrical-lighting.html): Shop Electrical & Lighting online in Kenya. 1 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
@@ -47,7 +48,7 @@
 - [Mosquito & Fly Control Products in Kenya](https://stermontarcade.co.ke/c/mosquito-fly-control.html): Buy mosquito and fly control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
 - [Pest Control & Fumigation Products in Kenya](https://stermontarcade.co.ke/c/pest-control-fumigation.html): Buy bed bug killers, insecticides and fumigation products online in Kenya. Pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Buy Phone Accessories in Kenya](https://stermontarcade.co.ke/c/phone-accessories.html): Shop Phone Accessories online in Kenya. 2 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
-- [Buy Phones & Tablets in Kenya](https://stermontarcade.co.ke/c/phones-tablets.html): Shop Phones & Tablets online in Kenya. 7 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
+- [Buy Phones & Tablets in Kenya](https://stermontarcade.co.ke/c/phones-tablets.html): Shop Phones & Tablets online in Kenya. 8 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Rat & Mouse Control Products in Kenya](https://stermontarcade.co.ke/c/rodent-control.html): Buy rat and mouse control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
 - [Buy Shoes in Kenya](https://stermontarcade.co.ke/c/shoes.html): Shop Shoes online in Kenya. 3 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Pest Control Sprayers & Equipment in Kenya](https://stermontarcade.co.ke/c/sprayers-equipment.html): Buy pest control sprayers, masks and gloves online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
@@ -78,6 +79,6 @@
 - [Washing Machine Buying Guide Kenya: Front vs Top Load](https://stermontarcade.co.ke/blog/washing-machine-buying-guide-kenya.html): Choosing a washing machine in Kenya? Compare front load and top load, semi and fully automatic, capacity in kg, and what you need to install one.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 157 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 164 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
