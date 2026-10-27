@@ -199,6 +199,8 @@
         if (m.old && !(m.old > m.price)) m.old = 0;
         if (!m.old && o.disc && m.price > 0) m.old = autoOld(m.price, Math.round(o.dmin + Math.random() * (o.dmax - o.dmin)));
         m.newCat = !!m.cat && !findCat(m.cat);
+        /* strict categories: an item goes only into a category that already exists, unless the owner asked for a new one (allow_new_category) */
+        if (m.newCat && !a.allow_new_category) bad.push('category "' + m.cat + '" does not exist. Choose the exact name of the one existing category this item belongs to from the shop category list (closest: ' + cats.filter(function (c) { var n = norm(c.name), w = norm(m.cat).split(' ').filter(function (x) { return x.length > 3; }); return w.some(function (x) { return n.indexOf(x) > -1; }); }).slice(0, 6).map(function (c) { return c.name; }).join(' | ') + '). Only if the owner asked for a new category, send allow_new_category true');
         if (bad.length) problems.push({ item: label, problem: bad.join('; ') }); else ok.push(m);
       });
       var ids = {}; ok.forEach(function (m) { ids[m.id] = 1; });
@@ -424,7 +426,7 @@
         items: { type: 'array', items: P({
           photos: { type: 'array', items: I, description: 'Numbers of the attached photos that show this product (Photo 1, Photo 2 ...). Every pack of the same product can use the same photo numbers' },
           name: { type: 'string', description: 'Title Case: brand, product, and size or model only if visible on the photo or stated by the owner. Do NOT put the pack size in the name when the product has packs: use pack_size' },
-          category: { type: 'string', description: 'Best match from the shop category list, or a short new category name only if none fits' },
+          category: { type: 'string', description: 'The EXACT name of the one existing category this item strictly belongs to (copy it from the shop category list)' },
           cost: { type: 'number', description: 'Buying price in KSh (COGS) of THIS pack, ONLY if the owner stated it. Never guess' },
           price: { type: 'number', description: 'Selling price of THIS pack ONLY if the owner stated it. Otherwise leave out: it is worked out from the cost' },
           pack_size: { type: 'string', description: 'Size or variant such as 1 Litre. When a product comes in several packs, send one entry per pack with the same name and a different pack_size' },
@@ -435,6 +437,7 @@
           featured: { type: 'boolean', description: 'Only if the owner asked for this item to be an advert' }
         }, ['name', 'category']) },
         settings: P({ profit_percent: N, profit_mode: { type: 'string', description: 'cost (cost plus percent) or margin' }, discount_min: N, discount_max: N, show_previous_price: B, stock: I, low_stock_alert: I, featured: B }),
+        allow_new_category: { type: 'boolean', description: 'true ONLY when the owner asked for a brand new category. Otherwise every category must be an exact existing category name' },
         min_description_words: { type: 'integer', description: 'Minimum words for every description (default 300). Use the owner\'s number if they gave one' },
         max_description_words: { type: 'integer', description: 'Maximum words for every description. Only if the owner gave a limit' }
       }, ['items']) }
@@ -460,5 +463,5 @@
 
   /* More tool files. A file written here runs right now, before the builder reads its tool list, so it can add tools to BuilderProducts.
      Add a new tool by creating its own file and listing it here. If a file is missing the builder simply works without it. */
-  if (D.readyState === 'loading') { try { D.write('<scr' + 'ipt src="/builder-sitepacks.js?v=1"></scr' + 'ipt><scr' + 'ipt src="/builder-tasks.js?v=5"></scr' + 'ipt>'); } catch (e) {} }
+  if (D.readyState === 'loading') { try { D.write('<scr' + 'ipt src="/builder-sitepacks.js?v=2"></scr' + 'ipt><scr' + 'ipt src="/builder-tasks.js?v=5"></scr' + 'ipt>'); } catch (e) {} }
 })();
