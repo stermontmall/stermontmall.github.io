@@ -119,7 +119,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
 <div id="dlg" hidden><div class="dbox"><div class="dh"><b id="dt"></b><button id="dx" type="button" class="sm">Close</button></div><div id="dbody"></div></div></div>
 
 <script src="/builder-attach.js?v=5"></script>
-<script src="/builder-products.js?v=9"></script>
+<script src="/builder-products.js?v=10"></script>
 <script>
 (function () {
   'use strict';
@@ -633,7 +633,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     '12. Make everything real. Every script, stylesheet, image or link you add must point to a file that exists. If you reference a new file, create it with write_file in the same job: a calculator or tool needs its real working code, not just a script tag that points nowhere. Never say you built something unless its code is actually staged.\n' +
     '13. Before you finish any change, call check_work. If it reports problems, fix every one and call check_work again. Only then write your summary, and say truthfully what changed and anything you could not do. Nothing is live until the owner presses Publish, so never say it is live.\n' +
     '14. The owner can attach photos, screenshots, PDFs and text or code files to a message. Look at them carefully and use them (for example copy a design from a screenshot, read a PDF price list, fix an attached file). You cannot save attached photos into the website files. If the owner wants a product photo posted as an advert on the home page, tell them to open /advert-poster.html.\n' +
-    '15. POSTING SHOP ITEMS: when the owner attaches product photos (up to 30 at once) and asks you to post, list or add items to the shop, use post_products. Call it once with every product, and give each item the numbers of its photos (Photo 1, Photo 2 ... as numbered in the attachment labels). Read each photo for the brand, product name, size and category, and write the description in store format. Never guess the cost price (COGS) or the selling price: take them from the owner or from the attached screenshots or pasted text when the owner referred to a website (you cannot open websites); if neither gave them, ask for them in one short message (post_products also reports what is missing). Selling price, previous price, stock, low-stock alert and advert use the owner standard settings from the admin catalog, so do not invent them. Use category names from the shop category list. Use list_products to see what is already in the shop (duplicates, hidden items, items with no photo). Nothing is in the shop until the owner taps Post on the green card, so never say items are posted before that. Posting shop items is separate from website files: it needs no Publish.';
+    '15. POSTING SHOP ITEMS: when the owner attaches product photos (up to 30 at once) and asks you to post, list or add items to the shop, use post_products. Call it once with every product, and give each item the numbers of its photos (Photo 1, Photo 2 ... as numbered in the attachment labels). Read each photo for the brand, product name, size and category, and write the description in store format. Never guess the cost price (COGS) or the selling price: take them from the owner or from the attached screenshots or pasted text when the owner referred to a website (open it with open_website, or use screenshots if the tool fails); if neither gave them, ask for them in one short message (post_products also reports what is missing). Selling price, previous price, stock, low-stock alert and advert use the owner standard settings from the admin catalog, so do not invent them. Use category names from the shop category list. Use list_products to see what is already in the shop (duplicates, hidden items, items with no photo). Nothing is in the shop until the owner taps Post on the green card, so never say items are posted before that. Posting shop items is separate from website files: it needs no Publish.';
   var NAMES = { list_files: 'Looking at files', read_file: 'Reading', search_text: 'Searching', shop_data: 'Checking the shop', edit_file: 'Editing', write_file: 'Writing', delete_file: 'Marking for deletion', check_work: 'Checking my work' };
   /* shop item posting (builder-products.js). If that file did not load, the builder simply works without these two tools. */
   (function () {
@@ -641,8 +641,8 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     try {
       BP.decls.forEach(function (d) { DECLS.push(d); });
       Object.keys(BP.tools).forEach(function (k) { TOOLS[k] = BP.tools[k]; });
-      RO.list_products = 1; RO.read_product_page = 1;
-      NAMES.list_products = 'Checking the shop items'; NAMES.read_product_page = 'Reading the Jumia page'; NAMES.post_products = 'Preparing items to post';
+      RO.list_products = 1; RO.read_product_page = 1; RO.open_website = 1; RO.web_search = 1;
+      NAMES.list_products = 'Checking the shop items'; NAMES.read_product_page = 'Reading the Jumia page'; NAMES.open_website = 'Opening the website'; NAMES.web_search = 'Searching the web'; NAMES.post_products = 'Preparing items to post';
       BP.bind({
         busy: function () { return S.busy; },
         note: function (t) { S.hist.push({ role: 'user', parts: [{ text: t }] }); S.hist.push({ role: 'model', parts: [{ text: 'Understood.' }] }); saveChat(); },
