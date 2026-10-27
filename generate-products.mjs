@@ -315,7 +315,14 @@ for (const p of products) {
         availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
         seller: { '@type': 'Organization', name: BRAND } } }))
   }) : '';
-  const ld = (p.variants ? ldGroup : ldOne) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
+  const productFaqLd = jsonLd({
+    '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [
+      { '@type': 'Question', name: `How can I buy ${p.name} in Kenya?`, acceptedAnswer: { '@type': 'Answer', text: `You can order ${p.name} online at Stermont Arcade, pay securely by M-Pesa, and get delivery to all 47 counties in Kenya.` } },
+      { '@type': 'Question', name: `Do you deliver ${p.name} outside Nairobi?`, acceptedAnswer: { '@type': 'Answer', text: `Yes, we deliver ${p.name} to all 47 counties across Kenya, typically within 1 to 3 days.` } },
+      { '@type': 'Question', name: `What is the price of ${p.name}?`, acceptedAnswer: { '@type': 'Answer', text: `The price of ${p.name} is ${money(p.price)}${p.unit ? ' / ' + p.unit : ''}. You can order directly on our website or via WhatsApp.` } }
+    ]
+  });
+  const ld = (p.variants ? ldGroup : ldOne) + productFaqLd + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
     const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${SITE}${path}`)}`;
     return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
