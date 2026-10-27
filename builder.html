@@ -732,8 +732,11 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
   }
   function trimHist() {
     var size = function () { return JSON.stringify(S.hist).length; };
-    if (size() < 120000) return;
-    for (var i = 0; i < S.hist.length - 6 && size() >= 80000; i++) {
+    /* Lean mode (Settings > Limit tools) keeps a shorter memory so every request is smaller */
+    var lean = false; try { lean = !!(window.__stmLimits && window.__stmLimits.lean()); } catch (e) {}
+    var hi = lean ? 45000 : 120000, lo = lean ? 28000 : 80000;
+    if (size() < hi) return;
+    for (var i = 0; i < S.hist.length - 6 && size() >= lo; i++) {
       var h = S.hist[i];
       if (h.role === 'user' && h.parts) h.parts.forEach(function (p) { if (p.functionResponse) p.functionResponse.response = { result: '[older tool output removed to save space]' }; });
     }

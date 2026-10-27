@@ -9,8 +9,10 @@
   'use strict';
   var D = typeof document !== 'undefined' ? document : null;
   var STORE = 'stm_backup_keys_v1';
-  /* tried in this order. Groq's free plan only allows small requests (about 8K tokens a minute), so it goes last. */
+  /* tried in this order. Mistral's free plan has the biggest allowance (about 500K tokens a minute, 1 billion a month, 1 request a second).
+     Groq's free plan only allows small requests (about 8K tokens a minute), so it goes last. */
   var PROV = [
+    { id: 'mistral', name: 'Mistral', url: 'https://api.mistral.ai/v1/chat/completions', models: ['mistral-small-latest', 'open-mistral-nemo'], vision: false },
     { id: 'cerebras', name: 'Cerebras', url: 'https://api.cerebras.ai/v1/chat/completions', models: ['gpt-oss-120b', 'qwen-3.8-27b'], vision: false },
     { id: 'openrouter', name: 'OpenRouter', url: 'https://openrouter.ai/api/v1/chat/completions', models: ['openrouter/free'], vision: false },
     { id: 'groq', name: 'Groq', url: 'https://api.groq.com/openai/v1/chat/completions', models: ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b'], vision: false }
@@ -46,6 +48,8 @@
     }
     return o;
   }
+  /* tool call ids: exactly 9 letters or digits, which every provider accepts (Mistral insists on it) */
+  function cid(n) { return 'c' + String(100000000 + n).slice(1); }
   function toOA(j, vision) {
     var msgs = [], pending = [], n = 0;
     var sys = j.systemInstruction && j.systemInstruction.parts ? j.systemInstruction.parts.map(function (p) { return p.text || ''; }).join('\n') : '';
@@ -57,7 +61,7 @@
         parts.forEach(function (p) {
           if (p.thought) return;
           if (p.functionCall) {
-            var id = 'call_' + (++n);
+            var id = cid(++n);
             pending.push({ name: p.functionCall.name, id: id });
             calls.push({ id: id, type: 'function', function: { name: p.functionCall.name, arguments: JSON.stringify(p.functionCall.args || {}) } });
           } else if (typeof p.text === 'string') text += p.text;
@@ -159,7 +163,8 @@
     else cool[p.id + '|' + m] = Date.now() + 600000;
     lastError = p.name + ' ' + st + ': ' + msg.slice(0, 160);
   }
-  function run(body, sig, real, say) {
+  /* "why" is the start of the status message, so it can say Gemini is full or that the owner chose backups first */
+  function run(body, sig, real, say, why) {
     var j; try { j = JSON.parse(body); } catch (e) { return Promise.resolve(null); }
     say = say || function () {};
     var keys = getKeys(), list = [], cache = {};
@@ -174,7 +179,8 @@
       if (/gpt-oss/.test(m) && p.id !== 'openrouter') payload.reasoning_effort = 'low';
       return real(p.url, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + keys[p.id] }, body: JSON.stringify(payload), signal: sig }).then(function (r) {
         if (r.ok && r.body) {
-          say('Gemini is full for now. Using ' + p.name + ' (' + m + ')', 4000);
+          say((why || 'Gemini is full for now. Using ') + p.name + ' (' + m + ')', 4000);
+          try { if (root.__stmLimits) root.__stmLimits.count(p.id); } catch (e) {}
           return new Response(toGem(r), { status: 200, headers: { 'Content-Type': 'text/event-stream' } });
         }
         return r.text().then(function (t) { fail(p, m, r.status, t, r.headers); return go(i + 1); });
@@ -186,6 +192,21 @@
       });
     }
     return go(0);
+  }
+
+  /* for the Limits panel: which configured providers are ready, and which are paused until when */
+  function status() {
+    var keys = getKeys(), now = Date.now(), out = [];
+    PROV.forEach(function (p) {
+      if (!keys[p.id]) return;
+      var until = 0, free = 0;
+      p.models.forEach(function (m) {
+        var c = Math.max(cool[p.id] || 0, cool[p.id + '|' + m] || 0);
+        if (c > now) { until = until ? Math.min(until, c) : c; } else free++;
+      });
+      out.push({ id: p.id, name: p.name, ready: free > 0, until: free > 0 ? 0 : until });
+    });
+    return out;
   }
 
   /* quick check used by the "Test backups" button */
@@ -223,9 +244,9 @@
       PROV.map(function (p) { return '<input id="bk_' + p.id + '" type="password" autocomplete="off" placeholder="' + p.name + ' API key">'; }).join('') +
       '<p class="hint">When the daily Gemini limit is used up, the builder switches to these by itself. Each one has its own separate free limit. Get a key at ' +
       '<a href="https://cloud.cerebras.ai/" target="_blank" rel="noopener noreferrer">cloud.cerebras.ai</a>, ' +
-      '<a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">openrouter.ai/keys</a> or ' +
+      '<a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">openrouter.ai/keys</a>, ' +
       '<a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">console.groq.com/keys</a>. ' +
-      'You can add one, two or all three. Backups are a little less capable than Gemini and cannot see attached photos.</p>' +
+      'Mistral (<a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener noreferrer">console.mistral.ai</a>) has the biggest free allowance. You can add any of them. Backups are a little less capable than Gemini and cannot see attached photos. Free plans may let the provider use what you send, so never paste customer data or passwords.</p>' +
       '<div class="row"><button id="bkTest" type="button" class="sm">Test backups</button></div><div id="bkOut" class="hint"></div>';
     anchor.parentNode.insertBefore(box, anchor);
     var k = getKeys();
@@ -252,7 +273,7 @@
   if (D) { if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', mount); else mount(); }
 
   var api = {
-    has: has, run: run, test: test, toOA: toOA, toGem: toGem, PROV: PROV, cool: cool,
+    has: has, run: run, test: test, status: status, toOA: toOA, toGem: toGem, PROV: PROV, cool: cool,
     useKeys: function (o) { mem = o; },
     lastError: function () { return lastError; }
   };

@@ -16,6 +16,7 @@
   var MODELS = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
   var HOLD = 18000, GIVEUP = 75000; /* wait up to 18s per try (the builder gives up silent requests at 30s); longer pauses are reported */
   var cool = {}, toast = null, toastT = 0;
+  W.__stmGem = { cool: cool, models: MODELS }; /* read by the Limit tools box in Settings */
   var EXTRA = '\n\nWORK EFFICIENTLY (the owner uses a limited AI quota): read a file once with a large window, then make ALL the edits to it in the same step by calling edit_file several times together. Never read the same file again after every small edit. Finish a task in as few steps as possible and never repeat a step you already completed.';
 
   function say(t, ms) {
@@ -55,7 +56,7 @@
   function fake429(left) {
     var B = W.__stmBackup, hasB = !!(B && B.has());
     var t = left > 600000 ? (hasB ? 'Daily free limit used up on Gemini and on your backup providers. Try again later, or turn on billing for your Gemini key (see Settings) for no limits.'
-        : 'Daily free limit used up on every Gemini model. Add a free backup key (Cerebras, OpenRouter or Groq) in Settings, or turn on billing for your Gemini key for no limits.')
+        : 'Daily free limit used up on every Gemini model. Add a free backup key (Mistral, Cerebras, OpenRouter or Groq) in Settings, or turn on billing for your Gemini key for no limits.')
       : left >= 60000 ? 'Free limit reached. Try again in about ' + Math.ceil(left / 60000) + ' min' + (hasB ? '.' : ', add a free backup key, or turn on billing for no limits (see Settings).')
       : 'Free limit reached. Waiting about ' + Math.ceil(left / 1000) + 's, then trying again.';
     say(t, 9000);
@@ -88,7 +89,7 @@
       Object.keys(init).forEach(function (k) { o[k] = init[k]; });
       o.body = body;
       return real(urlFor(model), o).then(function (r) {
-        if (r.ok) { say(model !== asked ? 'Using ' + model + ' for now' : '', model !== asked ? 3000 : 0); return r; }
+        if (r.ok) { try { if (W.__stmLimits) W.__stmLimits.count('gemini'); } catch (e) {} say(model !== asked ? 'Using ' + model + ' for now' : '', model !== asked ? 3000 : 0); return r; }
         if (r.status === 429 || r.status >= 500 || (r.status === 404 && order.length > 1)) {
           return r.clone().text().then(function (t) {
             cool[model] = Date.now() + (r.status === 429 ? delayOf(t) : r.status === 404 ? 3600000 : 8000);
@@ -98,6 +99,9 @@
         return r;
       });
     }
+    /* "Backups first" (chosen in Settings) keeps Gemini's allowance for later; if every backup is busy it falls back to Gemini */
+    var L = W.__stmLimits, B0 = W.__stmBackup;
+    if (L && L.mode() === 'backups' && B0 && B0.has()) return B0.run(body, sig, real, say, 'Saving Gemini. Using ').then(function (r) { return r || attempt(); });
     return attempt();
   }
 
@@ -120,6 +124,8 @@
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', hint); else hint();
 })();
 /* backup AI providers (optional: the builder works without it) */
-try { var bk = document.createElement('script'); bk.src = '/builder-backup.js?v=1'; bk.async = true; (document.head || document.documentElement).appendChild(bk); } catch (e) {}
+try { var bk = document.createElement('script'); bk.src = '/builder-backup.js?v=2'; bk.async = true; (document.head || document.documentElement).appendChild(bk); } catch (e) {}
+/* limit tools: usage meter, reset countdown, backups-first switch, lean mode (optional) */
+try { var lm = document.createElement('script'); lm.src = '/builder-limits.js?v=1'; lm.async = true; (document.head || document.documentElement).appendChild(lm); } catch (e) {}
 /* automatic publishing (optional: the builder works without it) */
 try { var as = document.createElement('script'); as.src = '/builder-auto.js?v=1'; as.async = true; (document.head || document.documentElement).appendChild(as); } catch (e) {}

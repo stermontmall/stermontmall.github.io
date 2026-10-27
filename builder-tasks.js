@@ -4,6 +4,7 @@
    - when the AI pauses after 40 steps it sends "continue" for you
    - when the free Gemini limit is reached it waits 5 minutes and tries again (the tab must stay open)
    - each task can start in a fresh chat (page reload), which saves quota and loads the newest code
+   - batch mode: send 2, 3, 5 or 10 tasks in one request, so far fewer requests count against the daily limit
    Extras:
    - Supabase: the queue is saved in the shop database (table builder_tasks, see setup-builder-tasks.sql), so it survives clearing the browser
      and can be opened on another device. It uses the same admin sign-in as /admin.html. If you are signed out, the queue still works and is
@@ -20,15 +21,28 @@
   if (window.__stmTasks) return;
   window.__stmTasks = 1;
   var SUFFIX = ' (Queued task: do the whole job now without asking questions. If something essential is missing, say exactly what in one sentence and stop.)';
+  /* batch mode: several waiting tasks go to the AI in ONE request, so far fewer requests count against the daily limit.
+     Only fresh tasks are batched; a task that already failed once is always sent alone. */
+  function pickGroup(items, i, size) {
+    var g = [items[i]];
+    if (size > 1 && items[i].n === 0) for (var k = i + 1; k < items.length && g.length < size; k++) if (items[k].s === 'p' && items[k].n === 0) g.push(items[k]);
+    return g;
+  }
+  function batchMsg(g) {
+    return 'Do ALL ' + g.length + ' jobs below in this one go, in order. Use your tools as needed and finish every job before you stop. When all are done, reply with one short line per job number saying what you did, or exactly why you could not.\n\n' +
+      g.map(function (x, k) { return (k + 1) + '. ' + x.t; }).join('\n') + SUFFIX;
+  }
+  window.__stmTasksPure = { pickGroup: pickGroup, batchMsg: batchMsg };
   function $(id) { return D.getElementById(id); }
   function load() {
     var o = null; try { o = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
     if (!o || !Array.isArray(o.items)) o = { run: false, fresh: true, items: [], retryAt: 0 };
     if (!Array.isArray(o.del)) o.del = [];
+    o.batch = [1, 2, 3, 5, 10].indexOf(o.batch) >= 0 ? o.batch : 1;
     o.items = o.items.filter(function (i) { return i && typeof i.t === 'string'; });
     return o;
   }
-  var st = load(), working = false, panel = null, listEl = null, infoEl = null, cloudEl = null, barEl = null, btn = null, startBtn = null, freshCb = null, toast = null, toastT = 0;
+  var st = load(), working = false, panel = null, listEl = null, infoEl = null, cloudEl = null, barEl = null, btn = null, startBtn = null, freshCb = null, batchSel = null, toast = null, toastT = 0;
   var cloud = 'connecting', cloudMsg = '', synced = false, renewing = null, view = 'all', shown = 150;
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(st)); return; } catch (e) {}
@@ -195,23 +209,27 @@
     var it = st.items[i];
     if (!($('gkey') && $('gkey').value.trim())) { st.run = false; save(); render(); try { $('set').hidden = false; } catch (e) {} say('Add your Gemini key in Settings, then press Start.', 7000); return; }
     if (it.n >= 3) { it.s = 'f'; it.r = it.r || 'Gave up after 3 tries'; touch(it); render(); return; }
-    working = true; it.n++; touch(it); render();
+    var grp = pickGroup(st.items, i, st.batch || 1);
+    working = true; grp.forEach(function (x) { x.n++; touch(x); }); render();
     var more = 0;
     function go(msg) {
       sendTask(msg).then(function (r) {
-        if (r.stopped) { st.run = false; it.n--; touch(it); working = false; render(); return; }
+        if (r.stopped) { st.run = false; grp.forEach(function (x) { x.n--; touch(x); }); working = false; render(); return; }
         if (r.err) {
           working = false;
-          if (/limit|quota|429/i.test(r.err)) { it.n--; it.r = 'Waiting for the Gemini limit, trying again later'; st.retryAt = Date.now() + 5 * 60000; }
-          else { it.r = r.err.slice(0, 160); st.retryAt = Date.now() + 20000; }
-          touch(it); render(); return;
+          /* a daily limit will not clear in a few minutes, so check less often (the check costs nothing while the limit is on) */
+          if (/limit|quota|429/i.test(r.err)) { grp.forEach(function (x) { x.n--; x.r = 'Waiting for the AI limit, trying again later'; }); st.retryAt = Date.now() + (/daily/i.test(r.err) ? 15 : 5) * 60000; }
+          else { grp.forEach(function (x) { x.r = r.err.slice(0, 160); }); st.retryAt = Date.now() + 20000; }
+          grp.forEach(function (x) { touch(x); }); render(); return;
         }
         if (r.more && more < 6) { more++; go('continue'); return; }
-        it.s = 'd'; it.r = String(r.reply || 'Done').replace(/\s+/g, ' ').slice(0, 300); st.retryAt = 0; touch(it); render();
+        var rep = String(r.reply || 'Done').replace(/\s+/g, ' ').slice(0, 300);
+        grp.forEach(function (x) { x.s = 'd'; x.r = grp.length > 1 ? '(batch of ' + grp.length + ') ' + rep : rep; touch(x); });
+        st.retryAt = 0; render();
         settle(function () { (cloud === 'on' ? flush() : Promise.resolve()).then(function () { working = false; if (st.run && st.fresh && first('p') >= 0) fresh(); else render(); }); });
       });
     }
-    go(it.t + SUFFIX);
+    go(grp.length > 1 ? batchMsg(grp) : it.t + SUFFIX);
   }
 
   function render() {
@@ -225,6 +243,7 @@
     cloudEl.style.color = cloud === 'off' ? 'var(--no)' : '';
     startBtn.textContent = st.run ? 'Pause' : 'Start';
     freshCb.checked = !!st.fresh;
+    if (batchSel) batchSel.value = String(st.batch || 1);
     listEl.innerHTML = '';
     var cur = first('p'), rows = [];
     st.items.forEach(function (x, k) { if (view === 'all' || x.s === view) rows.push(k); });
@@ -318,6 +337,12 @@
     var lab = D.createElement('label'); lab.style.fontWeight = '500'; freshCb = D.createElement('input'); freshCb.type = 'checkbox';
     freshCb.onchange = function () { st.fresh = freshCb.checked; save(); };
     lab.appendChild(freshCb); lab.appendChild(D.createTextNode(' Start every task in a fresh chat (saves quota, recommended)')); panel.appendChild(lab);
+    var bl = D.createElement('label'); bl.style.fontWeight = '500'; bl.appendChild(D.createTextNode('Tasks per request: '));
+    batchSel = D.createElement('select');
+    [1, 2, 3, 5, 10].forEach(function (n) { var op = D.createElement('option'); op.value = String(n); op.textContent = n === 1 ? '1 (one by one, most careful)' : n + ' at a time'; batchSel.appendChild(op); });
+    batchSel.onchange = function () { st.batch = parseInt(batchSel.value, 10) || 1; save(); };
+    bl.appendChild(batchSel); panel.appendChild(bl);
+    var bh = D.createElement('p'); bh.className = 'hint'; bh.textContent = 'Sending several tasks in one request uses far fewer requests, so the daily limit lasts much longer. Best for simple repeated jobs such as product descriptions. Use 1 for tricky fixes. If a batch fails, its tasks are tried again one by one. Check the results line of each task.'; panel.appendChild(bh);
     barEl = D.createElement('div'); barEl.style.cssText = 'height:8px;border-radius:99px;background:rgba(127,127,127,.25);overflow:hidden;margin:.5rem 0 .3rem';
     var fill = D.createElement('div'); fill.style.cssText = 'height:100%;width:0;background:var(--ok,#15803d);transition:width .3s'; barEl.appendChild(fill); panel.appendChild(barEl);
     infoEl = D.createElement('p'); infoEl.className = 'hint'; panel.appendChild(infoEl);
