@@ -1,6 +1,7 @@
 /* Stermont AI Builder: list shop items, post new products from attached photos, edit live products, and start a fresh chat.
    Loaded by builder.html after builder-attach.js. Uses the same admin sign-in as /admin.html on this device.
    New items: the AI prepares them, the owner taps Post on a green card in the chat, then they go into the shop (Supabase). All items on the card are posted at the same time.
+   Packs: a product with several pack sizes is sent as one entry per pack (same name, different pack_size, own price). The packs are joined under one item, the same way Admin, Catalog does it (shared variant_group, pack in variant_label).
    Existing items: update_products saves straight to the shop (no card), because the owner asked for it. Old values are kept in a backup on this device.
    Description length is enforced by the tools: at least 300 words by default, or whatever minimum and maximum the owner asks for.
    new_chat: clears the saved chat and reloads the builder so it starts fresh on the newest code. The header New chat button does the same.
@@ -135,15 +136,18 @@
   }
   function upload(p, base) {
     if (p.url) return Promise.resolve(p.url);
-    return toBlob(p).then(function (b) {
+    /* several packs of one product share the same photo: it is uploaded once and every pack re-uses the same web address */
+    if (p.pending) return p.pending;
+    p.pending = toBlob(p).then(function (b) {
       return tok().then(function (t) {
         var path = slug(base).slice(0, 60) + '-' + Date.now() + Math.floor(Math.random() * 99) + '.jpg';
         return fetch(SB + '/storage/v1/object/product-images/' + path, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + t, 'Content-Type': 'image/jpeg' }, body: b }).then(function (r) {
           if (!r.ok) throw new Error('Photo upload failed (' + r.status + ')');
-          p.url = SB + '/storage/v1/object/public/product-images/' + path; return p.url;
+          p.url = SB + '/storage/v1/object/public/product-images/' + path; p.pending = null; return p.url;
         });
       });
-    });
+    }).then(function (u) { return u; }, function (e) { p.pending = null; throw e; });
+    return p.pending;
   }
   function uploadAll(q) {
     var urls = [], chain = Promise.resolve();
@@ -189,7 +193,7 @@
           if (seen[m.id]) bad.push('appears twice in this request (same name and pack size)'); seen[m.id] = 1;
           if (hasId(m.id)) bad.push('is already in the shop (' + m.id + '). Skipped. If it is a different product, change the name or pack size');
           var sib = shop.filter(function (p) { return norm(p.name) === norm(m.name); }), withG = sib.filter(function (p) { return p.variant_group; })[0];
-          if (m.pack) { m.group = withG ? withG.variant_group : slug(m.name); if (sib.length && !withG) bad.push('exists in the shop without a pack size. Add the pack size to the existing item in Admin, Catalog first'); }
+          if (m.pack) { m.group = withG ? withG.variant_group : slug(m.name); if (sib.length && !withG) bad.push('has the same name as a shop item that has no pack size yet (' + sib[0].id + '). Ask the owner which pack size that existing item is, set it with update_products (id and pack_size), then send this pack again'); }
           else if (sib.length && !hasId(m.id)) bad.push('has the same name as a shop item that has pack sizes. Add a pack size or change the name');
         }
         if (m.old && !(m.old > m.price)) m.old = 0;
@@ -199,11 +203,13 @@
       });
       var ids = {}; ok.forEach(function (m) { ids[m.id] = 1; });
       queue = queue.filter(function (q) { return !ids[q.id]; }).concat(ok);
+      /* packs of the same product sit next to each other on the card */
+      queue.sort(function (x, y) { var gx = x.group || x.id, gy = y.group || y.id; return gx === gy ? 0 : 0; });
       drawCard();
       return {
         card_shown: queue.length > 0,
         waiting_for_owner_to_tap_post: queue.map(function (q) { return q.name + (q.pack ? ' ' + q.pack : ''); }),
-        prepared: ok.map(function (m) { return { name: m.name, pack_size: m.pack || undefined, category: m.cat, new_category: m.newCat || undefined, selling_price_ksh: m.price, previous_price_ksh: m.old || undefined, stock: m.stock, description_words: words(m.desc), photos: m.files.length, no_photo_warning: m.files.length ? undefined : 'no photo attached' }; }),
+        prepared: ok.map(function (m) { return { name: m.name, pack_size: m.pack || undefined, joins_item: m.group || undefined, category: m.cat, new_category: m.newCat || undefined, selling_price_ksh: m.price, previous_price_ksh: m.old || undefined, stock: m.stock, description_words: words(m.desc), photos: m.files.length, no_photo_warning: m.files.length ? undefined : 'no photo attached' }; }),
         needs_attention: problems,
         categories_in_shop: cats.map(function (c) { return c.name; }),
         note: 'Nothing is in the shop yet. The owner must tap Post on the green card. Items listed in needs_attention were NOT added to the card: fix them yourself when the problem is a description length (rewrite and resend only those items), and ask the owner in one short message only for things you cannot know, such as a cost price.'
@@ -218,11 +224,12 @@
     var log = D.getElementById('log'); if (!log) return;
     var d = h('div', 'm pub'), btns = [], st = h('p', 'hint');
     card = d; d.appendChild(h('b', '', 'Ready to post to your shop: ' + queue.length + ' item' + (queue.length === 1 ? '' : 's')));
-    var ul = h('ul');
+    var ul = h('ul'), gcount = {};
+    queue.forEach(function (q) { if (q.group) gcount[q.group] = (gcount[q.group] || 0) + 1; });
     queue.forEach(function (q) {
       var li = h('li');
       if (q.files[0] && q.files[0].thumb) { var im = D.createElement('img'); im.src = q.files[0].thumb; im.alt = ''; im.style.cssText = 'width:40px;height:40px;object-fit:cover;border-radius:6px;flex:none'; li.appendChild(im); }
-      var f = h('span', 'f', q.name + (q.pack ? ' \u00B7 ' + q.pack : '') + ' \u00B7 ' + q.cat + (q.newCat ? ' (new category)' : '') + ' \u00B7 ' + money(q.price) + (q.old ? ' (was ' + money(q.old) + ')' : '') + (q.cost ? ' \u00B7 cost ' + money(q.cost) : '') + ' \u00B7 stock ' + q.stock + ' \u00B7 ' + q.files.length + ' photo' + (q.files.length === 1 ? '' : 's') + ' \u00B7 ' + words(q.desc) + ' words');
+      var f = h('span', 'f', q.name + (q.pack ? ' \u00B7 ' + q.pack : '') + (q.group && gcount[q.group] > 1 ? ' (one of ' + gcount[q.group] + ' packs of the same item)' : '') + ' \u00B7 ' + q.cat + (q.newCat ? ' (new category)' : '') + ' \u00B7 ' + money(q.price) + (q.old ? ' (was ' + money(q.old) + ')' : '') + (q.cost ? ' \u00B7 cost ' + money(q.cost) : '') + ' \u00B7 stock ' + q.stock + ' \u00B7 ' + q.files.length + ' photo' + (q.files.length === 1 ? '' : 's') + ' \u00B7 ' + words(q.desc) + ' words');
       f.style.wordBreak = 'normal'; li.appendChild(f); ul.appendChild(li);
     });
     d.appendChild(ul);
@@ -231,7 +238,7 @@
     go.onclick = function () { post(btns, st); };
     no.onclick = function () { queue = []; dropCard(); };
     row.appendChild(go); row.appendChild(no); d.appendChild(row);
-    st.textContent = 'Nothing is in your shop until you tap Post. All items are posted at the same time. Prices come from your standard settings. The shop and Google feed refresh within about 3 hours.'; d.appendChild(st);
+    st.textContent = 'Nothing is in your shop until you tap Post. All items are posted at the same time. Packs of the same product are joined under one item, each with its own price. Prices come from your standard settings. The shop and Google feed refresh within about 3 hours.'; d.appendChild(st);
     log.appendChild(d); down();
   }
   function one(q) {
@@ -257,7 +264,7 @@
       return seq.then(function () {
         /* every item is uploaded and saved at the same time instead of one after another */
         return Promise.all(list.map(function (q) {
-          return one(q).then(function () { done.push(q); }, function (e) { fails.push(q.name + ': ' + String(e && e.message || e).slice(0, 160)); })
+          return one(q).then(function () { done.push(q); }, function (e) { fails.push(q.name + (q.pack ? ' ' + q.pack : '') + ': ' + String(e && e.message || e).slice(0, 160)); })
             .then(function () { finished++; st.textContent = 'Posted ' + finished + ' of ' + list.length + '...'; });
         }));
       }).then(function () { finish(list, done, fails); });
@@ -279,7 +286,7 @@
     var lim = Math.max(1, Math.min(parseInt(a.limit, 10) || 100, 300)), off = Math.max(0, parseInt(a.offset, 10) || 0);
     return tok().then(function () { return true; }, function () { return false; }).then(function (admin) {
       return loadCats(!admin).then(function () {
-        var q = '/rest/v1/products?select=id,name,price,old_price,unit,stock,low_at,featured,active,category_id,images,variant_label,created_at' + (admin && a.include_cost ? ',cost' : '');
+        var q = '/rest/v1/products?select=id,name,price,old_price,unit,stock,low_at,featured,active,category_id,images,variant_label,variant_group,created_at' + (admin && a.include_cost ? ',cost' : '');
         if (a.search) q += '&name=ilike.' + encodeURIComponent('*' + String(a.search).replace(/[*%,()]/g, ' ').trim() + '*');
         if (a.category) {
           var c = findCat(a.category); if (!c) throw new Error('No category called "' + a.category + '". Categories: ' + cats.map(function (x) { return x.name; }).join(', '));
@@ -291,7 +298,7 @@
         return api(q, 'GET', undefined, '', !admin).then(function (rows) {
           var cn = {}; cats.forEach(function (x) { cn[x.id] = x.name; });
           rows = (rows || []).map(function (p) {
-            var r = { id: p.id, name: p.name, pack_size: p.variant_label || undefined, category: cn[p.category_id] || '', price: p.price, was: p.old_price || undefined, unit: p.unit || undefined, stock: p.stock, low_stock_alert: p.low_at, advert: !!p.featured, live: !!p.active, photos: (p.images || []).length, added: String(p.created_at || '').slice(0, 10) };
+            var r = { id: p.id, name: p.name, pack_size: p.variant_label || undefined, same_item_group: p.variant_group || undefined, category: cn[p.category_id] || '', price: p.price, was: p.old_price || undefined, unit: p.unit || undefined, stock: p.stock, low_stock_alert: p.low_at, advert: !!p.featured, live: !!p.active, photos: (p.images || []).length, added: String(p.created_at || '').slice(0, 10) };
             if (p.cost != null) r.cost = p.cost; return r;
           });
           return { admin_view: admin, note: admin ? undefined : 'Signed out of Admin, so hidden items are not shown. Tell the owner to sign in at /admin.html for the full list.', count: rows.length, more_available: rows.length === lim, next_offset: off + rows.length, rows: rows, categories: cats.map(function (x) { return x.name; }) };
@@ -334,6 +341,7 @@
     if (it.cost != null) { v = num(it.cost); if (v > 0) p.cost = v; else bad.push('cost must be above 0'); }
     if (it.stock != null) { v = parseInt(it.stock, 10); if (v >= 0) p.stock = v; else bad.push('stock must be 0 or more'); }
     if (it.low_stock_alert != null) { v = parseInt(it.low_stock_alert, 10); if (v >= 0) p.low_at = v; else bad.push('low_stock_alert must be 0 or more'); }
+    if (it.pack_size != null && it.pack_size !== '') { v = str(it.pack_size, 30); if (v) p.variant_label = v; else bad.push('pack_size is empty'); }
     if (typeof it.featured === 'boolean') p.featured = it.featured;
     if (typeof it.live === 'boolean') p.active = it.live;
     if (it.unit != null && it.unit !== '') { if (UNITS.indexOf(it.unit) > -1) p.unit = it.unit; else bad.push('unit must be one of: ' + UNITS.join(', ')); }
@@ -366,6 +374,7 @@
         Object.keys(r.patch).forEach(function (k) { keys[k] = 1; });
       });
       if (!jobs.length) return { updated: [], not_changed: bad, note: 'Nothing was saved. Fix the problems listed (for a description length, rewrite it and send it again) and send those items again.' };
+      if (keys.variant_label) { keys.variant_group = 1; keys.name = 1; }
       var sel = ['id'].concat(Object.keys(keys)).join(','), inList = '(' + ids.map(function (i) { return '"' + i.replace(/"/g, '') + '"'; }).join(',') + ')';
       return api('/rest/v1/products?select=' + sel + '&id=in.' + encodeURIComponent(inList)).then(function (old) {
         var before = {}; (old || []).forEach(function (p) { before[p.id] = p; });
@@ -373,6 +382,8 @@
         jobs.forEach(function (j) {
           chain = chain.then(function () {
             if (!before[j.id]) { bad.push({ id: j.id, problem: 'no product with this id in the shop' }); return; }
+            /* giving an existing item a pack size also puts it in a pack group (same method as Admin, Catalog), so new packs of the same product can join it */
+            if (j.patch.variant_label != null && !before[j.id].variant_group && !j.patch.variant_group) j.patch.variant_group = slug(j.patch.name || before[j.id].name);
             return api('/rest/v1/products?select=id&id=eq.' + encodeURIComponent(j.id), 'PATCH', j.patch, 'return=representation').then(function (r) {
               if (r && r.length) { done.push(j); backup(j.id, before[j.id]); }
               else bad.push({ id: j.id, problem: 'the shop did not accept the change. The owner may need to sign in again at /admin.html' });
@@ -391,31 +402,32 @@
   var S = { type: 'string' }, N = { type: 'number' }, I = { type: 'integer' }, B = { type: 'boolean' };
   var decls = [
     { name: 'new_chat', description: 'Clear this whole chat and reload the builder so it starts fresh on the newest code. Use it only when the owner asks to clear the chat, start a new chat, start fresh or refresh the builder. Changes waiting to be published are kept.' },
-    { name: 'list_products', description: 'List the items stored in the shop (admin view: includes hidden items, stock, price, previous price, advert flag and how many photos each has). Use it when the owner asks what is in the shop, to check for duplicates, or to find items with no photo. Pages through with offset.',
+    { name: 'list_products', description: 'List the items stored in the shop (admin view: includes hidden items, stock, price, previous price, advert flag, pack size, same_item_group and how many photos each has). Packs of one product share the same same_item_group. Use it when the owner asks what is in the shop, to check for duplicates, to see which packs and prices an item already has (search by name), or to find items with no photo. Pages through with offset.',
       parameters: P({ search: S, category: S, status: { type: 'string', description: 'live, hidden or all (default all)' }, missing_photos: B, include_cost: { type: 'boolean', description: 'only when the owner asks to see cost prices' }, limit: I, offset: I }) },
     { name: 'product_descriptions', description: 'Find shop products whose description has fewer than min_words words (default 300), or more than max_words if given, and read their current text. Returns the product ids, names, categories and current descriptions so you can rewrite them. Then save the new text with update_products.',
       parameters: P({ min_words: I, max_words: I, limit: { type: 'integer', description: 'how many to return, up to 25 (default 8)' }, offset: I }) },
-    { name: 'update_products', description: 'Change products that are ALREADY in the shop. Saves straight to the live shop with no card and no Publish (the owner is signed in as admin and asked for direct edits). Can change description, name, price, previous price, cost, stock, low-stock alert, advert flag, live/hidden, category and unit. Send up to 100 products per call, each with its id. Only change what the owner asked for. Descriptions are checked: at least 300 words unless you pass another require_min_words (0 turns the minimum off), and at most max_words if given. A description outside the range is refused, so rewrite it and send it again.',
+    { name: 'update_products', description: 'Change products that are ALREADY in the shop. Saves straight to the live shop with no card and no Publish (the owner is signed in as admin and asked for direct edits). Can change description, name, price, previous price, cost, stock, low-stock alert, advert flag, live/hidden, category, unit and pack size. Send up to 100 products per call, each with its id. Only change what the owner asked for. Descriptions are checked: at least 300 words unless you pass another require_min_words (0 turns the minimum off), and at most max_words if given. A description outside the range is refused, so rewrite it and send it again.',
       parameters: P({
         items: { type: 'array', items: P({
           id: { type: 'string', description: 'The product id from list_products or product_descriptions' },
           description: { type: 'string', description: 'Full new description in store format: short paragraphs or one point per line, section titles on their own line, no bullets or markdown' },
           name: S, price: N, old_price: { type: 'number', description: 'Previous price in KSh. 0 removes it' }, cost: N, stock: I, low_stock_alert: I,
+          pack_size: { type: 'string', description: 'Pack size of this item such as 50 ml. Also puts the item in a pack group so more packs of the same product can be added to it' },
           featured: { type: 'boolean', description: 'Show as advert on the home page' }, live: { type: 'boolean', description: 'false hides the product from the shop' },
           category: { type: 'string', description: 'An existing category name' }, unit: S
         }, ['id']) },
         require_min_words: { type: 'integer', description: 'Minimum words for a description (default 300). Use the owner\'s number if they gave one' },
         max_words: { type: 'integer', description: 'Maximum words for a description. Only if the owner gave a limit' }
       }, ['items']) },
-    { name: 'post_products', description: 'Prepare shop products from the attached photos and show the owner a green Post card in the chat. Nothing is in the shop until the owner taps Post. Prices, previous price, stock, low-stock alert and advert are worked out from the standard settings, so send only what the owner stated or what is visible on the photos. Call it once with every product (up to 100). Every description is checked: at least 300 words unless you pass another min_description_words, and at most max_description_words if given. Items with a description outside the range are refused, so rewrite and send those again. It returns the prices it worked out and anything missing (for example a cost price).',
+    { name: 'post_products', description: 'Prepare shop products from the attached photos and show the owner a green Post card in the chat. Nothing is in the shop until the owner taps Post. Prices, previous price, stock, low-stock alert and advert are worked out from the standard settings, so send only what the owner stated or what is visible on the photos. Call it once with every product (up to 100). A product that comes in several packs is sent as one entry per pack: same name, different pack_size, each with its own cost or price. The packs are joined under one item automatically. Every description is checked: at least 300 words unless you pass another min_description_words, and at most max_description_words if given. Items with a description outside the range are refused, so rewrite and send those again. It returns the prices it worked out and anything missing (for example a cost price).',
       parameters: P({
         items: { type: 'array', items: P({
-          photos: { type: 'array', items: I, description: 'Numbers of the attached photos that show this product (Photo 1, Photo 2 ...)' },
-          name: { type: 'string', description: 'Title Case: brand, product, and size or model only if visible on the photo or stated by the owner' },
+          photos: { type: 'array', items: I, description: 'Numbers of the attached photos that show this product (Photo 1, Photo 2 ...). Every pack of the same product can use the same photo numbers' },
+          name: { type: 'string', description: 'Title Case: brand, product, and size or model only if visible on the photo or stated by the owner. Do NOT put the pack size in the name when the product has packs: use pack_size' },
           category: { type: 'string', description: 'Best match from the shop category list, or a short new category name only if none fits' },
-          cost: { type: 'number', description: 'Buying price in KSh (COGS) ONLY if the owner stated it for this product. Never guess' },
-          price: { type: 'number', description: 'Selling price ONLY if the owner stated it. Otherwise leave out: it is worked out from the cost' },
-          pack_size: { type: 'string', description: 'Size or variant such as 1 Litre, only if visible or stated' },
+          cost: { type: 'number', description: 'Buying price in KSh (COGS) of THIS pack, ONLY if the owner stated it. Never guess' },
+          price: { type: 'number', description: 'Selling price of THIS pack ONLY if the owner stated it. Otherwise leave out: it is worked out from the cost' },
+          pack_size: { type: 'string', description: 'Size or variant such as 1 Litre. When a product comes in several packs, send one entry per pack with the same name and a different pack_size' },
           unit: { type: 'string', description: 'One of: ' + UNITS.join(', ') + ' (only if clear)' },
           description: { type: 'string', description: 'Store format: one point per line, no bullets, section titles on their own line, Brand: line when visible. At least 300 words unless the owner set another length' },
           stock: { type: 'integer', description: 'Only if the owner stated it' },
@@ -429,9 +441,10 @@
   ];
 
   /* added to the AI instructions: it must know it CAN edit live products */
-  var EDIT_RULES = '\n\nEDITING THE LIVE SHOP: you CAN change products that are already in the shop. Use update_products (description, name, price, previous price, cost, stock, advert, live or hidden, category, unit). It saves straight to the live shop with no Post card and no Publish, because the owner is signed in as admin and wants direct edits. Never tell the owner you cannot edit product text or that they must use SQL or the admin panel. Do what the owner asked, change only that, and afterwards say plainly what you changed. To find short descriptions call product_descriptions, then fix them in batches of about 5 with update_products, and repeat until none are left. If a tool says the owner is signed out, tell them to open /admin.html, sign in, and ask again.' +
+  var EDIT_RULES = '\n\nEDITING THE LIVE SHOP: you CAN change products that are already in the shop. Use update_products (description, name, price, previous price, cost, stock, advert, live or hidden, category, unit, pack size). It saves straight to the live shop with no Post card and no Publish, because the owner is signed in as admin and wants direct edits. Never tell the owner you cannot edit product text or that they must use SQL or the admin panel. Do what the owner asked, change only that, and afterwards say plainly what you changed. To find short descriptions call product_descriptions, then fix them in batches of about 5 with update_products, and repeat until none are left. If a tool says the owner is signed out, tell them to open /admin.html, sign in, and ask again.' +
     '\nNEW CHAT: when the owner asks to clear the chat, start a new chat, start fresh or refresh the builder, call new_chat at once without asking anything, then reply with one short sentence. It clears this chat and reloads the builder on the newest code. Changes waiting to be published are kept.' +
     '\nPOSTING ALL AT ONCE: the owner can attach up to 30 photos in one message, and the builder posts every item on the green card at the same time. When the owner attaches photos and asks you to post items, put EVERY product from the photos into ONE post_products call (not several smaller calls), then tell the owner to tap the Post all button. This replaces the older note about 12 photos at most.' +
+    '\nPACKS AND PRICES: many products come in several pack sizes (for example 50 ml, 100 ml, 1 Litre), each with its own price. The shop shows them as ONE item with a choice of packs, the same way Admin, Catalog does. Rules: (1) Send ONE entry per pack inside the same post_products call. Every pack has the SAME name and a different pack_size (for example "50 ml", "1 Litre") and its own cost, or its own selling price if the owner gave one. Use the same photo numbers for every pack of that product. Never put two packs in one entry and never add the pack size to the name. (2) The tool joins the packs under one item and works out the price of each pack from its cost with the standard admin settings, so never invent prices. On the green card each pack shows its own price. (3) The owner usually names the website or price list the products come from. Take the packs and prices from what the owner typed, pasted or attached. You cannot open other websites yourself: if you only have a web address, say so in one sentence and ask the owner to paste or screenshot the pack and price list. (4) Before posting, call list_products with search set to the product name to see which packs and prices the shop already has, and only add the packs that are missing. (5) If the tool says the same name already exists without a pack size, ask the owner which pack size that existing item is, set it with update_products (id and pack_size), then post the new packs.' +
     '\nWORD COUNTS: every product description must be at least 300 words unless the owner gives another length. If the owner gives a number or a range, pass it as min and max (min_description_words and max_description_words for post_products, require_min_words and max_words for update_products). The tools COUNT the words and refuse a description outside the range, so when a tool says a description is too short or too long, rewrite it and send it again yourself without asking the owner.' +
     '\nWRITING PRODUCT DESCRIPTIONS: use only facts from the product name, pack size, category, the existing description and what the owner told you, and keep any facts already there (Brand: lines, sizes). Write plain, useful English: what the product is, who it is for, common uses, general handling and storage tips, a reminder to read and follow the label and keep it away from children and food (for pest control, fumigation, agrovet and chemical products), and how buying works at Stermont Arcade (pay by M-Pesa, delivery to all 47 counties, questions on WhatsApp). NEVER invent brand claims, ingredients, strengths, dosages, mixing ratios, certifications, awards, guarantees, ratings, statistics or delivery times. Format: short paragraphs, section titles on their own line, no bullets and no markdown. Reach the word count with real content, not repetition.';
   function info() {
