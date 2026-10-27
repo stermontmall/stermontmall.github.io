@@ -2,6 +2,7 @@
    Loaded by builder.html after builder-attach.js. Uses the same admin sign-in as /admin.html on this device.
    New items: the AI prepares them, the owner taps Post on a green card in the chat, then they go into the shop (Supabase).
    Existing items: update_products saves straight to the shop (no card), because the owner asked for it. Old values are kept in a backup on this device.
+   Description length is enforced by the tools: at least 300 words by default, or whatever minimum and maximum the owner asks for.
    If this file fails to load, the builder keeps working without these tools. */
 (function () {
   'use strict';
@@ -10,6 +11,7 @@
   var UNITS = ['g', 'kg', 'tonne', 'ml', 'litre', 'piece', 'pair', 'dozen', 'set', 'bundle', 'pack', 'bag', '50 kg bag', 'bottle', 'carton', 'box', 'crate', 'sachet', 'tin', 'metre', 'roll'];
   /* the owner's standard settings, same as /list-products.html: price = cost + 30% (at least KSh 150), rounded up to KSh 50 */
   var DEF = { pm: 30, mode: 'cost', dmin: 6, dmax: 12, disc: true, stock: 1000, low: 20, feat: true };
+  var MINW = 300; /* default minimum words for a product description */
   var H = { busy: function () { return false; }, note: function () {}, say: function () {} };
   var photos = {}, queue = [], cats = [], shop = [], card = null, renewing = null;
 
@@ -20,6 +22,15 @@
   function num(v) { v = parseFloat(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return v > 0 ? Math.round(v) : 0; }
   function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
   function down() { try { W.scrollTo(0, D.body.scrollHeight); } catch (e) {} }
+  function words(t) { t = String(t == null ? '' : t).trim(); return t ? t.split(/\s+/).length : 0; }
+  /* minimum and maximum words: the owner's numbers if given (0 turns a limit off), otherwise at least 300 and no maximum */
+  function range(lo, hi) { return { min: lo != null ? Math.max(0, parseInt(lo, 10) || 0) : MINW, max: Math.max(0, parseInt(hi, 10) || 0) }; }
+  function lengthProblem(text, r) {
+    var w = words(text);
+    if (r.min && w < r.min) return 'description has ' + w + ' words but needs at least ' + r.min + '. Write a longer, useful description and send it again';
+    if (r.max && w > r.max) return 'description has ' + w + ' words but must be at most ' + r.max + '. Shorten it and send it again';
+    return '';
+  }
 
   /* ---------- standard settings and prices (same method as the admin Catalog) ---------- */
   function settings(a) {
@@ -129,15 +140,15 @@
     a = a || {};
     var list = Array.isArray(a.items) ? a.items : [];
     if (!list.length) throw new Error('items is required: send one entry for every product');
-    if (list.length > 30) throw new Error('Send at most 30 products at a time');
-    var o = settings(a.settings);
+    if (list.length > 100) throw new Error('Send at most 100 products at a time');
+    var o = settings(a.settings), rg = range(a.min_description_words, a.max_description_words);
     return loadShop().then(function () {
       var ok = [], problems = [], seen = {};
       list.forEach(function (it, i) {
         it = it || {};
         var m = { name: str(it.name, 120), cat: str(it.category, 60), pack: str(it.pack_size, 30), unit: UNITS.indexOf(it.unit) > -1 ? it.unit : '', cost: num(it.cost), price: num(it.price), old: num(it.old_price),
-          desc: String(it.description || '').replace(/^[\s*\-\u2022]+/gm, '').slice(0, 4000).trim(), feat: !!it.featured || o.feat, low: o.low, nums: [], files: [], manual: false };
-        var label = m.name || ('item ' + (i + 1)), st = parseInt(it.stock, 10), bad = [];
+          desc: String(it.description || '').replace(/^[\s*\-\u2022]+/gm, '').slice(0, 8000).trim(), feat: !!it.featured || o.feat, low: o.low, nums: [], files: [], manual: false };
+        var label = m.name || ('item ' + (i + 1)), st = parseInt(it.stock, 10), bad = [], lp;
         m.stock = st >= 0 ? st : o.stock;
         (Array.isArray(it.photos) ? it.photos : [it.photo]).map(Number).forEach(function (n) {
           if (!n) return;
@@ -147,6 +158,7 @@
         });
         if (!m.name) bad.push('needs a product name');
         if (!m.cat) bad.push('needs a category');
+        lp = lengthProblem(m.desc, rg); if (lp) bad.push(lp);
         m.manual = m.price > 0;
         if (!m.manual && !(m.cost > 0)) bad.push('needs the cost price (COGS) in KSh from the owner, or the selling price. Never guess it');
         m.price = m.manual ? m.price : auto(m.cost, o);
@@ -169,10 +181,10 @@
       return {
         card_shown: queue.length > 0,
         waiting_for_owner_to_tap_post: queue.map(function (q) { return q.name + (q.pack ? ' ' + q.pack : ''); }),
-        prepared: ok.map(function (m) { return { name: m.name, pack_size: m.pack || undefined, category: m.cat, new_category: m.newCat || undefined, selling_price_ksh: m.price, previous_price_ksh: m.old || undefined, stock: m.stock, photos: m.files.length, no_photo_warning: m.files.length ? undefined : 'no photo attached' }; }),
+        prepared: ok.map(function (m) { return { name: m.name, pack_size: m.pack || undefined, category: m.cat, new_category: m.newCat || undefined, selling_price_ksh: m.price, previous_price_ksh: m.old || undefined, stock: m.stock, description_words: words(m.desc), photos: m.files.length, no_photo_warning: m.files.length ? undefined : 'no photo attached' }; }),
         needs_attention: problems,
         categories_in_shop: cats.map(function (c) { return c.name; }),
-        note: 'Nothing is in the shop yet. The owner must tap Post on the green card. If something needs attention, ask the owner for it in one short message, then call post_products again with only those items.'
+        note: 'Nothing is in the shop yet. The owner must tap Post on the green card. Items listed in needs_attention were NOT added to the card: fix them yourself when the problem is a description length (rewrite and resend only those items), and ask the owner in one short message only for things you cannot know, such as a cost price.'
       };
     });
   }
@@ -188,7 +200,7 @@
     queue.forEach(function (q) {
       var li = h('li');
       if (q.files[0] && q.files[0].thumb) { var im = D.createElement('img'); im.src = q.files[0].thumb; im.alt = ''; im.style.cssText = 'width:40px;height:40px;object-fit:cover;border-radius:6px;flex:none'; li.appendChild(im); }
-      var f = h('span', 'f', q.name + (q.pack ? ' \u00B7 ' + q.pack : '') + ' \u00B7 ' + q.cat + (q.newCat ? ' (new category)' : '') + ' \u00B7 ' + money(q.price) + (q.old ? ' (was ' + money(q.old) + ')' : '') + (q.cost ? ' \u00B7 cost ' + money(q.cost) : '') + ' \u00B7 stock ' + q.stock + ' \u00B7 ' + q.files.length + ' photo' + (q.files.length === 1 ? '' : 's'));
+      var f = h('span', 'f', q.name + (q.pack ? ' \u00B7 ' + q.pack : '') + ' \u00B7 ' + q.cat + (q.newCat ? ' (new category)' : '') + ' \u00B7 ' + money(q.price) + (q.old ? ' (was ' + money(q.old) + ')' : '') + (q.cost ? ' \u00B7 cost ' + money(q.cost) : '') + ' \u00B7 stock ' + q.stock + ' \u00B7 ' + q.files.length + ' photo' + (q.files.length === 1 ? '' : 's') + ' \u00B7 ' + words(q.desc) + ' words');
       f.style.wordBreak = 'normal'; li.appendChild(f); ul.appendChild(li);
     });
     d.appendChild(ul);
@@ -262,7 +274,6 @@
   }
 
   /* ---------- tools: product_descriptions and update_products (edit products that are already in the shop) ---------- */
-  function words(t) { t = String(t == null ? '' : t).trim(); return t ? t.split(/\s+/).length : 0; }
   function allRows(sel) {
     var out = [];
     function more(off) {
@@ -274,23 +285,23 @@
   }
   function descList(a) {
     a = a || {};
-    var min = Math.max(1, parseInt(a.min_words, 10) || 300), lim = Math.max(1, Math.min(parseInt(a.limit, 10) || 8, 25)), off = Math.max(0, parseInt(a.offset, 10) || 0);
+    var min = Math.max(1, parseInt(a.min_words, 10) || MINW), lim = Math.max(1, Math.min(parseInt(a.limit, 10) || 8, 25)), off = Math.max(0, parseInt(a.offset, 10) || 0), max = Math.max(0, parseInt(a.max_words, 10) || 0);
     return tok().then(function () { return loadCats(false); }).then(function () {
       return allRows('id,name,variant_label,category_id,price,unit,active,description');
     }).then(function (rows) {
       var cn = {}; cats.forEach(function (c) { cn[c.id] = c.name; });
-      var short = rows.filter(function (p) { return words(p.description) < min; });
+      var short = rows.filter(function (p) { var w = words(p.description); return w < min || (max && w > max); });
       var page = short.slice(off, off + lim).map(function (p) {
         return { id: p.id, name: p.name, pack_size: p.variant_label || undefined, category: cn[p.category_id] || '', price: p.price, unit: p.unit || undefined, live: !!p.active, words_now: words(p.description), current_description: String(p.description || '').slice(0, 3000) };
       });
-      return { total_products: rows.length, below_min_words: short.length, min_words: min, returned: page.length, next_offset: off + page.length, more_available: off + page.length < short.length, rows: page,
-        note: 'Fixed items leave this list, so after you update a batch call this again with offset 0. Keep going until below_min_words is 0, or only items you could not fix remain.' };
+      return { total_products: rows.length, outside_word_range: short.length, min_words: min, max_words: max || undefined, returned: page.length, next_offset: off + page.length, more_available: off + page.length < short.length, rows: page,
+        note: 'Fixed items leave this list, so after you update a batch call this again with offset 0. Keep going until outside_word_range is 0, or only items you could not fix remain.' };
     });
   }
   function patchOf(it) {
     var p = {}, bad = [], v;
     if (it.name != null) { v = str(it.name, 120); if (v) p.name = v; else bad.push('name is empty'); }
-    if (it.description != null) p.description = String(it.description).replace(/^[\s*\-\u2022]+/gm, '').slice(0, 8000).trim();
+    if (it.description != null) p.description = String(it.description).replace(/^[\s*\-\u2022]+/gm, '').slice(0, 12000).trim();
     if (it.price != null) { v = num(it.price); if (v > 0) p.price = v; else bad.push('price must be above 0'); }
     if (it.old_price != null) p.old_price = num(it.old_price) || null;
     if (it.cost != null) { v = num(it.cost); if (v > 0) p.cost = v; else bad.push('cost must be above 0'); }
@@ -309,25 +320,25 @@
     a = a || {};
     var items = Array.isArray(a.items) ? a.items : [];
     if (!items.length) return Promise.reject(new Error('items is required: send one entry per product, each with its id'));
-    if (items.length > 40) return Promise.reject(new Error('Send at most 40 products at a time'));
-    var minW = parseInt(a.require_min_words, 10) || 0;
+    if (items.length > 100) return Promise.reject(new Error('Send at most 100 products at a time'));
+    var rg = range(a.require_min_words, a.max_words);
     return tok().then(function () { return loadCats(false); }).then(function () {
       var jobs = [], bad = [], ids = [], keys = {};
       items.forEach(function (it) {
         it = it || {};
-        var id = String(it.id == null ? '' : it.id).trim(), r = patchOf(it), problems = r.bad.slice();
+        var id = String(it.id == null ? '' : it.id).trim(), r = patchOf(it), problems = r.bad.slice(), lp;
         if (!id) { bad.push({ id: '(missing)', problem: 'id is required. Get it from list_products or product_descriptions' }); return; }
         if (it.category != null && it.category !== '') {
           var c = findCat(it.category);
           if (c) r.patch.category_id = c.id; else problems.push('no category called "' + it.category + '". Categories: ' + cats.map(function (x) { return x.name; }).join(', '));
         }
-        if (minW && r.patch.description != null && words(r.patch.description) < minW) problems.push('description has ' + words(r.patch.description) + ' words but needs at least ' + minW + '. Write more and send it again');
+        if (r.patch.description != null) { lp = lengthProblem(r.patch.description, rg); if (lp) problems.push(lp); }
         if (!Object.keys(r.patch).length && !problems.length) problems.push('nothing to change');
         if (problems.length) { bad.push({ id: id, problem: problems.join('; ') }); return; }
         jobs.push({ id: id, patch: r.patch }); ids.push(id);
         Object.keys(r.patch).forEach(function (k) { keys[k] = 1; });
       });
-      if (!jobs.length) return { updated: [], not_changed: bad, note: 'Nothing was saved. Fix the problems listed and send those items again.' };
+      if (!jobs.length) return { updated: [], not_changed: bad, note: 'Nothing was saved. Fix the problems listed (for a description length, rewrite it and send it again) and send those items again.' };
       var sel = ['id'].concat(Object.keys(keys)).join(','), inList = '(' + ids.map(function (i) { return '"' + i.replace(/"/g, '') + '"'; }).join(',') + ')';
       return api('/rest/v1/products?select=' + sel + '&id=in.' + encodeURIComponent(inList)).then(function (old) {
         var before = {}; (old || []).forEach(function (p) { before[p.id] = p; });
@@ -354,9 +365,9 @@
   var decls = [
     { name: 'list_products', description: 'List the items stored in the shop (admin view: includes hidden items, stock, price, previous price, advert flag and how many photos each has). Use it when the owner asks what is in the shop, to check for duplicates, or to find items with no photo. Pages through with offset.',
       parameters: P({ search: S, category: S, status: { type: 'string', description: 'live, hidden or all (default all)' }, missing_photos: B, include_cost: { type: 'boolean', description: 'only when the owner asks to see cost prices' }, limit: I, offset: I }) },
-    { name: 'product_descriptions', description: 'Find shop products whose description has fewer than min_words words (default 300) and read their current text. Returns the product ids, names, categories and current descriptions so you can rewrite them. Then save the new text with update_products.',
-      parameters: P({ min_words: I, limit: { type: 'integer', description: 'how many to return, up to 25 (default 8)' }, offset: I }) },
-    { name: 'update_products', description: 'Change products that are ALREADY in the shop. Saves straight to the live shop with no card and no Publish (the owner is signed in as admin and asked for direct edits). Can change description, name, price, previous price, cost, stock, low-stock alert, advert flag, live/hidden, category and unit. Send up to 40 products per call, each with its id. Only change what the owner asked for. Set require_min_words (for example 300) to refuse descriptions that are too short.',
+    { name: 'product_descriptions', description: 'Find shop products whose description has fewer than min_words words (default 300), or more than max_words if given, and read their current text. Returns the product ids, names, categories and current descriptions so you can rewrite them. Then save the new text with update_products.',
+      parameters: P({ min_words: I, max_words: I, limit: { type: 'integer', description: 'how many to return, up to 25 (default 8)' }, offset: I }) },
+    { name: 'update_products', description: 'Change products that are ALREADY in the shop. Saves straight to the live shop with no card and no Publish (the owner is signed in as admin and asked for direct edits). Can change description, name, price, previous price, cost, stock, low-stock alert, advert flag, live/hidden, category and unit. Send up to 100 products per call, each with its id. Only change what the owner asked for. Descriptions are checked: at least 300 words unless you pass another require_min_words (0 turns the minimum off), and at most max_words if given. A description outside the range is refused, so rewrite it and send it again.',
       parameters: P({
         items: { type: 'array', items: P({
           id: { type: 'string', description: 'The product id from list_products or product_descriptions' },
@@ -365,9 +376,10 @@
           featured: { type: 'boolean', description: 'Show as advert on the home page' }, live: { type: 'boolean', description: 'false hides the product from the shop' },
           category: { type: 'string', description: 'An existing category name' }, unit: S
         }, ['id']) },
-        require_min_words: { type: 'integer', description: 'Refuse any description shorter than this many words' }
+        require_min_words: { type: 'integer', description: 'Minimum words for a description (default 300). Use the owner\'s number if they gave one' },
+        max_words: { type: 'integer', description: 'Maximum words for a description. Only if the owner gave a limit' }
       }, ['items']) },
-    { name: 'post_products', description: 'Prepare shop products from the attached photos and show the owner a green Post card in the chat. Nothing is in the shop until the owner taps Post. Prices, previous price, stock, low-stock alert and advert are worked out from the standard settings, so send only what the owner stated or what is visible on the photos. Call it once with every product. It returns the prices it worked out and anything missing (for example a cost price).',
+    { name: 'post_products', description: 'Prepare shop products from the attached photos and show the owner a green Post card in the chat. Nothing is in the shop until the owner taps Post. Prices, previous price, stock, low-stock alert and advert are worked out from the standard settings, so send only what the owner stated or what is visible on the photos. Call it once with every product (up to 100). Every description is checked: at least 300 words unless you pass another min_description_words, and at most max_description_words if given. Items with a description outside the range are refused, so rewrite and send those again. It returns the prices it worked out and anything missing (for example a cost price).',
       parameters: P({
         items: { type: 'array', items: P({
           photos: { type: 'array', items: I, description: 'Numbers of the attached photos that show this product (Photo 1, Photo 2 ...)' },
@@ -377,18 +389,21 @@
           price: { type: 'number', description: 'Selling price ONLY if the owner stated it. Otherwise leave out: it is worked out from the cost' },
           pack_size: { type: 'string', description: 'Size or variant such as 1 Litre, only if visible or stated' },
           unit: { type: 'string', description: 'One of: ' + UNITS.join(', ') + ' (only if clear)' },
-          description: { type: 'string', description: 'Store format: one point per line, no bullets, section titles on their own line, Brand: line when visible' },
+          description: { type: 'string', description: 'Store format: one point per line, no bullets, section titles on their own line, Brand: line when visible. At least 300 words unless the owner set another length' },
           stock: { type: 'integer', description: 'Only if the owner stated it' },
           old_price: { type: 'number', description: 'Only if the owner stated a previous price' },
           featured: { type: 'boolean', description: 'Only if the owner asked for this item to be an advert' }
         }, ['name', 'category']) },
-        settings: P({ profit_percent: N, profit_mode: { type: 'string', description: 'cost (cost plus percent) or margin' }, discount_min: N, discount_max: N, show_previous_price: B, stock: I, low_stock_alert: I, featured: B })
+        settings: P({ profit_percent: N, profit_mode: { type: 'string', description: 'cost (cost plus percent) or margin' }, discount_min: N, discount_max: N, show_previous_price: B, stock: I, low_stock_alert: I, featured: B }),
+        min_description_words: { type: 'integer', description: 'Minimum words for every description (default 300). Use the owner\'s number if they gave one' },
+        max_description_words: { type: 'integer', description: 'Maximum words for every description. Only if the owner gave a limit' }
       }, ['items']) }
   ];
 
   /* added to the AI instructions: it must know it CAN edit live products */
-  var EDIT_RULES = '\n\nEDITING THE LIVE SHOP: you CAN change products that are already in the shop. Use update_products (description, name, price, previous price, cost, stock, advert, live or hidden, category, unit). It saves straight to the live shop with no Post card and no Publish, because the owner is signed in as admin and wants direct edits. Never tell the owner you cannot edit product text or that they must use SQL or the admin panel. Do what the owner asked, change only that, and afterwards say plainly what you changed. To find short descriptions call product_descriptions, then fix them in batches of about 5 with update_products and require_min_words, and repeat until none are left. If a tool says the owner is signed out, tell them to open /admin.html, sign in, and ask again.' +
-    '\nWRITING PRODUCT DESCRIPTIONS: use only facts from the product name, pack size, category, the existing description and what the owner told you, and keep any facts already there (Brand: lines, sizes). Write plain, useful English: what the product is, who it is for, common uses, general handling and storage tips, a reminder to read and follow the label and keep it away from children and food (for pest control, fumigation, agrovet and chemical products), and how buying works at Stermont Arcade (pay by M-Pesa, delivery to all 47 counties, questions on WhatsApp). NEVER invent brand claims, ingredients, strengths, dosages, mixing ratios, certifications, awards, guarantees, ratings, statistics or delivery times. Format: short paragraphs, section titles on their own line, no bullets and no markdown. When the owner gives a minimum word count, hit it with real content, not repetition.';
+  var EDIT_RULES = '\n\nEDITING THE LIVE SHOP: you CAN change products that are already in the shop. Use update_products (description, name, price, previous price, cost, stock, advert, live or hidden, category, unit). It saves straight to the live shop with no Post card and no Publish, because the owner is signed in as admin and wants direct edits. Never tell the owner you cannot edit product text or that they must use SQL or the admin panel. Do what the owner asked, change only that, and afterwards say plainly what you changed. To find short descriptions call product_descriptions, then fix them in batches of about 5 with update_products, and repeat until none are left. If a tool says the owner is signed out, tell them to open /admin.html, sign in, and ask again.' +
+    '\nWORD COUNTS: every product description must be at least 300 words unless the owner gives another length. If the owner gives a number or a range, pass it as min and max (min_description_words and max_description_words for post_products, require_min_words and max_words for update_products). The tools COUNT the words and refuse a description outside the range, so when a tool says a description is too short or too long, rewrite it and send it again yourself without asking the owner.' +
+    '\nWRITING PRODUCT DESCRIPTIONS: use only facts from the product name, pack size, category, the existing description and what the owner told you, and keep any facts already there (Brand: lines, sizes). Write plain, useful English: what the product is, who it is for, common uses, general handling and storage tips, a reminder to read and follow the label and keep it away from children and food (for pest control, fumigation, agrovet and chemical products), and how buying works at Stermont Arcade (pay by M-Pesa, delivery to all 47 counties, questions on WhatsApp). NEVER invent brand claims, ingredients, strengths, dosages, mixing ratios, certifications, awards, guarantees, ratings, statistics or delivery times. Format: short paragraphs, section titles on their own line, no bullets and no markdown. Reach the word count with real content, not repetition.';
   function info() {
     return (cats.length ? '\n\nShop categories right now (use these names for post_products and update_products): ' + cats.map(function (c) { return c.name; }).join(' | ') : '\n\nThe shop category list is not loaded yet: call list_products first to see the category names.') + EDIT_RULES;
   }

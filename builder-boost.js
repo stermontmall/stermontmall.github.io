@@ -1,7 +1,7 @@
 /* Stermont AI Builder: keeps working when the free Gemini limit is hit.
    Loaded by builder-attach.js. It sits between the builder and Google and:
    - waits out short "limit reached" pauses and carries on by itself, so a task is not lost
-   - switches to another Gemini model, because each model has its own separate limit
+   - switches to another Gemini model, because each model has its own separate limit (six models are tried in turn)
    - tells the AI to work in fewer steps, so the free quota lasts much longer
    Google's free tier can never be truly unlimited. For no limits at all, turn on billing for the Gemini key.
    If this file fails to load, the builder keeps working without it. */
@@ -12,7 +12,8 @@
   W.__stmBoost = 1;
   var real = W.fetch.bind(W);
   var HOST = 'generativelanguage.googleapis.com';
-  var MODELS = ['gemini-flash-latest', 'gemini-flash-lite-latest'];
+  /* a model that does not exist (404) is skipped for an hour, so old or renamed names here are harmless */
+  var MODELS = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
   var HOLD = 18000, GIVEUP = 75000; /* wait up to 18s per try (the builder gives up silent requests at 30s); longer pauses are reported */
   var cool = {}, toast = null, toastT = 0;
   var EXTRA = '\n\nWORK EFFICIENTLY (the owner uses a limited AI quota): read a file once with a large window, then make ALL the edits to it in the same step by calling edit_file several times together. Never read the same file again after every small edit. Finish a task in as few steps as possible and never repeat a step you already completed.';
