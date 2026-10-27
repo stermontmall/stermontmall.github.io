@@ -43,7 +43,7 @@
 - [Herbicides in Kenya](https://stermontarcade.co.ke/c/herbicides.html): Buy herbicides and weed killers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
 - [Home Theatre Systems in Kenya](https://stermontarcade.co.ke/c/home-theatre.html): Buy home theatre and surround sound systems online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
 - [Kitchen Appliances in Kenya](https://stermontarcade.co.ke/c/kitchen-dining.html): Buy pressure cookers, air fryers and other kitchen appliances online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
-- [Buy Men's Fashion in Kenya](https://stermontarcade.co.ke/c/mens-fashion.html): Shop Men's Fashion online in Kenya. 1 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
+- [Buy Men's Fashion in Kenya](https://stermontarcade.co.ke/c/mens-fashion.html): Shop Men's Fashion online in Kenya. 7 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Mosquito & Fly Control Products in Kenya](https://stermontarcade.co.ke/c/mosquito-fly-control.html): Buy mosquito and fly control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
 - [Pest Control & Fumigation Products in Kenya](https://stermontarcade.co.ke/c/pest-control-fumigation.html): Buy bed bug killers, insecticides and fumigation products online in Kenya. Pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Buy Phone Accessories in Kenya](https://stermontarcade.co.ke/c/phone-accessories.html): Shop Phone Accessories online in Kenya. 2 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
@@ -58,6 +58,7 @@
 - [Buy Veterinary Drugs & Vaccines in Kenya](https://stermontarcade.co.ke/c/veterinary-drugs.html): Shop Veterinary Drugs & Vaccines online in Kenya. 7 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Washing Machines in Kenya](https://stermontarcade.co.ke/c/washing-machines.html): Buy washing machines online in Kenya, including twin tub models. Pay by M-Pesa, delivery to all 47 counties.
 - [Buy Watches & Jewellery in Kenya](https://stermontarcade.co.ke/c/watches-jewellery.html): Shop Watches & Jewellery online in Kenya. 2 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
+- [Buy Women's Fashion in Kenya](https://stermontarcade.co.ke/c/womens-fashion.html): Shop Women's Fashion online in Kenya. 1 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 
 ## Guides
 - [Air Fryer Buying Guide Kenya: Size, Power & Tips](https://stermontarcade.co.ke/blog/air-fryer-buying-guide-kenya.html): Thinking of buying an air fryer in Kenya? Learn how to choose the right litre size, power and features, and how an air fryer compares with an oven.
@@ -77,6 +78,6 @@
 - [Washing Machine Buying Guide Kenya: Front vs Top Load](https://stermontarcade.co.ke/blog/washing-machine-buying-guide-kenya.html): Choosing a washing machine in Kenya? Compare front load and top load, semi and fully automatic, capacity in kg, and what you need to install one.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 150 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 157 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
