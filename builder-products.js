@@ -1,6 +1,6 @@
 /* Stermont AI Builder: list shop items, post new products from attached photos, edit live products, and start a fresh chat.
    Loaded by builder.html after builder-attach.js. Uses the same admin sign-in as /admin.html on this device.
-   New items: the AI prepares them, the owner taps Post on a green card in the chat, then they go into the shop (Supabase).
+   New items: the AI prepares them, the owner taps Post on a green card in the chat, then they go into the shop (Supabase). All items on the card are posted at the same time.
    Existing items: update_products saves straight to the shop (no card), because the owner asked for it. Old values are kept in a backup on this device.
    Description length is enforced by the tools: at least 300 words by default, or whatever minimum and maximum the owner asks for.
    new_chat: clears the saved chat and reloads the builder so it starts fresh on the newest code. The header New chat button does the same.
@@ -226,12 +226,12 @@
       f.style.wordBreak = 'normal'; li.appendChild(f); ul.appendChild(li);
     });
     d.appendChild(ul);
-    var row = h('div', 'row'), go = h('button', 'ok', 'Post to my website'), no = h('button', '', 'Not now');
+    var row = h('div', 'row'), go = h('button', 'ok', 'Post all ' + queue.length + ' to my website'), no = h('button', '', 'Not now');
     go.type = 'button'; no.type = 'button'; btns.push(go, no);
     go.onclick = function () { post(btns, st); };
     no.onclick = function () { queue = []; dropCard(); };
     row.appendChild(go); row.appendChild(no); d.appendChild(row);
-    st.textContent = 'Nothing is in your shop until you tap Post. Prices come from your standard settings. The shop and Google feed refresh within about 3 hours.'; d.appendChild(st);
+    st.textContent = 'Nothing is in your shop until you tap Post. All items are posted at the same time. Prices come from your standard settings. The shop and Google feed refresh within about 3 hours.'; d.appendChild(st);
     log.appendChild(d); down();
   }
   function one(q) {
@@ -250,12 +250,17 @@
     var list = queue.slice(); if (!list.length) return;
     btns.forEach(function (b) { b.disabled = true; }); st.textContent = 'Checking your admin sign-in...';
     tok().then(loadShop).then(function () {
-      var done = [], fails = [], chain = Promise.resolve();
-      list.forEach(function (q, i) {
-        chain = chain.then(function () { st.textContent = 'Posting ' + (i + 1) + ' of ' + list.length + ': ' + q.name; return one(q); })
-          .then(function () { done.push(q); }, function (e) { fails.push(q.name + ': ' + String(e && e.message || e).slice(0, 160)); });
-      });
-      return chain.then(function () { finish(list, done, fails); });
+      var done = [], fails = [], finished = 0, seq = Promise.resolve();
+      st.textContent = 'Posting all ' + list.length + ' items at once...';
+      /* new categories are created first, one at a time, so two items never create the same category twice */
+      list.forEach(function (q) { if (q.cat && !findCat(q.cat)) seq = seq.then(function () { return catId(q.cat); }).then(function () {}, function () {}); });
+      return seq.then(function () {
+        /* every item is uploaded and saved at the same time instead of one after another */
+        return Promise.all(list.map(function (q) {
+          return one(q).then(function () { done.push(q); }, function (e) { fails.push(q.name + ': ' + String(e && e.message || e).slice(0, 160)); })
+            .then(function () { finished++; st.textContent = 'Posted ' + finished + ' of ' + list.length + '...'; });
+        }));
+      }).then(function () { finish(list, done, fails); });
     }, function (e) { st.textContent = String(e && e.message || e).replace(/^The owner is signed out/, 'You are signed out').replace(/Tell them to/, 'Please').replace(/ask again \(or tap Post\)\./, 'tap Post again.'); btns.forEach(function (b) { b.disabled = false; }); });
   }
   function finish(list, done, fails) {
@@ -426,6 +431,7 @@
   /* added to the AI instructions: it must know it CAN edit live products */
   var EDIT_RULES = '\n\nEDITING THE LIVE SHOP: you CAN change products that are already in the shop. Use update_products (description, name, price, previous price, cost, stock, advert, live or hidden, category, unit). It saves straight to the live shop with no Post card and no Publish, because the owner is signed in as admin and wants direct edits. Never tell the owner you cannot edit product text or that they must use SQL or the admin panel. Do what the owner asked, change only that, and afterwards say plainly what you changed. To find short descriptions call product_descriptions, then fix them in batches of about 5 with update_products, and repeat until none are left. If a tool says the owner is signed out, tell them to open /admin.html, sign in, and ask again.' +
     '\nNEW CHAT: when the owner asks to clear the chat, start a new chat, start fresh or refresh the builder, call new_chat at once without asking anything, then reply with one short sentence. It clears this chat and reloads the builder on the newest code. Changes waiting to be published are kept.' +
+    '\nPOSTING ALL AT ONCE: the owner can attach up to 30 photos in one message, and the builder posts every item on the green card at the same time. When the owner attaches photos and asks you to post items, put EVERY product from the photos into ONE post_products call (not several smaller calls), then tell the owner to tap the Post all button. This replaces the older note about 12 photos at most.' +
     '\nWORD COUNTS: every product description must be at least 300 words unless the owner gives another length. If the owner gives a number or a range, pass it as min and max (min_description_words and max_description_words for post_products, require_min_words and max_words for update_products). The tools COUNT the words and refuse a description outside the range, so when a tool says a description is too short or too long, rewrite it and send it again yourself without asking the owner.' +
     '\nWRITING PRODUCT DESCRIPTIONS: use only facts from the product name, pack size, category, the existing description and what the owner told you, and keep any facts already there (Brand: lines, sizes). Write plain, useful English: what the product is, who it is for, common uses, general handling and storage tips, a reminder to read and follow the label and keep it away from children and food (for pest control, fumigation, agrovet and chemical products), and how buying works at Stermont Arcade (pay by M-Pesa, delivery to all 47 counties, questions on WhatsApp). NEVER invent brand claims, ingredients, strengths, dosages, mixing ratios, certifications, awards, guarantees, ratings, statistics or delivery times. Format: short paragraphs, section titles on their own line, no bullets and no markdown. Reach the word count with real content, not repetition.';
   function info() {
