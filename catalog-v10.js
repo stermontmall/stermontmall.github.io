@@ -11,6 +11,18 @@
     var target = Math.max(cost / (1 - PROFIT_PCT / 100), cost + MIN_PROFIT);
     return Math.ceil(target / ROUND_TO - 1e-6) * ROUND_TO;
   }
+  /* crossed-out (previous) price: shows a discount between OLD_MIN% and OLD_MAX% (a random whole % per item unless pct is given),
+     rounded UP to the next KSh 10; on cheap items it falls back to whole shillings so the discount never leaves the 6-16% range */
+  var OLD_MIN = 6, OLD_MAX = 16;
+  function autoOld(price, pct) {
+    price = Number(price); if (!(price > 0)) return 0;
+    var d = pct != null ? pct : OLD_MIN + Math.floor(Math.random() * (OLD_MAX - OLD_MIN + 1));
+    var lo = price / (1 - OLD_MIN / 100), hi = price / (1 - OLD_MAX / 100);
+    var r10 = Math.ceil(price / (1 - d / 100) / 10 - 1e-9) * 10;
+    if (r10 >= lo - 1e-9 && r10 <= hi + 1e-9) return r10;
+    var r1 = Math.ceil(price / (1 - d / 100) - 1e-9);
+    return r1 <= Math.floor(hi + 1e-9) ? r1 : Math.floor(hi + 1e-9);
+  }
   var css = '.cx-k{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem}.cx-k div{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:.6rem .8rem}.cx-k small{color:var(--mu);display:block;font-size:.74rem;font-weight:600}.cx-k b{font-size:1.05rem}' +
     '.cx-k .hi{background:var(--p);color:#fff;border-color:var(--p)}.cx-k .hi small{color:#e9ddff}.cx-k .lime{background:' + LIME + ';border-color:' + LIME + ';color:#1a2e05}.cx-k .lime small{color:#365314}' +
     '.cx-p{display:flex;gap:.8rem}.cx-p img,.cx-ph{width:72px;height:72px;border-radius:10px;object-fit:cover;background:#eceaf5;flex:none;display:flex;align-items:center;justify-content:center;font-size:1.6rem}' +
@@ -431,6 +443,7 @@
       (low.length ? '<div class="err" style="background:#fef3c7;color:#92400e">⚠ ' + low.length + ' item' + (low.length > 1 ? 's' : '') + ' low on stock: ' + low.slice(0, 4).map(function (p) { return esc(p.name) + ' (' + p.stock + ')'; }).join(', ') + (low.length > 4 ? '…' : '') + '</div>' : '') +
       '<p style="margin:0 0 .7rem"><button class="btn" id="cx-add" type="button" style="width:100%">＋ Add new item</button></p>' +
       '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-reprice" type="button" style="width:100%">↻ Recalculate all prices (' + PROFIT_PCT + '% below price = cost)</button></p>' +
+      '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-rules" type="button" style="width:100%">\u{1F3F7} Apply pricing rules to all items (' + PROFIT_PCT + '% margin, ' + OLD_MIN + '-' + OLD_MAX + '% crossed-out price)</button></p>' +
       '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-export" type="button" style="width:100%">⬇ Download backup (CSV)</button></p>' +
       '<div class="tabs" id="cx-chips"></div><p class="meta" id="cx-cnt" style="margin:.2rem 0 .6rem"></p>' +
       '<div id="cx-list"></div><h2 style="font-size:1.05rem;margin:1.2rem 0 .5rem">Financial ledger' + (S.range === 'all' ? '' : ' · ' + RANGES.filter(function (r) { return r[0] === S.range; })[0][1]) + '</h2><div class="lg" id="cx-led"></div>';
@@ -448,6 +461,26 @@
       todo.reduce(function (pr, t) { return pr.then(function () { return call('/rest/v1/products?id=eq.' + encodeURIComponent(t[0].id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { price: t[1] } }); }); }, Promise.resolve())
         .then(load).then(render).then(function () { toast('Updated ' + todo.length + ' price(s).'); })
         .catch(function (x) { b.disabled = false; b.textContent = '\u21bb Recalculate all prices'; toast('Could not update prices: ' + x.message); });
+    };
+    $('cx-rules').onclick = function () {
+      var todo = [], nPrice = 0, nOld = 0, nocost = 0;
+      S.prods.forEach(function (p) {
+        var price = Number(p.price); if (!(price > 0)) return;
+        var body = {};
+        if (Number(p.cost) > 0) { var np = autoPrice(p.cost); if (np !== price) { body.price = np; price = np; nPrice++; } } else nocost++;
+        var o = autoOld(price); if (o > price) { body.old_price = o; nOld++; }
+        todo.push([p, body]);
+      });
+      if (!todo.length) { toast('Nothing to update.'); return; }
+      if (!confirm('Apply the pricing rules to ' + todo.length + ' item(s)?\n\n' +
+        '\u2022 Selling price = cost \u00f7 ' + (1 - PROFIT_PCT / 100) + ' (cost is ' + PROFIT_PCT + '% below the price): ' + nPrice + ' price(s) will change.\n' +
+        '\u2022 Crossed-out price shows ' + OLD_MIN + '-' + OLD_MAX + '% off, a different % per item: ' + nOld + ' item(s).' +
+        (nocost ? '\n\u2022 ' + nocost + ' item(s) with no cost keep their selling price (only the crossed-out price is set).' : '') +
+        '\n\nCost, stock and descriptions are not touched. Tap \u201cDownload backup (CSV)\u201d first if you want a copy.')) return;
+      var b = $('cx-rules'); b.disabled = true; b.textContent = 'Applying\u2026';
+      todo.reduce(function (pr, t) { return pr.then(function () { return call('/rest/v1/products?id=eq.' + encodeURIComponent(t[0].id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: t[1] }); }); }, Promise.resolve())
+        .then(load).then(render).then(function () { toast('Pricing rules applied to ' + todo.length + ' item(s).'); })
+        .catch(function (x) { b.disabled = false; b.textContent = '\u{1F3F7} Apply pricing rules to all items'; toast('Could not apply the rules: ' + x.message); });
     };
     $('cx-export').onclick = function () { exportCsv(all); };
     RANGES.forEach(function (r) { var b = el('button', S.range === r[0] ? 'on' : '', r[1]); b.type = 'button'; b.onclick = function () { S.range = r[0]; load().then(render).catch(function (x) { toast(x.message + ' (run setup-catalog-2.sql?)'); }); }; $('cx-rg').appendChild(b); });
@@ -637,6 +670,7 @@
 
   window.STMCatalog = {
     autoPrice: autoPrice,
+    autoOld: autoOld,
     mountStock: function (c) {
       root = c; view = renderStockView; if (!D.getElementById('cx-css')) { var s = el('style'); s.id = 'cx-css'; s.textContent = css; D.head.appendChild(s); }
       root.innerHTML = '<div class="empty">Loading stock…</div>';
