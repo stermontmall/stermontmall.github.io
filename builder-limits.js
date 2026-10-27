@@ -15,7 +15,7 @@
 
   function readJ(k, d) { try { return JSON.parse(root.localStorage.getItem(k)) || d; } catch (e) { return d; } }
   function writeJ(k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  function cfg() { var c = readJ(CFG, {}), B = window.__stmBackup; /* until the owner picks a mode, backups answer first whenever a backup key exists (faster than a slow Gemini) */ return { mode: c.mode === 'backups' || c.mode === 'gemini' ? c.mode : (B && B.has && B.has() ? 'backups' : 'gemini'), lean: !!c.lean }; }
+  function cfg() { var c = readJ(CFG, {}), B = window.__stmBackup; /* until the owner picks a mode, backups answer first whenever a backup key exists (faster than a slow Gemini) */ return { mode: c.mode === 'backups' || c.mode === 'gemini' || c.mode === 'only' ? c.mode : (B && B.has && B.has() ? 'backups' : 'gemini'), lean: !!c.lean }; }
   function setCfg(p) { var c = cfg(); Object.keys(p).forEach(function (k) { c[k] = p[k]; }); writeJ(CFG, c); }
 
   /* Google's free limits reset at midnight Pacific time, so "today" is counted in that time zone */
@@ -62,7 +62,7 @@
     if (!anchor || D.getElementById('limBox')) return;
     var c = cfg(), box = D.createElement('div'); box.id = 'limBox';
     box.innerHTML = '<label>Limit tools</label><div id="limUse" class="hint" style="white-space:pre-line"></div>' +
-      '<label style="font-weight:500">Which AI answers first? <select id="limMode"><option value="gemini">Gemini first (best quality)</option><option value="backups">Backups first (keeps Gemini for later)</option></select></label>' +
+      '<label style="font-weight:500">Which AI answers first? <select id="limMode"><option value="gemini">Gemini first (best quality)</option><option value="backups">Backups first (keeps Gemini for later)</option><option value="only">Backups only (never use Gemini)</option></select></label>' +
       '<label style="font-weight:500"><input id="limLean" type="checkbox"> Lean mode: shorter memory, fewer tokens per request</label>' +
       '<p class="hint">"Backups first" needs at least one backup key below. Lean mode helps most with Cerebras and Groq, which only allow small requests, and it makes every Gemini request cheaper. A very long chat may forget older details sooner, so press New chat between unrelated jobs.</p>';
     anchor.parentNode.insertBefore(box, anchor);

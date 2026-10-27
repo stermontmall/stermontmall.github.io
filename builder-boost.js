@@ -117,6 +117,12 @@
     }
     /* "Backups first" (chosen in Settings) keeps Gemini's allowance for later; if every backup is busy it falls back to Gemini */
     var L = W.__stmLimits, B0 = W.__stmBackup;
+    /* "Backups only" never calls Gemini at all, so a slow or full Gemini can never hold the work up */
+    if (L && L.mode() === 'only' && B0 && B0.has()) return B0.run(body, sig, real, say, 'Using ').then(function (r) {
+      if (r) return r;
+      say('Every backup is busy right now.', 6000);
+      return new Response(JSON.stringify({ error: { code: 429, message: 'Every backup AI is busy or out of free limit right now. Wait a minute and send again, add another backup key in Settings, or change "Which AI answers first?" to Backups first.', status: 'RESOURCE_EXHAUSTED' } }), { status: 429, headers: { 'Content-Type': 'application/json' } });
+    });
     if (L && L.mode() === 'backups' && B0 && B0.has()) return B0.run(body, sig, real, say, 'Saving Gemini. Using ').then(function (r) { return r || attempt(); });
     return attempt();
   }
@@ -142,6 +148,6 @@
 /* backup AI providers (optional: the builder works without it) */
 try { var bk = document.createElement('script'); bk.src = '/builder-backup.js?v=4'; bk.async = true; (document.head || document.documentElement).appendChild(bk); } catch (e) {}
 /* limit tools: usage meter, reset countdown, backups-first switch, lean mode (optional) */
-try { var lm = document.createElement('script'); lm.src = '/builder-limits.js?v=2'; lm.async = true; (document.head || document.documentElement).appendChild(lm); } catch (e) {}
+try { var lm = document.createElement('script'); lm.src = '/builder-limits.js?v=3'; lm.async = true; (document.head || document.documentElement).appendChild(lm); } catch (e) {}
 /* automatic publishing (optional: the builder works without it) */
 try { var as = document.createElement('script'); as.src = '/builder-auto.js?v=3'; as.async = true; (document.head || document.documentElement).appendChild(as); } catch (e) {}
