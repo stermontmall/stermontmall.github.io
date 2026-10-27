@@ -53,8 +53,10 @@
     return Math.ceil((s || 20) * 1000) + 500;
   }
   function fake429(left) {
-    var t = left > 600000 ? 'Daily free limit used up on every model. Turn on billing for your Gemini key (see Settings) for no limits, or try again later.'
-      : left >= 60000 ? 'Free limit reached. Try again in about ' + Math.ceil(left / 60000) + ' min, or turn on billing for no limits (see Settings).'
+    var B = W.__stmBackup, hasB = !!(B && B.has());
+    var t = left > 600000 ? (hasB ? 'Daily free limit used up on Gemini and on your backup providers. Try again later, or turn on billing for your Gemini key (see Settings) for no limits.'
+        : 'Daily free limit used up on every Gemini model. Add a free backup key (Cerebras, OpenRouter or Groq) in Settings, or turn on billing for your Gemini key for no limits.')
+      : left >= 60000 ? 'Free limit reached. Try again in about ' + Math.ceil(left / 60000) + ' min' + (hasB ? '.' : ', add a free backup key, or turn on billing for no limits (see Settings).')
       : 'Free limit reached. Waiting about ' + Math.ceil(left / 1000) + 's, then trying again.';
     say(t, 9000);
     return new Response(JSON.stringify({ error: { code: 429, message: t, status: 'RESOURCE_EXHAUSTED' } }), { status: 429, headers: { 'Content-Type': 'application/json' } });
@@ -72,9 +74,15 @@
       var now = Date.now(), free = order.filter(function (x) { return !(cool[x] > now); });
       if (!free.length) {
         var left = Math.min.apply(null, order.map(function (x) { return cool[x]; })) - now;
-        if (left > GIVEUP || waited) return Promise.resolve(fake429(left));
-        waited = true;
-        return countdown(Math.min(left, HOLD), sig).then(attempt);
+        var legacy = function () {
+          if (left > GIVEUP || waited) return Promise.resolve(fake429(left));
+          waited = true;
+          return countdown(Math.min(left, HOLD), sig).then(attempt);
+        };
+        /* every Gemini model is paused: use a backup provider if the owner added a key (a pause of a few seconds is just waited out) */
+        var B = W.__stmBackup;
+        if (B && B.has() && left > 10000) return B.run(body, sig, real, say).then(function (r) { return r || legacy(); });
+        return legacy();
       }
       var model = free[0], o = {};
       Object.keys(init).forEach(function (k) { o[k] = init[k]; });
@@ -106,10 +114,12 @@
     var s = D.getElementById('set'), l = s && s.querySelector('label[for="model"]');
     if (!l || D.getElementById('boostHint')) return;
     var p = D.createElement('p'); p.id = 'boostHint'; p.className = 'hint';
-    p.innerHTML = '<b>No limits:</b> the free Gemini plan has daily caps set by Google. To remove them, open <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>, find the project of your key and set up billing. You then pay only for what you use, which is small with a flash-lite model. Set a monthly budget alert to stay in control. Until then the builder waits out short pauses and switches models by itself.';
+    p.innerHTML = '<b>No limits:</b> the free Gemini plan has daily caps set by Google. To remove them, open <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>, find the project of your key and set up billing. You then pay only for what you use, which is small with a flash-lite model. Set a monthly budget alert to stay in control. Until then the builder waits out short pauses, switches Gemini models by itself, and uses any backup keys you add below.';
     l.parentNode.insertBefore(p, l);
   }
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', hint); else hint();
 })();
+/* backup AI providers (optional: the builder works without it) */
+try { var bk = document.createElement('script'); bk.src = '/builder-backup.js?v=1'; bk.async = true; (document.head || document.documentElement).appendChild(bk); } catch (e) {}
 /* automatic publishing (optional: the builder works without it) */
 try { var as = document.createElement('script'); as.src = '/builder-auto.js?v=1'; as.async = true; (document.head || document.documentElement).appendChild(as); } catch (e) {}
