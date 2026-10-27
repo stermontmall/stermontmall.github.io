@@ -12,8 +12,8 @@
   var W = window, D = document;
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session', BK = 'stm_builder_backup_v1', CHATKEY = 'stm_builder_chat_v1';
   var UNITS = ['g', 'kg', 'tonne', 'ml', 'litre', 'piece', 'pair', 'dozen', 'set', 'bundle', 'pack', 'bag', '50 kg bag', 'bottle', 'carton', 'box', 'crate', 'sachet', 'tin', 'metre', 'roll'];
-  /* the owner's standard settings, same as /list-products.html: price = cost + 30% (at least KSh 150), rounded up to KSh 50 */
-  var DEF = { pm: 30, mode: 'cost', dmin: 6, dmax: 12, disc: true, stock: 1000, low: 20, feat: true };
+  /* the owner's standard settings, same as /list-products.html: price = cost / (1 - 12%), so the cost (COGS) is 12% below the selling price, rounded up to the next whole KSh */
+  var DEF = { pm: 12, mode: 'margin', dmin: 6, dmax: 12, disc: true, stock: 1000, low: 20, feat: true };
   var MINW = 300; /* default minimum words for a product description */
   var H = { busy: function () { return false; }, note: function () {}, say: function () {} };
   var photos = {}, queue = [], cats = [], shop = [], card = null, renewing = null;
@@ -67,7 +67,8 @@
   }
   function auto(c, o) {
     c = Number(c); if (!(c > 0)) return 0;
-    var t = o.mode === 'margin' && o.pm < 95 ? Math.max(c / (1 - o.pm / 100), c + 150) : c + Math.max(c * o.pm / 100, 150);
+    if (o.mode === 'margin' && o.pm < 95) return Math.ceil(c / (1 - o.pm / 100) - 1e-6);   // margin: exact, to the next whole KSh
+    var t = c + Math.max(c * o.pm / 100, 150);
     return Math.ceil(t / 50 - 1e-9) * 50;
   }
   function autoOld(price, d) { return price > 0 && d > 0 ? Math.ceil(price / (1 - d / 100) / 10) * 10 : 0; }

@@ -4,12 +4,12 @@
   var S = { cats: [], prods: [], st: {}, cat: 'all', q: '', range: 'all' }, root, D = document, view = function () { render(); };
   var LIME = '#84cc16';
   /* ---------- AUTO PRICING: change these 3 numbers to change pricing everywhere ---------- */
-  var PROFIT_PCT = 30, MIN_PROFIT = 150, ROUND_TO = 50;
-  /* selling price = cost + 30% (at least KSh 150 profit), rounded UP to the next KSh 50 so profit is never below target */
+  var PROFIT_PCT = 12, MIN_PROFIT = 0, ROUND_TO = 1;
+  /* selling price = cost / (1 - 12%), so the cost (COGS) is always 12% below the selling price; rounded UP to the next whole KSh */
   function autoPrice(cost) {
     cost = Number(cost); if (!(cost > 0)) return 0;
-    var target = cost + Math.max(cost * PROFIT_PCT / 100, MIN_PROFIT);
-    return Math.ceil(target / ROUND_TO - 1e-9) * ROUND_TO;
+    var target = Math.max(cost / (1 - PROFIT_PCT / 100), cost + MIN_PROFIT);
+    return Math.ceil(target / ROUND_TO - 1e-6) * ROUND_TO;
   }
   var css = '.cx-k{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem}.cx-k div{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:.6rem .8rem}.cx-k small{color:var(--mu);display:block;font-size:.74rem;font-weight:600}.cx-k b{font-size:1.05rem}' +
     '.cx-k .hi{background:var(--p);color:#fff;border-color:var(--p)}.cx-k .hi small{color:#e9ddff}.cx-k .lime{background:' + LIME + ';border-color:' + LIME + ';color:#1a2e05}.cx-k .lime small{color:#365314}' +
@@ -277,7 +277,7 @@
         if (!em.checked) { ep.value = np || ''; }
         var pr = parseFloat(ep.value), pf = pr - cs;
         ea.innerHTML = cs > 0 && pr > 0 ? 'Cost <b>' + money(cs) + '</b> \u2192 Selling price <b>' + money(pr) + '</b><div class="meta">Profit ' + money(pf) + ' (' + Math.round(pf / cs * 100) + '% on cost)</div>'
-          : '<span class="meta">Type the cost price. The selling price is worked out automatically (cost + ' + PROFIT_PCT + '%, minimum KSh ' + MIN_PROFIT + ' profit).</span>';
+          : '<span class="meta">Type the cost price. The selling price is worked out automatically (the cost is ' + PROFIT_PCT + '% below the selling price).</span>';
         onPrices();
       }
       ec.oninput = auto; em.onchange = function () { auto(); if (em.checked) ep.focus(); };
@@ -430,7 +430,7 @@
       insights(all) +
       (low.length ? '<div class="err" style="background:#fef3c7;color:#92400e">⚠ ' + low.length + ' item' + (low.length > 1 ? 's' : '') + ' low on stock: ' + low.slice(0, 4).map(function (p) { return esc(p.name) + ' (' + p.stock + ')'; }).join(', ') + (low.length > 4 ? '…' : '') + '</div>' : '') +
       '<p style="margin:0 0 .7rem"><button class="btn" id="cx-add" type="button" style="width:100%">＋ Add new item</button></p>' +
-      '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-reprice" type="button" style="width:100%">↻ Recalculate all prices (cost + ' + PROFIT_PCT + '%)</button></p>' +
+      '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-reprice" type="button" style="width:100%">↻ Recalculate all prices (' + PROFIT_PCT + '% below price = cost)</button></p>' +
       '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-export" type="button" style="width:100%">⬇ Download backup (CSV)</button></p>' +
       '<div class="tabs" id="cx-chips"></div><p class="meta" id="cx-cnt" style="margin:.2rem 0 .6rem"></p>' +
       '<div id="cx-list"></div><h2 style="font-size:1.05rem;margin:1.2rem 0 .5rem">Financial ledger' + (S.range === 'all' ? '' : ' · ' + RANGES.filter(function (r) { return r[0] === S.range; })[0][1]) + '</h2><div class="lg" id="cx-led"></div>';
@@ -442,8 +442,8 @@
         if (Number(p.old_price) > Number(p.price)) { disc++; return; }
         var np = autoPrice(p.cost); if (np !== Number(p.price)) todo.push([p, np]);
       });
-      if (!todo.length) { toast('All prices already match cost + ' + PROFIT_PCT + '%.' + (disc ? ' ' + disc + ' discounted item(s) were left alone.' : '')); return; }
-      if (!confirm('Update the selling price of ' + todo.length + ' item(s) to cost + ' + PROFIT_PCT + '% (min KSh ' + MIN_PROFIT + ' profit)?' + (disc ? '\n' + disc + ' discounted item(s) will be skipped.' : '') + (nocost ? '\n' + nocost + ' item(s) with no cost will be skipped.' : ''))) return;
+      if (!todo.length) { toast('All prices already match the ' + PROFIT_PCT + '% rule.' + (disc ? ' ' + disc + ' discounted item(s) were left alone.' : '')); return; }
+      if (!confirm('Update the selling price of ' + todo.length + ' item(s) so the cost is ' + PROFIT_PCT + '% below the price?' + (disc ? '\n' + disc + ' discounted item(s) will be skipped.' : '') + (nocost ? '\n' + nocost + ' item(s) with no cost will be skipped.' : ''))) return;
       var b = $('cx-reprice'); b.disabled = true; b.textContent = 'Updating prices\u2026';
       todo.reduce(function (pr, t) { return pr.then(function () { return call('/rest/v1/products?id=eq.' + encodeURIComponent(t[0].id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { price: t[1] } }); }); }, Promise.resolve())
         .then(load).then(render).then(function () { toast('Updated ' + todo.length + ' price(s).'); })
