@@ -1,162 +1,171 @@
 /* Stermont AI Builder: task queue (up to 200 tasks).
-   Loaded by builder-products.js, before the builder reads its tool list. Adds two tools for the AI:
-   add_tasks     put up to 200 separate tasks in a queue
-   manage_tasks  list, pause, resume or clear the queue
-   The queue then sends the tasks to the builder one at a time, by itself, as if the owner typed each one, so no single reply has to do
-   everything and the builder's step limit per message never blocks a big job. It waits out Gemini limits and retries, keeps going after a
-   page refresh, and shows a small progress bar above the message box. If this file fails to load, the builder works as before. */
+   Adds a Tasks button next to Settings. Paste a list (one task per line), press Start, and the builder does the tasks one after another
+   by sending each one to the AI as if you had typed it. It keeps going on its own:
+   - when the AI pauses after 40 steps it sends "continue" for you
+   - when the free Gemini limit is reached it waits 5 minutes and tries again (the tab must stay open)
+   - each task can start in a fresh chat (page reload), which saves quota and loads the newest code
+   The queue is saved on this device, so it survives a refresh. Website changes are published by the automatic publishing,
+   product edits save straight to the shop. If this file fails to load, the builder works as before. */
 (function () {
   'use strict';
-  var W = window, D = document, BP = W.BuilderProducts;
-  if (!BP || W.__stmTasks) return;
-  W.__stmTasks = 1;
-  var KEY = 'stm_builder_tasks_v1', CHATKEY = 'stm_builder_chat_v1', MAX = 200;
-  var hooks = { bound: false, busy: function () { return false; }, say: function () {} };
-  var Q = fresh(), cur = null, logBefore = 0, holdUntil = 0, transient = 0, bar = null, txt = null, bPause = null, bClear = null;
-
-  function fresh() { return { tasks: [], paused: false, told: false }; }
+  var D = document, KEY = 'stm_builder_tasks_v1', CHAT = 'stm_builder_chat_v1', MAX = 200;
+  if (window.__stmTasks) return;
+  window.__stmTasks = 1;
+  var SUFFIX = ' (Queued task: do the whole job now without asking questions. If something essential is missing, say exactly what in one sentence and stop.)';
   function $(id) { return D.getElementById(id); }
   function load() {
-    try {
-      var j = JSON.parse(localStorage.getItem(KEY));
-      if (j && Array.isArray(j.tasks)) { Q = j; Q.tasks.forEach(function (t) { if (t.s === 'doing') t.s = 'todo'; }); }
-    } catch (e) {}
+    var o = null; try { o = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    if (!o || !Array.isArray(o.items)) o = { run: false, fresh: true, items: [], retryAt: 0 };
+    return o;
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(Q)); } catch (e) {} }
-  function cnt(s) { return Q.tasks.filter(function (t) { return t.s === s; }).length; }
-  function pending() { return cnt('todo') + cnt('doing'); }
-  function nextTask() { return Q.tasks.filter(function (t) { return t.s === 'todo'; })[0]; }
-
-  /* ---------- tools for the AI ---------- */
-  function addTasks(a) {
-    var list = (Array.isArray(a && a.tasks) ? a.tasks : []).map(function (x) { return String(x == null ? '' : x).replace(/\s+/g, ' ').trim().slice(0, 1500); }).filter(Boolean);
-    if (!list.length) throw new Error('tasks is required: send a list of short, separate tasks');
-    if (!pending()) Q = fresh();
-    if (pending() + list.length > MAX) throw new Error('The queue holds at most ' + MAX + ' waiting tasks and ' + pending() + ' are already waiting. Add fewer tasks.');
-    list.forEach(function (x) { Q.tasks.push({ t: x, s: 'todo', n: 0, c: 0 }); });
-    Q.paused = false; Q.told = false; save(); render();
-    return { queued: list.length, waiting: pending(), note: 'The tasks run one at a time, by themselves, starting a few seconds after this reply ends. Do NOT start them now. Tell the owner in one or two sentences that they are queued and will run by themselves, and that they can watch the progress bar above the message box.' };
-  }
-  function manage(a) {
-    var act = String(a && a.action || 'list').toLowerCase();
-    if (act === 'clear') { var n = pending(); Q = fresh(); cur = null; save(); render(); return { cleared: n }; }
-    if (act === 'pause') { Q.paused = true; save(); render(); }
-    if (act === 'resume') { Q.paused = false; holdUntil = 0; save(); render(); }
-    return {
-      waiting: pending(), done: cnt('done'), failed: cnt('failed'), paused: !!Q.paused,
-      next: Q.tasks.filter(function (t) { return t.s === 'todo'; }).slice(0, 5).map(function (t) { return t.t.slice(0, 100); }),
-      failed_tasks: Q.tasks.filter(function (t) { return t.s === 'failed'; }).slice(0, 10).map(function (t) { return t.t.slice(0, 80) + ' (' + (t.r || 'failed') + ')'; })
-    };
-  }
-
-  /* ---------- the progress bar ---------- */
-  function pill() {
-    if (bar || !D.body) return;
-    bar = D.createElement('div');
-    bar.hidden = true;
-    bar.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:176px;z-index:7;max-width:94%;display:flex;gap:.4rem;align-items:center;background:#1f1b2e;color:#fff;border-radius:999px;padding:.3rem .5rem .3rem .9rem;font:600 .82rem/1.3 system-ui,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.3)';
-    txt = D.createElement('span'); bar.appendChild(txt);
-    function mk(t, fn) {
-      var b = D.createElement('button'); b.type = 'button'; b.textContent = t; b.onclick = fn;
-      b.style.cssText = 'background:transparent;color:#fff;border:1px solid #fff;border-radius:999px;padding:.15rem .6rem;font:inherit;font-size:.8rem';
-      bar.appendChild(b); return b;
+  var st = load(), working = false, panel = null, listEl = null, infoEl = null, btn = null, startBtn = null, freshCb = null, toast = null, toastT = 0;
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  function count(s) { return st.items.filter(function (i) { return i.s === s; }).length; }
+  function first(s) { for (var i = 0; i < st.items.length; i++) if (st.items[i].s === s) return i; return -1; }
+  function busy() { var s = $('bStop'); return !!(s && !s.hidden); }
+  function ready() { var s = $('bSend'); return !!(s && typeof s.onclick === 'function' && $('inp') && $('log') && $('bStop')); }
+  function say(t, ms) {
+    if (!D.body) return;
+    if (!toast) {
+      toast = D.createElement('div');
+      toast.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:130px;z-index:30;max-width:90%;background:#15803d;color:#fff;border-radius:999px;padding:.35rem .9rem;font:600 .85rem/1.3 system-ui,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.25);text-align:center';
+      D.body.appendChild(toast);
     }
-    bPause = mk('Pause', function () { manage({ action: Q.paused ? 'resume' : 'pause' }); });
-    bClear = mk('Clear', function () { if (pending() && !confirm('Remove all waiting tasks?')) return; manage({ action: 'clear' }); });
-    D.body.appendChild(bar);
-  }
-  function render() {
-    pill();
-    if (!bar) return;
-    var total = Q.tasks.length, left = pending(), f = cnt('failed');
-    if (!total) { bar.hidden = true; return; }
-    bar.hidden = false;
-    txt.textContent = left
-      ? 'Tasks: ' + cnt('done') + ' of ' + total + ' done' + (f ? ', ' + f + ' failed' : '') + (Q.paused ? ' (paused)' : Date.now() < holdUntil - 5000 ? ' (waiting to retry)' : '')
-      : 'Tasks finished: ' + cnt('done') + ' done' + (f ? ', ' + f + ' failed' : '');
-    bPause.hidden = !left; bPause.textContent = Q.paused ? 'Resume' : 'Pause';
-    bClear.textContent = left ? 'Clear' : 'Dismiss';
+    clearTimeout(toastT); toast.hidden = false; toast.textContent = t;
+    if (ms) toastT = setTimeout(function () { toast.hidden = true; }, ms);
   }
 
-  /* ---------- the runner ---------- */
-  function bigChat() {
-    var s = ''; try { s = localStorage.getItem(CHATKEY) || sessionStorage.getItem(CHATKEY) || ''; } catch (e) {}
-    return s.length > 120000;
+  /* clear the saved chat and reload, so the next task starts with an empty chat and the newest code */
+  function wipe() { try { localStorage.removeItem(CHAT); } catch (e) {} try { sessionStorage.removeItem(CHAT); } catch (e) {} }
+  function fresh() { wipe(); window.addEventListener('pagehide', wipe); setTimeout(function () { try { location.reload(); } catch (e) {} }, 200); }
+
+  function parse(txt) {
+    return String(txt || '').split(/\r?\n/).map(function (l) { return l.replace(/^\s*(?:[-*\u2022]|\d{1,3}[.)])\s+/, '').trim(); }).filter(Boolean).map(function (l) { return l.slice(0, 2000); });
   }
-  function msgFor(t) {
-    var i = Q.tasks.indexOf(t) + 1, of = i + ' of ' + Q.tasks.length;
-    return t.c ? 'Continue task ' + of + ' (you ran out of steps): ' + t.t : 'Task ' + of + ': ' + t.t;
-  }
-  function newMsgs() {
-    var l = $('log'), a = [];
-    if (l) for (var i = logBefore; i < l.children.length; i++) a.push(l.children[i]);
-    return a;
-  }
-  function summary() {
-    if (Q.told) return;
-    var d = cnt('done'), f = cnt('failed'); if (!d && !f) return;
-    Q.told = true; save();
-    var bad = Q.tasks.filter(function (t) { return t.s === 'failed'; }).slice(0, 5).map(function (t) { return t.t.slice(0, 70) + ' (' + (t.r || 'failed') + ')'; }).join(' | ');
-    hooks.say('Task queue finished: ' + d + ' done' + (f ? ', ' + f + ' could not be finished: ' + bad : '') + '. Website changes are published automatically when the check passes. Otherwise use the green Publish card.', f ? 'err' : 'sys');
-  }
-  function finishTurn() {
-    var t = cur; cur = null;
-    var err = null, stopped = false, steps = false, reply = '';
-    newMsgs().forEach(function (e) {
-      var c = e.classList, x = e.textContent || '';
-      if (c.contains('err') && !/^Could not publish/.test(x)) err = x;
-      else if (c.contains('sys') && x === 'Stopped.') stopped = true;
-      else if (c.contains('sys') && /^I paused after 40 steps/.test(x)) steps = true;
-      else if (c.contains('ai')) reply = x;
+
+  /* send one task to the builder and report how it went */
+  function inspect(before, seen) {
+    var kids = Array.prototype.slice.call($('log').children, before), r = { err: '', stopped: false, more: false, reply: '', started: seen };
+    kids.forEach(function (n) {
+      var c = n.classList, tx = n.textContent || '';
+      if (c.contains('err')) r.err = tx;
+      else if (c.contains('sys') && /^Stopped\./.test(tx)) r.stopped = true;
+      else if (c.contains('sys') && /paused after 40 steps/i.test(tx)) r.more = true;
+      else if (c.contains('ai')) r.reply = tx;
     });
-    if (stopped) { t.s = 'todo'; Q.paused = true; }
-    else if (err) {
-      t.s = 'todo';
-      if (/limit|quota|429|busy|too long|did not answer|no answer|connection|fetch|50\d|overload|Gemini/i.test(err)) {
-        /* a limit or a bad connection is not the task's fault: wait longer each time and try the same task again */
-        transient++; holdUntil = Date.now() + Math.min(600000, 20000 * Math.pow(2, Math.min(transient, 5)));
-      } else {
-        t.n = (t.n || 0) + 1; holdUntil = Date.now() + 5000;
-        if (t.n >= 2) { t.s = 'failed'; t.r = err.slice(0, 140); }
-      }
-    } else if (steps && (t.c || 0) < 3) { t.c = (t.c || 0) + 1; t.s = 'todo'; holdUntil = Date.now() + 2500; }
-    else { t.s = 'done'; t.r = reply.slice(0, 140); transient = 0; holdUntil = Date.now() + 2500; } /* a short pause lets automatic publishing finish first */
-    save(); render();
-    if (!pending()) summary();
+    return r;
   }
-  function tick() {
-    if (!hooks.bound) return;
-    var busy = hooks.busy();
-    if (cur) { if (!busy) finishTurn(); return; }
-    if (busy || Q.paused || Date.now() < holdUntil) return;
-    var t = nextTask(); if (!t) return;
-    var inp = $('inp'), send = $('bSend'), BA = W.BuilderAttach;
-    if (!inp || !send) return;
-    if (BA && BA.has && BA.has()) return; /* files are waiting in the message box: never attach them to a queued task */
-    if (D.activeElement === inp && inp.value.trim()) return; /* the owner is typing */
-    if (bigChat()) { W.__stmNoReload = true; try { var nb = $('bNew'); if (nb) nb.click(); } finally { W.__stmNoReload = false; } } /* start the next task on a fresh, small chat */
-    logBefore = $('log') ? $('log').children.length : 0;
-    var draft = inp.value;
-    inp.value = msgFor(t); cur = t; t.s = 'doing';
-    send.click();
-    inp.value = draft;
-    if (!hooks.busy()) { cur = null; t.s = 'todo'; holdUntil = Date.now() + 15000; } /* the builder did not start it (for example no Gemini key yet): try again later */
-    save(); render();
+  function sendTask(text) {
+    var before = $('log').children.length, inp = $('inp');
+    inp.value = text; inp.dispatchEvent(new Event('input'));
+    $('bSend').click();
+    return new Promise(function (res) {
+      var t0 = Date.now(), seen = false, iv = setInterval(function () {
+        var b = busy(), r;
+        if (b) seen = true;
+        if (seen && !b) { clearInterval(iv); res(inspect(before, true)); return; }
+        if (!seen) {
+          r = inspect(before, false);
+          if (r.err || Date.now() - t0 > 20000) { clearInterval(iv); if (!r.err) r.err = 'The task did not start.'; res(r); }
+        }
+      }, 500);
+    });
+  }
+  /* after a task: wait until the builder has been idle for 3 seconds (automatic publishing may still be running) */
+  function settle(cb) {
+    var idle = 0, iv = setInterval(function () {
+      if (busy()) idle = 0; else idle += 500;
+      if (idle >= 3000) { clearInterval(iv); cb(); }
+    }, 500);
   }
 
-  /* ---------- register the tools and the instructions ---------- */
-  var RULES = '\nTASK QUEUE: the builder can run up to 200 tasks one after another by itself, so no single reply has to do everything. When the owner gives a big job, a long list, or asks for many changes, split it into separate short tasks that each make sense on their own (name the product id, file or page in every task) and call add_tasks once with all of them. Then tell the owner in one or two sentences that they are queued and will run by themselves. Do not start them yourself. Each queued task later arrives as its own message that starts with "Task N of M:". Do only that one task, then reply in one or two sentences. Never call add_tasks while you are doing a queued task. Use manage_tasks to list, pause, resume or clear the queue when the owner asks.';
-  BP.decls.push(
-    { name: 'add_tasks', description: 'Add tasks to the builder task queue (up to 200 waiting at once). The builder then does them one at a time by itself, as if the owner typed each one, even after a refresh. Use it for big jobs or long lists: split the work into separate short tasks that each make sense on their own, and send them all in one call.',
-      parameters: { type: 'object', properties: { tasks: { type: 'array', items: { type: 'string' }, description: 'The tasks, in order. Each one is a complete instruction that names the product id, file or page it is about' } }, required: ['tasks'] } },
-    { name: 'manage_tasks', description: 'Show the task queue (how many are waiting, done and failed), or pause, resume or clear it. Use it when the owner asks about the queue.',
-      parameters: { type: 'object', properties: { action: { type: 'string', description: 'list, pause, resume or clear (default list)' } }, required: [] } }
-  );
-  BP.tools.add_tasks = addTasks;
-  BP.tools.manage_tasks = manage;
-  var oi = BP.info; BP.info = function () { return (oi ? oi.apply(BP, arguments) : '') + RULES; };
-  var ob = BP.bind; BP.bind = function (o) { if (ob) ob.apply(BP, arguments); if (o) { if (o.busy) hooks.busy = o.busy; if (o.say) hooks.say = o.say; hooks.bound = true; } };
+  function step() {
+    if (working || !st.run) return;
+    if (st.retryAt > Date.now()) { render(); return; }
+    if (!ready() || busy()) return;
+    var i = first('p');
+    if (i < 0) { st.run = false; save(); render(); say('All tasks are finished.', 6000); return; }
+    var it = st.items[i];
+    if (!($('gkey') && $('gkey').value.trim())) { st.run = false; save(); render(); try { $('set').hidden = false; } catch (e) {} say('Add your Gemini key in Settings, then press Start.', 7000); return; }
+    if (it.n >= 3) { it.s = 'f'; it.r = it.r || 'Gave up after 3 tries'; save(); render(); return; }
+    working = true; it.n++; save(); render();
+    var more = 0;
+    function go(msg) {
+      sendTask(msg).then(function (r) {
+        if (r.stopped) { st.run = false; it.n--; save(); working = false; render(); return; }
+        if (r.err) {
+          working = false;
+          if (/limit|quota|429/i.test(r.err)) { it.n--; it.r = 'Waiting for the Gemini limit, trying again later'; st.retryAt = Date.now() + 5 * 60000; }
+          else { it.r = r.err.slice(0, 160); st.retryAt = Date.now() + 20000; }
+          save(); render(); return;
+        }
+        if (r.more && more < 6) { more++; go('continue'); return; }
+        it.s = 'd'; it.r = String(r.reply || 'Done').replace(/\s+/g, ' ').slice(0, 300); st.retryAt = 0; save(); render();
+        settle(function () { working = false; if (st.run && st.fresh && first('p') >= 0) fresh(); else render(); });
+      });
+    }
+    go(it.t + SUFFIX);
+  }
 
-  load(); render();
-  setInterval(tick, 1500);
+  function render() {
+    var p = count('p'), d = count('d'), f = count('f');
+    if (btn) btn.textContent = (st.run ? '\u25B6 ' : '') + 'Tasks' + (p ? ' (' + p + ')' : '');
+    if (!panel) return;
+    var wait = st.run && st.retryAt > Date.now() ? ' Waiting until ' + new Date(st.retryAt).toTimeString().slice(0, 5) + ', then trying again.' : '';
+    infoEl.textContent = (st.run ? 'Running.' : 'Paused.') + ' ' + p + ' waiting, ' + d + ' done, ' + f + ' failed. The queue holds up to ' + MAX + ' tasks.' + wait;
+    startBtn.textContent = st.run ? 'Pause' : 'Start';
+    freshCb.checked = !!st.fresh;
+    listEl.innerHTML = '';
+    var cur = first('p');
+    st.items.forEach(function (it, i) {
+      var li = D.createElement('li'), sp = D.createElement('span');
+      var tag = it.s === 'd' ? '\u2713' : it.s === 'f' ? '\u2717' : (working && i === cur ? '\u25B6' : '\u00B7');
+      sp.textContent = tag + ' ' + (i + 1) + '. ' + it.t.slice(0, 160) + (it.r ? ' \u2014 ' + it.r.slice(0, 160) : '');
+      sp.style.color = it.s === 'f' ? 'var(--no)' : it.s === 'd' ? 'var(--ok)' : '';
+      li.appendChild(sp); listEl.appendChild(li);
+    });
+  }
+
+  function mk(txt, cls, fn) { var b = D.createElement('button'); b.type = 'button'; b.className = cls || ''; b.textContent = txt; b.onclick = fn; return b; }
+  function init() {
+    var bSet = $('bSet'), log = $('log');
+    if (!bSet || !log || $('bTasks')) return;
+    btn = mk('Tasks', '', function () { panel.hidden = !panel.hidden; render(); });
+    btn.id = 'bTasks';
+    bSet.parentNode.insertBefore(btn, bSet);
+    panel = D.createElement('section'); panel.className = 'card'; panel.hidden = true;
+    var h = D.createElement('h2'); h.textContent = 'Task queue (up to ' + MAX + ' tasks)'; panel.appendChild(h);
+    var ta = D.createElement('textarea'); ta.rows = 6; ta.placeholder = 'One task per line, for example:\nFix typos on the About page\nWrite a banner for the weekend offer\nCheck all pages for broken links';
+    panel.appendChild(ta);
+    var row = D.createElement('div'); row.className = 'row'; row.style.marginTop = '.5rem';
+    row.appendChild(mk('Add to queue', 'pri', function () {
+      var tasks = parse(ta.value), room = MAX - st.items.length;
+      if (!tasks.length) { say('Type or paste some tasks first.', 3000); return; }
+      var add = tasks.slice(0, Math.max(0, room));
+      add.forEach(function (t) { st.items.push({ t: t, s: 'p', n: 0, r: '' }); });
+      ta.value = ''; save(); render();
+      say(add.length < tasks.length ? 'Added ' + add.length + '. The queue is full at ' + MAX + ' tasks. Clear finished ones to make room.' : 'Added ' + add.length + ' task' + (add.length === 1 ? '' : 's') + '.', 5000);
+    }));
+    startBtn = mk('Start', 'ok', function () {
+      if (st.run) { st.run = false; save(); render(); return; }
+      if (first('p') < 0) { say('Add some tasks first.', 3000); return; }
+      st.run = true; st.retryAt = 0; save(); render();
+      if (st.fresh && D.querySelector('#log .m.user') && !busy()) fresh();
+    });
+    row.appendChild(startBtn);
+    row.appendChild(mk('Retry failed', '', function () { st.items.forEach(function (i) { if (i.s === 'f') { i.s = 'p'; i.n = 0; i.r = ''; } }); st.retryAt = 0; save(); render(); }));
+    row.appendChild(mk('Clear finished', '', function () { st.items = st.items.filter(function (i) { return i.s === 'p'; }); save(); render(); }));
+    row.appendChild(mk('Clear all', '', function () { if (confirm('Remove every task from the queue?')) { st.items = []; st.run = false; save(); render(); } }));
+    panel.appendChild(row);
+    var lab = D.createElement('label'); lab.style.fontWeight = '500'; freshCb = D.createElement('input'); freshCb.type = 'checkbox';
+    freshCb.onchange = function () { st.fresh = freshCb.checked; save(); };
+    lab.appendChild(freshCb); lab.appendChild(D.createTextNode(' Start every task in a fresh chat (saves quota, recommended)')); panel.appendChild(lab);
+    infoEl = D.createElement('p'); infoEl.className = 'hint'; panel.appendChild(infoEl);
+    listEl = D.createElement('ul'); listEl.style.cssText = 'list-style:none;margin:.4rem 0 0;padding:0;font-size:.85rem;max-height:40vh;overflow:auto'; panel.appendChild(listEl);
+    var hint = D.createElement('p'); hint.className = 'hint'; hint.textContent = 'Keep this page open while the queue runs. It carries on through the 40-step pause, waits out Gemini limits, and resumes after a refresh. Pause stops it after the current task.'; panel.appendChild(hint);
+    log.parentNode.insertBefore(panel, log);
+    render();
+    setInterval(step, 1500);
+  }
+  if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', init); else init();
 })();

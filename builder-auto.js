@@ -63,3 +63,5 @@
   }
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', init); else init();
 })();
+/* task queue (optional: the builder works without it) */
+try { var ts = document.createElement('script'); ts.src = '/builder-tasks.js?v=1'; ts.async = true; (document.head || document.documentElement).appendChild(ts); } catch (e) {}
