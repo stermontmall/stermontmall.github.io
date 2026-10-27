@@ -7,8 +7,8 @@
   "scope": "/builder.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#5b21b6",
-  "theme_color": "#5b21b6",
+  "background_color": "#c2410c",
+  "theme_color": "#c2410c",
   "icons": [
     {
       "src": "icon-builder-192.png",
