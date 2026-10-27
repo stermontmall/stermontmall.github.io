@@ -1,4 +1,4 @@
-/* Stermont AI Builder: automatic publishing.
+/* Stermont Office: automatic publishing.
    When the AI finishes a job and the built-in check finds no problems and no unverified claims,
    this presses the Publish button for you, so the change is committed straight to the website.
    If the check finds anything, nothing is published automatically and the normal card is shown.

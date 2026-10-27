@@ -1,4 +1,4 @@
-/* Stermont AI Builder: limit tools (all free, all in your browser).
+/* Stermont Office: limit tools (all free, all in your browser).
    Loaded by builder-boost.js. Adds a "Limit tools" box to Settings:
    - a usage counter per AI for today, so you can see how much of the free allowance is gone
    - a countdown to Gemini's daily reset (Google resets free limits at midnight Pacific time)

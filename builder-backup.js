@@ -1,4 +1,4 @@
-/* Stermont AI Builder: backup AI providers.
+/* Stermont Office: backup AI providers.
    Loaded by builder-boost.js. When every Gemini model has hit its free limit, the builder's request is
    sent to another provider instead (Mistral, Cerebras, OpenRouter, Groq). Each provider has its own separate
    free limit, so this adds real extra room. The reply is converted back into the format the builder

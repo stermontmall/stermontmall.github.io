@@ -1,4 +1,4 @@
-/* Stermont AI Builder: read the packs and prices of products from a website the owner refers to.
+/* Stermont Office: read the packs and prices of products from a website the owner refers to.
    Adds the tool read_website_packs(url, product). It asks Gemini (with Google's URL reading) to open the page and list EVERY pack size
    and its price, so the AI can then send one post_products entry per pack (same name, different pack_size, own cost). The price found on
    the website is used as the COST (COGS); the admin Catalog method then adds the profit and the previous price, stock, alert and advert.

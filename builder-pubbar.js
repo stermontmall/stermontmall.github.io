@@ -1,4 +1,4 @@
-/* Stermont AI Builder: always-visible Publish button.
+/* Stermont Office: always-visible Publish button.
    While there are changes waiting to be published, a green "Publish" button stays on the screen (bottom right, above the message box),
    so the owner never has to scroll the chat to look for the Publish card. One tap publishes through the same check as the card.
    If the automatic check found a problem, the tap scrolls to the card with the warning instead of publishing.

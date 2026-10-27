@@ -1,4 +1,4 @@
-/* Stermont AI Builder: list shop items, post new products from attached photos, edit live products, and start a fresh chat.
+/* Stermont Office: list shop items, post new products from attached photos, edit live products, and start a fresh chat.
    Loaded by builder.html after builder-attach.js. Uses the same admin sign-in as /admin.html on this device.
    New items: the AI prepares them, the owner taps Post on a green card in the chat, then they go into the shop (Supabase). All items on the card are posted at the same time.
    Packs: a product with several pack sizes is sent as one entry per pack (same name, different pack_size, own price). The packs are joined under one item, the same way Admin, Catalog does it (shared variant_group, pack in variant_label).

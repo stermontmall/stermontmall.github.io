@@ -1,4 +1,4 @@
-/* Stermont AI Builder: attach photos, screenshots, PDFs and text/code files.
+/* Stermont Office: attach photos, screenshots, PDFs and text/code files.
    Loaded by builder.html. Adds a paperclip button, previews, and gives the builder the parts to send to Gemini.
    If this file fails to load, the builder keeps working without attachments. */
 (function () {

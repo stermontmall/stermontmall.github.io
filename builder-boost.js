@@ -1,4 +1,4 @@
-/* Stermont AI Builder: keeps working when the free Gemini limit is hit.
+/* Stermont Office: keeps working when the free Gemini limit is hit.
    Loaded by builder-attach.js. It sits between the builder and Google and:
    - waits out short "limit reached" pauses and carries on by itself, so a task is not lost
    - switches to another Gemini model, because each model has its own separate limit (six models are tried in turn)

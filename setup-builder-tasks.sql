@@ -1,4 +1,4 @@
--- Stermont Arcade · AI Builder task queue (up to 6000 tasks), saved in Supabase.
+-- Stermont Arcade · Stermont Office task queue (up to 6000 tasks), saved in Supabase.
 -- Applied to Supabase on 2026-10-27. Safe to re-run.
 -- Only signed-in staff (public.is_staff()) can read or change it. Shoppers and anonymous visitors get nothing.
 

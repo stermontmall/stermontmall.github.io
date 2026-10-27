@@ -1,4 +1,4 @@
-/* Stermont AI Builder: task queue (up to 6000 tasks), saved in Supabase.
+/* Stermont Office: task queue (up to 6000 tasks), saved in Supabase.
    Adds a Tasks button next to Settings. Paste a list (one task per line), press Start, and the builder does the tasks one after another
    by sending each one to the AI as if you had typed it. It keeps going on its own:
    - when the AI pauses after 40 steps it sends "continue" for you
