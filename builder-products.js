@@ -1,13 +1,14 @@
-/* Stermont AI Builder: list shop items, post new products from attached photos, and edit live products.
+/* Stermont AI Builder: list shop items, post new products from attached photos, edit live products, and start a fresh chat.
    Loaded by builder.html after builder-attach.js. Uses the same admin sign-in as /admin.html on this device.
    New items: the AI prepares them, the owner taps Post on a green card in the chat, then they go into the shop (Supabase).
    Existing items: update_products saves straight to the shop (no card), because the owner asked for it. Old values are kept in a backup on this device.
    Description length is enforced by the tools: at least 300 words by default, or whatever minimum and maximum the owner asks for.
+   new_chat: clears the saved chat and reloads the builder so it starts fresh on the newest code. The header New chat button does the same.
    If this file fails to load, the builder keeps working without these tools. */
 (function () {
   'use strict';
   var W = window, D = document;
-  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session', BK = 'stm_builder_backup_v1';
+  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session', BK = 'stm_builder_backup_v1', CHATKEY = 'stm_builder_chat_v1';
   var UNITS = ['g', 'kg', 'tonne', 'ml', 'litre', 'piece', 'pair', 'dozen', 'set', 'bundle', 'pack', 'bag', '50 kg bag', 'bottle', 'carton', 'box', 'crate', 'sachet', 'tin', 'metre', 'roll'];
   /* the owner's standard settings, same as /list-products.html: price = cost + 30% (at least KSh 150), rounded up to KSh 50 */
   var DEF = { pm: 30, mode: 'cost', dmin: 6, dmax: 12, disc: true, stock: 1000, low: 20, feat: true };
@@ -31,6 +32,25 @@
     if (r.max && w > r.max) return 'description has ' + w + ' words but must be at most ' + r.max + '. Shorten it and send it again';
     return '';
   }
+
+  /* ---------- fresh start: clear the saved chat and reload the builder ---------- */
+  function wipeChat() {
+    try { localStorage.removeItem(CHATKEY); } catch (e) {}
+    try { sessionStorage.removeItem(CHATKEY); } catch (e) {}
+  }
+  function reloadSoon(ms) { setTimeout(function () { try { W.location.reload(); } catch (e) {} }, ms); }
+  /* tool for the AI. The turn that called it would normally save the chat again when it ends, so the chat is wiped once more as the page unloads */
+  function freshStart() {
+    wipeChat();
+    W.addEventListener('pagehide', wipeChat);
+    reloadSoon(300);
+    return { ok: true, note: 'The chat is cleared and the builder is reloading on the newest code. Changes that were waiting to be published are kept. The page reloads in a moment, so reply with at most one short sentence such as "Starting fresh..." and nothing more.' };
+  }
+  /* the header New chat button: the builder clears the chat itself (it does nothing while the AI is working); this then reloads so the newest code is used */
+  (function () {
+    var b = D.getElementById('bNew'); if (!b) return;
+    b.addEventListener('click', function () { if (H.busy()) return; reloadSoon(150); });
+  })();
 
   /* ---------- standard settings and prices (same method as the admin Catalog) ---------- */
   function settings(a) {
@@ -363,6 +383,7 @@
   var P = function (props, req) { return { type: 'object', properties: props, required: req || [] }; };
   var S = { type: 'string' }, N = { type: 'number' }, I = { type: 'integer' }, B = { type: 'boolean' };
   var decls = [
+    { name: 'new_chat', description: 'Clear this whole chat and reload the builder so it starts fresh on the newest code. Use it only when the owner asks to clear the chat, start a new chat, start fresh or refresh the builder. Changes waiting to be published are kept.' },
     { name: 'list_products', description: 'List the items stored in the shop (admin view: includes hidden items, stock, price, previous price, advert flag and how many photos each has). Use it when the owner asks what is in the shop, to check for duplicates, or to find items with no photo. Pages through with offset.',
       parameters: P({ search: S, category: S, status: { type: 'string', description: 'live, hidden or all (default all)' }, missing_photos: B, include_cost: { type: 'boolean', description: 'only when the owner asks to see cost prices' }, limit: I, offset: I }) },
     { name: 'product_descriptions', description: 'Find shop products whose description has fewer than min_words words (default 300), or more than max_words if given, and read their current text. Returns the product ids, names, categories and current descriptions so you can rewrite them. Then save the new text with update_products.',
@@ -402,6 +423,7 @@
 
   /* added to the AI instructions: it must know it CAN edit live products */
   var EDIT_RULES = '\n\nEDITING THE LIVE SHOP: you CAN change products that are already in the shop. Use update_products (description, name, price, previous price, cost, stock, advert, live or hidden, category, unit). It saves straight to the live shop with no Post card and no Publish, because the owner is signed in as admin and wants direct edits. Never tell the owner you cannot edit product text or that they must use SQL or the admin panel. Do what the owner asked, change only that, and afterwards say plainly what you changed. To find short descriptions call product_descriptions, then fix them in batches of about 5 with update_products, and repeat until none are left. If a tool says the owner is signed out, tell them to open /admin.html, sign in, and ask again.' +
+    '\nNEW CHAT: when the owner asks to clear the chat, start a new chat, start fresh or refresh the builder, call new_chat at once without asking anything, then reply with one short sentence. It clears this chat and reloads the builder on the newest code. Changes waiting to be published are kept.' +
     '\nWORD COUNTS: every product description must be at least 300 words unless the owner gives another length. If the owner gives a number or a range, pass it as min and max (min_description_words and max_description_words for post_products, require_min_words and max_words for update_products). The tools COUNT the words and refuse a description outside the range, so when a tool says a description is too short or too long, rewrite it and send it again yourself without asking the owner.' +
     '\nWRITING PRODUCT DESCRIPTIONS: use only facts from the product name, pack size, category, the existing description and what the owner told you, and keep any facts already there (Brand: lines, sizes). Write plain, useful English: what the product is, who it is for, common uses, general handling and storage tips, a reminder to read and follow the label and keep it away from children and food (for pest control, fumigation, agrovet and chemical products), and how buying works at Stermont Arcade (pay by M-Pesa, delivery to all 47 counties, questions on WhatsApp). NEVER invent brand claims, ingredients, strengths, dosages, mixing ratios, certifications, awards, guarantees, ratings, statistics or delivery times. Format: short paragraphs, section titles on their own line, no bullets and no markdown. Reach the word count with real content, not repetition.';
   function info() {
@@ -410,7 +432,7 @@
   loadCats(true).catch(function () {});
 
   W.BuilderProducts = {
-    decls: decls, tools: { list_products: list, product_descriptions: descList, update_products: update, post_products: prepare }, setPhotos: setPhotos, info: info,
+    decls: decls, tools: { new_chat: freshStart, list_products: list, product_descriptions: descList, update_products: update, post_products: prepare }, setPhotos: setPhotos, info: info,
     bind: function (o) { if (o) { if (o.busy) H.busy = o.busy; if (o.note) H.note = o.note; if (o.say) H.say = o.say; } },
     _t: { auto: auto, autoOld: autoOld, settings: settings, prepare: prepare, setCats: function (c) { cats = c; }, setShop: function (s) { shop = s; }, queue: function () { return queue; } }
   };
