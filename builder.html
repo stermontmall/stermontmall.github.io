@@ -7,13 +7,13 @@
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#5b21b6">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src https://generativelanguage.googleapis.com https://api.github.com https://oewvtbnmyombbtggamor.supabase.co https://api.mistral.ai https://api.cerebras.ai https://api.groq.com https://openrouter.ai; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src about: blob:; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
-<title>Stermont AI Builder</title>
+<title>Stermont I.T</title>
 <link rel="icon" href="/favicon.png">
 <link rel="manifest" href="/builder-manifest.json">
 <link rel="apple-touch-icon" href="/icon-builder-192.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="AI Builder">
+<meta name="apple-mobile-web-app-title" content="Stermont I.T">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 :root{--p:#5b21b6;--pl:#f3eefc;--ink:#1f1b2e;--mu:#6b6785;--ln:#e3ddf3;--ok:#15803d;--no:#b91c1c}
@@ -77,7 +77,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
 </head>
 <body>
 <header>
-  <b>&#128736; AI Builder</b>
+  <b>&#128736; Stermont I.T</b>
   <button id="bInst" type="button" hidden>Install app</button>
   <button id="bSet" type="button">Settings</button>
   <button id="bNew" type="button">New chat</button>
@@ -626,7 +626,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     { name: 'delete_file', description: 'Stage a file for deletion.', parameters: P({ path: T }, ['path']) },
     { name: 'check_work', description: 'Check every waiting change for mistakes: pages pointing at files that do not exist, broken code, invalid JSON, secret keys and invented claims. Call it before you finish any change.' }
   ];
-  var SYSTEM = 'You are Site Builder, a friendly, fast, all-round AI assistant for the owner of Stermont Arcade (stermontarcade.co.ke), a Kenyan online store: prices in KSh, customers pay by M-Pesa and ask questions on WhatsApp. The site is a static GitHub Pages site of plain HTML, CSS and JavaScript files. Product data and orders live in Supabase, not in the repository. The owner is not a programmer: talk like a friendly colleague, in short simple English (reply in the language the owner uses).\n' +
+  var SYSTEM = 'You are Stermont I.T, a friendly, fast, all-round AI assistant for the owner of Stermont Arcade (stermontarcade.co.ke), a Kenyan online store: prices in KSh, customers pay by M-Pesa and ask questions on WhatsApp. The site is a static GitHub Pages site of plain HTML, CSS and JavaScript files. Product data and orders live in Supabase, not in the repository. The owner is not a programmer: talk like a friendly colleague, in short simple English (reply in the language the owner uses).\n' +
     'You do two jobs.\nJOB A, ANSWER ANYTHING: you can answer any question or chat about any topic: business and marketing advice, product descriptions, WhatsApp and customer replies, pricing ideas, Kenyan shipping, tax and M-Pesa questions, coding help, maths, writing, general knowledge. For a question or chat, just answer directly in plain text and do NOT use tools. Never say a question is outside your job.\nJOB B, BUILD AND FIX THE WEBSITE:\n' +
     '1. Be fast and proactive. Do the whole job in one go instead of asking questions. When you need several files or searches, request them all in the same step so they run together. Ask one short question only if a wrong guess would be costly.\n2. Be creative: when asked for something new (banner, landing page, section, promo, layout), design it boldly and professionally, mobile first, matching the store look, with clear calls to action (WhatsApp, M-Pesa). You can also fix bugs, improve speed, SEO, accessibility and copywriting. Use shop_data to see the real products, prices and categories before writing product-related content.\n3. Read the relevant part of a file before editing. Make small exact changes with edit_file, copying "find" text exactly. Use write_file for new files or very small ones.\n4. Edits are only staged. When you finish, a green Publish card appears automatically in the chat with Preview, Changes and Publish buttons. Nothing goes live until the owner presses Publish.\n5. Do not hand-edit files in p/, sitemap*.xml, merchant-feed.xml, sitemap-state.json or llms.txt: workflows generate them. Edit the generator script instead and say so.\n6. If an HTML page loads a JS or CSS file with ?v=N, raise N when you change that file.\n7. Never add secret keys. Keep existing SEO tags valid. Never remove working features. Never show or guess product cost or profit figures publicly.\n8. The default admin profit percentage is the PROFIT_PCT constant in catalog-v10.js.\n9. If a tool fails, say what failed in one plain sentence and try another way. Never go silent.\n10. Keep replies short. After building, finish with a 2 or 3 sentence summary, tell the owner to check the Publish card below (Preview first if they like) and press Publish, and suggest one next idea.\n' +
     '11. NEVER invent or exaggerate facts: no rankings (like "#1"), awards, ratings, certifications, guarantees, statistics, testimonials, delivery times, discounts or stock claims unless they are in the site files, in shop_data, or the owner told you. Prices come only from shop_data.\n' +
@@ -837,7 +837,7 @@ input[type=text],input[type=password],textarea{width:100%;font:inherit;font-size
     if (!ghReady()) { addMsg('err', 'Add your GitHub token in Settings to publish.', true); $('set').hidden = false; return; }
     var iss = validate();
     if (iss.errors.length && !confirm('The check found problems that could break your website:\n\n- ' + iss.errors.slice(0, 4).join('\n- ') + '\n\nPublish anyway?')) return;
-    var msg = ($('cmsg').value || '').trim() || 'Site update via Site Builder', repo = cfg.repo, branch = cfg.branch, tried = false;
+    var msg = ($('cmsg').value || '').trim() || 'Site update via Stermont I.T', repo = cfg.repo, branch = cfg.branch, tried = false;
     clearPubErr(); setBusy(true); setStatus('Publishing...');
     function run() {
       var base, baseTree;

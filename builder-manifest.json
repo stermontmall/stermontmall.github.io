@@ -1,7 +1,7 @@
 {
-  "name": "Stermont AI Builder",
-  "short_name": "AI Builder",
-  "description": "Chat with an AI to edit and publish your Stermont Arcade website.",
+  "name": "Stermont I.T",
+  "short_name": "Stermont I.T",
+  "description": "Stermont I.T: chat with an AI to edit and publish your Stermont Arcade website.",
   "id": "/builder.html",
   "start_url": "/builder.html",
   "scope": "/builder.html",

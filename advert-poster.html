@@ -36,7 +36,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
 <meta name="description" content="Post an advert - Stermont Arcade, online shopping in Kenya with M-Pesa payment and delivery to all 47 counties.">
 </head>
 <body>
-<header><b>&#128227; Post an advert</b><a href="/builder.html">AI Builder</a></header>
+<header><b>&#128227; Post an advert</b><a href="/builder.html">Stermont I.T</a></header>
 <main>
   <div class="card"><h2>How it works</h2>
     <p class="hint">1. Tap the paperclip and add your product photo (or a PDF or file). 2. Type what the advert should say: the offer, price, who it is for. 3. Tap Make advert, check the preview, change any words, then Post. It goes on your home page in about a minute.</p></div>
@@ -102,7 +102,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
   async function make() {
     if (S.busy) return;
     var c = cfg(), txt = $('inp').value.trim();
-    if (!c.gkey || !c.gh || !c.repo) { say('Open the AI Builder, tap Settings, add your Gemini key and GitHub token, tick "Remember my keys on this device" and tap Save and test. Then come back here.', 'err'); return; }
+    if (!c.gkey || !c.gh || !c.repo) { say('Open Stermont I.T, tap Settings, add your Gemini key and GitHub token, tick "Remember my keys on this device" and tap Save and test. Then come back here.', 'err'); return; }
     if (BuilderAttach.busy()) { say('Your photo is still getting ready. Try again in a second.', 'err'); return; }
     var att = BuilderAttach.take();
     if (!txt && !att) { say('Add a photo or type what the advert should say.', 'err'); return; }
@@ -151,7 +151,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
       files.push({ path: 'adverts.json', text: JSON.stringify({ adverts: list }, null, 1) });
       var ix = await gh(fpath('index.html'), { raw: true }), mark = '<script src="advert-banner.js" defer></script>';
       if (ix.indexOf('adverts.js') < 0) {
-        if (ix.indexOf(mark) < 0) throw new Error('I could not find the place in index.html to switch adverts on. Ask the AI Builder to add adverts.js to the home page.');
+        if (ix.indexOf(mark) < 0) throw new Error('I could not find the place in index.html to switch adverts on. Ask Stermont I.T to add adverts.js to the home page.');
         files.push({ path: 'index.html', text: ix.replace(mark, function () { return mark + '\n<script src="adverts.js" defer></script>'; }) });
       }
       await commit(files, 'New advert: ' + ad.headline.slice(0, 50));
@@ -173,7 +173,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
     busy(false);
   }
   async function live() {
-    var box = $('live'); if (!cfg().gh) { box.textContent = 'Add your keys in the AI Builder first (Settings).'; return; }
+    var box = $('live'); if (!cfg().gh) { box.textContent = 'Add your keys in Stermont I.T first (Settings).'; return; }
     try {
       var list = await readAds(); box.textContent = '';
       if (!list.length) { box.textContent = 'No adverts yet. Make your first one below.'; return; }
