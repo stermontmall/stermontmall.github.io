@@ -54,7 +54,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
       <div><label for="pm">Profit %</label><input id="pm" type="number" inputmode="decimal" value="12"></div>
       <div><label for="pmode">Profit is worked out</label><select id="pmode"><option value="cost">on cost (cost + %)</option><option value="margin" selected>of selling price (margin)</option></select></div>
       <div><label for="dmin">Discount from (%)</label><input id="dmin" type="number" inputmode="numeric" value="6"></div>
-      <div><label for="dmax">Discount up to (%)</label><input id="dmax" type="number" inputmode="numeric" value="12"></div>
+      <div><label for="dmax">Discount up to (%)</label><input id="dmax" type="number" inputmode="numeric" value="16"></div>
       <div><label for="dst">Pieces in stock (each item)</label><input id="dst" type="number" inputmode="numeric" value="1000"></div>
       <div><label for="dlow">Low-stock alert below</label><input id="dlow" type="number" inputmode="numeric" value="20"></div>
     </div>
@@ -73,7 +73,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
   var $ = function (i) { return document.getElementById(i); };
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session', CK = 'stm_builder_cfg_v1';
   var UNITS = ['g', 'kg', 'tonne', 'ml', 'litre', 'piece', 'pair', 'dozen', 'set', 'bundle', 'pack', 'bag', '50 kg bag', 'bottle', 'carton', 'box', 'crate', 'sachet', 'tin', 'metre', 'roll'];
-  var S = { photos: [], items: [], cats: [], ids: {}, busy: false, opt: { pm: 12, mode: 'margin', dmin: 6, dmax: 12, disc: true, stock: 1000, low: 20, feat: true } };
+  var S = { photos: [], items: [], cats: [], ids: {}, busy: false, opt: { pm: 12, mode: 'margin', dmin: 6, dmax: 16, disc: true, stock: 1000, low: 20, feat: true } };
   var SYS = 'You help the owner of Stermont Arcade, a Kenyan online store (prices in KSh), list products from photos. Return one item for every product you can identify. Reply with ONLY JSON: {"items":[{"photos":[numbers of the photos that show this product],"name":"clear product name in Title Case: brand, product and size or model only if visible on the photo or stated by the owner","category":"best match from the category list, or a short new category name only if none fits","cost":buying price in KSh ONLY if the owner stated it for this product else 0,"stock":pieces ONLY if the owner stated it else null,"unit":"one of the units list or empty","pack_size":"size or variant such as 1 Litre only if visible or stated else empty","old_price":number only if the owner stated a previous price else 0,"description":"text in the store format","featured":true only if the owner asked for this product to be an advert or banner else false}]}. Description format: one point per line, no bullets or dashes; section titles on their own line such as Key Features, Specifications, What is in the box?; a Brand: line when the brand is visible. Use only what is visible on the photo or stated by the owner. Never invent specifications, prices, discounts, rankings, awards, guarantees, delivery times or stock. If unsure, leave it out. If the owner refers to products by photo number, file name or order, follow that. Reply in English unless the owner writes in another language.';
 
   function h(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
@@ -93,7 +93,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
   function autoOld(it) { return S.opt.disc && it.price > 0 ? Math.ceil(it.price / (1 - it.d / 100) / 10) * 10 : 0; }
   function readOpt() {
     var n = function (id, d) { var v = parseFloat($(id).value); return v >= 0 ? v : d; };
-    var lo = Math.min(n('dmin', 6), n('dmax', 12)), hi = Math.max(n('dmin', 6), n('dmax', 12));
+    var lo = Math.min(n('dmin', 6), n('dmax', 16)), hi = Math.max(n('dmin', 6), n('dmax', 16));
     S.opt = { pm: n('pm', 12), mode: $('pmode').value, dmin: Math.min(lo, 90), dmax: Math.min(hi, 90), disc: $('disc').checked, stock: $('dst').value === '' ? null : Math.round(n('dst', 0)), low: Math.round(n('dlow', 5)), feat: $('dfeat').checked };
   }
   function say(t, c) { var d = h('div', 'm ' + (c || ''), t); $('msg').appendChild(d); d.scrollIntoView({ block: 'nearest' }); return d; }
