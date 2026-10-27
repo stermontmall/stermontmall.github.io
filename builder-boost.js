@@ -124,7 +124,7 @@
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', hint); else hint();
 })();
 /* backup AI providers (optional: the builder works without it) */
-try { var bk = document.createElement('script'); bk.src = '/builder-backup.js?v=2'; bk.async = true; (document.head || document.documentElement).appendChild(bk); } catch (e) {}
+try { var bk = document.createElement('script'); bk.src = '/builder-backup.js?v=3'; bk.async = true; (document.head || document.documentElement).appendChild(bk); } catch (e) {}
 /* limit tools: usage meter, reset countdown, backups-first switch, lean mode (optional) */
 try { var lm = document.createElement('script'); lm.src = '/builder-limits.js?v=1'; lm.async = true; (document.head || document.documentElement).appendChild(lm); } catch (e) {}
 /* automatic publishing (optional: the builder works without it) */
