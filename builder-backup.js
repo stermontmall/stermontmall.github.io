@@ -1,18 +1,22 @@
 /* Stermont AI Builder: backup AI providers.
    Loaded by builder-boost.js. When every Gemini model has hit its free limit, the builder's request is
-   sent to another provider instead (Cerebras, OpenRouter, Groq). Each provider has its own separate
+   sent to another provider instead (Mistral, Cerebras, OpenRouter, Groq). Each provider has its own separate
    free limit, so this adds real extra room. The reply is converted back into the format the builder
    already understands, so nothing else in the builder needs to change.
    Only providers whose key you add in Settings are ever used. Keys stay in this browser.
+   Photos: Mistral Small can read attached photos (up to 8 per request); the other backups cannot.
+   A provider that does not answer within 15 seconds is skipped so the next one gets a turn.
    If this file fails to load, the builder keeps working without it. */
 (function (root) {
   'use strict';
   var D = typeof document !== 'undefined' ? document : null;
   var STORE = 'stm_backup_keys_v1';
+  var WAIT = 15000, MAXIMG = 8;
   /* tried in this order. Mistral's free plan has the biggest allowance (about 500K tokens a minute, 1 billion a month, 1 request a second).
-     Groq's free plan only allows small requests (about 8K tokens a minute), so it goes last. */
+     Groq's free plan only allows small requests (about 8K tokens a minute), so it goes last.
+     visionModels: models that can read attached photos. */
   var PROV = [
-    { id: 'mistral', name: 'Mistral', url: 'https://api.mistral.ai/v1/chat/completions', models: ['mistral-small-latest', 'open-mistral-nemo'], vision: false },
+    { id: 'mistral', name: 'Mistral', url: 'https://api.mistral.ai/v1/chat/completions', models: ['mistral-small-latest', 'open-mistral-nemo'], vision: false, visionModels: ['mistral-small-latest'] },
     { id: 'cerebras', name: 'Cerebras', url: 'https://api.cerebras.ai/v1/chat/completions', models: ['gpt-oss-120b', 'qwen-3.8-27b'], vision: false },
     { id: 'openrouter', name: 'OpenRouter', url: 'https://openrouter.ai/api/v1/chat/completions', models: ['openrouter/free'], vision: false },
     { id: 'groq', name: 'Groq', url: 'https://api.groq.com/openai/v1/chat/completions', models: ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b'], vision: false }
@@ -48,10 +52,16 @@
     }
     return o;
   }
+  /* does this request carry any attached photo? */
+  function hasImage(j) {
+    return (j.contents || []).some(function (c) {
+      return (c.parts || []).some(function (p) { return p.inlineData && /^image\//.test(p.inlineData.mimeType || ''); });
+    });
+  }
   /* tool call ids: exactly 9 letters or digits, which every provider accepts (Mistral insists on it) */
   function cid(n) { return 'c' + String(100000000 + n).slice(1); }
   function toOA(j, vision) {
-    var msgs = [], pending = [], n = 0;
+    var msgs = [], pending = [], n = 0, imgs = 0;
     var sys = j.systemInstruction && j.systemInstruction.parts ? j.systemInstruction.parts.map(function (p) { return p.text || ''; }).join('\n') : '';
     if (sys) msgs.push({ role: 'system', content: sys });
     (j.contents || []).forEach(function (c) {
@@ -81,7 +91,8 @@
             content.push({ type: 'text', text: p.text });
           } else if (p.inlineData) {
             var mt = p.inlineData.mimeType || 'file';
-            if (vision && /^image\//.test(mt)) content.push({ type: 'image_url', image_url: { url: 'data:' + mt + ';base64,' + p.inlineData.data } });
+            if (vision && /^image\//.test(mt) && imgs < MAXIMG) { imgs++; content.push({ type: 'image_url', image_url: { url: 'data:' + mt + ';base64,' + p.inlineData.data } }); }
+            else if (vision && /^image\//.test(mt)) content.push({ type: 'text', text: '[An extra photo was left out: this backup model can only read ' + MAXIMG + ' photos at once.]' });
             else content.push({ type: 'text', text: '[An attached ' + mt + ' file was here. This backup model cannot see it.]' });
           }
         });
@@ -153,41 +164,60 @@
 
   /* ---------- trying the providers ---------- */
   function retrySecs(h) { var v = h && h.get && (h.get('retry-after') || h.get('x-ratelimit-reset-requests')); var n = parseFloat(v); return isFinite(n) ? n : 0; }
-  function fail(p, m, st, txt, h) {
+  /* mk is the model name, with "|v" added when the photo-reading version of it was tried */
+  function fail(p, mk, st, txt, h) {
     var ms, msg = String(txt || ''); try { msg = JSON.parse(txt).error.message || msg; } catch (e) {}
-    if (st === 429) { ms = Math.max(retrySecs(h) * 1000, /per day|daily|\bTPD\b|\bRPD\b/i.test(msg) ? 3600000 : 60000); cool[p.id + '|' + m] = Date.now() + ms; }
-    else if (st === 413) cool[p.id + '|' + m] = Date.now() + 300000;
+    var photo = /\|v$/.test(mk);
+    if (st === 429) { ms = Math.max(retrySecs(h) * 1000, /per day|daily|\bTPD\b|\bRPD\b/i.test(msg) ? 3600000 : 60000); cool[p.id + '|' + mk] = Date.now() + ms; }
+    else if (st === 413) cool[p.id + '|' + mk] = Date.now() + 300000;
     else if (st === 401 || st === 403) cool[p.id] = Date.now() + 6 * 3600000;
-    else if (st === 404 || st === 402 || (st === 400 && /model/i.test(msg) && /not found|does not exist|unsupported|invalid|not available/i.test(msg))) cool[p.id + '|' + m] = Date.now() + 3600000;
-    else if (st >= 500) cool[p.id + '|' + m] = Date.now() + 15000;
-    else cool[p.id + '|' + m] = Date.now() + 600000;
+    else if (st === 404 || st === 402 || (st === 400 && /model/i.test(msg) && /not found|does not exist|unsupported|invalid|not available/i.test(msg))) cool[p.id + '|' + mk] = Date.now() + 3600000;
+    else if (st >= 500) cool[p.id + '|' + mk] = Date.now() + 15000;
+    else cool[p.id + '|' + mk] = Date.now() + (photo && st === 400 ? 60000 : 600000);
     lastError = p.name + ' ' + st + ': ' + msg.slice(0, 160);
   }
   /* "why" is the start of the status message, so it can say Gemini is full or that the owner chose backups first */
   function run(body, sig, real, say, why) {
     var j; try { j = JSON.parse(body); } catch (e) { return Promise.resolve(null); }
     say = say || function () {};
-    var keys = getKeys(), list = [], cache = {};
-    PROV.forEach(function (p) { if (keys[p.id]) p.models.forEach(function (m) { list.push({ p: p, m: m }); }); });
+    var keys = getKeys(), list = [], cache = {}, pics = hasImage(j);
+    PROV.forEach(function (p) {
+      if (!keys[p.id]) return;
+      p.models.forEach(function (m) {
+        if (pics && p.visionModels && p.visionModels.indexOf(m) >= 0) list.push({ p: p, m: m, v: true });
+        list.push({ p: p, m: m, v: !!p.vision });
+      });
+    });
     function go(i) {
       if (i >= list.length) return Promise.resolve(null);
-      var p = list[i].p, m = list[i].m, now = Date.now();
-      if (cool[p.id] > now || cool[p.id + '|' + m] > now) return go(i + 1);
-      var o = cache[p.vision ? 1 : 0] || (cache[p.vision ? 1 : 0] = toOA(j, !!p.vision));
+      var p = list[i].p, m = list[i].m, v = list[i].v, mk = m + (v && !p.vision ? '|v' : ''), now = Date.now();
+      if (cool[p.id] > now || cool[p.id + '|' + mk] > now) return go(i + 1);
+      var o = cache[v ? 1 : 0] || (cache[v ? 1 : 0] = toOA(j, v));
       var payload = { model: m, messages: o.messages, stream: true, max_tokens: 12000 };
       if (o.tools.length) { payload.tools = o.tools; payload.tool_choice = 'auto'; }
       if (/gpt-oss/.test(m) && p.id !== 'openrouter') payload.reasoning_effort = 'low';
-      return real(p.url, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + keys[p.id] }, body: JSON.stringify(payload), signal: sig }).then(function (r) {
+      /* a provider that stays silent is cut off after WAIT ms so the next one gets a turn; the builder's own stop button still works */
+      var ac = new AbortController(), timedOut = false;
+      var tm = setTimeout(function () { timedOut = true; ac.abort(); }, WAIT);
+      if (sig) { if (sig.aborted) ac.abort(); else sig.addEventListener('abort', function () { ac.abort(); }); }
+      return real(p.url, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + keys[p.id] }, body: JSON.stringify(payload), signal: ac.signal }).then(function (r) {
+        clearTimeout(tm);
         if (r.ok && r.body) {
-          say((why || 'Gemini is full for now. Using ') + p.name + ' (' + m + ')', 4000);
+          say((why || 'Gemini is full for now. Using ') + p.name + ' (' + m + ')' + (v && pics ? ', reading your photos' : ''), 4000);
           try { if (root.__stmLimits) root.__stmLimits.count(p.id); } catch (e) {}
           return new Response(toGem(r), { status: 200, headers: { 'Content-Type': 'text/event-stream' } });
         }
-        return r.text().then(function (t) { fail(p, m, r.status, t, r.headers); return go(i + 1); });
+        return r.text().then(function (t) { fail(p, mk, r.status, t, r.headers); return go(i + 1); });
       }, function (e) {
-        if (e && e.name === 'AbortError') throw e;
-        cool[p.id] = Date.now() + 120000;
-        lastError = p.name + ' could not be reached (blocked by the browser, or offline)';
+        clearTimeout(tm);
+        if (sig && sig.aborted) throw e;
+        if (timedOut) {
+          cool[p.id] = Date.now() + 120000;
+          lastError = p.name + ' (' + m + ') did not answer in ' + (WAIT / 1000) + 's';
+        } else {
+          cool[p.id] = Date.now() + 120000;
+          lastError = p.name + ' could not be reached (blocked by the browser, or offline)';
+        }
         return go(i + 1);
       });
     }
@@ -246,7 +276,7 @@
       '<a href="https://cloud.cerebras.ai/" target="_blank" rel="noopener noreferrer">cloud.cerebras.ai</a>, ' +
       '<a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">openrouter.ai/keys</a>, ' +
       '<a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">console.groq.com/keys</a>. ' +
-      'Mistral (<a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener noreferrer">console.mistral.ai</a>) has the biggest free allowance. You can add any of them. Backups are a little less capable than Gemini and cannot see attached photos. Free plans may let the provider use what you send, so never paste customer data or passwords.</p>' +
+      'Mistral (<a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener noreferrer">console.mistral.ai</a>) has the biggest free allowance and is the only backup that can read attached photos (up to 8 at a time). You can add any of them. Backups are a little less capable than Gemini. Free plans may let the provider use what you send, so never paste customer data or passwords.</p>' +
       '<div class="row"><button id="bkTest" type="button" class="sm">Test backups</button></div><div id="bkOut" class="hint"></div>';
     anchor.parentNode.insertBefore(box, anchor);
     var k = getKeys();
