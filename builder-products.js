@@ -1,11 +1,12 @@
-/* Stermont AI Builder: list shop items and post new products from attached photos.
+/* Stermont AI Builder: list shop items, post new products from attached photos, and edit live products.
    Loaded by builder.html after builder-attach.js. Uses the same admin sign-in as /admin.html on this device.
-   The AI prepares the items, the owner taps Post on a green card in the chat, then they go into the shop (Supabase).
-   If this file fails to load, the builder keeps working without these two tools. */
+   New items: the AI prepares them, the owner taps Post on a green card in the chat, then they go into the shop (Supabase).
+   Existing items: update_products saves straight to the shop (no card), because the owner asked for it. Old values are kept in a backup on this device.
+   If this file fails to load, the builder keeps working without these tools. */
 (function () {
   'use strict';
   var W = window, D = document;
-  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
+  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session', BK = 'stm_builder_backup_v1';
   var UNITS = ['g', 'kg', 'tonne', 'ml', 'litre', 'piece', 'pair', 'dozen', 'set', 'bundle', 'pack', 'bag', '50 kg bag', 'bottle', 'carton', 'box', 'crate', 'sachet', 'tin', 'metre', 'roll'];
   /* the owner's standard settings, same as /list-products.html: price = cost + 30% (at least KSh 150), rounded up to KSh 50 */
   var DEF = { pm: 30, mode: 'cost', dmin: 6, dmax: 12, disc: true, stock: 1000, low: 20, feat: true };
@@ -260,11 +261,112 @@
     });
   }
 
+  /* ---------- tools: product_descriptions and update_products (edit products that are already in the shop) ---------- */
+  function words(t) { t = String(t == null ? '' : t).trim(); return t ? t.split(/\s+/).length : 0; }
+  function allRows(sel) {
+    var out = [];
+    function more(off) {
+      return api('/rest/v1/products?select=' + sel + '&order=id.asc&limit=1000&offset=' + off).then(function (r) {
+        r = r || []; out = out.concat(r); return r.length === 1000 && off < 4000 ? more(off + 1000) : out;
+      });
+    }
+    return more(0);
+  }
+  function descList(a) {
+    a = a || {};
+    var min = Math.max(1, parseInt(a.min_words, 10) || 300), lim = Math.max(1, Math.min(parseInt(a.limit, 10) || 8, 25)), off = Math.max(0, parseInt(a.offset, 10) || 0);
+    return tok().then(function () { return loadCats(false); }).then(function () {
+      return allRows('id,name,variant_label,category_id,price,unit,active,description');
+    }).then(function (rows) {
+      var cn = {}; cats.forEach(function (c) { cn[c.id] = c.name; });
+      var short = rows.filter(function (p) { return words(p.description) < min; });
+      var page = short.slice(off, off + lim).map(function (p) {
+        return { id: p.id, name: p.name, pack_size: p.variant_label || undefined, category: cn[p.category_id] || '', price: p.price, unit: p.unit || undefined, live: !!p.active, words_now: words(p.description), current_description: String(p.description || '').slice(0, 3000) };
+      });
+      return { total_products: rows.length, below_min_words: short.length, min_words: min, returned: page.length, next_offset: off + page.length, more_available: off + page.length < short.length, rows: page,
+        note: 'Fixed items leave this list, so after you update a batch call this again with offset 0. Keep going until below_min_words is 0, or only items you could not fix remain.' };
+    });
+  }
+  function patchOf(it) {
+    var p = {}, bad = [], v;
+    if (it.name != null) { v = str(it.name, 120); if (v) p.name = v; else bad.push('name is empty'); }
+    if (it.description != null) p.description = String(it.description).replace(/^[\s*\-\u2022]+/gm, '').slice(0, 8000).trim();
+    if (it.price != null) { v = num(it.price); if (v > 0) p.price = v; else bad.push('price must be above 0'); }
+    if (it.old_price != null) p.old_price = num(it.old_price) || null;
+    if (it.cost != null) { v = num(it.cost); if (v > 0) p.cost = v; else bad.push('cost must be above 0'); }
+    if (it.stock != null) { v = parseInt(it.stock, 10); if (v >= 0) p.stock = v; else bad.push('stock must be 0 or more'); }
+    if (it.low_stock_alert != null) { v = parseInt(it.low_stock_alert, 10); if (v >= 0) p.low_at = v; else bad.push('low_stock_alert must be 0 or more'); }
+    if (typeof it.featured === 'boolean') p.featured = it.featured;
+    if (typeof it.live === 'boolean') p.active = it.live;
+    if (it.unit != null && it.unit !== '') { if (UNITS.indexOf(it.unit) > -1) p.unit = it.unit; else bad.push('unit must be one of: ' + UNITS.join(', ')); }
+    return { patch: p, bad: bad };
+  }
+  /* the old values of every product that is changed are kept on this device, so a mistake can be put back */
+  function backup(id, old) {
+    try { var b = JSON.parse(localStorage.getItem(BK) || '[]'); b.push({ t: new Date().toISOString(), id: id, before: old }); localStorage.setItem(BK, JSON.stringify(b.slice(-200))); } catch (e) {}
+  }
+  function update(a) {
+    a = a || {};
+    var items = Array.isArray(a.items) ? a.items : [];
+    if (!items.length) return Promise.reject(new Error('items is required: send one entry per product, each with its id'));
+    if (items.length > 40) return Promise.reject(new Error('Send at most 40 products at a time'));
+    var minW = parseInt(a.require_min_words, 10) || 0;
+    return tok().then(function () { return loadCats(false); }).then(function () {
+      var jobs = [], bad = [], ids = [], keys = {};
+      items.forEach(function (it) {
+        it = it || {};
+        var id = String(it.id == null ? '' : it.id).trim(), r = patchOf(it), problems = r.bad.slice();
+        if (!id) { bad.push({ id: '(missing)', problem: 'id is required. Get it from list_products or product_descriptions' }); return; }
+        if (it.category != null && it.category !== '') {
+          var c = findCat(it.category);
+          if (c) r.patch.category_id = c.id; else problems.push('no category called "' + it.category + '". Categories: ' + cats.map(function (x) { return x.name; }).join(', '));
+        }
+        if (minW && r.patch.description != null && words(r.patch.description) < minW) problems.push('description has ' + words(r.patch.description) + ' words but needs at least ' + minW + '. Write more and send it again');
+        if (!Object.keys(r.patch).length && !problems.length) problems.push('nothing to change');
+        if (problems.length) { bad.push({ id: id, problem: problems.join('; ') }); return; }
+        jobs.push({ id: id, patch: r.patch }); ids.push(id);
+        Object.keys(r.patch).forEach(function (k) { keys[k] = 1; });
+      });
+      if (!jobs.length) return { updated: [], not_changed: bad, note: 'Nothing was saved. Fix the problems listed and send those items again.' };
+      var sel = ['id'].concat(Object.keys(keys)).join(','), inList = '(' + ids.map(function (i) { return '"' + i.replace(/"/g, '') + '"'; }).join(',') + ')';
+      return api('/rest/v1/products?select=' + sel + '&id=in.' + encodeURIComponent(inList)).then(function (old) {
+        var before = {}; (old || []).forEach(function (p) { before[p.id] = p; });
+        var done = [], chain = Promise.resolve();
+        jobs.forEach(function (j) {
+          chain = chain.then(function () {
+            if (!before[j.id]) { bad.push({ id: j.id, problem: 'no product with this id in the shop' }); return; }
+            return api('/rest/v1/products?select=id&id=eq.' + encodeURIComponent(j.id), 'PATCH', j.patch, 'return=representation').then(function (r) {
+              if (r && r.length) { done.push(j); backup(j.id, before[j.id]); }
+              else bad.push({ id: j.id, problem: 'the shop did not accept the change. The owner may need to sign in again at /admin.html' });
+            }, function (e) { bad.push({ id: j.id, problem: String(e && e.message || e).slice(0, 200) }); });
+          });
+        });
+        return chain.then(function () {
+          return { saved_to_live_shop: done.length, updated: done.map(function (j) { return { id: j.id, changed: Object.keys(j.patch), words: j.patch.description != null ? words(j.patch.description) : undefined }; }), not_changed: bad,
+            note: 'These changes are already live in the shop (no Post or Publish needed). The shop and Google feed refresh within about 3 hours.' };
+        });
+      });
+    });
+  }
+
   var P = function (props, req) { return { type: 'object', properties: props, required: req || [] }; };
   var S = { type: 'string' }, N = { type: 'number' }, I = { type: 'integer' }, B = { type: 'boolean' };
   var decls = [
     { name: 'list_products', description: 'List the items stored in the shop (admin view: includes hidden items, stock, price, previous price, advert flag and how many photos each has). Use it when the owner asks what is in the shop, to check for duplicates, or to find items with no photo. Pages through with offset.',
       parameters: P({ search: S, category: S, status: { type: 'string', description: 'live, hidden or all (default all)' }, missing_photos: B, include_cost: { type: 'boolean', description: 'only when the owner asks to see cost prices' }, limit: I, offset: I }) },
+    { name: 'product_descriptions', description: 'Find shop products whose description has fewer than min_words words (default 300) and read their current text. Returns the product ids, names, categories and current descriptions so you can rewrite them. Then save the new text with update_products.',
+      parameters: P({ min_words: I, limit: { type: 'integer', description: 'how many to return, up to 25 (default 8)' }, offset: I }) },
+    { name: 'update_products', description: 'Change products that are ALREADY in the shop. Saves straight to the live shop with no card and no Publish (the owner is signed in as admin and asked for direct edits). Can change description, name, price, previous price, cost, stock, low-stock alert, advert flag, live/hidden, category and unit. Send up to 40 products per call, each with its id. Only change what the owner asked for. Set require_min_words (for example 300) to refuse descriptions that are too short.',
+      parameters: P({
+        items: { type: 'array', items: P({
+          id: { type: 'string', description: 'The product id from list_products or product_descriptions' },
+          description: { type: 'string', description: 'Full new description in store format: short paragraphs or one point per line, section titles on their own line, no bullets or markdown' },
+          name: S, price: N, old_price: { type: 'number', description: 'Previous price in KSh. 0 removes it' }, cost: N, stock: I, low_stock_alert: I,
+          featured: { type: 'boolean', description: 'Show as advert on the home page' }, live: { type: 'boolean', description: 'false hides the product from the shop' },
+          category: { type: 'string', description: 'An existing category name' }, unit: S
+        }, ['id']) },
+        require_min_words: { type: 'integer', description: 'Refuse any description shorter than this many words' }
+      }, ['items']) },
     { name: 'post_products', description: 'Prepare shop products from the attached photos and show the owner a green Post card in the chat. Nothing is in the shop until the owner taps Post. Prices, previous price, stock, low-stock alert and advert are worked out from the standard settings, so send only what the owner stated or what is visible on the photos. Call it once with every product. It returns the prices it worked out and anything missing (for example a cost price).',
       parameters: P({
         items: { type: 'array', items: P({
@@ -284,13 +386,16 @@
       }, ['items']) }
   ];
 
+  /* added to the AI instructions: it must know it CAN edit live products */
+  var EDIT_RULES = '\n\nEDITING THE LIVE SHOP: you CAN change products that are already in the shop. Use update_products (description, name, price, previous price, cost, stock, advert, live or hidden, category, unit). It saves straight to the live shop with no Post card and no Publish, because the owner is signed in as admin and wants direct edits. Never tell the owner you cannot edit product text or that they must use SQL or the admin panel. Do what the owner asked, change only that, and afterwards say plainly what you changed. To find short descriptions call product_descriptions, then fix them in batches of about 5 with update_products and require_min_words, and repeat until none are left. If a tool says the owner is signed out, tell them to open /admin.html, sign in, and ask again.' +
+    '\nWRITING PRODUCT DESCRIPTIONS: use only facts from the product name, pack size, category, the existing description and what the owner told you, and keep any facts already there (Brand: lines, sizes). Write plain, useful English: what the product is, who it is for, common uses, general handling and storage tips, a reminder to read and follow the label and keep it away from children and food (for pest control, fumigation, agrovet and chemical products), and how buying works at Stermont Arcade (pay by M-Pesa, delivery to all 47 counties, questions on WhatsApp). NEVER invent brand claims, ingredients, strengths, dosages, mixing ratios, certifications, awards, guarantees, ratings, statistics or delivery times. Format: short paragraphs, section titles on their own line, no bullets and no markdown. When the owner gives a minimum word count, hit it with real content, not repetition.';
   function info() {
-    return cats.length ? '\n\nShop categories right now (use these names for post_products): ' + cats.map(function (c) { return c.name; }).join(' | ') : '\n\nThe shop category list is not loaded yet: call list_products first to see the category names.';
+    return (cats.length ? '\n\nShop categories right now (use these names for post_products and update_products): ' + cats.map(function (c) { return c.name; }).join(' | ') : '\n\nThe shop category list is not loaded yet: call list_products first to see the category names.') + EDIT_RULES;
   }
   loadCats(true).catch(function () {});
 
   W.BuilderProducts = {
-    decls: decls, tools: { list_products: list, post_products: prepare }, setPhotos: setPhotos, info: info,
+    decls: decls, tools: { list_products: list, product_descriptions: descList, update_products: update, post_products: prepare }, setPhotos: setPhotos, info: info,
     bind: function (o) { if (o) { if (o.busy) H.busy = o.busy; if (o.note) H.note = o.note; if (o.say) H.say = o.say; } },
     _t: { auto: auto, autoOld: autoOld, settings: settings, prepare: prepare, setCats: function (c) { cats = c; }, setShop: function (s) { shop = s; }, queue: function () { return queue; } }
   };
