@@ -10,6 +10,8 @@ on:
     branches: [main]
     paths:
       - 'generate-products.mjs'
+      - 'seo-overrides.mjs'
+      - 'seo-overrides.json'
       - '.github/workflows/product-pages.yml'
 
 permissions:
@@ -33,6 +35,9 @@ jobs:
 
       - name: Build pages and sitemap from the live catalog
         run: node generate-products.mjs
+
+      - name: Apply Google titles, descriptions and FAQs (seo-overrides.json)
+        run: node seo-overrides.mjs
 
       - name: Save changes (only if something changed)
         run: |
