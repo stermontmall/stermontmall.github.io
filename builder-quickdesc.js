@@ -83,9 +83,11 @@
     if (d.name !== 'post_products') return;
     try {
       var p = d.parameters.properties.items.items.properties;
-      p.highlights = { type: 'string', description: 'FAST WAY (use this for every item): a catchy one-line tagline on the first line, then 3 to 6 short facts about the product, one per line (what it is, who uses it, what it is for), only facts from the photo, the website or the owner. The tool then builds the full 300+ word Google-friendly description by itself. Do not write a long description when you send highlights' };
+      p.highlights = { type: 'string', description: 'FAST WAY (use this for every item): a catchy one-line tagline on the first line, then 3 to 6 short facts about the product, one per line (what it is, who uses it, what it is for), only facts from the photo, the screenshots or the owner. The tool then builds the full 300+ word Google-friendly description by itself. Do not write a long description when you send highlights' };
       p.description.description = 'Only when the owner wants a custom full text. Normally leave it out and send highlights instead, which is much faster. ' + p.description.description;
       d.description += ' SPEED: for each item send "highlights" (a tagline and 3 to 6 short fact lines) instead of a long description. The tool builds the full description itself, so a big upload takes seconds, not minutes.';
     } catch (e) {}
   });
+  /* written in right now so it runs last and checks every photo against its item before the Post card */
+  if (document.readyState === 'loading') { try { document.write('<scr' + 'ipt src="/builder-photocheck.js?v=1"></scr' + 'ipt>'); } catch (e) {} }
 })();
