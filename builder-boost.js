@@ -14,7 +14,7 @@
   var HOST = 'generativelanguage.googleapis.com';
   /* a model that does not exist (404) is skipped for an hour, so old or renamed names here are harmless */
   var MODELS = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
-  var HOLD = 18000, GIVEUP = 75000; /* wait up to 18s per try (the builder gives up silent requests at 30s); longer pauses are reported */
+  var HOLD = 18000, GIVEUP = 75000, SLOW = 12000; /* SLOW: Gemini gets 12s to start answering before a backup takes over */
   var cool = {}, toast = null, toastT = 0;
   W.__stmGem = { cool: cool, models: MODELS }; /* read by the Limit tools box in Settings */
   var EXTRA = '\n\nWORK EFFICIENTLY (the owner uses a limited AI quota): read a file once with a large window, then make ALL the edits to it in the same step by calling edit_file several times together. Never read the same file again after every small edit. Finish a task in as few steps as possible and never repeat a step you already completed.';
@@ -71,6 +71,22 @@
     } catch (e) {}
     var order = [asked].concat(MODELS).filter(function (x, i, a) { return x && a.indexOf(x) === i; }), sig = init.signal, waited = false;
     function urlFor(model) { return url.replace(/models\/[^:?\/]+:/, 'models/' + encodeURIComponent(model) + ':'); }
+    /* slow Gemini: if Google has not started answering within SLOW ms and a backup key exists, stop waiting and use the backup */
+    function fastFetch(u, o0) {
+      var B = W.__stmBackup;
+      if (!(B && B.has()) || typeof AbortController === 'undefined') return real(u, o0);
+      var ac = new AbortController(), slow = false, tm = 0, parent = o0.signal, o2 = {};
+      Object.keys(o0).forEach(function (k) { o2[k] = o0[k]; });
+      if (parent) { if (parent.aborted) ac.abort(); else parent.addEventListener('abort', function () { ac.abort(); }); }
+      o2.signal = ac.signal;
+      tm = setTimeout(function () { slow = true; ac.abort(); }, SLOW);
+      return real(u, o2).then(function (r) { clearTimeout(tm); return r; }, function (e) {
+        clearTimeout(tm);
+        if (!slow || (parent && parent.aborted)) throw e;
+        say('Gemini is slow. Switching to your backup AI...', 4000);
+        return B.run(body, sig, real, say, 'Gemini is slow. Using ').then(function (r) { return r || real(u, o0); });
+      });
+    }
     function attempt() {
       var now = Date.now(), free = order.filter(function (x) { return !(cool[x] > now); });
       if (!free.length) {
@@ -88,7 +104,7 @@
       var model = free[0], o = {};
       Object.keys(init).forEach(function (k) { o[k] = init[k]; });
       o.body = body;
-      return real(urlFor(model), o).then(function (r) {
+      return fastFetch(urlFor(model), o).then(function (r) {
         if (r.ok) { try { if (W.__stmLimits) W.__stmLimits.count('gemini'); } catch (e) {} say(model !== asked ? 'Using ' + model + ' for now' : '', model !== asked ? 3000 : 0); return r; }
         if (r.status === 429 || r.status >= 500 || (r.status === 404 && order.length > 1)) {
           return r.clone().text().then(function (t) {
@@ -124,8 +140,8 @@
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', hint); else hint();
 })();
 /* backup AI providers (optional: the builder works without it) */
-try { var bk = document.createElement('script'); bk.src = '/builder-backup.js?v=3'; bk.async = true; (document.head || document.documentElement).appendChild(bk); } catch (e) {}
+try { var bk = document.createElement('script'); bk.src = '/builder-backup.js?v=4'; bk.async = true; (document.head || document.documentElement).appendChild(bk); } catch (e) {}
 /* limit tools: usage meter, reset countdown, backups-first switch, lean mode (optional) */
-try { var lm = document.createElement('script'); lm.src = '/builder-limits.js?v=1'; lm.async = true; (document.head || document.documentElement).appendChild(lm); } catch (e) {}
+try { var lm = document.createElement('script'); lm.src = '/builder-limits.js?v=2'; lm.async = true; (document.head || document.documentElement).appendChild(lm); } catch (e) {}
 /* automatic publishing (optional: the builder works without it) */
 try { var as = document.createElement('script'); as.src = '/builder-auto.js?v=3'; as.async = true; (document.head || document.documentElement).appendChild(as); } catch (e) {}

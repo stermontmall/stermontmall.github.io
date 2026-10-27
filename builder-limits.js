@@ -15,7 +15,7 @@
 
   function readJ(k, d) { try { return JSON.parse(root.localStorage.getItem(k)) || d; } catch (e) { return d; } }
   function writeJ(k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  function cfg() { var c = readJ(CFG, {}); return { mode: c.mode === 'backups' ? 'backups' : 'gemini', lean: !!c.lean }; }
+  function cfg() { var c = readJ(CFG, {}), B = window.__stmBackup; /* until the owner picks a mode, backups answer first whenever a backup key exists (faster than a slow Gemini) */ return { mode: c.mode === 'backups' || c.mode === 'gemini' ? c.mode : (B && B.has && B.has() ? 'backups' : 'gemini'), lean: !!c.lean }; }
   function setCfg(p) { var c = cfg(); Object.keys(p).forEach(function (k) { c[k] = p[k]; }); writeJ(CFG, c); }
 
   /* Google's free limits reset at midnight Pacific time, so "today" is counted in that time zone */
