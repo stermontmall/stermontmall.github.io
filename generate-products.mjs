@@ -286,7 +286,9 @@ for (const p of products) {
   const sizes = p.variants ? ' Sizes: ' + p.variants.map(v => v.variant_label).join(', ') + '.' : '';
   const desc = clip(`Buy ${p.name} online in Kenya ${p.variants ? 'from' : 'at'} ${money(p.price)}.${sizes} ${plain ? plain + ' ' : ''}Pay by M-Pesa, delivery to all 47 counties. Order online at ${BRAND}.`, 158);
   // "Buy [Product] Online in Kenya" is the phrase shoppers search; fall back to shorter wordings so the title stays under ~70 characters and Google does not cut it off.
-  const title = [`Buy ${p.name} Online in Kenya | ${BRAND}`, `Buy ${p.name} in Kenya | ${BRAND}`, `Buy ${p.name} Online in Kenya`, `Buy ${p.name} in Kenya`].find(t => t.length <= 70) || clip(`Buy ${p.name} in Kenya`, 70);
+  // The price is in the title too, because many shoppers search "[product] price in Kenya". Tiers go from fullest to shortest.
+  const pr = `${p.variants ? 'from ' : ''}${money(p.price)}`;
+  const title = [`Buy ${p.name} Online in Kenya - ${pr} | ${BRAND}`, `Buy ${p.name} Online in Kenya - ${pr}`, `Buy ${p.name} in Kenya - ${pr}`, `Buy ${p.name} Online in Kenya | ${BRAND}`, `Buy ${p.name} in Kenya | ${BRAND}`, `Buy ${p.name} Online in Kenya`, `Buy ${p.name} in Kenya`].find(t => t.length <= 70) || clip(`Buy ${p.name} in Kenya`, 70);
   // Related products rotate through the category (the 6 that follow this one, wrapping round), so EVERY product, including the newest, gets links from other product pages.
   const related = (() => {
     if (!cat) return [];
