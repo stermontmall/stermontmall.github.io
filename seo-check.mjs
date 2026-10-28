@@ -25,7 +25,9 @@ for (const f of pages) {
   for (const m of h.matchAll(/<script type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)) { try { JSON.parse(m[1]); } catch { add('Broken structured data (JSON-LD)', f); } }
   if (f.startsWith('p/')) {
     if (!/<img\b(?![^>]*placeholder\.svg)/i.test(h)) add('Product page has no photo (also left out of the Google Shopping feed)', f);
-    if (!/Product details/.test(h)) add('Product has no description (short pages rank poorly)', f);
+    // The description sits in <div class="desc"> (or the older <section class="desc">). Count the real text, whichever heading the page builder uses.
+    const dd = h.match(/class="desc"[^>]*>([\s\S]*?)<\/(?:div|section)>/i), dtext = dd ? dd[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+    if (dtext.length < 100) add('Product has no description (short pages rank poorly)', f);
     if (!/"@type":"(Product|ProductGroup)"/.test(h)) add('Missing Product structured data', f);
   }
   for (const m of h.matchAll(/href=["']([^"'#]+)[^"']*["']/gi)) {
