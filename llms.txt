@@ -48,7 +48,7 @@
 - [Buy Men's Fashion in Kenya](https://stermontarcade.co.ke/c/mens-fashion.html): Shop Men's Fashion online in Kenya. 7 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Mosquito & Fly Control Products in Kenya](https://stermontarcade.co.ke/c/mosquito-fly-control.html): Buy mosquito and fly control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
 - [Pest Control & Fumigation Products in Kenya](https://stermontarcade.co.ke/c/pest-control-fumigation.html): Buy bed bug killers, insecticides and fumigation products online in Kenya. Pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
-- [Buy Phone Accessories in Kenya](https://stermontarcade.co.ke/c/phone-accessories.html): Shop Phone Accessories online in Kenya. 13 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
+- [Buy Phone Accessories in Kenya](https://stermontarcade.co.ke/c/phone-accessories.html): Shop Phone Accessories online in Kenya. 2 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Buy Phones & Tablets in Kenya](https://stermontarcade.co.ke/c/phones-tablets.html): Shop Phones & Tablets online in Kenya. 9 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Buy Protective Wear & Safety in Kenya](https://stermontarcade.co.ke/c/protective-wear-safety.html): Shop Protective Wear & Safety online in Kenya. 1 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Rat & Mouse Control Products in Kenya](https://stermontarcade.co.ke/c/rodent-control.html): Buy rat and mouse control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
@@ -61,7 +61,7 @@
 - [TVs, Home Theatre & Speakers in Kenya](https://stermontarcade.co.ke/c/tvs-audio.html): Buy smart TVs, home theatre systems, Bluetooth speakers and TV wall mounts online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
 - [Buy Veterinary Drugs & Vaccines in Kenya](https://stermontarcade.co.ke/c/veterinary-drugs.html): Shop Veterinary Drugs & Vaccines online in Kenya. 7 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Washing Machines in Kenya](https://stermontarcade.co.ke/c/washing-machines.html): Buy washing machines online in Kenya, including twin tub models. Pay by M-Pesa, delivery to all 47 counties.
-- [Buy Watches & Jewellery in Kenya](https://stermontarcade.co.ke/c/watches-jewellery.html): Shop Watches & Jewellery online in Kenya. 5 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
+- [Buy Watches & Jewellery in Kenya](https://stermontarcade.co.ke/c/watches-jewellery.html): Shop Watches & Jewellery online in Kenya. 2 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 - [Buy Women's Fashion in Kenya](https://stermontarcade.co.ke/c/womens-fashion.html): Shop Women's Fashion online in Kenya. 1 products, pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.
 
 ## Guides
@@ -69,7 +69,7 @@
 - [Cockroach gel, spray or powder: which suits your home in Kenya?](https://stermontarcade.co.ke/blog/cockroach-gel-spray-or-powder-kenya.html): Compare cockroach gel baits, sprays and powders for Kenyan homes and kitchens: where each works, safety around food and children, and what to do first.
 - [How to Buy a Phone Online in Kenya: What to Check](https://stermontarcade.co.ke/blog/how-to-buy-a-phone-online-kenya.html): Buying a smartphone online in Kenya? Check storage, RAM, battery, camera and the IMEI, and learn what to do before you pay and when it arrives.
 - [Buy Agrovet Products Online in Kenya: Checklist](https://stermontarcade.co.ke/blog/how-to-buy-agrovet-products-online-kenya.html): A checklist for buying agrovet products online in Kenya: seeds, chemicals, fertilizers and animal supplies. What to check on the label and how to store it.
-- [How to Buy Smartphones Online in Kenya: Prices, M-Pesa & Delivery](https://stermontarcade.co.ke/blog/how-to-buy-smartphones-online-kenya.html): Looking for a new smartphone in Kenya? Learn how to buy genuine phones online, pay safely with M-Pesa, check warranty and specifications, and get fast delivery to all 47 counties from Stermont Arcade.
+- [Buy Smartphones Online in Kenya: M-Pesa & Delivery](https://stermontarcade.co.ke/blog/how-to-buy-smartphones-online-kenya.html): Learn how to buy a genuine smartphone online in Kenya: compare RAM, storage and battery, check warranty, pay with M-Pesa and get delivery to all 47 counties.
 - [How to Choose a Fridge in Kenya: Size & Types](https://stermontarcade.co.ke/blog/how-to-choose-a-fridge-in-kenya.html): Choosing a fridge in Kenya? Compare sizes, single and double door, frost-free and energy use, and learn what to check when it is delivered.
 - [How to get rid of ants at home in Kenya: a practical guide](https://stermontarcade.co.ke/blog/how-to-get-rid-of-ants-at-home-kenya.html): Find the ant trail, remove food and water, then choose bait or spray. A practical guide for Kenyan kitchens and homes, with a table of common problems.
 - [How to Get Rid of Bed Bugs in Kenya: Step-by-Step](https://stermontarcade.co.ke/blog/how-to-get-rid-of-bed-bugs-kenya.html): Bed bugs at home in Kenya? Learn the signs, how to clean and treat your bed and room, why you must repeat treatment, and when to call a professional.
@@ -89,6 +89,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 197 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 183 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
