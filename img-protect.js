@@ -49,3 +49,8 @@
 (function () {
   try { if (/admin|upload-photos/.test(location.pathname)) return; var b = document.createElement('script'); b.src = '/recent-orders.js?v=6'; b.defer = true; document.head.appendChild(b); } catch (e) {}
 })();
+
+/* Kilimall-style category pages: sticky sort + sub-category chips, two-column grid, products load as you scroll (see /cat-feel.js). Only runs on /c/ pages. */
+(function () {
+  try { if (!/^\/c\//.test(location.pathname)) return; var k = document.createElement('script'); k.src = '/cat-feel.js?v=1'; k.defer = true; document.head.appendChild(k); } catch (e) {}
+})();
