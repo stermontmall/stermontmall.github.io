@@ -1,4 +1,4 @@
-// Stermont Arcade - price watch. Compares your prices with Jumia, Kilimall, Agroduka and ImagineCare, writes a Markdown report,
+// Stermont Arcade - price watch. Compares your prices with the competitor sites listed in price-watch.config.json, writes a Markdown report,
 // and (when auto-apply is on) fixes the prices that are clearly out of line with the market.
 // Runs from .github/workflows/price-watch.yml (no installs needed, Node 18+).
 //
@@ -12,6 +12,8 @@
 //   - Needs the SUPABASE_SERVICE_KEY secret. Without it the run is report-only.
 //
 // Keeping a run from hanging:
+//   - All sites are searched AT THE SAME TIME for each product (each site is still asked one request at a time, with a pause,
+//     so no single site is hit harder). Before this, 8 sites were asked one after another and a run could not finish in time.
 //   - Every request has a timeout (requestTimeoutMs).
 //   - A site that fails to load skipSourceAfter searches in a row is skipped for the rest of the run.
 //   - The whole check stops after maxRunMinutes and still writes the report for the products it got through;
@@ -39,8 +41,8 @@ const DEFAULTS = {
   minMatches: 2,          // matching listings needed (all sites together) before a price is trusted enough to change
   maxChangesPerRun: 40,   // biggest gaps first; the rest wait for the next run
   autoApply: true,        // change prices automatically (still needs the SUPABASE_SERVICE_KEY secret)
-  delayMs: 1200,          // pause between requests, to be polite to the sites
-  requestTimeoutMs: 15000, // give up on a single request after this long
+  delayMs: 1200,          // pause between requests to the same site, to be polite to it
+  requestTimeoutMs: 8000, // give up on a single request after this long (a slow site holds up every product, so keep this short)
   skipSourceAfter: 5,     // skip a site for the rest of the run after this many searches in a row that could not load
   maxRunMinutes: 45,      // stop checking products after this long and report on the ones done (the workflow limit is higher)
   sources: ['jumia', 'kilimall', 'agroduka', 'imaginecare'],
@@ -353,12 +355,13 @@ async function main() {
   }
   const deadline = Date.now() + CFG.maxRunMinutes * 60000;
   let timedOut = false;
-  progress(`Checking ${products.length} products (time limit ${CFG.maxRunMinutes} min)`);
+  progress(`Checking ${products.length} products on ${CFG.sources.length} sites (time limit ${CFG.maxRunMinutes} min)`);
   const results = [];
   for (const [i, p] of products.entries()) {
     if (Date.now() > deadline) { timedOut = true; progress(`Time limit reached after ${i} of ${products.length} products; writing the report`); break; }
-    const q = queryFor(p), listings = [];
-    for (const s of CFG.sources) listings.push(...await search(s, q));
+    const q = queryFor(p);
+    // every site is searched at the same time; the results keep the order of CFG.sources
+    const listings = (await Promise.all(CFG.sources.map(s => search(s, q)))).flat();
     results.push({ p, ...assess(p, pickMatches(p, listings, CFG)) });
     if ((i + 1) % 10 === 0) progress(`${i + 1} of ${products.length} products checked`);
   }
