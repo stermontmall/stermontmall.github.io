@@ -1,7 +1,7 @@
 {
   "tolerancePct": 10,
   "raiseGapPct": 10,
-  "minMarginPct": 10,
+  "minMarginPct": 30,
   "maxCutPct": 25,
   "maxRaisePct": 25,
   "roundTo": 10,
