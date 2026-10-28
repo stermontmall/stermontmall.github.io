@@ -8,10 +8,11 @@
   "minMatches": 2,
   "maxChangesPerRun": 40,
   "autoApply": true,
-  "sources": ["jumia", "kilimall", "agroduka", "imaginecare", "seedfarm", "asepsis", "agriguard"],
+  "sources": ["jumia", "kilimall", "agroduka", "imaginecare", "seedfarm", "asepsis", "agriguard", "farmerstrend"],
   "urlOverrides": {
     "seedfarm": "https://seedfarm.co.ke/?s={q}&post_type=product",
     "asepsis": "https://asepsis-kenya.com/?s={q}&post_type=product",
-    "agriguard": "https://agriguardagrovet.co.ke/?s={q}&post_type=product"
+    "agriguard": "https://agriguardagrovet.co.ke/?s={q}&post_type=product",
+    "farmerstrend": "https://agrovet.farmerstrend.co.ke/?s={q}&post_type=product"
   }
 }
