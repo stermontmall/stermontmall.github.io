@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync, spawn } from 'node:child_process';
 import { createServer } from 'node:http';
-import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, copyFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -101,40 +101,47 @@ test('accessories and bundles far from our price are ignored', () => {
   assert.equal(m.length, 1);
 });
 
+const T = { tolerancePct: 10, raiseGapPct: 10, minMarginPct: 10, maxCutPct: 25, maxRaisePct: 25, roundTo: 10, marketBasis: 'median', minMatches: 2 };   // fixed settings for these tests, so editing price-watch.config.json never breaks them
+// End-to-end tests run a private copy of the script with its own config, so the live price-watch.config.json (sources, margins) cannot change their results.
+const scriptIn = (dir, cfg = {}) => {
+  copyFileSync(fileURLToPath(new URL('./price-watch.mjs', import.meta.url)), join(dir, 'price-watch.mjs'));
+  writeFileSync(join(dir, 'price-watch.config.json'), JSON.stringify({ ...T, sources: ['jumia', 'kilimall', 'agroduka', 'imaginecare'], autoApply: true, ...cfg }));
+  return join(dir, 'price-watch.mjs');
+};
 const mk = (prices) => prices.map(price => ({ source: 'jumia', name: 'x', price }));
 
 test('clearly above market: suggests the market price, keeps margin', () => {
-  const a = assess({ price: 3500, cost: 2000 }, mk([2800, 2900]));
+  const a = assess({ price: 3500, cost: 2000 }, mk([2800, 2900]), T);
   assert.equal(a.status, 'above');
   assert.equal(a.direction, 'cut');
   assert.equal(a.target, 2850);                       // median 2850, rounded up to 10
-  assert.ok(a.marginPct >= CFG.minMarginPct);
+  assert.ok(a.marginPct >= T.minMarginPct);
   assert.ok(a.trusted);
 });
 
 test('never cuts below the minimum margin', () => {
-  const a = assess({ price: 3500, cost: 2900 }, mk([2800, 2900]));
+  const a = assess({ price: 3500, cost: 2900 }, mk([2800, 2900]), T);
   assert.equal(a.target, 3190);                       // cost 2900 x 1.10 = 3190 exactly: a 10% margin, already a multiple of 10
-  assert.ok(a.marginPct >= CFG.minMarginPct - 1e-6);
+  assert.ok(a.marginPct >= T.minMarginPct - 1e-6);
 });
 
 test('limits a single cut to maxCutPct', () => {
-  const a = assess({ price: 6000, cost: 1000 }, mk([2000, 2000]));
+  const a = assess({ price: 6000, cost: 1000 }, mk([2000, 2000]), T);
   assert.equal(a.target, 4500);                       // 25% cut at most
   assert.match(a.note, /limited/);
 });
 
 test('no cost on file: a cut is reported but never given a price', () => {
-  const a = assess({ price: 3500, cost: 0 }, mk([2800, 2900]));
+  const a = assess({ price: 3500, cost: 0 }, mk([2800, 2900]), T);
   assert.equal(a.status, 'above');
   assert.equal(a.target, undefined);
   assert.ok(a.blocked);
 });
 
 test('well under market: raises toward the market price, never above it', () => {
-  const a = assess({ price: 2600, cost: 1500 }, mk([2800, 2900]));   // market 2850, we are 8.8% under: still in line
+  const a = assess({ price: 2600, cost: 1500 }, mk([2800, 2900]), T);   // market 2850, we are 8.8% under: still in line
   assert.equal(a.status, 'ok');
-  const b = assess({ price: 2400, cost: 1500 }, mk([2800, 2900]));   // 15.8% under
+  const b = assess({ price: 2400, cost: 1500 }, mk([2800, 2900]), T);   // 15.8% under
   assert.equal(b.status, 'below');
   assert.equal(b.direction, 'raise');
   assert.equal(b.target, 2850);                                      // market median, rounded down, so never above the market
@@ -142,17 +149,51 @@ test('well under market: raises toward the market price, never above it', () => 
 });
 
 test('a raise is limited to maxRaisePct per run and needs no cost on file', () => {
-  const a = assess({ price: 1200, cost: 0 }, mk([1950, 1950]));
+  const a = assess({ price: 1200, cost: 0 }, mk([1950, 1950]), T);
   assert.equal(a.status, 'below');
   assert.equal(a.target, 1500);                                      // +25% at most
   assert.match(a.note, /limited/);
   assert.equal(a.marginPct, null);
 });
 
+test('lowest basis: follows the cheapest listing exactly, no rounding, no tolerance', () => {
+  const L = { ...T, marketBasis: 'lowest', roundTo: 1, tolerancePct: 0, raiseGapPct: 0 };
+  const cut = assess({ price: 3500, cost: 2000 }, mk([2899, 2975, 3100]), L);
+  assert.equal(cut.market, 2899);
+  assert.equal(cut.direction, 'cut');
+  assert.equal(cut.target, 2899);                                    // exact, not 2900 and not the median
+  const raise = assess({ price: 2400, cost: 1500 }, mk([2899, 2975, 3100]), L);
+  assert.equal(raise.direction, 'raise');
+  assert.equal(raise.target, 2899);                                  // never above the lowest listing
+  assert.equal(assess({ price: 2899, cost: 1500 }, mk([2899, 2975]), L).status, 'ok');   // already exactly at the lowest
+  const floor = assess({ price: 4000, cost: 2900 }, mk([2800, 2900]), { ...L, minMarginPct: 25 });
+  assert.equal(floor.target, 3625);                                  // still never below cost + margin
+});
+
+test('no per-run cap: a big gap goes straight to the lowest listing', () => {
+  const L = { ...T, marketBasis: 'lowest', roundTo: 1, tolerancePct: 0, raiseGapPct: 0, maxCutPct: 100, maxRaisePct: 10000 };
+  assert.equal(assess({ price: 6000, cost: 1000 }, mk([2000, 2500]), L).target, 2000);   // -67% in one go
+  assert.equal(assess({ price: 1200, cost: 0 }, mk([3000, 3500]), L).target, 3000);      // +150% in one go
+});
+
+test('range basis: one site is matched exactly, several sites keep us inside their range, cost is ignored', () => {
+  const R = { ...T, marketBasis: 'range', roundTo: 1, tolerancePct: 0, raiseGapPct: 0, maxCutPct: 100, maxRaisePct: 10000, useCost: false, minMatches: 1 };
+  const J = (price, source = 'jumia') => ({ source, name: 'x', price });
+  // Jumia has many sellers: only the cheapest counts, so 2899 (not 3100) is the Jumia price
+  assert.equal(assess({ price: 3500, cost: 0 }, [J(3100), J(2899), J(2975)], R).target, 2899);
+  assert.equal(assess({ price: 2400, cost: 9999 }, [J(3100), J(2899)], R).target, 2899);   // cost is ignored
+  // two sites at 2899 (Jumia) and 3300 (shop): inside the range = leave alone, above = down to the top, below = up to the bottom
+  const two = [J(3100), J(2899), J(3300, 'shop')];
+  assert.equal(assess({ price: 3000, cost: 0 }, two, R).status, 'ok');
+  assert.equal(assess({ price: 4000, cost: 0 }, two, R).target, 3300);
+  assert.equal(assess({ price: 2500, cost: 0 }, two, R).target, 2899);
+  assert.equal(assess({ price: 3300, cost: 0 }, two, R).status, 'ok');
+});
+
 test('within tolerance is ok, one listing is not trusted, no listings is nomatch', () => {
-  assert.equal(assess({ price: 3000, cost: 2000 }, mk([2800, 2900])).status, 'ok');
-  assert.equal(assess({ price: 3500, cost: 2000 }, mk([2800])).trusted, false);
-  assert.equal(assess({ price: 3500, cost: 2000 }, []).status, 'nomatch');
+  assert.equal(assess({ price: 3000, cost: 2000 }, mk([2800, 2900]), T).status, 'ok');
+  assert.equal(assess({ price: 3500, cost: 2000 }, mk([2800]), T).trusted, false);
+  assert.equal(assess({ price: 3500, cost: 2000 }, [], T).status, 'nomatch');
   assert.equal(median([3, 1, 2]), 2);
 });
 
@@ -169,7 +210,7 @@ test('end to end: four sources, cuts and raises are found, a missing source is f
   writeFileSync(join(dir, 'imaginecare.json'), JSON.stringify([
     { name: 'Knapsack Sprayer 16L', is_in_stock: true, prices: { price: '285000', currency_minor_unit: 2 } },
     { name: 'Electric Kettle 1.8L', is_in_stock: true, prices: { price: '195000', currency_minor_unit: 2 } }]));
-  const script = fileURLToPath(new URL('./price-watch.mjs', import.meta.url));
+  const script = scriptIn(dir);
   const run = spawnSync(process.execPath, [script], { cwd: dir, encoding: 'utf8', env: { ...process.env, PRODUCTS_JSON: join(dir, 'products.json'), FIXTURE_DIR: dir, APPLY: '0', SUPABASE_SERVICE_KEY: '' } });
   assert.equal(run.status, 0, run.stderr);
   assert.match(run.stdout, /Kilimall returned no readable listings/);
@@ -201,7 +242,7 @@ test('apply: sends guarded updates, skips a price changed meanwhile, writes the 
     });
   });
   await new Promise(r => server.listen(0, r));
-  const script = fileURLToPath(new URL('./price-watch.mjs', import.meta.url));
+  const script = scriptIn(dir);
   const out = await new Promise(resolve => {
     const c = spawn(process.execPath, [script], { cwd: dir, env: { ...process.env, PRODUCTS_JSON: join(dir, 'products.json'), FIXTURE_DIR: dir, APPLY: '1', SUPABASE_SERVICE_KEY: 'svc-test', SUPABASE_URL: `http://127.0.0.1:${server.address().port}` } });
     let o = ''; c.stdout.on('data', d => o += d); c.on('close', code => resolve({ code, o }));
@@ -226,7 +267,7 @@ test('apply without the service key changes nothing and says why', () => {
   writeFileSync(join(dir, 'products.json'), JSON.stringify([{ id: 'a1', name: 'Knapsack Sprayer 16L', price: 3500, cost: 2000 }]));
   writeFileSync(join(dir, 'jumia.html'), jumiaPage);
   writeFileSync(join(dir, 'agroduka.html'), csCartPage);
-  const script = fileURLToPath(new URL('./price-watch.mjs', import.meta.url));
+  const script = scriptIn(dir);
   const run = spawnSync(process.execPath, [script], { cwd: dir, encoding: 'utf8', env: { ...process.env, PRODUCTS_JSON: join(dir, 'products.json'), FIXTURE_DIR: dir, APPLY: '', SUPABASE_SERVICE_KEY: '' } });
   assert.equal(run.status, 0, run.stderr);
   assert.match(run.stdout, /SUPABASE_SERVICE_KEY secret is not set, so nothing was changed/);
