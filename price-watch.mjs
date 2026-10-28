@@ -11,6 +11,13 @@
 //     was edited by hand while the check was running is skipped.
 //   - Needs the SUPABASE_SERVICE_KEY secret. Without it the run is report-only.
 //
+// Keeping a run from hanging:
+//   - Every request has a timeout (requestTimeoutMs).
+//   - A site that fails to load skipSourceAfter searches in a row is skipped for the rest of the run.
+//   - The whole check stops after maxRunMinutes and still writes the report for the products it got through;
+//     the list is rotated daily so the rest are covered on later runs.
+//   - Progress is printed to the log (stderr) as it goes.
+//
 // Env: APPLY=1 (force apply) / APPLY=0 (force report-only), otherwise config "autoApply" decides.
 //      SUPABASE_SERVICE_KEY, PRODUCTS_JSON (local test file), FIXTURE_DIR (local test pages), LIMIT (first N products)
 import { readFileSync, writeFileSync, appendFileSync, existsSync } from 'node:fs';
@@ -33,6 +40,9 @@ const DEFAULTS = {
   maxChangesPerRun: 40,   // biggest gaps first; the rest wait for the next run
   autoApply: true,        // change prices automatically (still needs the SUPABASE_SERVICE_KEY secret)
   delayMs: 1200,          // pause between requests, to be polite to the sites
+  requestTimeoutMs: 15000, // give up on a single request after this long
+  skipSourceAfter: 5,     // skip a site for the rest of the run after this many searches in a row that could not load
+  maxRunMinutes: 45,      // stop checking products after this long and report on the ones done (the workflow limit is higher)
   sources: ['jumia', 'kilimall', 'agroduka', 'imaginecare'],
   urlOverrides: {},       // e.g. { "agroduka": "https://example.co.ke/search?q={q}" } if a site changes its search address
 };
@@ -281,11 +291,12 @@ export function assess(product, matches, cfg = CFG) {
 
 /* ---------- I/O ---------- */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const progress = m => console.error(`[${new Date().toISOString().slice(11, 19)}] ${m}`);   // stderr, so it shows in the Actions log and stays out of the report
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));
   const all = [];
   for (let from = 0; ; from += 1000) {
-    const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=id,name,price,cost,old_price,variant_label,unit&order=name.asc&limit=1000&offset=${from}`, { headers: { apikey: KEY } });
+    const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=id,name,price,cost,old_price,variant_label,unit&order=name.asc&limit=1000&offset=${from}`, { headers: { apikey: KEY }, signal: AbortSignal.timeout(30000) });
     if (!r.ok) throw new Error(`Could not read products from Supabase (${r.status})`);
     const page = await r.json(); all.push(...page);
     if (page.length < 1000) break;
@@ -301,12 +312,14 @@ async function load(src, t, query) {
     if (!existsSync(f)) throw new Error('no fixture');
     return readFileSync(f, 'utf8');
   }
-  const r = await fetch(t.url(query), { headers: { 'user-agent': 'Mozilla/5.0 (compatible; StermontPriceWatch/1.0; +https://stermontarcade.co.ke)', 'accept-language': 'en-KE,en;q=0.9' }, signal: AbortSignal.timeout(25000) });
+  // the timeout covers reading the body too, so a site that sends headers and then stalls cannot hang the run
+  const r = await fetch(t.url(query), { headers: { 'user-agent': 'Mozilla/5.0 (compatible; StermontPriceWatch/1.0; +https://stermontarcade.co.ke)', 'accept-language': 'en-KE,en;q=0.9' }, signal: AbortSignal.timeout(CFG.requestTimeoutMs) });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.text();
 }
 async function search(src, query) {
-  const h = (health[src] ||= { asked: 0, loaded: 0, readable: 0, lastError: '' });
+  const h = (health[src] ||= { asked: 0, loaded: 0, readable: 0, lastError: '', streak: 0, gaveUp: false });
+  if (h.gaveUp) return [];
   h.asked++;
   const tries = triesFor(src);
   let loaded = false, found = [];
@@ -320,7 +333,8 @@ async function search(src, query) {
     if (!process.env.FIXTURE_DIR) await sleep(CFG.delayMs);
     if (found.length) break;
   }
-  if (loaded) h.loaded++;
+  if (loaded) { h.loaded++; h.streak = 0; }
+  else if (++h.streak >= CFG.skipSourceAfter) { h.gaveUp = true; progress(`${sourceLabel(src)} failed ${h.streak} searches in a row (${h.lastError}); skipping it for the rest of this run`); }
   if (found.length) h.readable++;
   return found;
 }
@@ -332,12 +346,23 @@ const csvCell = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
 async function main() {
   let products = (await getProducts()).filter(p => p && p.id && p.name && Number(p.price) > 0);
   if (process.env.LIMIT) products = products.slice(0, Number(process.env.LIMIT));
+  else if (process.env.GITHUB_ACTIONS && products.length > 1) {
+    // start somewhere different each day, so if a run runs out of time the same products are not always the ones left unchecked
+    const day = Math.floor(Date.now() / 86400000), start = (day * 60) % products.length;
+    products = [...products.slice(start), ...products.slice(0, start)];
+  }
+  const deadline = Date.now() + CFG.maxRunMinutes * 60000;
+  let timedOut = false;
+  progress(`Checking ${products.length} products (time limit ${CFG.maxRunMinutes} min)`);
   const results = [];
-  for (const p of products) {
+  for (const [i, p] of products.entries()) {
+    if (Date.now() > deadline) { timedOut = true; progress(`Time limit reached after ${i} of ${products.length} products; writing the report`); break; }
     const q = queryFor(p), listings = [];
     for (const s of CFG.sources) listings.push(...await search(s, q));
     results.push({ p, ...assess(p, pickMatches(p, listings, CFG)) });
+    if ((i + 1) % 10 === 0) progress(`${i + 1} of ${products.length} products checked`);
   }
+  const checked = results.length;
 
   const by = s => results.filter(r => r.status === s);
   const above = by('above'), below = by('below'), ok = by('ok'), nomatch = by('nomatch');
@@ -348,11 +373,12 @@ async function main() {
   const margin = r => r.marginPct == null ? '-' : r.marginPct.toFixed(0) + '%';
   const untrusted = r => r.target && !r.trusted ? ' (only 1 listing, not auto-applied)' : '';
 
-  const broken = CFG.sources.filter(s => health[s] && health[s].readable === 0);
+  const broken = CFG.sources.filter(s => health[s] && (health[s].readable === 0 || health[s].gaveUp));
   let md = `# Price watch ${new Date().toISOString().slice(0, 10)}\n\n`;
-  md += `Checked **${products.length}** active items against ${CFG.sources.map(sourceLabel).join(', ')}. `;
+  md += `Checked **${checked}** active items against ${CFG.sources.map(sourceLabel).join(', ')}. `;
   md += `**${above.length}** clearly above market, **${below.length}** clearly under market, **${ok.length}** in line, **${nomatch.length}** with no confident match.\n`;
-  for (const s of broken) md += `\n> ⚠️ **${sourceLabel(s)} returned no readable listings** (${health[s].loaded}/${health[s].asked} pages loaded${health[s].lastError ? `, last error: ${health[s].lastError}` : ''}). The site may be blocking the check or has changed its page, so its prices were not used this run. If its search address changed, set it under "urlOverrides" in price-watch.config.json.\n`;
+  if (timedOut) md += `\n> ⏱️ Stopped after ${CFG.maxRunMinutes} minutes with **${products.length - checked}** items not yet checked. They are covered on later runs (the starting point moves every day).\n`;
+  for (const s of broken) md += `\n> ⚠️ **${sourceLabel(s)} returned no readable listings** (${health[s].loaded}/${health[s].asked} pages loaded${health[s].lastError ? `, last error: ${health[s].lastError}` : ''}).${health[s].gaveUp ? ' It was skipped for the rest of the run after repeated failures.' : ''} The site may be blocking the check or has changed its page, so its prices were not used this run. If its search address changed, set it under "urlOverrides" in price-watch.config.json.\n`;
 
   if (above.length) {
     md += `\n### Above market (${above.length})\nSuggested price matches the ${CFG.marketBasis === 'median' ? 'market median' : CFG.marketBasis === 'range' ? 'top of what the sites charge (each site at its cheapest seller)' : 'lowest matching price'}${CFG.useCost === false ? '' : `, never below cost + ${CFG.minMarginPct}%`}.\n\n| Item | Now | Market | Over | Suggested | New margin | Seen at |\n|---|---|---|---|---|---|---|\n`;
@@ -381,7 +407,13 @@ async function main() {
         const body = { price: r.target };
         if (r.p.old_price != null && Number(r.p.old_price) <= r.target) body.old_price = null;   // no "was" price below the new price
         // the price=eq filter makes sure nobody edited this price by hand while the check was running
-        const res = await fetch(`${SB}/rest/v1/products?id=eq.${encodeURIComponent(r.p.id)}&price=eq.${encodeURIComponent(r.p.price)}`, { method: 'PATCH', headers: { apikey: svc, authorization: `Bearer ${svc}`, 'content-type': 'application/json', prefer: 'return=representation' }, body: JSON.stringify(body) });
+        let res;
+        try {
+          res = await fetch(`${SB}/rest/v1/products?id=eq.${encodeURIComponent(r.p.id)}&price=eq.${encodeURIComponent(r.p.price)}`, { method: 'PATCH', headers: { apikey: svc, authorization: `Bearer ${svc}`, 'content-type': 'application/json', prefer: 'return=representation' }, body: JSON.stringify(body), signal: AbortSignal.timeout(30000) });
+        } catch (e) {
+          lines.push(`- could not update **${label(r.p)}** (${String(e.message || e)})`);
+          continue;
+        }
         let rows = [];
         if (res.ok) { try { rows = await res.json(); } catch { rows = []; } }
         if (res.ok && rows.length) { r.applied = true; lines.push(`- ${r.direction === 'cut' ? '⬇️ cut' : '⬆️ raised'} **${label(r.p)}**: ${kes(r.p.price)} → ${kes(r.target)} (market ${kes(r.market)}${r.note ? `, ${r.note}` : ''})`); }
@@ -399,7 +431,7 @@ async function main() {
 
   writeFileSync('price-watch.csv', 'id,name,status,our_price,cost,market_median,gap_pct,suggested,applied,matches\n' + results.map(r => [r.p.id, label(r.p), r.status, r.p.price, r.p.cost ?? '', r.market ? Math.round(r.market) : '', r.gapPct != null ? r.gapPct.toFixed(1) : '', r.target ?? '', r.applied ? 'yes' : '', (r.matches || []).map(m => `${m.source}:${m.price}:${m.name}`).join(' | ')].map(csvCell).join(',')).join('\n') + '\n');
   console.log(md);
-  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `items=${above.length + below.length + broken.length}\n`);
+  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `items=${above.length + below.length + broken.length + (timedOut ? 1 : 0)}\n`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] || '').href) await main();
