@@ -34,7 +34,8 @@ writeFileSync('sitemap-images.xml', xml);
 // ---------- 2) llms.txt ----------
 const cats = list('c').filter(f => f !== 'index.html').map(f => ({ f, h: read(`c/${f}`) }))
   .filter(({ h }) => !/http-equiv="refresh"/i.test(h));
-const posts = list('blog').filter(f => f !== 'index.html').map(f => ({ f, h: read(`blog/${f}`) }));
+const posts = list('blog').filter(f => f !== 'index.html').map(f => ({ f, h: read(`blog/${f}`) }))
+  .filter(({ h }) => !/http-equiv=["']refresh/i.test(h));            // moved posts (redirect stubs) are not guides
 const products = list('p').map(f => ({ f, h: read(`p/${f}`) })).filter(({ h }) => !/http-equiv="refresh"/i.test(h));
 
 let t = `# Stermont Arcade\n\n`;
