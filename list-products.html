@@ -42,17 +42,15 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
 <header><b>&#128230; List products</b><a href="/admin.html#catalog">Admin</a></header>
 <main>
   <div class="card"><h2>1. Photos and instructions</h2>
-    <p class="hint">Pick up to 30 product photos. Tell me the cost price (COGS) of each product. I never guess costs. I write the name, category, pack size and description the way the admin Catalog does, and work out prices from your settings below.</p>
+    <p class="hint">Pick up to 30 product photos. Tell me the selling price of each product. I never guess prices. I write the name, category, pack size and description the way the admin Catalog does.</p>
     <input type="file" id="ph" accept="image/*" multiple>
     <div id="cnt" class="hint"></div>
     <label for="ins">Instructions</label>
-    <textarea id="ins" rows="7" placeholder="Example:&#10;Photo 1 Kungu Nil bed bug killer 1 Litre: cost 2200.&#10;Photo 2 is the same product, 100 ml: cost 800.&#10;Photos 3 to 10 are Supermarket items: cost 120 each."></textarea>
+    <textarea id="ins" rows="7" placeholder="Example:&#10;Photo 1 Kungu Nil bed bug killer 1 Litre: price 2900.&#10;Photo 2 is the same product, 100 ml: price 1100.&#10;Photos 3 to 10 are Supermarket items: price 150 each."></textarea>
     <div class="row"><button id="rd" type="button" class="pri">Read my photos</button><button id="clr" type="button">Clear photos</button></div>
   </div>
   <div class="card"><h2>2. Your standard settings</h2>
     <div class="g2">
-      <div><label for="pm">Profit %</label><input id="pm" type="number" inputmode="decimal" value="25"></div>
-      <div><label for="pmode">Profit is worked out</label><select id="pmode"><option value="cost">on cost (cost + %)</option><option value="margin" selected>of selling price (margin)</option></select></div>
       <div><label for="dmin">Discount from (%)</label><input id="dmin" type="number" inputmode="numeric" value="6"></div>
       <div><label for="dmax">Discount up to (%)</label><input id="dmax" type="number" inputmode="numeric" value="16"></div>
       <div><label for="dst">Pieces in stock (each item)</label><input id="dst" type="number" inputmode="numeric" value="1000"></div>
@@ -60,7 +58,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
     </div>
     <label class="chk"><input id="disc" type="checkbox" checked> Show a previous price (crossed out) using that discount</label>
     <label class="chk"><input id="dfeat" type="checkbox" checked> Feature every item as advert / top banner</label>
-    <p class="hint">Selling prices are rounded up to the next KSh 50 with at least KSh 150 profit, like the Catalog. The previous price should be a price you really charged or will honour, so customers are not misled. You can change anything on each item before posting.</p>
+    <p class="hint">The selling price is what you type for each item. Price Watch may update it later to follow market prices. The previous price should be a price you really charged or will honour, so customers are not misled. You can change anything on each item before posting.</p>
   </div>
   <div id="msg"></div>
   <div id="rows"></div>
@@ -73,8 +71,8 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
   var $ = function (i) { return document.getElementById(i); };
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session', CK = 'stm_builder_cfg_v1';
   var UNITS = ['g', 'kg', 'tonne', 'ml', 'litre', 'piece', 'pair', 'dozen', 'set', 'bundle', 'pack', 'bag', '50 kg bag', 'bottle', 'carton', 'box', 'crate', 'sachet', 'tin', 'metre', 'roll'];
-  var S = { photos: [], items: [], cats: [], ids: {}, busy: false, opt: { pm: 25, mode: 'margin', dmin: 6, dmax: 16, disc: true, stock: 1000, low: 20, feat: true } };
-  var SYS = 'You help the owner of Stermont Arcade, a Kenyan online store (prices in KSh), list products from photos. Return one item for every product you can identify. Reply with ONLY JSON: {"items":[{"photos":[numbers of the photos that show this product],"name":"clear product name in Title Case: brand, product and size or model only if visible on the photo or stated by the owner","category":"best match from the category list, or a short new category name only if none fits","cost":buying price in KSh ONLY if the owner stated it for this product else 0,"stock":pieces ONLY if the owner stated it else null,"unit":"one of the units list or empty","pack_size":"size or variant such as 1 Litre only if visible or stated else empty","old_price":number only if the owner stated a previous price else 0,"description":"text in the store format","featured":true only if the owner asked for this product to be an advert or banner else false}]}. Description format: one point per line, no bullets or dashes; section titles on their own line such as Key Features, Specifications, What is in the box?; a Brand: line when the brand is visible. Use only what is visible on the photo or stated by the owner. Never invent specifications, prices, discounts, rankings, awards, guarantees, delivery times or stock. If unsure, leave it out. If the owner refers to products by photo number, file name or order, follow that. Reply in English unless the owner writes in another language.';
+  var S = { photos: [], items: [], cats: [], ids: {}, busy: false, opt: { dmin: 6, dmax: 16, disc: true, stock: 1000, low: 20, feat: true } };
+  var SYS = 'You help the owner of Stermont Arcade, a Kenyan online store (prices in KSh), list products from photos. Return one item for every product you can identify. Reply with ONLY JSON: {"items":[{"photos":[numbers of the photos that show this product],"name":"clear product name in Title Case: brand, product and size or model only if visible on the photo or stated by the owner","category":"best match from the category list, or a short new category name only if none fits","price":selling price in KSh ONLY if the owner stated it for this product else 0,"stock":pieces ONLY if the owner stated it else null,"unit":"one of the units list or empty","pack_size":"size or variant such as 1 Litre only if visible or stated else empty","old_price":number only if the owner stated a previous price else 0,"description":"text in the store format","featured":true only if the owner asked for this product to be an advert or banner else false}]}. Description format: one point per line, no bullets or dashes; section titles on their own line such as Key Features, Specifications, What is in the box?; a Brand: line when the brand is visible. Use only what is visible on the photo or stated by the owner. Never invent specifications, prices, discounts, rankings, awards, guarantees, delivery times or stock. If unsure, leave it out. If the owner refers to products by photo number, file name or order, follow that. Reply in English unless the owner writes in another language.';
 
   function h(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function slug(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
@@ -82,19 +80,12 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
   function str(v, n) { return String(v == null ? '' : v).replace(/[ \t]+/g, ' ').trim().slice(0, n); }
   function num(v) { v = parseFloat(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return v > 0 ? Math.round(v) : 0; }
   function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
-  /* same method as the admin Catalog (default: cost is 25% below the selling price, rounded UP to the next whole KSh), using the profit % set on this page */
-  function auto(c) {
-    c = Number(c); if (!(c > 0)) return 0;
-    var o = S.opt;
-    if (o.mode === 'margin' && o.pm < 95) return Math.ceil(c / (1 - o.pm / 100) - 1e-6);
-    var t = c + Math.max(c * o.pm / 100, 150);
-    return Math.ceil(t / 50 - 1e-9) * 50;
-  }
+  /* previous (crossed-out) price: the selling price plus the chosen discount, rounded up to the next KSh 10 */
   function autoOld(it) { return S.opt.disc && it.price > 0 ? Math.ceil(it.price / (1 - it.d / 100) / 10) * 10 : 0; }
   function readOpt() {
     var n = function (id, d) { var v = parseFloat($(id).value); return v >= 0 ? v : d; };
     var lo = Math.min(n('dmin', 6), n('dmax', 16)), hi = Math.max(n('dmin', 6), n('dmax', 16));
-    S.opt = { pm: n('pm', 25), mode: $('pmode').value, dmin: Math.min(lo, 90), dmax: Math.min(hi, 90), disc: $('disc').checked, stock: $('dst').value === '' ? null : Math.round(n('dst', 0)), low: Math.round(n('dlow', 5)), feat: $('dfeat').checked };
+    S.opt = { dmin: Math.min(lo, 90), dmax: Math.min(hi, 90), disc: $('disc').checked, stock: $('dst').value === '' ? null : Math.round(n('dst', 0)), low: Math.round(n('dlow', 5)), feat: $('dfeat').checked };
   }
   function say(t, c) { var d = h('div', 'm ' + (c || ''), t); $('msg').appendChild(d); d.scrollIntoView({ block: 'nearest' }); return d; }
   function cfg() { var s = null; try { s = localStorage.getItem(CK) || sessionStorage.getItem(CK); } catch (e) {} try { return JSON.parse(s) || {}; } catch (e) { return {}; } }
@@ -161,8 +152,8 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
   }
   function fromAI(it) {
     var o = S.opt, ph = (Array.isArray(it.photos) ? it.photos : [it.photo]).map(Number).filter(function (n) { return n >= 1 && n <= S.photos.length; });
-    var st = it.stock == null || it.stock === '' ? null : parseInt(it.stock, 10), cost = num(it.cost), old = num(it.old_price);
-    var m = { name: str(it.name, 120), cat: str(it.category, 60), cost: cost, stock: st >= 0 ? st : o.stock, low: o.low, unit: UNITS.indexOf(it.unit) > -1 ? it.unit : '', pack: str(it.pack_size, 30), old: old, oldManual: !!old, d: Math.round(o.dmin + Math.random() * (o.dmax - o.dmin)) || 1, desc: String(it.description || '').replace(/^[\s*\-\u2022]+/gm, '').slice(0, 4000).trim(), feat: !!it.featured || o.feat, photos: ph, manual: false, price: auto(cost), done: false };
+    var st = it.stock == null || it.stock === '' ? null : parseInt(it.stock, 10), price = num(it.price), old = num(it.old_price);
+    var m = { name: str(it.name, 120), cat: str(it.category, 60), price: price, stock: st >= 0 ? st : o.stock, low: o.low, unit: UNITS.indexOf(it.unit) > -1 ? it.unit : '', pack: str(it.pack_size, 30), old: old, oldManual: !!old, d: Math.round(o.dmin + Math.random() * (o.dmax - o.dmin)) || 1, desc: String(it.description || '').replace(/^[\s*\-\u2022]+/gm, '').slice(0, 4000).trim(), feat: !!it.featured || o.feat, photos: ph, done: false };
     if (!m.oldManual) m.old = autoOld(m);
     return m;
   }
@@ -185,7 +176,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
       S.photos.forEach(function (p, i) { if (!used[i + 1]) out.push(fromAI({ photos: [i + 1] })); });
       out.sort(function (a, b2) { return a.photos[0] - b2.photos[0]; });
       S.items = out; draw(); $('cnt').textContent = S.photos.length + ' photos read.';
-      say(out.length + ' item' + (out.length === 1 ? '' : 's') + ' ready to check. Fill in anything marked in red (cost is never guessed), then tap Post.', 'okm');
+      say(out.length + ' item' + (out.length === 1 ? '' : 's') + ' ready to check. Fill in anything marked in red (prices are never guessed), then tap Post.', 'okm');
     } catch (e) { say('Could not read the photos: ' + String(e.message || e).slice(0, 260), 'err'); $('cnt').textContent = ''; }
     S.busy = false; $('rd').disabled = false;
   };
@@ -194,18 +185,15 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
   function check(it) {
     if (!it.name.trim()) return 'Needs a product name';
     if (!it.cat.trim()) return 'Needs a category';
-    if (it.manual ? !(it.price > 0) : !(it.cost > 0)) return it.manual ? 'Enter the selling price' : 'Needs the cost price (the selling price is worked out from it)';
+    if (!(it.price > 0)) return 'Enter the selling price';
     if (it.old && !(it.old > it.price)) return 'Previous price must be higher than the selling price (or leave it empty)';
     if (it.stock == null || !(it.stock >= 0)) return 'Needs the pieces in stock';
     return '';
   }
   function isNewCat(n) { return !!n.trim() && !S.cats.some(function (c) { return norm(c.name) === norm(n); }); }
   function sync(it) {
-    if (!it.manual) it.price = auto(it.cost);
     if (!it.oldManual) { it.old = autoOld(it); it.$old.value = it.old || ''; }
-    it.$price.value = it.price || '';
-    var pf = it.price - it.cost;
-    it.$info.textContent = it.cost > 0 && it.price > 0 ? 'Profit ' + money(pf) + ' (' + Math.round(pf / it.cost * 100) + '% on cost, ' + Math.round(pf / it.price * 100) + '% of selling price)' + (it.old > it.price ? ' · shows ' + Math.round((it.old - it.price) / it.old * 100) + '% off' : '') : '';
+    it.$info.textContent = it.old > it.price && it.price > 0 ? 'Shows ' + Math.round((it.old - it.price) / it.old * 100) + '% off (' + money(it.old) + ' crossed out, ' + money(it.price) + ' now)' : '';
     it.$cn.textContent = isNewCat(it.cat) ? 'New category: it will be created' : '';
     var e = it.done ? '\u2713 Posted' : check(it); it.$er.textContent = e;
     it.el.className = 'it' + (it.done ? ' done' : e ? ' bad' : '');
@@ -231,9 +219,8 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
       g.appendChild(fld('Category', (function () { var i = inp('text', it.cat, function (v) { it.cat = v; sync(it); }, 'Pick or type'); i.setAttribute('list', 'cl'); return i; })()));
       var us = h('select'); [''].concat(UNITS).forEach(function (u) { var o = h('option', '', u || 'No unit (per item)'); o.value = u; if (u === it.unit) o.selected = true; us.appendChild(o); }); us.onchange = function () { it.unit = us.value; };
       g.appendChild(fld('Unit of sale', us));
-      g.appendChild(fld('Cost price per unit (COGS, KSh) *', inp('number', it.cost || '', function (v) { it.cost = num(v); sync(it); }, 'what you pay')));
-      it.$price = inp('number', it.price || '', function (v) { it.manual = true; it.price = num(v); sync(it); });
-      g.appendChild(fld('Selling price (auto)', it.$price));
+      it.$price = inp('number', it.price || '', function (v) { it.price = num(v); sync(it); }, 'type the price');
+      g.appendChild(fld('Selling price (KSh) *', it.$price));
       it.$old = inp('number', it.old || '', function (v) { it.old = num(v); it.oldManual = true; sync(it); });
       g.appendChild(fld('Previous price (optional)', it.$old));
       g.appendChild(fld('Pieces in stock *', inp('number', it.stock == null ? '' : it.stock, function (v) { it.stock = v === '' ? null : parseInt(v, 10); sync(it); })));
@@ -274,7 +261,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
         var imgs = []; for (var k = 0; k < it.photos.length; k++) imgs.push(await up(S.photos[it.photos[k] - 1], it.name));
         var cid = await catId(it.cat), pack = it.pack.trim(), id = slug(it.name + (pack ? ' ' + pack : '')) || 'item', base = id, n = 2;
         while (S.ids[id]) id = base + '-' + n++;
-        var row = { id: id, category_id: cid, name: it.name.trim(), price: it.price, cost: it.cost, stock: it.stock, low_at: it.low >= 0 ? it.low : 5, featured: !!it.feat, active: true, images: imgs };
+        var row = { id: id, category_id: cid, name: it.name.trim(), price: it.price, cost: 0, stock: it.stock, low_at: it.low >= 0 ? it.low : 5, featured: !!it.feat, active: true, images: imgs };
         if (it.desc.trim()) row.description = it.desc.trim(); if (it.old) row.old_price = it.old; if (it.unit) row.unit = it.unit;
         if (pack) { row.variant_label = pack; row.variant_group = slug(it.name); }
         try { await api('/rest/v1/products', 'POST', row, 'return=minimal'); }
