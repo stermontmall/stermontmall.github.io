@@ -25,7 +25,10 @@ const DEFAULTS = {
   minMarginPct: 10,       // never cut a price below cost + this %
   maxCutPct: 25,          // never cut a price by more than this % in one run
   maxRaisePct: 25,        // never raise a price by more than this % in one run
-  roundTo: 10,            // cuts round UP and raises round DOWN to a multiple of this (KES)
+  roundTo: 10,            // cuts round UP and raises round DOWN to a multiple of this (KES); 1 = match the competitor price exactly
+  useCost: true,          // false = ignore the cost column completely (no margin floor)
+  maxMatches: 5,          // how many matching listings to keep per product (use a big number with marketBasis 'range')
+  marketBasis: 'median',  // 'range' = one price per site (its cheapest), stay inside their range; 'lowest' = cheapest listing; 'median' = middle
   minMatches: 2,          // matching listings needed (all sites together) before a price is trusted enough to change
   maxChangesPerRun: 40,   // biggest gaps first; the rest wait for the next run
   autoApply: true,        // change prices automatically (still needs the SUPABASE_SERVICE_KEY secret)
@@ -228,33 +231,47 @@ export function median(a) { const s = [...a].sort((x, y) => x - y), n = s.length
 const roundUp = (n, step) => Math.ceil(n / step - 1e-9) * step;
 const roundDown = (n, step) => Math.floor(n / step + 1e-9) * step;
 
-export function pickMatches(product, listings) {
+export function pickMatches(product, listings, cfg = CFG) {
   const ours = Number(product.price);
   return listings
     .filter(l => l.price >= ours * 0.4 && l.price <= ours * 3)        // ignore accessories and bundles far from our price
     .map(l => ({ ...l, score: matchScore(product, l) }))
     .filter(l => l.score >= 0.75)
     .sort((a, b) => b.score - a.score || a.price - b.price)
-    .slice(0, 5);
+    .slice(0, cfg.maxMatches || 5);
 }
 
+// marketBasis 'range': every site counts once, at its own cheapest matching listing (on Jumia that is the cheapest seller).
+// One site = match its price exactly. Several sites with different prices = our price must sit inside their range;
+// above the range comes down to its top, below the range goes up to its bottom, inside the range is left alone.
+// useCost:false means the cost column is ignored (no margin floor).
 export function assess(product, matches, cfg = CFG) {
-  const ours = Number(product.price), cost = Number(product.cost) || 0;
+  const ours = Number(product.price), cost = Number(product.cost) || 0, useCost = cfg.useCost !== false;
   if (!matches.length) return { status: 'nomatch' };
-  const market = median(matches.map(m => m.price));
   const trusted = matches.length >= cfg.minMatches;
-  const base = { market, matches, trusted, gapPct: (ours / market - 1) * 100 };
-  if (ours > market * (1 + cfg.tolerancePct / 100)) {
-    const floor = cost > 0 ? cost * (1 + cfg.minMarginPct / 100) : 0;
-    let target = Math.max(roundUp(market, cfg.roundTo), floor ? roundUp(floor, cfg.roundTo) : 0, roundUp(ours * (1 - cfg.maxCutPct / 100), cfg.roundTo));
-    if (!cost) return { ...base, status: 'above', blocked: 'no cost on file, so the margin floor cannot be checked' };
-    if (target >= ours) return { ...base, status: 'above', blocked: 'already at the minimum margin' };
-    const capped = target > roundUp(market, cfg.roundTo);
-    return { ...base, status: 'above', direction: 'cut', target, marginPct: (target / cost - 1) * 100, note: capped ? (target === roundUp(floor, cfg.roundTo) ? 'held at minimum margin' : `cut limited to ${cfg.maxCutPct}%`) : '' };
+  let low, high;
+  if (cfg.marketBasis === 'range') {
+    const per = {};
+    for (const m of matches) if (!(m.source in per) || m.price < per[m.source]) per[m.source] = m.price;
+    const ps = Object.values(per);
+    low = Math.min(...ps); high = Math.max(...ps);
+  } else {
+    low = high = cfg.marketBasis === 'lowest' ? Math.min(...matches.map(m => m.price)) : median(matches.map(m => m.price));
   }
-  if (ours < market * (1 - cfg.raiseGapPct / 100)) {
-    // follow the market up: to the market price at most (never above it), and by no more than maxRaisePct in one run
-    const ceiling = roundDown(market, cfg.roundTo), step = roundDown(ours * (1 + cfg.maxRaisePct / 100), cfg.roundTo);
+  const market = ours > high ? high : low;
+  const gapPct = (ours > high ? ours / high - 1 : ours < low ? ours / low - 1 : 0) * 100;
+  const base = { market, low, high, matches, trusted, gapPct: ours > high || ours < low ? gapPct : (ours / market - 1) * 100 };
+  if (ours > high * (1 + cfg.tolerancePct / 100)) {
+    const floor = useCost && cost > 0 ? cost * (1 + cfg.minMarginPct / 100) : 0;
+    const target = Math.max(roundUp(high, cfg.roundTo), floor ? roundUp(floor, cfg.roundTo) : 0, roundUp(ours * (1 - cfg.maxCutPct / 100), cfg.roundTo));
+    if (useCost && !cost) return { ...base, status: 'above', blocked: 'no cost on file, so the margin floor cannot be checked' };
+    if (target >= ours) return { ...base, status: 'above', blocked: 'already at the minimum margin' };
+    const capped = target > roundUp(high, cfg.roundTo);
+    return { ...base, status: 'above', direction: 'cut', target, marginPct: cost > 0 ? (target / cost - 1) * 100 : null, note: capped ? (floor && target === roundUp(floor, cfg.roundTo) ? 'held at minimum margin' : `cut limited to ${cfg.maxCutPct}%`) : '' };
+  }
+  if (ours < low * (1 - cfg.raiseGapPct / 100)) {
+    // follow the market up: to the lowest competitor price at most (never above it), and by no more than maxRaisePct in one run
+    const ceiling = roundDown(low, cfg.roundTo), step = roundDown(ours * (1 + cfg.maxRaisePct / 100), cfg.roundTo);
     const target = Math.min(ceiling, step);
     if (target <= ours) return { ...base, status: 'below', blocked: 'too close to the market price to move a whole step' };
     return { ...base, status: 'below', direction: 'raise', target, marginPct: cost > 0 ? (target / cost - 1) * 100 : null, note: step < ceiling ? `raise limited to ${cfg.maxRaisePct}%` : '' };
@@ -319,7 +336,7 @@ async function main() {
   for (const p of products) {
     const q = queryFor(p), listings = [];
     for (const s of CFG.sources) listings.push(...await search(s, q));
-    results.push({ p, ...assess(p, pickMatches(p, listings)) });
+    results.push({ p, ...assess(p, pickMatches(p, listings, CFG)) });
   }
 
   const by = s => results.filter(r => r.status === s);
@@ -338,7 +355,7 @@ async function main() {
   for (const s of broken) md += `\n> ⚠️ **${sourceLabel(s)} returned no readable listings** (${health[s].loaded}/${health[s].asked} pages loaded${health[s].lastError ? `, last error: ${health[s].lastError}` : ''}). The site may be blocking the check or has changed its page, so its prices were not used this run. If its search address changed, set it under "urlOverrides" in price-watch.config.json.\n`;
 
   if (above.length) {
-    md += `\n### Above market (${above.length})\nSuggested price matches the market median, never below cost + ${CFG.minMarginPct}%, and cuts are capped at ${CFG.maxCutPct}%.\n\n| Item | Now | Market | Over | Suggested | New margin | Seen at |\n|---|---|---|---|---|---|---|\n`;
+    md += `\n### Above market (${above.length})\nSuggested price matches the ${CFG.marketBasis === 'median' ? 'market median' : CFG.marketBasis === 'range' ? 'top of what the sites charge (each site at its cheapest seller)' : 'lowest matching price'}${CFG.useCost === false ? '' : `, never below cost + ${CFG.minMarginPct}%`}.\n\n| Item | Now | Market | Over | Suggested | New margin | Seen at |\n|---|---|---|---|---|---|---|\n`;
     for (const r of above.sort((a, b) => b.gapPct - a.gapPct).slice(0, 60))
       md += `| ${label(r.p)} | ${kes(r.p.price)} | ${kes(r.market)} | +${r.gapPct.toFixed(0)}% | ${r.target ? kes(r.target) + (r.note ? ` (${r.note})` : '') : `no change: ${r.blocked}`}${untrusted(r)} | ${r.target ? margin(r) : '-'} | ${links(r)} |\n`;
     if (above.length > 60) md += `\n…and ${above.length - 60} more in the CSV.\n`;
