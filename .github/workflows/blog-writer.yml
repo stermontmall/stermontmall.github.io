@@ -1,5 +1,6 @@
 # Stermont Arcade - drafts one new blog post every day from the next "pending" topic in blog-topics.json.
-# It never publishes by itself: each draft arrives as a pull request for you to read and merge.
+# Each draft is opened as a pull request and then MERGED AUTOMATICALLY, so the post goes live with no manual step.
+# (To go back to manual review, delete the "Merge the pull request automatically" step and the one after it.)
 # Needs the repository secret ANTHROPIC_API_KEY (Settings > Secrets and variables > Actions).
 # Also needs Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests" turned on.
 # Runs: every day at 09:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
@@ -18,6 +19,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 concurrency:
   group: blog-writer
@@ -42,7 +44,8 @@ jobs:
           TOPIC_SLUG: ${{ github.event.inputs.topic_slug }}
         run: node blog-write.mjs
 
-      - name: Open a pull request for review
+      - name: Open a pull request
+        id: pr
         if: steps.draft.outputs.written == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -57,5 +60,20 @@ jobs:
           git commit -m "Draft blog post: $TITLE"
           git push origin "$branch"
           gh pr create --base main --head "$branch" \
-            --title "Blog draft: $TITLE" \
-            --body "Automatic draft for review. Read it, check any product links, then merge to publish. Merging also updates the blog index and sitemap automatically. Close the PR to discard it."
+            --title "Blog post: $TITLE" \
+            --body "Automatic post, merged automatically. To undo, revert the merge commit."
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Merge the pull request automatically
+        if: steps.draft.outputs.written == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr merge "${{ steps.pr.outputs.branch }}" --squash --delete-branch
+
+      # A merge made with the built-in token does not start the other workflows,
+      # so start the blog index and sitemap rebuild by hand.
+      - name: Rebuild blog index and sitemap
+        if: steps.draft.outputs.written == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run blog-build.yml --ref main
