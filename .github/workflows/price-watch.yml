@@ -1,17 +1,18 @@
-# Stermont Arcade - weekly price watch. Compares your prices with Jumia and Kilimall and opens a GitHub Issue (GitHub emails you)
-# when something is clearly above market or a source could not be read.
-# Runs every Monday 08:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
-# By default it is READ-ONLY. To actually lower the trusted over-market prices, run it by hand and tick "apply"
-# (needs the SUPABASE_SERVICE_KEY repository secret). Settings live in price-watch.config.json.
-name: Weekly price watch
+# Stermont Arcade - price watch. Compares your prices with Jumia, Kilimall, Agroduka and ImagineCare, then fixes the ones that are
+# clearly out of line: cuts prices that are well above the market and raises prices that are well under it (the safety limits are
+# in price-watch.config.json). It opens a GitHub Issue (GitHub emails you) listing what changed or what could not be read.
+# Runs every Monday and Thursday 08:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
+# Changing prices needs the SUPABASE_SERVICE_KEY repository secret; without it the run is report-only.
+# Tick "report only" on a manual run to look without changing anything.
+name: Price watch
 
 on:
   schedule:
-    - cron: '0 5 * * 1'
+    - cron: '0 5 * * 1,4'
   workflow_dispatch:
     inputs:
-      apply:
-        description: 'Apply the trusted price cuts (otherwise report only)'
+      report_only:
+        description: 'Report only - do not change any prices'
         type: boolean
         default: false
 
@@ -19,10 +20,14 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: price-watch
+  cancel-in-progress: false
+
 jobs:
   watch:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -33,7 +38,7 @@ jobs:
       - name: Check prices
         id: rep
         env:
-          APPLY: ${{ inputs.apply && '1' || '0' }}
+          APPLY: ${{ inputs.report_only && '0' || '' }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: node price-watch.mjs > price-watch.md
       - uses: actions/upload-artifact@v4
