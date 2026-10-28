@@ -7,6 +7,7 @@ const issues = {};   // problem -> [pages]
 const add = (what, page) => (issues[what] = issues[what] || []).push(page);
 const files = d => (existsSync(d) ? readdirSync(d).filter(f => f.endsWith('.html')).map(f => `${d}/${f}`) : []);
 const pages = [...files('p'), ...files('c'), ...files('blog'), 'products.html', 'index.html'].filter(existsSync);
+const unesc = t => String(t).replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');   // measure what Google sees, not the escaped HTML
 const exists = path => { path = decodeURIComponent(path.split('#')[0].split('?')[0]); if (!path || path === '/') path = '/index.html'; if (path.endsWith('/')) path += 'index.html'; return existsSync('.' + path); };
 let redirects = 0, checked = 0;
 
@@ -14,8 +15,8 @@ for (const f of pages) {
   const h = readFileSync(f, 'utf8');
   if (/http-equiv="refresh"/i.test(h)) { redirects++; continue; }   // size-variant redirect pages
   checked++;
-  const title = (h.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || '';
-  const dm = h.match(/<meta name=["']description["'] content=(?:"([^"]*)"|'([^']*)')/i), desc = dm ? (dm[1] || dm[2] || '') : '';   // blog posts use single quotes, product pages double
+  const title = unesc((h.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || '');
+  const dm = h.match(/<meta name=["']description["'] content=(?:"([^"]*)"|'([^']*)')/i), desc = dm ? unesc(dm[1] || dm[2] || '') : '';   // blog posts use single quotes, product pages double
   if (!title.trim()) add('Missing page title', f); else if (title.length > 75) add('Title longer than 75 characters (Google cuts it off)', f);
   if (!desc.trim()) add('Missing meta description', f); else if (desc.length < 70) add('Meta description under 70 characters', f); else if (desc.length > 165) add('Meta description over 165 characters', f);
   if (!/<link rel=["']canonical["']/i.test(h)) add('Missing canonical link', f);

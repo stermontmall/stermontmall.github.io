@@ -106,7 +106,7 @@ for (const p of rows) {
       stock: g.reduce((n, x) => n + (Number(x.stock) || 0), 0),
       images: [...new Set(g.flatMap(x => x.images || []).filter(Boolean))], description: g.map(x => x.description).find(Boolean) || '' });
     g.slice(1).forEach(x => aliases.push({ id: x.id, to: top.id }));
-  } else products.push(g ? { ...p, name: `${p.name} \u2013 ${p.variant_label}` } : p);
+  } else products.push(g && !p.name.toLowerCase().endsWith(String(p.variant_label).toLowerCase()) ? { ...p, name: `${p.name} \u2013 ${p.variant_label}` } : p);   // skip a label the name already ends with (e.g. "... Set \u2013 Set")
 }
 // Retired duplicate listings: their old URLs forward to the product we kept (so links and Google results keep working).
 const DUPES = {
