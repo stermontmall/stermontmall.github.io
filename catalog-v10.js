@@ -1,16 +1,9 @@
-/* Stermont Arcade · Catalog, Restock & Ledger module. Mount: STMCatalog.mount(containerEl) */
+/* Stermont Arcade · Catalog, Restock & Sales ledger module. Mount: STMCatalog.mount(containerEl)
+   No cost (COGS) or profit is shown or entered here. The selling price is typed by hand; Price Watch may update it later. */
 (function () {
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
   var S = { cats: [], prods: [], st: {}, cat: 'all', q: '', range: 'all' }, root, D = document, view = function () { render(); };
   var LIME = '#84cc16';
-  /* ---------- AUTO PRICING: change these 3 numbers to change pricing everywhere ---------- */
-  var PROFIT_PCT = 25, MIN_PROFIT = 0, ROUND_TO = 1;
-  /* selling price = cost / (1 - 25%), so the cost (COGS) is always 25% below the selling price; rounded UP to the next whole KSh */
-  function autoPrice(cost) {
-    cost = Number(cost); if (!(cost > 0)) return 0;
-    var target = Math.max(cost / (1 - PROFIT_PCT / 100), cost + MIN_PROFIT);
-    return Math.ceil(target / ROUND_TO - 1e-6) * ROUND_TO;
-  }
   /* crossed-out (previous) price: shows a discount between OLD_MIN% and OLD_MAX% (a random whole % per item unless pct is given),
      rounded UP to the next KSh 10; on cheap items it falls back to whole shillings so the discount never leaves the 6-16% range */
   var OLD_MIN = 6, OLD_MAX = 16;
@@ -108,11 +101,11 @@
   }
   function logsCall() {
     var b = bounds(), f = b ? '&created_at=gte.' + encodeURIComponent(b[0].toISOString()) : '';
-    return call('/rest/v1/loss_logs?select=product_id,reason,loss,qty,note,created_at' + f + '&order=created_at.desc&limit=2000').catch(function () { return []; });
+    return call('/rest/v1/loss_logs?select=product_id,reason,qty,note,created_at' + f + '&order=created_at.desc&limit=2000').catch(function () { return []; });
   }
   function restCall() {
     var b = bounds(), f = b ? '&created_at=gte.' + encodeURIComponent(b[0].toISOString()) : '';
-    return call('/rest/v1/stock_restocks?select=product_id,qty,unit_cost,supplier,created_at' + f + '&order=created_at.desc&limit=2000').catch(function () { return []; });
+    return call('/rest/v1/stock_restocks?select=product_id,qty,supplier,created_at' + f + '&order=created_at.desc&limit=2000').catch(function () { return []; });
   }
   function load() {
     S.warn = '';
@@ -132,7 +125,7 @@
     });
     return { n: n, value: v };
   }
-  function stat(p) { var s = S.st[p.id] || {}; var sales = +s.sales || 0, cogs = +s.cogs || 0; return { sold: +s.sold || 0, sales: sales, cogs: cogs, profit: sales - cogs, loss: +s.loss || 0 }; }
+  function stat(p) { var s = S.st[p.id] || {}; return { sold: +s.sold || 0, sales: +s.sales || 0 }; }
   var ICONS = { agrovet: '🌾', 'phones-tablets': '📱', 'tvs-audio': '📺', appliances: '🧺', fashion: '👕', 'home-office': '🛋️', computing: '💻', supermarket: '🛒', 'health-beauty': '💄', gaming: '🎮', 'baby-products': '🍼', shoes: '👟', bags: '🎒', 'watches-jewellery': '⌚', automotive: '🚗', 'music-audio': '🎸', 'phone-accessories': '🔌', 'cameras-photography': '📷', 'printers-office-machines': '🖨️', 'networking-smart-home': '📡', 'security-cctv': '📹', 'solar-power': '☀️', 'electrical-lighting': '💡', 'kitchen-dining': '🍳', 'furniture': '🪑', 'bedding-decor': '🛏️', 'cleaning-laundry': '🧼', 'garden-outdoors': '🌳', 'building-hardware': '🧱', 'tools-machinery': '🔧', 'pest-control-fumigation': '🐛', 'bed-bug-killers': '🪲', 'cockroach-ant-killers': '🪳', 'mosquito-fly-control': '🦟', 'rodent-control': '🐀', 'termite-control': '🐜', 'fumigation-chemicals': '💨', 'sprayers-equipment': '🧴', 'animal-feeds': '🐄', 'veterinary-drugs': '💉', 'seeds-seedlings': '🌱', 'fertilizers': '🌿', 'agrochemicals': '⚗️', 'poultry-dairy-equipment': '🐔', 'water-tanks-irrigation': '💧', 'beekeeping': '🐝', 'fish-farming': '🐟', 'protective-wear-safety': '🧤', 'mens-fashion': '👔', 'womens-fashion': '👗', 'kids-fashion': '🧒', 'wedding-events': '🎉', 'gifts-printing': '🎁', 'toys-games': '🧸', 'sporting-goods-fitness': '🏋️', 'books-stationery': '📚', 'school-office-supplies': '✏️', 'pet-supplies': '🐾', 'medical-supplies': '🩺', 'car-accessories-parts': '🚘', 'motorcycle-accessories': '🏍️', 'packaging-shop-supplies': '🏷️' };
   var UNITS = [['Weight', ['g', 'kg', 'tonne']], ['Volume', ['ml', 'litre']], ['Count', ['piece', 'pair', 'dozen', 'set', 'bundle']],
     ['Packaging', ['pack', 'bag', '50 kg bag', 'bottle', 'carton', 'box', 'crate', 'sachet', 'tin']], ['Length', ['metre', 'roll']]];
@@ -187,7 +180,6 @@
   /* ---------- Add / Edit item ---------- */
   function itemForm(p, from) {
     var edit = !!p, tpl = !edit && from ? from : null;
-    function priceFor(c) { return edit && Number(c) === Number(p.cost) ? Number(p.price) : autoPrice(c); }
     var imgs = edit ? (p.images || []).slice() : (tpl ? (tpl.images || []).slice() : []);
     var opts = S.cats.map(function (c) { return '<option value="' + c.id + '"' + (edit && p.category_id === c.id ? ' selected' : '') + '>' + (ICONS[c.slug] ? ICONS[c.slug] + ' ' : '') + esc(c.name) + '</option>'; }).join('');
     var curU = edit && p.unit ? String(p.unit) : '', knownU = UNITS.some(function (g) { return g[1].indexOf(curU) > -1; });
@@ -198,20 +190,17 @@
       '<div class="meta">Customers see it next to the price, e.g. "Per kg" or "Per litre".</div>';
     var packHtml = (tpl && !tpl.variant_label ? '<div class="cx-pr" style="margin-top:.6rem"><div class="cx-pt">\ud83d\udce6 Pack size of the existing item</div><input class="cx-f" id="cx-vl0" maxlength="30" placeholder="e.g. 1 Litre"><div class="meta">The item you are copying (' + esc(tpl.name) + ') has no pack size yet. Type its size so buyers can choose between the two.</div></div>' : '') +
       '<div class="cx-pr" style="margin-top:.6rem"><div class="cx-pt">\ud83d\udce6 Pack size (what buyers choose)</div><input class="cx-f" id="cx-vl" maxlength="30" placeholder="e.g. 1 Litre, 250 mL, 50 kg bag" value="' + esc(edit && p.variant_label ? p.variant_label : '') + '">' +
-      '<div class="meta">Leave empty if this item has only one size. To sell the same product in other sizes, save it, then tap <b>\uff0b Pack size</b> on its card. Each size has its own price, cost and stock below.</div></div>';
+      '<div class="meta">Leave empty if this item has only one size. To sell the same product in other sizes, save it, then tap <b>\uff0b Pack size</b> on its card. Each size has its own price and stock below.</div></div>';
     var body = '<label>Category</label><select class="cx-f" id="cx-cat">' + opts + '<option value="__new">＋ Create new category…</option></select>' +
       '<input class="cx-f" id="cx-newcat" placeholder="New category name" hidden style="margin-top:.4rem">' +
       '<label>Item name</label><input class="cx-f" id="cx-name" maxlength="120" value="' + esc(edit ? (p.base || p.name) : '') + '">' + packHtml +
       '<label>Description (shown on the product page)</label><textarea class="cx-f" id="cx-desc" rows="9" maxlength="4000" placeholder="One point per line.\nPut a section title on its own line, e.g.\nKey Features\nSpecifications\nBrand: Hisense\nWhat is in the box?">' + esc(edit ? p.description || '' : '') + '</textarea>' +
-      unitHtml + '<div class="cx-pr"><div class="cx-pt">🏷️ Pricing (automatic)</div>' +
-      '<label>Cost price per unit · COGS (KSh) *</label><input class="cx-f" id="cx-cost" type="number" min="0" inputmode="decimal" placeholder="Type the cost only" value="' + (edit ? p.cost : '') + '">' +
-      '<div class="cx-pvc" id="cx-auto" style="margin-top:.5rem"></div>' +
-      '<label style="display:flex;gap:.5rem;align-items:center;font-weight:500;font-size:.85rem"><input type="checkbox" id="cx-man"> Set the selling price by hand (special cases only)</label>' +
+      unitHtml + '<div class="cx-pr"><div class="cx-pt">🏷️ Pricing</div>' +
       '<div class="cx-r3">' +
       '<div><label>Previous price</label><input class="cx-f" id="cx-old" type="number" min="0" inputmode="decimal" placeholder="optional" value="' + (edit && p.old_price ? p.old_price : '') + '"></div>' +
-      '<div><label>Selling price (auto)</label><input class="cx-f" id="cx-price" type="number" min="0" inputmode="decimal" readonly value="' + (edit ? p.price : '') + '"></div>' +
+      '<div><label>Selling price *</label><input class="cx-f" id="cx-price" type="number" min="0" inputmode="decimal" placeholder="Type the price" value="' + (edit ? p.price : '') + '"></div>' +
       '<div><label>Discount %</label><input class="cx-f" id="cx-pct" type="number" min="0" max="95" step="any" inputmode="decimal" placeholder="auto"></div></div>' +
-      '<div class="meta" style="margin:.4rem 0 0">Fill any two and the third is worked out for you. Customers see the old price crossed out, the new price and the % off.</div>' +
+      '<div class="meta" style="margin:.4rem 0 0">Type the selling price yourself. Price Watch may update it later to follow market prices. Fill any two boxes and the third is worked out for you. Customers see the old price crossed out, the new price and the % off.</div>' +
       '<div class="cx-quick" id="cx-quick"></div><div class="cx-pvc" id="cx-pvc"></div></div>' +
       '<div class="cx-r">' +
       '<div><label>' + (edit ? 'Pieces in stock' : 'Initial pieces') + '</label><input class="cx-f" id="cx-stock" type="number" min="0" inputmode="numeric" value="' + (edit ? p.stock : '') + '"></div>' +
@@ -220,18 +209,18 @@
       '<label>Photos</label><input type="file" id="cx-file" accept="image/*" multiple><div class="cx-th" id="cx-th"></div><div class="meta" id="cx-up"></div>';
     modal(edit ? 'Edit item' : 'Add new item', body, edit ? 'Save changes' : 'Publish to website', function () {
       if ($('cx-up').textContent) throw new Error('Wait for photos to finish uploading');
-      var name = v('cx-name').trim(), cost = num('cx-cost'), manual = $('cx-man').checked, price = manual ? num('cx-price') : priceFor(cost), stock = edit ? (v('cx-stock') === '' ? NaN : parseInt(v('cx-stock'), 10)) : parseInt(v('cx-stock') || 0, 10);
-      if (!name) throw new Error('Enter an item name'); if (!manual && !(cost > 0)) throw new Error('Enter the cost price and the selling price will be worked out for you'); if (!(price >= 0) || (manual && v('cx-price') === '')) throw new Error('Enter the selling price');
+      var name = v('cx-name').trim(), price = num('cx-price'), stock = edit ? (v('cx-stock') === '' ? NaN : parseInt(v('cx-stock'), 10)) : parseInt(v('cx-stock') || 0, 10);
+      if (!name) throw new Error('Enter an item name'); if (v('cx-price') === '' || !(price > 0)) throw new Error('Enter the selling price');
       var vl = v('cx-vl').trim(), vl0 = tpl && !tpl.variant_label ? v('cx-vl0').trim() : ''; if (tpl && !vl) throw new Error('Type the pack size for this new item, e.g. 250 mL'); if (tpl && !tpl.variant_label && !vl0) throw new Error('Type the pack size of the existing item too');
       var unit = v('cx-unit') === '__custom' ? v('cx-unitc').trim() : v('cx-unit'); if (v('cx-unit') === '__custom' && !unit) throw new Error('Type the custom unit, or choose one from the list');
       var oldP = v('cx-old') === '' ? null : num('cx-old'); if (oldP != null && !(oldP > price)) throw new Error('Previous price must be higher than the current price (or leave it empty)');
-      if (!(cost >= 0) || v('cx-cost') === '') throw new Error('Enter the cost price'); if (!(stock >= 0)) throw new Error('Enter pieces in stock');
+      if (!(stock >= 0)) throw new Error('Enter pieces in stock');
       var catP = v('cx-cat') === '__new' ? (function () {
         var cn = v('cx-newcat').trim(); if (!cn) throw new Error('Enter the new category name');
         return call('/rest/v1/categories?on_conflict=slug', { m: 'POST', h: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: { name: cn, slug: slug(cn) } }).then(function (r) { return r[0].id; });
       })() : Promise.resolve(parseInt(v('cx-cat'), 10));
       return catP.then(function (cid) {
-        var row = { category_id: cid, name: name, price: price, cost: cost, low_at: parseInt(v('cx-low') || 5, 10), featured: $('cx-feat').checked, images: imgs };
+        var row = { category_id: cid, name: name, price: price, low_at: parseInt(v('cx-low') || 5, 10), featured: $('cx-feat').checked, images: imgs };
         if (oldP != null || (edit && p.old_price != null)) row.old_price = oldP;
         if (unit || (edit && p.unit)) row.unit = unit || null;
         var grp = tpl ? (tpl.variant_group || slug(tpl.base || tpl.name)) : (edit && p.variant_group) || slug(name);
@@ -240,7 +229,7 @@
         if (edit && stock !== p.stock) row.stock = stock;
         if (edit) return call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: row });
         var id = slug(name + (vl ? ' ' + vl : '')) || 'item', n = 2, base = id; while (S.prods.some(function (x) { return x.id === id; })) id = base + '-' + n++;
-        row.id = id; row.stock = stock;
+        row.id = id; row.stock = stock; row.cost = 0;   /* cost is no longer tracked in the admin */
         var first = tpl && !tpl.variant_label ? call('/rest/v1/products?id=eq.' + encodeURIComponent(tpl.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { variant_label: vl0, variant_group: grp } }) : Promise.resolve();
         return first.then(function () { return call('/rest/v1/products', { m: 'POST', h: { Prefer: 'return=minimal' }, body: row }); });
       }).catch(function (e) {
@@ -260,7 +249,7 @@
       function pctOf(o, n) { return Math.round((o - n) / o * 1000) / 10; }
       function paint() {
         var o = fv(eo), n = fv(ep), h = '';
-        if (!n && !o) h = '<span class="meta">Enter the current price to preview how customers will see it.</span>';
+        if (!n && !o) h = '<span class="meta">Enter the selling price to preview how customers will see it.</span>';
         else if (o && n && o <= n) h = '<span class="bad">Previous price must be higher than the current price.</span>';
         else if (o && n) h = '<span class="cx-bd">-' + Math.max(1, Math.round((o - n) / o * 100)) + '%</span> <s>' + money(o) + '</s> <b>' + money(n) + '</b><div class="meta">Customers save ' + money(o - n) + '</div>';
         else if (n) h = '<b>' + money(n) + '</b><div class="meta">No discount shown. Add a previous price or a discount %.</div>';
@@ -275,30 +264,14 @@
       }
       function fromPct(d) {
         d = parseFloat(d); if (!(d > 0) || d >= 100) { paint(); return; }
-        var o = fv(eo), n = fv(ep);
+        var n = fv(ep);
         if (n) eo.value = Math.round(n / (1 - d / 100));
         paint();
       }
-      var ec = c.querySelector('#cx-cost'), em = c.querySelector('#cx-man'), ea = c.querySelector('#cx-auto');
-      if (edit && p.cost > 0 && Math.abs(Number(p.price) - autoPrice(p.cost)) > 1) {
-        em.checked = true;
-      }
-      function auto() {
-        var cs = parseFloat(ec.value), np = em.checked ? 0 : priceFor(cs);
-        ep.readOnly = !em.checked;
-        if (!em.checked) { ep.value = np || ''; }
-        var pr = parseFloat(ep.value), pf = pr - cs;
-        ea.innerHTML = cs > 0 && pr > 0 ? 'Cost <b>' + money(cs) + '</b> \u2192 Selling price <b>' + money(pr) + '</b><div class="meta">Profit ' + money(pf) + ' (' + Math.round(pf / cs * 100) + '% on cost)</div>'
-          : '<span class="meta">Type the cost price. The selling price is worked out automatically (the cost is ' + PROFIT_PCT + '% below the selling price).</span>';
-        onPrices();
-      }
-      ec.oninput = auto; em.onchange = function () { auto(); if (em.checked) ep.focus(); };
-      ep.onfocus = function () { if (!em.checked) { em.checked = true; auto(); } };
-      ep.oninput = function () { if (!em.checked) { em.checked = true; } auto(); };
-      eo.oninput = onPrices; eq.oninput = function () { fromPct(eq.value); };
+      ep.oninput = onPrices; eo.oninput = onPrices; eq.oninput = function () { fromPct(eq.value); };
       [5, 10, 15, 20, 25, 30, 40, 50].forEach(function (d) { var b = el('button', 'cx-chip', d + '% off'); b.type = 'button'; b.onclick = function () { eq.value = d; fromPct(d); }; qk.appendChild(b); });
       var nd = el('button', 'cx-chip alt', 'No discount'); nd.type = 'button'; nd.onclick = function () { eo.value = ''; eq.value = ''; paint(); }; qk.appendChild(nd);
-      auto();
+      onPrices();
       var us = c.querySelector('#cx-unit'), uc = c.querySelector('#cx-unitc'); us.onchange = function () { uc.hidden = us.value !== '__custom'; if (!uc.hidden) uc.focus(); };
       var sel = c.querySelector('#cx-cat'), th = c.querySelector('#cx-th');
       if (!S.cats.length) { sel.value = '__new'; } sel.onchange = function () { c.querySelector('#cx-newcat').hidden = sel.value !== '__new'; }; sel.onchange();
@@ -318,44 +291,37 @@
   /* ---------- Restock ---------- */
   function restockForm(p) {
     var today = new Date().toISOString().slice(0, 10);
-    var body = '<p class="meta"><b>' + esc(p.name) + '</b> · ' + p.stock + ' in stock at ' + money(p.cost) + ' each</p>' +
-      '<div class="cx-r"><div><label>+ Pieces</label><input class="cx-f" id="cx-pcs" type="number" min="1" inputmode="numeric"></div>' +
-      '<div><label>Cost per unit (KSh)</label><input class="cx-f" id="cx-c" type="number" min="0" inputmode="decimal" value="' + p.cost + '"></div></div>' +
+    var body = '<p class="meta"><b>' + esc(p.name) + '</b> · ' + p.stock + ' in stock</p>' +
+      '<label>+ Pieces</label><input class="cx-f" id="cx-pcs" type="number" min="1" inputmode="numeric">' +
       '<label>Supplier</label><input class="cx-f" id="cx-s" maxlength="100"><label>Restock date</label><input class="cx-f" id="cx-d" type="date" value="' + today + '">' +
-      '<div class="cx-pv" id="cx-pv">Enter pieces to preview new stock and average cost.</div>';
-    modal('Restock item <small style="font-weight:400;color:#6b6785">· v9</small>', body, 'Save restock', function () {
-      var q = parseInt(v('cx-pcs'), 10), c = num('cx-c'); if (!(q > 0)) throw new Error('Enter pieces to add'); if (!(c >= 0)) throw new Error('Enter the unit cost');
-      return call('/rest/v1/rpc/restock_product', { m: 'POST', body: { p_id: p.id, p_qty: q, p_cost: c, p_supplier: v('cx-s').trim() || null, p_date: v('cx-d') || null } })
-        .then(function () { return call('/rest/v1/products?select=id,cost,price,old_price&id=eq.' + encodeURIComponent(p.id)); })
-        .then(function (r) {
-          var x = r && r[0]; if (!x || Number(x.old_price) > Number(x.price)) return;   /* leave discounted items alone */
-          var np = autoPrice(x.cost); if (np && np !== Number(x.price)) return call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { price: np } });
-        }).catch(function () {});
+      '<div class="cx-pv" id="cx-pv">Enter pieces to preview the new stock.</div>';
+    modal('Restock item', body, 'Save restock', function () {
+      var q = parseInt(v('cx-pcs'), 10); if (!(q > 0)) throw new Error('Enter pieces to add');
+      /* the stored cost is passed through unchanged; prices are never touched by a restock */
+      return call('/rest/v1/rpc/restock_product', { m: 'POST', body: { p_id: p.id, p_qty: q, p_cost: Number(p.cost) || 0, p_supplier: v('cx-s').trim() || null, p_date: v('cx-d') || null } });
     }, function () {
-      function pv() { var q = parseInt(v('cx-pcs'), 10) || 0, c = num('cx-c') || 0; if (q < 1) return;
-        var avg = (p.stock * p.cost + q * c) / (p.stock + q); $('cx-pv').innerHTML = 'New stock: <b>' + (p.stock + q) + '</b> pcs · Average cost: <b>' + money(avg) + '</b> · Outlay: <b>' + money(q * c) + '</b>'; }
-      $('cx-pcs').oninput = $('cx-c').oninput = pv;
+      $('cx-pcs').oninput = function () { var q = parseInt(v('cx-pcs'), 10) || 0; if (q < 1) return; $('cx-pv').innerHTML = 'New stock: <b>' + (p.stock + q) + '</b> pcs'; };
     });
   }
 
-  /* ---------- Loss / write-off ---------- */
+  /* ---------- Loss / write-off (stock only) ---------- */
   function lossForm(p) {
-    var body = '<p class="meta"><b>' + esc(p.name) + '</b> · ' + p.stock + ' in stock at ' + money(p.cost) + ' each</p>' +
+    var body = '<p class="meta"><b>' + esc(p.name) + '</b> · ' + p.stock + ' in stock</p>' +
       '<div class="cx-r"><div><label>Pieces lost</label><input class="cx-f" id="cx-pcs" type="number" min="1" max="' + p.stock + '" inputmode="numeric"></div>' +
       '<div><label>Reason</label><select class="cx-f" id="cx-r"><option>Damaged</option><option>Transit loss</option><option>Returned</option><option>Expired</option><option>Other</option></select></div></div>' +
-      '<label>Note (optional)</label><input class="cx-f" id="cx-n" maxlength="200"><div class="cx-pv" id="cx-pv">Loss = pieces × cost</div>';
+      '<label>Note (optional)</label><input class="cx-f" id="cx-n" maxlength="200"><div class="cx-pv" id="cx-pv">Pieces are taken off the stock count.</div>';
     modal('Log loss / write-off', body, 'Log loss', function () {
       var q = parseInt(v('cx-pcs'), 10); if (!(q > 0)) throw new Error('Enter pieces lost'); if (q > p.stock) throw new Error('Only ' + p.stock + ' in stock');
       return call('/rest/v1/rpc/record_loss', { m: 'POST', body: { p_id: p.id, p_qty: q, p_reason: v('cx-r'), p_note: v('cx-n').trim() || null } });
-    }, function () { $('cx-pcs').oninput = function () { var q = parseInt(v('cx-pcs'), 10) || 0; $('cx-pv').innerHTML = 'Write-off cost: <b>' + money(q * p.cost) + '</b>'; }; });
+    }, function () { $('cx-pcs').oninput = function () { var q = parseInt(v('cx-pcs'), 10) || 0; if (q > 0) $('cx-pv').innerHTML = 'Stock after: <b>' + Math.max(0, p.stock - q) + '</b> pcs'; }; });
   }
 
   /* ---------- Restock & loss history ---------- */
   function history(p) {
     Promise.all([call('/rest/v1/stock_restocks?select=*&product_id=eq.' + encodeURIComponent(p.id) + '&order=created_at.desc&limit=25'),
                  call('/rest/v1/loss_logs?select=*&product_id=eq.' + encodeURIComponent(p.id) + '&order=created_at.desc&limit=25')]).then(function (r) {
-      var ev = r[0].map(function (x) { return { t: x.created_at, h: '<b style="color:var(--ok)">+' + x.qty + ' pcs</b> @ ' + money(x.unit_cost) + (x.supplier ? ' · ' + esc(x.supplier) : '') + '<small> · avg cost was ' + money(x.cost_before) + '</small>' }; })
-        .concat(r[1].map(function (x) { return { t: x.created_at, h: '<b style="color:var(--no)">−' + x.qty + ' pcs</b> ' + esc(x.reason) + ' · ' + money(x.loss) + (x.note ? '<small> · ' + esc(x.note) + '</small>' : '') }; }))
+      var ev = r[0].map(function (x) { return { t: x.created_at, h: '<b style="color:var(--ok)">+' + x.qty + ' pcs</b>' + (x.supplier ? ' · ' + esc(x.supplier) : '') }; })
+        .concat(r[1].map(function (x) { return { t: x.created_at, h: '<b style="color:var(--no)">−' + x.qty + ' pcs</b> ' + esc(x.reason) + (x.note ? '<small> · ' + esc(x.note) + '</small>' : '') }; }))
         .sort(function (a, b) { return a.t < b.t ? 1 : -1; });
       var html = '<p class="meta"><b>' + esc(p.name) + '</b></p>' + (ev.length ? '<div class="tl">' + ev.map(function (e) { return '<div class="st" style="color:var(--tx)">' + e.h + '<small>' + new Date(e.t).toLocaleString('en-KE') + '</small></div>'; }).join('') + '</div>' : '<div class="empty">No restocks or write-offs yet.</div>');
       modal('Stock history', html, 'Close', function () {});
@@ -364,25 +330,8 @@
 
   /* ---------- render ---------- */
   function totals(list) {
-    return list.reduce(function (a, p) { var s = stat(p); a.stock += p.stock; a.sold += s.sold; a.sales += s.sales; a.cogs += s.cogs; a.profit += s.profit; a.loss += s.loss; a.value += p.stock * p.cost; return a; }, { stock: 0, sold: 0, sales: 0, cogs: 0, profit: 0, loss: 0, value: 0 });
+    return list.reduce(function (a, p) { var s = stat(p); a.stock += p.stock; a.sold += s.sold; a.sales += s.sales; return a; }, { stock: 0, sold: 0, sales: 0 });
   }
-  function plBox(T, X) {
-    var by = {}, rets = 0;
-    (S.logs || []).forEach(function (l) { var k = l.reason || 'Other'; by[k] = by[k] || { q: 0, v: 0 }; by[k].q += +l.qty || 0; by[k].v += +l.loss || 0; });
-    var rows = Object.keys(by).sort().map(function (k) { return '<tr><td>&nbsp;&nbsp;' + esc(k) + (k === 'Returned' ? ' (returns)' : '') + ' · ' + by[k].q + ' pcs</td><td class="neg">−' + money(by[k].v) + '</td></tr>'; }).join('');
-    var net = T.profit - T.loss;
-    return '<details class="cx-pl" open><summary>Profit &amp; loss breakdown</summary><table class="cx-t">' +
-      '<tr><td>Total sales</td><td>' + money(T.sales) + '</td></tr>' +
-      '<tr><td>− Cost of goods sold (COGS)</td><td class="neg">−' + money(T.cogs) + '</td></tr>' +
-      '<tr class="sub"><td>= Total profit</td><td>' + money(T.profit) + '</td></tr>' +
-      '<tr><td>Losses logged:</td><td></td></tr>' + (rows || '<tr><td>&nbsp;&nbsp;None</td><td>' + money(0) + '</td></tr>') +
-      '<tr class="sub"><td>= Total loss (write-offs &amp; returns)</td><td class="neg">−' + money(T.loss) + '</td></tr>' +
-      '<tr class="tot"><td>NET PROFIT</td><td>' + money(net) + '</td></tr>' +
-      '<tr><td>Cancelled / declined orders · ' + X.n + '</td><td class="neg">' + money(X.value) + '</td></tr>' +
-      '<tr class="sub"><td>Total loss incl. cancelled orders</td><td class="neg">−' + money(T.loss + X.value) + '</td></tr></table>' +
-      '<p class="meta" style="margin:.4rem .2rem">Cancelled or declined orders were never counted as sales, so they are shown as lost sales and are not deducted from profit. Log returned goods with <b>Log loss → Returned</b> so they count as a loss.</p></details>';
-  }
-  function neg(n) { return n < 0 ? ' class="neg"' : ''; }
   /* ---------- Dashboard insights + CSV backup (read-only; nothing here writes to the database) ---------- */
   function insights(all) {
     var per = S.range === 'all' ? 'all time' : RANGES.filter(function (r) { return r[0] === S.range; })[0][1].toLowerCase();
@@ -391,19 +340,16 @@
         (rows.length ? rows.join('') : '<tr><td>' + empty + '</td><td></td></tr>') + '</table></details>';
     }
     function r2(a, b) { return '<tr><td>' + esc(a) + '</td><td>' + b + '</td></tr>'; }
-    var best = all.filter(function (p) { return stat(p).sold > 0; }).sort(function (a, b) { return stat(b).profit - stat(a).profit; }).slice(0, 5)
-      .map(function (p) { var s = stat(p); return r2(p.name + ' · ' + s.sold + ' sold', money(s.profit)); });
-    var idle = all.filter(function (p) { return p.active && p.stock > 0 && stat(p).sold === 0; }).sort(function (a, b) { return b.stock * b.cost - a.stock * a.cost; }).slice(0, 5)
-      .map(function (p) { return r2(p.name + ' · ' + p.stock + ' pcs', money(p.stock * p.cost)); });
+    var best = all.filter(function (p) { return stat(p).sold > 0; }).sort(function (a, b) { return stat(b).sales - stat(a).sales; }).slice(0, 5)
+      .map(function (p) { var s = stat(p); return r2(p.name + ' · ' + s.sold + ' sold', money(s.sales)); });
+    var idle = all.filter(function (p) { return p.active && p.stock > 0 && stat(p).sold === 0; }).sort(function (a, b) { return b.stock - a.stock; }).slice(0, 5)
+      .map(function (p) { return r2(p.name, p.stock + ' pcs'); });
     var need = all.filter(function (p) { return p.active && p.stock < p.low_at; }).sort(function (a, b) { return stat(b).sold - stat(a).sold; }).slice(0, 5)
       .map(function (p) { return r2(p.name + ' · ' + p.stock + ' left', stat(p).sold + ' sold'); });
-    var thin = all.filter(function (p) { return p.active && p.price && (p.price - p.cost) / p.price < 0.15; }).slice(0, 5)
-      .map(function (p) { return r2(p.name, Math.round((p.price - p.cost) / p.price * 100) + '% margin'); });
     return '<h3 style="margin:.9rem 0 .3rem;font-size:1.05rem">📊 Insights (' + esc(per) + ')</h3>' +
-      tbl('🏆 Best sellers · profit', best, 'No sales yet in this period.') +
+      tbl('🏆 Best sellers · sales', best, 'No sales yet in this period.') +
       tbl('🛒 Restock now · sold', need, 'Nothing is low on stock.') +
-      tbl('💤 Not selling · money tied up in stock', idle, 'Every item in stock has sold.') +
-      tbl('⚠ Thin margin (under 15%)', thin, 'All margins look healthy.');
+      tbl('💤 Not selling · pieces in stock', idle, 'Every item in stock has sold.');
   }
   function csvCell(x) {
     var t = x == null ? '' : String(x);
@@ -411,12 +357,12 @@
     return /[",\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
   }
   function exportCsv(all) {
-    var head = ['Item', 'Category', 'Pack size', 'Price', 'Cost', 'Margin %', 'Stock', 'Low-stock alert', 'Visible', 'Advert', 'Sold', 'Sales', 'COGS', 'Profit', 'Loss', 'Stock value', 'Description'];
+    var head = ['Item', 'Category', 'Pack size', 'Price', 'Stock', 'Low-stock alert', 'Visible', 'Advert', 'Sold', 'Sales', 'Description'];
     var lines = [head.map(csvCell).join(',')];
     all.forEach(function (p) {
       var s = stat(p);
-      lines.push([p.base || p.name, catName(p.category_id), p.variant_label || '', p.price, p.cost, p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0, p.stock, p.low_at,
-        p.active ? 'yes' : 'no', p.featured ? 'yes' : 'no', s.sold, s.sales, s.cogs, s.profit, s.loss, p.stock * p.cost, p.description || ''].map(csvCell).join(','));
+      lines.push([p.base || p.name, catName(p.category_id), p.variant_label || '', p.price, p.stock, p.low_at,
+        p.active ? 'yes' : 'no', p.featured ? 'yes' : 'no', s.sold, s.sales, p.description || ''].map(csvCell).join(','));
     });
     var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
     var a = D.createElement('a'), d = new Date(), pad = function (n) { return (n < 10 ? '0' : '') + n; };
@@ -426,61 +372,33 @@
   }
   function render() {
     var all = S.prods, T = totals(all), X = cancelled(), rl = S.range === 'all' ? '' : ' · ' + RANGES.filter(function (r) { return r[0] === S.range; })[0][1].toUpperCase(), low = all.filter(function (p) { return p.active && p.stock < p.low_at; });
-    var q = S.q.trim().toLowerCase();
-    var shown = all.filter(function (p) { return inCat(p, S.cat) && (!q || matches(p, q)); });
     root.innerHTML = '<div class="err" id="cx-err" hidden></div>' +
       '<div id="cx-sbar" style="position:sticky;top:0;z-index:5;background:var(--bg,#f6f4fb);padding:.4rem 0 .5rem;display:flex;gap:.4rem"><input id="cx-q" type="search" autocomplete="off" placeholder="Search items by name, category, price…" value="' + esc(S.q) + '" style="flex:1;min-width:0;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit"><button class="btn alt sm" id="cx-qx" type="button" aria-label="Clear search"' + (S.q ? '' : ' hidden') + '>✕</button><button class="btn alt sm" id="cx-rf" type="button" aria-label="Refresh items">⟳</button></div>' +
       '<div class="tabs" id="cx-rg"></div>' +
       '<div class="cx-k"><div class="hi"><small>TOTAL SALES' + rl + '</small><b>' + money(T.sales) + '</b></div>' +
-      '<div><small>COST OF GOODS SOLD (COGS)</small><b>' + money(T.cogs) + '</b></div>' +
-      '<div class="lime"><small>TOTAL PROFIT (sales − COGS)</small><b>' + money(T.profit) + '</b></div>' +
-      '<div><small>TOTAL LOSS (write-offs &amp; returns)</small><b style="color:var(--no)">' + money(T.loss) + '</b></div>' +
-      '<div><small>NET PROFIT (profit − loss)</small><b' + neg(T.profit - T.loss) + '>' + money(T.profit - T.loss) + '</b></div>' +
       '<div><small>CANCELLED / DECLINED ORDERS</small><b>' + X.n + ' · ' + money(X.value) + '</b></div>' +
-      '<div><small>PIECES LEFT · SOLD</small><b>' + T.stock + ' · ' + T.sold + '</b></div><div><small>STOCK VALUE (AT COST)</small><b>' + money(T.value) + '</b></div></div>' +
-      plBox(T, X) +
+      '<div><small>PIECES LEFT · SOLD</small><b>' + T.stock + ' · ' + T.sold + '</b></div>' +
+      '<div><small>ITEMS</small><b>' + all.length + '</b></div></div>' +
       insights(all) +
       (low.length ? '<div class="err" style="background:#fef3c7;color:#92400e">⚠ ' + low.length + ' item' + (low.length > 1 ? 's' : '') + ' low on stock: ' + low.slice(0, 4).map(function (p) { return esc(p.name) + ' (' + p.stock + ')'; }).join(', ') + (low.length > 4 ? '…' : '') + '</div>' : '') +
       '<p style="margin:0 0 .7rem"><button class="btn" id="cx-add" type="button" style="width:100%">＋ Add new item</button></p>' +
-      '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-reprice" type="button" style="width:100%">↻ Recalculate all prices (' + PROFIT_PCT + '% below price = cost)</button></p>' +
-      '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-rules" type="button" style="width:100%">\u{1F3F7} Apply pricing rules to all items (' + PROFIT_PCT + '% margin, ' + OLD_MIN + '-' + OLD_MAX + '% crossed-out price)</button></p>' +
+      '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-rules" type="button" style="width:100%">\u{1F3F7} Show crossed-out prices on all items (' + OLD_MIN + '-' + OLD_MAX + '% off)</button></p>' +
       '<p style="margin:0 0 .7rem"><button class="btn alt sm" id="cx-export" type="button" style="width:100%">⬇ Download backup (CSV)</button></p>' +
       '<div class="tabs" id="cx-chips"></div><p class="meta" id="cx-cnt" style="margin:.2rem 0 .6rem"></p>' +
-      '<div id="cx-list"></div><h2 style="font-size:1.05rem;margin:1.2rem 0 .5rem">Financial ledger' + (S.range === 'all' ? '' : ' · ' + RANGES.filter(function (r) { return r[0] === S.range; })[0][1]) + '</h2><div class="lg" id="cx-led"></div>';
+      '<div id="cx-list"></div><h2 style="font-size:1.05rem;margin:1.2rem 0 .5rem">Sales ledger' + (S.range === 'all' ? '' : ' · ' + RANGES.filter(function (r) { return r[0] === S.range; })[0][1]) + '</h2><div class="lg" id="cx-led"></div>';
     $('cx-add').onclick = function () { itemForm(); };
-    $('cx-reprice').onclick = function () {
-      var todo = [], disc = 0, nocost = 0;
-      S.prods.forEach(function (p) {
-        if (!(Number(p.cost) > 0)) { nocost++; return; }
-        if (Number(p.old_price) > Number(p.price)) { disc++; return; }
-        var np = autoPrice(p.cost); if (np !== Number(p.price)) todo.push([p, np]);
-      });
-      if (!todo.length) { toast('All prices already match the ' + PROFIT_PCT + '% rule.' + (disc ? ' ' + disc + ' discounted item(s) were left alone.' : '')); return; }
-      if (!confirm('Update the selling price of ' + todo.length + ' item(s) so the cost is ' + PROFIT_PCT + '% below the price?' + (disc ? '\n' + disc + ' discounted item(s) will be skipped.' : '') + (nocost ? '\n' + nocost + ' item(s) with no cost will be skipped.' : ''))) return;
-      var b = $('cx-reprice'); b.disabled = true; b.textContent = 'Updating prices\u2026';
-      todo.reduce(function (pr, t) { return pr.then(function () { return call('/rest/v1/products?id=eq.' + encodeURIComponent(t[0].id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { price: t[1] } }); }); }, Promise.resolve())
-        .then(load).then(render).then(function () { toast('Updated ' + todo.length + ' price(s).'); })
-        .catch(function (x) { b.disabled = false; b.textContent = '\u21bb Recalculate all prices'; toast('Could not update prices: ' + x.message); });
-    };
     $('cx-rules').onclick = function () {
-      var todo = [], nPrice = 0, nOld = 0, nocost = 0;
+      var todo = [];
       S.prods.forEach(function (p) {
         var price = Number(p.price); if (!(price > 0)) return;
-        var body = {};
-        if (Number(p.cost) > 0) { var np = autoPrice(p.cost); if (np !== price) { body.price = np; price = np; nPrice++; } } else nocost++;
-        var o = autoOld(price); if (o > price) { body.old_price = o; nOld++; }
-        todo.push([p, body]);
+        var o = autoOld(price); if (o > price) todo.push([p, { old_price: o }]);
       });
       if (!todo.length) { toast('Nothing to update.'); return; }
-      if (!confirm('Apply the pricing rules to ' + todo.length + ' item(s)?\n\n' +
-        '\u2022 Selling price = cost \u00f7 ' + (1 - PROFIT_PCT / 100) + ' (cost is ' + PROFIT_PCT + '% below the price): ' + nPrice + ' price(s) will change.\n' +
-        '\u2022 Crossed-out price shows ' + OLD_MIN + '-' + OLD_MAX + '% off, a different % per item: ' + nOld + ' item(s).' +
-        (nocost ? '\n\u2022 ' + nocost + ' item(s) with no cost keep their selling price (only the crossed-out price is set).' : '') +
-        '\n\nCost, stock and descriptions are not touched. Tap \u201cDownload backup (CSV)\u201d first if you want a copy.')) return;
+      if (!confirm('Show a crossed-out previous price (' + OLD_MIN + '-' + OLD_MAX + '% off, a different % per item) on ' + todo.length + ' item(s)?\n\nSelling prices, stock and descriptions are not touched. Tap \u201cDownload backup (CSV)\u201d first if you want a copy.')) return;
       var b = $('cx-rules'); b.disabled = true; b.textContent = 'Applying\u2026';
       todo.reduce(function (pr, t) { return pr.then(function () { return call('/rest/v1/products?id=eq.' + encodeURIComponent(t[0].id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: t[1] }); }); }, Promise.resolve())
-        .then(load).then(render).then(function () { toast('Pricing rules applied to ' + todo.length + ' item(s).'); })
-        .catch(function (x) { b.disabled = false; b.textContent = '\u{1F3F7} Apply pricing rules to all items'; toast('Could not apply the rules: ' + x.message); });
+        .then(load).then(render).then(function () { toast('Crossed-out prices set on ' + todo.length + ' item(s).'); })
+        .catch(function (x) { b.disabled = false; b.textContent = '\u{1F3F7} Show crossed-out prices on all items'; toast('Could not apply: ' + x.message); });
     };
     $('cx-export').onclick = function () { exportCsv(all); };
     RANGES.forEach(function (r) { var b = el('button', S.range === r[0] ? 'on' : '', r[1]); b.type = 'button'; b.onclick = function () { S.range = r[0]; load().then(render).catch(function (x) { toast(x.message + ' (run setup-catalog-2.sql?)'); }); }; $('cx-rg').appendChild(b); });
@@ -494,16 +412,15 @@
     var L = $('cx-list'); L.textContent = ''; $('cx-cnt').textContent = (q2 || S.cat !== 'all') ? shown.length + ' of ' + all.length + ' items shown' : all.length + ' items';
     if (!shown.length) L.appendChild(el('div', 'empty', !all.length ? 'No items yet. Tap “Add new item” to publish your first product.' : (!q2 && S.cat === CAT_OUT) ? 'Nothing is out of stock right now. 🎉' : (!q2 && S.cat === CAT_HID) ? 'No hidden items. Tap Hide on any item and it will be kept here for you.' : 'No item matches' + (q2 ? ' “' + S.q.trim() + '”' : '') + '. Try fewer letters or choose All.'));
     shown.forEach(function (p) {
-      var s = stat(p), lowS = p.stock < p.low_at, c = el('div', 'card'), margin = p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0;
+      var s = stat(p), lowS = p.stock < p.low_at, c = el('div', 'card');
       c.innerHTML = '<div class="cx-p">' + (p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="' + esc(p.name) + '" loading="lazy" onerror="this.outerHTML=&quot;<div class=cx-ph>📦</div>&quot;">' : '<div class="cx-ph">' + catIcon(p.category_id) + '</div>') +
         '<div style="min-width:0"><div class="ref">' + esc(p.name) + '</div><div class="when">' + esc(catName(p.category_id)) + '</div><div style="margin-top:.3rem">' +
         (p.stock === 0 ? '<span class="badge b-declined">Out of stock</span> ' : lowS ? '<span class="badge b-low">Low · ' + p.stock + ' left</span> ' : '<span class="badge b-paid">In stock</span> ') +
         (p.featured ? '<span class="badge b-ad">Advert</span> ' : '') + (p.active ? '' : '<span class="badge b-pending">Hidden</span>') + '</div></div></div>' +
         (p.description ? '<div class="meta" style="margin:.5rem 0 0;white-space:pre-line">' + esc(p.description.length > 140 ? p.description.slice(0, 140) + '…' : p.description) + '</div>' : '<div class="meta" style="margin:.5rem 0 0;color:#b45309">No description yet. Tap Edit to add one.</div>') +
-        '<div class="cx-g"><div><span>Price</span><b>' + priceHtml(p) + '</b></div><div><span>COGS / unit</span><b>' + money(p.cost) + '</b></div>' +
-        '<div><span>Left / Sold</span><b>' + p.stock + ' / ' + s.sold + '</b></div><div><span>Margin</span><b>' + margin + '%</b></div>' +
-        '<div><span>Sales</span><b>' + money(s.sales) + '</b></div><div><span>COGS (sold)</span><b>' + money(s.cogs) + '</b></div>' +
-        '<div><span>Profit</span><b>' + money(s.profit) + '</b></div><div><span>Loss / returns</span><b' + (s.loss ? ' style="color:var(--no)"' : '') + '>' + money(s.loss) + '</b></div></div>' +
+        '<div class="cx-g"><div><span>Price</span><b>' + priceHtml(p) + '</b></div>' +
+        '<div><span>Left / Sold</span><b>' + p.stock + ' / ' + s.sold + '</b></div>' +
+        '<div><span>Sales</span><b>' + money(s.sales) + '</b></div></div>' +
         '<div class="acts"><button class="btn ok sm" data-a="r" type="button">＋ Restock</button><button class="btn alt sm" data-a="l" type="button">Log loss</button><button class="btn alt sm" data-a="y" type="button">History</button><button class="btn alt sm" data-a="f" type="button">' + (p.featured ? 'Remove advert' : '★ Advert') + '</button><button class="btn alt sm" data-a="e" type="button">Edit</button><button class="btn alt sm" data-a="v" type="button">＋ Pack size</button><button class="btn alt sm" data-a="h" type="button">' + (p.active ? 'Hide' : 'Show') + '</button><button class="btn alt sm" data-a="d" type="button" style="color:var(--no)">Delete</button></div>';
       c.onclick = function (e) { var a = e.target.getAttribute && e.target.getAttribute('data-a'); if (!a) return;
         if (a === 'r') restockForm(p); else if (a === 'l') lossForm(p); else if (a === 'e') itemForm(p); else if (a === 'v') itemForm(null, p); else if (a === 'y') history(p);
@@ -516,7 +433,7 @@
             .catch(function (x) {
               btn.disabled = false; btn.textContent = 'Delete';
               var m = String(x && x.message || x);
-              if (/foreign key|violates|23503/i.test(m)) toast('“' + p.name + '” has sales, restock or loss history, so it can’t be deleted without breaking your financial records. Tap Hide instead to remove it from the shop.');
+              if (/foreign key|violates|23503/i.test(m)) toast('“' + p.name + '” has sales, restock or loss history, so it can’t be deleted without breaking your records. Tap Hide instead to remove it from the shop.');
               else if (m === 'NOROW') toast('Nothing was deleted. Your account may not have permission to delete items.');
               else toast('Could not delete: ' + m);
             });
@@ -538,42 +455,37 @@
     var per = S.range === 'all' ? 'All time' : RANGES.filter(function (r) { return r[0] === S.range; })[0][1];
     var X = cancelled(), G = totals(all), names = {};
     all.forEach(function (p) { names[p.id] = p.name; });
-    function pct(a, b) { return b ? Math.round(a / b * 1000) / 10 + '%' : '0%'; }
-    function cls(n) { return n < 0 ? ' lg-neg' : ''; }
     function row(p) {
       var s = stat(p);
-      return { n: p.name, price: +p.price || 0, cost: +p.cost || 0, mg: p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0, left: p.stock, sold: s.sold, sales: s.sales, cogs: s.cogs, profit: s.profit, loss: s.loss, net: s.profit - s.loss, val: p.stock * p.cost, hid: !p.active };
+      return { n: p.name, price: +p.price || 0, left: p.stock, sold: s.sold, sales: s.sales, hid: !p.active };
     }
     var groups = S.cats.concat([{ id: null, name: 'Uncategorised' }]).map(function (c) {
       var ps = all.filter(function (p) { return p.category_id === c.id; }); if (!ps.length) return null;
-      var t = totals(ps); t.net = t.profit - t.loss; return { name: c.name, icon: c.slug ? (ICONS[c.slug] || '📦') : '📦', t: t, rows: ps.map(row) };
+      return { name: c.name, icon: c.slug ? (ICONS[c.slug] || '📦') : '📦', t: totals(ps), rows: ps.map(row) };
     }).filter(Boolean);
-    G.net = G.profit - G.loss;
 
     /* ---- desktop table ---- */
-    var d = '<div class="lg-desk lg-scroll"><table class="lg-t"><thead><tr><th class="l">Item</th><th>Price</th><th>Cost / unit</th><th>Margin</th><th>Left</th><th>Sold</th><th>Sales</th><th>COGS</th><th>Profit</th><th>Loss</th><th>Net</th><th>Stock value</th></tr></thead><tbody>';
+    var d = '<div class="lg-desk lg-scroll"><table class="lg-t"><thead><tr><th class="l">Item</th><th>Price</th><th>Left</th><th>Sold</th><th>Sales</th></tr></thead><tbody>';
     groups.forEach(function (g) {
-      d += '<tr class="lg-cat"><td class="l">' + g.icon + ' ' + esc(g.name) + ' <small>(' + g.rows.length + ' item' + (g.rows.length > 1 ? 's' : '') + ')</small></td><td></td><td></td><td>' + pct(g.t.profit, g.t.sales) + '</td><td>' + g.t.stock + '</td><td>' + g.t.sold + '</td><td>' + money(g.t.sales) + '</td><td>' + money(g.t.cogs) + '</td><td class="' + cls(g.t.profit) + '">' + money(g.t.profit) + '</td><td>' + money(g.t.loss) + '</td><td class="' + cls(g.t.net) + '">' + money(g.t.net) + '</td><td>' + money(g.t.value) + '</td></tr>';
+      d += '<tr class="lg-cat"><td class="l">' + g.icon + ' ' + esc(g.name) + ' <small>(' + g.rows.length + ' item' + (g.rows.length > 1 ? 's' : '') + ')</small></td><td></td><td>' + g.t.stock + '</td><td>' + g.t.sold + '</td><td>' + money(g.t.sales) + '</td></tr>';
       g.rows.forEach(function (r) {
-        d += '<tr><td class="l">' + esc(r.n) + (r.hid ? ' <em>hidden</em>' : '') + '</td><td>' + money(r.price) + '</td><td>' + money(r.cost) + '</td><td>' + r.mg + '%</td><td>' + r.left + '</td><td>' + r.sold + '</td><td>' + money(r.sales) + '</td><td>' + money(r.cogs) + '</td><td class="' + cls(r.profit) + '">' + money(r.profit) + '</td><td>' + (r.loss ? money(r.loss) : '–') + '</td><td class="' + cls(r.net) + '">' + money(r.net) + '</td><td>' + money(r.val) + '</td></tr>';
+        d += '<tr><td class="l">' + esc(r.n) + (r.hid ? ' <em>hidden</em>' : '') + '</td><td>' + money(r.price) + '</td><td>' + r.left + '</td><td>' + r.sold + '</td><td>' + money(r.sales) + '</td></tr>';
       });
     });
-    d += '</tbody><tfoot><tr><td class="l">ALL ITEMS</td><td></td><td></td><td>' + pct(G.profit, G.sales) + '</td><td>' + G.stock + '</td><td>' + G.sold + '</td><td>' + money(G.sales) + '</td><td>' + money(G.cogs) + '</td><td>' + money(G.profit) + '</td><td>' + money(G.loss) + '</td><td>' + money(G.net) + '</td><td>' + money(G.value) + '</td></tr></tfoot></table></div>';
+    d += '</tbody><tfoot><tr><td class="l">ALL ITEMS</td><td></td><td>' + G.stock + '</td><td>' + G.sold + '</td><td>' + money(G.sales) + '</td></tr></tfoot></table></div>';
 
     /* ---- mobile cards ---- */
-    function kv(k, v, c) { return '<div><span>' + k + '</span><b class="' + (c || '') + '">' + v + '</b></div>'; }
+    function kv(k, v) { return '<div><span>' + k + '</span><b>' + v + '</b></div>'; }
     var m = '<div class="lg-mob">';
     groups.forEach(function (g) {
-      m += '<details class="lg-g" open><summary><span>' + g.icon + ' ' + esc(g.name) + '</span><b class="' + cls(g.t.net) + '">' + money(g.t.net) + '</b></summary>';
+      m += '<details class="lg-g" open><summary><span>' + g.icon + ' ' + esc(g.name) + '</span><b>' + money(g.t.sales) + '</b></summary>';
       g.rows.forEach(function (r) {
         m += '<div class="lg-c"><h4>' + esc(r.n) + (r.hid ? ' <em>hidden</em>' : '') + '</h4><div class="lg-kv">' +
-          kv('Price', money(r.price)) + kv('Cost / unit', money(r.cost)) + kv('Margin', r.mg + '%') + kv('Left · Sold', r.left + ' · ' + r.sold) +
-          kv('Sales', money(r.sales)) + kv('COGS', money(r.cogs)) + kv('Profit', money(r.profit), cls(r.profit)) + kv('Loss', r.loss ? money(r.loss) : '–') +
-          kv('Net', money(r.net), cls(r.net)) + kv('Stock value', money(r.val)) + '</div></div>';
+          kv('Price', money(r.price)) + kv('Left · Sold', r.left + ' · ' + r.sold) + kv('Sales', money(r.sales)) + '</div></div>';
       });
-      m += '<div class="lg-sub"><div class="lg-kv">' + kv('Category sales', money(g.t.sales)) + kv('COGS', money(g.t.cogs)) + kv('Profit', money(g.t.profit), cls(g.t.profit)) + kv('Loss', money(g.t.loss)) + kv('Net', money(g.t.net), cls(g.t.net)) + kv('Stock value', money(g.t.value)) + '</div></div></details>';
+      m += '</details>';
     });
-    m += '<div class="lg-tot"><h4>ALL ITEMS · ' + esc(per) + '</h4><div class="lg-kv">' + kv('Sales', money(G.sales)) + kv('COGS', money(G.cogs)) + kv('Profit', money(G.profit)) + kv('Loss', money(G.loss)) + kv('Net profit', money(G.net)) + kv('Stock value', money(G.value)) + kv('Left · Sold', G.stock + ' · ' + G.sold) + kv('Margin', pct(G.profit, G.sales)) + '</div></div></div>';
+    m += '<div class="lg-tot"><h4>ALL ITEMS · ' + esc(per) + '</h4><div class="lg-kv">' + kv('Sales', money(G.sales)) + kv('Left · Sold', G.stock + ' · ' + G.sold) + '</div></div></div>';
 
     /* ---- supporting records ---- */
     function dt(x) { return x ? new Date(x).toLocaleString('en-KE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '–'; }
@@ -584,25 +496,24 @@
       rows.forEach(function (r) { h += '<div class="lg-lr">' + r.map(function (x, i) { return '<span data-l="' + esc(head[i]) + '">' + x + '</span>'; }).join('') + '</div>'; });
       return h + '</div></details>';
     }
-    var losses = (S.logs || []).slice().sort(function (a, b) { return a.created_at < b.created_at ? 1 : -1; }).map(function (l) { return [dt(l.created_at), esc(names[l.product_id] || 'Item'), esc(l.reason || 'Other'), (+l.qty || 0) + ' pcs', '<b class="lg-neg">−' + money(l.loss) + '</b>', esc(l.note || '')]; });
-    var rests = (S.rest || []).slice().sort(function (a, b) { return a.created_at < b.created_at ? 1 : -1; }).map(function (r) { return [dt(r.created_at), esc(names[r.product_id] || 'Item'), '+' + (+r.qty || 0) + ' pcs', money(r.unit_cost), '<b>' + money((+r.qty || 0) * (+r.unit_cost || 0)) + '</b>', esc(r.supplier || '')]; });
-    var spent = (S.rest || []).reduce(function (a, r) { return a + (+r.qty || 0) * (+r.unit_cost || 0); }, 0);
+    var losses = (S.logs || []).slice().sort(function (a, b) { return a.created_at < b.created_at ? 1 : -1; }).map(function (l) { return [dt(l.created_at), esc(names[l.product_id] || 'Item'), esc(l.reason || 'Other'), (+l.qty || 0) + ' pcs', esc(l.note || '')]; });
+    var rests = (S.rest || []).slice().sort(function (a, b) { return a.created_at < b.created_at ? 1 : -1; }).map(function (r) { return [dt(r.created_at), esc(names[r.product_id] || 'Item'), '+' + (+r.qty || 0) + ' pcs', esc(r.supplier || '')]; });
     var canc = (window.STM_orders || []).filter(function (o) { var b = bounds(); return (o.status === 'declined' || o.status === 'cancelled') && !(b && new Date(o.handled_at || o.created_at) < b[0]); })
       .map(function (o) { return [dt(o.handled_at || o.created_at), esc(o.ref || o.order_ref || o.id || ''), esc(o.name || o.customer_name || o.customer || ''), esc(o.status), '<b class="lg-neg">' + money(o.subtotal) + '</b>']; });
 
     $('cx-led').innerHTML =
       '<div class="lg-hd"><div><b>Period:</b> ' + esc(per) + '</div><div><b>Items:</b> ' + all.length + '</div><div><b>Generated:</b> ' + dt(new Date()) + '</div></div>' +
       d + m +
-      '<div class="lg-chk"><b>How it adds up</b><br>Sales ' + money(G.sales) + ' − COGS ' + money(G.cogs) + ' = Profit ' + money(G.profit) + '. Profit − Losses ' + money(G.loss) + ' = <b class="' + cls(G.net) + '">Net ' + money(G.net) + '</b>. Cancelled/declined orders (' + X.n + ') worth ' + money(X.value) + ' were never counted as sales.</div>' +
-      list('Losses &amp; returns', ['Date', 'Item', 'Reason', 'Qty', 'Loss', 'Note'], losses, 'No losses or returns logged for this period.') +
-      list('Restocks (money spent on stock · ' + money(spent) + ')', ['Date', 'Item', 'Qty', 'Unit cost', 'Total', 'Supplier'], rests, 'No restocks recorded for this period.') +
+      '<div class="lg-chk"><b>Note</b><br>Total sales ' + money(G.sales) + '. Cancelled/declined orders (' + X.n + ') worth ' + money(X.value) + ' were never counted as sales.</div>' +
+      list('Write-offs &amp; returns', ['Date', 'Item', 'Reason', 'Qty', 'Note'], losses, 'No write-offs or returns logged for this period.') +
+      list('Restocks', ['Date', 'Item', 'Qty', 'Supplier'], rests, 'No restocks recorded for this period.') +
       list('Cancelled / declined orders', ['Date', 'Order', 'Customer', 'Status', 'Value'], canc, 'No cancelled or declined orders for this period.');
   }
 
   /* ---------- Stock tab (live products: pieces left, restock, loss) ---------- */
   /* every typed word must appear in the item name or its category, so "ultra 1l" or "hisense cooker" both work */
   function matches(p, q) {
-    var h = [p.name, p.base, p.variant_label, catName(p.category_id), p.description, p.sku, p.barcode, p.price, p.cost].map(function (v) { return v == null ? '' : String(v); }).join(' ').toLowerCase();
+    var h = [p.name, p.base, p.variant_label, catName(p.category_id), p.description, p.sku, p.barcode, p.price].map(function (v) { return v == null ? '' : String(v); }).join(' ').toLowerCase();
     return String(q).toLowerCase().split(/\s+/).filter(Boolean).every(function (w) { return h.indexOf(w) > -1; });
   }
   /* type-ahead suggestions for the Catalog and Stock search boxes (best name match first) */
@@ -669,7 +580,6 @@
   }
 
   window.STMCatalog = {
-    autoPrice: autoPrice,
     autoOld: autoOld,
     mountStock: function (c) {
       root = c; view = renderStockView; if (!D.getElementById('cx-css')) { var s = el('style'); s.id = 'cx-css'; s.textContent = css; D.head.appendChild(s); }
@@ -678,6 +588,7 @@
     },
     mount: function (c) {
       root = c; view = render; if (!D.getElementById('cx-css')) { var s = el('style'); s.id = 'cx-css'; s.textContent = css; D.head.appendChild(s); }
+      var pt = $('ptitle'), ps = $('psub'); if (pt) pt.textContent = '🛍️ Catalog'; if (ps) ps.textContent = 'Products, prices, restocks and the sales ledger';
       root.innerHTML = '<div class="empty">Loading catalog…</div>';
       var go = function () { root.innerHTML = '<div class="empty">Loading catalog…</div>'; load().then(render).catch(function (e) { root.innerHTML = '<div class="err">Could not load the catalog (' + esc(e.message) + ').' + (/signed out|expired/i.test(e.message) ? ' Please sign in again.' : ' Check your internet, or run setup-catalog.sql in Supabase.') + '</div><p><button class="btn" id="cx-retry" type="button" style="width:100%">Try again</button></p>'; var r = $('cx-retry'); if (r) r.onclick = go; }); }; go();
     }
