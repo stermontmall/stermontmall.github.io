@@ -1,0 +1,9 @@
+{
+  "tolerancePct": 10,
+  "raiseGapPct": 20,
+  "minMarginPct": 10,
+  "maxCutPct": 25,
+  "roundTo": 10,
+  "minMatches": 2,
+  "sources": ["jumia", "kilimall"]
+}

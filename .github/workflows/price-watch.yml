@@ -1,0 +1,58 @@
+# Stermont Arcade - weekly price watch. Compares your prices with Jumia and Kilimall and opens a GitHub Issue (GitHub emails you)
+# when something is clearly above market or a source could not be read.
+# Runs every Monday 08:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
+# By default it is READ-ONLY. To actually lower the trusted over-market prices, run it by hand and tick "apply"
+# (needs the SUPABASE_SERVICE_KEY repository secret). Settings live in price-watch.config.json.
+name: Weekly price watch
+
+on:
+  schedule:
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Apply the trusted price cuts (otherwise report only)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run the tests
+        run: node --test price-watch.test.mjs
+      - name: Check prices
+        id: rep
+        env:
+          APPLY: ${{ inputs.apply && '1' || '0' }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node price-watch.mjs > price-watch.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: price-watch
+          path: |
+            price-watch.csv
+            price-watch-backup.csv
+          retention-days: 90
+      - name: Open or refresh the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --search "Price watch in:title" --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Superseded by the latest report." || true
+          done
+          if [ "${{ steps.rep.outputs.items }}" != "0" ]; then
+            gh issue create --title "Price watch $(date +%F)" --body-file price-watch.md
+          else
+            echo "Prices are in line with the market - no issue needed."
+          fi
