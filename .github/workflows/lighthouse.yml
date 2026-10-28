@@ -1,5 +1,6 @@
-# Stermont Arcade - weekly speed, accessibility, best-practice and SEO scores from Google Lighthouse (mobile) on the live site.
-# Opens a GitHub Issue with the scores and the biggest problems. Runs every Monday 10:00 Nairobi time, or tap "Run workflow".
+# Stermont Arcade - weekly Core Web Vitals check (Google Lighthouse, mobile) on the live site: speed score, LCP, CLS, TBT and image weight per page.
+# Opens a GitHub Issue with the results; the title says "all good" or "needs attention" so growing product photos are caught early.
+# Runs every Monday 10:00 Nairobi time, or tap "Run workflow".
 name: Weekly speed check
 
 on:
@@ -39,4 +40,5 @@ jobs:
           for n in $(gh issue list --state open --search "Weekly speed and quality check in:title" --json number --jq '.[].number'); do
             gh issue close "$n" --comment "Superseded by this week's report." || true
           done
-          gh issue create --title "Weekly speed and quality check $(date +%F)" --body-file lh-report.md
+          if [ "$(cat lh-status.txt 2>/dev/null)" = "ok" ]; then SUFFIX="all good"; else SUFFIX="needs attention"; fi
+          gh issue create --title "Weekly speed and quality check $(date +%F) - $SUFFIX" --body-file lh-report.md
