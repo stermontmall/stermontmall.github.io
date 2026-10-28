@@ -54,3 +54,8 @@
 (function () {
   try { if (!/^\/c\//.test(location.pathname)) return; var k = document.createElement('script'); k.src = '/cat-feel.js?v=1'; k.defer = true; document.head.appendChild(k); } catch (e) {}
 })();
+
+/* Kilimall-style extras on category, product and all-products pages: header search, mobile bottom menu, live discount badges, photo gallery and Add to cart (see /kili-pages.js). */
+(function () {
+  try { var p = location.pathname; if (!/^\/(c|p)\//.test(p) && p !== '/products.html') return; var x = document.createElement('script'); x.src = '/kili-pages.js?v=1'; x.defer = true; document.head.appendChild(x); } catch (e) {}
+})();
