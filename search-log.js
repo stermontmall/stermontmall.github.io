@@ -53,10 +53,11 @@
   } catch (e) {}
 })();
 
-/* Loads the Kilimall-style browsing (kili-feel.js) on the homepage only. */
+/* Loads the Kilimall-style browsing (kili-feel.js) and the cart bridge (cart-bridge.js) on the homepage only. */
 (function () {
   try {
     if (!document.getElementById('music-gear')) return;
     var s = document.createElement('script'); s.src = 'kili-feel.js?v=1'; s.defer = true; document.head.appendChild(s);
+    var b = document.createElement('script'); b.src = 'cart-bridge.js?v=1'; b.defer = true; document.head.appendChild(b);
   } catch (e) {}
 })();
