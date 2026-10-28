@@ -24,6 +24,6 @@
 (function () {
   try {
     if (!document.getElementById('search-form') || !document.getElementById('sugg')) return;
-    var s = document.createElement('script'); s.src = 'search-jumia.js?v=2'; document.head.appendChild(s);
+    var s = document.createElement('script'); s.src = 'search-jumia.js?v=3'; document.head.appendChild(s);
   } catch (e) {}
 })();
