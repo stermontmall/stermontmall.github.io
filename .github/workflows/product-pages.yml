@@ -1,5 +1,6 @@
 # Stermont Arcade - rebuilds every product page, category page and the product sitemap automatically.
 # Runs: every 3 hours, when generate-products.mjs changes, and whenever you tap "Run workflow" in the Actions tab.
+# Price refresh requested 2026-10-28.
 name: Build product pages
 
 on:
