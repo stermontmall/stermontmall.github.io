@@ -40,6 +40,13 @@ jobs:
       - name: Apply Google titles, descriptions and FAQs (seo-overrides.json)
         run: node seo-overrides.mjs
 
+      - name: Speed - connect to the shop database early (preconnect)
+        run: |
+          # Safe and repeatable: adds one line to the home page head if it is not there yet.
+          if ! grep -q 'rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co"' index.html; then
+            sed -i '0,/<meta charset="UTF-8">/s##&\n  <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>#' index.html
+          fi
+
       - name: Save changes (only if something changed)
         run: |
           git config user.name "bot"
