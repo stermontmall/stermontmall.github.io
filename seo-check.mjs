@@ -25,7 +25,8 @@ for (const f of pages) {
   for (const m of h.matchAll(/<script type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)) { try { JSON.parse(m[1]); } catch { add('Broken structured data (JSON-LD)', f); } }
   if (f.startsWith('p/')) {
     if (!/<img\b(?![^>]*placeholder\.svg)/i.test(h)) add('Product page has no photo (also left out of the Google Shopping feed)', f);
-    if (!/Product details/.test(h)) add('Product has no description (short pages rank poorly)', f);
+    // generate-products.mjs only renders <div class="desc"> (under the "About <name>" heading) when the product has a description
+    if (!/<div class="desc">/.test(h)) add('Product has no description (short pages rank poorly)', f);
     if (!/"@type":"(Product|ProductGroup)"/.test(h)) add('Missing Product structured data', f);
   }
   for (const m of h.matchAll(/href=["']([^"'#]+)[^"']*["']/gi)) {
