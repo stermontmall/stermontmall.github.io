@@ -1,5 +1,6 @@
 /* Stermont Arcade · Bulk import: add many products from a spreadsheet (CSV) + photos, and attach photos to existing items.
-   Mounted by admin-extras.js -> STMBulk.mount(containerEl). Uses window.STMAdmin (api, raw, base, money) and STMCatalog.autoPrice. */
+   Mounted by admin-extras.js -> STMBulk.mount(containerEl). Uses window.STMAdmin (api, raw, base, money).
+   Selling price is required in the spreadsheet; no cost or profit is used. Price Watch may update prices later. */
 (function () {
   var D = document, BUCKET = 'product-images';
   function h(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
@@ -7,7 +8,6 @@
   function norm(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
   function baseName(f) { return String(f).replace(/\.[^.]+$/, ''); }
   function A() { return window.STMAdmin; }
-  function autoPrice(c) { return window.STMCatalog && STMCatalog.autoPrice ? STMCatalog.autoPrice(c) : 0; }
 
   /* ---------- CSV ---------- */
   function parseCSV(t) {
@@ -26,14 +26,14 @@
     return out.filter(function (r) { return r.some(function (x) { return String(x).trim() !== ''; }); });
   }
   function csvCell(x) { x = String(x == null ? '' : x); return /[",\n;]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; }
-  var HEAD = { name: ['name', 'product', 'item', 'product name', 'item name'], category: ['category', 'cat'], cost: ['cost', 'cost price', 'buying price', 'buy price'],
+  var HEAD = { name: ['name', 'product', 'item', 'product name', 'item name'], category: ['category', 'cat'],
     price: ['selling price', 'price', 'sell price'], old: ['old price', 'was price', 'previous price'], stock: ['stock', 'qty', 'quantity', 'pieces'], unit: ['unit'],
     pack: ['pack size', 'size', 'variant', 'pack'], desc: ['description', 'details'], photo: ['photo', 'photos', 'image', 'images', 'picture', 'pictures'], feat: ['featured'] };
   function mapHeaders(r) { var m = {}; r.forEach(function (c, i) { var k = norm(c); Object.keys(HEAD).forEach(function (f) { if (HEAD[f].indexOf(k) > -1 && m[f] == null) m[f] = i; }); }); return m; }
-  var TEMPLATE = [['name', 'category', 'cost', 'selling_price', 'old_price', 'stock', 'unit', 'pack_size', 'description', 'photo', 'featured'],
-    ['Kungu Nil 200 SL Bed Bug Killer', 'Bed Bug Killers', 2200, '', '', 50, '', '1 Litre', 'Short description shoppers will read.', 'kungu-nil-1l.jpg', 'no'],
-    ['Kungu Nil 200 SL Bed Bug Killer', 'Bed Bug Killers', 800, '', '', 80, '', '100 ml', 'Short description shoppers will read.', 'kungu-nil-1l.jpg', 'no'],
-    ['Haier 7L Air Fryer', 'Appliances', 9500, 12500, 14000, 5, '', '', 'Digital air fryer, 7 litre.', 'haier-air-fryer.jpg;haier-air-fryer-2.jpg', 'yes']];
+  var TEMPLATE = [['name', 'category', 'selling_price', 'old_price', 'stock', 'unit', 'pack_size', 'description', 'photo', 'featured'],
+    ['Kungu Nil 200 SL Bed Bug Killer', 'Bed Bug Killers', 2900, '', 50, '', '1 Litre', 'Short description shoppers will read.', 'kungu-nil-1l.jpg', 'no'],
+    ['Kungu Nil 200 SL Bed Bug Killer', 'Bed Bug Killers', 1100, '', 80, '', '100 ml', 'Short description shoppers will read.', 'kungu-nil-1l.jpg', 'no'],
+    ['Haier 7L Air Fryer', 'Appliances', 12500, 14000, 5, '', '', 'Digital air fryer, 7 litre.', 'haier-air-fryer.jpg;haier-air-fryer-2.jpg', 'yes']];
   function download(name, text) { var a = h('a'); a.href = URL.createObjectURL(new Blob(['﻿' + text], { type: 'text/csv' })); a.download = name; D.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 500); }
 
   /* ---------- images (resized in the browser, stored in Supabase Storage like the Catalog does) ---------- */
@@ -79,7 +79,7 @@
     /* =============== 1. spreadsheet import =============== */
     var c1 = h('div', 'card'); c.appendChild(c1);
     c1.appendChild(h('h3', null, '1 · Add many products from a spreadsheet')); c1.firstChild.style.margin = '0 0 .3rem';
-    c1.appendChild(h('p', 'meta', 'Fill the template in Excel or Google Sheets, save as CSV, then choose it below together with the product photos. Leave selling_price empty to price automatically from the cost (cost + 15%, rounded up to KSh 50). Rows with the same name and different pack_size become sizes of one product.'));
+    c1.appendChild(h('p', 'meta', 'Fill the template in Excel or Google Sheets, save as CSV, then choose it below together with the product photos. Every row needs a selling_price. Rows with the same name and different pack_size become sizes of one product.'));
     var a1 = h('div', 'acts'); a1.appendChild(btn('⬇ Download template', 'alt sm', function () { download('stermont-products-template.csv', TEMPLATE.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n')); })); c1.appendChild(a1);
     var csvIn = fileInput(false, '.csv,text/csv,text/plain'), phIn = fileInput(true, 'image/*');
     var lb1 = h('label', null, 'Spreadsheet (.csv)'), lb2 = h('label', null, 'Photos (select all of them together)');
@@ -107,11 +107,10 @@
           o.id = slug(o.name + (o.pack ? ' ' + o.pack : '')) || 'item';
           if (seen[o.id]) o.errs.push('Same name and size appears twice'); seen[o.id] = 1;
           var cat = catBy[norm(o.catName)]; o.cat = cat || null; if (!o.catName) o.errs.push('No category'); else if (!cat) o.newCat = true;
-          var cost = g('cost') === '' ? null : Number(g('cost').replace(/,/g, '')), price = g('price') === '' ? null : Number(g('price').replace(/,/g, ''));
-          if ((cost != null && !(cost >= 0)) || (price != null && !(price >= 0))) o.errs.push('Cost or price is not a number');
-          o.cost = cost == null ? 0 : cost; o.price = price != null ? price : (cost > 0 ? autoPrice(cost) : null); o.auto = price == null && cost > 0;
-          if (o.price == null || !(o.price >= 0)) o.errs.push('Needs a cost or a selling price');
-          if (price != null && cost == null) o.warns.push('No cost: profit will show as 100%');
+          var price = g('price') === '' ? null : Number(g('price').replace(/,/g, ''));
+          if (price != null && !(price >= 0)) o.errs.push('Selling price is not a number');
+          o.price = price;
+          if (o.price == null || !(o.price > 0)) o.errs.push('Needs a selling price');
           var old = g('old') === '' ? null : Number(g('old').replace(/,/g, '')); if (old != null && !(old > o.price)) { o.warns.push('Old price ignored (must be higher than the price)'); old = null; } o.old = old;
           o.stock = g('stock') === '' ? 0 : parseInt(g('stock'), 10); if (!(o.stock >= 0)) { o.errs.push('Stock is not a number'); o.stock = 0; } else if (o.stock === 0) o.warns.push('Stock 0: shows as sold out');
           o.unit = g('unit'); o.desc = g('desc'); o.featured = /^(y|yes|true|1)$/i.test(g('feat'));
@@ -141,10 +140,10 @@
       if (Object.keys(newCats).length) out1.appendChild(h('p', 'meta', 'New categories to create: ' + Object.keys(newCats).map(function (k) { return newCats[k]; }).join(', ')));
       out1.appendChild(table(['Row', 'Item', 'Price', 'Stock', 'Photos', 'Result'], plan.map(function (o) {
         var res = o.errs.length ? { t: '✖ ' + o.errs.join('; '), cls: 'neg' } : { t: (o.action === 'update' ? '↻ Update existing' : '＋ Add') + (o.warns.length ? ' · ⚠ ' + o.warns.join('; ') : '') };
-        return [{ t: String(o.line) }, { t: (o.name || '—') + (o.pack ? ' · ' + o.pack : '') }, { t: o.price != null ? A().money(o.price) + (o.auto ? ' (auto)' : '') : '—' }, { t: String(o.stock || 0) }, { t: String(o.photos.length) }, res];
+        return [{ t: String(o.line) }, { t: (o.name || '—') + (o.pack ? ' · ' + o.pack : '') }, { t: o.price != null ? A().money(o.price) : '—' }, { t: String(o.stock || 0) }, { t: String(o.photos.length) }, res];
       })));
       if (ok.length) { var go = btn('Import ' + ok.length + ' item' + (ok.length === 1 ? '' : 's'), 'ok', function () { run(ok, go); }); go.style.cssText = 'width:100%;margin-top:.8rem'; out1.appendChild(go); }
-      var note = h('p', 'meta', 'Existing items only get new photos, description, old price and unit; their stock, cost and price are never changed here.'); out1.appendChild(note);
+      var note = h('p', 'meta', 'Existing items only get new photos, description, old price and unit; their stock and price are never changed here.'); out1.appendChild(note);
     }
 
     function run(list, go) {
@@ -162,7 +161,7 @@
             if (!Object.keys(patch).length) return null; return req('/rest/v1/products?id=eq.' + encodeURIComponent(o.id), 'PATCH', patch, 'return=minimal');
           }
           return catId(o).then(function (cid) {
-            var row = { id: o.id, category_id: cid, name: o.name, price: o.price, cost: o.cost, stock: o.stock, low_at: 5, featured: o.featured, active: true, images: imgs };
+            var row = { id: o.id, category_id: cid, name: o.name, price: o.price, cost: 0, stock: o.stock, low_at: 5, featured: o.featured, active: true, images: imgs };
             if (o.desc) row.description = o.desc; if (o.old != null) row.old_price = o.old; if (o.unit) row.unit = o.unit; if (o.pack) { row.variant_label = o.pack; row.variant_group = o.group; }
             return req('/rest/v1/products', 'POST', row, 'return=minimal');
           });
