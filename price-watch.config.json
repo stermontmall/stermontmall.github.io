@@ -8,6 +8,9 @@
   "minMatches": 2,
   "maxChangesPerRun": 40,
   "autoApply": true,
-  "sources": ["jumia", "kilimall", "agroduka", "imaginecare"],
-  "urlOverrides": {}
+  "sources": ["jumia", "kilimall", "agroduka", "imaginecare", "seedfarm", "asepsis"],
+  "urlOverrides": {
+    "seedfarm": "https://seedfarm.co.ke/?s={q}&post_type=product",
+    "asepsis": "https://asepsis-kenya.com/?s={q}&post_type=product"
+  }
 }
