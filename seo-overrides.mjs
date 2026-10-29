@@ -7,6 +7,8 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 try { await import('./seo-product-extras.mjs'); } catch (e) { console.log('seo-product-extras skipped:', e.message); }
 // Then the small clean-ups (seo-fixes.mjs): no repeated "Buy <product>" in meta descriptions, clean JSON-LD description. To switch it off, delete this line.
 try { await import('./seo-fixes.mjs'); } catch (e) { console.log('seo-fixes skipped:', e.message); }
+// Then the modern titles + descriptions for all products (seo-titles.mjs, Task D). Hand-written seo-overrides.json entries below still win. To switch it off, delete this line.
+try { await import('./seo-titles.mjs'); } catch (e) { console.log('seo-titles skipped:', e.message); }
 const O = JSON.parse(readFileSync('seo-overrides.json', 'utf8'));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s;
