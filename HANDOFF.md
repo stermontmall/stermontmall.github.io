@@ -8,8 +8,8 @@ Google ignores everything after `#`, so these links only ever point at the homep
 The real, indexable product pages are `/p/<product-id>.html` (they are already in `sitemap-products.xml`).
 
 ## Where the `#p-` links come from
-- `storefront-live.js`: WhatsApp enquiry message uses `location.origin + '/#p-' + p.id`
-- `storefront-live.js`: opening the product popup calls `history.pushState(..., '#p-' + p.id)`
+- `storefront-live.js`: WhatsApp enquiry message used `location.origin + '/#p-' + p.id` (FIXED in step 1)
+- `storefront-live.js`: opening the product popup calls `history.pushState(..., '#p-' + p.id)` (kept, see decisions)
 - `kili-pages.js`: "Add to cart" button on /p/ pages links to `/#p-<id>` (intentional, opens the popup)
 - `recent-orders.js`: fallback links to `/#p-<id>` (intentional, opens the popup)
 - `tools/build_product_pages.py`: order link `index.html#p-<id>` (intentional)
@@ -17,13 +17,12 @@ The real, indexable product pages are `/p/<product-id>.html` (they are already i
 ## Done
 - [x] Investigated; branch created
 - [x] Confirmed Supabase data: no null, duplicate or badly formatted slugs; `products.slug` column is not used by the site
+- [x] Step 1 (commit e2deb6e): `storefront-live.js` WhatsApp "Link:" now sends `https://stermontarcade.co.ke/p/<id>.html`. File grew by 137 bytes (one changed line + one comment), nothing else touched.
 
 ## Left (small steps, one push each)
-- [ ] Step 1: `storefront-live.js` WhatsApp "Link:" -> `/p/<id>.html`
-- [ ] Step 2: decide whether the address bar should also show `/p/<id>.html` (see decisions)
-- [ ] Step 3: fix Pentagon product id (`...-stermont-arcade-kenya-1-litre`), needs DB migration + page rename + redirect (needs owner approval)
-- [ ] Step 4: remove or redirect 3 orphan pages: `jembe-star-500-sl-herbicide-1-litre`, `kingcode-elite-50-ec-insecticide-1-litre`, `zagro-...-1-litre-2`
-- [ ] Test on a preview, then merge to `main`
+- [ ] Step 2: fix Pentagon product id (`pentagon-50ec-insecticide-1-litre-stermont-arcade-kenya-1-litre` -> `pentagon-50ec-insecticide-1-litre`). Needs DB migration (FKs in stock_restocks, sales_ledger, loss_logs; check orders.items JSON), page rename in `/p/`, sitemap + merchant-feed update, and a redirect page at the old URL. Needs owner approval before touching the live DB.
+- [ ] Step 3: remove or redirect 3 orphan pages with no product in the DB: `jembe-star-500-sl-herbicide-1-litre`, `kingcode-elite-50-ec-insecticide-1-litre`, `zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre-2`
+- [ ] Step 4: test on a preview (open a product, tap "Ask on WhatsApp", check the link in the message opens the product page), then merge to `main`
 
 ## Decisions
 - Keep old `#p-` links working (the load handler at the end of `storefront-live.js` still opens the popup), so links already shared do not break.
