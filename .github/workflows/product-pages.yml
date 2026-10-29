@@ -13,6 +13,7 @@ on:
       - 'generate-products.mjs'
       - 'seo-overrides.mjs'
       - 'seo-overrides.json'
+      - 'seo-kenya.mjs'
       - '.github/workflows/product-pages.yml'
 
 permissions:
@@ -40,6 +41,10 @@ jobs:
       - name: Apply Google titles, descriptions and FAQs (seo-overrides.json)
         run: node seo-overrides.mjs
 
+      - name: Kenya search wording and live price guides (seo-kenya.mjs)
+        continue-on-error: true
+        run: node seo-kenya.mjs
+
       - name: Speed - connect to the shop database early (preconnect)
         run: |
           # Safe and repeatable: adds one line to the home page head if it is not there yet.
@@ -52,6 +57,7 @@ jobs:
           git config user.name "bot"
           git config user.email "bot@users.noreply.github.com"
           git add -A p c sitemap-products.xml sitemap-state.json products.html merchant-feed.xml index.html
+          for x in best kenya-guides-state.json; do [ -e "$x" ] && git add -A "$x"; done || true
           if git diff --cached --quiet; then
             echo "Nothing changed - no commit needed."
           else
@@ -63,7 +69,7 @@ jobs:
         run: |
           if [ "$(git log -1 --format=%s)" != "Update product pages and sitemap" ]; then echo "No new commit - nothing to submit."; exit 0; fi
           sleep 120   # give GitHub Pages time to publish the new files
-          git diff --name-only --diff-filter=AMD HEAD~1 HEAD | grep -E '^(p|c)/.*\.html$|^products\.html$' | sed 's#^#https://stermontarcade.co.ke/#' | head -9000 > urls.txt || true
+          git diff --name-only --diff-filter=AMD HEAD~1 HEAD | grep -E '^(p|c|best)/.*\.html$|^products\.html$' | sed 's#^#https://stermontarcade.co.ke/#' | head -9000 > urls.txt || true
           if [ ! -s urls.txt ]; then echo "No page URLs changed."; exit 0; fi
           python3 - <<'PY'
           import json, urllib.request
