@@ -106,3 +106,6 @@ Tested in headless Chromium against the repo served locally, Supabase products m
 - Tested: generator run on real rows (alonze, actellic, zagro, pentagon): H1 "#1 Top ALONZE ...", "#1 Original Actellic ..."; `node seo-meta.test.mjs` 642 checks, 0 violations; headless Chromium: list cards and Actellic product view show the page names.
 - Left: `product-names.json` does not exist until the next rebuild (this merge touches `generate-products.mjs`, which triggers the workflow); until then the shop shows database names. After the rebuild check 3 products on the live site.
 - Decision: to choose a product's ranking name, put the prefix on ANY one size (if several have one, the earliest of them wins).
+
+## Fix: product-names.json was built but never committed (branch `wip-names-file-commit`, 2026-10-29 ~22:05 EAT)
+- Check after PR #65's rebuild: product pages had the prefixed H1s (Alonze "#1 Top", Actellic "#1 Original", Agita "#1 Best", Amito "Reliable"), but `product-names.json` was missing from the repo: `product-pages.yml` only `git add`s a fixed file list. Added `product-names.json` to it. Until the next run the shop list shows database names; after it, list and view use the page headings.
