@@ -11,8 +11,14 @@ Follow-up to the agro descriptions below. Two defects seen on live pages after t
 - [x] The related-guides link on those pages read "Adjuvants &amp;amp; Growth Regulators" (category name escaped twice). It is now unescaped first.
 - [x] Tested in a sandbox with fixture pages: the plant-input box has no PCPB / pre-harvest / spraying words, the fungicide box is unchanged, no `&amp;amp;`, a second run changes nothing. The file on this branch is byte-identical to the tested file (same git blob SHA).
 
+## Checked 2026-10-30 ~00:45 EAT (branch `wip-handoff-status`)
+- [x] `seo-product-extras.mjs` on `main` has the same git blob SHA (83d784d) as `wip-agro-page-boxes`, so the fix is already on `main` (the branch tip is not in `main`'s history, so it was not a plain merge; likely squashed or copied).
+- [x] The built page `p/rootex-6-rooting-hormone-50-g.html` on `main` (bot commit ed352f2, 2026-10-29 21:23 UTC) has no PCPB / pre-harvest / "mixing and spraying" / insecticide-label wording and no `&amp;amp;`; the guides link reads "Adjuvants & Growth Regulators". So the rebuild has already run with the fix.
+- [x] Full test `node seo-agro/build.test.mjs` over all four batches: 310 checks, 0 violations.
+- Not checked: the live site (stermontarcade.co.ke is not reachable from the sandbox); only the committed page file was inspected.
+
 ## Left
-- [ ] Merge `wip-agro-page-boxes` to `main`, then check `p/rootex-6-rooting-hormone-50-g.html` after the next "Build product pages" run (every 3 hours). `seo-product-extras.mjs` is not in that workflow's watched paths, so the merge alone does not trigger a rebuild; tap "Run workflow" to rebuild now.
+- [x] Merge `wip-agro-page-boxes` to `main`: done (see the check above). The branch can be deleted.
 - [ ] Not changed: `fertilizers` is also in the CROP set, so fertilizer pages would still get the pesticide box. No fertilizer pages were checked; decide whether they need the plant-input box too.
 
 ---
@@ -38,7 +44,7 @@ STATUS: all 4 batches (39 products) are written to Supabase and the code (`seo-a
 
 ## Left
 - [x] DONE 2026-10-30 (see the section above): check 3 product pages after the next rebuild (the bot runs every 3 hours): confirm the new description shows (plain text with CAPITAL headings and bullets) and the owner's `seo_title` is unchanged. Status 2026-10-29 ~20:50 UTC: `p/chariot-500-sc-fungicide-1-litre.html` on `main` still shows the OLD text while the database already holds the new text, so the page simply has not been rebuilt since the write (not a defect yet). Re-check Chariot (batch 02), one batch 03 page (e.g. Abasi) and one batch 04 page (Rootex 6, Tihan) after the next "Build product pages" run. If a page still shows the old text after a rebuild, look at how `generate-products.mjs` reads `products.description` before changing anything.
-- [ ] Run the full test once on a complete checkout: `node seo-agro/build.test.mjs` over all four batch files. Batch 04 alone passed (72 checks); batches 01-03 were not re-run after the builder change for Rootex, which cannot change their output (the new fields are absent there), but it was not executed.
+- [x] Full test on a complete checkout, 2026-10-30: `node seo-agro/build.test.mjs` over all four batch files = 310 checks, 0 violations.
 - [x] Merge `wip-agro-descriptions` to `main`: already on `main` (2026-10-30). The merge only adds `seo-agro/` and this file, no site behaviour changes, so it does not need a rebuild.
 - [ ] Owner: supply LABEL DATA (list below). Until then the text says "use the dose on the manufacturer's label". Wrong rates on a pesticide can burn crops or harm people, so nothing was invented.
 - [ ] Owner: LABEL DATA for batch 02 (same gaps as batch 01): dose and coverage for all 10; active ingredient for Covver Xtra and Revus (nothing in the catalog); active ingredient/concentration for Mastercop (copper compound) and Milestone Extreme (dual-action, actives not named); pack size for Revus; pre-harvest and re-entry intervals for all 10. Covver Xtra and Revus catalog text was generic ("maize, wheat, cereals"); that crop claim was NOT repeated because the product type is unknown, crops stay "see the label".
