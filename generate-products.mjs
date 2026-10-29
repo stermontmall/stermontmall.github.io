@@ -98,6 +98,8 @@ const gmap = {};
 rows.forEach(p => { if (p.variant_group && p.variant_label) (gmap[p.variant_group] = gmap[p.variant_group] || []).push(p); });
 const products = [], aliases = [], seenG = new Set();
 const inS = x => x.stock == null || Number(x.stock) > 0;
+// true when the name already ends with the variant label, or every word/number of the label is already in the name
+const labelInName = (name, label) => { const n = String(name).toLowerCase(), l = String(label).toLowerCase(), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
 for (const p of rows) {
   const g = p.variant_group && p.variant_label ? gmap[p.variant_group] : null;
   if (g && g.length > 1) {
@@ -108,7 +110,7 @@ for (const p of rows) {
       stock: g.reduce((n, x) => n + (Number(x.stock) || 0), 0),
       images: [...new Set(g.flatMap(x => x.images || []).filter(Boolean))], description: g.map(x => x.description).find(Boolean) || '' });
     g.slice(1).forEach(x => aliases.push({ id: x.id, to: top.id }));
-  } else products.push(g && !p.name.toLowerCase().endsWith(String(p.variant_label).toLowerCase()) ? { ...p, name: `${p.name} \u2013 ${p.variant_label}` } : p);   // skip a label the name already ends with (e.g. "... Set \u2013 Set")
+  } else products.push(g && !labelInName(p.name, p.variant_label) ? { ...p, name: `${p.name} \u2013 ${p.variant_label}` } : p);   // skip a label the name already carries (e.g. "... Set \u2013 Set", "... 3GB RAM + 64GB \u2013 3GB + 64GB")
 }
 // Retired duplicate listings: their old URLs forward to the product we kept (so links and Google results keep working).
 const DUPES = {
@@ -390,8 +392,8 @@ for (const a of aliases) {
 for (const [slug, c] of Object.entries(byCat)) {
   const path = `/c/${encodeURIComponent(slug)}.html`;
   const info = INFO[slug] || {};
-  const title = info.title || clip(`Buy ${c.name} in Kenya | Prices and Delivery | ${BRAND}`, 70);
-  const desc = info.desc || clip(`Shop ${c.name} online in Kenya. ${c.items.length} products, pay by M-Pesa, delivery to all 47 counties. Order online at ${BRAND}.`, 158);
+  const title = info.title || catTitle(c.name);   // seo-meta.mjs pattern, <= 60 chars (small categories are skipped by seo-kenya.mjs, so they must be right here)
+  const desc = info.desc || catDescription(c.name, slug);
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
 <p>${esc(info.intro || 'Order online and pay by M-Pesa. We deliver to all 47 counties.')} Order online, pay by M-Pesa, delivery to all 47 counties.</p><ul class="g">${c.items.map(card).join('')}</ul>

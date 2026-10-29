@@ -1,4 +1,4 @@
-# HANDOFF - Kenya SEO refactor, part 2: power words (merged; live check pending)
+# HANDOFF - Kenya SEO refactor, part 2: power words (merged; live check done on built pages, one fix on `wip-category-title-fallback`)
 
 Rule: small steps, commit + push to a `wip-<task-name>` branch after each, update this file with every push, merge to `main` only when finished AND tested.
 
@@ -30,6 +30,8 @@ The site is static. `p/*.html`, `c/*.html`, `guides/*.html` are GENERATED and th
 - PR #53 was merged BEFORE the live-data run, which breaks the "merge only when tested" rule. Live check below is therefore the open item, and the fallback is to revert PR #53 if it fails.
 
 ### Left
-- [ ] Live check (needs the Supabase catalog, only available in Actions): after the next "Build product pages" run on `main` (cron every 3 hours, or Actions > Build product pages > Run workflow), open 3 pages (agrochemical, pest control, non-chemical) and check title, meta description and H1 in the browser. Confirm titles are <= 60 chars and have no repeated words. Then tick this box.
+- [x] Live check, 2026-10-29 (file inspection of the pages committed by the "Build product pages" run after PR #54, 287 pages, no browser): all product titles <= 60 chars, 46 use "Best Price in Kenya", 130 use "Price in Kenya", no banned words anywhere. Milthane (agro), Gradometer (pest) and an electric hot plate (general) look right.
+- [ ] Found: 8 small categories (< 3 priced items: watches-jewellery, electrical-lighting, health-beauty, computing, garden-outdoors, protective-wear-safety, phone-accessories, womens-fashion) kept the OLD title "Buy X in Kenya | Prices and Delivery | ..." (62-70 chars), because `seo-kenya.mjs` skips categories with < 3 items and `generate-products.mjs` used its own fallback. Fixed on `wip-category-title-fallback` (generator now calls `catTitle`/`catDescription`). Needs a merge and one rebuild, then re-check those 8 pages.
+- [x] Fixed on `wip-category-title-fallback`: duplicate spec in one title, `p/xiaomi-poco-c71-3gb-ram-64gb.html` ("3GB RAM + 64GB – 3GB + 64GB"). `generate-products.mjs` now skips a variant label when every word/number of it is already in the name (`labelInName`). Verify after the next rebuild.
 - [ ] Owner to confirm "Best Price in Kenya" and "high-potency" wording are acceptable.
 - [ ] Optional: H1 lead word variety (H1 still uses `trustName`, "Original <name>"); per-product `seo-overrides.json` entries for hero products (Bazooka etc.).
