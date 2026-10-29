@@ -39,3 +39,23 @@ Decisions:
 - Fix lives in a new post-processing file instead of editing the large generator, so it is easy to switch off (delete one line).
 - When the meta description had a repeated "Buy", the descriptive middle sentence is dropped entirely (simple and safe); it can be improved later in `seo-kenya.mjs`.
 - Not changed: meta-refresh redirects (GitHub Pages cannot send 301; a Cloudflare layer would), reviews/stars (already only from real approved reviews).
+
+## Task D: cross-sells + mobile navigation (IN PROGRESS, branch `wip-cross-sell-nav`, started from `main`, NOT merged)
+Goal: (1) product pages suggest relevant extras; (2) the main navigation cleanly separates the top clusters (Poultry & Livestock Feed, Crop Protection & Agrochemicals, Public Health & Fumigation) so mobile users can filter ~270 items.
+
+Catalogue facts checked in Supabase (2026-10-29, read-only): Animal Feeds 5 (Kynofos 21 Elite Feed Phosphate, Layer Premix, Lysine Feed Amino Acid, Salinomycin, Gut Bio), Sprayers & Equipment 5, Veterinary Drugs 12, Disinfectants 2, Protective Wear & Safety 1 (only a safety helmet: NO masks, gloves or overalls in the catalogue yet).
+
+### Part 1: cross-sell box
+- [x] Step 1: new `seo-crosssell.mjs` (post-processing on built `p/*.html`, same safe pattern as `seo-fixes.mjs`). Adds a "Complete your order" card grid (2 to 4 in-stock products from related categories, stable pick per product) right after "Available sizes". Rules: termite/rodent/cockroach/bed bug/mosquito/fumigation -> sprayers (+ PPE when it exists); crop insecticides/fungicides/herbicides -> sprayers, wetter/sticker, other crop class; Kynofos / feed phosphates -> premix, lysine, coccidiostat/supplement, poultry vet items; animal feeds / vet drugs / disinfectants cross-link; TVs -> mounts, home theatre, speakers; phones -> accessories.
+- [ ] Step 2: wire into `seo-overrides.mjs` (one line after the `seo-fixes` line).
+- [ ] Step 3: owner runs workflow "Build product pages" on this branch; check `/p/kynofos-21-elite-feed-phosphate-25-kg.html` (premix + lysine) and a termite page (sprayers) and a TV page. The log line `seo-crosssell: ...` shows counts.
+
+### Part 2: navigation (not started)
+- [ ] Read `nav-modern.js` + `index.html` nav, then propose the 3 cluster tabs for mobile.
+
+### Decisions
+- Heading is "Complete your order", not "Frequently bought together": the picks come from rules, not from real order history, so the heading must not claim sales data. Can switch to real data later from the orders table.
+- No PPE cards for chemicals until real masks/gloves/overalls are in the catalogue (the rule `PPE` already looks for them by name, so adding the products is enough).
+- Product pages are post-processed (no change to the large generator), so it can be switched off by deleting one line.
+
+Rollback: delete the `seo-crosssell` import line in `seo-overrides.mjs` (or revert the commits on this branch).
