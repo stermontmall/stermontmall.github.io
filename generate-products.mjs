@@ -390,8 +390,8 @@ for (const a of aliases) {
 for (const [slug, c] of Object.entries(byCat)) {
   const path = `/c/${encodeURIComponent(slug)}.html`;
   const info = INFO[slug] || {};
-  const title = info.title || clip(`Buy ${c.name} in Kenya | Prices and Delivery | ${BRAND}`, 70);
-  const desc = info.desc || clip(`Shop ${c.name} online in Kenya. ${c.items.length} products, pay by M-Pesa, delivery to all 47 counties. Order online at ${BRAND}.`, 158);
+  const title = info.title || catTitle(c.name);   // seo-meta.mjs pattern, <= 60 chars (small categories are skipped by seo-kenya.mjs, so they must be right here)
+  const desc = info.desc || catDescription(c.name, slug);
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
 <p>${esc(info.intro || 'Order online and pay by M-Pesa. We deliver to all 47 counties.')} Order online, pay by M-Pesa, delivery to all 47 counties.</p><ul class="g">${c.items.map(card).join('')}</ul>
