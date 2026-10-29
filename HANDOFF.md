@@ -83,3 +83,12 @@ Static GitHub Pages site. No Next.js / React Router / Nuxt, so `force-dynamic`, 
 
 ## Shop product view heading = page H1 (branch `wip-view-h1`, 2026-10-29)
 Owner wants the name shown in the shop's product view to match the product page ("Original Zagro Ultraxide Disinfectant for Poultry & Livestock Farms – 1 Litre"). `storefront-live.js?v=5`: `setMeta` already revalidates the real /p/ page; it now also copies that page's `<h1>` into the view's heading and top bar (plain name shown for a moment until it arrives; stays plain if the page cannot be fetched). Cards on the list keep the plain name.
+
+## Verification of the names work (branch `wip-names-verified`, 2026-10-29 ~21:55 EAT)
+Tested in headless Chromium against the repo served locally, Supabase products mocked (Alonze group with one stray "#1 Top" name, plus Zagro):
+- [x] List cards: every size of a product shows the majority name (no "#1 Top").
+- [x] Opening Zagro: view heading AND top bar = the page H1 "Original Zagro Ultraxide Disinfectant for Poultry & Livestock Farms – 1 Litre".
+- [x] No page errors.
+- Decisions: PRs #60, #61, #62 were merged BEFORE this browser test (breaks the "merge only when tested" rule); the test now passes, so no revert needed.
+- Not testable from the sandbox: the live site (network blocked). Owner check on phone: open stermontarcade.co.ke twice (first visit installs service worker v3), rename a size in admin, confirm all sizes follow.
+- Left: if a phone still shows old names, clear site data once for stermontarcade.co.ke (old service worker/cache); cards on the list keep the plain name (decision: long names cut off on mobile).
