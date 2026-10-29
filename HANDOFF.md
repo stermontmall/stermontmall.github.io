@@ -1,20 +1,71 @@
-# HANDOFF - fresh product titles/metadata without manual refresh (branch `wip-fresh-product-routing`)
+# HANDOFF - Kenya SEO refactor, part 2: power words (merged; live check done on built pages, one fix on `wip-category-title-fallback`)
 
-Rule: small steps, commit + push to `wip-<task-name>` after each, update this file with every push, merge to `main` only when finished AND tested.
-(The previous SEO/power-words HANDOFF was replaced on this branch; it is still in git history on `main`.)
+Rule: small steps, commit + push to a `wip-<task-name>` branch after each, update this file with every push, merge to `main` only when finished AND tested.
+
+## Part 1 (DONE, merged to `main` as PR #52, branch `wip-seo-kenya-meta`)
+Shared builders in `seo-meta.mjs`, product pages (title, description, H1 trust word, 3 local H2 sections, `stm-seo v2` marker) in `generate-products.mjs`, category meta in `seo-kenya.mjs`. JSON-LD and OG already correct (KES, availability, seller, og:locale en_KE). Clean slugs + permanent redirects already exist (Task A).
+
+## How the site is built (important)
+The site is static. `p/*.html`, `c/*.html`, `guides/*.html` are GENERATED and the bot rebuilds them every 3 hours (`.github/workflows/product-pages.yml`) from the Supabase catalog, then commits to `main`. Edit the generators, never the generated pages.
+1. `generate-products.mjs` - product (`/p/`), category (`/c/`) pages, sitemap. Calls `pdpTitle/pdpDescription/pdpHeadings` from `seo-meta.mjs`.
+2. `seo-kenya.mjs` - category titles/descriptions via `catTitle/catDescription`; skips `stm-seo v2` product pages.
+3. `seo-overrides.mjs` (+ `seo-product-extras.mjs`, `seo-fixes.mjs`) - hand-written `seo-overrides.json` always wins.
+4. `seo-auto-index.mjs` - hand-written pages.
+
+## Part 2 - power words
+### Done
+- [x] `seo-meta.mjs`: product-type power-word layer (pest / agro / farm / general), deterministic pick, never repeats a word already in the name. New PDP title, PDP description, category title and category description patterns (see the code comments above each function).
+- [x] `seo-meta.test.mjs`: `node seo-meta.test.mjs` - 250 checks, 0 violations (run 2026-10-29 before the merge).
+- [x] `seo-check.mjs` verified compatible with the new title/description shapes.
+- [x] Merged to `main` as PR #53 (branch `wip-seo-power-words`) on 2026-10-29 at 17:23 EAT.
+- [x] Workflow gap fixed (PR from `wip-power-words-followup`): `product-pages.yml` did not watch `seo-meta.mjs`, so merging PR #53 did NOT trigger a rebuild. It now does.
+
+### Decisions
+- Banned from generated copy: "#1 Rated", "Top-Rated", "Guaranteed", "Certified" (verifiable claims; no reviews/paperwork to back them). Also not used: "Instant Knockdown", "Maximum Strength", "Commercial-Grade" (true only per product label). They can be added per product in `seo-overrides.json`.
+- "Best Price in Kenya" follows the brief; price-watch matches competitor prices. Owner to confirm. To revert, delete the `Best Price` tiers in `pdpTitle` (3 lines).
+- "Wholesale Price Nairobi" in category descriptions only.
+- Category title limit is 60 chars, so most categories use the shorter fallbacks ("Shop Top <Category> Online in Kenya | Stermont Arcade").
+- PCPB wording only on regulated categories; delivery wording never says "same-day to 47 counties".
+- "Original" still beats a power word when true (known brand or farm input).
+- PR #53 was merged BEFORE the live-data run, which breaks the "merge only when tested" rule. Live check below is therefore the open item, and the fallback is to revert PR #53 if it fails.
+
+### Left
+- [x] Live check, 2026-10-29 (file inspection of the pages committed by the "Build product pages" run after PR #54, 287 pages, no browser): all product titles <= 60 chars, 46 use "Best Price in Kenya", 130 use "Price in Kenya", no banned words anywhere. Milthane (agro), Gradometer (pest) and an electric hot plate (general) look right.
+- [ ] Found: 8 small categories (< 3 priced items: watches-jewellery, electrical-lighting, health-beauty, computing, garden-outdoors, protective-wear-safety, phone-accessories, womens-fashion) kept the OLD title "Buy X in Kenya | Prices and Delivery | ..." (62-70 chars), because `seo-kenya.mjs` skips categories with < 3 items and `generate-products.mjs` used its own fallback. Fixed on `wip-category-title-fallback` (generator now calls `catTitle`/`catDescription`). Needs a merge and one rebuild, then re-check those 8 pages.
+- [x] Fixed on `wip-category-title-fallback`: duplicate spec in one title, `p/xiaomi-poco-c71-3gb-ram-64gb.html` ("3GB RAM + 64GB – 3GB + 64GB"). `generate-products.mjs` now skips a variant label when every word/number of it is already in the name (`labelInName`). Verify after the next rebuild.
+- [ ] Owner to confirm "Best Price in Kenya" and "high-potency" wording are acceptable.
+- [x] Visible on-page wording (branch `wip-power-words-h1`): the H1 now uses `pdpH1` (same lead word as the title: "Original" when true, else a power word) and a visible line under it from `pdpTagline`: "Best Price in Kenya · 100% genuine & high-potency · M-Pesa checkout · Delivery to all 47 counties" ("100% genuine" only where `isGenuine`). Before this the power words were only in the <title> and meta description, not on the page. Check 3 pages after the rebuild.
+- [ ] Optional: per-product `seo-overrides.json` entries for hero products (Bazooka etc.).
+
+## Part 3 - visible trust badges and H2 wording (branch `wip-pdp-trust-badges`)
+Handoff check 2026-10-29 18:5x EAT: `wip-category-title-fallback` (PR #55) and `wip-power-words-h1` (PR #56) are both merged to `main`. So brief item A (H1 power word) and the tagline under the H1 were already live. Still missing from the brief: B (trust badge pills near price / Add to Cart) and C (the three H2 headings with the exact wording).
+### Done
+- [x] Step 1 `seo-meta.mjs`: `pdpBadges(ctx)` and new `pdpHeadings(catSlug)` ({features, guide, price}); tests in `seo-meta.test.mjs` (642 checks, 0 violations).
+### Left
+- [ ] Step 2 `generate-products.mjs`: render badge pills under the price, use the new H2 sections and CSS (mobile first).
+- [ ] Step 3 build check (generator needs the Supabase anon key to fetch the catalog), inspect 3 generated pages (pest, agro, general), then merge to `main`.
+### Decisions
+- "Top-Rated Quality" badge from the brief is shown as "Top-Quality Selection": there are no ratings to back "Top-Rated" (rule at the top of `seo-meta.mjs`). To use the brief wording, edit one string in `pdpBadges` and the banned-words test.
+- "100% Original & PCPB Approved" only in PCPB-regulated categories; "100% Original" only for known brands and farm inputs; no such badge on other products (a sneaker is not PCPB approved).
+- H2 #1 "Powerful Features & Target Dudu Control" for home pest control, "Powerful Features & Target Crop Protection" for crop chemicals; none for other products. H2 #2 and #3 appear on every product. Old H2s "Price & M-Pesa Ordering in Kenya" and "Delivery to Nairobi & 47 Counties" are merged into #3.
+
+---
+
+# Task: fresh product titles/metadata without a manual refresh (branch `wip-fresh-product-routing`)
+Separate task from the SEO parts above (those are untouched). Scope = caching, service worker, route-change title/meta.
 
 ## What the repo is (decides what can be done)
-Static site on GitHub Pages (`CNAME`, `.nojekyll`). No Next.js / React Router / Nuxt, so `force-dynamic`, `revalidate = 0` and `<Link prefetch>` do not exist here.
-`p/*.html` and `c/*.html` are generated every 3 h by `generate-products.mjs` (never hand-edit them). Home page cards (`storefront-live.js`) open a client-side product view and `pushState` to `/p/<slug>.html`.
+Static GitHub Pages site. No Next.js / React Router / Nuxt, so `force-dynamic`, `revalidate = 0` and `<Link prefetch>` do not exist here (not applicable). Home-page cards (`storefront-live.js`) open a client-side product view and `pushState` to `/p/<slug>.html`, so the page never reloads.
 
 ## Done
-- [x] `sw.js` -> `stermont-v2`. Network-first; HTML/JSON requests use `cache:'no-cache'` so they are revalidated with the server instead of served from the browser's 10-minute GitHub Pages cache. `skipWaiting()` + `clients.claim()` kept. Only OK same-origin responses are cached; cache is offline fallback only. (commit c633aaf)
-- [x] `_headers` with `Cache-Control: no-cache, no-store, must-revalidate, max-age=0`, `Pragma: no-cache`, `Expires: 0` for `/`, `/index.html`, `/p/*`, `/c/*`, `/sw.js`.
+- [x] `sw.js` -> cache `stermont-v2`. Network-first; HTML/JSON/page navigations use `cache:'no-cache'` (revalidate with the server, 304 when unchanged) instead of the browser's 10-minute GitHub Pages cache. `skipWaiting()` + `clients.claim()` kept; old `stermont-v1` deleted on activate; only OK same-origin responses cached (cache = offline fallback only). Tested with a node mock: shell fetched with `reload`, `/p/*.html`, `/`, `*.json` fetched `no-cache`, images default, cross-origin skipped, v1 deleted, skipWaiting and claim called once each.
+- [x] `_headers` (`Cache-Control: no-cache, no-store, must-revalidate, max-age=0`, `Pragma: no-cache`, `Expires: 0`) for `/`, `/index.html`, `/p/*`, `/c/*`, `/sw.js`.
+- [x] `storefront-live.js` (already contains this, no change needed on this branch): Supabase product fetch uses `cache:'no-store'`; opening a product view sets `document.title` and the meta description from a fresh (`no-cache`) fetch of the product page, switching pack size updates them, closing/back restores the originals (`setMeta` / `resetMeta`).
 
-## Left
-- [ ] `storefront-live.js`: Supabase product fetch with `cache:'no-store'`; set `document.title` + meta description when a product view opens (fresh fetch of the product page's real title/description), restore on close/back (route-change equivalent of `useEffect`).
-- [ ] Verify (node syntax check, diff review) and merge to `main`.
+## Left / not testable here
+- [ ] Real-browser check (no browser available to me): open the home page, tap a product card, confirm the tab title shows the page's SEO title; rebuild pages, reopen, confirm it is the new title without a hard refresh.
+- [ ] If `stermontarcade.co.ke` is proxied by Cloudflare, add the same headers as a Response Header Transform Rule (dashboard only).
 
 ## Decisions / limits
-- GitHub Pages cannot send custom HTTP headers. `_headers` takes effect only if the site is served from Cloudflare Pages/Netlify. If `stermontarcade.co.ke` is proxied by Cloudflare, create the same headers as a Cloudflare Response Header Transform Rule or Cache Rule (dashboard; not possible from the repo). Until then the service worker is what stops stale pages for returning visitors.
-- Next.js items (force-dynamic, prefetch) are not applicable: there is no framework in this repo.
+- GitHub Pages cannot send custom HTTP headers, so `_headers` has no effect there (it works on Cloudflare Pages / Netlify). The service worker is what prevents stale pages for returning visitors on GitHub Pages. First-time visitors and browsers without the worker still get GitHub's 10-minute cache.
+- `no-store` on pages also disables the browser's back/forward cache for them (requested; costs some speed).
