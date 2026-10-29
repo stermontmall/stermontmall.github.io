@@ -18,8 +18,13 @@ for (const f of fs.readdirSync(dir).filter(f => /^batch-\d+\.json$/.test(f))) {
     ok((html.match(/<h3>/g) || []).length === 5, id + ' needs 5 sections');
     ok(/KSh [\d,]+/.test(meta), id + ' price in meta');
     ok(p.ai || p.labelNeeded.some(x => /active ingredient/.test(x)), id + ' missing AI must be flagged');
-    ok(!/\b\d+\s?(ml|g|l|litres?)\s*per\s*(l|litre|ha|hectare|knapsack|20)/i.test(html), id + ' invented dose');
-    ok(!/\d+\s?(hours?|days?)\b/i.test(html.replace(/<!--.*?-->/g, '')), id + ' invented interval');
+    // Products flagged labelData carry dose/interval figures taken from the catalog text (listed in the batch file); all others must have none.
+    if (!p.labelData) {
+      ok(!/\b\d+\s?(ml|g|l|litres?)\s*per\s*(l|litre|ha|hectare|knapsack|20)/i.test(html), id + ' invented dose');
+      ok(!/\d+\s?(hours?|days?)\b/i.test(html.replace(/<!--.*?-->/g, '')), id + ' invented interval');
+    } else {
+      ok(p.dose || p.preHarvest || p.reentry, id + ' labelData flag without figures');
+    }
   }
 }
 console.log(checks + ' checks, ' + bad + ' violations');

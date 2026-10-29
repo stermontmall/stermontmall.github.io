@@ -50,7 +50,7 @@ export function render(p) {
   const ai = p.ai || 'See the product label (not stated in our catalog)';
   const form = p.formulation || 'See the product label';
   const steps = [
-    `<li><strong>Dilution Rate:</strong> Use the dose and water volume printed on the manufacturer's label for your crop and growth stage.</li>`,
+    `<li><strong>Dilution Rate:</strong> ${p.dose ? esc(p.dose) : "Use the dose and water volume printed on the manufacturer's label for your crop and growth stage."}</li>`,
     `<li><strong>Application Method:</strong> ${esc(p.method)}</li>`,
     `<li><strong>Coverage Area:</strong> Depends on the dose and spray volume on the label. ${/\d/.test(p.sizes) ? `Available in ${esc(p.sizes)}; choose the pack that matches your acreage.` : 'Check the pack for its size.'}</li>`,
     ...p.extraSteps.map(s => `<li>${esc(s)}</li>`),
@@ -76,7 +76,7 @@ export function render(p) {
     <h3>Safety &amp; Re-Entry Precautions:</h3>
     <ul>
         <li><strong>Required PPE:</strong> Gloves, mask, goggles, overalls and boots when mixing and spraying.</li>
-        <li><strong>Re-Entry:</strong> Keep people, children and animals out of the sprayed area until the spray has dried, and follow the re-entry and pre-harvest intervals on the label.</li>
+        ${(p.preHarvest ? `<li><strong>Pre-Harvest Interval:</strong> ${esc(p.preHarvest)}</li>\n        ` : '')}<li><strong>Re-Entry:</strong> ${p.reentry ? esc(p.reentry) + ' ' : ''}Keep people, children and animals out of the sprayed area until the spray has dried, and follow the re-entry and pre-harvest intervals on the label.</li>
         <li><strong>Water &amp; Storage:</strong> Keep spray and rinse water away from streams, ponds and wells. Store in the original closed container, cool, dry and locked, away from food and feed.</li>
     </ul>
 
@@ -114,13 +114,14 @@ export function renderText(p) {
   L.push(/\d/.test(p.sizes) ? `${p.name} (${p.sizes.replace(/ and /g, ', ')})` : p.name, '', p.lead, '', 'KEY SPECIFICATIONS & FEATURES');
   L.push(`• Active ingredient: ${ai}`, `• Target: ${p.targets}`, `• Formulation: ${form}`, `• Application settings: ${p.settings}`, '');
   L.push('MIXING & APPLICATION INSTRUCTIONS');
-  L.push(`1. Dilution rate: use the dose and water volume printed on the manufacturer's label for your crop and growth stage.`);
+  L.push(`1. Dilution rate: ${p.dose || "use the dose and water volume printed on the manufacturer's label for your crop and growth stage."}`);
   L.push(`2. Application method: ${p.method}`);
   L.push(`3. Coverage: depends on the dose and spray volume on the label. ${/\d/.test(p.sizes) ? `Available in ${p.sizes}.` : 'Check the pack for its size.'}`);
   p.extraSteps.forEach((s, i) => L.push(`${4 + i}. ${s}`));
   L.push('', 'SAFETY & RE-ENTRY PRECAUTIONS');
   L.push('• Wear gloves, a mask, goggles, overalls and boots when mixing and spraying.');
-  L.push('• Keep people, children and animals out of the sprayed area until the spray has dried, and follow the re-entry and pre-harvest intervals on the label.');
+  if (p.preHarvest) L.push(`• Pre-harvest interval: ${p.preHarvest}`);
+  L.push(`• ${p.reentry ? p.reentry + ' ' : ''}Keep people, children and animals out of the sprayed area until the spray has dried, and follow the re-entry and pre-harvest intervals on the label.`);
   L.push('• Keep spray and rinse water away from streams, ponds and wells. Store in the original closed container, cool, dry and locked, away from food and feed.', '');
   L.push(...textTail(p));
   return L.join('\n');
