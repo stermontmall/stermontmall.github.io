@@ -61,6 +61,23 @@ const hasLeadWord = n => /^(original|genuine|powerful|premium|top|best|quality|r
 const hasTrustWord = n => /^(original|genuine)\b/i.test(n);
 export const trustName = (name, ctx) => (isGenuine(ctx) && !hasTrustWord(name) ? `Original ${name}` : name);
 
+// Visible H1 on the product page: the same lead word the title uses ("Original" when true, otherwise a type-appropriate power word),
+// so what shoppers read on the page matches the search listing. Never repeats a word the name already starts with.
+export function pdpH1(name, ctx = {}) {
+  const base = String(name || '').replace(/\s+/g, ' ').trim();
+  if (hasLeadWord(base)) return base;
+  const lead = isGenuine(ctx) ? 'Original' : powerWord(base, ctx);
+  return `${lead} ${base}`;
+}
+
+// One visible line under the H1 on the product page. Same claims as the meta description (genuine only where true).
+//   "Best Price in Kenya · 100% genuine & high-potency · M-Pesa checkout · Delivery to all 47 counties"
+export function pdpTagline(ctx = {}) {
+  const desc = DESCRIPTOR[productType(ctx.catSlug)];
+  const claim = isGenuine(ctx) ? `100% genuine & ${desc}` : desc.charAt(0).toUpperCase() + desc.slice(1);
+  return `Best Price in Kenya \u00b7 ${claim} \u00b7 M-Pesa checkout \u00b7 Delivery to all 47 counties`;
+}
+
 // PDP meta title, max 60 characters.
 //   Best:   "<Original|Power word> <name> – Best Price in Kenya | Stermont Arcade"
 // "Original" leads when it is true (known brand or farm input); otherwise a type-appropriate power word leads.
