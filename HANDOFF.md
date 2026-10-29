@@ -48,3 +48,24 @@ Handoff check 2026-10-29 18:5x EAT: `wip-category-title-fallback` (PR #55) and `
 - "Top-Rated Quality" badge from the brief is shown as "Top-Quality Selection": there are no ratings to back "Top-Rated" (rule at the top of `seo-meta.mjs`). To use the brief wording, edit one string in `pdpBadges` and the banned-words test.
 - "100% Original & PCPB Approved" only in PCPB-regulated categories; "100% Original" only for known brands and farm inputs; no such badge on other products (a sneaker is not PCPB approved).
 - H2 #1 "Powerful Features & Target Dudu Control" for home pest control, "Powerful Features & Target Crop Protection" for crop chemicals; none for other products. H2 #2 and #3 appear on every product. Old H2s "Price & M-Pesa Ordering in Kenya" and "Delivery to Nairobi & 47 Counties" are merged into #3.
+
+---
+
+# Task: fresh product titles/metadata without a manual refresh (branch `wip-fresh-product-routing`)
+Separate task from the SEO parts above (those are untouched). Scope = caching, service worker, route-change title/meta.
+
+## What the repo is (decides what can be done)
+Static GitHub Pages site. No Next.js / React Router / Nuxt, so `force-dynamic`, `revalidate = 0` and `<Link prefetch>` do not exist here (not applicable). Home-page cards (`storefront-live.js`) open a client-side product view and `pushState` to `/p/<slug>.html`, so the page never reloads.
+
+## Done
+- [x] `sw.js` -> cache `stermont-v2`. Network-first; HTML/JSON/page navigations use `cache:'no-cache'` (revalidate with the server, 304 when unchanged) instead of the browser's 10-minute GitHub Pages cache. `skipWaiting()` + `clients.claim()` kept; old `stermont-v1` deleted on activate; only OK same-origin responses cached (cache = offline fallback only). Tested with a node mock: shell fetched with `reload`, `/p/*.html`, `/`, `*.json` fetched `no-cache`, images default, cross-origin skipped, v1 deleted, skipWaiting and claim called once each.
+- [x] `_headers` (`Cache-Control: no-cache, no-store, must-revalidate, max-age=0`, `Pragma: no-cache`, `Expires: 0`) for `/`, `/index.html`, `/p/*`, `/c/*`, `/sw.js`.
+- [x] `storefront-live.js` (already contains this, no change needed on this branch): Supabase product fetch uses `cache:'no-store'`; opening a product view sets `document.title` and the meta description from a fresh (`no-cache`) fetch of the product page, switching pack size updates them, closing/back restores the originals (`setMeta` / `resetMeta`).
+
+## Left / not testable here
+- [ ] Real-browser check (no browser available to me): open the home page, tap a product card, confirm the tab title shows the page's SEO title; rebuild pages, reopen, confirm it is the new title without a hard refresh.
+- [ ] If `stermontarcade.co.ke` is proxied by Cloudflare, add the same headers as a Response Header Transform Rule (dashboard only).
+
+## Decisions / limits
+- GitHub Pages cannot send custom HTTP headers, so `_headers` has no effect there (it works on Cloudflare Pages / Netlify). The service worker is what prevents stale pages for returning visitors on GitHub Pages. First-time visitors and browsers without the worker still get GitHub's 10-minute cache.
+- `no-store` on pages also disables the browser's back/forward cache for them (requested; costs some speed).

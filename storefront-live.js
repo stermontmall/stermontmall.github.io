@@ -90,6 +90,30 @@
   /* straight product URL: /p/<id>.html (the real page Google indexes), never a #hash */
   var SLUGS = {};   /* product id -> clean page name (products.slug); falls back to the id */
   function purl(id) { return '/p/' + encodeURIComponent(SLUGS[id] || id) + '.html'; }
+
+  /* ---------- tab title + meta description follow the open product (no manual refresh needed) ----------
+     The product view is a soft navigation (pushState), so the browser never reloads the page and the tab title would stay on the
+     homepage title. We set a name-based title at once, then revalidate the real /p/ page (cache:'no-cache') and use ITS <title> and
+     meta description, so what the tab shows is always what the freshly built page says. Closing the view restores the original. */
+  var T0 = null, DESC0 = null, MT = 0;
+  function descTag() { return D.querySelector('meta[name="description"]'); }
+  function setMeta(p) {
+    var md = descTag(); if (T0 === null) { T0 = D.title; DESC0 = md ? md.getAttribute('content') : null; }
+    var tok = ++MT; D.title = (p.vbase || p.name) + ' | Stermont Arcade';
+    try {
+      fetch(purl(p.id), { cache: 'no-cache', credentials: 'omit' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (h) {
+        if (!h || tok !== MT || !cur) return;
+        var dd = new DOMParser().parseFromString(h, 'text/html'), t = dd.title, m = dd.querySelector('meta[name="description"]'), cd = descTag();
+        if (t) D.title = t;
+        if (m && cd && m.getAttribute('content')) cd.setAttribute('content', m.getAttribute('content'));
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  function resetMeta() {
+    MT++; if (T0 === null) return;
+    D.title = T0; var md = descTag(); if (md && DESC0 !== null) md.setAttribute('content', DESC0);
+  }
+
   function build() {
     if (pd) return;
     var st = mk('style'); st.textContent = CSS; D.head.appendChild(st);
@@ -166,8 +190,10 @@
     if (!BASE && location.pathname.indexOf('/p/') !== 0) BASE = location.pathname + location.search;
     if (!noPush) { try { history.pushState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }
     else if (keep) { try { history.replaceState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }   /* switching pack size: update the URL in place */
+    setMeta(p);   /* tab title + meta description now match the product that is open */
   }
   function hide() {
+    resetMeta();
     if (pd) pd.classList.remove('on'); D.documentElement.style.overflow = ''; cur = null;
     /* if the view was closed without Back (e.g. the Cart button), restore the homepage URL so relative links keep working */
     if (BASE && location.pathname.indexOf('/p/') === 0) { try { history.replaceState(null, '', BASE); } catch (e) {} }
@@ -231,7 +257,8 @@
 
   /* ---------- put items into their category sections ---------- */
   function bump(m) { var c = m.querySelector('.cnt'); if (c) c.textContent = m.querySelectorAll('.pcard:not(.vhide)').length; }
-  function getProducts(sel) { return fetch(SB + '/rest/v1/products?active=eq.true&select=' + sel + '&order=created_at.asc', { headers: { apikey: KEY } }); }
+  /* cache:'no-store' = always ask the database, never reuse a copy the browser kept (fresh names, prices and stock on every load) */
+  function getProducts(sel) { return fetch(SB + '/rest/v1/products?active=eq.true&select=' + sel + '&order=created_at.asc', { headers: { apikey: KEY }, cache: 'no-store' }); }
   getProducts('id,slug,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)')
     .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)'); })
     .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,stock,images,featured,description,categories(name,slug)'); })
