@@ -29,7 +29,8 @@ const fixProducts = list => list.map(p => (Array.isArray(p.images) ? { ...p, ima
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
-  const cols = ['id,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
+  const cols = ['id,slug,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
+                'id,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
                 'id,name,price,old_price,unit,stock,images,description,categories(name,slug)',
                 'id,name,price,stock,images,description,categories(name,slug)'];
   for (const c of cols) {
@@ -115,6 +116,19 @@ const DUPES = {
   'zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre-2': 'zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre'
 };
 Object.entries(DUPES).forEach(([id, to]) => { if (products.some(p => p.id === to) && !products.some(p => p.id === id)) aliases.push({ id, to }); });
+// Clean page addresses: /p/<slug>.html from the products.slug column. The product id stays the real key (cart, orders, stock) and is kept on each page in <meta name="stm-id">.
+// A slug is only used when it is URL-safe and not the id or slug of another product; otherwise the page keeps its id address.
+const slugOf = {};
+{
+  const allIds = new Set(rows.map(r => r.id)), usedSlugs = new Set();
+  for (const r of rows) {
+    const s = typeof r.slug === 'string' ? r.slug.trim() : '';
+    if (s && s !== r.id && /^[a-z0-9][a-z0-9-]*$/.test(s) && !allIds.has(s) && !usedSlugs.has(s)) { slugOf[r.id] = s; usedSlugs.add(s); }
+  }
+}
+const sl = id => slugOf[id] || id;
+// The old id address of a renamed product becomes a redirect to its clean page.
+products.forEach(p => { if (sl(p.id) !== p.id) aliases.push({ id: p.id, to: p.id }); });
 const fileOf = path => `.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m));
 const byCat = {};
 products.forEach(p => { const s = p.categories?.slug; if (s) (byCat[s] = byCat[s] || { name: p.categories.name, items: [] }).items.push(p); });
@@ -276,10 +290,10 @@ mkdirSync('p', { recursive: true }); mkdirSync('c', { recursive: true });
 const urls = [];
 
 const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(u)}" alt="${esc(p.name)}" width="160" height="150" loading="lazy" decoding="async">` : ''; };
-const card = p => `<li><a href="/p/${encodeURIComponent(p.id)}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
+const card = p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 for (const p of products) {
-  const path = `/p/${encodeURIComponent(p.id)}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
+  const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
   const revs = reviewsFor(p), rLd = reviewLd(revs);
   const plain = clip(p.description, 150);
@@ -341,12 +355,12 @@ ${p.description ? `<div class="box"><h2 style="margin-top:0">About ${esc(p.name)
 ${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
 ${related.length ? `<h2>More in ${esc(cat.name)}</h2><ul class="g">${related.map(card).join('')}</ul>` : ''}
 <div class="stk" role="complementary" aria-label="Order this product"><b>${p.variants ? 'From ' : ''}${money(p.price)}<small>${esc(p.name)}</small></b><a class="call" href="tel:+${WHATSAPP}" aria-label="Call ${BRAND}">Call</a><a href="${esc(inStock ? wa : ask)}">${inStock ? 'Order on WhatsApp' : 'Ask on WhatsApp'}</a></div>`;
-  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld, ogType: 'product', extra: `<meta property="product:price:amount" content="${Math.round(Number(p.price) || 0)}"><meta property="product:price:currency" content="KES"><meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` }));
+  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld, ogType: 'product', extra: `<meta name="stm-id" content="${esc(p.id)}"><meta property="product:price:amount" content="${Math.round(Number(p.price) || 0)}"><meta property="product:price:currency" content="KES"><meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` }));
   urls.push(path);
 }
 
 for (const a of aliases) {
-  const from = `/p/${encodeURIComponent(a.id)}.html`, to = `${SITE}/p/${encodeURIComponent(a.to)}.html`;
+  const from = `/p/${encodeURIComponent(a.id)}.html`, to = `${SITE}/p/${encodeURIComponent(sl(a.to))}.html`;
   writeFileSync(fileOf(from), `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Redirecting\u2026</title><link rel="canonical" href="${to}"><meta http-equiv="refresh" content="0;url=${to}"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><p>This product moved. <a href="${to}">Continue to the product page</a>.</p></body></html>`);
 }
 
@@ -355,7 +369,7 @@ for (const [slug, c] of Object.entries(byCat)) {
   const info = INFO[slug] || {};
   const title = info.title || clip(`Buy ${c.name} in Kenya | Prices and Delivery | ${BRAND}`, 70);
   const desc = info.desc || clip(`Shop ${c.name} online in Kenya. ${c.items.length} products, pay by M-Pesa, delivery to all 47 counties. Order online at ${BRAND}.`, 158);
-  const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(p.id)}.html`, name: p.name })) });
+  const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
 <p>${esc(info.intro || 'Order online and pay by M-Pesa. We deliver to all 47 counties.')} Order online, pay by M-Pesa, delivery to all 47 counties.</p><ul class="g">${c.items.map(card).join('')}</ul>
 ${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
@@ -387,7 +401,7 @@ ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<
 <p>${products.length} product${products.length === 1 ? '' : 's'} to order online in Kenya. Pay by M-Pesa, delivery to all 47 counties. Cannot see what you need? <a href="https://wa.me/${WHATSAPP}">Ask us on WhatsApp</a> and we will source it.</p>
 ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html">${esc(g.name)}</a>` : esc(g.name)}</h2><ul class="g">${g.items.map(card).join('')}</ul>`).join('\n')}
 <p><a href="/c/">Browse all categories</a></p>`;
-  const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: `All products at ${BRAND}`, itemListElement: products.slice(0, 100).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(p.id)}.html`, name: p.name })) });
+  const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: `All products at ${BRAND}`, itemListElement: products.slice(0, 100).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   writeFileSync('products.html', shell({ title: `All Products | Buy Online in Kenya | ${BRAND}`, desc: `Browse every product at ${BRAND}: pest control, agrovet, appliances and more. Pay by M-Pesa, delivery to all 47 counties.`, path: '/products.html', body,
     ld: ld + crumbLd([['Home', SITE + '/'], ['All products', SITE + '/products.html']]) }));
   urls.push('/products.html');
@@ -401,7 +415,7 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
     const imgs = (p.images || []).filter(Boolean); if (!imgs.length || !(Number(p.price) > 0)) continue;
     const grouped = p.variant_group && p.variant_label && gmap[p.variant_group]?.length > 1;
     const title = clip(grouped ? `${p.name.replace(SIZE_END, '') || p.name} ${p.variant_label}` : p.name, 150);
-    const page = `${SITE}/p/${encodeURIComponent(pageOf[p.id] || p.id)}.html`;
+    const page = `${SITE}/p/${encodeURIComponent(sl(pageOf[p.id] || p.id))}.html`;
     const price = Math.round(Number(p.price)), old = Math.round(Number(p.old_price) || 0);
     feed.push(`<item><g:id>${esc(p.id)}</g:id><title>${esc(title)}</title><description>${esc(clip(p.description, 4000) || `${title} available at ${BRAND}, Kenya. Pay by M-Pesa, delivery to all 47 counties.`)}</description>
 <link>${esc(page)}</link><g:image_link>${esc(imgs[0])}</g:image_link>${imgs.slice(1, 10).map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('')}
@@ -431,9 +445,9 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
 <h2 id="seo-cats">Shop by category</h2>
 <ul>${catsAll.map(([slug, c]) => `<li><a href="/c/${encodeURIComponent(slug)}.html">${esc(c.name)}</a></li>`).join('')}</ul>
 <h2>Popular products</h2>
-<ul>${picks.slice(0, 12).map(p => `<li><a href="/p/${encodeURIComponent(p.id)}.html">${esc(p.name)}</a></li>`).join('')}</ul>
+<ul>${picks.slice(0, 12).map(p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${esc(p.name)}</a></li>`).join('')}</ul>
 <h2>New arrivals</h2>
-<ul>${[...products].reverse().slice(0, 16).map(p => `<li><a href="/p/${encodeURIComponent(p.id)}.html">${esc(p.name)}</a></li>`).join('')}</ul>
+<ul>${[...products].reverse().slice(0, 16).map(p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${esc(p.name)}</a></li>`).join('')}</ul>
 <p><a href="/products.html">View all ${products.length} products</a> &middot; <a href="/c/">All categories</a></p>
 </div></section>
 ${B}`;

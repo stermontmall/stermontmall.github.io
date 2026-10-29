@@ -44,7 +44,7 @@ Do NOT rename product ids. Use the existing, unused `products.slug` column as th
 ## Left (small steps, one push each)
 - [ ] Step 3c: `storefront-live.js` must read `slug` (select it, fall back to `id`) and `purl(p)` use `p.slug || p.id`; WhatsApp link too. Do this together with 3b so no URL is ever published before its page exists.
 - [ ] Step 3d: update `sitemap-products.xml` (and `sitemap-images.xml`, `merchant-feed.xml` if they hold /p/ URLs) for batch 1.
-- [ ] Generator risk: `tools/build_product_pages.py` / `generate-products.mjs` build pages from `id`. If they are re-run they will recreate old-id pages and ignore slugs. Teach them to use `slug` (check how/when they are run first).
+- [x] Generator (this push): `generate-products.mjs` (run every 3h by `.github/workflows/product-pages.yml`, it WIPES and rebuilds `p/` and `c/`) now reads `products.slug`: pages, cards, category/home lists, sitemap and merchant feed use `/p/<slug>.html`; each page carries `<meta name="stm-id">`; the old id URL of a renamed product is regenerated as a redirect. A slug is ignored (id kept) if it is not URL-safe or clashes with another id/slug. Tested locally on a fixture (renamed product, variant group, clash). `tools/build_product_pages.py` is the old builder (not in the workflow).
 - [ ] Batch 2 and 3: remaining 23 products with junk tails (same method: slug column + pages + redirects)
 - [ ] 3 orphan pages with no product in the DB: `jembe-star-500-sl-herbicide-1-litre`, `kingcode-elite-50-ec-insecticide-1-litre`, `zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre-2` (remove or redirect)
 - [ ] Optional: drop `.html` so URLs read `/p/<slug>/` like masterpiece (bigger job)
