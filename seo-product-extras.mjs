@@ -17,6 +17,8 @@ const MARK = '<!--stm-extras-->';
 
 const CROP = new Set(['crop-insecticides', 'fungicides', 'herbicides', 'adjuvants-growth-regulators', 'agrochemicals', 'fertilizers']);
 const PEST = new Set(['pest-control-fumigation', 'bed-bug-killers', 'cockroach-ant-killers', 'mosquito-fly-control', 'rodent-control', 'termite-control', 'fumigation-chemicals']);
+// Plant inputs (rooting hormone, foliar feeds, growth regulators) are not sprayed pesticides: no PCPB, pre-harvest or "mixing and spraying" wording for them.
+const PLANT_INPUT = new Set(['adjuvants-growth-regulators']);
 
 const HUB_NAME = { 'pest-control-fumigation': 'Pest Control & Fumigation', 'agrochemicals': 'Agrochemicals', 'agrovet': 'Agrovet', 'tvs-audio': 'TVs & Audio', 'appliances': 'Appliances' };
 const PARENT = {
@@ -135,14 +137,20 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     }
     // 3) safe use
     if (CROP.has(slug) || PEST.has(slug)) {
-      const li = [
+      const plant = PLANT_INPUT.has(slug);
+      const li = plant ? [
+        'Read the whole label before you use the product. The label is the instruction for rates, crops and safety.',
+        'Wear gloves and avoid contact with skin and eyes; wash your hands after handling.',
+        'Keep chemicals in their original container, out of reach of children, pets and livestock, and away from food and feed.',
+        'Store tightly closed in a cool, dry place away from direct sunlight. Never reuse empty containers for food or water.'
+      ] : [
         'Read the whole label before you buy or mix. The label is the legal instruction for crops, pests, rates and safety.',
         'Look for the PCPB registration number on the pack. Do not buy chemicals that carry none.',
         'Wear gloves, a mask or respirator, eye protection and long protective clothing when mixing and spraying, and wash well afterwards.',
         'Keep chemicals in their original container, out of reach of children, pets and livestock. Never reuse empty containers for food or water.'
       ];
-      if (CROP.has(slug)) li.splice(2, 0, 'Respect the pre-harvest interval (PHI) printed on the label, the number of days that must pass between the last spray and harvest. Use the product only on the crops the label lists.');
-      const safe = `<div class="box safe"><h2 style="margin-top:0">Safe use of ${esc(name)}</h2><ul>${li.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p>Need advice on the right product, rate or crop? <a href="https://wa.me/${WA}?text=${encodeURIComponent(`Hello Stermont Arcade, I need advice on using ${name}`)}">Ask us on WhatsApp</a>${hasBlog(LABEL[0]) ? ` or read <a href="${LABEL[0]}">${LABEL[1].toLowerCase()}</a>` : ''}.</p></div>\n`;
+      if (CROP.has(slug) && !plant) li.splice(2, 0, 'Respect the pre-harvest interval (PHI) printed on the label, the number of days that must pass between the last spray and harvest. Use the product only on the crops the label lists.');
+      const safe = `<div class="box safe"><h2 style="margin-top:0">Safe use of ${esc(name)}</h2><ul>${li.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p>Need advice on the right product, rate or crop? <a href="https://wa.me/${WA}?text=${encodeURIComponent(`Hello Stermont Arcade, I need advice on using ${name}`)}">Ask us on WhatsApp</a>${!plant && hasBlog(LABEL[0]) ? ` or read <a href="${LABEL[0]}">${LABEL[1].toLowerCase()}</a>` : ''}.</p></div>\n`;
       const about = /(<div class="box"><h2 style="margin-top:0">About [\s\S]*?<\/div><\/div>)/;
       h = about.test(h) ? h.replace(about, (m) => m + '\n' + (h.includes(MARK) ? '' : MARK) + safe) : h.replace('<div class="stk"', () => (h.includes(MARK) ? '' : MARK) + safe + '<div class="stk"');
     }
@@ -155,7 +163,8 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     }
     // 5) related guides and categories
     const items = [];
-    if (slug && existsSync(`guides/cheapest-${slug}-kenya.html`)) items.push([`/guides/cheapest-${slug}-kenya.html`, `Cheapest ${esc(cname)} in Kenya: price list`]);
+    // cname is already HTML-escaped on the page (e.g. "Adjuvants &amp; Growth Regulators"), so unescape before escaping again
+    if (slug && existsSync(`guides/cheapest-${slug}-kenya.html`)) items.push([`/guides/cheapest-${slug}-kenya.html`, `Cheapest ${esc(unesc(cname))} in Kenya: price list`]);
     (GUIDES[slug] || []).filter(g => hasBlog(g[0])).forEach(g => items.push([g[0], esc(g[1])]));
     (SIBLINGS[slug] || []).filter(hasCat).forEach(k => items.push([`/c/${k}.html`, `Shop ${esc(catName(k))}`]));
     if (hub && hasCat(hub)) items.push([`/c/${hub}.html`, `All ${esc(HUB_NAME[hub] || catName(hub))}`]);
