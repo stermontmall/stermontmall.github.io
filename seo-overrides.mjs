@@ -7,6 +7,8 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 try { await import('./seo-product-extras.mjs'); } catch (e) { console.log('seo-product-extras skipped:', e.message); }
 // Then the small clean-ups (seo-fixes.mjs): no repeated "Buy <product>" in meta descriptions, clean JSON-LD description. To switch it off, delete this line.
 try { await import('./seo-fixes.mjs'); } catch (e) { console.log('seo-fixes skipped:', e.message); }
+// Then the cross-sell box (seo-crosssell.mjs): "Complete your order" product suggestions. To switch it off, delete this line.
+try { await import('./seo-crosssell.mjs'); } catch (e) { console.log('seo-crosssell skipped:', e.message); }
 const O = JSON.parse(readFileSync('seo-overrides.json', 'utf8'));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s;
@@ -38,4 +40,4 @@ for (const [id, o] of Object.entries(O)) {
   }
   writeFileSync(file, h); done++;
 }
-console.log(`SEO overrides applied to ${done} product page(s).`);
+console.log(`SEO overrides applied to ${done} SEO override(s) product page(s).`);
