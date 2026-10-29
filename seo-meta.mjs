@@ -8,6 +8,9 @@
 //   Delivery                -> Nairobi same or next day, 1 to 3 days to the other counties (see shipping.html). Never "same-day to 47 counties".
 //   Power words             -> descriptive, product-type appropriate adjectives only (see POWER). Never "#1 Rated", "Top-Rated",
 //                              "Guaranteed" or "Certified": those are verifiable claims and need real ratings / paperwork behind them.
+//   EXCEPTION (owner decision, 2026-10-29): names the owner supplied in the Master Catalog SEO Mapping PDF (stored in products.seo_name /
+//   products.seo_title, applied by seo-titles.mjs) may carry such words. This file never ADDS them; hasLeadWord below only recognises them
+//   so that no second word is ever stacked in front of the owner's wording.
 
 export const STORE = 'Stermont Arcade';
 export const TITLE_MAX = 60;   // product titles
@@ -57,7 +60,8 @@ export function powerWord(name, ctx = {}) {
 }
 
 // Does the name already start with "Original", "Genuine" or one of our power words? Then do not repeat it.
-export const hasLeadWord = n => /^(?:#\d+\s+)?(?:original|genuine|powerful|premium|top|best|quality|reliable|proven|effective|fast-acting|heavy-duty|high-potency|long-lasting)\b/i.test(n);
+// The second half of the list is every lead word used in the owner's Master Catalog SEO Mapping PDF (see EXCEPTION at the top), so those names are never prefixed again.
+export const hasLeadWord = n => /^(?:#\d+\s+)?(?:original|genuine|powerful|premium|top|best|quality|reliable|proven|effective|fast-acting|heavy-duty|high-potency|long-lasting|highly effective|high-yield|professional|commercial-grade|leading|trusted|sturdy|weatherproof|odourless|ultimate|elegant|trendy|value-pack|certified|veterinary standard|rated)\b/i.test(n);
 const hasTrustWord = n => /^(original|genuine)\b/i.test(n);
 export const trustName = (name, ctx) => (isGenuine(ctx) && !hasTrustWord(name) ? `Original ${name}` : name);
 
@@ -83,6 +87,7 @@ export function pdpTagline(ctx = {}) {
 // "Original" leads when it is true (known brand or farm input); otherwise a type-appropriate power word leads.
 // Long names cannot fit all of that in 60 characters, so wording is dropped from the least important end:
 // store name, then "Best", then the lead word, then the name itself is shortened. "Price in Kenya" is kept as long as possible.
+// (Products with an owner-supplied products.seo_title get that exact title afterwards from seo-titles.mjs.)
 export function pdpTitle(name, ctx = {}) {
   const base = String(name || '').replace(/\s+/g, ' ').trim();
   const lead = hasLeadWord(base) ? '' : (isGenuine(ctx) ? 'Original' : powerWord(base, ctx));
@@ -163,9 +168,10 @@ export function pdpBadges(ctx = {}) {
 }
 
 // Product page H2 headings. `features` only for pesticides and crop chemicals (null otherwise), the other two are on every product.
+// `delivery` is the heading of the separate delivery box that generate-products.mjs still renders. Before it existed that box printed an EMPTY <h2> on every product page.
 export function pdpHeadings(catSlug) {
   const features = isPest(catSlug) ? 'Powerful Features & Target Dudu Control'
     : PCPB_CATS.has(catSlug) ? 'Powerful Features & Target Crop Protection'
     : null;
-  return { features, guide: 'Reliable Quality & Application Guide', price: 'Best Price & Countrywide Kenya Delivery' };
+  return { features, guide: 'Reliable Quality & Application Guide', price: 'Best Price & Countrywide Kenya Delivery', delivery: 'Delivery to Nairobi & All 47 Counties' };
 }

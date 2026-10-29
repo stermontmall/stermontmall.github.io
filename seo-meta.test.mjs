@@ -1,6 +1,6 @@
 // Run: node seo-meta.test.mjs   (no dependencies)
 import assert from 'node:assert/strict';
-import { pdpBadges, pdpHeadings, pdpH1, pdpTagline, pdpTitle, pdpDescription, catTitle, catDescription, powerWord, productType, TITLE_MAX, DESC_MAX } from './seo-meta.mjs';
+import { pdpBadges, pdpHeadings, pdpH1, pdpTagline, pdpTitle, pdpDescription, catTitle, catDescription, powerWord, productType, hasLeadWord, TITLE_MAX, DESC_MAX } from './seo-meta.mjs';
 
 const names = [
   'Bazooka 18EC Insecticide (1L)', 'Bazooka 18EC', 'Duduthrin 1.75EC Insecticide 1 Litre', 'Roundup Turbo 500ml',
@@ -61,6 +61,33 @@ assert.equal(pdpHeadings('smartphones').features, null);
 assert.equal(pdpHeadings('smartphones').guide, 'Reliable Quality & Application Guide');
 assert.equal(pdpHeadings('smartphones').price, 'Best Price & Countrywide Kenya Delivery');
 n += 8;
+
+// generate-products.mjs prints pdpHeadings().delivery as an <h2>; it must never be empty (it was, on every product page, before 2026-10-29).
+for (const slug of ['bed-bug-killers', 'herbicides', 'smartphones', undefined]) { assert.ok(String(pdpHeadings(slug).delivery || '').length > 10, `empty delivery heading for ${slug}`); n++; }
+
+// Owner's catalog names (products.seo_name, from the Master Catalog SEO Mapping PDF): every lead word it uses must be recognised, so pdpH1/pdpTitle
+// never stack "Original" or a power word in front of it ("Original Top-Rated ...", "Powerful Certified ...").
+const catalogNames = [
+  'Top-Quality 2 Litre Hand Pressure Sprayer', 'Top-Rated Absolute 375SC Systemic Fungicide', '#1 Rated Premise 200 SC Termiticide',
+  'Fast-Acting Bedlam 200SL Bedbug Insecticide', 'Highly Effective Bromarat 0.005 RB Rodent Bait', 'Heavy-Duty Mchwatox 350 SC Termiticide',
+  'Odourless Promax 20EC Bedbug Insecticide', 'Original Actellic 25EC Insecticide', 'Professional Tatua Advion Cockroach Gel Bait Tube',
+  'Professional Grade Covver Xtra 500SC Fungicide', 'Reliable Chariot 500SC Fungicide', 'Certified Lysine Feed Amino Acid',
+  'Commercial-Grade Catapult 480SL Herbicide', 'Effective Bat CRP Bat Repellent', 'Elegant OURSTART Men\'s Quartz Watch (Gold/Silver)',
+  'Genuine Bayer Baraki Pellets Rat & Mice Poison', 'High-Potency Darvin 50EW Insecticide', 'High-Yield Optimizer Biostimulant (250ml)',
+  'Leading Beanpro 480SL Herbicide', 'Powerful Bazooka 18EC Insecticide', 'Premium Glamstar Double Door Refrigerator',
+  'Sturdy Lumagogo 210cm Adjustable Tripod Stand Set', 'Trendy Urban Comfort Women\'s Tracksuit Set', 'Trusted Popvet Total Dewormer for Dogs (4 Tabs)',
+  'Ultimate TCL 75C6K QD-Mini LED 4K Smart TV', 'Value-Pack SONAR X2 Kettle with Gift Jug Set', 'Veterinary Standard Levafas Diamond Fluke & Worm Drench',
+  'Weatherproof Rodilon Wax Blocks'
+];
+for (const nm of catalogNames) {
+  assert.ok(hasLeadWord(nm), `lead word not recognised: ${nm}`); n++;
+  for (const ctx of ctxs) {
+    assert.equal(pdpH1(nm, ctx), nm, `H1 must be the owner's name unchanged: ${pdpH1(nm, ctx)}`);
+    assert.ok(pdpTitle(nm, ctx).startsWith(nm.slice(0, 12)) || pdpTitle(nm, ctx).length <= TITLE_MAX, `title lost the lead word: ${pdpTitle(nm, ctx)}`); n += 2;
+  }
+}
+// names with no lead word still get one (unchanged behaviour)
+for (const nm of ['Bazooka 18EC', 'Samsung Galaxy A15 128GB', 'Odour Control Spray', 'Professionals Choice Kit']) { assert.ok(!hasLeadWord(nm), `false positive: ${nm}`); n++; }
 console.log('example PDP :', pdpTitle('Bazooka 18EC Insecticide (1L)', { catSlug: 'crop-insecticides' }));
 console.log('example desc:', pdpDescription('Bazooka 18EC', { catSlug: 'crop-insecticides' }));
 console.log('example cat :', catTitle('Crop Insecticides'));
