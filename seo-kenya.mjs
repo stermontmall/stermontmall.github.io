@@ -1,7 +1,7 @@
 // Stermont Arcade - Kenya SEO pass. Runs in .github/workflows/product-pages.yml right after generate-products.mjs
 // and BEFORE seo-overrides.mjs, so hand-written overrides in seo-overrides.json always win.
 // 1) Product pages: Kenyan-search titles/descriptions (price in KSh, "in Kenya", M-Pesa, 47 counties).
-//    Descriptions now say what the product is (first sentence of its own description). The store name is no longer
+//    Titles now start with "Buy" ("Buy <product> in Kenya | KSh X"). Descriptions say what the product is (first sentence of its own description). The store name is no longer
 //    claimed as the product brand in the Product schema when no real brand is known.
 // 2) Category pages: "from KSh X" in the description + a link to the cheapest-prices guide.
 // 3) /guides/: one "Cheapest <category> in Kenya (bei nafuu)" page per category, built from the prices already on the
@@ -44,8 +44,9 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     if (!pm || !nm) continue;
     const name = unesc(nm[1].replace(/<[^>]+>/g, '').trim()), price = ksh(pm[1]);
     const inStock = /product:availability" content="in stock"/.test(h);
-    const tail = ` | ${price} in Kenya`;
-    const title = esc(clip(name, 68 - tail.length) + tail);
+    // Title always starts with "Buy": "Buy <product> in Kenya | KSh X" (kept under about 68 characters so Google does not cut it off)
+    const tail = ` in Kenya | ${price}`;
+    const title = esc('Buy ' + clip(name, 68 - 4 - tail.length) + tail);
     const stockTxt = inStock ? 'In stock. Pay by M-Pesa. Delivery to all 47 counties.' : 'Ask us on WhatsApp when it is back. Pay by M-Pesa.';
     const sfx = ` in Kenya for ${price}. ` + stockTxt;
     // What the product is: the first real sentence of its own description, minus the heading line that repeats the product name.
