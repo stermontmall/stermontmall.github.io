@@ -37,7 +37,7 @@ export function extras(p) {
     [`What is ${p.name} used for?`, `${p.targets}. It is meant for: ${p.settings}.`],
     [`How do I mix and apply ${p.name}?`, `Follow the dose and water volume on the manufacturer's label. ${p.method}`],
     [`Is ${p.name} safe to handle?`, `Treat it as a pesticide: wear full protective clothing, keep children, pets and livestock away, and keep spray out of water sources.`],
-    [sizeQ ? `Which pack size should I choose?` : `What pack size is available?`, sizeQ ? `${p.name} comes in ${p.sizes}. Small packs suit trials, kitchen gardens and small plots; larger packs suit bigger acreages, so you do not run short in the middle of a job.` : /\d/.test(one) ? `${p.name} is sold in a ${one} pack.` : `${p.name} is sold as a ${one}.`],
+    [sizeQ ? `Which pack size should I choose?` : `What pack size is available?`, sizeQ ? `${p.name} comes in ${p.sizes}. Small packs suit trials, kitchen gardens and small plots; larger packs suit bigger acreages, so you do not run short in the middle of a job.` : /\d/.test(one) ? `${p.name} is sold in a ${one} pack.` : `${p.name} is sold as a ${one}. The size is printed on the pack.`],
     [`How do I buy ${p.name} in Kenya?`, `Pay by M-Pesa and we deliver to all 47 counties, or collect at The Sarit Centre, Westlands, Nairobi. Questions? WhatsApp +254 748 888 230.`],
   ];
   const why = `Stermont Arcade is an online agrovet and pest control store at The Sarit Centre, Westlands, Nairobi. Buy ${p.name} with an upfront price in Kenya shillings, M-Pesa payment, delivery to all 47 counties and WhatsApp support. Always read the label before use.`;
@@ -52,7 +52,7 @@ export function render(p) {
   const steps = [
     `<li><strong>Dilution Rate:</strong> Use the dose and water volume printed on the manufacturer's label for your crop and growth stage.</li>`,
     `<li><strong>Application Method:</strong> ${esc(p.method)}</li>`,
-    `<li><strong>Coverage Area:</strong> Depends on the dose and spray volume on the label. Available in ${esc(p.sizes)}; choose the pack that matches your acreage.</li>`,
+    `<li><strong>Coverage Area:</strong> Depends on the dose and spray volume on the label. ${/\d/.test(p.sizes) ? `Available in ${esc(p.sizes)}; choose the pack that matches your acreage.` : 'Check the pack for its size.'}</li>`,
     ...p.extraSteps.map(s => `<li>${esc(s)}</li>`),
   ];
   const html = `<!-- ${esc(p.name)} | /p/${p.slug}.html -->
@@ -111,12 +111,12 @@ export function renderText(p) {
   const ai = p.ai || 'See the product label';
   const form = p.formulation || 'See the product label';
   const L = [];
-  L.push(`${p.name} (${p.sizes.replace(/ and /g, ', ')})`, '', p.lead, '', 'KEY SPECIFICATIONS & FEATURES');
+  L.push(/\d/.test(p.sizes) ? `${p.name} (${p.sizes.replace(/ and /g, ', ')})` : p.name, '', p.lead, '', 'KEY SPECIFICATIONS & FEATURES');
   L.push(`• Active ingredient: ${ai}`, `• Target: ${p.targets}`, `• Formulation: ${form}`, `• Application settings: ${p.settings}`, '');
   L.push('MIXING & APPLICATION INSTRUCTIONS');
   L.push(`1. Dilution rate: use the dose and water volume printed on the manufacturer's label for your crop and growth stage.`);
   L.push(`2. Application method: ${p.method}`);
-  L.push(`3. Coverage: depends on the dose and spray volume on the label. Available in ${p.sizes}.`);
+  L.push(`3. Coverage: depends on the dose and spray volume on the label. ${/\d/.test(p.sizes) ? `Available in ${p.sizes}.` : 'Check the pack for its size.'}`);
   p.extraSteps.forEach((s, i) => L.push(`${4 + i}. ${s}`));
   L.push('', 'SAFETY & RE-ENTRY PRECAUTIONS');
   L.push('• Wear gloves, a mask, goggles, overalls and boots when mixing and spraying.');
