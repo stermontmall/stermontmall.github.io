@@ -20,6 +20,7 @@ The site is static. `p/*.html`, `c/*.html`, `guides/*.html` are GENERATED and th
   - Category title: `Shop Top & Reliable <Category> Online in Kenya – M-Pesa & Delivery`, with shorter fallbacks to fit 60.
   - Category description: `Order PCPB-approved, top-quality <Category> at wholesale prices in Nairobi. Fast delivery across 47 counties with secure M-Pesa checkout.` PCPB wording only for PCPB categories; non-regulated categories get the same shape without "PCPB-approved".
 - [x] `seo-meta.test.mjs`: `node seo-meta.test.mjs` - 250 checks (title <= 60, description <= 155, "Price in Kenya" present, no PCPB claim on product pages, no banned claims, no repeated words, deterministic), 0 violations. Run locally 2026-10-29.
+- [x] `seo-check.mjs` read and verified: it only checks title <= 75, description 70-165, canonical, one H1, alt text, JSON-LD parses, links. It never asserts the wording pattern, so the new titles/descriptions pass.
 - Function signatures unchanged, so `generate-products.mjs` and `seo-kenya.mjs` need no edit.
 
 ### Decisions
@@ -31,6 +32,6 @@ The site is static. `p/*.html`, `c/*.html`, `guides/*.html` are GENERATED and th
 - "Original" still beats a power word in the title when it is true (known brand or farm input), because counterfeit chemicals are the real buying worry.
 
 ### Left
-- [ ] Full pipeline dry run with live data (needs network): Actions > Build product pages > Run workflow on branch `wip-seo-power-words`, then `node seo-check.mjs` (confirm it accepts the new title shapes; I could not run it from the sandbox) and open 3 pages (agrochemical, pest control, non-chemical).
-- [ ] Open PR `wip-seo-power-words` -> `main`, review, merge (the push to `main` rebuilds live pages).
+- [ ] Full pipeline dry run with live data (needs network + Supabase): Actions > Build product pages > Run workflow on branch `wip-seo-power-words`, then open 3 pages (agrochemical, pest control, non-chemical) and check the title/H1 in the browser.
+- [ ] Open PR `wip-seo-power-words` -> `main`, review, merge (the push to `main` rebuilds live pages). NOT merged yet: the pipeline has not been run on real data.
 - [ ] Optional: H1 lead word variety (H1 still uses `trustName`, "Original <name>"); per-product `seo-overrides.json` entries for hero products (Bazooka etc.).
