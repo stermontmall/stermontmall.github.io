@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const dir = path.dirname(fileURLToPath(import.meta.url));
+export const isPlantInput = p => p.kind === 'plant-input';
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 export function metaDescription(p) {
@@ -36,7 +37,7 @@ export function extras(p) {
   const faq = [
     [`What is ${p.name} used for?`, `${p.targets}. It is meant for: ${p.settings}.`],
     [`How do I mix and apply ${p.name}?`, `Follow the dose and water volume on the manufacturer's label. ${p.method}`],
-    [`Is ${p.name} safe to handle?`, `Treat it as a pesticide: wear full protective clothing, keep children, pets and livestock away, and keep spray out of water sources.`],
+    [`Is ${p.name} safe to handle?`, isPlantInput(p) ? `Read the label before use, avoid contact with skin and eyes, wash your hands after handling and keep it away from children, pets and livestock.` : `Treat it as a pesticide: wear full protective clothing, keep children, pets and livestock away, and keep spray out of water sources.`],
     [sizeQ ? `Which pack size should I choose?` : `What pack size is available?`, sizeQ ? `${p.name} comes in ${p.sizes}. Small packs suit trials, kitchen gardens and small plots; larger packs suit bigger acreages, so you do not run short in the middle of a job.` : /\d/.test(one) ? `${p.name} is sold in a ${one} pack.` : `${p.name} is sold as a ${one}. The size is printed on the pack.`],
     [`How do I buy ${p.name} in Kenya?`, `Pay by M-Pesa and we deliver to all 47 counties, or collect at The Sarit Centre, Westlands, Nairobi. Questions? WhatsApp +254 748 888 230.`],
   ];
@@ -62,7 +63,7 @@ export function render(p) {
 
     <h3>Key Specifications &amp; Features:</h3>
     <ul>
-        <li><strong>Active Ingredient:</strong> ${esc(ai)}</li>
+        <li><strong>${isPlantInput(p) ? 'Composition' : 'Active Ingredient'}:</strong> ${esc(ai)}</li>
         <li><strong>Target:</strong> ${esc(p.targets)}</li>
         <li><strong>Formulation:</strong> ${esc(form)}</li>
         <li><strong>Application Settings:</strong> ${esc(p.settings)}</li>
@@ -73,11 +74,13 @@ export function render(p) {
         ${steps.join('\n        ')}
     </ol>
 
-    <h3>Safety &amp; Re-Entry Precautions:</h3>
+    <h3>${isPlantInput(p) ? 'Safety, Handling &amp; Storage Precautions:' : 'Safety &amp; Re-Entry Precautions:'}</h3>
     <ul>
-        <li><strong>Required PPE:</strong> Gloves, mask, goggles, overalls and boots when mixing and spraying.</li>
+${isPlantInput(p) ? `        <li><strong>Protection:</strong> Wear gloves and avoid contact with skin and eyes; wash your hands after handling.</li>
+        <li><strong>Keep Away:</strong> Keep out of reach of children, pets and livestock, and away from food and feed.</li>
+        <li><strong>Storage:</strong> Store tightly closed in the original pack, in a cool, dry place away from direct sunlight.</li>` : `        <li><strong>Required PPE:</strong> Gloves, mask, goggles, overalls and boots when mixing and spraying.</li>
         ${(p.preHarvest ? `<li><strong>Pre-Harvest Interval:</strong> ${esc(p.preHarvest)}</li>\n        ` : '')}<li><strong>Re-Entry:</strong> ${p.reentry ? esc(p.reentry) + ' ' : ''}Keep people, children and animals out of the sprayed area until the spray has dried, and follow the re-entry and pre-harvest intervals on the label.</li>
-        <li><strong>Water &amp; Storage:</strong> Keep spray and rinse water away from streams, ponds and wells. Store in the original closed container, cool, dry and locked, away from food and feed.</li>
+        <li><strong>Water &amp; Storage:</strong> Keep spray and rinse water away from streams, ponds and wells. Store in the original closed container, cool, dry and locked, away from food and feed.</li>`}
     </ul>
 
     <h3>Why Buy ${esc(p.name)} from Stermont Arcade:</h3>
@@ -112,17 +115,24 @@ export function renderText(p) {
   const form = p.formulation || 'See the product label';
   const L = [];
   L.push(/\d/.test(p.sizes) ? `${p.name} (${p.sizes.replace(/ and /g, ', ')})` : p.name, '', p.lead, '', 'KEY SPECIFICATIONS & FEATURES');
-  L.push(`• Active ingredient: ${ai}`, `• Target: ${p.targets}`, `• Formulation: ${form}`, `• Application settings: ${p.settings}`, '');
+  L.push(`• ${isPlantInput(p) ? 'Composition' : 'Active ingredient'}: ${ai}`, `• Target: ${p.targets}`, `• Formulation: ${form}`, `• Application settings: ${p.settings}`, '');
   L.push('MIXING & APPLICATION INSTRUCTIONS');
   L.push(`1. Dilution rate: ${p.dose || "use the dose and water volume printed on the manufacturer's label for your crop and growth stage."}`);
   L.push(`2. Application method: ${p.method}`);
   L.push(`3. Coverage: depends on the dose and spray volume on the label. ${/\d/.test(p.sizes) ? `Available in ${p.sizes}.` : 'Check the pack for its size.'}`);
   p.extraSteps.forEach((s, i) => L.push(`${4 + i}. ${s}`));
+  if (isPlantInput(p)) {
+    L.push('', 'SAFETY, HANDLING & STORAGE');
+    L.push('• Wear gloves and avoid contact with skin and eyes; wash your hands after handling.');
+    L.push('• Keep out of reach of children, pets and livestock, and away from food and feed.');
+    L.push('• Store tightly closed in the original pack, in a cool, dry place away from direct sunlight.', '');
+  } else {
   L.push('', 'SAFETY & RE-ENTRY PRECAUTIONS');
   L.push('• Wear gloves, a mask, goggles, overalls and boots when mixing and spraying.');
   if (p.preHarvest) L.push(`• Pre-harvest interval: ${p.preHarvest}`);
   L.push(`• ${p.reentry ? p.reentry + ' ' : ''}Keep people, children and animals out of the sprayed area until the spray has dried, and follow the re-entry and pre-harvest intervals on the label.`);
   L.push('• Keep spray and rinse water away from streams, ponds and wells. Store in the original closed container, cool, dry and locked, away from food and feed.', '');
+  }
   L.push(...textTail(p));
   return L.join('\n');
 }

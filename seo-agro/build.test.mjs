@@ -17,7 +17,7 @@ for (const f of fs.readdirSync(dir).filter(f => /^batch-\d+\.json$/.test(f))) {
     ok(!banned.test(meta + html), id + ' banned claim');
     ok((html.match(/<h3>/g) || []).length === 5, id + ' needs 5 sections');
     ok(/KSh [\d,]+/.test(meta), id + ' price in meta');
-    ok(p.ai || p.labelNeeded.some(x => /active ingredient/.test(x)), id + ' missing AI must be flagged');
+    ok(p.ai || p.labelNeeded.some(x => /active ingredient|composition|nutrient analysis/.test(x)), id + ' missing AI must be flagged');
     // Products flagged labelData carry dose/interval figures taken from the catalog text (listed in the batch file); all others must have none.
     if (!p.labelData) {
       ok(!/\b\d+\s?(ml|g|l|litres?)\s*per\s*(l|litre|ha|hectare|knapsack|20)/i.test(html), id + ' invented dose');
