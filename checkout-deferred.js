@@ -19,6 +19,10 @@
       function h(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
       function money(n) { return 'KSh ' + n.toLocaleString('en-KE'); }
       var cart = ls('stm_cart') || {}, cust = ls('stm_cust') || {}, step = 'cart', isOpen = false, opener = null, ref = '', lastMsg = '', lastUrl = '', sending = false, sendErr = '', doneRef = '', doneTotal = 0, doneCode = '', doneAmt = 0;
+      /* Saved checkout details belong to one person. If a different account (or a guest) is now using this phone, drop them so nobody sees the previous customer's details. */
+      function myUid() { try { var x = JSON.parse(localStorage.getItem('sb-' + CFG.sbRef + '-auth-token')); return x && x.user && x.user.id ? x.user.id : null; } catch (e) { return null; } }
+      var lastUid = myUid();
+      if (!cust || cust.uid === undefined || cust.uid !== lastUid) { cust = {}; ls('stm_cust', null); }
       var form = { method: 'delivery', name: cust.name || '', phone: cust.phone || '', email: cust.email || '', county: cust.county || '', addr: cust.addr || '', notes: '', payCode: '', payAmt: '', payTouched: false }, errs = {};
       function session() {
         try {
@@ -28,6 +32,14 @@
         return null;
       }
       (function () { var u = (session() || {}).user; if (u) { var md = u.user_metadata || {}; if (!form.name) form.name = md.full_name || ''; if (!form.phone) form.phone = md.phone || ''; if (!form.email) form.email = u.email || ''; } })();
+      /* If the signed-in account changes while the page is open (sign out / sign in as someone else), clear everything typed or saved for the previous person. */
+      function checkWho() {
+        var u = myUid(); if (u === lastUid) return; lastUid = u;
+        cust = {}; ls('stm_cust', null); ref = ''; stkPhone = ''; stkMsg = ''; errs = {}; if (step === 'done') step = 'cart';
+        form.name = ''; form.phone = ''; form.email = ''; form.county = ''; form.addr = ''; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.vc = null; form.vcode = '';
+        var us = (session() || {}).user; if (us) { var m2 = us.user_metadata || {}; form.name = m2.full_name || ''; form.phone = m2.phone || ''; form.email = us.email || ''; }
+      }
+      window.addEventListener('storage', function (e) { if (e.key && e.key.indexOf('-auth-token') > -1) { checkWho(); if (isOpen) render(); } });
       var counties = [].map.call(D.querySelectorAll('.counties li'), function (l) { return l.textContent; });
 
       D.querySelectorAll('#featured .pcard:not(.cta)').forEach(function (c) {
@@ -458,7 +470,7 @@
             clearTimeout(to); doneCode = code; doneAmt = paid;
             lastMsg = message(T); lastUrl = 'https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(lastMsg);
             notify(T, s);
-            ls('stm_cust', { name: form.name.trim(), phone: form.phone, email: (form.email || '').trim(), county: form.county, addr: form.addr, method: form.method });
+            ls('stm_cust', { uid: myUid(), name: form.name.trim(), phone: form.phone, email: (form.email || '').trim(), county: form.county, addr: form.addr, method: form.method });
             doneRef = ref; doneTotal = due(T); form.vc = null; form.vcode = ''; ref = ''; cart = {}; store(); sending = false; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; step = 'done'; sync(); if (!isOpen) render();
           })
           .catch(function (err) {
@@ -486,6 +498,7 @@
         ({ cart: rCart, details: rDetails, review: rReview, done: rDone })[step](b, f, T);
       }
       function openDr(s) {
+        checkWho();
         step = s || 'cart'; opener = D.activeElement; isOpen = true; D.getElementById('dr').classList.add('on'); D.body.style.overflow = 'hidden';
         if (!(history.state && history.state.dr)) history.pushState({ dr: 1 }, ''); sync(); D.getElementById('dr-x').focus();
       }
