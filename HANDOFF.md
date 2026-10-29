@@ -69,3 +69,9 @@ Static GitHub Pages site. No Next.js / React Router / Nuxt, so `force-dynamic`, 
 ## Decisions / limits
 - GitHub Pages cannot send custom HTTP headers, so `_headers` has no effect there (it works on Cloudflare Pages / Netlify). The service worker is what prevents stale pages for returning visitors on GitHub Pages. First-time visitors and browsers without the worker still get GitHub's 10-minute cache.
 - `no-store` on pages also disables the browser's back/forward cache for them (requested; costs some speed).
+
+# Task: names/prices stale until hard refresh (branch `wip-fresh-names`, 2026-10-29)
+- Cause: product data was already fetched with `cache:'no-store'`, but `storefront-live.js` (builds names, prices, badges) and other `.js`/`.css` were served from the browser's 10-minute GitHub Pages cache, and Back/forward restored the old page from memory.
+- Fix: `sw.js` v3 revalidates `.js`/`.css` too (cache `stermont-v3`); `index.html` loads `storefront-live.js?v=3`; `storefront-live.js` reloads once when the page is restored from the back/forward cache.
+- Note: a variant product with a single size still shows "Name – 1 Litre" on its card (name + pack label, by design so the size reaches the cart).
+- Not testable here (live site blocked from the sandbox): confirm on a phone that a rename in admin shows on the home list without a hard refresh.

@@ -1,8 +1,8 @@
-/* Stermont Arcade service worker (v2): NETWORK-FIRST with revalidation.
-   Pages (HTML) and data files (.json) are always re-checked with the server (cache:'no-cache' = conditional request, a cheap 304 when unchanged),
+/* Stermont Arcade service worker (v3): NETWORK-FIRST with revalidation.
+   Pages (HTML), data files (.json) and the site's own scripts/styles (.js, .css: they build product names, prices and badges) are always re-checked with the server (cache:'no-cache' = conditional request, a cheap 304 when unchanged),
    so a product page rebuilt by the bot shows its new title/description straight away instead of waiting out GitHub Pages' 10-minute browser cache.
    The cache is only an offline fallback. Only successful same-origin responses are stored. Supabase (cross-origin) is never touched here. */
-var C = 'stermont-v2', SHELL = ['/', '/index.html', '/manifest.json', '/icon-192.png'];
+var C = 'stermont-v3', SHELL = ['/', '/index.html', '/manifest.json', '/icon-192.png'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(C).then(function (c) {
     return c.addAll(SHELL.map(function (u) { return new Request(u, { cache: 'reload' }); }));
@@ -14,7 +14,7 @@ self.addEventListener('activate', function (e) {
   }).then(function () { return self.clients.claim(); }));
 });
 function wantsFresh(r, u) {
-  return r.mode === 'navigate' || r.destination === 'document' || u.pathname.slice(-1) === '/' || /\.(html|json)$/i.test(u.pathname);
+  return r.mode === 'navigate' || r.destination === 'document' || u.pathname.slice(-1) === '/' || /\.(html|json|js|css)$/i.test(u.pathname);
 }
 self.addEventListener('fetch', function (e) {
   var r = e.request, u = new URL(r.url);

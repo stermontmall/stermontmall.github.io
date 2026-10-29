@@ -87,6 +87,10 @@
     '@media(min-width:760px){#stm-pd .pd{inset:auto;top:4vh;bottom:4vh;left:50%;transform:translateX(-50%);width:min(980px,94vw);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.35)}' +
     '#stm-pd .body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1.6rem;align-items:start}#stm-pd .body h2:first-child{margin-top:0}#stm-pd .full{grid-column:1/-1}}';
   var pd, cur = null, qty = 1, imgs = [], idx = 0, BASE = null;
+  /* Back/forward cache: returning to the shop with Back restores the OLD page from memory (old names/prices) without running any code.
+     Reload it once so the list is rebuilt from the database. Only when the page was restored from memory and is older than 20s. */
+  var LOADED = Date.now();
+  window.addEventListener('pageshow', function (e) { if (e.persisted && Date.now() - LOADED > 20000 && !(pd && pd.classList.contains('on'))) location.reload(); });
   /* straight product URL: /p/<id>.html (the real page Google indexes), never a #hash */
   var SLUGS = {};   /* product id -> clean page name (products.slug); falls back to the id */
   function purl(id) { return '/p/' + encodeURIComponent(SLUGS[id] || id) + '.html'; }
