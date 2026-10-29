@@ -1123,6 +1123,52 @@
         if (t === lastLogged) return; lastLogged = t;
         if (window.STM_searchLog) window.STM_searchLog(t, lastFound, hint || src);
       }
+      /* Scroll to the first matching product group, leaving room for the sticky header (search box + tabs)
+         so the items are not hidden under it. Falls back to featured, then the "What we sell" list. */
+      function showItems() {
+        function go() {
+          var hd = document.querySelector('header'), off = (hd ? hd.getBoundingClientRect().height : 0) + 10, t = null;
+          if (!music.classList.contains('hidden')) {
+            t = [].filter.call(music.querySelectorAll('.mcat'), function (g) {
+              return !g.classList.contains('hidden') && !g.classList.contains('stm-empty') && g.querySelector('.pcard:not(.hidden):not(.vhide)');
+            })[0] || null;
+          }
+          if (!t && !featured.classList.contains('hidden')) t = featured;
+          if (!t) t = document.querySelector('#range .range > div:not(.hidden)') || document.getElementById('range');
+          window.scrollTo({ top: Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - off), behavior: 'smooth' });
+        }
+        /* wait one frame so the filtered layout (and the header message) has settled before measuring */
+        if (window.requestAnimationFrame) requestAnimationFrame(function () { requestAnimationFrame(go); }); else setTimeout(go, 50);
+      }
+      window.STM_showItems = showItems;
+
+      /* Category buttons: jump straight to that category's products and leave the rest of the page as it is
+         (no filtering, nothing hidden). Returns false when the category has no products loaded, so the caller
+         can fall back to a normal search (which shows "Nothing listed ... Ask on WhatsApp"). */
+      function gotoCategory(term) {
+        term = String(term || '').trim().toLowerCase(); if (!term) return false;
+        var words = term.split(/\s+/).filter(function (w) { return w !== 'and' && w !== '&'; }).map(function (w) { return w.replace(/s$/, ''); });
+        function m(t) { t = t.toLowerCase(); return words.every(function (w) { return t.indexOf(w) !== -1; }); }
+        var groups = [].filter.call(music.querySelectorAll('.mcat'), function (g) { return !g.classList.contains('stm-empty') && g.querySelector('.pcard:not(.vhide)'); });
+        var g = groups.filter(function (x) { return m(x.querySelector('h3').textContent); })[0] ||
+                groups.filter(function (x) { return [].some.call(x.querySelectorAll('.pcard:not(.vhide)'), function (c) { return m(c.textContent); }); })[0];
+        if (!g) return false;
+        /* leave results mode if a search is on, so the whole page is back */
+        if (input.value) { input.value = ''; input.removeAttribute('data-src'); input.dispatchEvent(new Event('input')); }
+        /* show the department this category lives in */
+        var vg = g.closest && g.closest('.stm-vg');
+        if (vg && !vg.classList.contains('kc-on')) {
+          var tb = document.querySelector('#htabs button[data-v="' + vg.getAttribute('data-v') + '"]'); if (tb) tb.click();
+        }
+        g.classList.add('open');
+        try { if (window.STM_searchLog) window.STM_searchLog(term, g.querySelectorAll('.pcard:not(.vhide)').length, 'category'); } catch (e) {}
+        setTimeout(function () {
+          var hd = document.querySelector('header'), off = (hd ? hd.getBoundingClientRect().height : 0) + 10;
+          window.scrollTo({ top: Math.max(0, g.getBoundingClientRect().top + window.pageYOffset - off), behavior: 'smooth' });
+        }, 120);
+        return true;
+      }
+      window.STM_gotoCategory = gotoCategory;
       function run(scroll) {
         var q = input.value.trim().toLowerCase();
         var found = 0;
@@ -1166,10 +1212,7 @@
         lastFound = found;
         if (found) {
           msg.textContent = 'Showing results for "' + input.value.trim() + '". Clear the box to see everything.';
-          if (scroll) {
-            var target = !featured.classList.contains('hidden') ? featured : (!music.classList.contains('hidden') ? music : document.getElementById('range'));
-            target.scrollIntoView({ behavior: 'smooth' });
-          }
+          if (scroll) showItems();
         } else {
           msg.innerHTML = '';
           msg.appendChild(document.createTextNode('Nothing listed for "' + input.value.trim() + '". We can still source it. '));
@@ -1330,9 +1373,12 @@
       var q = document.getElementById('q');
       document.querySelectorAll('.cat').forEach(function (b) {
         b.addEventListener('click', function () {
+          /* go straight to the category's items without hiding the rest of the page */
+          if (window.STM_gotoCategory && window.STM_gotoCategory(b.getAttribute('data-q'))) return;
+          /* nothing loaded for it yet: normal search, so the shopper sees the "ask on WhatsApp" message */
           q.value = b.getAttribute('data-q'); q.setAttribute('data-src', 'category');
           q.dispatchEvent(new Event('input'));
-          document.getElementById('range').scrollIntoView({ behavior: 'smooth' });
+          if (window.STM_showItems) window.STM_showItems(); else document.getElementById('range').scrollIntoView({ behavior: 'smooth' });
         });
       });
       var links = document.querySelectorAll('#bar a');
@@ -1383,8 +1429,7 @@
       D.querySelectorAll('.range li').forEach(function (li) {
         li.addEventListener('click', function () {
           q.value = li.textContent; q.setAttribute('data-src', 'list'); q.dispatchEvent(new Event('input'));
-          var m = D.getElementById('music-gear');
-          (m.classList.contains('hidden') ? D.getElementById('range') : m).scrollIntoView({ behavior: 'smooth' });
+          if (window.STM_showItems) window.STM_showItems(); else { var m = D.getElementById('music-gear'); (m.classList.contains('hidden') ? D.getElementById('range') : m).scrollIntoView({ behavior: 'smooth' }); }
         });
       });
       var om = D.getElementById('om'), oi = D.getElementById('om-i'), ot = D.getElementById('om-t'), op = D.getElementById('om-p'),
