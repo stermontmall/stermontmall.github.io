@@ -36,7 +36,7 @@ export function extras(p) {
   const one = p.sizes.replace(/Litres$/, 'Litre');
   const faq = [
     [`What is ${p.name} used for?`, `${p.targets}. It is meant for: ${p.settings}.`],
-    [`How do I mix and apply ${p.name}?`, `Follow the dose and water volume on the manufacturer's label. ${p.method}`],
+    [`How do I mix and apply ${p.name}?`, p.noMix ? `No mixing with water is needed. ${p.method}` : `Follow the dose and water volume on the manufacturer's label. ${p.method}`],
     [`Is ${p.name} safe to handle?`, isPlantInput(p) ? `Read the label before use, avoid contact with skin and eyes, wash your hands after handling and keep it away from children, pets and livestock.` : `Treat it as a pesticide: wear full protective clothing, keep children, pets and livestock away, and keep spray out of water sources.`],
     [sizeQ ? `Which pack size should I choose?` : `What pack size is available?`, sizeQ ? `${p.name} comes in ${p.sizes}. Small packs suit trials, kitchen gardens and small plots; larger packs suit bigger acreages, so you do not run short in the middle of a job.` : /\d/.test(one) ? `${p.name} is sold in a ${one} pack.` : `${p.name} is sold as a ${one}. The size is printed on the pack.`],
     [`How do I buy ${p.name} in Kenya?`, `Pay by M-Pesa and we deliver to all 47 counties, or collect at The Sarit Centre, Westlands, Nairobi. Questions? WhatsApp +254 748 888 230.`],
@@ -53,7 +53,7 @@ export function render(p) {
   const steps = [
     `<li><strong>Dilution Rate:</strong> ${p.dose ? esc(p.dose) : "Use the dose and water volume printed on the manufacturer's label for your crop and growth stage."}</li>`,
     `<li><strong>Application Method:</strong> ${esc(p.method)}</li>`,
-    `<li><strong>Coverage Area:</strong> Depends on the dose and spray volume on the label. ${/\d/.test(p.sizes) ? `Available in ${esc(p.sizes)}; choose the pack that matches your acreage.` : 'Check the pack for its size.'}</li>`,
+    `<li><strong>Coverage Area:</strong> ${p.coverage ? esc(p.coverage) + ' ' : 'Depends on the dose and spray volume on the label. '}${/\d/.test(p.sizes) ? `Available in ${esc(p.sizes)}; choose the pack that matches your ${p.coverage ? 'needs' : 'acreage'}.` : 'Check the pack for its size.'}</li>`,
     ...p.extraSteps.map(s => `<li>${esc(s)}</li>`),
   ];
   const html = `<!-- ${esc(p.name)} | /p/${p.slug}.html -->
@@ -119,7 +119,7 @@ export function renderText(p) {
   L.push('MIXING & APPLICATION INSTRUCTIONS');
   L.push(`1. Dilution rate: ${p.dose || "use the dose and water volume printed on the manufacturer's label for your crop and growth stage."}`);
   L.push(`2. Application method: ${p.method}`);
-  L.push(`3. Coverage: depends on the dose and spray volume on the label. ${/\d/.test(p.sizes) ? `Available in ${p.sizes}.` : 'Check the pack for its size.'}`);
+  L.push(`3. Coverage: ${p.coverage || 'depends on the dose and spray volume on the label.'} ${/\d/.test(p.sizes) ? `Available in ${p.sizes}.` : 'Check the pack for its size.'}`);
   p.extraSteps.forEach((s, i) => L.push(`${4 + i}. ${s}`));
   if (isPlantInput(p)) {
     L.push('', 'SAFETY, HANDLING & STORAGE');
