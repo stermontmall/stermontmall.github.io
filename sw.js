@@ -1,9 +1,30 @@
-/* Stermont Arcade service worker: network-first so shoppers always get fresh stock/prices; falls back to cache offline */
-var C = 'stermont-v1', SHELL = ['/', '/index.html', '/manifest.json', '/icon-192.png'];
-self.addEventListener('install', function (e) { e.waitUntil(caches.open(C).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); })); });
-self.addEventListener('activate', function (e) { e.waitUntil(caches.keys().then(function (k) { return Promise.all(k.filter(function (x) { return x !== C; }).map(function (x) { return caches.delete(x); })); }).then(function () { return self.clients.claim(); })); });
+/* Stermont Arcade service worker (v2): NETWORK-FIRST with revalidation.
+   Pages (HTML) and data files (.json) are always re-checked with the server (cache:'no-cache' = conditional request, a cheap 304 when unchanged),
+   so a product page rebuilt by the bot shows its new title/description straight away instead of waiting out GitHub Pages' 10-minute browser cache.
+   The cache is only an offline fallback. Only successful same-origin responses are stored. Supabase (cross-origin) is never touched here. */
+var C = 'stermont-v2', SHELL = ['/', '/index.html', '/manifest.json', '/icon-192.png'];
+self.addEventListener('install', function (e) {
+  e.waitUntil(caches.open(C).then(function (c) {
+    return c.addAll(SHELL.map(function (u) { return new Request(u, { cache: 'reload' }); }));
+  }).then(function () { return self.skipWaiting(); }));
+});
+self.addEventListener('activate', function (e) {
+  e.waitUntil(caches.keys().then(function (k) {
+    return Promise.all(k.filter(function (x) { return x !== C; }).map(function (x) { return caches.delete(x); }));
+  }).then(function () { return self.clients.claim(); }));
+});
+function wantsFresh(r, u) {
+  return r.mode === 'navigate' || r.destination === 'document' || u.pathname.slice(-1) === '/' || /\.(html|json)$/i.test(u.pathname);
+}
 self.addEventListener('fetch', function (e) {
-  var r = e.request; if (r.method !== 'GET' || new URL(r.url).origin !== location.origin) return;
-  e.respondWith(fetch(r).then(function (res) { var cp = res.clone(); caches.open(C).then(function (c) { c.put(r, cp); }); return res; })
-    .catch(function () { return caches.match(r).then(function (m) { return m || caches.match('/index.html'); }); }));
+  var r = e.request, u = new URL(r.url);
+  if (r.method !== 'GET' || u.origin !== location.origin) return;
+  var req = r;
+  if (wantsFresh(r, u)) { try { req = new Request(r, { cache: 'no-cache' }); } catch (err) { req = r; } }
+  e.respondWith(fetch(req).then(function (res) {
+    if (res && res.ok && res.type === 'basic') { var cp = res.clone(); caches.open(C).then(function (c) { return c.put(r, cp); }); }
+    return res;
+  }).catch(function () {
+    return caches.match(r).then(function (m) { return m || caches.match('/index.html'); });
+  }));
 });
