@@ -20,18 +20,10 @@ Nobody can guarantee #1 on Google; this removes on-page gaps.
 - [ ] Collect real customer reviews (stars appear only for approved reviews)
 - [ ] Optional: shorter titles with no cut-off name (`seo-kenya.mjs`); Search Console: submit `sitemap-products.xml`, request indexing for top pages
 
-## Task C: product page clean-up (IN PROGRESS, branch `wip-seo-cleanup`, NOT merged)
-Found on `/p/pentagon-50ec-insecticide-1-litre.html` (build `cdf72d1`):
-1. Meta description repeats the product name: `Buy X in Kenya for KSh 1,800. Buy X 1 Litre… In stock...`.
-2. Product JSON-LD `description` runs a heading into the text (`...Why Choose Pentagon 50EC Thrips and aphids suck sap...…`) because newlines are flattened before clipping.
-
-Done so far:
-- [x] Step 1: new `seo-fixes.mjs` added (fixes both items, per-page try/catch).
-- [x] Step 2: wired in with one line in `seo-overrides.mjs` (commit `ea50617`, only 2 lines changed).
-- [x] Step 3a: workflow "Build product pages" run on the branch by the owner (bot commit `c59bdca`). Result on the Pentagon page: item 1 FIXED (meta description is now `Buy ... in Kenya for KSh 1,800. In stock. Pay by M-Pesa. Delivery to all 47 counties.`); item 2 NOT fixed.
-- [x] Step 3b: cause of item 2 found. On this page the description box is `<div class="desc" style="white-space:normal">` (my regex expected no attributes) and headings such as "Why Choose Pentagon 50EC" are plain `<p>` lines. Fixed in `seo-fixes.mjs`: match the box with any attributes, keep only sentence-like paragraphs (60+ characters or ending in . ! ?). NOT TESTED yet.
-- [ ] Step 4: owner runs "Build product pages" on `wip-seo-cleanup` again; check the Pentagon JSON-LD `description` has no "Why Choose", and `/p/abasi-5-ec.html` still has FAQ + breadcrumb. The run log line `seo-fixes: ...` shows how many pages changed.
-- [ ] Step 5: merge to `main` only after step 4 passes. Heads-up: the branch now also holds bot-rebuilt pages; if the merge shows conflicts in `p/`, `c/`, sitemap files, take `main` for those and keep only `seo-fixes.mjs`, `seo-overrides.mjs`, `HANDOFF.md`.
+## Task C: product page clean-up (DONE, MERGED to `main` via PR #50, verified 2026-10-29)
+Found on `/p/pentagon-50ec-insecticide-1-litre.html`: (1) meta description repeated the product name; (2) Product JSON-LD `description` ran a heading ("Why Choose ...") into the text.
+- `seo-fixes.mjs` (wired in from `seo-overrides.mjs`) fixes both. Checked on the built pages on `main`: 0 pages with a repeated "Buy ... Buy ..." meta description, 0 pages with "Why Choose" in the JSON-LD description, Pentagon JSON-LD is clean, `/p/abasi-5-ec.html` still has FAQ + breadcrumb schema.
+- Minor, left as is: the JSON-LD description is clipped at 500 characters with "..." (it can end mid-sentence).
 
 Rollback: delete the `seo-fixes.mjs` import line in `seo-overrides.mjs` (or revert `ea50617`).
 
