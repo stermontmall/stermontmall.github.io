@@ -3,7 +3,9 @@
    - Mobile bottom menu (Home, Categories, Search, Orders) on category pages.
    - Live discount badges, current prices and "Sold out" tags on product cards (read from the shop database).
    - Product page: photo gallery with thumbnails + swipe, and an "Add to cart" button that opens the product in the shop.
-   Loaded by img-protect.js. To switch off: remove the kili-pages loader at the bottom of img-protect.js. */
+   Loaded by img-protect.js. To switch off: remove the kili-pages loader at the bottom of img-protect.js.
+   Product pages may be named by a clean slug (/p/<slug>.html) instead of the product id: such pages carry
+   <meta name="stm-id" content="<product id>"> so the cart still uses the real id. */
 (function () {
   'use strict';
   try {
@@ -50,7 +52,7 @@
         dd.textContent = ''; var seen = {}, n = 0;
         rows.forEach(function (r) {
           var k = String(r.name || '').toLowerCase(); if (!k || seen[k]) return; seen[k] = 1; n++;
-          var a = el('a'); a.href = '/p/' + encodeURIComponent(r.id) + '.html';
+          var a = el('a'); a.href = '/p/' + encodeURIComponent(r.slug || r.id) + '.html';
           var im = (r.images || []).filter(Boolean)[0]; if (im) { var i = new Image(); i.src = im; i.alt = ''; i.loading = 'lazy'; a.appendChild(i); }
           var t = el('span', '', r.name); t.appendChild(el('small', '', money(r.price))); a.appendChild(t); dd.appendChild(a);
         });
@@ -59,7 +61,7 @@
       };
       var run = function (q) {
         var term = q.replace(/[*(),%\\]/g, ' ').replace(/\s+/g, ' ').trim(); if (term.length < 2) return; last = term;
-        api('products?active=eq.true&name=ilike.' + encodeURIComponent('*' + term.replace(/ /g, '*') + '*') + '&select=id,name,price,images&order=name.asc&limit=12').then(function (rows) { if (term === last) render(rows.slice(0, 12), q); });
+        api('products?active=eq.true&name=ilike.' + encodeURIComponent('*' + term.replace(/ /g, '*') + '*') + '&select=id,slug,name,price,images&order=name.asc&limit=12').then(function (rows) { if (term === last) render(rows.slice(0, 12), q); });
       };
       inp.addEventListener('input', function () { clearTimeout(tm); var q = inp.value.trim(); if (q.length < 2) { dd.hidden = true; return; } tm = setTimeout(function () { run(q); }, 220); });
       form.addEventListener('submit', function (e) { e.preventDefault(); var a = dd.querySelector('a[href^="/p/"]'); if (a) location.href = a.href; else if (inp.value.trim().length > 1) run(inp.value.trim()); });
@@ -83,8 +85,8 @@
 
     /* ---------- live badges and prices on product cards ---------- */
     if (isC || isAll) {
-      api('products?active=eq.true&select=id,price,old_price,stock').then(function (rows) {
-        var m = {}; rows.forEach(function (r) { m[r.id] = r; });
+      api('products?active=eq.true&select=id,slug,price,old_price,stock').then(function (rows) {
+        var m = {}; rows.forEach(function (r) { m[r.id] = r; if (r.slug) m[r.slug] = r; });   /* card links use either the id or the clean slug */
         [].forEach.call(D.querySelectorAll('ul.g li'), function (li) {
           var a = li.querySelector('a[href^="/p/"]'), pr = li.lastElementChild; if (!a || !pr || pr === a) return;
           if (/^\s*from/i.test(pr.textContent)) return;   /* pages that group several pack sizes keep their "From" price */
@@ -102,7 +104,8 @@
 
     /* ---------- product page: photo gallery + Add to cart ---------- */
     if (isP) {
-      var pid = idOf(P), soldOut = !!D.querySelector('main p.no');
+      var mid = D.querySelector('meta[name="stm-id"]');
+      var pid = (mid && mid.getAttribute('content')) || idOf(P), soldOut = !!D.querySelector('main p.no');
       var imgs = [];
       [].forEach.call(D.querySelectorAll('script[type="application/ld+json"]'), function (s) {
         try {
