@@ -1,0 +1,22 @@
+# Anti-stale-cache headers for dynamic product pages and the service worker.
+# NOTE: this file is only honoured by Cloudflare Pages / Netlify. GitHub Pages ignores it (see HANDOFF.md).
+/
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+/p/*
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+/c/*
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
