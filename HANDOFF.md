@@ -1,6 +1,33 @@
-# HANDOFF - Kenya SEO refactor, part 2: power words (merged; live check done on built pages, one fix on `wip-category-title-fallback`)
+# HANDOFF - Master Catalog SEO names: owner's exact Google titles + names on pages and shop (branch `wip-seo-catalog-names`, 2026-10-29)
 
 Rule: small steps, commit + push to a `wip-<task-name>` branch after each, update this file with every push, merge to `main` only when finished AND tested.
+
+Owner brief: the PDF "Master Catalog SEO Mapping" lists the exact Google title for each product. Names must show on the product pages AND in the shop (list + product view).
+The PDF file holds 140 rows (its numbers run 1 to 182 with gaps, e.g. 21-26 and 51-59 are not in the file; nothing is missing from the upload).
+
+## Done
+- [x] Supabase `products.seo_name` / `products.seo_title` filled for 140 products (checked 2026-10-29: 140 rows, every title ends "| Stermont Arcade", spot checks Abasi, Dudu-Stop, Euroken, Nunix match the PDF). The other 86 active products are not in the PDF and keep their generated wording.
+- [x] Step 1 (`seo-meta.mjs`): the lead words used in the PDF are recognised by `hasLeadWord`, so nothing is ever stacked in front of the owner's name; empty delivery H2 fixed (`pdpHeadings().delivery`).
+- [x] Step 2 (`seo-titles.mjs` + `product-pages.yml` step, `continue-on-error`): after each page build the owner's title replaces `<title>`, og:title and twitter:title.
+- [x] Step 3 (this push): the same script now also sets the visible `<h1>`, the last breadcrumb, the JSON-LD Product/ProductGroup name and the last BreadcrumbList item, and writes the name into `product-names.json` for the page id and every pack size, so the shop list and the shop product view show the same name. `node seo-titles.test.mjs`: 36 checks, 0 violations (fixture pages: pack-size page matched through a sibling size, single-size page, product without a title left untouched, idempotent).
+
+## How a name is chosen
+- Single-size page: title exactly as in the PDF; name = title up to " - " (size in brackets kept, e.g. "... Systemic Fungicide (250ml)").
+- Pack-size page (several sizes of one product are ONE page): name = `seo_name` (no size), title = `seo_name` + the rest of the PDF title. If the earliest size has no title, the earliest size that has one is used.
+
+## Left
+- [ ] Merge to `main` (triggers the rebuild because `seo-titles.mjs` is watched by `product-pages.yml`), then check 3 live pages (one pack-size, one single-size, one without an owner title), the shop list card and the tab title. Not testable from my sandbox (no network).
+- [ ] Owner to confirm the claim words in the PDF ("#1 Rated", "Top-Rated", "Certified", "PCPB-Approved", "Genuine"): they are applied as supplied, but there are no ratings or paperwork in the repo to back them. To drop one, edit that product's `seo_title`/`seo_name` in Supabase; the next rebuild applies it.
+- [ ] Titles are longer than 60 characters (Google may cut them in results). Kept exactly as the owner wrote them.
+- [ ] The Merchant Center feed (`merchant-feed.xml`) still uses the plain product names on purpose (Google Shopping rejects promotional words in feed titles).
+
+## Decisions
+- Owner decision (2026-10-29): the PDF wording wins over the generated wording, including words banned in Part 2 below. `seo-meta.mjs` itself still never adds them.
+- Done as a post-build step (not inside `generate-products.mjs`) so a problem can never break the build: any failure leaves the generated page as it was.
+
+---
+
+# HANDOFF - Kenya SEO refactor, part 2: power words (merged; live check done on built pages, one fix on `wip-category-title-fallback`)
 
 ## Part 1 (DONE, merged to `main` as PR #52, branch `wip-seo-kenya-meta`)
 Shared builders in `seo-meta.mjs`, product pages (title, description, H1 trust word, 3 local H2 sections, `stm-seo v2` marker) in `generate-products.mjs`, category meta in `seo-kenya.mjs`. JSON-LD and OG already correct (KES, availability, seller, og:locale en_KE). Clean slugs + permanent redirects already exist (Task A).
