@@ -29,8 +29,24 @@ export function metaDescription(p) {
   return best;
 }
 
+// Extra sections that bring every description into the 300-600 word range. Facts come only from the batch JSON.
+export function extras(p) {
+  const sizeQ = p.sizes.includes(' and ') || p.sizes.includes(',');
+  const one = p.sizes.replace(/Litres$/, 'Litre');
+  const faq = [
+    [`What is ${p.name} used for?`, `${p.targets}. It is meant for: ${p.settings}.`],
+    [`How do I mix and apply ${p.name}?`, `Follow the dose and water volume on the manufacturer's label. ${p.method}`],
+    [`Is ${p.name} safe to handle?`, `Treat it as a pesticide: wear full protective clothing, keep children, pets and livestock away, and keep spray out of water sources.`],
+    [sizeQ ? `Which pack size should I choose?` : `What pack size is available?`, sizeQ ? `${p.name} comes in ${p.sizes}. Small packs suit trials, kitchen gardens and small plots; larger packs suit bigger acreages, so you do not run short in the middle of a job.` : `${p.name} is sold in a ${one} pack.`],
+    [`How do I buy ${p.name} in Kenya?`, `Pay by M-Pesa and we deliver to all 47 counties, or collect at The Sarit Centre, Westlands, Nairobi. Questions? WhatsApp +254 748 888 230.`],
+  ];
+  const why = `Stermont Arcade is an online agrovet and pest control store at The Sarit Centre, Westlands, Nairobi. Buy ${p.name} with an upfront price in Kenya shillings, M-Pesa payment, delivery to all 47 counties and WhatsApp support. Always read the label before use.`;
+  return { faq, why };
+}
+
 export function render(p) {
   const meta = metaDescription(p);
+  const ex = extras(p);
   const ai = p.ai || 'See the product label (not stated in our catalog)';
   const form = p.formulation || 'See the product label';
   const steps = [
@@ -63,6 +79,12 @@ export function render(p) {
         <li><strong>Re-Entry:</strong> Keep people, children and animals out of the sprayed area until the spray has dried, and follow the re-entry and pre-harvest intervals on the label.</li>
         <li><strong>Water &amp; Storage:</strong> Keep spray and rinse water away from streams, ponds and wells. Store in the original closed container, cool, dry and locked, away from food and feed.</li>
     </ul>
+
+    <h3>Why Buy ${esc(p.name)} from Stermont Arcade:</h3>
+    <p>${esc(ex.why)}</p>
+
+    <h3>Frequently Asked Questions:</h3>
+    ${ex.faq.map(([q, a]) => `<p><strong>${esc(q)}</strong><br>${esc(a)}</p>`).join('\n    ')}
 </div>
 `;
   return { meta, html };
@@ -82,4 +104,30 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   fs.writeFileSync(path.join(dir, 'out', batch + '.html'), all);
   fs.writeFileSync(path.join(dir, 'out', batch + '.report.json'), JSON.stringify(report, null, 1));
   for (const r of report) console.log(r.metaLength, r.group);
+}
+
+// Plain-text description in the format the generator already renders (CAPITAL headings, bullets). This is what is stored in products.description.
+export function renderText(p) {
+  const ai = p.ai || 'See the product label';
+  const form = p.formulation || 'See the product label';
+  const L = [];
+  L.push(`${p.name} (${p.sizes.replace(/ and /g, ', ')})`, '', p.lead, '', 'KEY SPECIFICATIONS & FEATURES');
+  L.push(`• Active ingredient: ${ai}`, `• Target: ${p.targets}`, `• Formulation: ${form}`, `• Application settings: ${p.settings}`, '');
+  L.push('MIXING & APPLICATION INSTRUCTIONS');
+  L.push(`1. Dilution rate: use the dose and water volume printed on the manufacturer's label for your crop and growth stage.`);
+  L.push(`2. Application method: ${p.method}`);
+  L.push(`3. Coverage: depends on the dose and spray volume on the label. Available in ${p.sizes}.`);
+  p.extraSteps.forEach((s, i) => L.push(`${4 + i}. ${s}`));
+  L.push('', 'SAFETY & RE-ENTRY PRECAUTIONS');
+  L.push('• Wear gloves, a mask, goggles, overalls and boots when mixing and spraying.');
+  L.push('• Keep people, children and animals out of the sprayed area until the spray has dried, and follow the re-entry and pre-harvest intervals on the label.');
+  L.push('• Keep spray and rinse water away from streams, ponds and wells. Store in the original closed container, cool, dry and locked, away from food and feed.', '');
+  L.push(...textTail(p));
+  return L.join('\n');
+}
+
+// Everything from "WHY BUY" to the end.
+export function textTail(p) {
+  const ex = extras(p);
+  return [`WHY BUY ${p.name.toUpperCase()} FROM STERMONT ARCADE`, ex.why, '', 'FREQUENTLY ASKED QUESTIONS', ...ex.faq.flatMap(([q, a]) => [q, a, '']), `ORDER\nOrder ${p.name} online, pay by M-Pesa and get delivery to all 47 counties, or pick up at The Sarit Centre, Westlands, Nairobi. WhatsApp orders: +254 748 888 230.`];
 }
