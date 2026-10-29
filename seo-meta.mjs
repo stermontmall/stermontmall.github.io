@@ -37,8 +37,8 @@ const isAgro = catSlug => PCPB_CATS.has(catSlug) && !PEST_CATS.has(catSlug);
 export const POWER = {
   pest:    ['Powerful', 'Fast-Acting', 'Heavy-Duty', 'High-Potency', 'Long-Lasting'],      // home/premises pest control
   agro:    ['Powerful', 'High-Potency', 'Fast-Acting', 'Proven', 'Effective'],             // crop chemicals
-  farm:    ['Quality', 'Reliable', 'Proven', 'Effective'],                                 // other farm / vet inputs
-  general: ['Top', 'Reliable', 'Quality', 'Premium']                                        // everything else
+  farm:    ['Top-Quality', 'Reliable', 'Proven', 'Effective'],                             // other farm / vet inputs
+  general: ['Top-Quality', 'Reliable', 'Premium']                                          // everything else
 };
 // Descriptor used inside meta descriptions ("Buy 100% genuine & high-potency <name>").
 export const DESCRIPTOR = { pest: 'high-potency', agro: 'high-potency', farm: 'quality', general: 'top-quality' };
@@ -61,13 +61,13 @@ const hasLeadWord = n => /^(original|genuine|powerful|premium|top|best|quality|r
 const hasTrustWord = n => /^(original|genuine)\b/i.test(n);
 export const trustName = (name, ctx) => (isGenuine(ctx) && !hasTrustWord(name) ? `Original ${name}` : name);
 
-// Visible H1 on the product page: the same lead word the title uses ("Original" when true, otherwise a type-appropriate power word),
-// so what shoppers read on the page matches the search listing. Never repeats a word the name already starts with.
+// Visible H1 on the product page. No length limit here, so it carries BOTH words: "Original" when it is true (known brand or farm input)
+// followed by a type-appropriate power word ("Original Powerful Bazooka 18EC Insecticide", "Top-Quality Hand Pressure Sprayer").
+// A name that already starts with one of these lead words is left alone, so a word is never repeated.
 export function pdpH1(name, ctx = {}) {
   const base = String(name || '').replace(/\s+/g, ' ').trim();
   if (hasLeadWord(base)) return base;
-  const lead = isGenuine(ctx) ? 'Original' : powerWord(base, ctx);
-  return `${lead} ${base}`;
+  return [isGenuine(ctx) ? 'Original' : '', powerWord(base, ctx), base].filter(Boolean).join(' ');
 }
 
 // One visible line under the H1 on the product page. Same claims as the meta description (genuine only where true).
@@ -91,14 +91,11 @@ export function pdpTitle(name, ctx = {}) {
     `${led} – Best Price in Kenya | ${STORE}`,
     `${led} – Price in Kenya | ${STORE}`,
     `${led} – Best Price in Kenya`,
-    `${base} – Best Price in Kenya | ${STORE}`,
-    `${led} – Price in Kenya`,
-    `${base} – Price in Kenya | ${STORE}`,
-    `${base} – Best Price in Kenya`,
-    `${base} – Price in Kenya`
+    `${led} – Price in Kenya`
   ];
   const hit = tiers.find(t => t.length <= TITLE_MAX);
-  return hit || `${clip(base, TITLE_MAX - ' – Price in Kenya'.length)} – Price in Kenya`;
+  // Name too long even without the store name: keep the lead word (Original / power word) and clip the product name instead.
+  return hit || `${clip(led, TITLE_MAX - ' – Price in Kenya'.length)} – Price in Kenya`;
 }
 
 // PDP meta description, max 155 characters.
