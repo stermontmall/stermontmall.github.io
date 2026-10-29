@@ -1,6 +1,6 @@
 // Run: node seo-meta.test.mjs   (no dependencies)
 import assert from 'node:assert/strict';
-import { pdpH1, pdpTagline, pdpTitle, pdpDescription, catTitle, catDescription, powerWord, productType, TITLE_MAX, DESC_MAX } from './seo-meta.mjs';
+import { pdpBadges, pdpHeadings, pdpH1, pdpTagline, pdpTitle, pdpDescription, catTitle, catDescription, powerWord, productType, TITLE_MAX, DESC_MAX } from './seo-meta.mjs';
 
 const names = [
   'Bazooka 18EC Insecticide (1L)', 'Bazooka 18EC', 'Duduthrin 1.75EC Insecticide 1 Litre', 'Roundup Turbo 500ml',
@@ -44,6 +44,23 @@ assert.equal(productType('bed-bug-killers'), 'pest'); assert.equal(productType('
 assert.equal(productType('fertilizers'), 'farm'); assert.equal(productType('smartphones'), 'general');
 const leads = new Set(names.map(x => powerWord(x, { catSlug: 'crop-insecticides' })));
 assert.ok(leads.size >= 3, `expected variety of power words, got ${[...leads]}`);
+
+// Trust badges and H2 headings
+for (const ctx of ctxs) {
+  const b = pdpBadges(ctx).join(' | '); n += 3;
+  assert.ok(pdpBadges(ctx).every(x => x.startsWith('\u2713 ')), `badge needs a tick: ${b}`);
+  assert.ok(/Fast M-Pesa Checkout/.test(b) && /Sarit Centre Pickup \| Delivery to 47 Counties/.test(b), `missing M-Pesa/pickup badge: ${b}`);
+  assert.ok(!/(#1|top-rated|guaranteed|certified)/i.test(b), `unverifiable badge: ${b}`);
+}
+assert.ok(pdpBadges({ catSlug: 'crop-insecticides' })[0].includes('PCPB Approved'));
+assert.ok(!pdpBadges({ catSlug: 'fertilizers' }).join().includes('PCPB'));
+assert.ok(!pdpBadges({ catSlug: 'kitchen', brand: 'Stermont Arcade' }).join().includes('Original'));
+assert.equal(pdpHeadings('bed-bug-killers').features, 'Powerful Features & Target Dudu Control');
+assert.equal(pdpHeadings('herbicides').features, 'Powerful Features & Target Crop Protection');
+assert.equal(pdpHeadings('smartphones').features, null);
+assert.equal(pdpHeadings('smartphones').guide, 'Reliable Quality & Application Guide');
+assert.equal(pdpHeadings('smartphones').price, 'Best Price & Countrywide Kenya Delivery');
+n += 8;
 console.log('example PDP :', pdpTitle('Bazooka 18EC Insecticide (1L)', { catSlug: 'crop-insecticides' }));
 console.log('example desc:', pdpDescription('Bazooka 18EC', { catSlug: 'crop-insecticides' }));
 console.log('example cat :', catTitle('Crop Insecticides'));
