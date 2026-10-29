@@ -14,6 +14,7 @@ on:
       - 'seo-meta.mjs'
       - 'seo-overrides.mjs'
       - 'seo-overrides.json'
+      - 'seo-titles.mjs'
       - 'seo-kenya.mjs'
       - '.github/workflows/product-pages.yml'
 
@@ -45,6 +46,10 @@ jobs:
 
       - name: Apply Google titles, descriptions and FAQs (seo-overrides.json)
         run: node seo-overrides.mjs
+
+      - name: Apply the owner's exact Google titles (products.seo_title, from the Master Catalog SEO Mapping PDF)
+        continue-on-error: true
+        run: node seo-titles.mjs
 
       - name: Speed - connect to the shop database early (preconnect)
         run: |
