@@ -1,3 +1,31 @@
+# HANDOFF - Agrochemical product descriptions in the 4-section format (branch `wip-agro-descriptions`, 2026-10-29)
+
+Owner brief: "Elite E-Commerce SEO Strategist" prompt (title, meta description, 4-section description: lead / specifications / mixing & application / safety, JSON-LD). Scope chosen by owner: ALL agrochemicals, in batches of 10 products (a product = one pack-size group, e.g. Absolute 375SC 50 ml to 1 L is ONE product). Categories in scope: Herbicides (70), Fungicides (71), Crop Insecticides (72), Adjuvants & Growth Regulators (73) = 39 products, 58 rows. Order: category id, then name.
+
+## Done
+- [x] Batch 01 = 10 products (7 herbicides + Absolute 375SC, Agrixyl 407, Bradley 500SC): `seo-agro/batch-01.json` (facts taken only from the catalog descriptions), `seo-agro/build.mjs` (renders the brief's HTML block + a 150-160 char meta description), `seo-agro/build.test.mjs` (`node seo-agro/build.test.mjs`: 70 checks, 0 violations - meta length, banned claims, 3 sections, price present, missing active ingredient flagged, no invented dose or interval).
+- Run `node seo-agro/build.mjs batch-01` to write `seo-agro/out/batch-01.html` (paste-ready blocks) and `batch-01.report.json` (meta text + what is missing per product). `out/` is not committed yet.
+
+## Left
+- [ ] Owner: supply LABEL DATA for batch 01 (list below). Until then the blocks say "use the dose on the manufacturer's label".
+- [ ] Decide how the text goes live: the Supabase `products.description` column feeds the generator (plain text with CAPITAL headings and bullets). Nothing has been written to Supabase. Proposal: after owner approval, update `description` for the rows of each approved product, rebuild runs within 3 hours.
+- [ ] Batches 02-04 (29 products left): next 10 in order are the rest of Fungicides, then Crop Insecticides, then Adjuvants.
+- [ ] JSON-LD: the generator already outputs Product + Offer (KES, InStock, NewCondition, seller, image, sku), so no extra schema block is added.
+
+### Label data still needed for batch 01
+- Dose per litre / per knapsack and coverage per pack: ALL 10 products.
+- Active ingredient and formulation: Agrixyl 407 (nothing in the catalog); active ingredient only: Beanpro 480SL.
+- Pre-harvest interval: Absolute 375SC, Agrixyl 407, Beanpro, Bradley, Commander, Digester Supper. Re-entry interval: all 10. Waiting period before planting: Catapult. Rotation restriction: Maguguma Top.
+
+## Decisions
+- NO invented dosing: the catalog says "follow the label" and holds no rates, so dilution, coverage and re-entry/pre-harvest times are NOT made up. Wrong rates on a pesticide can burn crops or harm people, so numbers come from the label only.
+- Titles are NOT regenerated: the owner's PDF titles in `products.seo_title` win (see the section below). The brief's title format and the 60-character title rule in `seo-meta.mjs` conflict, and the owner already decided.
+- Banned claims stay out (no "Guaranteed", "Certified", "#1 Rated", "Top-Rated", "PCPB approved"): there is nothing in the repo to back them.
+- The meta description formula in the brief cannot reach 150-160 characters with long product names, so the builder tries shorter variants (drops "Effective for" / "Active:") and the test enforces 150-160.
+- Price in the meta is the lowest pack price ("from KSh" when several sizes).
+
+---
+
 # HANDOFF - Master Catalog SEO names: owner's exact Google titles + names on pages and shop (branch `wip-seo-catalog-names`, 2026-10-29)
 
 Rule: small steps, commit + push to a `wip-<task-name>` branch after each, update this file with every push, merge to `main` only when finished AND tested.
