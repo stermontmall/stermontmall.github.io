@@ -26,10 +26,12 @@ Found on `/p/pentagon-50ec-insecticide-1-litre.html` (build `cdf72d1`):
 2. Product JSON-LD `description` runs a heading into the text (`...Why Choose Pentagon 50EC Thrips and aphids suck sap...…`) because newlines are flattened before clipping.
 
 Done so far:
-- [x] Step 1: new `seo-fixes.mjs` added (fixes both items, per-page try/catch). NOT wired in yet, so it changes nothing on its own.
-- [ ] Step 2: wire it in with one line in `seo-overrides.mjs` (after the seo-product-extras line).
-- [ ] Step 3: owner runs the product-pages workflow from the branch (or locally with `node generate-products.mjs && node seo-kenya.mjs && node seo-overrides.mjs`) and checks the Pentagon page source: meta description has no second "Buy", JSON-LD description has no heading run. Check `/p/abasi-5-ec.html` still has its FAQ and breadcrumb.
+- [x] Step 1: new `seo-fixes.mjs` added (fixes both items, per-page try/catch).
+- [x] Step 2: wired in with one line in `seo-overrides.mjs` (after the seo-product-extras line). Commit `ea50617` changes only those 2 lines (1 comment + 1 import). NOT TESTED: nothing has been run yet.
+- [ ] Step 3: owner runs the product-pages workflow from the branch (or locally with `node generate-products.mjs && node seo-kenya.mjs && node seo-overrides.mjs`) and checks the Pentagon page source: meta description has no second "Buy", JSON-LD description has no heading run. Check `/p/abasi-5-ec.html` still has its FAQ and breadcrumb. The log line `seo-fixes: meta descriptions fixed on N page(s)...` shows what changed.
 - [ ] Step 4: merge to `main` only after step 3 passes.
+
+Rollback: delete the `seo-fixes.mjs` import line in `seo-overrides.mjs` (or revert `ea50617`).
 
 Decisions:
 - Fix lives in a new post-processing file instead of editing the large generator, so it is easy to switch off (delete one line).
