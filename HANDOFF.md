@@ -9,7 +9,7 @@ Plan, each step committed and pushed:
 1. [x] This plan.
 2. [x] (tests pass, 610 checks) `seo-meta.mjs`: general list gets "Top-Quality" (replaces bare "Top"); H1 carries BOTH the trust word and the power word ("Original Powerful <name>").
 3. [x] (checked on the 183 real product names x 4 category types: 0 titles over 60 chars, 0 without a modifier; trade-off: a very long name loses up to ~9 characters to the lead word) `seo-meta.mjs`: title fallback keeps the lead word when the name has to be clipped, so every title carries a modifier.
-4. [ ] `seo-meta.test.mjs`: assert every title and H1 carries a modifier; run it.
+4. [x] (`node seo-meta.test.mjs`: 850 checks, 0 violations) `seo-meta.test.mjs`: assert every title and H1 carries a modifier; run it.
 5. [ ] Check against the real product names in `p/*.html`, then merge to `main` and confirm the rebuild.
 
 ## Part 1 (DONE, merged to `main` as PR #52, branch `wip-seo-kenya-meta`)
