@@ -92,3 +92,10 @@ Tested in headless Chromium against the repo served locally, Supabase products m
 - Decisions: PRs #60, #61, #62 were merged BEFORE this browser test (breaks the "merge only when tested" rule); the test now passes, so no revert needed.
 - Not testable from the sandbox: the live site (network blocked). Owner check on phone: open stermontarcade.co.ke twice (first visit installs service worker v3), rename a size in admin, confirm all sizes follow.
 - Left: if a phone still shows old names, clear site data once for stermontarcade.co.ke (old service worker/cache); cards on the list keep the plain name (decision: long names cut off on mobile).
+
+## CORRECTION: per-size SEO names are intentional (branch `wip-restore-per-size-names`, 2026-10-29)
+- DECISION (owner): each pack size keeps its OWN name, with ranking prefixes ("#1 Top", "Best", "#1 Original", "#1 Best", "Reliable") for Google. Do NOT normalise names across sizes.
+- Mistake made earlier today (PR #61): data was "cleaned" to one name per group and code forced one name per group. Reverted: Supabase names of actellic-50ec-insecticide-100-ml, agita-1gb-fly-bait-400-g, alonze-50ec-abamectin-insecticide-250-ml / -100-ml, amito-5-7-wdg-insecticide-100-g / -250-g restored exactly; `catalog-v10.js?v=10` (admin saves only the edited size) and `storefront-live.js?v=6` (each size shows its own name) restored.
+- Kept from before: service worker v3 revalidates .js/.css; shop product view heading = its page H1 (PR #62); reload on back/forward cache restore.
+- Tested in headless Chromium (mock data): card shows own row name; selecting 250 ml shows "#1 Top ALONZE 50EC Abamectin Insecticide" and the tab title follows.
+- Open: list card shows the name of the first in-stock size (not the size you edited), so editing another size shows only after opening the product and choosing that size. Option: show the best-prefixed name on the card.
