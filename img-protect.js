@@ -42,7 +42,7 @@
 
 /* Homepage department navigation (see /nav-modern.js). Does nothing on pages without the homepage category strip. */
 (function () {
-  try { if (!document.getElementById('cats')) return; var n = document.createElement('script'); n.src = '/nav-modern.js?v=1'; n.defer = true; document.head.appendChild(n); } catch (e) {}
+  try { if (!document.getElementById('cats')) return; var n = document.createElement('script'); n.src = '/nav-modern.js?v=2'; n.defer = true; document.head.appendChild(n); } catch (e) {}
 })();
 
 /* "Someone just bought" popup showing real recent orders (see /recent-orders.js). Loading it twice is harmless. */

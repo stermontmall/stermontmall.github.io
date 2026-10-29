@@ -128,7 +128,14 @@
         var t = tabEls[k]; if (t && t.scrollIntoView) { try { t.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); } catch (e) {} }
         if (byUser) {
           if (q && q.value.trim()) { q.value = ''; q.dispatchEvent(new Event('input')); }
-          if (grid.getBoundingClientRect().top < 0) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          /* bring this department's products to the top, just below the sticky search box and tabs, so the shopper
+             does not have to scroll past the banner, info cards and "Recommended" box. If nothing is loaded for the
+             department yet, bring its sub-category icons to the top instead. */
+          setTimeout(function () {
+            var hd = document.querySelector('header'), off = (hd ? hd.getBoundingClientRect().height : 0) + 8;
+            var g = groups[k], t = (g && g.el && !g.el.hidden && g.el.offsetParent && count(k) > 0) ? g.el : grid;
+            window.scrollTo({ top: Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - off), behavior: 'smooth' });
+          }, 60);
         }
       }
       function drawTabs() {
