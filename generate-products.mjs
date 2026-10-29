@@ -129,6 +129,22 @@ const slugOf = {};
 const sl = id => slugOf[id] || id;
 // The old id address of a renamed product becomes a redirect to its clean page.
 products.forEach(p => { if (sl(p.id) !== p.id) aliases.push({ id: p.id, to: p.id }); });
+// Permanent links: every slug a product ever had (table product_slug_redirects, filled by a database trigger) keeps forwarding to its current page.
+{
+  let hist = [];
+  try {
+    if (process.env.SLUG_REDIRECTS_JSON) hist = JSON.parse(readFileSync(process.env.SLUG_REDIRECTS_JSON, 'utf8'));
+    else { const r = await fetch(`${SB}/rest/v1/product_slug_redirects?select=old_slug,product_id`, { headers: { apikey: KEY } }); if (r.ok) hist = await r.json(); }
+  } catch { hist = []; }
+  const topOf = {}; aliases.forEach(x => { topOf[x.id] = x.to; });
+  const taken = new Set(); products.forEach(p => { taken.add(p.id); taken.add(sl(p.id)); }); aliases.forEach(x => taken.add(x.id));
+  (Array.isArray(hist) ? hist : []).forEach(h => {
+    if (!h || !h.old_slug || !h.product_id || taken.has(h.old_slug) || !/^[a-z0-9][a-z0-9-]*$/.test(h.old_slug)) return;
+    const to = topOf[h.product_id] || h.product_id;
+    if (!products.some(p => p.id === to)) return;
+    taken.add(h.old_slug); aliases.push({ id: h.old_slug, to });
+  });
+}
 const fileOf = path => `.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m));
 const byCat = {};
 products.forEach(p => { const s = p.categories?.slug; if (s) (byCat[s] = byCat[s] || { name: p.categories.name, items: [] }).items.push(p); });

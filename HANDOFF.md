@@ -76,3 +76,8 @@ The database is live, `main` is live. Nothing on `main` reads `slug` yet, so the
 - [x] Pages for batch 2 are produced by `generate-products.mjs` on its first run after merge (no hand-made pages needed). Orphan pages are redirected by its DUPES list.
 - Remaining ids with mild tails were left alone on purpose (ids stay stable; they are already readable).
 - Merged to `main` after code checks (generator fixture test, node --check, seo-check 0 broken links). Browser test checklist above still worth a quick manual pass on the live site.
+
+## Permanent links (2026-10-29, branch wip-permanent-product-links)
+- DB (live): new products get a clean slug = product name (short code only if the name is taken) via `make_product_slug_v2`; the slug is created once and NOT changed when the name is edited (trigger `set_product_slug`). Table `product_slug_redirects` + trigger `trg_log_product_slug_change` remember any slug that is ever changed by hand.
+- `generate-products.mjs` reads that table and writes a redirect page for every old slug (ignored if it clashes with a live page or its product is gone). Tested on a fixture.
+- To rename a product link by hand: `update products set slug='new-name' where id='...'` (old link keeps working automatically).
