@@ -2,6 +2,9 @@
 // Runs right after generate-products.mjs (see .github/workflows/product-pages.yml). Pages that do not exist yet (hidden or sold-out products) are skipped.
 // To optimise another product: add its id (the file name in /p/) to seo-overrides.json. {price} is filled in from the live page.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+// First run the structure + internal links pass (seo-product-extras.mjs). Wired in here because this script is already a workflow step.
+// If that pass fails for any reason the overrides below still run. To switch it off, delete these 2 lines.
+try { await import('./seo-product-extras.mjs'); } catch (e) { console.log('seo-product-extras skipped:', e.message); }
 const O = JSON.parse(readFileSync('seo-overrides.json', 'utf8'));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s;
