@@ -36,3 +36,15 @@ The site is static. `p/*.html`, `c/*.html`, `guides/*.html` are GENERATED and th
 - [ ] Owner to confirm "Best Price in Kenya" and "high-potency" wording are acceptable.
 - [x] Visible on-page wording (branch `wip-power-words-h1`): the H1 now uses `pdpH1` (same lead word as the title: "Original" when true, else a power word) and a visible line under it from `pdpTagline`: "Best Price in Kenya · 100% genuine & high-potency · M-Pesa checkout · Delivery to all 47 counties" ("100% genuine" only where `isGenuine`). Before this the power words were only in the <title> and meta description, not on the page. Check 3 pages after the rebuild.
 - [ ] Optional: per-product `seo-overrides.json` entries for hero products (Bazooka etc.).
+
+## Part 3 - visible trust badges and H2 wording (branch `wip-pdp-trust-badges`)
+Handoff check 2026-10-29 18:5x EAT: `wip-category-title-fallback` (PR #55) and `wip-power-words-h1` (PR #56) are both merged to `main`. So brief item A (H1 power word) and the tagline under the H1 were already live. Still missing from the brief: B (trust badge pills near price / Add to Cart) and C (the three H2 headings with the exact wording).
+### Done
+- [x] Step 1 `seo-meta.mjs`: `pdpBadges(ctx)` and new `pdpHeadings(catSlug)` ({features, guide, price}); tests in `seo-meta.test.mjs` (642 checks, 0 violations).
+### Left
+- [ ] Step 2 `generate-products.mjs`: render badge pills under the price, use the new H2 sections and CSS (mobile first).
+- [ ] Step 3 build check (generator needs the Supabase anon key to fetch the catalog), inspect 3 generated pages (pest, agro, general), then merge to `main`.
+### Decisions
+- "Top-Rated Quality" badge from the brief is shown as "Top-Quality Selection": there are no ratings to back "Top-Rated" (rule at the top of `seo-meta.mjs`). To use the brief wording, edit one string in `pdpBadges` and the banned-words test.
+- "100% Original & PCPB Approved" only in PCPB-regulated categories; "100% Original" only for known brands and farm inputs; no such badge on other products (a sneaker is not PCPB approved).
+- H2 #1 "Powerful Features & Target Dudu Control" for home pest control, "Powerful Features & Target Crop Protection" for crop chemicals; none for other products. H2 #2 and #3 appear on every product. Old H2s "Price & M-Pesa Ordering in Kenya" and "Delivery to Nairobi & 47 Counties" are merged into #3.

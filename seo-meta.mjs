@@ -154,11 +154,18 @@ export function catDescription(catName, catSlug) {
   return tiers.find(t => t.length <= DESC_MAX) || clip(`Order ${c} in Kenya. M-Pesa checkout, delivery to 47 counties.`, DESC_MAX);
 }
 
-// Product page H2 headings (local utility + problem solving). The first one depends on what the product is.
+// Visible trust badges (pills) shown under the price on the product page. Same truthful-claims rule as everything above:
+//   "100% Original & PCPB Approved" only in PCPB-regulated categories, "100% Original" only where isGenuine, nothing otherwise.
+//   "Top-Quality Selection" replaces "Top-Rated Quality" (we have no ratings to back "Top-Rated"; see the rule at the top).
+export function pdpBadges(ctx = {}) {
+  const first = isPcpb(ctx.catSlug) ? '100% Original & PCPB Approved' : isGenuine(ctx) ? '100% Original' : null;
+  return [first, 'Top-Quality Selection', 'Fast M-Pesa Checkout', 'Sarit Centre Pickup | Delivery to 47 Counties'].filter(Boolean).map(t => `✓ ${t}`);
+}
+
+// Product page H2 headings. `features` only for pesticides and crop chemicals (null otherwise), the other two are on every product.
 export function pdpHeadings(catSlug) {
-  const first = isPest(catSlug) ? 'Target Pests & Dudu Control Application'
-    : PCPB_CATS.has(catSlug) ? 'Target Crops, Pests & Application'
-    : FARM_CATS.has(catSlug) ? 'Uses & Application'
+  const features = isPest(catSlug) ? 'Powerful Features & Target Dudu Control'
+    : PCPB_CATS.has(catSlug) ? 'Powerful Features & Target Crop Protection'
     : null;
-  return { uses: first, price: 'Price & M-Pesa Ordering in Kenya', delivery: 'Delivery to Nairobi & 47 Counties' };
+  return { features, guide: 'Reliable Quality & Application Guide', price: 'Best Price & Countrywide Kenya Delivery' };
 }
