@@ -1,13 +1,17 @@
 // Stermont Arcade - blog writer. Drafts ONE new blog post from the next "pending" topic in blog-topics.json.
 // The workflow (.github/workflows/blog-writer.yml) then opens a pull request, so a person reviews the draft
 // before anything goes live. It never publishes by itself.
-// Needs the repository secret ANTHROPIC_API_KEY. Node 18+, no installs.
+// Needs ONE repository secret: GEMINI_API_KEY (free, from aistudio.google.com/apikey) or ANTHROPIC_API_KEY (paid). Node 18+, no installs.
 //
 // Each draft is written for search intent: a direct answer box first, question-style headings, a comparison table,
 // an FAQ (with FAQPage structured data), links to the right shop categories and related guides.
 import { readFileSync, writeFileSync, existsSync, readdirSync, appendFileSync } from 'node:fs';
 
 const MODEL = process.env.BLOG_MODEL || 'claude-sonnet-5-5';
+// FREE option: a Google Gemini API key (https://aistudio.google.com/apikey, no card needed) works instead of an Anthropic key.
+// Models are tried in order; if one is unavailable or its free quota is used up, the next one is used.
+const GKEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODELS = (process.env.GEMINI_MODEL || 'gemini-3.8-flash,gemini-3.6-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite').split(',').map(s => s.trim()).filter(Boolean);
 const KEY = process.env.ANTHROPIC_API_KEY;
 const ONLY = (process.env.TOPIC_SLUG || '').trim();
 const TOPICS_FILE = 'blog-topics.json';
@@ -24,7 +28,7 @@ const tokens = s => new Set(String(s).toLowerCase().replace(/\.html$/, '').split
 const jaccard = (a, b) => { let i = 0; for (const x of a) if (b.has(x)) i++; const u = a.size + b.size - i; return u ? i / u : 0; };
 const titleOf = f => { try { const m = readFileSync(f, 'utf8').match(/<title>([^<]*)<\/title>/i); return m ? unesc(m[1]).replace(/\s*[|\u2013-]\s*Stermont Arcade.*$/i, '').trim() : ''; } catch { return ''; } };
 
-if (!KEY) stop('The ANTHROPIC_API_KEY secret is not set - nothing written.');
+if (!KEY && !GKEY) { console.error('No API key: add the repository secret GEMINI_API_KEY (free) or ANTHROPIC_API_KEY. Nothing written.'); out('written', 'false'); process.exit(1); }
 if (!existsSync(TOPICS_FILE)) stop('No blog-topics.json - nothing to do.');
 data = JSON.parse(readFileSync(TOPICS_FILE, 'utf8'));
 
@@ -113,6 +117,33 @@ function check(a) {
 
 async function ask(extra) {
   const user = `Topic: ${topic.title}\nAngle: ${topic.angle || ''}\nKeywords to work in naturally: ${(topic.keywords || []).join(', ')}\nFacts you may use (nothing else about our products):\n${(topic.facts || []).map(f => '- ' + f).join('\n')}\nAllowed link paths:\n${offered.map(p => '- ' + p).join('\n')}\nExisting articles (do not repeat them):\n${posts.map(p => '- ' + p.title).join('\n') || '- none yet'}${extra ? `\n\nYour previous attempt was rejected because: ${extra}. Fix this.` : ''}`;
+  if (!KEY) {   /* free path: Google Gemini */
+    const body = JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM }] },
+      contents: [{ role: 'user', parts: [{ text: user }] }],
+      generationConfig: { maxOutputTokens: 16000, temperature: 0.7, responseMimeType: 'application/json' }
+    });
+    let lastErr = '';
+    for (const m of GEMINI_MODELS) {
+      for (let t = 0; t < 2; t++) {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+          method: 'POST', headers: { 'x-goog-api-key': GKEY, 'content-type': 'application/json' }, body
+        });
+        if (r.ok) {
+          const j = await r.json();
+          const text = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []).filter(p => !p.thought).map(p => p.text || '').join('');
+          const a = text.indexOf('{'), b = text.lastIndexOf('}');
+          console.log(`Gemini model used: ${m}`);
+          try { return JSON.parse(text.slice(a, b + 1)); } catch { return null; }
+        }
+        lastErr = `Gemini ${m} error ${r.status}: ${(await r.text()).slice(0, 200)}`;
+        console.log(lastErr);
+        if (r.status === 429 || r.status === 503) { if (t === 0) await new Promise(ok => setTimeout(ok, 20000)); continue; }   /* busy or per-minute limit: wait once, then next model */
+        break;   /* 400/403/404 etc: this model will not work, try the next one */
+      }
+    }
+    throw new Error(lastErr || 'No Gemini model answered');
+  }
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST', headers: { 'x-api-key': KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({ model: MODEL, max_tokens: 6000, system: SYSTEM, messages: [{ role: 'user', content: user }] })
