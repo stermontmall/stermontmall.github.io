@@ -2,17 +2,22 @@
    Add at the end of index.html, AFTER storefront-live.js:  <script src="account-panel.js" defer></script>
    Replaces the old account panel (same #ac container) with: Orders (Ongoing/Delivered + Canceled/Returned),
    Inbox, Ratings & Reviews, Vouchers, Wishlist, Recently viewed, Address book.
-   v2: full-detail order enquiry on WhatsApp, Edit saved details, Recently viewed now records products. */
+   v2: full-detail order enquiry on WhatsApp, Edit saved details, Recently viewed now records products.
+   v3: review emails link to /?rate=<order ref>, which opens Ratings & Reviews straight away (after login if needed);
+       saved address details are tied to the signed-in account. */
 (function () {
   var D = document, NS = 'http://www.w3.org/2000/svg', REF = 'oewvtbnmyombbtggamor', SBU = 'https://' + REF + '.supabase.co',
       KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'sb-' + REF + '-auth-token', WA = '254748888230';
-  var AC, AB, view = 'main', tab = 'ongoing', orders = null, loading = false, loadErr = '';
+  var AC, AB, view = 'main', tab = 'ongoing', orders = null, loading = false, loadErr = '', rateRef = '';
   var COUNTIES = ['Baringo', 'Bomet', 'Bungoma', 'Busia', 'Elgeyo-Marakwet', 'Embu', 'Garissa', 'Homa Bay', 'Isiolo', 'Kajiado', 'Kakamega', 'Kericho', 'Kiambu', 'Kilifi', 'Kirinyaga', 'Kisii', 'Kisumu', 'Kitui', 'Kwale', 'Laikipia', 'Lamu', 'Machakos', 'Makueni', 'Mandera', 'Marsabit', 'Meru', 'Migori', 'Mombasa', "Murang'a", 'Nairobi', 'Nakuru', 'Nandi', 'Narok', 'Nyamira', 'Nyandarua', 'Nyeri', 'Samburu', 'Siaya', 'Taita-Taveta', 'Tana River', 'Tharaka-Nithi', 'Trans-Nzoia', 'Turkana', 'Uasin Gishu', 'Vihiga', 'Wajir', 'West Pokot'];
 
   function el(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function get(k) { try { return JSON.parse(localStorage.getItem(k)) || null; } catch (e) { return null; } }
   function put(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   function sess() { var x = get(SK); return x && x.user && x.access_token && (!x.expires_at || x.expires_at * 1000 > Date.now()) ? x : null; }
+  /* Saved address details belong to one account. Details saved by someone else (or for a guest) are ignored. */
+  function myUid() { var x = get(SK); return x && x.user && x.user.id ? x.user.id : null; }
+  function custOf() { var c = get('stm_cust'); return c && c.uid !== undefined && c.uid === myUid() ? c : {}; }
   function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
   function dmy(d) { d = new Date(d); if (isNaN(d)) return ''; var p = function (n) { return (n < 10 ? '0' : '') + n; }; return p(d.getDate()) + '-' + p(d.getMonth() + 1) + '-' + d.getFullYear(); }
   function ico(d) { var s = D.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 24 24'); var p = D.createElementNS(NS, 'path'); p.setAttribute('d', d); s.appendChild(p); return s; }
@@ -89,7 +94,7 @@
 
   /* ---------- UI helpers ---------- */
   function open() { view = 'main'; render(); AC.classList.add('on'); D.body.style.overflow = 'hidden'; }
-  function shut() { AC.classList.remove('on'); D.body.style.overflow = ''; }
+  function shut() { AC.classList.remove('on'); D.body.style.overflow = ''; rateRef = ''; }
   function row(label, path, fn, count, href) {
     var r = href ? el('a', 'ac-row') : el('button', 'ac-row'); if (href) r.href = href; else r.type = 'button';
     r.appendChild(ico(path)); r.appendChild(el('span', 'l', label)); if (count != null) r.appendChild(el('span', 'c', count));
@@ -191,7 +196,7 @@
       .catch(function () { myRev = []; })
       .then(function () { revLoading = false; done(); });
   }
-  function reviewerName(S) { var c = get('stm_cust') || {}, n = String(c.name || (S.user.user_metadata && S.user.user_metadata.full_name) || '').trim().split(/\s+/)[0]; return n ? n.slice(0, 40) : 'Customer'; }
+  function reviewerName(S) { var c = custOf(), n = String(c.name || (S.user.user_metadata && S.user.user_metadata.full_name) || '').trim().split(/\s+/)[0]; return n ? n.slice(0, 40) : 'Customer'; }
   function submitReview(o, i, key, S) {
     var d = drafts[key] || {}; if (!d.n) { revMsg[key] = 'Tap the stars to rate first.'; return render(); }
     revMsg[key] = 'Sending\u2026'; render();
@@ -227,11 +232,22 @@
     return d;
   }
   function vReviews() {
-    var f = D.createDocumentFragment(), S = sess(); if (!S) return needLogin();
+    var f = D.createDocumentFragment(), S = sess();
+    if (!S) {   /* arriving from a review email: ask to log in, then the rating page opens by itself */
+      f.appendChild(el('p', 'ac-empty', rateRef ? 'Log in to rate your order #' + rateRef + '.' : 'Log in to see this.'));
+      var lg = el('a', 'ac-login', 'Log in or create account'); lg.href = 'account.html'; f.appendChild(lg); return f;
+    }
     if (orders === null || loading) { f.appendChild(el('p', 'ac-empty', 'Loading\u2026')); return f; }
     if (myRev === null) { if (!revLoading) loadReviews(render); f.appendChild(el('p', 'ac-empty', 'Loading\u2026')); return f; }
     var any = false, ST = { pending: 'Waiting for approval', approved: 'Published', hidden: 'Not published' };
-    orders.filter(function (o) { return kind(o) === 'ok'; }).forEach(function (o) {
+    var list = orders.filter(function (o) { return kind(o) === 'ok'; });
+    if (rateRef) {   /* the order from the email goes first */
+      list.sort(function (a, b) { return (b.ref === rateRef) - (a.ref === rateRef); });
+      var tgt = orders.filter(function (o) { return o.ref === rateRef; })[0];
+      if (!tgt) f.appendChild(el('p', 'ac-empty', 'Order #' + rateRef + ' is not on this account. If you ordered with a different account, log out and sign in with that one.'));
+      else if (kind(tgt) !== 'ok') f.appendChild(el('p', 'ac-empty', 'Order #' + rateRef + ' has not been delivered yet. You can rate it once it arrives.'));
+    }
+    list.forEach(function (o) {
       any = true; f.appendChild(serviceBox(o, S));
       itemsOf(o).forEach(function (i) {
         any = true; var d = el('div', 'ac-msg'), key = o.ref + '|' + i.name;
@@ -271,7 +287,7 @@
     return f;
   }
   function vAddr() {
-    var f = D.createDocumentFragment(), c = get('stm_cust') || {}, has = false;
+    var f = D.createDocumentFragment(), c = custOf(), has = false;
     [['Name', c.name], ['Phone', c.phone], ['Email', c.email], ['County', c.county], ['Address', c.addr]].forEach(function (k) { if (k[1]) { has = true; var d = el('div', 'ac-kv'); d.appendChild(el('small', null, k[0])); d.appendChild(el('b', null, k[1])); f.appendChild(d); } });
     if (!has) f.appendChild(el('p', 'ac-empty', 'No saved address yet. Add one now, or it is saved when you place your first order.'));
     var bt = el('div', 'ac-two'), ed = el('button', 'ac-login', has ? 'Edit saved details' : 'Add details'); ed.type = 'button';
@@ -281,7 +297,7 @@
     return f;
   }
   function vAddrEdit() {
-    var c = get('stm_cust') || {}, form = el('form', 'ac-f'), F = {};
+    var c = custOf(), form = el('form', 'ac-f'), F = {};
     function field(key, lab, type, val, ph) {
       form.appendChild(el('label', null, lab)); var i = el('input'); i.type = type; i.value = val || ''; if (ph) i.placeholder = ph; i.name = key;
       if (key === 'phone') i.inputMode = 'tel'; if (key === 'email') i.autocomplete = 'email'; if (key === 'name') i.autocomplete = 'name';
@@ -306,7 +322,7 @@
       if (phone && !/^(\+?254|0)(7|1)\d{8}$/.test(phone)) fail('phone', 'Enter a valid Kenyan number, e.g. 0712345678.');
       if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) fail('email', 'Enter a valid email address.');
       if (bad) return;
-      put('stm_cust', Object.assign({}, c, { name: name, phone: phone, email: email, county: sel.value, addr: F.addr.i.value.trim() }));
+      put('stm_cust', Object.assign({}, c, { uid: myUid(), name: name, phone: phone, email: email, county: sel.value, addr: F.addr.i.value.trim() }));
       view = 'addr'; render();
     });
     return form;
@@ -346,6 +362,25 @@
     if (S) { var lo = el('button', 'ac-out', 'Logout'); lo.type = 'button'; lo.addEventListener('click', function () { try { localStorage.removeItem(SK); } catch (e) {} shut(); location.reload(); }); AB.appendChild(lo); }
   }
 
+  /* Review email link: /?rate=<order ref>. Opens Ratings & Reviews straight away. If the customer is not signed in yet,
+     the request is remembered for 30 minutes so it opens by itself after they log in on the account page. */
+  function checkRate() {
+    var ref = '', fromUrl = false, S = sess();
+    try { ref = (new URLSearchParams(location.search).get('rate') || '').trim().slice(0, 30); fromUrl = !!ref; } catch (e) {}
+    if (fromUrl) {
+      put('stm_rate', { ref: ref, t: Date.now() });
+      try { var u = new URL(location.href); u.searchParams.delete('rate'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch (e) {}
+    } else {
+      var sv = get('stm_rate');
+      if (!sv || !sv.ref || !S || Date.now() - (sv.t || 0) > 30 * 60 * 1000) { if (sv && Date.now() - (sv.t || 0) > 30 * 60 * 1000) try { localStorage.removeItem('stm_rate'); } catch (e) {} return; }
+      ref = String(sv.ref);
+    }
+    if (!ref) return;
+    if (S) { try { localStorage.removeItem('stm_rate'); } catch (e) {} }
+    rateRef = ref; orders = null; myRev = null;
+    AC.classList.add('on'); D.body.style.overflow = 'hidden'; go('reviews');
+  }
+
   function init() {
     AC = D.getElementById('ac'); AB = D.getElementById('ac-b'); if (!AC || !AB) return;
     var h2 = AC.querySelector('.ac-h h2'); if (h2) h2.textContent = 'My Stermont Account';
@@ -362,6 +397,7 @@
     hookOpenView(); setTimeout(hookOpenView, 1500); window.addEventListener('load', hookOpenView);
     /* keep the order list fresh whenever the panel opens */
     var mo = new MutationObserver(function () { if (!AC.classList.contains('on')) { orders = null; } }); mo.observe(AC, { attributes: true, attributeFilter: ['class'] });
+    checkRate();
   }
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', init); else init();
 })();
