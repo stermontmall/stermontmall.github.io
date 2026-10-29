@@ -69,3 +69,10 @@ The database is live, `main` is live. Nothing on `main` reads `slug` yet, so the
 - `kili-pages.js`, `recent-orders.js` and `tools/build_product_pages.py` still link to `/#p-<id>` on purpose (they need the popup); after the popup opens the URL becomes the straight `/p/` URL.
 - Do NOT rename every id to a name-derived slug: existing short ids are nicer (e.g. `abasi-5-ec` vs `abasi-5-ec-1-litre`). Only fix the 33 junk ones.
 - Nothing is merged to `main` yet. Testing needs a browser/preview, which was not available in this session.
+
+
+## Final status (2026-10-29)
+- [x] Batch 2 slugs applied in DB (migration `products_slug_clean_batch2`, 9 more: blazer, tracksuit, 2 tumbler sets, 32" TV, 2 cookers, sneaker, watch). 19 products renamed in total, 0 duplicate slugs, 0 clashes with ids. Rollback: `update products p set slug=b.slug from products_slug_backup_20261029 b where b.id=p.id`.
+- [x] Pages for batch 2 are produced by `generate-products.mjs` on its first run after merge (no hand-made pages needed). Orphan pages are redirected by its DUPES list.
+- Remaining ids with mild tails were left alone on purpose (ids stay stable; they are already readable).
+- Merged to `main` after code checks (generator fixture test, node --check, seo-check 0 broken links). Browser test checklist above still worth a quick manual pass on the live site.
