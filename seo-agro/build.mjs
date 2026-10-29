@@ -37,7 +37,7 @@ export function extras(p) {
     [`What is ${p.name} used for?`, `${p.targets}. It is meant for: ${p.settings}.`],
     [`How do I mix and apply ${p.name}?`, `Follow the dose and water volume on the manufacturer's label. ${p.method}`],
     [`Is ${p.name} safe to handle?`, `Treat it as a pesticide: wear full protective clothing, keep children, pets and livestock away, and keep spray out of water sources.`],
-    [sizeQ ? `Which pack size should I choose?` : `What pack size is available?`, sizeQ ? `${p.name} comes in ${p.sizes}. Small packs suit trials, kitchen gardens and small plots; larger packs suit bigger acreages, so you do not run short in the middle of a job.` : `${p.name} is sold in a ${one} pack.`],
+    [sizeQ ? `Which pack size should I choose?` : `What pack size is available?`, sizeQ ? `${p.name} comes in ${p.sizes}. Small packs suit trials, kitchen gardens and small plots; larger packs suit bigger acreages, so you do not run short in the middle of a job.` : /\d/.test(one) ? `${p.name} is sold in a ${one} pack.` : `${p.name} is sold as a ${one}.`],
     [`How do I buy ${p.name} in Kenya?`, `Pay by M-Pesa and we deliver to all 47 counties, or collect at The Sarit Centre, Westlands, Nairobi. Questions? WhatsApp +254 748 888 230.`],
   ];
   const why = `Stermont Arcade is an online agrovet and pest control store at The Sarit Centre, Westlands, Nairobi. Buy ${p.name} with an upfront price in Kenya shillings, M-Pesa payment, delivery to all 47 counties and WhatsApp support. Always read the label before use.`;
