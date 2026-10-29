@@ -227,7 +227,10 @@
         if (vl || (edit && (p.variant_label || p.variant_group))) { row.variant_label = vl || null; row.variant_group = vl ? grp : null; }
         var desc = v('cx-desc').trim(); if (desc || (edit && p.description)) row.description = desc;
         if (edit && stock !== p.stock) row.stock = stock;
-        if (edit) return call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: row });
+        if (edit) return call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: row }).then(function () {
+          /* pack sizes of one product share ONE name: renaming one size renames them all (otherwise the shop list and each size's page disagree) */
+          if (p.variant_group && name !== p.name) return call('/rest/v1/products?variant_group=eq.' + encodeURIComponent(p.variant_group) + '&id=neq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { name: name } });
+        });
         var id = slug(name + (vl ? ' ' + vl : '')) || 'item', n = 2, base = id; while (S.prods.some(function (x) { return x.id === id; })) id = base + '-' + n++;
         row.id = id; row.stock = stock; row.cost = 0;   /* cost is no longer tracked in the admin */
         var first = tpl && !tpl.variant_label ? call('/rest/v1/products?id=eq.' + encodeURIComponent(tpl.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { variant_label: vl0, variant_group: grp } }) : Promise.resolve();

@@ -75,3 +75,8 @@ Static GitHub Pages site. No Next.js / React Router / Nuxt, so `force-dynamic`, 
 - Fix: `sw.js` v3 revalidates `.js`/`.css` too (cache `stermont-v3`); `index.html` loads `storefront-live.js?v=3`; `storefront-live.js` reloads once when the page is restored from the back/forward cache.
 - Note: a variant product with a single size still shows "Name – 1 Litre" on its card (name + pack label, by design so the size reaches the cart).
 - Not testable here (live site blocked from the sandbox): confirm on a phone that a rename in admin shows on the home list without a hard refresh.
+
+## Names differ between pack sizes (branch `wip-group-names`, 2026-10-29)
+- Real cause of "name only changes after opening the product + hard refresh": the admin Edit saved the new name on ONE row only, while pack sizes of a product are separate rows. The shop list card used one row's name, each size's page another. Four families (Actellic, Agita, Alonze, Amito) had prefixes ("#1 Top", "Best", "Reliable", "#1 Original") on some sizes only.
+- Data fixed in Supabase (all sizes now share one plain name; slugs unchanged). `catalog-v10.js?v=9`: renaming a size renames every size of that group. `storefront-live.js?v=4`: list shows the name most sizes use.
+- Open: who/what added the prefixes to single rows is unknown (nothing in this repo does it).
