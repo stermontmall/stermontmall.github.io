@@ -91,14 +91,11 @@ export function pdpTitle(name, ctx = {}) {
     `${led} – Best Price in Kenya | ${STORE}`,
     `${led} – Price in Kenya | ${STORE}`,
     `${led} – Best Price in Kenya`,
-    `${base} – Best Price in Kenya | ${STORE}`,
-    `${led} – Price in Kenya`,
-    `${base} – Price in Kenya | ${STORE}`,
-    `${base} – Best Price in Kenya`,
-    `${base} – Price in Kenya`
+    `${led} – Price in Kenya`
   ];
   const hit = tiers.find(t => t.length <= TITLE_MAX);
-  return hit || `${clip(base, TITLE_MAX - ' – Price in Kenya'.length)} – Price in Kenya`;
+  // Name too long even without the store name: keep the lead word (Original / power word) and clip the product name instead.
+  return hit || `${clip(led, TITLE_MAX - ' – Price in Kenya'.length)} – Price in Kenya`;
 }
 
 // PDP meta description, max 155 characters.
