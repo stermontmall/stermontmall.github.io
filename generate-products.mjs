@@ -3,7 +3,7 @@
 // Runs automatically on GitHub (see .github/workflows/product-pages.yml). No installs needed (Node 18+).
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
+import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -106,7 +106,9 @@ for (const p of rows) {
     if (seenG.has(p.variant_group)) continue;
     seenG.add(p.variant_group);
     const vs = [...g].sort((a, b) => Number(a.price) - Number(b.price)), live = vs.filter(inS), top = g[0];
-    products.push({ ...top, name: top.name.replace(SIZE_END, '') || top.name, variants: vs, price: Number((live[0] || vs[0]).price), old_price: null, unit: null,
+    /* the one page of a product takes the name of the size the owner gave a ranking prefix ("#1 Top ...", "Best ...") if there is one, else the earliest size */
+    const named = g.find(x => hasLeadWord(x.name)) || top;
+    products.push({ ...top, name: named.name.replace(SIZE_END, '') || named.name, variants: vs, price: Number((live[0] || vs[0]).price), old_price: null, unit: null,
       stock: g.reduce((n, x) => n + (Number(x.stock) || 0), 0),
       images: [...new Set(g.flatMap(x => x.images || []).filter(Boolean))], description: g.map(x => x.description).find(Boolean) || '' });
     g.slice(1).forEach(x => aliases.push({ id: x.id, to: top.id }));
@@ -311,6 +313,7 @@ const urls = [];
 const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(u)}" alt="${esc(p.name)}" width="160" height="150" loading="lazy" decoding="async">` : ''; };
 const card = p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
+const NAMES = {};   // product id -> the heading its page shows; the shop list reads this (product-names.json) so list, view and page always carry the same wording
 for (const p of products) {
   const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
@@ -319,6 +322,7 @@ for (const p of products) {
   // "Original / genuine" is only claimed for known brands and farm inputs; the price stays in the Product schema and on the page.
   const ctx = { brand: brandOf(p.name), catSlug: cat?.slug };
   const title = pdpTitle(p.name, ctx), desc = pdpDescription(p.name, ctx), h1 = pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
+  NAMES[p.id] = h1; (p.variants || []).forEach(v => { NAMES[v.id] = h1; });
   // Related products rotate through the category (the 6 that follow this one, wrapping round), so EVERY product, including the newest, gets links from other product pages.
   const related = (() => {
     if (!cat) return [];
@@ -502,6 +506,7 @@ for (const u of urls) {
   const hash = existsSync(file) ? createHash('sha1').update(readFileSync(file)).digest('hex') : '';
   next[u] = { hash, lastmod: prev[u] && prev[u].hash === hash ? prev[u].lastmod : today };
 }
+writeFileSync('product-names.json', JSON.stringify(NAMES));
 writeFileSync(STATE, JSON.stringify(next, null, 1));
 writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
   urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${next[u].lastmod}</lastmod></url>`).join('\n') + `\n</urlset>\n`);
