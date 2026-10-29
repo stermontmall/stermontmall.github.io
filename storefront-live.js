@@ -274,9 +274,7 @@
     .then(function (r) { return r.ok ? r.json() : []; }).then(function (rows) {
       var root = D.querySelector('#music-gear .wrap'), groups = {};
       rows.forEach(function (p) { if (p.slug && p.slug !== p.id) SLUGS[p.id] = p.slug; });
-      rows.forEach(function (p) { if (p.variant_group && p.variant_label) { p.vbase = p.name; (groups[p.variant_group] = groups[p.variant_group] || []).push(p); } });
-      /* all pack sizes of a product show ONE name: the one most sizes use (shortest on a tie), so one stray renamed size cannot make the list and the pages disagree */
-      Object.keys(groups).forEach(function (k) { var g = groups[k], n = {}, best = g[0].vbase; g.forEach(function (x) { n[x.vbase] = (n[x.vbase] || 0) + 1; }); Object.keys(n).forEach(function (nm) { if (n[nm] > n[best] || (n[nm] === n[best] && nm.length < best.length)) best = nm; }); g.forEach(function (x) { x.vbase = best; x.name = best + ' \u2013 ' + x.variant_label; }); });
+      rows.forEach(function (p) { if (p.variant_group && p.variant_label) { p.vbase = p.name; p.name = p.vbase + ' \u2013 ' + p.variant_label; (groups[p.variant_group] = groups[p.variant_group] || []).push(p); } });
       Object.keys(groups).forEach(function (k) { var g = groups[k]; if (g.length < 2) { g[0].vbase = null; g[0].name = g[0].name; return; } g.rep = g.filter(function (x) { return x.stock > 0; })[0] || g[0]; g.forEach(function (x) { x._g = g; x._c = card(x); }); });
       function vfix(c, p) {
         var g = p._g, b = c.querySelector('.b'); c._grp = g.map(function (x) { return x._c; });
