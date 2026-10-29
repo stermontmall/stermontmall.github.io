@@ -8,46 +8,62 @@ instead of `https://stermontarcade.co.ke/#p-<product-id>`, for ALL products (not
 Google ignores everything after `#`, so hash links only ever point at the homepage.
 The real, indexable product pages are `/p/<product-id>.html` (already in `sitemap-products.xml`).
 
+## KEY DECISION (changed from the first plan)
+Do NOT rename product ids. Use the existing, unused `products.slug` column as the URL name instead.
+- Why: `id` is the primary key used by carts, orders, restock/sales/loss tables and wishlists. Renaming it on a live shop is risky and can break past orders.
+- `products.slug` is not read anywhere in the site code (checked: only category slugs are used), so filling it is safe.
+- Result: `id` stays as is (cart, orders, DB unchanged); the page URL becomes `/p/<slug>.html`.
+
 ## Done
 - [x] Investigated; branch created
-- [x] Supabase data checked: no null, duplicate or badly formatted slugs; `products.slug` column is not used by the site
 - [x] Step 1 (e2deb6e): WhatsApp enquiry "Link:" sends `/p/<id>.html` (all products)
-- [x] Step 2 (f49654c), `storefront-live.js` (all products):
-  - Opening the product popup puts `/p/<id>.html` in the address bar (was `#p-<id>`)
-  - Switching pack size updates the URL in place (replaceState)
-  - Closing with Back returns to the homepage URL; closing via the Cart button restores the homepage URL (`BASE`) so relative links like `account.html` do not break
-  - Old `#p-<id>` links still open the popup and then switch to the straight URL
-  - Reloading a `/p/<id>.html` URL loads the real static product page
-- [x] Audit (read-only SQL): 226 active products. Page URLs come from the product `id`. Most ids are already short and clean.
+- [x] Step 2 (f49654c), `storefront-live.js` (all products): popup puts `/p/<id>.html` in the address bar, pack-size switch updates URL, Back/Cart restore homepage URL, old `#p-<id>` links still work
+- [x] Audit (read-only SQL): 226 active products, 33 ids have junk tails, ~190 are fine
+- [x] Step 3a: DATABASE (live, already applied, migration `products_slug_clean_batch1`):
+  - Backup table `public.products_slug_backup_20261029` (259 rows) holds the old slug values (restore with `update products p set slug=b.slug from products_slug_backup_20261029 b where b.id=p.id`)
+  - `products.slug` set to `id` for all products (so existing pages stay valid)
+  - Batch 1 slugs set for 10 products (ids unchanged). Verified: 259 rows, 10 renamed, 0 duplicate slugs.
 
-## Audit result: 33 product ids have junk tails (need renaming)
-Pattern -> examples:
-- repeated words: `...-set-set`, `...-steam-iron-steam-iron`, `...-3-piece-set` (habei-bear, smart-raha-life), `...-4gb-plus-64gb-4gb-plus-64gb` (samsung-galaxy-a06, tecno-spark-go-3, xiaomi-poco-c71, xiaomi-redmi-15c), `...-aerosol-spray-aerosol-can`
-- leftover unit words: `...-1-unit`, `...-1-piece`, `...-blazer-piece`, `...-tracksuit-set`, `...-single-unit`
-- inconsistent sizes: `...-1-litres`, `-5-litres`, `-5l`, `-1l` (absolute-375sc, agrixyl-407-5l, covver-xtra-500sc-1l, weed-out-480sl, digester-supper-69-ew, albafas-10 5-litres, jacto-hd-550, glamstar-20l, haier-90l, von-138l, hisense-ref205dr, kenwood-air-fryer)
-- stray suffix: `bedlam-200sl-insecticide-50-ml-2`
-- site name in the id: `pentagon-50ec-insecticide-1-litre-stermont-arcade-kenya-1-litre`
-Full list: run `select id from products where active and id ~ '...'` (see git history of this file) or ask.
-The other ~190 ids are fine and need no change.
+### Batch 1 mapping (id -> new slug)
+| old id (current page) | new slug |
+|---|---|
+| pentagon-50ec-insecticide-1-litre-stermont-arcade-kenya-1-litre | pentagon-50ec-insecticide-1-litre |
+| shan-yes-men-s-navy-blue-tracksuit-set-set | shan-yes-mens-navy-blue-tracksuit-set |
+| shan-yes-men-s-white-black-tracksuit-set-set | shan-yes-mens-white-black-tracksuit-set |
+| ramtons-steam-iron-with-vertical-and-variable-steam-steam-iron | ramtons-steam-iron-with-vertical-and-variable-steam |
+| samsung-galaxy-a06-4gb-ram-plus-64gb-4gb-plus-64gb | samsung-galaxy-a06-4gb-ram-64gb |
+| tecno-spark-go-3-4gb-ram-plus-64gb-4gb-plus-64gb | tecno-spark-go-3-4gb-ram-64gb |
+| xiaomi-poco-c71-3gb-ram-plus-64gb-3gb-plus-64gb | xiaomi-poco-c71-3gb-ram-64gb |
+| xiaomi-redmi-15c-8gb-ram-plus-256gb-8gb-plus-256gb | xiaomi-redmi-15c-8gb-ram-256gb |
+| familly-insect-killer-super-strength-aerosol-spray-aerosol-can | familly-insect-killer-super-strength-aerosol-spray |
+| bedlam-200sl-insecticide-50-ml-2 | bedlam-200sl-insecticide-50-ml |
 
 ## Left (small steps, one push each)
-- [ ] Step 3: rename the 33 ids to clean slugs. For each: DB migration (update `products.id`; FKs in stock_restocks, sales_ledger, loss_logs; check orders.items JSON and wishlists in localStorage), rename page in `/p/`, update `sitemap-products.xml`, `merchant-feed.xml`, `sitemap-images.xml`, and leave a redirect page at the old URL. Needs owner approval before touching the live DB. Do in batches of ~10 with a DB backup table first.
-- [ ] Step 4: remove or redirect 3 orphan pages with no product in the DB: `jembe-star-500-sl-herbicide-1-litre`, `kingcode-elite-50-ec-insecticide-1-litre`, `zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre-2`
-- [ ] Step 5 (optional): drop `.html` so URLs read `/p/<id>/` like masterpiece (needs folder-per-product pages + redirects + sitemap change; bigger job)
-- [ ] Step 6: TEST on a preview, then merge to `main`
+- [ ] Step 3b: batch 1 PAGES: for each product above create `/p/<new-slug>.html` (copy of the old page; change only URL contexts: canonical, og:url, JSON-LD url, sitemap; keep id-based cart/#p- links unchanged), turn `/p/<old-id>.html` into a redirect to the new page.
+- [ ] Step 3c: `storefront-live.js` must read `slug` (select it, fall back to `id`) and `purl(p)` use `p.slug || p.id`; WhatsApp link too. Do this together with 3b so no URL is ever published before its page exists.
+- [ ] Step 3d: update `sitemap-products.xml` (and `sitemap-images.xml`, `merchant-feed.xml` if they hold /p/ URLs) for batch 1.
+- [ ] Generator risk: `tools/build_product_pages.py` / `generate-products.mjs` build pages from `id`. If they are re-run they will recreate old-id pages and ignore slugs. Teach them to use `slug` (check how/when they are run first).
+- [ ] Batch 2 and 3: remaining 23 products with junk tails (same method: slug column + pages + redirects)
+- [ ] 3 orphan pages with no product in the DB: `jembe-star-500-sl-herbicide-1-litre`, `kingcode-elite-50-ec-insecticide-1-litre`, `zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre-2` (remove or redirect)
+- [ ] Optional: drop `.html` so URLs read `/p/<slug>/` like masterpiece (bigger job)
+- [ ] TEST on a preview, then merge to `main`
+
+## IMPORTANT ordering rule
+The database is live, `main` is live. Nothing on `main` reads `slug` yet, so the DB change is invisible today. Do not merge 3c (code reads slug) unless the matching pages from 3b are in the same merge.
 
 ## Test checklist (needed before merge)
-1. Open homepage, tap a product: address bar shows `/p/<id>.html`, popup opens
+1. Open homepage, tap a product: address bar shows `/p/<slug>.html`, popup opens
 2. Tap Back: popup closes, address bar is `/`
 3. Open a product, tap Cart button: URL returns to `/`, then tap a nav link (e.g. Account): it must open `/account.html`, not `/p/account.html`
 4. Open a product with pack sizes, switch size: URL changes to that size
 5. Copy the address bar link, open it in a new tab: real product page loads
-6. Open an old `/#p-<id>` link: popup opens and URL becomes `/p/<id>.html`
-7. Tap "Ask about this item on WhatsApp": message contains `/p/<id>.html`
+6. Open an old `/#p-<id>` link: popup opens and URL becomes the `/p/<slug>.html`
+7. Tap "Ask about this item on WhatsApp": message contains `/p/<slug>.html`
+8. Open an OLD page URL of a renamed product (e.g. the long Pentagon one): redirects to the new page
+9. Add a renamed product to cart and place a test order: order saves, product id is the unchanged id
 
-## Decisions
-- Straight URL is the existing static page `/p/<id>.html` (already indexed via sitemap, already has canonical + schema).
+## Other decisions
 - Kept `#p-` links working so already-shared links do not break.
-- `kili-pages.js` ("Add to cart" on /p/ pages), `recent-orders.js` and `tools/build_product_pages.py` still link to `/#p-<id>` on purpose (they need the popup); after the popup opens the URL becomes `/p/<id>.html`.
-- Do NOT rename every id to a name-derived slug: the existing short ids are nicer than name-derived ones (e.g. `abasi-5-ec` vs `abasi-5-ec-1-litre`). Only fix the 33 junk ones.
+- `kili-pages.js`, `recent-orders.js` and `tools/build_product_pages.py` still link to `/#p-<id>` on purpose (they need the popup); after the popup opens the URL becomes the straight `/p/` URL.
+- Do NOT rename every id to a name-derived slug: existing short ids are nicer (e.g. `abasi-5-ec` vs `abasi-5-ec-1-litre`). Only fix the 33 junk ones.
 - Nothing is merged to `main` yet. Testing needs a browser/preview, which was not available in this session.
