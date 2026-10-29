@@ -1,8 +1,27 @@
+# HANDOFF - Agro page boxes (branch `wip-agro-page-boxes`, 2026-10-30)
+Follow-up to the agro descriptions below. Two defects seen on live pages after the descriptions went live. Fix is in `seo-product-extras.mjs` only (it runs inside `seo-overrides.mjs`).
+
+## Verified 2026-10-30 (read-only)
+- [x] Supabase: all 58 rows in `description_backup` batches 01-04 differ from their backup and are 421-599 words.
+- [x] Live pages on `main` show the new text: Chariot 500SC (batch 02), Abasi 5% EC (batch 03), Rootex 6 (batch 04). The Tihan page was not opened.
+- [x] `seo-agro/` on `main` is identical to `wip-agro-descriptions` (same file SHAs), so that code is already merged.
+
+## Done
+- [x] Every product in `adjuvants-growth-regulators` (Easygro Calcium, Easygro Fruit & Flower, Optimizer, Rootex 6) showed the pesticide "Safe use" box (PCPB, pre-harvest interval, "mixing and spraying", insecticide-label link). They now get a plant-input box: read the label, gloves, keep away from children and food, store closed and cool. All other categories keep the old box.
+- [x] The related-guides link on those pages read "Adjuvants &amp;amp; Growth Regulators" (category name escaped twice). It is now unescaped first.
+- [x] Tested in a sandbox with fixture pages: the plant-input box has no PCPB / pre-harvest / spraying words, the fungicide box is unchanged, no `&amp;amp;`, a second run changes nothing. The file on this branch is byte-identical to the tested file (same git blob SHA).
+
+## Left
+- [ ] Merge `wip-agro-page-boxes` to `main`, then check `p/rootex-6-rooting-hormone-50-g.html` after the next "Build product pages" run (every 3 hours). `seo-product-extras.mjs` is not in that workflow's watched paths, so the merge alone does not trigger a rebuild; tap "Run workflow" to rebuild now.
+- [ ] Not changed: `fertilizers` is also in the CROP set, so fertilizer pages would still get the pesticide box. No fertilizer pages were checked; decide whether they need the plant-input box too.
+
+---
+
 # HANDOFF - Agrochemical product descriptions in the 4-section format (branch `wip-agro-descriptions`, 2026-10-29)
 
 Owner brief: "Elite E-Commerce SEO Strategist" prompt (title, meta description, 4-section description: lead / specifications / mixing & application / safety, JSON-LD). Scope chosen by owner: ALL agrochemicals, in batches of 10 products (a product = one pack-size group, e.g. Absolute 375SC 50 ml to 1 L is ONE product). Categories in scope: Herbicides (70), Fungicides (71), Crop Insecticides (72), Adjuvants & Growth Regulators (73) = 39 active products, 58 rows. Order: category id, then name. Owner rule (2026-10-29): every SEO description must be 300-600 words.
 
-STATUS: all 4 batches (39 products) are written to Supabase. The code on this branch is NOT merged to `main` yet (see "Left").
+STATUS: all 4 batches (39 products) are written to Supabase and the code (`seo-agro/`) is on `main` (checked 2026-10-30: file SHAs identical to this branch).
 
 ## Done
 - [x] Batch 01 = 10 products (7 herbicides + Absolute 375SC, Agrixyl 407, Bradley 500SC; 14 rows): `seo-agro/batch-01.json` (facts taken only from the catalog descriptions), `seo-agro/build.mjs` (renders the brief's HTML block, a 150-160 char meta description and the plain-text description stored in the database), `seo-agro/build.test.mjs` (`node seo-agro/build.test.mjs`: 80 checks, 0 violations - meta length, description 300-600 words, banned claims, 5 sections, price present, missing active ingredient flagged, no invented dose or interval).
@@ -18,9 +37,9 @@ STATUS: all 4 batches (39 products) are written to Supabase. The code on this br
 - Run `node seo-agro/build.mjs batch-01` to write `seo-agro/out/batch-01.html` (paste-ready blocks) and `batch-01.report.json`. `out/` is not committed.
 
 ## Left
-- [ ] Check 3 product pages after the next rebuild (the bot runs every 3 hours): confirm the new description shows (plain text with CAPITAL headings and bullets) and the owner's `seo_title` is unchanged. Status 2026-10-29 ~20:50 UTC: `p/chariot-500-sc-fungicide-1-litre.html` on `main` still shows the OLD text while the database already holds the new text, so the page simply has not been rebuilt since the write (not a defect yet). Re-check Chariot (batch 02), one batch 03 page (e.g. Abasi) and one batch 04 page (Rootex 6, Tihan) after the next "Build product pages" run. If a page still shows the old text after a rebuild, look at how `generate-products.mjs` reads `products.description` before changing anything.
+- [x] DONE 2026-10-30 (see the section above): check 3 product pages after the next rebuild (the bot runs every 3 hours): confirm the new description shows (plain text with CAPITAL headings and bullets) and the owner's `seo_title` is unchanged. Status 2026-10-29 ~20:50 UTC: `p/chariot-500-sc-fungicide-1-litre.html` on `main` still shows the OLD text while the database already holds the new text, so the page simply has not been rebuilt since the write (not a defect yet). Re-check Chariot (batch 02), one batch 03 page (e.g. Abasi) and one batch 04 page (Rootex 6, Tihan) after the next "Build product pages" run. If a page still shows the old text after a rebuild, look at how `generate-products.mjs` reads `products.description` before changing anything.
 - [ ] Run the full test once on a complete checkout: `node seo-agro/build.test.mjs` over all four batch files. Batch 04 alone passed (72 checks); batches 01-03 were not re-run after the builder change for Rootex, which cannot change their output (the new fields are absent there), but it was not executed.
-- [ ] Merge `wip-agro-descriptions` to `main` once the page check above is done. The merge only adds `seo-agro/` and this file, no site behaviour changes, so it does not need a rebuild.
+- [x] Merge `wip-agro-descriptions` to `main`: already on `main` (2026-10-30). The merge only adds `seo-agro/` and this file, no site behaviour changes, so it does not need a rebuild.
 - [ ] Owner: supply LABEL DATA (list below). Until then the text says "use the dose on the manufacturer's label". Wrong rates on a pesticide can burn crops or harm people, so nothing was invented.
 - [ ] Owner: LABEL DATA for batch 02 (same gaps as batch 01): dose and coverage for all 10; active ingredient for Covver Xtra and Revus (nothing in the catalog); active ingredient/concentration for Mastercop (copper compound) and Milestone Extreme (dual-action, actives not named); pack size for Revus; pre-harvest and re-entry intervals for all 10. Covver Xtra and Revus catalog text was generic ("maize, wheat, cereals"); that crop claim was NOT repeated because the product type is unknown, crops stay "see the label".
 - [ ] Owner: LABEL DATA for batch 04 (each product's `labelNeeded` list in `batch-04.json`): Pentagon 50EC (approved crops, dose, coverage, pre-harvest, re-entry); Ranger 480EC (dose for each use, coverage, pre-harvest, re-entry); Systema 50EC (active ingredient and %, approved crops and pests, dose, coverage, pre-harvest, re-entry); Thunder OD 145 (dose, coverage, pre-harvest, re-entry); Tihan (active ingredient, formulation, pack size, crops and pests, dose, coverage, pre-harvest, re-entry); Easygro Calcium (foliar and fertigation rate, timing per crop); Easygro Fruit & Flower (N:P:K analysis, pack size, rate and method, timing); Optimizer (composition, pack size, rate and method, crops and timing); Rootex 6 (active ingredient and strength, time to rooting per crop).
