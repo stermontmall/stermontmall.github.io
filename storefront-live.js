@@ -266,15 +266,20 @@
   function bump(m) { var c = m.querySelector('.cnt'); if (c) c.textContent = m.querySelectorAll('.pcard:not(.vhide)').length; }
   /* cache:'no-store' = always ask the database, never reuse a copy the browser kept (fresh names, prices and stock on every load) */
   function getProducts(sel) { return fetch(SB + '/rest/v1/products?active=eq.true&select=' + sel + '&order=created_at.asc', { headers: { apikey: KEY }, cache: 'no-store' }); }
+  /* product-names.json (written by every site rebuild) = the heading each product page shows, with its ranking words ("Original ...", "#1 Top ...").
+     The list and the product view use it so they read exactly like the page; if it cannot be loaded the plain database name is shown. */
+  var NAMES = {}, namesP = fetch('product-names.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
   getProducts('id,slug,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)')
     .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)'); })
     .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,stock,images,featured,description,categories(name,slug)'); })
     .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,stock,images,featured,description,categories(name,slug)'); })   /* unit column not added yet */
     .then(function (r) { return r.ok ? r : getProducts('id,name,price,stock,images,featured,description,categories(name,slug)'); })   /* old_price column not added yet: still show products */
-    .then(function (r) { return r.ok ? r.json() : []; }).then(function (rows) {
+    .then(function (r) { return r.ok ? r.json() : []; }).then(function (rows) { return namesP.then(function (nm) { NAMES = nm && typeof nm === 'object' ? nm : {}; return rows; }); }).then(function (rows) {
       var root = D.querySelector('#music-gear .wrap'), groups = {};
       rows.forEach(function (p) { if (p.slug && p.slug !== p.id) SLUGS[p.id] = p.slug; });
       rows.forEach(function (p) { if (p.variant_group && p.variant_label) { p.vbase = p.name; p.name = p.vbase + ' \u2013 ' + p.variant_label; (groups[p.variant_group] = groups[p.variant_group] || []).push(p); } });
+      /* use the page heading: pack sizes of one product share the page's name, single items use the full heading */
+      rows.forEach(function (p) { var nm = NAMES[p.id]; if (typeof nm !== 'string' || !nm) return; var g = p.variant_group && groups[p.variant_group]; if (g && g.length > 1) { p.vbase = nm; p.name = nm + ' \u2013 ' + p.variant_label; } else p.name = nm; });
       Object.keys(groups).forEach(function (k) { var g = groups[k]; if (g.length < 2) { g[0].vbase = null; g[0].name = g[0].name; return; } g.rep = g.filter(function (x) { return x.stock > 0; })[0] || g[0]; g.forEach(function (x) { x._g = g; x._c = card(x); }); });
       function vfix(c, p) {
         var g = p._g, b = c.querySelector('.b'); c._grp = g.map(function (x) { return x._c; });

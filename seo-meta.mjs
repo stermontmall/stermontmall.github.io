@@ -57,7 +57,7 @@ export function powerWord(name, ctx = {}) {
 }
 
 // Does the name already start with "Original", "Genuine" or one of our power words? Then do not repeat it.
-const hasLeadWord = n => /^(original|genuine|powerful|premium|top|best|quality|reliable|proven|effective|fast-acting|heavy-duty|high-potency|long-lasting)\b/i.test(n);
+export const hasLeadWord = n => /^(?:#\d+\s+)?(?:original|genuine|powerful|premium|top|best|quality|reliable|proven|effective|fast-acting|heavy-duty|high-potency|long-lasting)\b/i.test(n);
 const hasTrustWord = n => /^(original|genuine)\b/i.test(n);
 export const trustName = (name, ctx) => (isGenuine(ctx) && !hasTrustWord(name) ? `Original ${name}` : name);
 
