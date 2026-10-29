@@ -9,38 +9,41 @@ The site is static. `p/*.html`, `c/*.html`, `guides/*.html` are GENERATED and th
 So: edit the generators, never the generated pages. Build order:
 
 1. `generate-products.mjs` - builds every product page (`/p/`), category page (`/c/`), `products.html`, sitemap. Owns title, description, og:*, JSON-LD (Product/ProductGroup/FAQ/Breadcrumb), H1/H2 on product pages. Category copy lives in the `INFO` map.
-2. `seo-kenya.mjs` - REWRITES product titles/descriptions after step 1 (`Buy <name> in Kenya | KSh X`) and category descriptions; builds `/guides/`.
-3. `seo-product-extras.mjs` - description headings, "At a glance", "Safe use" box, breadcrumbs, internal links.
-4. `seo-fixes.mjs` - meta/JSON-LD clean-ups.
-5. `seo-overrides.mjs` + `seo-overrides.json` - hand-written titles/descriptions per product; always win.
-6. `seo-auto-index.mjs` - meta/schema for hand-written pages (about, contact, faq, shipping, nairobi...).
+2. `seo-kenya.mjs` - after step 1: sets category titles/descriptions (seo-meta pattern), builds `/guides/`. Skips product pages marked `stm-seo v2` (they are already final); older pages still get `Buy <name> in Kenya | KSh X`.
+3. `seo-overrides.mjs` runs `seo-product-extras.mjs` and `seo-fixes.mjs` first, then applies `seo-overrides.json` (hand-written titles/descriptions per product; always win).
+4. `seo-auto-index.mjs` - meta/schema for hand-written pages (about, contact, faq, shipping, nairobi...).
+
+Shared wording lives in `seo-meta.mjs` (pure functions: `pdpTitle`, `pdpDescription`, `catTitle`, `catDescription`, `trustName`, `pdpHeadings`).
 
 ## Files that govern what was asked
 | Need | File |
 |---|---|
-| Product meta title/description, og:*, JSON-LD | `generate-products.mjs` (product loop) and `seo-kenya.mjs` (rewrites title/desc) |
-| Product H1/H2 | `generate-products.mjs` (body template), `seo-product-extras.mjs` |
-| Category meta, H1, copy | `generate-products.mjs` (`INFO`, category loop), `seo-kenya.mjs` |
+| Product meta title/description, og:*, JSON-LD | `generate-products.mjs` (product loop) + `seo-meta.mjs` |
+| Product H1/H2 | `generate-products.mjs` (`seoBoxes`, `h1`) |
+| Category meta | `seo-kenya.mjs` (uses `seo-meta.mjs`); H1 and copy in `generate-products.mjs` (`INFO`) |
 | Slugs | `products.slug` column in Supabase; `slugOf` in `generate-products.mjs` |
 | Hand-written pages head | `seo-auto-index.mjs`, the `.html` files in the repo root |
 | Per-product overrides | `seo-overrides.json` |
 
 ## Already in place (verified in code)
-- Product JSON-LD already has priceCurrency KES, dynamic price, InStock/OutOfStock, NewCondition, seller Organization "Stermont Arcade".
-- og:title/description/image, og:type=product (product pages), og:locale=en_KE already emitted by `shell()`.
+- Product JSON-LD has priceCurrency KES, dynamic price, InStock/OutOfStock, NewCondition, seller Organization "Stermont Arcade".
+- og:title/description/image, og:type=product (product pages), og:locale=en_KE emitted by `shell()`.
 - Clean slugs and permanent slug redirects already exist.
 
 ## Decisions
-- (pending) Titles: current pattern is `Buy <name> in Kenya | KSh X`. New pattern requested is `[Original] <name> <size> - Price in Kenya | Stermont Arcade`, max 60 chars.
-- Claims must stay true: "PCPB Approved" only on pesticide/agrochemical categories; "Original/Genuine" only where a brand is known or the product is a registered agrochemical. No "same day delivery to 47 counties": shipping.html says same/next day for Nairobi, 1-3 days elsewhere.
+- Title pattern: `[Original] <name> \u2013 Price in Kenya | Stermont Arcade`, max 60 chars. If too long, drop "Original", then the store name, then shorten the name. "Price in Kenya" is kept longest.
+- Description max 155 chars, always includes M-Pesa, Westlands/Sarit Centre pickup, 47 counties.
+- Claims stay true: "PCPB approved" only on pesticide/agrochemical categories; "Original / 100% genuine" only where a real brand is known or the product is a farm input. Delivery wording matches shipping.html: Nairobi same/next day, 1-3 days elsewhere (never "same-day to 47 counties").
+- Category pages now use `catTitle`/`catDescription` for ALL categories. This replaces the hand-written `INFO.title`/`INFO.desc` and the old "from KSh X" lead in the meta description (the cheapest-price guide still shows prices). `INFO.h1`, intro, guide and FAQ text are unchanged.
+- Hand-written entries in `seo-overrides.json` still win over everything.
 
 ## Done
-- [x] Repo scanned, file map written (this file).
+- [x] Repo scanned, file map written.
+- [x] `seo-meta.mjs` shared builders (unit tested 2026-10-29: 0 title/description length violations over 36 product/brand/category combos; 0 on 6 categories).
+- [x] Product pages in `generate-products.mjs`: new title/description, H1 trust word, 3 local H2 sections (target pests/uses, price + M-Pesa, delivery + Sarit Centre pickup), `stm-seo v2` marker.
+- [x] `seo-kenya.mjs`: no longer overwrites v2 product titles/descriptions; category title/description use the new pattern (og/twitter too).
+- [x] JSON-LD and OG checked in code: no change needed.
 
 ## Left
-- [ ] Shared SEO helper module for titles/descriptions
-- [ ] Product title/description pattern in `generate-products.mjs` and `seo-kenya.mjs`
-- [ ] Product H1 + H2 sections
-- [ ] Category title/description/H1
-- [ ] JSON-LD check, OG check
-- [ ] Local build test, then merge to main
+- [ ] Full pipeline dry run with live data: Actions tab > Build product pages > Run workflow > branch `wip-seo-kenya-meta` (the bot commits the rebuilt pages to the branch). Then run `node seo-check.mjs` and open 3 pages (agrochemical, pest control, non-chemical).
+- [ ] Review the PR, then merge to `main` (the push to main rebuilds the live pages).
