@@ -1,15 +1,18 @@
 # HANDOFF - Agrochemical product descriptions in the 4-section format (branch `wip-agro-descriptions`, 2026-10-29)
 
-Owner brief: "Elite E-Commerce SEO Strategist" prompt (title, meta description, 4-section description: lead / specifications / mixing & application / safety, JSON-LD). Scope chosen by owner: ALL agrochemicals, in batches of 10 products (a product = one pack-size group, e.g. Absolute 375SC 50 ml to 1 L is ONE product). Categories in scope: Herbicides (70), Fungicides (71), Crop Insecticides (72), Adjuvants & Growth Regulators (73) = 39 products, 58 rows. Order: category id, then name.
+Owner brief: "Elite E-Commerce SEO Strategist" prompt (title, meta description, 4-section description: lead / specifications / mixing & application / safety, JSON-LD). Scope chosen by owner: ALL agrochemicals, in batches of 10 products (a product = one pack-size group, e.g. Absolute 375SC 50 ml to 1 L is ONE product). Categories in scope: Herbicides (70), Fungicides (71), Crop Insecticides (72), Adjuvants & Growth Regulators (73) = 39 products, 58 rows. Order: category id, then name. Owner rule (2026-10-29): every SEO description must be 300-600 words.
 
 ## Done
-- [x] Batch 01 = 10 products (7 herbicides + Absolute 375SC, Agrixyl 407, Bradley 500SC): `seo-agro/batch-01.json` (facts taken only from the catalog descriptions), `seo-agro/build.mjs` (renders the brief's HTML block + a 150-160 char meta description), `seo-agro/build.test.mjs` (`node seo-agro/build.test.mjs`: 70 checks, 0 violations - meta length, banned claims, 3 sections, price present, missing active ingredient flagged, no invented dose or interval).
-- Run `node seo-agro/build.mjs batch-01` to write `seo-agro/out/batch-01.html` (paste-ready blocks) and `batch-01.report.json` (meta text + what is missing per product). `out/` is not committed yet.
+- [x] Batch 01 = 10 products (7 herbicides + Absolute 375SC, Agrixyl 407, Bradley 500SC; 14 rows): `seo-agro/batch-01.json` (facts taken only from the catalog descriptions), `seo-agro/build.mjs` (renders the brief's HTML block, a 150-160 char meta description and the plain-text description stored in the database), `seo-agro/build.test.mjs` (`node seo-agro/build.test.mjs`: 80 checks, 0 violations - meta length, description 300-600 words, banned claims, 5 sections, price present, missing active ingredient flagged, no invented dose or interval).
+- [x] WRITTEN TO SUPABASE `products.description` for all 14 rows of batch 01 (2026-10-29). Verified by query: 445 to 557 words each, FAQ present. Old text saved in table `public.description_backup` (batch `agro-batch-01`, 14 rows, RLS on). To restore one: `update products p set description = b.description from description_backup b where b.id = p.id and b.batch = 'agro-batch-01' and p.id = '<id>'`.
+- [x] Sections in each description: lead, key specifications, mixing & application, safety & re-entry, why buy from Stermont Arcade, 5 FAQs, order line (M-Pesa, 47 counties, Sarit Centre pickup, WhatsApp +254 748 888 230).
+- Run `node seo-agro/build.mjs batch-01` to write `seo-agro/out/batch-01.html` (paste-ready blocks) and `batch-01.report.json`. `out/` is not committed.
 
 ## Left
-- [ ] Owner: supply LABEL DATA for batch 01 (list below). Until then the blocks say "use the dose on the manufacturer's label".
-- [ ] Decide how the text goes live: the Supabase `products.description` column feeds the generator (plain text with CAPITAL headings and bullets). Nothing has been written to Supabase. Proposal: after owner approval, update `description` for the rows of each approved product, rebuild runs within 3 hours.
-- [ ] Batches 02-04 (29 products left): next 10 in order are the rest of Fungicides, then Crop Insecticides, then Adjuvants.
+- [ ] Owner: supply LABEL DATA for batch 01 (list below). Until then the text says "use the dose on the manufacturer's label".
+- [ ] Check 3 product pages after the next rebuild (rebuild runs every 3 hours): confirm the new description shows (plain text with CAPITAL headings and bullets) and the owner's `seo_title` is unchanged. Not testable from my sandbox (no network).
+- [ ] Batches 02-04 (29 products left): next 10 in order are the rest of Fungicides, then Crop Insecticides, then Adjuvants. Same process: facts file, `build.mjs`, test, backup table rows, update, verify.
+- [ ] `seo-agro/mksql.mjs` style one-off SQL scripts are not committed; the writer used a templated `update ... from (values ...)` with `format()`.
 - [ ] JSON-LD: the generator already outputs Product + Offer (KES, InStock, NewCondition, seller, image, sku), so no extra schema block is added.
 
 ### Label data still needed for batch 01
@@ -21,8 +24,10 @@ Owner brief: "Elite E-Commerce SEO Strategist" prompt (title, meta description, 
 - NO invented dosing: the catalog says "follow the label" and holds no rates, so dilution, coverage and re-entry/pre-harvest times are NOT made up. Wrong rates on a pesticide can burn crops or harm people, so numbers come from the label only.
 - Titles are NOT regenerated: the owner's PDF titles in `products.seo_title` win (see the section below). The brief's title format and the 60-character title rule in `seo-meta.mjs` conflict, and the owner already decided.
 - Banned claims stay out (no "Guaranteed", "Certified", "#1 Rated", "Top-Rated", "PCPB approved"): there is nothing in the repo to back them.
-- The meta description formula in the brief cannot reach 150-160 characters with long product names, so the builder tries shorter variants (drops "Effective for" / "Active:") and the test enforces 150-160.
+- The meta description formula in the brief cannot reach 150-160 characters with long product names, so the builder tries shorter variants (drops "Effective for" / "Active:") and the test enforces 150-160. Meta descriptions are generated in `build.mjs` but are not stored in the database yet (the generator builds its own meta); decision needed whether to wire them in via `seo-overrides.json`.
 - Price in the meta is the lowest pack price ("from KSh" when several sizes).
+- The 300-600 word rule is checked on the stored plain text (`renderText`), not the HTML.
+- Owner approved writing straight to Supabase ("Fix directly"); the writes happened BEFORE the code for the longer text was pushed, so the database was ahead of the branch for a short time. They match now.
 
 ---
 
