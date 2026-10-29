@@ -38,8 +38,10 @@ Do NOT rename product ids. Use the existing, unused `products.slug` column as th
 | familly-insect-killer-super-strength-aerosol-spray-aerosol-can | familly-insect-killer-super-strength-aerosol-spray |
 | bedlam-200sl-insecticide-50-ml-2 | bedlam-200sl-insecticide-50-ml |
 
+- [x] Step 3b-prep (3aaca0e): `kili-pages.js` understands clean-slug pages (reads real product id from `<meta name="stm-id">`, maps slug->id for card badges, search links use slug)
+- [x] Step 3b (Pentagon, a90a9e2 + all 9 others, this push): all 10 batch-1 pages exist as `/p/<new-slug>.html` (canonical, og:url, JSON-LD, WhatsApp links use the new URL; `<meta name="stm-id">` keeps the real product id); each old `/p/<old-id>.html` is now a redirect stub (meta refresh + JS replace, keeps ?query and #hash). Made with a one-off script (URL contexts only).
+
 ## Left (small steps, one push each)
-- [ ] Step 3b: batch 1 PAGES: for each product above create `/p/<new-slug>.html` (copy of the old page; change only URL contexts: canonical, og:url, JSON-LD url, sitemap; keep id-based cart/#p- links unchanged), turn `/p/<old-id>.html` into a redirect to the new page.
 - [ ] Step 3c: `storefront-live.js` must read `slug` (select it, fall back to `id`) and `purl(p)` use `p.slug || p.id`; WhatsApp link too. Do this together with 3b so no URL is ever published before its page exists.
 - [ ] Step 3d: update `sitemap-products.xml` (and `sitemap-images.xml`, `merchant-feed.xml` if they hold /p/ URLs) for batch 1.
 - [ ] Generator risk: `tools/build_product_pages.py` / `generate-products.mjs` build pages from `id`. If they are re-run they will recreate old-id pages and ignore slugs. Teach them to use `slug` (check how/when they are run first).
