@@ -126,9 +126,12 @@ async function ask(extra) {
     let lastErr = '';
     for (const m of GEMINI_MODELS) {
       for (let t = 0; t < 2; t++) {
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
-          method: 'POST', headers: { 'x-goog-api-key': GKEY, 'content-type': 'application/json' }, body
-        });
+        let r;
+        try {
+          r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+            method: 'POST', headers: { 'x-goog-api-key': GKEY, 'content-type': 'application/json' }, body, signal: AbortSignal.timeout(120000)
+          });
+        } catch (e) { lastErr = `Gemini ${m} did not answer: ${e.message}`; console.log(lastErr); break; }   /* timeout or network: next model */
         if (r.ok) {
           const j = await r.json();
           const text = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []).filter(p => !p.thought).map(p => p.text || '').join('');
@@ -137,7 +140,7 @@ async function ask(extra) {
           try { return JSON.parse(text.slice(a, b + 1)); } catch { return null; }
         }
         lastErr = `Gemini ${m} error ${r.status}: ${(await r.text()).slice(0, 200)}`;
-        console.log(lastErr);
+        console.log(lastErr); console.log(`::warning title=Blog writer::${lastErr.replace(/%/g, '%25').replace(/\r?\n/g, ' ')}`);
         if (r.status === 429 || r.status === 503) { if (t === 0) await new Promise(ok => setTimeout(ok, 20000)); continue; }   /* busy or per-minute limit: wait once, then next model */
         break;   /* 400/403/404 etc: this model will not work, try the next one */
       }
@@ -155,14 +158,18 @@ async function ask(extra) {
   try { return JSON.parse(text.slice(a, b + 1)); } catch { return null; }
 }
 
+// Messages shown as annotations on the GitHub run page (readable without opening the log).
+const note = (lvl, msg) => console.log(`::${lvl} title=Blog writer::${String(msg).replace(/%/g, '%25').replace(/\r?\n/g, ' ').slice(0, 900)}`);
 let art = null, problems = [];
 for (let i = 0; i < 3; i++) {
-  art = await ask(problems.join('; '));
-  problems = check(art);
+  try { art = await ask(problems.join('; ')); }
+  catch (e) { note('error', `AI request failed: ${e.message}`); save(); console.error(e.message); process.exit(1); }
+  problems = art ? check(art) : ['the reply was not valid JSON (it may have been cut off)'];
   if (!problems.length) break;
+  note('warning', `Attempt ${i + 1} rejected: ${problems.join('; ')}`);
   console.log(`Attempt ${i + 1} rejected: ${problems.join('; ')}`);
 }
-if (problems.length) { save(); console.error('Could not produce a draft that passes the checks. Nothing written.'); process.exit(1); }
+if (problems.length) { save(); note('error', `Could not produce a draft that passes the checks. Last problems: ${problems.join('; ')}`); console.error('Could not produce a draft that passes the checks. Nothing written.'); process.exit(1); }
 
 const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, path, text) => allowed.has(path) ? `<a href="${path}">${text}</a>` : text).replace(/\[\[|\]\]/g, '');
 const para = s => '<p>' + inline(s) + '</p>';
