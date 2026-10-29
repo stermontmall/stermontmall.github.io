@@ -80,3 +80,6 @@ Static GitHub Pages site. No Next.js / React Router / Nuxt, so `force-dynamic`, 
 - Real cause of "name only changes after opening the product + hard refresh": the admin Edit saved the new name on ONE row only, while pack sizes of a product are separate rows. The shop list card used one row's name, each size's page another. Four families (Actellic, Agita, Alonze, Amito) had prefixes ("#1 Top", "Best", "Reliable", "#1 Original") on some sizes only.
 - Data fixed in Supabase (all sizes now share one plain name; slugs unchanged). `catalog-v10.js?v=9`: renaming a size renames every size of that group. `storefront-live.js?v=4`: list shows the name most sizes use.
 - Open: who/what added the prefixes to single rows is unknown (nothing in this repo does it).
+
+## Shop product view heading = page H1 (branch `wip-view-h1`, 2026-10-29)
+Owner wants the name shown in the shop's product view to match the product page ("Original Zagro Ultraxide Disinfectant for Poultry & Livestock Farms – 1 Litre"). `storefront-live.js?v=5`: `setMeta` already revalidates the real /p/ page; it now also copies that page's `<h1>` into the view's heading and top bar (plain name shown for a moment until it arrives; stays plain if the page cannot be fetched). Cards on the list keep the plain name.

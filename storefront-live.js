@@ -109,6 +109,9 @@
         if (!h || tok !== MT || !cur) return;
         var dd = new DOMParser().parseFromString(h, 'text/html'), t = dd.title, m = dd.querySelector('meta[name="description"]'), cd = descTag();
         if (t) D.title = t;
+        /* heading of the open product = the heading of its real page ("Original <name> – <pack>"), so the shop view and the page always read the same */
+        var h1 = dd.querySelector('h1'), ht = h1 && h1.textContent.replace(/\s+/g, ' ').trim();
+        if (ht && pd) { var h2 = pd.querySelector('h2'), bb = pd.querySelector('.bar b'); if (h2) h2.textContent = ht; if (bb) bb.textContent = ht; }
         if (m && cd && m.getAttribute('content')) cd.setAttribute('content', m.getAttribute('content'));
       }).catch(function () {});
     } catch (e) {}
