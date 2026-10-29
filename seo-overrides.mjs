@@ -5,6 +5,8 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 // First run the structure + internal links pass (seo-product-extras.mjs). Wired in here because this script is already a workflow step.
 // If that pass fails for any reason the overrides below still run. To switch it off, delete these 2 lines.
 try { await import('./seo-product-extras.mjs'); } catch (e) { console.log('seo-product-extras skipped:', e.message); }
+// Then the small clean-ups (seo-fixes.mjs): no repeated "Buy <product>" in meta descriptions, clean JSON-LD description. To switch it off, delete this line.
+try { await import('./seo-fixes.mjs'); } catch (e) { console.log('seo-fixes skipped:', e.message); }
 const O = JSON.parse(readFileSync('seo-overrides.json', 'utf8'));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s;
