@@ -148,8 +148,9 @@
     var s = q('.st'), sold = p.stock <= 0; s.className = 'st' + (sold ? ' out' : p.stock <= 5 ? ' low' : '');
     s.textContent = sold ? 'Sold out' : p.stock <= 5 ? 'Only ' + p.stock + ' left' : 'In stock';
     var avail = sold ? 'Currently sold out' : p.stock <= 5 ? 'Only ' + p.stock + ' left' : 'In stock';
+    /* share the real, indexable product page (/p/<id>.html), not the #p- popup link that Google ignores */
     var sum = ['Hello Stermont Arcade, I would like to enquire about this item:', '', 'Product: ' + p.name, 'Price: ' + money(p.price) + (p.unit && !p.variant_label ? ' / ' + p.unit : ''),
-      'Availability: ' + avail].concat(p.categories && p.categories.name ? ['Category: ' + p.categories.name] : [], ['Ref: ' + p.id, 'Link: ' + location.origin + '/#p-' + p.id, '', 'Please confirm availability and the delivery fee to my location.']).join('\n');
+      'Availability: ' + avail].concat(p.categories && p.categories.name ? ['Category: ' + p.categories.name] : [], ['Ref: ' + p.id, 'Link: ' + location.origin + '/p/' + encodeURIComponent(p.id) + '.html', '', 'Please confirm availability and the delivery fee to my location.']).join('\n');
     var wl = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(sum); q('.wa').href = wl; q('.wat').href = wl;
     var th = q('.thumbs'); th.textContent = ''; th.hidden = imgs.length < 2;
     imgs.forEach(function (u, k) { var t = new Image(); t.src = u; t.alt = ''; t.onclick = function () { show(k); }; th.appendChild(t); });
