@@ -1,13 +1,15 @@
 // Stermont Arcade - Kenya SEO pass. Runs in .github/workflows/product-pages.yml right after generate-products.mjs
 // and BEFORE seo-overrides.mjs, so hand-written overrides in seo-overrides.json always win.
-// 1) Product pages: Kenyan-search titles/descriptions (price in KSh, "in Kenya", M-Pesa, 47 counties).
-//    Titles now start with "Buy" ("Buy <product> in Kenya | KSh X"). Descriptions say what the product is (first sentence of its own description). The store name is no longer
-//    claimed as the product brand in the Product schema when no real brand is known.
-// 2) Category pages: "from KSh X" in the description + a link to the cheapest-prices guide.
+// 1) Product pages: pages built by generate-products.mjs with <meta name="stm-seo" content="v2"> already carry the final Kenya title/description
+//    (seo-meta.mjs: "[Original] <product> \u2013 Price in Kenya | Stermont Arcade"), so they are left alone here. Older pages without the marker still get the
+//    previous "Buy <product> in Kenya | KSh X" wording. The store name is not claimed as the product brand in the Product schema when no real brand is known.
+// 2) Category pages: title and description follow the seo-meta.mjs pattern ("Buy <category> Online in Kenya ...", "Order PCPB-approved ..." only for regulated categories)
+//    + a link to the cheapest-prices guide.
 // 3) /guides/: one "Cheapest <category> in Kenya (bei nafuu)" page per category, built from the prices already on the
 //    category pages (no network, no database), plus /guides/ index and the /guides/ entries in sitemap.xml.
 // Safe by design: every file is wrapped in try/catch, a bad page is skipped, the script never exits with an error.
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'node:fs';
+import { catTitle, catDescription } from './seo-meta.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const WA = 'https://wa.me/254748888230';
@@ -42,6 +44,12 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     const file = `p/${f}`; let h = readFileSync(file, 'utf8');
     const pm = h.match(/product:price:amount" content="(\d+)"/), nm = h.match(/<h1>([\s\S]*?)<\/h1>/);
     if (!pm || !nm) continue;
+    // v2 pages already have the final title/description from seo-meta.mjs. Only the brand clean-up below still applies to them.
+    if (h.includes('<meta name="stm-seo" content="v2">')) {
+      const nb = h.replace(/,"brand":\{"@type":"Brand","name":"Stermont Arcade"\}/g, '');
+      if (nb !== h) { writeFileSync(file, nb); pDone++; }
+      continue;
+    }
     const name = unesc(nm[1].replace(/<[^>]+>/g, '').trim()), price = ksh(pm[1]);
     const inStock = /product:availability" content="in stock"/.test(h);
     // Title always starts with "Buy": "Buy <product> in Kenya | KSh X" (kept under about 68 characters so Google does not cut it off)
@@ -84,6 +92,7 @@ console.log(`Kenya titles and descriptions set on ${pDone} product page(s).`);
 // ---------- 2) category pages + 3) guides ----------
 const ITEM = /<li><a href="(\/p\/[^"]+)"><img[^>]*?>([^<]*)<\/a><span>KSh ([\d,]+)<\/span><\/li>/g;
 const cats = [];
+let cDone = 0;
 if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.html') && f !== 'index.html')) {
   try {
     const slug = f.replace(/\.html$/, ''), file = `c/${f}`; let h = readFileSync(file, 'utf8');
@@ -94,19 +103,24 @@ if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.h
     const label = h1.replace(/\s+in Kenya$/i, '');
     const min = items[0].price, max = items[items.length - 1].price;
     cats.push({ slug, label, h1, items, min, max, sw: SW[slug] || '' });
-    // category description: lead with "from KSh X"
-    const mark = `${esc(h1)} from KSh `;
-    h = h.replace(/(<meta name="description" content=")([^"]*)(">)/, (m, a, cur, b) => {
-      if (cur.startsWith(mark)) cur = cur.slice(cur.indexOf('. ') + 2);
-      return a + `${mark}${min.toLocaleString('en-US')}. ` + cur + b;
-    });
-    const dm = h.match(/<meta name="description" content="([^"]*)">/);
-    if (dm) h = h.replace(/(<meta property="og:description" content=")[^"]*(">)/, (m, a, b) => a + dm[1] + b).replace(/(<meta name="twitter:description" content=")[^"]*(">)/, (m, a, b) => a + dm[1] + b);
+    // category title + description: seo-meta.mjs pattern, built from the category name shown in the breadcrumb ("Home › <name>")
+    const cn = unesc(((h.match(/<nav class="bc"><a [^>]*>Home<\/a> › ([^<]*)<\/nav>/) || [])[1] || '').trim());
+    if (cn) {
+      const ct = esc(catTitle(cn)), cd = esc(catDescription(cn, slug));
+      h = h.replace(/<title>[\s\S]*?<\/title>/, () => `<title>${ct}</title>`)
+        .replace(/(<meta name="description" content=")[^"]*(">)/, (m, a, b) => a + cd + b)
+        .replace(/(<meta property="og:title" content=")[^"]*(">)/, (m, a, b) => a + ct + b)
+        .replace(/(<meta property="og:description" content=")[^"]*(">)/, (m, a, b) => a + cd + b)
+        .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, (m, a, b) => a + ct + b)
+        .replace(/(<meta name="twitter:description" content=")[^"]*(">)/, (m, a, b) => a + cd + b);
+      cDone++;
+    }
     if (!h.includes('/guides/cheapest-'))
       h = h.replace('<p><a href="/c/">Browse all categories</a></p>', () => `<div class="box"><a href="/guides/cheapest-${slug}-kenya.html">Cheapest ${esc(label)} in Kenya: bei nafuu, prices from ${ksh(min)}</a></div>\n<p><a href="/c/">Browse all categories</a></p>`);
     writeFileSync(file, h);
   } catch (e) { console.log('skip category page', f, e.message); }
 }
+console.log(`Kenya titles and descriptions set on ${cDone} category page(s).`);
 
 const STYLE = `<style>.answer{background:#f1ebff;border-left:4px solid #7c3aed;border-radius:10px;padding:.8rem 1rem;margin:1rem 0}.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;width:100%;font-size:.95rem}caption{text-align:left;font-weight:700;padding:.3rem 0}th,td{border:1px solid #e6e1f5;padding:.5rem .6rem;text-align:left;vertical-align:top}th{background:#f1ebff}h3{font-size:1.05rem;margin:1.1rem 0 .2rem}</style>`;
 const FOOT = `<footer>Stermont Arcade · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href='${WA}'>WhatsApp +254 748 888 230</a> · <a href='/shipping.html'>Shipping</a> · <a href='/returns.html'>Returns</a> · <a href='/privacy.html'>Privacy</a></footer><script src="/analytics.js" defer></script>`;

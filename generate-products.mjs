@@ -3,6 +3,7 @@
 // Runs automatically on GitHub (see .github/workflows/product-pages.yml). No installs needed (Node 18+).
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, pdpHeadings, isPcpb, isPest } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -312,13 +313,10 @@ for (const p of products) {
   const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
   const revs = reviewsFor(p), rLd = reviewLd(revs);
-  const plain = clip(p.description, 150);
-  const sizes = p.variants ? ' Sizes: ' + p.variants.map(v => v.variant_label).join(', ') + '.' : '';
-  const desc = clip(`Buy ${p.name} online in Kenya ${p.variants ? 'from' : 'at'} ${money(p.price)}.${sizes} ${plain ? plain + ' ' : ''}Pay by M-Pesa, delivery to all 47 counties. Order online at ${BRAND}.`, 158);
-  // "Buy [Product] Online in Kenya" is the phrase shoppers search; fall back to shorter wordings so the title stays under ~70 characters and Google does not cut it off.
-  // The price is in the title too, because many shoppers search "[product] price in Kenya". Tiers go from fullest to shortest.
-  const pr = `${p.variants ? 'from ' : ''}${money(p.price)}`;
-  const title = [`Buy ${p.name} Online in Kenya - ${pr} | ${BRAND}`, `Buy ${p.name} Online in Kenya - ${pr}`, `Buy ${p.name} in Kenya - ${pr}`, `Buy ${p.name} Online in Kenya | ${BRAND}`, `Buy ${p.name} in Kenya | ${BRAND}`, `Buy ${p.name} Online in Kenya`, `Buy ${p.name} in Kenya`].find(t => t.length <= 70) || `Buy ${clip(p.name, 70 - 'Buy '.length - ` - ${pr}`.length)} - ${pr}`;   // very long names: shorten the name so the price stays visible
+  // Meta title (max 60 chars) and description (max 155 chars) come from seo-meta.mjs: "[Original] <name> \u2013 Price in Kenya | Stermont Arcade".
+  // "Original / genuine" is only claimed for known brands and farm inputs; the price stays in the Product schema and on the page.
+  const ctx = { brand: brandOf(p.name), catSlug: cat?.slug };
+  const title = pdpTitle(p.name, ctx), desc = pdpDescription(p.name, ctx), h1 = trustName(p.name, ctx), hd = pdpHeadings(cat?.slug);
   // Related products rotate through the category (the 6 that follow this one, wrapping round), so EVERY product, including the newest, gets links from other product pages.
   const related = (() => {
     if (!cat) return [];
@@ -359,19 +357,28 @@ for (const p of products) {
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
     const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${SITE}${path}`)}`;
     return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
+  // Local-utility sections (H2s): what it is used for, price and M-Pesa ordering, delivery and Sarit Centre pickup. Facts match shipping.html and nairobi.html.
+  const nameE = esc(p.name), priceTxt = `${p.variants ? 'from ' : ''}${money(p.price)}${p.unit ? ' / ' + esc(p.unit) : ''}`;
+  const usesTxt = isPcpb(cat?.slug)
+    ? `Use ${nameE} only as directed on the label: the ${isPest(cat?.slug) ? 'pests' : 'crops and pests'} it lists, the rate and the interval between treatments. Check the PCPB registration number on the pack, wear the gloves and mask the label recommends and keep children, pets and food away.${isPest(cat?.slug) ? ' Fighting kunguni, mchwa, mende, mbu or panya?' : ''} Not sure it fits your problem? <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> before you order.`
+    : `Follow the use and dosage instructions on the pack and read the label before you buy. <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> if you are not sure it suits your need.`;
+  const seoBoxes = `${hd.uses ? `<div class="box"><h2 style="margin-top:0">${esc(hd.uses)}</h2><p>${usesTxt}</p></div>` : ''}
+<div class="box"><h2 style="margin-top:0">${esc(hd.price)}</h2><p>${nameE} costs <b>${priceTxt}</b> at ${BRAND}${inStock ? ' and is in stock' : ', but is currently sold out, so ask us when it is back'}. Add it to your cart, pay by M-Pesa and enter the M-Pesa code from your SMS, or <a href="${esc(inStock ? wa : ask)}" rel="noopener">order on WhatsApp</a>. Buying in bulk? Message us for a quote.</p></div>
+<div class="box"><h2 style="margin-top:0">${esc(hd.delivery)}</h2><p>Orders to Nairobi usually arrive the same day or the next day, and the other counties usually within 1 to 3 days. We confirm the delivery fee for your location before you pay. Prefer store pickup? Collect at The Sarit Centre, Karuna Road, Westlands, open daily 8 AM to 8 PM, and confirm stock on WhatsApp first. See <a href="/shipping.html">shipping</a> and <a href="/nairobi.html">Nairobi delivery and pickup</a>.</p></div>`;
   const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
 <div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.name)} - buy online in Kenya" fetchpriority="high">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
-<div><h1>${esc(p.name)}</h1><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
+<div><h1>${esc(h1)}</h1><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
 <p class="${inStock ? 'ok' : 'no'}">${inStock ? 'In stock' : 'Currently sold out'}</p>
 <p>Buy ${esc(p.name)} online in Kenya from ${BRAND}. Pay by M-Pesa and get delivery to all 47 counties.</p>
 <a class="btn" href="${esc(wa)}">Order on WhatsApp</a><a class="btn alt" href="${SITE}/">Shop all products and add to cart</a>
 <div class="box">✔ Pay by M-Pesa &nbsp; ✔ Delivery to all 47 counties &nbsp; ✔ 48-hour returns on faulty items</div></div></div>
 ${sizeBox}
 ${p.description ? `<div class="box"><h2 style="margin-top:0">About ${esc(p.name)}</h2><div class="desc">${esc(p.description)}</div></div>` : ''}
+${seoBoxes}
 ${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
 ${related.length ? `<h2>More in ${esc(cat.name)}</h2><ul class="g">${related.map(card).join('')}</ul>` : ''}
 <div class="stk" role="complementary" aria-label="Order this product"><b>${p.variants ? 'From ' : ''}${money(p.price)}<small>${esc(p.name)}</small></b><a class="call" href="tel:+${WHATSAPP}" aria-label="Call ${BRAND}">Call</a><a href="${esc(inStock ? wa : ask)}">${inStock ? 'Order on WhatsApp' : 'Ask on WhatsApp'}</a></div>`;
-  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld, ogType: 'product', extra: `<meta name="stm-id" content="${esc(p.id)}"><meta property="product:price:amount" content="${Math.round(Number(p.price) || 0)}"><meta property="product:price:currency" content="KES"><meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` }));
+  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld, ogType: 'product', extra: `<meta name="stm-id" content="${esc(p.id)}"><meta name="stm-seo" content="v2"><meta property="product:price:amount" content="${Math.round(Number(p.price) || 0)}"><meta property="product:price:currency" content="KES"><meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` }));
   urls.push(path);
 }
 
