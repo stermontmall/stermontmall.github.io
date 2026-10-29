@@ -27,13 +27,15 @@ Found on `/p/pentagon-50ec-insecticide-1-litre.html` (build `cdf72d1`):
 
 Done so far:
 - [x] Step 1: new `seo-fixes.mjs` added (fixes both items, per-page try/catch).
-- [x] Step 2: wired in with one line in `seo-overrides.mjs` (after the seo-product-extras line). Commit `ea50617` changes only those 2 lines (1 comment + 1 import). NOT TESTED: nothing has been run yet.
-- [ ] Step 3: owner runs the product-pages workflow from the branch (or locally with `node generate-products.mjs && node seo-kenya.mjs && node seo-overrides.mjs`) and checks the Pentagon page source: meta description has no second "Buy", JSON-LD description has no heading run. Check `/p/abasi-5-ec.html` still has its FAQ and breadcrumb. The log line `seo-fixes: meta descriptions fixed on N page(s)...` shows what changed.
-- [ ] Step 4: merge to `main` only after step 3 passes.
+- [x] Step 2: wired in with one line in `seo-overrides.mjs` (commit `ea50617`, only 2 lines changed).
+- [x] Step 3a: workflow "Build product pages" run on the branch by the owner (bot commit `c59bdca`). Result on the Pentagon page: item 1 FIXED (meta description is now `Buy ... in Kenya for KSh 1,800. In stock. Pay by M-Pesa. Delivery to all 47 counties.`); item 2 NOT fixed.
+- [x] Step 3b: cause of item 2 found. On this page the description box is `<div class="desc" style="white-space:normal">` (my regex expected no attributes) and headings such as "Why Choose Pentagon 50EC" are plain `<p>` lines. Fixed in `seo-fixes.mjs`: match the box with any attributes, keep only sentence-like paragraphs (60+ characters or ending in . ! ?). NOT TESTED yet.
+- [ ] Step 4: owner runs "Build product pages" on `wip-seo-cleanup` again; check the Pentagon JSON-LD `description` has no "Why Choose", and `/p/abasi-5-ec.html` still has FAQ + breadcrumb. The run log line `seo-fixes: ...` shows how many pages changed.
+- [ ] Step 5: merge to `main` only after step 4 passes. Heads-up: the branch now also holds bot-rebuilt pages; if the merge shows conflicts in `p/`, `c/`, sitemap files, take `main` for those and keep only `seo-fixes.mjs`, `seo-overrides.mjs`, `HANDOFF.md`.
 
 Rollback: delete the `seo-fixes.mjs` import line in `seo-overrides.mjs` (or revert `ea50617`).
 
 Decisions:
 - Fix lives in a new post-processing file instead of editing the large generator, so it is easy to switch off (delete one line).
-- JSON-LD description now uses only the page's paragraphs; if a page has none, it is left unchanged.
+- When the meta description had a repeated "Buy", the descriptive middle sentence is dropped entirely (simple and safe); it can be improved later in `seo-kenya.mjs`.
 - Not changed: meta-refresh redirects (GitHub Pages cannot send 301; a Cloudflare layer would), reviews/stars (already only from real approved reviews).

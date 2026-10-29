@@ -1,7 +1,8 @@
 // Stermont Arcade - small clean-ups on built product pages. Runs from seo-overrides.mjs, after seo-kenya.mjs and seo-product-extras.mjs.
 // 1) Meta description: if it says "Buy <product> in Kenya for KSh X. Buy <product>..." the second "Buy ..." sentence is dropped (the product name was repeated).
-// 2) Product / ProductGroup JSON-LD: the description is rebuilt from the page's own paragraphs, so headings no longer run into the text.
-//    If the page has no paragraphs in its description, the JSON-LD is left exactly as it was.
+// 2) Product / ProductGroup JSON-LD: the description is rebuilt from the real sentences of the page's own description box.
+//    Heading-like lines (short, no full stop, e.g. "Why Choose Pentagon 50EC") and spec/feature lines are skipped.
+//    If the page has no such sentences, the JSON-LD is left exactly as it was.
 // Safe by design: every page is wrapped in try/catch, a bad page is skipped, the script never exits with an error.
 // To switch it off: delete the line that imports this file in seo-overrides.mjs.
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
@@ -11,6 +12,7 @@ const clip = (s, n) => s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') +
 const STOCK = '(In stock\\. Pay by M-Pesa\\. Delivery to all 47 counties\\.|Ask us on WhatsApp when it is back\\. Pay by M-Pesa\\.)';
 const DUP = new RegExp('^(Buy .+? in Kenya for KSh [\\d,]+\\.) Buy .*? ' + STOCK + '$');
 const META = /(<meta (?:name="description"|property="og:description"|name="twitter:description") content=")([^"]*)(">)/g;
+const isSentence = t => t.length >= 60 || /[.!?]$/.test(t);   // headings and one-line spec items are shorter and have no full stop
 
 let metaFixed = 0, ldFixed = 0;
 if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.html'))) {
@@ -22,9 +24,9 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     h = h.replace(META, (m, a, cur, b) => { const fix = cur.replace(DUP, '$1 $2'); return fix === cur ? m : a + fix + b; });
     if (h !== h0) metaFixed++;
 
-    // 2) JSON-LD description from the page's own paragraphs
-    const dm = h.match(/<div class="desc">([\s\S]*?)<\/div>/);
-    const paras = dm ? [...dm[1].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(x => unesc(x[1].replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim()).filter(Boolean) : [];
+    // 2) JSON-LD description from the real sentences of the description box (the box may carry a style attribute)
+    const dm = h.match(/<div class="desc"[^>]*>([\s\S]*?)<\/div>/);
+    const paras = dm ? [...dm[1].matchAll(/<p>([\s\S]*?)<\/p>/g)].map(x => unesc(x[1].replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim()).filter(t => t && isSentence(t)) : [];
     const text = paras.join(' ');
     if (text.length >= 60) {
       const nd = clip(text, 500);
