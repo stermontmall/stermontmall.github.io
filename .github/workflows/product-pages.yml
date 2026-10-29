@@ -11,6 +11,7 @@ on:
     branches: [main]
     paths:
       - 'generate-products.mjs'
+      - 'seo-meta.mjs'
       - 'seo-overrides.mjs'
       - 'seo-overrides.json'
       - 'seo-kenya.mjs'
