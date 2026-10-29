@@ -10,7 +10,7 @@ Plan, each step committed and pushed:
 2. [x] (tests pass, 610 checks) `seo-meta.mjs`: general list gets "Top-Quality" (replaces bare "Top"); H1 carries BOTH the trust word and the power word ("Original Powerful <name>").
 3. [x] (checked on the 183 real product names x 4 category types: 0 titles over 60 chars, 0 without a modifier; trade-off: a very long name loses up to ~9 characters to the lead word) `seo-meta.mjs`: title fallback keeps the lead word when the name has to be clipped, so every title carries a modifier.
 4. [x] (`node seo-meta.test.mjs`: 850 checks, 0 violations) `seo-meta.test.mjs`: assert every title and H1 carries a modifier; run it.
-5. [ ] Check against the real product names in `p/*.html`, then merge to `main` and confirm the rebuild.
+5. [ ] PR #57 is open, NOT merged. Real-names check done (183 names). A full `node generate-products.mjs` could not run from the cloud session (Supabase host unreachable), so the first live rebuild is untested. Merging triggers the rebuild (workflow watches `seo-meta.mjs`); after it, check 3 pages' `<title>` and H1. Revert = revert PR #57. Original step: Check against the real product names in `p/*.html`, then merge to `main` and confirm the rebuild.
 
 ## Part 1 (DONE, merged to `main` as PR #52, branch `wip-seo-kenya-meta`)
 Shared builders in `seo-meta.mjs`, product pages (title, description, H1 trust word, 3 local H2 sections, `stm-seo v2` marker) in `generate-products.mjs`, category meta in `seo-kenya.mjs`. JSON-LD and OG already correct (KES, availability, seller, og:locale en_KE). Clean slugs + permanent redirects already exist (Task A).
