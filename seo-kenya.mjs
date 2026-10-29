@@ -1,6 +1,8 @@
 // Stermont Arcade - Kenya SEO pass. Runs in .github/workflows/product-pages.yml right after generate-products.mjs
 // and BEFORE seo-overrides.mjs, so hand-written overrides in seo-overrides.json always win.
 // 1) Product pages: Kenyan-search titles/descriptions (price in KSh, "in Kenya", M-Pesa, 47 counties).
+//    Descriptions now say what the product is (first sentence of its own description). The store name is no longer
+//    claimed as the product brand in the Product schema when no real brand is known.
 // 2) Category pages: "from KSh X" in the description + a link to the cheapest-prices guide.
 // 3) /guides/: one "Cheapest <category> in Kenya (bei nafuu)" page per category, built from the prices already on the
 //    category pages (no network, no database), plus /guides/ index and the /guides/ entries in sitemap.xml.
@@ -44,18 +46,35 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     const inStock = /product:availability" content="in stock"/.test(h);
     const tail = ` | ${price} in Kenya`;
     const title = esc(clip(name, 68 - tail.length) + tail);
-    const sfx = ` in Kenya for ${price}. ` + (inStock
-      ? 'In stock. Pay by M-Pesa. Delivery to all 47 counties.'
-      : 'Ask us on WhatsApp when it is back. Pay by M-Pesa.');
-    const room = 158 - 4 - sfx.length;
-    const desc = esc(room >= 20 ? 'Buy ' + clip(name, room) + sfx : clip('Buy ' + name + sfx, 158));
+    const stockTxt = inStock ? 'In stock. Pay by M-Pesa. Delivery to all 47 counties.' : 'Ask us on WhatsApp when it is back. Pay by M-Pesa.';
+    const sfx = ` in Kenya for ${price}. ` + stockTxt;
+    // What the product is: the first real sentence of its own description, minus the heading line that repeats the product name.
+    let blurb = '';
+    const dm0 = h.match(/<div class="desc">([\s\S]*?)<\/div>/);
+    if (dm0) {
+      const lines = unesc(dm0[1].replace(/<[^>]+>/g, ' ')).split(/\n+/).map(s => s.replace(/\s+/g, ' ').trim()).filter(Boolean);
+      const key = name.toLowerCase().split(' ').slice(0, 3).join(' ');
+      while (lines.length && lines[0].length < 110 && lines[0].toLowerCase().includes(key)) lines.shift();
+      const first = lines[0] || '';
+      if (first.length > 40 && first !== first.toUpperCase()) blurb = (first.match(/^.*?[.!?](?=\s|$)/) || [first])[0];
+    }
+    const head = `Buy ${name} in Kenya for ${price}. `;
+    const free = 158 - head.length - stockTxt.length - 1;
+    let desc;
+    if (blurb && free >= 35) desc = esc(head + clip(blurb, free) + ' ' + stockTxt);
+    else {
+      const room = 158 - 4 - sfx.length;
+      desc = esc(room >= 20 ? 'Buy ' + clip(name, room) + sfx : clip('Buy ' + name + sfx, 158));
+    }
     const before = h;
     h = h.replace(/<title>[\s\S]*?<\/title>/, () => `<title>${title}</title>`)
       .replace(/<meta name="description" content="[^"]*">/, () => `<meta name="description" content="${desc}">`)
       .replace(/(<meta property="og:title" content=")[^"]*(">)/, (m, a, b) => a + title + b)
       .replace(/(<meta property="og:description" content=")[^"]*(">)/, (m, a, b) => a + desc + b)
       .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, (m, a, b) => a + title + b)
-      .replace(/(<meta name="twitter:description" content=")[^"]*(">)/, (m, a, b) => a + desc + b);
+      .replace(/(<meta name="twitter:description" content=")[^"]*(">)/, (m, a, b) => a + desc + b)
+      // the store is not the manufacturer: drop the placeholder brand so Google is not told the wrong one
+      .replace(/,"brand":\{"@type":"Brand","name":"Stermont Arcade"\}/g, '');
     if (h !== before) { writeFileSync(file, h); pDone++; }
   } catch (e) { console.log('skip product page', f, e.message); }
 }
