@@ -19,7 +19,8 @@
         "/c/pest-control-fumigation.html",
         "/blog/how-to-get-rid-of-bed-bugs-kenya.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "note": "post already exists"
     },
     {
       "slug": "cockroach-gel-spray-or-powder-kenya",
@@ -38,7 +39,8 @@
         "/c/pest-control-fumigation.html",
         "/blog/how-to-get-rid-of-cockroaches-kenya.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "note": "post already exists"
     },
     {
       "slug": "rat-poison-glue-board-or-trap-kenya",
@@ -57,7 +59,8 @@
         "/c/rodent-control.html",
         "/blog/rat-and-mouse-control-kenya.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "note": "post already exists"
     },
     {
       "slug": "termite-control-at-home-kenya",
@@ -76,7 +79,8 @@
         "/c/termite-control.html",
         "/c/pest-control-fumigation.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "note": "post already exists"
     },
     {
       "slug": "pest-control-products-for-hotels-and-restaurants-kenya",
@@ -96,7 +100,8 @@
         "/c/bed-bug-killers.html",
         "/c/rodent-control.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "drafted": "2026-10-29"
     },
     {
       "slug": "how-to-choose-an-electric-kettle-kenya",
@@ -472,7 +477,8 @@
         "/products.html",
         "/blog/how-to-order-and-pay-by-mpesa-online-kenya.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "note": "post already exists"
     },
     {
       "slug": "how-to-get-rid-of-flies-and-mosquitoes-in-restaurants-kenya",
@@ -552,7 +558,8 @@
         "/products.html",
         "/blog/how-to-order-and-pay-by-mpesa-online-kenya.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "note": "post already exists"
     },
     {
       "slug": "pcpb-registered-pesticides-what-it-means-kenya",
@@ -632,7 +639,8 @@
         "/products.html",
         "/blog/how-to-order-and-pay-by-mpesa-online-kenya.html"
       ],
-      "status": "pending"
+      "status": "duplicate",
+      "note": "too similar to an existing post"
     },
     {
       "slug": "farm-disinfectants-and-biosecurity-kenya",
