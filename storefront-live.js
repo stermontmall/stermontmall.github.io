@@ -88,7 +88,8 @@
     '#stm-pd .body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1.6rem;align-items:start}#stm-pd .body h2:first-child{margin-top:0}#stm-pd .full{grid-column:1/-1}}';
   var pd, cur = null, qty = 1, imgs = [], idx = 0, BASE = null;
   /* straight product URL: /p/<id>.html (the real page Google indexes), never a #hash */
-  function purl(id) { return '/p/' + encodeURIComponent(id) + '.html'; }
+  var SLUGS = {};   /* product id -> clean page name (products.slug); falls back to the id */
+  function purl(id) { return '/p/' + encodeURIComponent(SLUGS[id] || id) + '.html'; }
   function build() {
     if (pd) return;
     var st = mk('style'); st.textContent = CSS; D.head.appendChild(st);
@@ -231,12 +232,14 @@
   /* ---------- put items into their category sections ---------- */
   function bump(m) { var c = m.querySelector('.cnt'); if (c) c.textContent = m.querySelectorAll('.pcard:not(.vhide)').length; }
   function getProducts(sel) { return fetch(SB + '/rest/v1/products?active=eq.true&select=' + sel + '&order=created_at.asc', { headers: { apikey: KEY } }); }
-  getProducts('id,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)')
+  getProducts('id,slug,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)')
+    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)'); })
     .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,stock,images,featured,description,categories(name,slug)'); })
     .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,stock,images,featured,description,categories(name,slug)'); })   /* unit column not added yet */
     .then(function (r) { return r.ok ? r : getProducts('id,name,price,stock,images,featured,description,categories(name,slug)'); })   /* old_price column not added yet: still show products */
     .then(function (r) { return r.ok ? r.json() : []; }).then(function (rows) {
       var root = D.querySelector('#music-gear .wrap'), groups = {};
+      rows.forEach(function (p) { if (p.slug && p.slug !== p.id) SLUGS[p.id] = p.slug; });
       rows.forEach(function (p) { if (p.variant_group && p.variant_label) { p.vbase = p.name; p.name = p.vbase + ' \u2013 ' + p.variant_label; (groups[p.variant_group] = groups[p.variant_group] || []).push(p); } });
       Object.keys(groups).forEach(function (k) { var g = groups[k]; if (g.length < 2) { g[0].vbase = null; g[0].name = g[0].name; return; } g.rep = g.filter(function (x) { return x.stock > 0; })[0] || g[0]; g.forEach(function (x) { x._g = g; x._c = card(x); }); });
       function vfix(c, p) {
@@ -265,6 +268,6 @@
       });
       try { buildDeals(rows); buildToolbar(); } catch (e) {}
       var hm = location.hash.match(/^#p-(.+)$/);   /* old shared #p- links still open the item, and now switch to the straight /p/ URL */
-      if (hm) { var c0 = D.getElementById('p-' + decodeURIComponent(hm[1])); if (c0 && c0._p) openView(c0); }
+      if (hm) { var hid = decodeURIComponent(hm[1]); rows.forEach(function (p) { if (p.slug === hid) hid = p.id; }); var c0 = D.getElementById('p-' + hid); if (c0 && c0._p) openView(c0); }
     }).catch(function () {});
 })();
