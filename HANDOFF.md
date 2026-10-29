@@ -7,7 +7,7 @@ Request (2026-10-29): "Powerful", "Best", "Top-Quality", "Original" must show in
 Baseline measured on the product pages committed on `main` (183 pages in `p/`): 90 titles had no modifier word at all (long names fall to a tier that drops the lead word), the H1 never showed "Powerful" or "Top-Quality" ("Powerful" is skipped whenever "Original" applies, and the general list had "Top", not "Top-Quality").
 Plan, each step committed and pushed:
 1. [x] This plan.
-2. [ ] `seo-meta.mjs`: general list gets "Top-Quality" (replaces bare "Top"); H1 carries BOTH the trust word and the power word ("Original Powerful <name>").
+2. [x] (tests pass, 610 checks) `seo-meta.mjs`: general list gets "Top-Quality" (replaces bare "Top"); H1 carries BOTH the trust word and the power word ("Original Powerful <name>").
 3. [ ] `seo-meta.mjs`: title fallback keeps the lead word when the name has to be clipped, so every title carries a modifier.
 4. [ ] `seo-meta.test.mjs`: assert every title and H1 carries a modifier; run it.
 5. [ ] Check against the real product names in `p/*.html`, then merge to `main` and confirm the rebuild.
