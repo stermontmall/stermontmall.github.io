@@ -176,7 +176,7 @@
   </div>
 </div>
 
-<script src="receipt.js?v=9"></script>
+<script src="receipt.js?v=10"></script>
 <script src="admin-suggest.js?v=1"></script>
 <script src="catalog-v10.js?v=8"></script>
 <script src="admin-extras.js?v=6"></script>
@@ -404,7 +404,7 @@
             rr.onclick = function () { rr.disabled = true; sendReview(o).then(function () { rr.disabled = false; }); }; a.appendChild(rr);
           } else if (ph) {
             var fn = String(o.customer_name || '').trim().split(/\s+/)[0] || 'there';
-            var rq = 'Hi ' + fn + ', thank you for shopping at Stermont Arcade! \uD83D\uDE4F\n\nHow was your order ' + o.ref + '? Please rate it, it takes a minute:\nhttps://stermontarcade.co.ke/account.html\n(Sign in, tap Ratings & Reviews, then rate your items.)\n\nYour review helps other customers shop with confidence. Asante!';
+            var rq = 'Hi ' + fn + ', thank you for shopping at Stermont Arcade! \uD83D\uDE4F\n\nHow was your order ' + o.ref + '? Please rate it, it takes a minute:\nhttps://stermontarcade.co.ke/?rate=' + encodeURIComponent(o.ref) + '\n(Tap the link and rate your items. Sign in if asked.)\n\nYour review helps other customers shop with confidence. Asante!';
             var rw = h('a', 'btn alt sm', 'No email: ask on WhatsApp'); rw.href = 'https://wa.me/' + ph + '?text=' + encodeURIComponent(rq); rw.target = '_blank'; rw.rel = 'noopener'; a.appendChild(rw);
           }
         }

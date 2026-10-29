@@ -565,7 +565,8 @@
   /* Review request email: sent straight to the buyer's inbox (same EmailJS template as the status emails, body is {{{html_body}}}). */
   function reviewHtml(o) {
     var F = 'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Arial,sans-serif;';
-    var link = 'https://' + BIZ.web + '/account.html';
+    /* /?rate=<order ref> opens Ratings & Reviews straight away on the storefront (after login if needed) */
+    var link = 'https://' + BIZ.web + '/?rate=' + encodeURIComponent(o.ref);
     var rows = (o.items || []).map(function (i) {
       return '<tr><td style="padding:12px 0;border-bottom:1px solid #eee7fb;' + F + 'font-size:15px;color:#1b1230;">' + hx(i.name) + '</td><td align="right" style="padding:12px 0;border-bottom:1px solid #eee7fb;' + F + 'font-size:18px;color:#f6a800;letter-spacing:2px;">&#9734;&#9734;&#9734;&#9734;&#9734;</td></tr>';
     }).join('');
@@ -581,7 +582,7 @@
         '<p style="' + F + 'font-size:15px;line-height:1.65;color:#4a4163;margin:10px 0 0;">Thank you for shopping with Stermont Arcade. It takes about a minute to rate what you bought, and your review helps other customers in Kenya shop with confidence.</p></td></tr>' +
       (rows ? '<tr><td style="padding:14px 26px 4px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5ff;border:1px solid #e6dcfb;border-radius:18px;"><tr><td style="padding:6px 18px 8px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + rows + '</table></td></tr></table></td></tr>' : '') +
       '<tr><td align="center" style="padding:22px 26px 6px;"><a href="' + link + '" style="display:inline-block;background:#f6a800;color:#2a0e5c;' + F + 'font-size:16px;font-weight:800;text-decoration:none;padding:15px 28px;border-radius:14px;">Rate your items &#11088;</a></td></tr>' +
-      '<tr><td align="center" style="padding:6px 26px 22px;"><div style="' + F + 'font-size:13px;line-height:1.6;color:#8a7fa8;">Sign in to your account, tap <b>Ratings &amp; Reviews</b>, then rate each item.</div></td></tr>' +
+      '<tr><td align="center" style="padding:6px 26px 22px;"><div style="' + F + 'font-size:13px;line-height:1.6;color:#8a7fa8;">Tap the button and rate each item. If asked, sign in with the account you ordered with.</div></td></tr>' +
       '<tr><td align="center" bgcolor="#2a0e5c" style="background:#2a0e5c;padding:20px 24px;"><div style="' + F + 'font-size:14px;font-weight:700;color:#ffffff;">Thank you for choosing Stermont Arcade</div>' +
         '<div style="' + F + 'font-size:12px;line-height:1.7;color:#cdbdf3;padding-top:6px;">Something not right with your order? Reply to this email or call ' + hx(BIZ.phone) + ' and we will make it right.</div></td></tr>' +
       '</table></div>';
