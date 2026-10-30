@@ -22,6 +22,8 @@
     '@media(min-width:600px){#wa-float{width:auto;padding:0 18px 0 14px}#wa-float .wa-t{display:inline}}' +
     '#wa-float:hover{transform:scale(1.06)}#wa-float:focus-visible{outline:3px solid #7c3aed;outline-offset:3px}' +
     '#wa-float.wa-store{bottom:calc(214px + env(safe-area-inset-bottom,0px))}@media(min-width:760px){#wa-float.wa-store{bottom:84px}}' +
+    /* get out of the way while the account panel, cart drawer, product view or any sheet is open, so it never covers their buttons */
+    'body.no-scroll #wa-float,body:has(#ac.on) #wa-float,body:has(#dr.on) #wa-float,body:has(#stm-pd.on) #wa-float{display:none!important}' +
     '@media print{#wa-float{display:none}}';
   document.head.appendChild(s);
   document.body.appendChild(a);
