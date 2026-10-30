@@ -1,3 +1,29 @@
+# HANDOFF - Mobile-first shell prototype (branch `wip-mobile-shell`, 2026-10-30)
+Owner brief: mobile shell with the layout and interaction patterns of a large Kenyan marketplace's mobile site (sticky header with search + live cart badge, chips, sidebar categories, bottom nav, history-aware sheets, 2-column dense product grid, skeletons). Built as a STANDALONE prototype in `mobile-shell/`; the live `index.html`, `storefront-live.js` and the generators are untouched.
+
+## Done
+- [x] Step 1 `mobile-shell/index.html` + `src.css` + `tailwind.config.js`: header (menu, search, cart + account), chip row, five views (Home, Categories side-nav, Deals, Cart, Account), bottom nav, filters sheet, quick-buy sheet, category drawer, toast.
+- [x] Step 1b `build-css.mjs`: builds `tailwind.css` (24 KB, committed) with only the `tailwindcss` v4 package: `npm i -D tailwindcss@4 && node mobile-shell/build-css.mjs`. No CDN at runtime. (The npm registry was blocked in my sandbox, so I built with the copy of tailwindcss 4.3.3 already installed there: `TAILWIND_DIR=<node_modules dir> node build-css.mjs`.)
+- [x] Step 2 `mobile-shell/app.js` (vanilla JS, no framework): store with live badges (cart quantity from the cart, Deals unseen count), tab state, overlay stack tied to `history.pushState` / `popstate`, header compact-on-scroll, infinite-scroll grid with skeletons and stale-response guard, filters, quick buy, cart with quantity steppers (saved in localStorage). Data is MOCK: replace `fetchProducts()` with the Supabase query.
+- [x] Step 3 `mobile-shell/DESIGN-TOKENS.md`: colours, type, spacing, components, motion, history rules.
+- [x] Tested in headless Chromium at 390x780 with touch: `python3 mobile-shell/shell.test.py` = 37 checks, 0 failures, run 3 times (needs `pip install playwright && playwright install chromium`). Covers skeletons, 2-column grid, badges, Back closing quick buy / filters / drawer without leaving the page, Back from a tab returning to Home, Buy now flow, filter + sort results, header compaction, search, reload with a sheet open.
+
+## Left
+- [ ] Not merged to `main`: it is a prototype, not wired into the live shop. Say if it should be merged as is (it only adds `mobile-shell/`; the page is `noindex`).
+- [ ] Wire real data: `fetchProducts()` -> Supabase `products` (names from `product-names.json`, pack sizes from the grouped rows, real photos instead of emoji). The mock price for a pack size is `price x (1 + 0.45 x index)`; real prices come from each pack-size row.
+- [ ] Decide how this replaces or merges with the existing home page (`storefront-live.js` already has a product view that pushes `/p/<slug>.html`; the new sheets use their own history entries).
+- [ ] Not tested: real phones (iOS Safari bottom-bar behaviour, Android gesture back), landscape, screen readers beyond the basic roles. The live site was not compared side by side with the marketplace site it is modelled on (I did not open it).
+- [ ] Checkout button is a toast. The real flow (M-Pesa, WhatsApp order) is not built.
+
+## Decisions
+- Standalone prototype, vanilla JS: the repo is a static GitHub Pages site with no React build, so React snippets were not used. The same store/overlay logic ports directly to a `useReducer` + `popstate` effect if the site ever moves to React.
+- Tailwind compiled to a committed CSS file (no Play CDN) so pages stay fast and work without a build server.
+- Header keeps a fixed height; the chip row slides behind the search bar. A first version collapsed the row's height and the scroll position shifted, which made the header flicker (found by the test).
+- Tab history: leaving Home pushes one entry, hopping between other tabs replaces it, so Back always walks back to Home first.
+- Layout and behaviour patterns only: no logo, artwork, photos or copy from any other store.
+
+---
+
 # HANDOFF - Agro page boxes (branch `wip-agro-page-boxes`, 2026-10-30)
 Follow-up to the agro descriptions below. Two defects seen on live pages after the descriptions went live. Fix is in `seo-product-extras.mjs` only (it runs inside `seo-overrides.mjs`).
 
