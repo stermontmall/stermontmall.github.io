@@ -7,9 +7,11 @@ Continues the "Left" list of the mobile-shell section below. The item "wire `fet
 - [x] `shell.test.py` (commit 2): "deals badge starts at 5" now expects 19 (the discounted products in the fixture, listed in a comment next to `DEALS_EXPECTED`), plus one new check that the badge stays cleared after a reload: 51 checks.
 - [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request, WITHOUT a test run (breaks the "merge only when tested" rule; the owner chose it). Only `mobile-shell/app.js`, `mobile-shell/shell.test.py` and this file changed; the page is `noindex`, so no live shop page or generator is affected.
 
+- [x] TEST RUN 2026-10-30 (branch `wip-mobile-shell-test-run`, fresh clone of `main`): `python3 mobile-shell/shell.test.py` = 51/51 passed, 0 failures, no console/page errors. So the untested deals-badge merge above is now verified (fixture data only; the real-data browser check is still open below). No code changed. Re-verified in `app.js` that `fetchProducts()` -> `loadCatalog()` reads the Supabase `products` and `categories` tables plus `product-names.json` (nothing redone).
+
 ## Left
-- [ ] NOT RUN: `python3 mobile-shell/shell.test.py` has not been run since this change. The sandbox I worked in has Playwright and Chromium but no network and no git, so I could not copy the repo into it. Run it (expect 51 checks, 0 failures). If it fails, revert the merge or fix forward.
-- [ ] If the test fails on the badge checks, look first at `syncDealsBadge()` in `app.js` (called from the `loadCatalog().then(...)` line at the end) and at `showTab('deals')`, which saves `dealsSeen`.
+- [x] `python3 mobile-shell/shell.test.py`: run, 51/51 (see Done). The revert/fix-forward fallback is no longer needed.
+- [ ] If the badge ever misbehaves, look first at `syncDealsBadge()` in `app.js` (called from the `loadCatalog().then(...)` line at the end) and at `showTab('deals')`, which saves `dealsSeen`.
 - [ ] Everything still open in the mobile-shell "Left" list below stays open: real-browser check on `/mobile-shell/` with the live data (expect 182 products and a "99+" Deals badge on a first visit), how the shell replaces or merges with the home page, photo sizes, real phones, unwired fields, and the checkout button (needs M-Pesa / WhatsApp decisions from the owner).
 
 ---
