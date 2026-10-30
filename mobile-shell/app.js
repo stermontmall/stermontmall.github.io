@@ -1,6 +1,6 @@
 /* Stermont Arcade mobile shell prototype.
    Vanilla JS, no framework. Data is live: products + categories come from Supabase (section 1).
-   Sections: 1 data (Supabase)  2 store + badges  3 history-backed overlays  4 tabs  5 header scroll
+   Sections: 1 data (Supabase) + search  2 store + badges  3 history-backed overlays  4 tabs  5 header scroll
              6 grid + skeletons  7 categories  8 filters  9 quick buy  10 cart  11 wiring */
 (() => {
 'use strict';
@@ -43,6 +43,7 @@ function buildCatalog(rows, cats, names) {
     const low = sizes[0], img = (live.map(r => (r.images || [])[0]).find(Boolean)) || '';
     out.push({
       id: key, cat: top.slug, catName: top.name, sub: c.parent_id ? c.name : '', name: (names && names[rep.id]) || rep.name,
+      keys: live.map(r => (r.name || '') + ' ' + String(r.slug || '').replace(/-/g, ' ')).join(' '),   // extra words the search can match: every size's database name + page slug
       img, emoji: ICONS[top.slug] || '🛍️', bg: BGS[hashStr(key) % BGS.length],
       price: low.price, old: low.old, sizes, featured: !!rep.featured, rating: 0, reviews: 0   // no ratings exist in the database
     });
@@ -69,17 +70,74 @@ const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
 /* thumbnail markup: the product photo, or the category emoji when there is none (or it fails to load, see the error listener in section 11) */
 const thumb = p => p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" decoding="async" data-emoji="${esc(p.emoji)}" style="width:100%;height:100%;object-fit:contain;background:#fff">` : p.emoji;
 
-/* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
+/* ---------- 1b. Search ----------
+   Runs in memory on the folded products. What it understands:
+   - case, punctuation and accents do not matter ("bed-bug", "Bed Bug", "BED BUG"); "5%" and "1.8l" keep their % and .
+   - filler words are ignored ("buy", "price", "kenya", "online" ...) because every shown name starts with "Buy"
+   - plurals ("killers" finds "killer"), words glued together ("bedbug" finds "bed bug"), and the match looks at the shown name, every size's
+     database name, the page slug, the category, the sub-category and the pack sizes (so "1 litre" and "250ml" work)
+   - every word must match (AND); results are ranked by relevance (word starts in the name first) unless the customer chose another sort
+   - when nothing matches, a typo-tolerant pass runs ("glyphosat", "fungisid", "samsug") and the grid says "Close matches" */
+const FILLER = new Set(['buy', 'in', 'kenya', 'price', 'prices', 'online', 'the', 'for', 'and', 'of', 'a', 'best', 'cheap', 'original']);
+const normQ = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/&/g, ' and ')
+  .replace(/[^a-z0-9%.]+/g, ' ').split(' ').map(t => t.replace(/^\.+|\.+$/g, '')).filter(Boolean).join(' ');
+const queryWords = q => { const all = normQ(q).split(' ').filter(Boolean), keep = all.filter(w => !FILLER.has(w)); return keep.length ? keep : all; };
+const variants = w => { const v = [w]; if (w.length > 3 && w.endsWith('s')) v.push(w.slice(0, -1)); if (w.length > 4 && w.endsWith('es')) v.push(w.slice(0, -2)); return v; };
+function hayOf(p) {
+  if (!p._hay) {
+    const name = normQ(p.name);
+    const all = normQ([p.name, p.keys, p.catName, p.sub, p.sizes.map(s => s.label).join(' ')].join(' '));
+    p._hay = { name, nameTokens: name.split(' '), all, compact: all.replace(/ /g, ''), tokens: [...new Set(all.split(' '))] };
+  }
+  return p._hay;
+}
+const hit = (w, h) => variants(w).some(v => h.all.includes(v) || (v.length >= 4 && h.compact.includes(v)));
+function lev(a, b, max) {                                       // edit distance, gives up (returns max + 1) once it is clearly above max
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i]; let best = i;
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (cur[j] < best) best = cur[j];
+    }
+    if (best > max) return max + 1;
+    prev = cur;
+  }
+  return prev[b.length];
+}
+const fuzzyHit = (w, h) => {
+  if (hit(w, h)) return true;
+  const t = w.length < 4 ? 0 : w.length < 7 ? 1 : 2; if (!t) return false;   // short words must match exactly; longer ones may have 1 or 2 slips
+  return h.tokens.some(tok => lev(w, tok, t) <= t || (tok.length > w.length && lev(w, tok.slice(0, w.length), t) <= t));
+};
+function scoreOf(p, words) {
+  const h = hayOf(p); let s = 0;
+  for (const w of words) {
+    const vs = variants(w);
+    if (vs.some(v => h.nameTokens.some(t => t.startsWith(v)))) s += 4;       // a word of the shown name starts with it
+    else if (vs.some(v => h.name.includes(v))) s += 3;
+    else if (vs.some(v => h.all.includes(v))) s += 1;
+    else s += 0.5;
+  }
+  if (words.length > 1 && h.name.includes(words.join(' '))) s += 5;           // the whole phrase appears in the name
+  if (h.name.startsWith(words[0]) || h.name.startsWith('buy ' + words[0])) s += 2;
+  return s;
+}
+
+/* Resolves {items, hasMore, total, fuzzy}; rejects when Supabase cannot be reached (the grid shows a retry link). */
 async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 12 }) {
   await loadCatalog();
-  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-  const r = PRODUCTS.filter(p => (cat === 'all' || p.cat === cat) && (!sub || p.sub === sub) && (!min || p.price >= min) && (!max || p.price <= max) && (!disc || discOf(p) > 0) &&
-    (!words.length || words.every(w => (p.name + ' ' + p.catName + ' ' + p.sub).toLowerCase().includes(w))));
+  const words = queryWords(q);
+  const base = PRODUCTS.filter(p => (cat === 'all' || p.cat === cat) && (!sub || p.sub === sub) && (!min || p.price >= min) && (!max || p.price <= max) && (!disc || discOf(p) > 0));
+  let r = words.length ? base.filter(p => { const h = hayOf(p); return words.every(w => hit(w, h)); }) : base.slice(), fuzzy = false;
+  if (words.length && !r.length) { r = base.filter(p => { const h = hayOf(p); return words.every(w => fuzzyHit(w, h)); }); fuzzy = r.length > 0; }
   if (sort === 'low') r.sort((a, b) => a.price - b.price);
   else if (sort === 'high') r.sort((a, b) => b.price - a.price);
   else if (sort === 'disc') r.sort((a, b) => discOf(b) - discOf(a));
+  else if (words.length) { const sc = new Map(r.map(p => [p, scoreOf(p, words)])); r.sort((a, b) => sc.get(b) - sc.get(a) || b.featured - a.featured); }   // searching: best match first
   else r.sort((a, b) => b.featured - a.featured);               // recommended: featured first, then the catalog order (sort is stable)
-  return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size };
+  return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size, total: r.length, fuzzy };
 }
 
 /* ---------- 2. Store + live badges ---------- */
@@ -224,6 +282,7 @@ const skeletons = n => SKELETON.repeat(n);
 
 const grid = $('#grid'), sentinel = $('#sentinel'), EMPTY_TEXT = $('#grid-empty').textContent;
 function showGridError() { const el = $('#grid-empty'); el.innerHTML = 'Could not load products. <button class="underline text-brand" data-retry>Try again</button><br><a class="underline text-brand" href="/classic.html">Open the full shop</a>'; el.hidden = false; }
+const noResultsHTML = q => `No results for "${esc(q)}".<br><span class="text-xs">Check the spelling or try a shorter word.</span><br><a class="underline text-brand" target="_blank" rel="noopener" href="https://wa.me/254748888230?text=${encodeURIComponent('Hello Stermont Arcade, do you have: ' + q)}">Ask us on WhatsApp</a> &middot; <button class="underline text-brand" data-clear-search>Clear search</button>`;
 const feed = { page: 1, hasMore: true, loading: false, token: 0, items: new Map() };
 
 function query() {
@@ -249,7 +308,11 @@ async function loadPage(reset) {
   items.forEach(p => feed.items.set(p.id, p));
   grid.insertAdjacentHTML('beforeend', items.map(cardHTML).join(''));
   feed.page++; feed.hasMore = hasMore; feed.loading = false;
-  const em = $('#grid-empty'); em.textContent = EMPTY_TEXT; em.hidden = grid.children.length > 0;
+  const q = store.get().q;
+  if (q) $('#grid-title').textContent = `${res.fuzzy ? 'Close matches for' : 'Results for'} "${q}" (${res.total})`;
+  const em = $('#grid-empty');
+  if (grid.children.length) em.hidden = true;
+  else { if (q) em.innerHTML = noResultsHTML(q); else em.textContent = EMPTY_TEXT; em.hidden = false; }
   if (feed.hasMore && store.get().tab === 'home' && sentinel.getBoundingClientRect().top < innerHeight + 400) loadPage(false);
 }
 new IntersectionObserver(es => { if (es[0].isIntersecting && store.get().tab === 'home') loadPage(false); }, { rootMargin: '400px' }).observe(sentinel);
@@ -276,6 +339,7 @@ function renderChips() {
   $('#chips [aria-selected="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
 }
 function selectCategory(chip, sub = '') {
+  clearTimeout(searchTimer);
   store.set({ chip, sub, q: '' }); $('#search').value = '';
   if (store.get().tab !== 'home') goTab('home'); // goTab keeps history consistent
   refreshGrid();
@@ -457,6 +521,7 @@ function toast(msg) {
 document.addEventListener('click', e => {
   const t = e.target;
   let el;
+  if (t.closest('[data-clear-search]')) { $('#search').value = ''; return runSearch('', { force: true, go: false }); }
   if ((el = t.closest('[data-tab]'))) return goTab(el.dataset.tab);
   if ((el = t.closest('[data-open]'))) { opener = el; if (el.dataset.open === 'sheet-filters') { draftSort = store.get().filters.sort; syncFilterUI(); } return openOverlay(el.dataset.open); }
   if ((el = t.closest('[data-close]'))) return closeTop();
@@ -471,11 +536,29 @@ document.addEventListener('click', e => {
   if ((el = t.closest('.card[data-id]'))) return openQuickBuy(el.dataset.id);
 });
 document.addEventListener('error', e => { const i = e.target; if (i && i.tagName === 'IMG' && i.dataset.emoji) i.replaceWith(document.createTextNode(i.dataset.emoji)); }, true); // photo failed: show the category emoji
-$('#search-form').addEventListener('submit', e => {
-  e.preventDefault(); $('#search').blur();
-  store.set({ q: $('#search').value.trim(), chip: 'all', sub: '' });
-  if (store.get().tab !== 'home') goTab('home');
+
+/* Search box: results update while typing (after a short pause) and on Enter / the keyboard's search key. Every new search starts at the top of
+   the results (the list used to keep its old scroll position, which showed the page footer instead of the first result), and a search from another
+   tab switches to Home. Emptying the box (or the clear "x") brings back the normal list. */
+let searchTimer = 0;
+function runSearch(raw, { force = false, go = true } = {}) {
+  const q = String(raw || '').trim().replace(/\s+/g, ' '), s = store.get();
+  if (!force && q === s.q && s.chip === 'all' && !s.sub) return;          // nothing changed (e.g. typing a space)
+  store.set({ q, chip: 'all', sub: '' });
+  scrollPos.home = 0;                                                      // showTab('home') would otherwise restore the old scroll position
+  if (go && store.get().tab !== 'home') goTab('home'); else window.scrollTo(0, 0);
   refreshGrid();
+}
+$('#search').addEventListener('input', e => {
+  if (e.isComposing) return;
+  clearTimeout(searchTimer);
+  const v = $('#search').value.trim();
+  if (v.length === 1) return;                                              // one letter matches almost everything: wait for the second
+  searchTimer = setTimeout(() => runSearch(v, { go: v.length > 0 }), 280);
+});
+$('#search-form').addEventListener('submit', e => {
+  e.preventDefault(); clearTimeout(searchTimer); $('#search').blur();
+  runSearch($('#search').value, { force: true });
 });
 
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
