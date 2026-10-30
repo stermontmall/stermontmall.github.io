@@ -15,6 +15,7 @@ on:
       - 'seo-overrides.mjs'
       - 'seo-overrides.json'
       - 'seo-titles.mjs'
+      - 'seo-shell-redirect.mjs'
       - 'seo-kenya.mjs'
       - '.github/workflows/product-pages.yml'
 
@@ -50,6 +51,10 @@ jobs:
       - name: Apply the owner's exact Google titles (products.seo_title, from the Master Catalog SEO Mapping PDF)
         continue-on-error: true
         run: node seo-titles.mjs
+
+      - name: Phones on a product page go to the mobile shell, crawlers keep the page (seo-shell-redirect.mjs)
+        continue-on-error: true
+        run: node seo-shell-redirect.mjs
 
       - name: Speed - connect to the shop database early (preconnect)
         run: |
