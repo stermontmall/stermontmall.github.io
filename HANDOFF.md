@@ -1,3 +1,18 @@
+# HANDOFF - Mobile shell: stock limits per size (branch `wip-mobile-shell-stock-limits`, 2026-10-30)
+Owner asked to start with "wire `fetchProducts()` to the Supabase products table". NOT redone: it is Step 4 below and was already on `main` (checked 2026-10-30: `mobile-shell/app.js` on `main` reads `products`, `categories` and `../product-names.json`). Row security checked with read-only SQL: `products` (active rows only) and `categories` have public SELECT policies for the anon key; 225 active rows -> 182 in-stock products, 180 discounted. Next item taken from the "Not wired" line of the mobile-shell "Left" list: stock limits per size.
+
+## Done
+- [x] `app.js` (commit 1): each size now carries its `stock` (already fetched, not used before). Quick buy plus button stops at the selected size's stock (max 99) and says "Only N in stock"; choosing another size lowers the quantity if that size has less. `addToCart()` never lets a cart line go above its size's stock and returns the toast text ("Added to cart", "Added N: that is all we have in stock", "All N in stock are already in your cart"). Cart lines store `stock`; the cart plus button stops at it with the same toast. Cart lines saved before this change have no `stock` and keep the old cap of 99. Helper: `maxQty(stock)`.
+
+## Left
+- [ ] NOT RUN, NOT MERGED: `python3 mobile-shell/shell.test.py` has not been run on this branch (this session had no checkout, no git and no network). Expect 51 checks; the quantity and Buy now checks may need the fixture stock values looked at. Run it, then merge to `main` only if it passes.
+- [ ] No test covers the new limits yet. Add to `shell.test.py`: a size with stock 2 (quick buy plus stops at 2 with the toast; adding twice leaves 2 in the cart; cart plus stops at 2) and a smaller size lowering the quantity.
+- [ ] Still not wired from the "Not wired" line: `unit` and `description` (not fetched on purpose; the list view does not need them).
+- [ ] Stock is read once when the page loads; the cap uses that number. A purchase by someone else after the page loaded is not seen until reload. Real stock is checked again only when checkout exists (not built).
+- [ ] Everything open in the mobile-shell "Left" list below stays open (real-browser check of `/mobile-shell/`, home page decision, photo sizes, real phones, checkout needs M-Pesa / WhatsApp decisions).
+
+---
+
 # HANDOFF - Mobile shell: live Deals badge (branch `wip-mobile-shell-deals-badge`, 2026-10-30)
 Continues the "Left" list of the mobile-shell section below. The item "wire `fetchProducts()` to the Supabase products table" was NOT redone: it is Step 4 below and `mobile-shell/app.js` on `main` already reads `products`, `categories` and `../product-names.json`.
 
@@ -18,7 +33,7 @@ Continues the "Left" list of the mobile-shell section below. The item "wire `fet
 Owner request: "Can I include the word Buy before each product name? If so apply on all products." Yes: "Buy" is a normal commercial-intent word, and nothing in the repo blocks it.
 
 ## Done
-- [x] `seo-meta.mjs`: `buyName(name)` (idempotent: a name already starting with "Buy" is left alone; "Buyer ..." still gets one). `pdpH1` uses it, so every generated product page H1 is "Buy <lead word> <name>".
+- [x] `seo-meta.mjs`: `buyName(name)` (idempotent: a name already starting with "Buy" is left alone; "Buyer ..." still gets one). `pdpH1` uses it, so every generated product page H1 is "Buy <lead word> <n>".
 - [x] `seo-titles.mjs`: the owner's names (products.seo_name / seo_title head) get the same prefix on the visible H1 and in `product-names.json`. The last breadcrumb, JSON-LD names and `<title>` / og / twitter titles keep the plain name.
 - [x] `product-names.json` now carries "Buy ..." for every product id, so the shop list, the shop product view (it copies the page H1) and `mobile-shell/` all show it.
 - [x] Orders stay plain: `checkout-deferred.js` `info()` strips a leading "Buy " (cart, checkout, order rows, e-mails, WhatsApp all use it) and `storefront-live.js` strips it in the product enquiry text. `index.html` loads `storefront-live.js?v=8` and `checkout-deferred.js?v=2`.
@@ -56,7 +71,7 @@ Owner brief: mobile shell with the layout and interaction patterns of a large Ke
 - [ ] Check the shell on the real data in a browser: the sandbox cannot reach Supabase (proxy 403), so only the fixture run above and the SQL data check exist. Open `/mobile-shell/` after merge, confirm 182 products, the chips order (sort_order), names, photos, a multi-size product's prices.
 - [ ] Photos are the full-size files from Storage (no resize endpoint used); if the grid feels heavy on mobile data, serve smaller copies.
 - [x] Deals badge ("5") on the bottom nav was a mock number; it is now the count of new discounted products. Done 2026-10-30 on `wip-mobile-shell-deals-badge` and merged to `main` untested (see the top section).
-- [ ] Not wired: stock limits per size, `unit`, `description` (not fetched on purpose; list view does not need it).
+- [ ] Not wired: stock limits per size, `unit`, `description` (not fetched on purpose; list view does not need it). Stock limits: see the top section (`wip-mobile-shell-stock-limits`, not merged, not tested).
 - [ ] Checkout button is a toast. The real flow (M-Pesa, WhatsApp order) is not built.
 
 ## Decisions
@@ -273,4 +288,4 @@ Tested in headless Chromium against the repo served locally, Supabase products m
 - Decision: to choose a product's ranking name, put the prefix on ANY one size (if several have one, the earliest of them wins).
 
 ## Fix: product-names.json was built but never committed (branch `wip-names-file-commit`, 2026-10-29 ~22:05 EAT)
-- Check after PR #65's rebuild: product pages had the prefixed H1s (Alonze "#1 Top", Actellic "#1 Original", Agita "#1 Best", Amito "Reliable"), but `product-names.json` was missing from the repo: `product-pages.yml` only `git add`s a fixed file list. Added `product-names.json` to it. Until the next run the shop list shows database names; after it, list and view use the page headings.
+- Check after PR #65's rebuild: product pages had the prefixed H1s (Alonze "#1 Top", Actellic "#1 Original", Agita "#1 Best", Amito "Reliable"), but `product-names.json` was missing from the repo: `product-pages.yml` only `git add`s a fixed file list. Added `product-names.json` to it. Until the next run the shop shows database names; after it, list and view use the page headings.
