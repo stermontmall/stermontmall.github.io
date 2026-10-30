@@ -364,14 +364,14 @@ $('#cart-list').addEventListener('click', e => {
   const cart = store.get().cart.map(i => i.key === b.dataset.qty ? { ...i, qty: i.qty + +b.dataset.d } : i).filter(i => i.qty > 0);
   store.set({ cart });
 });
-/* Checkout: the shop's own checkout (M-Pesa, delivery fees, order e-mails) lives on /classic.html. The cart lines are handed over
-   under `stm_handoff`; that page adds them through its STM.add once its product cards exist, then opens its cart. */
+/* Checkout: the shop's own checkout (M-Pesa, delivery fees, order e-mails) runs on its own page, /checkout.html: just that panel, no home page behind it.
+   The full cart lines are handed over under `stm_handoff`. The shell cart is NOT emptied here: checkout.html writes it back (edited quantities, items
+   that were bought removed) when the customer leaves, and then sends them to / again. */
 $('#checkout').addEventListener('click', () => {
   const cart = store.get().cart; if (!cart.length) return;
-  try { localStorage.setItem('stm_handoff', JSON.stringify(cart.map(i => ({ rowId: i.rowId, qty: i.qty, price: i.price, name: i.name, size: i.size })))); }
+  try { localStorage.setItem('stm_handoff', JSON.stringify(cart.map(i => ({ ...i })))); }
   catch { toast('Could not start checkout. Please allow site storage and try again.'); return; }
-  store.set({ cart: [] });
-  location.href = '/classic.html?checkout=1';
+  location.href = '/checkout.html';
 });
 
 /* ---------- 11. Wiring ---------- */
@@ -403,6 +403,7 @@ $('#search-form').addEventListener('submit', e => {
   if (store.get().tab !== 'home') goTab('home');
   refreshGrid();
 });
+window.addEventListener('pageshow', e => { if (e.persisted) location.reload(); });   // restored from the back/forward cache: re-read the cart that checkout.html may have changed
 
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
 loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); }).catch(() => {});   // categories and the Deals badge appear once the data is in
