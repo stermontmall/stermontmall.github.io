@@ -9,7 +9,8 @@ Owner report: on the mobile shell, Checkout "takes me to my old home screen view
 - [x] `shell.test.py` = 69/69 (was 65): old home hidden in checkout mode, closing returns to `/`, cancelled checkout keeps the shell cart, finished order clears it. The old "shell cart emptied by the handoff" check was replaced by these.
 
 ## Left
-- [ ] Merge to `main` only after the phone check: add 2 items in the shell, tap Checkout, you should see only the checkout sheet (no home page), close it and land back on the shell with the items still in the cart; then one real small order and confirm the shell cart is empty afterwards.
+- [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request ("Merge"), after `shell.test.py` 69/69 but BEFORE the phone check below (fixture data only). If it misbehaves, revert the merge commit.
+- [ ] Phone check, still open: add 2 items in the shell, tap Checkout, you should see only the checkout sheet (no home page), close it and land back on the shell with the items still in the cart; then one real small order and confirm the shell cart is empty afterwards.
 - [ ] Not tested against the live site/database (sandbox). Everything else from the sections below stays open.
 
 ---
