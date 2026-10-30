@@ -3,6 +3,7 @@
 // 1) "Price of <product> by size" table when a product has several pack sizes (replaces the plain "Available sizes" list).
 // 2) "Buy <product> in Nairobi, Kiambu, Nakuru, Kisumu, Eldoret & Mombasa" box with the phone / WhatsApp number and a 3-step "how to order".
 // 3) For PCPB-regulated categories only: a link out to the Pest Control Products Board website to check registration.
+// 4) A visible "Frequently asked questions" box (price, delivery, M-Pesa, how to buy) so the FAQ schema on the page matches what visitors can read.
 // It never invents dosages, ingredients or coverage: those come from each product's own description (Supabase) and the structured sections of seo-product-extras.mjs.
 // Safe by design: every page is wrapped in try/catch, a page that already has the marker is skipped. To switch it off, delete the import line in seo-overrides.mjs.
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
@@ -43,7 +44,17 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     const bc = (h.match(/<nav class="bc">[\s\S]*?<\/nav>/) || [''])[0];
     const slugs = [...bc.matchAll(/href="\/c\/([^"]+)\.html"/g)].map(x => decodeURIComponent(x[1]));
     const pcpb = slugs.some(s => PCPB.has(s)) ? `<div class="box"><h2 style="margin-top:0">Check that the product is registered</h2><p>In Kenya only pest control products registered by the Pest Control Products Board (PCPB) may be sold and used. Compare the registration number on the pack with the lists on the <a href="https://pcpb.go.ke" target="_blank" rel="noopener">PCPB website</a> before you use any chemical.</p></div>` : '';
-    const add = local + '\n' + pcpb + '\n';
+    // 4) visible FAQ (store facts only)
+    const pm = h.match(/product:price:amount" content="(\d+)"/);
+    const priceTxt = pm ? `${h.includes('by size</h2>') ? 'from ' : ''}KSh ${Number(pm[1]).toLocaleString('en-KE')}` : '';
+    const faq = [
+      [`How can I buy ${name} in Kenya?`, `Order ${name} online at Stermont Arcade, pay by M-Pesa and get delivery to all 47 counties in Kenya. You can also order on WhatsApp.`],
+      [`Do you deliver ${name} outside Nairobi?`, `Yes. We deliver to Nairobi, Kiambu, Nakuru, Kisumu, Eldoret, Mombasa and all 47 counties, usually within 1 to 3 days. We confirm the delivery fee before you pay.`],
+      ...(priceTxt ? [[`What is the price of ${name}?`, `${name} costs ${priceTxt} at Stermont Arcade. Check the product price above for the size you want.`]] : []),
+      [`Can I pick up ${name} in Nairobi?`, `Yes. Collect at The Sarit Centre, Karuna Road, Westlands, open daily 8 AM to 8 PM. Confirm stock on WhatsApp first.`]
+    ];
+    const faqBox = `<div class="box"><h2 style="margin-top:0">Frequently asked questions</h2>${faq.map(([q, a]) => `<p><b>${esc(q)}</b><br>${esc(a)}</p>`).join('')}</div>`;
+    const add = local + '\n' + pcpb + '\n' + faqBox + '\n';
     const dRe = /(<div class="box"><h2 style="margin-top:0">Delivery to Nairobi &amp; All 47 Counties<\/h2>[\s\S]*?<\/div>)/;
     h = dRe.test(h) ? h.replace(dRe, m => m + '\n' + add) : h.replace('<div class="stk"', () => add + '<div class="stk"');
 
@@ -53,4 +64,4 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     }
   } catch (e) { console.log('skip rich content', f, e.message); }
 }
-console.log(`Rich content (size table, local delivery, PCPB link) added to ${done} product page(s).`);
+console.log(`Rich content (size table, local delivery, PCPB link, FAQ) added to ${done} product page(s).`);
