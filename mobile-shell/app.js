@@ -420,7 +420,12 @@ function openQuickBuy(id) {
 }
 function openDeepLink(slug) {   // the full product page for a /?product=<slug> address (any pack size's slug works)
   const p = PRODUCTS.find(x => x.slug === slug || x.sizes.some(z => z.slug === slug));
-  if (!p) { toast('That product is no longer available'); return; }
+  if (!p) {   // sold out, hidden or renamed: never a dead end. The generated /p/<slug>.html page is the fallback when it exists
+    fetch('/p/' + encodeURIComponent(slug) + '.html', { method: 'HEAD', cache: 'no-cache' })
+      .then(r => { if (r.ok) location.replace('/p/' + encodeURIComponent(slug) + '.html'); else toast('That product is no longer available'); })
+      .catch(() => toast('That product is no longer available'));
+    return;
+  }
   qb.p = p; qb.size = (p.sizes.find(z => z.slug === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
   renderQB(); openProductPage();
 }
@@ -479,7 +484,7 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-open]'))) { opener = el; if (el.dataset.open === 'sheet-filters') { draftSort = store.get().filters.sort; syncFilterUI(); } return openOverlay(el.dataset.open); }
   if ((el = t.closest('[data-close]'))) return closeTop();
   if ((el = t.closest('[data-add]'))) { const p = feed.items.get(el.dataset.add); if (p) { if (p.sizes.length > 1) openQuickBuy(p.id); else { addToCart(p, p.sizes[0].label, 1); toast('Added to cart'); } } return; }   // several pack sizes: pick the size first
-  if (t.closest('[data-retry]')) return refreshGrid();
+  if (t.closest('[data-retry]')) { refreshGrid(); if (DEEP && !qb.p) loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); openDeepLink(DEEP); }).catch(() => {}); return; }
   if (t.closest('[data-retry-deals]')) return renderDeals();
   if ((el = t.closest('#chips [data-chip]'))) return selectCategory(el.dataset.chip);
   if ((el = t.closest('[data-side]'))) { sideCat = el.dataset.side; return renderCategoriesView(); }
@@ -497,5 +502,5 @@ $('#search-form').addEventListener('submit', e => {
 });
 
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
-loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (DEEP) openDeepLink(DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
+loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (DEEP) openDeepLink(DEEP); }).catch(() => { if (DEEP) toast('Could not load that product. Check your connection and try again.'); });   // categories and the Deals badge appear once the data is in
 })();
