@@ -32,7 +32,7 @@ ${ld({ '@type': 'Product', name: 'Old & name', offers: { price: '1' } })}${ld({ 
 const out = applyPage(page('a', 'Old &amp; name', true), 'T & "x" | Stermont Arcade', "Top-Rated Abc's");
 assert.match(out, /<title>T &amp; &quot;x&quot; \| Stermont Arcade<\/title>/); n++;
 assert.match(out, /og:title" content="T &amp; &quot;x&quot; \| Stermont Arcade">/); n++;
-assert.match(out, /<h1>Top-Rated Abc&#39;s<\/h1>/); n++;
+assert.match(out, /<h1>Buy Top-Rated Abc&#39;s<\/h1>/); n++;                // visible H1 = "Buy " + name
 assert.match(out, /Fungicides<\/a> \u203a Top-Rated Abc&#39;s<\/nav>/); n++;
 assert.match(out, /"@type":"Product","name":"Top-Rated Abc's"/); n++;
 assert.match(out, /"name":"Top-Rated Abc's"\}\]\}/); n++;           // last breadcrumb item
@@ -57,11 +57,11 @@ const log = execFileSync('node', ['seo-titles.mjs'], { env: { ...process.env, P_
 const abs = readFileSync(join(dir, 'p', 'abs.html'), 'utf8'), eu = readFileSync(join(dir, 'p', 'euro.html'), 'utf8'), no = readFileSync(join(dir, 'p', 'none.html'), 'utf8');
 console.log(log.trim());
 assert.match(abs, /<title>Top-Rated Absolute 375SC Systemic Fungicide \u2013 Best Price in Kenya \| Stermont Arcade<\/title>/); n++;
-assert.match(abs, /<h1>Top-Rated Absolute 375SC Systemic Fungicide<\/h1>/); n++;
+assert.match(abs, /<h1>Buy Top-Rated Absolute 375SC Systemic Fungicide<\/h1>/); n++;
 assert.match(eu, /<title>Original Euroken 50x55 Standing Cooker \(3G\+1E\) \u2013 Best Price in Kenya \| Stermont Arcade<\/title>/); n++;
-assert.match(eu, /<h1>Original Euroken 50x55 Standing Cooker \(3G\+1E\)<\/h1>/); n++;
+assert.match(eu, /<h1>Buy Original Euroken 50x55 Standing Cooker \(3G\+1E\)<\/h1>/); n++;
 assert.match(no, /<title>Old title<\/title>/); n++; assert.match(no, /<h1>Untouched<\/h1>/); n++;
 const names = JSON.parse(readFileSync(join(dir, 'names.json'), 'utf8'));
-ok(names.keep, 'K'); ok(names['abs-1l'], row.seo_name); ok(names['abs-250'], row.seo_name); ok(names['abs-50'], row.seo_name); ok(names.euro, e.seo_name); ok(names.none, undefined);
+ok(names.keep, 'K'); ok(names['abs-1l'], 'Buy ' + row.seo_name); ok(names['abs-250'], 'Buy ' + row.seo_name); ok(names['abs-50'], 'Buy ' + row.seo_name); ok(names.euro, 'Buy ' + e.seo_name); ok(names.none, undefined);
 assert.match(log, /2 page\(s\) updated/); n++; assert.doesNotMatch(log, /whose H1 is not/); n++;
 console.log(`OK: ${n} checks, 0 violations`);

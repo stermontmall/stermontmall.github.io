@@ -65,13 +65,19 @@ export const hasLeadWord = n => /^(?:#\d+\s+)?(?:original|genuine|powerful|premi
 const hasTrustWord = n => /^(original|genuine)\b/i.test(n);
 export const trustName = (name, ctx) => (isGenuine(ctx) && !hasTrustWord(name) ? `Original ${name}` : name);
 
+// "Buy" in front of the VISIBLE product name (page H1, shop list, shop product view). Owner request 2026-10-30: "Buy" before every product name.
+// Idempotent (a name that already starts with "Buy" is left alone). Deliberately NOT applied to <title>/meta (the 60-character title limit and the owner's exact
+// Google titles win), JSON-LD names, breadcrumbs or the Merchant Center feed (Google Shopping rejects promotional words in feed titles).
+// Cart, order, e-mail and WhatsApp lines strip it again (checkout-deferred.js info(), storefront-live.js enquiry text), so orders keep the plain product name.
+export const buyName = n => { const s = String(n || '').replace(/\s+/g, ' ').trim(); return !s || /^buy\b/i.test(s) ? s : `Buy ${s}`; };
+
 // Visible H1 on the product page: the same lead word the title uses ("Original" when true, otherwise a type-appropriate power word),
 // so what shoppers read on the page matches the search listing. Never repeats a word the name already starts with.
 export function pdpH1(name, ctx = {}) {
   const base = String(name || '').replace(/\s+/g, ' ').trim();
-  if (hasLeadWord(base)) return base;
+  if (hasLeadWord(base)) return buyName(base);
   const lead = isGenuine(ctx) ? 'Original' : powerWord(base, ctx);
-  return `${lead} ${base}`;
+  return buyName(`${lead} ${base}`);
 }
 
 // One visible line under the H1 on the product page. Only facts that are true for every product (no price or quality superlatives):
