@@ -1,3 +1,18 @@
+# HANDOFF - Product links never dead-end (branch `wip-product-links-fix`, 2026-10-30)
+Owner: "Fix issue for all product links" (example: `/?product=abasi-5-ec-50-ml`). `fetchProducts()` -> Supabase was NOT redone (already live, see below).
+## Checked
+- [x] Real data (read-only SQL): all 225 active rows have a slug, a category and stock, no duplicate slugs, so every active product address resolves in the shell. Existing suite was 94/94 before this change. I could not open the live site from the sandbox, so what the owner sees on the phone is not reproduced.
+## Done
+- [x] `app.js` `openDeepLink()`: a slug missing from the shell catalog (sold-out size, hidden or renamed product) opens `/p/<slug>.html` when that page exists, otherwise shows "That product is no longer available".
+- [x] `app.js`: a failed catalog load on a product address shows "Could not load that product..."; the grid's "Try again" now also opens the product once the catalog loads.
+- [x] `index.html` loads `app.js?v=5`. `shell.test.py`: 2 new "address:" checks (page fallback, failed load notice).
+## Left
+- [ ] NOT TESTED yet: run `python3 mobile-shell/shell.test.py` (expect 96 checks) before any merge to `main`.
+- [ ] Owner to say what exactly fails on the phone (home page with no product, error, old version?). Phones keep the old `app.js` until the site is opened twice.
+- [ ] Shared `/?product=` links still show the home page preview card in WhatsApp/Facebook (one static page); `/p/<slug>.html` links give the product preview. Owner to choose.
+
+---
+
 # HANDOFF - Product addresses in the shell (branch `wip-shell-product-urls`, 2026-10-30)
 Owner: "There are no product links on my website after clicking on an item... it's only the domain name stermontarcade.co.ke. Fix that." Cause: every `history.pushState` in `mobile-shell/app.js` had no URL, so opening a product never changed the address bar.
 `fetchProducts()` -> Supabase was NOT redone: it is Step 4 below (`app.js` already reads `products`, `categories`, `product-names.json`).
