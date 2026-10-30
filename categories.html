@@ -87,7 +87,8 @@ body.kp-nav #wa-float{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
    Reads the live category tree from Supabase: left = top-level categories (sort_order), right = the sub-categories of the
    selected one. The first item (is_promo = Kili Featured) shows "Top Categories": every category with a top_label, in top_sort order.
    Tile picture = categories.image_url, else a photo of one of your products in that category (or its children), else an emoji.
-   A category with no products stays visible and shows "Soon" instead of opening an empty page. */
+   A category with no products stays visible and shows "Soon" instead of opening an empty page.
+   A tile whose /c/<slug>.html page does not exist (parent categories such as Clothes) opens its first child that has products. */
 (function () {
   'use strict';
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', WA = '254748888230';
@@ -98,7 +99,7 @@ body.kp-nav #wa-float{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
   function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
   var ICON = { 'pest-control-fumigation': '\uD83E\uDEB3', agrovet: '\uD83C\uDF31', 'phones-accessories': '\uD83D\uDCF1', 'tv-audio-video': '\uD83D\uDCFA', appliances: '\uD83C\uDF73', 'home-kitchen': '\uD83C\uDFE0',
     fashion: '\uD83D\uDC57', shoes: '\uD83D\uDC5F', bags: '\uD83D\uDC5C', 'watches-jewellery': '\u231A', 'computers-accessories': '\uD83D\uDCBB', 'health-beauty': '\uD83D\uDC84', automotive: '\uD83D\uDE97', 'baby-products': '\uD83E\uDDF8', 'kili-featured': '\u2B50' };
-  var cats = [], byId = {}, kids = {}, own = {}, photo = {}, totMemo = {}, cur = 0;
+  var cats = [], byId = {}, kids = {}, own = {}, photo = {}, live = {}, totMemo = {}, cur = 0;
 
   function topOf(c) { while (c && c.parent_id && byId[c.parent_id]) c = byId[c.parent_id]; return c; }
   function emo(c) { var t = topOf(c); return (t && ICON[t.slug]) || '\uD83D\uDECD\uFE0F'; }
@@ -114,6 +115,8 @@ body.kp-nav #wa-float{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
     for (var i = 0; i < ks.length; i++) { var u = pic(ks[i]); if (u) return u; }
     return '';
   }
+  function firstLive(c) { var ks = kids[c.id] || []; for (var i = 0; i < ks.length; i++) if (tot(ks[i]) > 0) return ks[i]; return null; }
+  function page(c) { return '/c/' + encodeURIComponent(c.slug) + '.html'; }
   function soon(n) {
     var t = $('#toast'); t.textContent = n + ' is coming soon. ';
     var a = el('a', '', 'Ask on WhatsApp'); a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Hello Stermont Arcade, do you have ' + n + '?'); a.target = '_blank'; a.rel = 'noopener';
@@ -121,10 +124,14 @@ body.kp-nav #wa-float{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
   }
   function tile(c, label) {
     var n = tot(c), a = el('a', 't' + (n ? '' : ' e')), im = el('span', 'im'), u = pic(c);
-    a.href = n ? '/c/' + encodeURIComponent(c.slug) + '.html' : '#';
+    a.href = n ? page(c) : '#';
     if (u) { var i = new Image(); i.src = u; i.alt = ''; i.loading = 'lazy'; i.decoding = 'async'; i.onerror = function () { im.textContent = emo(c); }; im.appendChild(i); } else im.textContent = emo(c);
     a.appendChild(im); a.appendChild(el('span', 'l', label));
     if (!n) { a.appendChild(el('span', 'soon', 'Soon')); a.onclick = function (e) { e.preventDefault(); soon(label); }; }
+    else {
+      /* make sure the page exists; if not (e.g. a parent such as Clothes) open the first child that has products instead */
+      fetch(a.href, { method: 'HEAD' }).then(function (r) { if (!r.ok) { var k = firstLive(c); a.href = k ? page(k) : '/products.html'; } }).catch(function () {});
+    }
     return a;
   }
   function pane(c) {
@@ -137,7 +144,7 @@ body.kp-nav #wa-float{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
     } else {
       items = kids[c.id] || [];
       if (tot(c) > 0) {
-        var va = el('a', 'va', 'View all \u203A'); va.href = '/c/' + encodeURIComponent(c.slug) + '.html'; va.hidden = true; head.appendChild(va);
+        var va = el('a', 'va', 'View all \u203A'); va.href = page(c); va.hidden = true; head.appendChild(va);
         fetch(va.href, { method: 'HEAD' }).then(function (r) { if (r.ok && cur === c.id) va.hidden = false; }).catch(function () {});   /* only shown when that category page exists */
       }
     }
@@ -171,11 +178,12 @@ body.kp-nav #wa-float{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
       api('categories?select=id,name,slug,parent_id,sort_order,is_promo,top_label,top_sort,image_url&order=sort_order.asc,id.asc'),
       api('products?active=eq.true&select=category_id,stock,images')
     ]).then(function (r) {
-      cats = r[0]; byId = {}; kids = {}; own = {}; photo = {}; totMemo = {};
+      cats = r[0]; byId = {}; kids = {}; own = {}; photo = {}; live = {}; totMemo = {};
       cats.forEach(function (c) { byId[c.id] = c; (kids[c.parent_id || 0] = kids[c.parent_id || 0] || []).push(c); });
       r[1].forEach(function (p) {
         if (!p.category_id) return; own[p.category_id] = (own[p.category_id] || 0) + 1;
-        var im = (p.images || [])[0]; if (im && (!photo[p.category_id] || (p.stock > 0 && !photo['L' + p.category_id]))) { photo[p.category_id] = im; if (p.stock > 0) photo['L' + p.category_id] = 1; }
+        var im = (p.images || [])[0];
+        if (im && (!photo[p.category_id] || (p.stock > 0 && !live[p.category_id]))) { photo[p.category_id] = im; if (p.stock > 0) live[p.category_id] = 1; }
       });
       if (!(kids[0] || []).length) return fail();
       side();
