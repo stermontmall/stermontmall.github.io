@@ -9,7 +9,7 @@ Owner brief: mobile shell with the layout and interaction patterns of a large Ke
 - [x] Tested in headless Chromium at 390x780 with touch: `python3 mobile-shell/shell.test.py` = 37 checks, 0 failures, run 3 times (needs `pip install playwright && playwright install chromium`). Covers skeletons, 2-column grid, badges, Back closing quick buy / filters / drawer without leaving the page, Back from a tab returning to Home, Buy now flow, filter + sort results, header compaction, search, reload with a sheet open.
 
 ## Left
-- [ ] Not merged to `main`: it is a prototype, not wired into the live shop. Say if it should be merged as is (it only adds `mobile-shell/`; the page is `noindex`).
+- [x] Merged to `main` on 2026-10-30 at the owner's request ("fix direct"). It only adds `mobile-shell/` (page is `noindex`, reachable at /mobile-shell/) and this note; no live page or generator changed.
 - [ ] Wire real data: `fetchProducts()` -> Supabase `products` (names from `product-names.json`, pack sizes from the grouped rows, real photos instead of emoji). The mock price for a pack size is `price x (1 + 0.45 x index)`; real prices come from each pack-size row.
 - [ ] Decide how this replaces or merges with the existing home page (`storefront-live.js` already has a product view that pushes `/p/<slug>.html`; the new sheets use their own history entries).
 - [ ] Not tested: real phones (iOS Safari bottom-bar behaviour, Android gesture back), landscape, screen readers beyond the basic roles. The live site was not compared side by side with the marketplace site it is modelled on (I did not open it).
