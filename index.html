@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#7c3aed">
   <title>Stermont Arcade | Online Shopping Store in Kenya</title>
   <meta name="description" content="Buy bed bug killers, pest control and fumigation products, agrovet supplies, phones, TVs and appliances online in Kenya. Pay by M-Pesa. Delivery to all 47 counties.">
@@ -64,1020 +63,74 @@
   {"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://stermontarcade.co.ke/#website", "name": "Stermont Arcade", "alternateName": ["Stermont Arcade Kenya"], "url": "https://stermontarcade.co.ke/", "inLanguage": "en-KE"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I order from Stermont Arcade?", "acceptedAnswer": {"@type": "Answer", "text": "Add items to your cart on the website, enter your name and delivery details, pay by M-Pesa Paybill, then enter the M-Pesa code from your SMS to place your order. We confirm stock and the delivery fee on WhatsApp."}}, {"@type": "Question", "name": "Do you deliver countrywide in Kenya?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. We deliver to all 47 counties in Kenya, usually in 1-3 days. The delivery fee, if any, is confirmed before you pay."}}, {"@type": "Question", "name": "Where can I buy bed bug killer and pest control products in Kenya?", "acceptedAnswer": {"@type": "Answer", "text": "Stermont Arcade sells bed bug killers, insecticides and pest control and fumigation supplies online. Pay by M-Pesa and we deliver to all 47 counties. If an item is not in stock, message us on WhatsApp and we will source it."}}, {"@type": "Question", "name": "How do I pay?", "acceptedAnswer": {"@type": "Answer", "text": "Pay by M-Pesa using our Paybill details shown at checkout, then enter the M-Pesa code from your confirmation SMS to place your order. Your order is processed once we verify the payment."}}, {"@type": "Question", "name": "What can I buy at Stermont Arcade?", "acceptedAnswer": {"@type": "Answer", "text": "Phones and tablets, TVs and audio, appliances, health and beauty, home and office, fashion, shoes, bags, computing, gaming, supermarket, baby products, automotive, music gear and agrovet supplies."}}, {"@type": "Question", "name": "What if an item is faulty or not what I ordered?", "acceptedAnswer": {"@type": "Answer", "text": "Message us on WhatsApp within 48 hours of delivery with photos and we will arrange a replacement or refund."}}]}]}
   </script>
   <link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#7c3aed"><link rel="apple-touch-icon" href="/icon-192.png">
-  <style>
-    :root{--paper:#fff;--ink:#282828;--muted:#6b6b6b;--line:#e3e3e3;--panel:#f1f1f2;--card:#fff;--orange:#7c3aed;--red:#5b21b6;--navy:#2a0e5c;--gold:#c8f31d;--green:#8fd400;--tint:#f1e8ff}
-    @media (prefers-color-scheme:dark){:root{--paper:#121212;--ink:#f1f1f1;--muted:#a8a8a8;--line:#2c2c2c;--panel:#1d1d1d;--card:#1d1d1d;--tint:#2b1d4d}}
-    *{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth;scroll-padding-top:120px}
-    body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5;font-size:1rem;padding-bottom:76px}
-    a{color:var(--orange)}
-    :focus-visible{outline:3px solid var(--orange);outline-offset:2px}
-    .wrap{max-width:980px;margin:0 auto;padding:0 1rem}
-    .hidden{display:none!important}
-    header{position:sticky;top:0;z-index:20;background:var(--paper);padding:.6rem 0 .7rem;border-bottom:1px solid var(--line)}
-    .top{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.6rem}
-    .logo{display:inline-flex;align-items:center;gap:.6rem;font-weight:800;font-size:1.1rem;text-decoration:none;color:var(--ink)}
-    .logo img{display:block;height:34px;width:auto;max-width:60vw}
-    nav.desk{display:none}
-    nav.desk a{margin-left:1.1rem;text-decoration:none;color:var(--ink);font-weight:600}
-    nav.desk a:hover{color:var(--orange)}
-    .search{position:relative;display:flex;align-items:center;gap:.75rem;background:var(--panel);border-radius:999px;padding:0 .5rem 0 1.1rem}
-    .search svg{flex:none;width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:2.2;stroke-linecap:round}
-    .search input{flex:1;min-width:0;border:0;background:transparent;font:inherit;color:var(--ink);padding:.8rem 0}
-    .search input:focus-visible{outline:0}
-    .search:focus-within{outline:3px solid var(--orange)}
-    .search button{border:0;background:linear-gradient(135deg,#9d5cff,#7c3aed);color:#fff;font:inherit;font-weight:700;border-radius:999px;padding:.5rem 1.1rem;cursor:pointer}
-    .sugg{position:absolute;left:0;right:0;top:calc(100% + .4rem);z-index:60;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:1rem;box-shadow:0 12px 30px rgba(0,0,0,.18);max-height:320px;overflow-y:auto;padding:.3rem;display:none}
-    .sugg.on{display:block}
-    .sugg button{display:flex;width:100%;justify-content:space-between;gap:.75rem;align-items:center;text-align:left;border:0;background:transparent;color:inherit;font:inherit;padding:.65rem .8rem;border-radius:.7rem;cursor:pointer}
-    .sugg button:hover,.sugg button.act{background:var(--tint)}
-    .sugg small{color:var(--muted);flex:none;font-size:.8rem}
-    .sugg mark{background:transparent;color:var(--orange);font-weight:700}
-    .search-msg{margin:.6rem 0 0;color:var(--muted);font-size:.95rem}
-    .search-msg:empty{display:none}
-    .search-msg a{font-weight:700}
-    .btn{display:inline-block;padding:.75rem 1.4rem;border-radius:10px;font-weight:700;text-decoration:none;transition:transform .15s}
-    .btn:hover{transform:translateY(-2px)}
-    .btn-main{background:linear-gradient(135deg,#9d5cff,#7c3aed);color:#fff;box-shadow:0 3px 10px rgba(124,58,237,.35)}
-    .btn-alt{border:2px solid currentColor;color:var(--ink)}
-    .actions{margin-top:1rem;display:flex;flex-wrap:wrap;gap:.6rem}
-    .slides{display:flex;gap:.75rem;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-top:1rem;padding:0 1rem}
-    .slides::-webkit-scrollbar{display:none}
-    .slide{flex:0 0 88%;max-width:560px;scroll-snap-align:center;position:relative;overflow:hidden;border-radius:20px;color:#fff;min-height:210px;padding:1.25rem;display:flex;flex-direction:column;justify-content:center;text-decoration:none}
-    .slide .live{font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
-    .slide .live::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;margin-right:.5rem}
-    .slide h2{font-size:2rem;line-height:1.05;margin:.35rem 0;font-weight:900;max-width:9ch}
-    .slide p{max-width:20ch;font-size:.95rem;font-weight:500}
-    .slide .go{margin-top:.8rem;font-weight:700}
-    .slide img{position:absolute;right:0;top:0;bottom:0;width:44%;height:100%;object-fit:cover;border-radius:60px 0 0 60px}
-    .s1{background:linear-gradient(135deg,#a855f7,#5b21b6 60%,#3b0f8c)}.s2{background:linear-gradient(135deg,#3b0f8c,#1d0745);border:3px solid var(--gold);box-shadow:0 0 18px rgba(200,243,29,.35)}.s3{background:linear-gradient(135deg,#e6ff5c,#c8f31d 45%,#8fd400);color:#1b1230}.s3 .live::before{background:#1b1230}
-    .slide::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.28) 0,rgba(255,255,255,0) 35%);pointer-events:none}
-    .s2 .go{color:var(--gold)}
-    .dots{display:flex;justify-content:center;gap:.5rem;margin:.8rem 0 1rem}
-    .dots i{width:12px;height:12px;border-radius:999px;border:2px solid var(--ink);transition:width .2s}
-    .dots i.on{width:38px;background:var(--ink)}
-    .cats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem .4rem;background:var(--panel);border-radius:20px;padding:1rem .6rem}
-    .cat{border:0;background:none;font:inherit;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.4rem;font-weight:600;font-size:.85rem;line-height:1.2}
-    .ring{width:100%;max-width:84px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:2.1rem;background:var(--card);border:2px solid var(--orange)}
-    .cat:nth-child(3n+2) .ring{border-color:var(--green)}.cat:nth-child(3n) .ring{border-color:#a855f7}
-    .rec{background:linear-gradient(135deg,#9d5cff,#7c3aed 50%,#5b21b6);box-shadow:0 6px 20px rgba(124,58,237,.35);border-radius:20px;padding:1rem 0 1rem 1rem;margin-top:1.25rem;overflow:hidden}
-    .rec-head{display:flex;justify-content:space-between;align-items:center;padding-right:1rem}
-    .rec h2{color:#fff;font-size:1.5rem;font-weight:800}
-    .pill{background:var(--gold);color:#2a0e5c;border-radius:999px;padding:.35rem 1.4rem;font-weight:800;text-decoration:none;font-size:1.2rem}
-    .row{display:flex;gap:.75rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:1rem 1rem .25rem 0;scrollbar-width:none}
-    .row::-webkit-scrollbar{display:none}
-    .pcard{flex:0 0 72%;max-width:300px;scroll-snap-align:start;background:var(--card);color:var(--ink);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
-    .pcard>a.img{display:block;background:#fff}
-    .pcard img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover}
-    .pcard .b{padding:.8rem;display:flex;flex-direction:column;gap:.25rem;flex:1}
-    .pcard h3{font-size:.95rem;line-height:1.3}
-    .price{font-size:1.35rem;font-weight:800}
-    .note{color:var(--muted);font-size:.85rem}
-    .pcard .btn{margin-top:auto;text-align:center;padding:.6rem}
-    .pcard.cta{background:var(--tint);padding:1rem;justify-content:center;gap:.5rem;color:#282828}
-    .pcard.cta .btn{margin-top:.5rem}.pcard.cta{color:var(--ink)}
-    section{padding:2rem 0 .5rem}
-    section h2.t{font-size:1.4rem;font-weight:800;margin-bottom:.4rem}
-    .lead{color:var(--muted);margin-bottom:1.1rem}
-    .range{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
-    .range>div{background:var(--panel);border-radius:16px;padding:1rem}
-    .range h3{font-size:1.05rem;margin-bottom:.5rem;border-left:4px solid var(--green);padding-left:.6rem}
-    .range ul{list-style:none}
-    .range li{padding:.3rem 0;border-bottom:1px solid var(--line);color:var(--muted);font-size:.95rem}
-    .range li:last-child{border-bottom:0}
-    .how{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));counter-reset:n}
-    .how>div{background:var(--panel);border-radius:16px;padding:1rem;counter-increment:n}
-    .how>div::before{content:counter(n);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--gold);color:#2a0e5c;font-weight:800;margin-bottom:.5rem}
-    .how h3{font-size:1.05rem}.how p{color:var(--muted)}
-    .counties{list-style:none;display:flex;flex-wrap:wrap;gap:.45rem}
-    .counties li{background:var(--panel);border-radius:999px;padding:.25rem .8rem;font-size:.9rem;color:var(--muted)}
-    .contact{background:var(--navy);color:#eef3ee;margin-top:2rem;padding:2rem 0}
-    .contact a{color:var(--gold)}
-    .contact .btn-main{background:var(--gold);color:#2a0e5c;box-shadow:0 0 14px rgba(200,243,29,.4)}
-    .contact .btn-alt{color:#eef3ee}
-    .contact address{font-style:normal;margin:.75rem 0 1rem}
-    footer{padding:1.25rem 0;font-size:.9rem;color:var(--muted)}
-    .bar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-around;background:var(--paper);border-top:1px solid var(--line);padding:.45rem 0 calc(.45rem + env(safe-area-inset-bottom,0px))}
-    .bar a{display:flex;flex-direction:column;align-items:center;gap:.15rem;text-decoration:none;color:var(--ink);font-size:.78rem;font-weight:500;min-width:62px}
-    .bar svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-    .bar a.on{color:var(--orange)}.bar a.on svg{fill:rgba(124,58,237,.2)}
-    @media(min-width:760px){
-      body{padding-bottom:0}.bar{display:none}nav.desk{display:block}
-      .slides{padding:0;margin-left:auto;margin-right:auto;max-width:980px;padding:0 1rem}
-      .slide{flex-basis:48%}
-      .cats{grid-template-columns:repeat(8,1fr)}
-      .ring{font-size:1.8rem}
-      .pcard{flex-basis:260px}
-    }
-    .mcat.stm-empty{display:none}
-    .mgrid{display:grid;gap:.75rem;grid-template-columns:repeat(2,1fr);margin-bottom:1.25rem}
-    .mgrid .pcard{max-width:none;background:var(--panel)}
-    .mgrid .pcard .img{display:block;background:#fff}
-    .mgrid .pcard img{object-fit:contain}
-    .mgrid .price{font-size:1.1rem}
-    .mgrid .pcard h3{font-size:.9rem}
-    section h3.sub{font-size:1.05rem;margin:1rem 0 .6rem;border-left:4px solid var(--green);padding-left:.6rem}
-    @media(min-width:760px){.mgrid{grid-template-columns:repeat(4,1fr)}}
-    .js .range>div:not(.open) ul{display:none}
-    .js .mcat:not(.open) .mgrid{display:none}
-    .range h3,.mcat>h3{cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:.5rem;user-select:none}
-    .range h3::after,.mcat>h3::after{content:"+";font-weight:800;font-size:1.3rem;color:var(--orange)}
-    .range>div.open h3::after,.mcat.open>h3::after{content:"\2212"}
-    .range h3{margin-bottom:0}.range>div.open h3{margin-bottom:.5rem}
-    .cnt{margin-left:auto;margin-right:.4rem;font-size:.8rem;font-weight:700;background:var(--gold);color:#2a0e5c;border-radius:999px;padding:.05rem .55rem}
-    .range li{cursor:pointer}.range li:hover{color:var(--orange)}
-    .mgrid .pcard .img img{cursor:pointer}
-
-    #faq details{border-bottom:1px solid var(--line);padding:.9rem 0}#faq summary{cursor:pointer;font-weight:700}#faq details p{margin-top:.5rem;color:var(--muted)}
-    .ac{position:fixed;inset:0;z-index:62;display:none;background:rgba(10,5,25,.55)}
-    .ac.on{display:flex;align-items:flex-end;justify-content:center}
-    .ac-panel{background:var(--paper);color:var(--ink);width:100%;max-width:560px;height:94vh;height:min(94dvh,820px);border-radius:22px 22px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:up .25s ease}
-    @media(min-width:760px){.ac.on{justify-content:flex-end;align-items:stretch}.ac-panel{max-width:460px;height:100%;border-radius:22px 0 0 22px}}
-    .ac-h{display:flex;align-items:center;gap:.6rem;padding:1rem 1rem .5rem}
-    .ac-h h2{flex:1;font-size:1.25rem;font-weight:800}
-    .ac-b{flex:1;overflow:auto;padding-bottom:calc(1rem + env(safe-area-inset-bottom,0px))}
-    .ac-hi{padding:1rem}.ac-hi h3{font-size:1.35rem;font-weight:800}.ac-hi p{color:var(--orange);font-weight:600;word-break:break-all}
-    .ac-btns{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;padding:.9rem 1rem;background:var(--panel)}
-    .ac-btns a,.ac-login{display:flex;align-items:center;justify-content:center;gap:.4rem;text-decoration:none;font-weight:800;border-radius:8px;padding:.8rem .5rem;border:2px solid transparent}
-    .ac-call{background:var(--orange);color:#fff}.ac-wa{border-color:var(--green)!important;color:var(--ink);background:var(--paper)}
-    .ac-login{margin:.2rem 1rem 1rem;background:var(--orange);color:#fff}
-    .ac-sec{padding:.7rem 1rem;font-size:.85rem;font-weight:700;color:var(--muted);background:var(--panel);letter-spacing:.02em}
-    .ac-row{display:flex;align-items:center;gap:.9rem;width:100%;border:0;border-bottom:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-weight:500;text-align:left;padding:1.05rem 1rem;cursor:pointer;text-decoration:none}
-    .ac-row svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
-    .ac-row span.l{flex:1}.ac-row span.c{color:var(--muted);font-size:.85rem}.ac-row::after{content:"\203A";font-size:1.5rem;line-height:1;color:var(--muted)}
-    .ac-out{display:block;width:calc(100% - 2rem);margin:1.2rem 1rem 0;padding:.9rem;border:2px solid var(--orange);border-radius:8px;background:var(--paper);color:var(--orange);font:inherit;font-weight:800;cursor:pointer}
-    .ac-it{display:flex;align-items:center;gap:.8rem;padding:.7rem 1rem;border-bottom:1px solid var(--line);cursor:pointer}
-    .ac-it img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:8px;flex:none}
-    .ac-it b{display:block;font-size:.92rem;line-height:1.25}.ac-it small{color:var(--orange);font-weight:700}
-    .ac-it .m{flex:1}.ac-it button{border:0;background:var(--panel);color:var(--ink);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1.1rem}
-    .ac-empty{padding:2rem 1rem;text-align:center;color:var(--muted)}
-    .ac-kv{padding:.8rem 1rem;border-bottom:1px solid var(--line)}.ac-kv small{display:block;color:var(--muted)}.ac-kv b{font-weight:600}
-    .om{position:fixed;inset:0;z-index:50;display:none;background:rgba(0,0,0,.55);align-items:flex-end;justify-content:center}
-    .om.on{display:flex}
-    .om-card{background:var(--paper);color:var(--ink);width:100%;max-width:520px;border-radius:20px 20px 0 0;padding:1rem 1rem calc(1rem + env(safe-area-inset-bottom,0px));max-height:94%;overflow:auto}
-    .om-card img{display:block;width:100%;max-width:340px;aspect-ratio:1;object-fit:contain;background:#fff;border-radius:14px;margin:0 auto .75rem}
-    .om-card h3{font-size:1.15rem;line-height:1.3}
-    .om-card .price{margin:.3rem 0}.om-card .note{margin-bottom:.6rem}
-    .om-x{float:right;border:0;background:var(--panel);color:var(--ink);width:36px;height:36px;border-radius:50%;font-size:1.3rem;cursor:pointer}
-    .om-card .btn{display:block;text-align:center;width:100%;margin-top:.5rem;border:0;font:inherit;font-weight:700;cursor:pointer}
-    .logo .mk{width:38px;height:38px;flex:none}
-    .logo .wm{font-size:1.15rem}
-    @media (max-width:380px){.logo .wm{font-size:1rem}.logo .mk{width:32px;height:32px}}
-    .wm{display:inline-flex;align-items:baseline;font-size:2rem;font-weight:800;letter-spacing:-.04em;line-height:1.1}
-    .wm b{color:var(--navy);font-weight:800}
-    .wm i{font-style:normal;background:var(--gold);color:#121212;padding:0 .12em;margin-left:.04em;border-radius:3px}
-    @media (prefers-color-scheme:dark){.wm b{color:#e9ddff}}
-    .pcard .btn+.btn{margin-top:.5rem}
-    .om-card .btn-alt{border:2px solid currentColor}
-    .btn.ok{background:var(--green);color:#1b1230;box-shadow:none}
-    .pcard button.btn-main.in-cart{background:var(--green);color:#1b1230;box-shadow:0 3px 10px rgba(143,212,0,.4)}
-    .pcard.in-cart{outline:3px solid var(--green);outline-offset:-3px}
-    button.btn{border:0;font:inherit;font-weight:700;cursor:pointer}
-    .cartbtn{position:relative;border:0;background:var(--panel);color:var(--ink);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex:none}
-    .cartbtn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-    .cb{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--gold);color:#2a0e5c;font-size:.75rem;font-weight:800;display:grid;place-items:center;border:2px solid var(--paper)}
-    .cb[hidden]{display:none}.cb.bump{animation:bump .35s}
-    @keyframes bump{50%{transform:scale(1.35)}}
-    .hd-r{display:flex;align-items:center;gap:.5rem}
-    .acctbtn{text-decoration:none;color:var(--ink)}
-    .acctbtn.in::after{content:"";position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:var(--green);border:2px solid var(--paper)}
-    #bar a{position:relative}#bar .cb{top:-2px;right:12px}
-    .cartbar{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:40;width:min(92%,460px);display:none;align-items:center;justify-content:space-between;gap:1rem;border:0;font:inherit;color:#fff;background:linear-gradient(135deg,#9d5cff,#5b21b6);border-radius:999px;padding:.85rem 1.25rem;box-shadow:0 8px 24px rgba(91,33,182,.45);cursor:pointer;font-weight:700;opacity:0;transition:opacity .2s,transform .2s}
-    .cartbar.on{display:flex;opacity:1;transform:translateX(-50%)}
-    .cartbar span:last-child{background:var(--gold);color:#2a0e5c;border-radius:999px;padding:.15rem .7rem}
-    @media(min-width:760px){.cartbar{bottom:20px}}
-    .toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;background:#1b1230;color:#fff;border-radius:999px;padding:.55rem 1.1rem;font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s}
-    .toast.on{opacity:1}
-    .dr{position:fixed;inset:0;z-index:60;display:none;background:rgba(10,5,25,.55)}
-    .dr.on{display:flex;align-items:flex-end;justify-content:center}
-    .dr-panel{background:var(--paper);color:var(--ink);width:100%;max-width:560px;height:92vh;height:min(92dvh,780px);border-radius:22px 22px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:up .25s ease}
-    @keyframes up{from{transform:translateY(24px);opacity:0}}
-    @keyframes inr{from{transform:translateX(30px);opacity:0}}
-    @media(min-width:760px){.dr.on{justify-content:flex-end;align-items:stretch}.dr-panel{max-width:460px;height:100%;border-radius:22px 0 0 22px;animation:inr .25s ease}}
-    .dr-h{display:flex;align-items:center;gap:.6rem;padding:1rem 1rem .5rem}
-    .dr-h h2{flex:1;font-size:1.25rem;font-weight:800}
-    .x,.dr-back{border:0;background:var(--panel);color:var(--ink);width:38px;height:38px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:grid;place-items:center;flex:none}
-    .dr-back[hidden],.steps[hidden]{display:none}
-    .steps{list-style:none;display:flex;gap:.4rem;padding:0 1rem .6rem}
-    .steps li{flex:1;text-align:center;font-size:.75rem;font-weight:700;color:var(--muted);border-top:3px solid var(--line);padding-top:.35rem}
-    .steps li.on{color:var(--orange);border-color:var(--orange)}.steps li.done{color:var(--ink);border-color:var(--green)}
-    .dr-b{flex:1;overflow:auto;padding:.25rem 1rem 1rem;overscroll-behavior:contain}
-    .dr-f{border-top:1px solid var(--line);padding:.8rem 1rem calc(.8rem + env(safe-area-inset-bottom,0px));background:var(--paper)}
-    .dr-f .btn{display:block;width:100%;text-align:center;margin-top:.6rem;padding:.9rem}
-    .dr-f .btn-alt{border:2px solid var(--line);color:var(--ink)}
-    .trow{display:flex;justify-content:space-between;font-size:.95rem;color:var(--muted)}
-    .trow.big{font-size:1.2rem;font-weight:800;color:var(--ink)}
-    .ci{display:flex;gap:.8rem;padding:.8rem 0;border-bottom:1px solid var(--line)}
-    .ci img{width:64px;height:64px;border-radius:12px;object-fit:contain;background:#fff;flex:none}
-    .cm{flex:1;min-width:0}.cn{font-weight:700;font-size:.95rem;line-height:1.3}.cu{color:var(--muted);font-size:.85rem;margin:.1rem 0 .4rem}
-    .cr{text-align:right;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end}
-    .rall{display:flex;justify-content:flex-end;padding:.2rem 0 .5rem}
-    .ci .rm{border:1.5px solid var(--line);border-radius:999px;padding:.35rem .85rem;min-height:36px;text-decoration:none;color:var(--ink);font-weight:600;font-size:.85rem}
-    .rall .rm.armed{background:#d92d20;color:#fff}
-    .rall .rm{border:1.5px solid #d92d20;border-radius:999px;padding:.45rem 1rem;min-height:40px;text-decoration:none;color:#d92d20;font-weight:700;font-size:.9rem}
-    .ct{font-weight:800}.rm{border:0;background:none;color:var(--muted);font:inherit;font-size:.8rem;text-decoration:underline;cursor:pointer}
-    .qty{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:999px}
-    .qty button{border:0;background:none;color:var(--ink);width:34px;height:34px;font-size:1.2rem;cursor:pointer;border-radius:50%}
-    .qty span{min-width:26px;text-align:center;font-weight:700}
-    .empty{text-align:center;padding:2.5rem 1rem}.empty .em{font-size:3rem}.empty h3{margin:.4rem 0}.empty .btn{margin-top:1rem}
-    .fld{margin:.75rem 0}.fld label,.fld legend{display:block;font-weight:700;font-size:.9rem;margin-bottom:.3rem}
-    .fld input,.fld select,.fld textarea{width:100%;font:inherit;color:var(--ink);background:var(--panel);border:2px solid transparent;border-radius:12px;padding:.75rem .9rem}
-    .fld input:focus,.fld select:focus,.fld textarea:focus{outline:0;border-color:var(--orange);background:var(--paper)}
-    .fld [aria-invalid=true]{border-color:#d92d20}.err{color:#d92d20;font-size:.82rem;margin-top:.25rem}
-    .opts{display:grid;gap:.5rem}
-    .opt{display:flex;gap:.7rem;align-items:flex-start;border:2px solid var(--line);border-radius:14px;padding:.75rem .9rem;cursor:pointer}
-    .opt.sel{border-color:var(--orange);background:var(--tint)}.opt input{margin-top:.25rem;accent-color:#7c3aed}
-    .opt b{display:block}.opt small{color:var(--muted)}
-    .box{background:var(--panel);border-radius:14px;padding:.8rem .9rem;margin:.75rem 0;font-size:.92rem}
-    .box h4{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.3rem}
-    .box .ln{display:flex;justify-content:space-between;gap:.8rem;padding:.15rem 0}
-    .box a{font-weight:700}
-    .done-ic{width:72px;height:72px;border-radius:50%;background:var(--green);color:#1b1230;display:grid;place-items:center;font-size:2.2rem;font-weight:800;margin:1rem auto .6rem}
-    .center{text-align:center}
-    .pay{background:var(--tint);border:2px solid var(--orange);border-radius:14px;padding:.8rem .9rem;margin:.75rem 0;font-size:.95rem}
-    .pay h4{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.4rem}
-    .pay .pl{display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--line)}
-    .pay .pl:last-of-type{border-bottom:0}
-    .pay .pv{font-weight:800;font-size:1.15rem;letter-spacing:.02em}
-    .pay .cp{border:0;background:var(--paper);color:var(--orange);font:inherit;font-weight:700;font-size:.8rem;border-radius:999px;padding:.25rem .8rem;cursor:pointer;border:1.5px solid var(--orange)}
-    .pay ol{margin:.5rem 0 0 1.1rem;color:var(--muted);font-size:.85rem}
-    .oerr{background:rgba(217,45,32,.1);color:#d92d20;border:1px solid #d92d20;border-radius:12px;padding:.6rem .8rem;font-size:.9rem;margin-bottom:.4rem}
-    @media(prefers-reduced-motion:reduce){.dr-panel,.cb.bump{animation:none}.cartbar,.toast{transition:none}}
-    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.dots i{transition:none}}
-    /* ---- modern layer ---- */
-    header{background:rgba(255,255,255,.82);-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid rgba(124,58,237,.12)}
-    .search{background:var(--card);border:1px solid rgba(124,58,237,.16);box-shadow:0 4px 18px rgba(124,58,237,.12)}
-    .slide{border-radius:26px;box-shadow:0 14px 34px rgba(91,33,182,.28);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
-    .slide:hover{transform:translateY(-3px) scale(1.01)}
-    .slide h2{font-size:2.15rem;letter-spacing:-.02em}
-    .slide::before{content:"";position:absolute;width:260px;height:260px;right:-60px;top:-90px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.3),transparent 65%);pointer-events:none}
-    .trust{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin:0 0 1rem}
-    .trust>div{display:flex;align-items:center;gap:.65rem;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.7rem .8rem;box-shadow:0 2px 10px rgba(124,58,237,.07)}
-    .trust i{font-style:normal;font-size:1.4rem;width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:var(--tint);flex:none}
-    .trust b{display:block;font-size:.9rem;line-height:1.2}.trust small{color:var(--muted);font-size:.78rem;line-height:1.2;display:block}
-    @media(min-width:760px){.trust{grid-template-columns:repeat(4,1fr)}}
-    .cats{border-radius:26px;box-shadow:inset 0 0 0 1px var(--line)}
-    .cat{transition:transform .2s}.cat:hover{transform:translateY(-3px)}
-    .ring{box-shadow:0 6px 14px rgba(124,58,237,.14);transition:box-shadow .2s,transform .2s}.cat:hover .ring{box-shadow:0 10px 22px rgba(124,58,237,.3);transform:scale(1.06)}
-    .rec{border-radius:28px}
-    .pcard{border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.08);transition:transform .22s,box-shadow .22s}
-    .pcard:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(91,33,182,.22)}
-    .pcard .btn-main{border-radius:12px}
-    .mgrid .pcard{border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.05)}
-    .mgrid .pcard .img{overflow:hidden;position:relative}.mgrid .pcard .img img{transition:transform .35s}.mgrid .pcard:hover .img img{transform:scale(1.06)}
-    section h2.t{font-size:1.6rem;letter-spacing:-.02em}
-    section h2.t::after{content:"";display:block;width:46px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--orange),var(--gold));margin-top:.45rem}
-    .how>div,.range>div{border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.04);transition:transform .2s,box-shadow .2s}
-    .how>div:hover,.range>div:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(91,33,182,.14)}
-    .counties li{transition:background .2s,color .2s}.counties li:hover{background:var(--orange);color:#fff}
-    .contact{background:linear-gradient(135deg,#2a0e5c,#3b0f8c 60%,#1d0745);border-radius:28px 28px 0 0}
-    .bar{background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-    .dr-panel,.ac-panel{border-radius:26px 26px 0 0}
-    @media (prefers-color-scheme:dark){header{background:rgba(18,18,18,.78)}.bar{background:rgba(18,18,18,.88)}}
-    @media(prefers-reduced-motion:reduce){.slide,.pcard,.cat,.ring,.how>div,.range>div{transition:none}}
-    /* ===== Tablet (>=760px) ===== */
-    @media(min-width:760px){
-      header{padding:.8rem 0}
-      .top{margin-bottom:.7rem}
-      .search{max-width:720px;margin:0 auto}
-      nav.desk{flex:1;text-align:center}
-      .logo img{height:40px}
-      section{padding:2.6rem 0 .8rem}
-      section h2.t{font-size:1.75rem}
-      .rec h2{font-size:1.9rem}
-      .range{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
-      .om{align-items:center}
-      .om-card{border-radius:20px;max-width:560px}
-    }
-    /* ===== Desktop view (>=1024px) ===== */
-    @media(min-width:1024px){
-      .wrap{max-width:1240px;padding:0 2rem}
-      .slides{max-width:1240px;padding:0 2rem;gap:1rem}
-      .slide{flex-basis:calc(33.333% - .7rem);min-height:260px;padding:1.6rem}
-      .slide h2{font-size:2.4rem}
-      .cats{grid-template-columns:repeat(8,1fr);padding:1.4rem 1rem;gap:1.2rem .8rem}
-      .ring{max-width:96px}
-      .cat{font-size:.92rem}
-      .mgrid{grid-template-columns:repeat(5,1fr);gap:1rem}
-      .mgrid .price{font-size:1.2rem}
-      .pcard{flex-basis:calc(20% - .6rem);transition:transform .2s,box-shadow .2s}
-      .pcard:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.14)}
-      .how{grid-template-columns:repeat(4,1fr)}
-    }
-    @media(min-width:1440px){.wrap,.slides{max-width:1360px}.mgrid{grid-template-columns:repeat(6,1fr)}}
-        /* ===== Vertical layout: product rows stack and scroll up/down; only the advert banner slides sideways ===== */
-    /* Advert banner (#slides) slides sideways again; dots show which one is on */
-    .row{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;overflow:visible;scroll-snap-type:none;padding:1rem 1rem .25rem 0}
-    .pcard{flex:none;max-width:none;width:100%;scroll-snap-align:none;min-width:0}
-    @media(min-width:760px){.row{grid-template-columns:repeat(3,1fr)}}
-    @media(min-width:1024px){.row{grid-template-columns:repeat(5,1fr)}.pcard{flex-basis:auto}}
-    /* ===== Mobile view (<760px) ===== */
-    @media(max-width:759px){
-      .wrap{padding:0 .85rem}
-      .mgrid{grid-template-columns:repeat(2,1fr);gap:.6rem}
-      .slide h2{font-size:1.7rem}
-      .actions .btn{flex:1 1 140px;text-align:center}
-      img,video,iframe{max-width:100%}
-    }
-
-    /* ===== Marketplace look: big bordered search bar, category tabs, icon strip, tidy 2-column product cards ===== */
-    :root{--page:#f4f4f6}
-    @media (prefers-color-scheme:dark){:root{--page:#121212}}
-    html{scroll-padding-top:150px}
-    body{background:var(--page)}
-    header{background:var(--paper);-webkit-backdrop-filter:none;backdrop-filter:none;padding:.5rem 0 0;border-bottom:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.05)}
-    .top{margin-bottom:.5rem}
-    .search{border:2px solid var(--orange);border-radius:10px;background:var(--card);box-shadow:none;padding:0 0 0 .9rem;overflow:visible;gap:0}
-    .search>svg{display:none}
-    .search input{padding:.7rem 0;font-size:1rem}
-    .search:focus-within{outline:0;box-shadow:0 0 0 3px rgba(124,58,237,.2)}
-    .search button{align-self:stretch;display:grid;place-items:center;border-radius:0 7px 7px 0;background:var(--orange);padding:0 1.15rem;margin:-1px -1px -1px 0}
-    .search button svg{display:block;width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round}
-    .tabs{display:flex;gap:1.5rem;overflow-x:auto;scrollbar-width:none;padding:.35rem .15rem 0;margin-top:.15rem;-webkit-overflow-scrolling:touch}
-    .tabs::-webkit-scrollbar{display:none}
-    .tabs:empty{display:none}
-    .tabs button{flex:none;background:none;border:0;border-bottom:3px solid transparent;font:inherit;font-size:1rem;font-weight:600;color:var(--muted);padding:.45rem 0 .4rem;cursor:pointer;white-space:nowrap}
-    .tabs button.on{color:var(--ink);font-weight:800;border-bottom-color:var(--orange)}
-    .slides{margin-top:.75rem}
-    .slide{border-radius:12px;box-shadow:none}.slide:hover{transform:none}
-    .dots{margin:.55rem 0 .7rem;gap:.35rem}
-    .dots i{width:8px;height:8px;border:0;background:#cfcfd8}.dots i.on{width:20px;background:var(--orange)}
-    .trust{gap:.5rem}.trust>div{border-radius:10px;box-shadow:none}
-    .cats{display:grid;grid-auto-flow:column;grid-template-columns:none;grid-template-rows:repeat(2,auto);grid-auto-columns:calc(100% / 4.6);gap:.9rem .15rem;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;background:var(--card);border-radius:12px;box-shadow:none;padding:.9rem .4rem}
-    .cats::-webkit-scrollbar{display:none}
-    .cat{scroll-snap-align:start;font-size:.74rem;font-weight:500;gap:.35rem;padding:0 .1rem}
-    .ring{max-width:54px;border:0;border-radius:16px;background:var(--tint);font-size:1.7rem;box-shadow:none}
-    .cat:nth-child(3n+2) .ring,.cat:nth-child(3n) .ring{border:0}
-    .cat:hover{transform:none}.cat:hover .ring{box-shadow:none;transform:scale(1.05)}
-    .rec{background:var(--card);box-shadow:none;border:1px solid var(--line);border-radius:12px;padding:.9rem .8rem .8rem;margin-top:.8rem}
-    .rec h2{color:var(--ink);font-size:1.25rem}
-    .rec-head{padding-right:0}
-    .pill{background:var(--orange);color:#fff;padding:.15rem .8rem;font-size:1.05rem}
-    .row{padding:.7rem 0 0;gap:.5rem}
-    .pcard{border-radius:10px;box-shadow:none;border:1px solid var(--line)}
-    .pcard:hover{transform:none;box-shadow:0 4px 14px rgba(0,0,0,.1)}
-    .pcard .b{padding:.55rem .6rem .65rem;gap:.2rem}
-    .pcard h3{font-size:.88rem;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:500}
-    .price{font-size:1.1rem;color:var(--orange)}
-    .mgrid{gap:.5rem}
-    .range>div,.how>div{background:var(--card)}
-    section h2.t{font-size:1.35rem}
-    @media(min-width:760px){.cats{grid-auto-columns:calc(100% / 9);grid-template-rows:repeat(2,auto)}.tabs{gap:2rem}}
-
-    /* ===== Search: Jumia-style bar and suggestion list =====
-       The suggestion rows used to inherit the search BUTTON style (solid purple, centred, unreadable text).
-       Everything below is scoped to the search form so nothing else on the page is affected. */
-    .search{border-radius:8px}
-    .search input{padding:.8rem 0;font-size:1rem}
-    .search>button .sbtxt{display:none}
-    @media(min-width:760px){
-      .search>button{display:flex;align-items:center;gap:.5rem;padding:0 1.7rem}
-      .search>button .sbtxt{display:inline;font-weight:800;font-size:.9rem;letter-spacing:.05em;text-transform:uppercase}
-    }
-    .search .sugg{left:-2px;right:-2px;top:calc(100% + 2px);padding:0;border-radius:0 0 8px 8px;border:1px solid var(--line);border-top:0;background:var(--card);box-shadow:0 14px 28px rgba(0,0,0,.16);max-height:min(62vh,430px)}
-    .search .sugg button{display:flex;align-items:center;justify-content:flex-start;gap:.8rem;width:100%;margin:0;padding:.75rem 1rem;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:var(--ink);font:inherit;font-weight:400;text-align:left;align-self:auto;cursor:pointer}
-    .search .sugg button:last-child{border-bottom:0}
-    .search .sugg button:hover,.search .sugg button.act{background:var(--tint)}
-    .search .sugg button svg{display:block;flex:none;width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-    .search .sugg .sg-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .search .sugg .sg-t b{font-weight:700}
-    .search .sugg small{flex:none;max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:.78rem}
-    .search .sugg .sg-h{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem .35rem;font-size:.74rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-bottom:0}
-    .search .sugg .sg-h button{display:inline;width:auto;padding:0;border:0;background:transparent;color:var(--orange);font-size:.78rem;font-weight:700;letter-spacing:0;text-transform:none}
-    .search .sugg .sg-h button:hover{background:transparent;text-decoration:underline}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="stylesheet" href="/mobile-shell/tailwind.css">
+  <style>/* the build bot rewrites the crawler links between the seo-links markers (generate-products.mjs); these variables style them */
+  :root{--panel:#f3f4f6;--line:#e5e7eb;--ink:#1f2937}.seo-links .wrap{padding:0 12px 8px}.seo-links h2{color:var(--ink)}</style>
+  <script>
+  /* Desktop screens keep the full classic shop; old shared /#p-... product links open it too. The shell is the phone home page. */
+  (function () {
+    var wide = window.matchMedia && matchMedia('(min-width:900px) and (pointer:fine)').matches;
+    if (wide || /^#p-/.test(location.hash)) location.replace('/classic.html' + location.search + location.hash);
+  })();
+  </script>
 </head>
-<body>
-  <header>
-    <div class="wrap">
-      <h1 style="position:absolute;left:-9999px">Stermont Arcade: pest control, fumigation and agrovet supplies, plus phones, TVs, appliances and fashion, online in Kenya</h1>
-      <div class="top">
-        <a class="logo" href="#top" aria-label="Stermont Arcade home"><svg class="mk" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#7c3aed"/><path d="M134 372V252a122 122 0 0 1 244 0v120" fill="none" stroke="#fff" stroke-width="38" stroke-linecap="round"/><path d="M208 372V262a48 48 0 0 1 96 0v110z" fill="#c8f31d"/><rect x="100" y="396" width="312" height="30" rx="15" fill="#fff"/></svg><span class="wm" aria-hidden="true"><b>Stermont</b><i>Arcade</i></span></a>
-        <nav class="desk" aria-label="Main"><a href="#range">Products</a><a href="c/pest-control-fumigation.html">Pest Control</a><a href="#order">How to order</a><a href="#delivery">Delivery</a><a href="track.html">Track order</a><a href="#contact">Contact</a><a href="account.html">Account</a></nav>
-        <div class="hd-r"><a class="cartbtn acctbtn" id="acctbtn" href="account.html" aria-label="Log in or create account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a><button class="cartbtn" id="cartbtn" type="button" aria-label="Open cart"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11L21 7H6"/></svg><span class="cb" hidden>0</span></button></div>
-      </div>
-      <form class="search" role="search" id="search-form">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>
-        <label for="q" style="position:absolute;left:-9999px">Search products</label>
-        <input id="q" type="search" placeholder="Search products &amp; categories" autocomplete="off">
-        <button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg><span class="sbtxt">Search</span></button>
-      </form>
-      <p class="search-msg" id="search-msg" aria-live="polite"></p>
-      <div class="tabs" id="htabs" role="tablist" aria-label="Browse categories"></div>
+<body class="min-h-dvh">
+
+<!-- ===== Icon sprite (stroke icons, 24x24) ===== -->
+<svg width="0" height="0" class="absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></g></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.5l2.2 10.5h9.6L19.5 8H6.2"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></g></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20c1-4 4-5.5 7.5-5.5s6.5 1.5 7.5 5.5"/></g></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5v8.5a1 1 0 01-1 1h-4.5v-6h-5v6H5a1 1 0 01-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></g></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5.5 13.5H11L10 21l7.5-10.5H12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- ===== Header / app bar (sticky) ===== -->
+<header id="appbar" class="sticky top-0 z-30 bg-white shadow-sm" style="padding-top:env(safe-area-inset-top)">
+  <div class="relative z-10 bg-white flex items-center gap-1 px-2 h-bar">
+    <button class="icon-btn" data-open="drawer-categories" aria-label="All categories"><svg class="w-6 h-6"><use href="#i-menu"/></svg></button>
+    <form id="search-form" role="search" class="relative flex-1">
+      <input id="search" type="search" enterkeyhint="search" autocomplete="off" placeholder="Search pest control, agrovet, phones..." class="w-full h-9 pl-9 pr-3 rounded-full bg-gray-100 text-sm outline-none focus:ring-2 focus:ring-brand/40 transition-[height] duration-200">
+      <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-mute"><use href="#i-search"/></svg>
+    </form>
+    <button class="icon-btn" data-tab="cart" aria-label="Cart"><svg class="w-6 h-6"><use href="#i-cart"/></svg><span class="badge" data-badge="cart" hidden>0</span></button>
+    <button class="icon-btn" data-tab="account" aria-label="Account"><svg class="w-6 h-6"><use href="#i-user"/></svg></button>
+  </div>
+  <div id="chips-wrap">
+    <nav id="chips" role="tablist" aria-label="Sub-categories" class="flex gap-2 px-3 py-1.5 overflow-x-auto no-sb"></nav>
+  </div>
+</header>
+
+<!-- ===== Views (one visible at a time) ===== -->
+<main id="views" class="pb-[calc(56px+env(safe-area-inset-bottom)+8px)]">
+
+  <section id="view-home" data-view="home">
+    <div class="h-11" aria-hidden="true"></div><!-- room for the chip row that hangs under the header -->
+    <div class="flex gap-2 overflow-x-auto no-sb px-3 py-2 text-2xs text-brand font-medium">
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">M-Pesa checkout</span>
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">Delivery to all 47 counties</span>
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">Pickup at Sarit Centre, Westlands</span>
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">WhatsApp +254 748 888 230</span>
     </div>
-  </header>
-
-  <main id="top">
-    <div class="slides" id="slides">
-      <a class="slide sbf" href="#range" style="background:linear-gradient(135deg,#18181b,#09090b 70%);border:3px solid #f59e0b;box-shadow:0 0 24px rgba(245,158,11,.35)">
-        <span class="live" style="color:#f59e0b"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-right:6px"></span>BLACK FRIDAY DEALS</span>
-        <h2 style="font-size:1.85rem;max-width:12ch">Massive Savings Across All Categories</h2>
-        <p style="color:#d4d4d8">Up to 40% off top electronics, kitchen appliances, footwear &amp; smartphones.</p>
-        <span class="go" style="color:#f59e0b">Explore Black Friday &rarr;</span>
-      </a>
-      <a class="slide s2" href="#delivery">
-        <span class="live">Countrywide</span>
-        <h2>Delivery to all 47 counties</h2>
-        <p>Pay by M-Pesa. We deliver to you.</p>
-        <span class="go">See counties &rarr;</span>
-      </a>
-      <a class="slide s3" href="#range">
-        <span class="live">Order fast</span>
-        <h2>Order on our website</h2>
-        <p>Agrovet, electronics, fashion and home goods.</p>
-        <span class="go">Shop now &rarr;</span>
-      </a>
+    <div class="flex items-center justify-between px-3 pb-2">
+      <h1 id="grid-title" class="text-sm font-semibold">Recommended for you</h1>
+      <button id="open-filters" data-open="sheet-filters" class="tap flex items-center gap-1 text-xs text-ink px-2 h-8 rounded-full bg-white shadow-card">
+        <svg class="w-4 h-4"><use href="#i-filter"/></svg>Filter<span id="filter-count" class="text-brand font-semibold" hidden></span>
+      </button>
     </div>
-    <div class="dots" id="dots" aria-hidden="true"></div>
-
-    <div class="wrap">
-      <div class="trust">
-        <div><i>💳</i><span><b>Pay by M-Pesa</b><small>Simple Paybill checkout</small></span></div>
-        <div><i>🚚</i><span><b>Countrywide delivery</b><small>All 47 counties</small></span></div>
-        <div><i>↩️</i><span><b>48-hour returns</b><small>Faulty or wrong item</small></span></div>
-        <div><i>💬</i><span><b>WhatsApp support</b><small>8 AM to 9 PM daily</small></span></div>
-      </div>
-      <div class="cats" id="cats">
-        <button class="cat" data-q="tvs"><span class="ring">&#128250;</span>TVs &amp; Audio</button>
-        <button class="cat" data-q="appliances"><span class="ring">&#129530;</span>Appliances</button>
-        <button class="cat" data-q="pest control"><span class="ring">&#128027;</span>Pest Control &amp; Fumigation</button>
-        <button class="cat" data-q="agrovet"><span class="ring">&#127806;</span>Agrovet</button>
-        <button class="cat" data-q="herbicide"><span class="ring">🌾</span>Herbicides</button>
-        <button class="cat" data-q="fungicide"><span class="ring">🍄</span>Fungicides</button>
-        <button class="cat" data-q="insecticide"><span class="ring">🐛</span>Crop Insecticides</button>
-        <button class="cat" data-q="veterinary"><span class="ring">💉</span>Veterinary Drugs</button>
-        <button class="cat" data-q="animal feed"><span class="ring">🐄</span>Animal Feeds</button>
-        <button class="cat" data-q="fertilizer"><span class="ring">🌿</span>Fertilizers</button>
-        <button class="cat" data-q="washing machine"><span class="ring">🧺</span>Washing Machines</button>
-        <button class="cat" data-q="fridge"><span class="ring">🧊</span>Fridges &amp; Freezers</button>
-        <button class="cat" data-q="home theatre"><span class="ring">🔊</span>Home Theatre</button>
-        <button class="cat" data-q="bluetooth speaker"><span class="ring">🎵</span>Bluetooth Speakers</button>
-        <button class="cat" data-q="wall mount"><span class="ring">📺</span>TV Mounts</button>
-        <button class="cat" data-q="disinfectant"><span class="ring">🧴</span>Disinfectants</button>
-        <button class="cat" data-q="rodent"><span class="ring">🐀</span>Rodent Control</button>
-        <button class="cat" data-q="termite"><span class="ring">🐜</span>Termite Control</button>
-        <button class="cat" data-q="phones"><span class="ring">&#128241;</span>Phones &amp; Tablets</button>
-        <button class="cat" data-q="fashion"><span class="ring">&#128085;</span>Fashion</button>
-        <button class="cat" data-q="home office"><span class="ring">&#128715;&#65039;</span>Home &amp; Office</button>
-        <button class="cat" data-q="computing"><span class="ring">&#128187;</span>Computing</button>
-        <button class="cat" data-q="supermarket"><span class="ring">&#128722;</span>Supermarket</button>
-        <button class="cat" data-q="health beauty"><span class="ring">💄</span>Health &amp; Beauty</button>
-        <button class="cat" data-q="gaming"><span class="ring">🎮</span>Gaming</button>
-        <button class="cat" data-q="baby"><span class="ring">🍼</span>Baby Products</button>
-        <button class="cat" data-q="shoes"><span class="ring">👟</span>Shoes</button>
-        <button class="cat" data-q="bags"><span class="ring">🎒</span>Bags</button>
-        <button class="cat" data-q="watches jewellery"><span class="ring">⌚</span>Watches &amp; Jewellery</button>
-        <button class="cat" data-q="automotive"><span class="ring">🚗</span>Automotive</button>
-        <button class="cat" data-q="music"><span class="ring">🎸</span>Music &amp; Audio</button>
-        <button class="cat" data-q="kitchen dining"><span class="ring">🍳</span>Kitchen &amp; Dining</button>
-        <button class="cat" data-q="building hardware"><span class="ring">🧱</span>Building &amp; Hardware</button>
-        <button class="cat" data-q="solar power"><span class="ring">☀️</span>Solar &amp; Power</button>
-        <button class="cat" data-q="security cctv"><span class="ring">📹</span>Security &amp; CCTV</button>
-        <button class="cat" data-q="furniture"><span class="ring">🪑</span>Furniture</button>
-        <button class="cat" data-q="cleaning laundry"><span class="ring">🧼</span>Cleaning &amp; Laundry</button>
-        <button class="cat" data-q="garden outdoors"><span class="ring">🌳</span>Garden &amp; Outdoors</button>
-        <button class="cat" data-q="books stationery"><span class="ring">📚</span>Books &amp; Stationery</button>
-        <button class="cat" data-q="toys games"><span class="ring">🧸</span>Toys &amp; Games</button>
-        <button class="cat" data-q="sporting goods"><span class="ring">🏋️</span>Sporting Goods</button>
-        <button class="cat" data-q="pet supplies"><span class="ring">🐾</span>Pet Supplies</button>
-      </div>
-
-      <div class="rec" id="featured">
-        <div class="rec-head"><h2>Recommended for you</h2><a class="pill" href="#range" aria-label="See all products">&rarr;</a></div>
-        <div class="row">
-          <div class="pcard cta">
-            <h3>Can't see what you need?</h3>
-            <p class="note">Ask us. If it is not in stock, we will source it for you.</p>
-            <a class="btn btn-main" href="https://wa.me/254748888230?text=Hello%20Stermont%20Arcade%2C%20do%20you%20have%3A%20" target="_blank" rel="noopener">Ask on WhatsApp</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <section id="music-gear">
-<div class="wrap">
-<h2 class="t">Shop by category</h2>
-<p class="lead">Browse our products, from everyday essentials to music and farm supplies. Delivery to all 47 counties, pay by M-Pesa.</p>
-<div class="mcat stm-empty" data-slug="agrovet"><h3 class="sub">Agrovet</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="agrochemicals"><h3 class="sub">Agrochemicals</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="herbicides"><h3 class="sub">Herbicides</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="fungicides"><h3 class="sub">Fungicides</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="crop-insecticides"><h3 class="sub">Crop Insecticides</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="adjuvants-growth-regulators"><h3 class="sub">Adjuvants &amp; Growth Regulators</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="fertilizers"><h3 class="sub">Fertilizers</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="veterinary-drugs"><h3 class="sub">Veterinary Drugs &amp; Vaccines</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="animal-feeds"><h3 class="sub">Animal Feeds</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="disinfectants-hygiene"><h3 class="sub">Disinfectants &amp; Farm Hygiene</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="pest-control-fumigation"><h3 class="sub">Pest Control &amp; Fumigation</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="bed-bug-killers"><h3 class="sub">Bed Bug Killers</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="cockroach-ant-killers"><h3 class="sub">Cockroach &amp; Ant Killers</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="mosquito-fly-control"><h3 class="sub">Mosquito &amp; Fly Control</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="rodent-control"><h3 class="sub">Rodent Control</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="termite-control"><h3 class="sub">Termite Control</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="fumigation-chemicals"><h3 class="sub">Fumigation Chemicals</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="sprayers-equipment"><h3 class="sub">Sprayers &amp; Equipment</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="phones-tablets"><h3 class="sub">Phones &amp; Tablets</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="tvs-audio"><h3 class="sub">TVs &amp; Audio</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="televisions"><h3 class="sub">Televisions</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="home-theatre"><h3 class="sub">Home Theatre &amp; Sound Systems</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="bluetooth-speakers"><h3 class="sub">Bluetooth Speakers</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="tv-mounts-accessories"><h3 class="sub">TV Mounts &amp; Accessories</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="appliances"><h3 class="sub">Appliances</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="washing-machines"><h3 class="sub">Washing Machines</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="fridges-freezers"><h3 class="sub">Fridges &amp; Freezers</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="fashion"><h3 class="sub">Fashion</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="home-office"><h3 class="sub">Home &amp; Office</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="computing"><h3 class="sub">Computing</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="supermarket"><h3 class="sub">Supermarket</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="health-beauty"><h3 class="sub">Health &amp; Beauty</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="gaming"><h3 class="sub">Gaming</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="baby-products"><h3 class="sub">Baby Products</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="shoes"><h3 class="sub">Shoes</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="bags"><h3 class="sub">Bags</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="watches-jewellery"><h3 class="sub">Watches &amp; Jewellery</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="automotive"><h3 class="sub">Automotive</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="music-audio"><h3 class="sub">Music &amp; Audio</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="phone-accessories"><h3 class="sub">Phone Accessories</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="cameras-photography"><h3 class="sub">Cameras &amp; Photography</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="printers-office-machines"><h3 class="sub">Printers &amp; Office Machines</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="networking-smart-home"><h3 class="sub">Networking &amp; Smart Home</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="security-cctv"><h3 class="sub">Security &amp; CCTV</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="solar-power"><h3 class="sub">Solar &amp; Power</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="electrical-lighting"><h3 class="sub">Electrical &amp; Lighting</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="kitchen-dining"><h3 class="sub">Kitchen &amp; Dining</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="furniture"><h3 class="sub">Furniture</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="bedding-decor"><h3 class="sub">Bedding &amp; Home Decor</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="cleaning-laundry"><h3 class="sub">Cleaning &amp; Laundry</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="garden-outdoors"><h3 class="sub">Garden &amp; Outdoors</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="building-hardware"><h3 class="sub">Building &amp; Hardware</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="tools-machinery"><h3 class="sub">Tools &amp; Machinery</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="seeds-seedlings"><h3 class="sub">Seeds &amp; Seedlings</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="poultry-dairy-equipment"><h3 class="sub">Poultry &amp; Dairy Equipment</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="water-tanks-irrigation"><h3 class="sub">Water Tanks &amp; Irrigation</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="beekeeping"><h3 class="sub">Beekeeping</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="fish-farming"><h3 class="sub">Fish Farming</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="protective-wear-safety"><h3 class="sub">Protective Wear &amp; Safety</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="mens-fashion"><h3 class="sub">Men's Fashion</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="womens-fashion"><h3 class="sub">Women's Fashion</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="kids-fashion"><h3 class="sub">Kids' Fashion</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="wedding-events"><h3 class="sub">Wedding &amp; Events</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="gifts-printing"><h3 class="sub">Gifts &amp; Custom Printing</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="toys-games"><h3 class="sub">Toys &amp; Games</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="sporting-goods-fitness"><h3 class="sub">Sporting Goods &amp; Fitness</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="books-stationery"><h3 class="sub">Books &amp; Stationery</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="school-office-supplies"><h3 class="sub">School &amp; Office Supplies</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="pet-supplies"><h3 class="sub">Pet Supplies</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="medical-supplies"><h3 class="sub">Medical Supplies &amp; Wellness</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="car-accessories-parts"><h3 class="sub">Car Accessories &amp; Spare Parts</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="motorcycle-accessories"><h3 class="sub">Motorcycle Accessories</h3><div class="mgrid"></div></div>
-<div class="mcat stm-empty" data-slug="packaging-shop-supplies"><h3 class="sub">Packaging &amp; Shop Supplies</h3><div class="mgrid"></div></div>
-</div>
-    </section>
-
-<section id="pest-control">
-      <div class="wrap">
-        <h2 class="t">Pest control and fumigation products in Kenya</h2>
-        <p class="lead">Stermont Arcade stocks registered insecticides and pest control supplies for homes, hotels, offices, farms and public places. Order online, pay by M-Pesa, and we deliver to all 47 counties. Look for products with a PCPB registration number on the label, and always read the label before use.</p>
-        <p class="lead">Popular searches: <a href="c/pest-control-fumigation.html">bed bug killer Kenya</a>, <a href="c/pest-control-fumigation.html">fumigation chemicals Kenya</a>, <a href="c/pest-control-fumigation.html">cockroach killer</a>, <a href="c/pest-control-fumigation.html">termite control</a>. <a href="c/pest-control-fumigation.html"><b>See the full Pest Control &amp; Fumigation guide</b></a>.</p>
-      </div>
-    </section>
-
-<section id="range">
-      <div class="wrap">
-        <h2 class="t">What we sell</h2>
-        <p class="lead">Ask for anything on this list. If it is not in stock, we will source it for you.</p>
-        <div class="range">
-          <div>
-            <h3>Agrovet</h3>
-            <ul>
-              <li>Animal feeds and supplements</li>
-              <li>Veterinary drugs and vaccines</li>
-              <li>Seeds and seedlings</li>
-              <li>Fertilizers</li>
-              <li>Pesticides, herbicides and fungicides</li>
-              <li>Sprayers and farm tools</li>
-              <li>Poultry and dairy equipment</li>
-              <li>Water tanks and irrigation kits</li>
-              <li>Greenhouse and farm nets</li>
-              <li>Protective wear, gumboots and gloves</li>
-              <li>Beehives and bee-keeping gear</li>
-              <li>Fish farming supplies</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Pest Control &amp; Fumigation</h3>
-            <ul>
-              <li>Bed bug killers</li>
-              <li>Cockroach and ant killers</li>
-              <li>Mosquito and fly control</li>
-              <li>Rat and mouse control</li>
-              <li>Termite control</li>
-              <li>Fumigation chemicals</li>
-              <li>Pest control sprayers and equipment</li>
-              <li>Protective wear, masks and gloves</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Phones &amp; Tablets</h3>
-            <ul>
-              <li>Smartphones and tablets</li>
-              <li>Cases and screen protectors</li>
-              <li>Chargers and power banks</li>
-              <li>Earphones and smartwatches</li>
-              <li>Phone holders and tripods</li>
-              <li>Memory cards</li>
-              <li>Phone repair parts</li>
-              <li>Feature phones and landlines</li>
-              <li>Phone batteries and cables</li>
-            </ul>
-          </div>
-          <div>
-            <h3>TVs &amp; Audio</h3>
-            <ul>
-              <li>Smart TVs</li>
-              <li>Home theatres and soundbars</li>
-              <li>Speakers</li>
-              <li>Decoders and accessories</li>
-              <li>TV wall mounts and stands</li>
-              <li>Projectors and screens</li>
-              <li>Microphones</li>
-              <li>Headphones</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Appliances</h3>
-            <ul>
-              <li>Fridges and freezers</li>
-              <li>Washing machines</li>
-              <li>Cookers and microwaves</li>
-              <li>Blenders, kettles and irons</li>
-              <li>Fans and heaters</li>
-              <li>Air fryers and rice cookers</li>
-              <li>Water dispensers</li>
-              <li>Vacuum cleaners</li>
-              <li>Sandwich makers and toasters</li>
-              <li>Electric pressure cookers</li>
-              <li>Hot plates and gas cookers</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Health &amp; Beauty</h3>
-            <ul>
-              <li>Skincare and makeup</li>
-              <li>Perfumes</li>
-              <li>Hair care and wigs</li>
-              <li>Vitamins and supplements</li>
-              <li>Shavers and grooming</li>
-              <li>Nail care and beauty tools</li>
-              <li>Blood pressure monitors and thermometers</li>
-              <li>First-aid and personal protection</li>
-              <li>Massagers</li>
-              <li>Wigs and hair extensions</li>
-              <li>Men's grooming and beard care</li>
-              <li>Oral care and feminine care</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Home &amp; Office</h3>
-            <ul>
-              <li>Furniture and beds</li>
-              <li>Bedding and curtains</li>
-              <li>Kitchenware</li>
-              <li>Cleaning supplies</li>
-              <li>Stationery and office furniture</li>
-              <li>Mattresses and pillows</li>
-              <li>Shelves, shoe racks and wardrobes</li>
-              <li>Carpets, rugs and towels</li>
-              <li>Mirrors and home decor</li>
-              <li>Wall art and clocks</li>
-              <li>Storage boxes and organisers</li>
-              <li>Kitchen utensils and food containers</li>
-              <li>Office chairs and desks</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Fashion</h3>
-            <ul>
-              <li>Men's clothing</li>
-              <li>Women's clothing</li>
-              <li>Kids' clothing</li>
-              <li>Shoes and bags</li>
-              <li>Watches and jewelry</li>
-              <li>Underwear and socks</li>
-              <li>Sportswear and sneakers</li>
-              <li>Sunglasses and belts</li>
-              <li>School and work uniforms</li>
-              <li>Dresses, suits and traditional wear</li>
-              <li>Lingerie and sleepwear</li>
-              <li>Hats, scarves and accessories</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Computing</h3>
-            <ul>
-              <li>Laptops and desktops</li>
-              <li>Printers, ink and toner</li>
-              <li>Routers and cables</li>
-              <li>Flash drives and hard drives</li>
-              <li>Keyboards and mice</li>
-              <li>Monitors</li>
-              <li>Laptop bags and accessories</li>
-              <li>Webcams and headsets</li>
-              <li>Networking and Wi-Fi gear</li>
-              <li>Software and antivirus</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Gaming</h3>
-            <ul>
-              <li>Consoles</li>
-              <li>Controllers</li>
-              <li>Games and accessories</li>
-              <li>Gaming chairs and headsets</li>
-              <li>VR and gaming PCs</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Supermarket</h3>
-            <ul>
-              <li>Cooking oil, flour, rice and sugar</li>
-              <li>Drinks and snacks</li>
-              <li>Detergents</li>
-              <li>Toiletries and personal care</li>
-              <li>Tea, coffee and spices</li>
-              <li>Bottled water and juices</li>
-              <li>Cereals, pasta and canned foods</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Baby Products</h3>
-            <ul>
-              <li>Diapers and wipes</li>
-              <li>Baby clothes</li>
-              <li>Toys</li>
-              <li>Strollers and car seats</li>
-              <li>Feeding bottles and sterilizers</li>
-              <li>Baby cots and bath sets</li>
-              <li>Baby care and nappy bags</li>
-              <li>Baby skincare and bath</li>
-              <li>Kids' toys and learning games</li>
-              <li>Baby food and formula</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Security &amp; Power</h3>
-            <ul>
-              <li>CCTV cameras</li>
-              <li>Solar panels and lights</li>
-              <li>Batteries and inverters</li>
-              <li>Generators</li>
-              <li>Alarm systems and smart door locks</li>
-              <li>Electric fences and gate motors</li>
-              <li>UPS, surge protectors and stabilizers</li>
-              <li>Extension cables and sockets</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Building &amp; Hardware</h3>
-            <ul>
-              <li>Paint and brushes</li>
-              <li>Door locks, hinges and handles</li>
-              <li>Plumbing pipes, taps and fittings</li>
-              <li>Ladders and tool boxes</li>
-              <li>Tiles and floor accessories</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Lighting &amp; Electricals</h3>
-            <ul>
-              <li>LED bulbs and tube lights</li>
-              <li>Security and solar floodlights</li>
-              <li>Switches, sockets and cables</li>
-              <li>Decorative and ceiling lights</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Garden &amp; Outdoor</h3>
-            <ul>
-              <li>Garden hoses and sprinklers</li>
-              <li>Lawn mowers and trimmers</li>
-              <li>Outdoor furniture</li>
-              <li>Camping and picnic gear</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Music &amp; Entertainment</h3>
-            <ul>
-              <li>Guitars</li>
-              <li>Guitar amplifiers</li>
-              <li>Keyboards and MIDI</li>
-              <li>Drums and electric drums</li>
-              <li>Studio microphones</li>
-              <li>Mixers and audio interfaces</li>
-              <li>Speakers and monitors</li>
-              <li>Snake cables</li>
-              <li>Stands</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Bags &amp; Travel</h3>
-            <ul>
-              <li>Suitcases and travel bags</li>
-              <li>School bags and backpacks</li>
-              <li>Laptop and camera bags</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Shoes</h3>
-            <ul>
-              <li>Men's shoes and sneakers</li>
-              <li>Women's shoes, heels and sandals</li>
-              <li>Kids' and school shoes</li>
-              <li>Boots and safety shoes</li>
-              <li>Slippers and flip-flops</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Watches &amp; Jewellery</h3>
-            <ul>
-              <li>Men's and women's watches</li>
-              <li>Smart and fitness watches</li>
-              <li>Necklaces, earrings and bracelets</li>
-              <li>Rings and jewellery sets</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Automotive</h3>
-            <ul>
-              <li>Car accessories and seat covers</li>
-              <li>Spare parts and car batteries</li>
-              <li>Car audio, dash cams and GPS trackers</li>
-              <li>Tyres, oils and car care</li>
-              <li>Motorbike gear and accessories</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Sports, Toys &amp; Office</h3>
-            <ul>
-              <li>Football, gym and fitness gear</li>
-              <li>Toys and board games</li>
-              <li>School and office supplies</li>
-              <li>Printing paper and toner</li>
-              <li>Art and craft supplies</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Other categories</h3>
-            <ul>
-              <li>Sporting goods</li>
-              <li>Car accessories and spare parts</li>
-              <li>Power and hand tools</li>
-              <li>Books</li>
-              <li>Pet supplies</li>
-              <li>Custom printing and gifts</li>
-              <li>Bicycles and fitness equipment</li>
-              <li>Packaging and shop supplies</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="order">
-      <div class="wrap">
-        <h2 class="t">How to order</h2>
-        <div class="how">
-          <div>
-            <h3>Add to cart</h3>
-            <p>Pick your items, then check out with your name and delivery details.</p>
-          </div>
-          <div>
-            <h3>Place your order</h3>
-            <p>Place your order on the website. We confirm stock and delivery.</p>
-          </div>
-          <div>
-            <h3>Pay and receive</h3>
-            <p>Pay by M-Pesa and we deliver to your location countrywide.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="delivery">
-      <div class="wrap">
-        <h2 class="t">Countrywide delivery in Kenya</h2>
-        <p class="lead">We deliver agrovet supplies, electronics, fashion and home goods to all 47 counties, usually within 1-3 days. We confirm the time for your location before you pay. Counties include:</p>
-        <ul class="counties">
-          <li>Nairobi</li>
-          <li>Mombasa</li>
-          <li>Kwale</li>
-          <li>Kilifi</li>
-          <li>Tana River</li>
-          <li>Lamu</li>
-          <li>Taita-Taveta</li>
-          <li>Garissa</li>
-          <li>Wajir</li>
-          <li>Mandera</li>
-          <li>Marsabit</li>
-          <li>Isiolo</li>
-          <li>Meru</li>
-          <li>Tharaka-Nithi</li>
-          <li>Embu</li>
-          <li>Kitui</li>
-          <li>Machakos</li>
-          <li>Makueni</li>
-          <li>Nyandarua</li>
-          <li>Nyeri</li>
-          <li>Kirinyaga</li>
-          <li>Murang'a</li>
-          <li>Kiambu</li>
-          <li>Turkana</li>
-          <li>West Pokot</li>
-          <li>Samburu</li>
-          <li>Trans Nzoia</li>
-          <li>Uasin Gishu</li>
-          <li>Elgeyo-Marakwet</li>
-          <li>Nandi</li>
-          <li>Baringo</li>
-          <li>Laikipia</li>
-          <li>Nakuru</li>
-          <li>Narok</li>
-          <li>Kajiado</li>
-          <li>Kericho</li>
-          <li>Bomet</li>
-          <li>Kakamega</li>
-          <li>Vihiga</li>
-          <li>Bungoma</li>
-          <li>Busia</li>
-          <li>Siaya</li>
-          <li>Kisumu</li>
-          <li>Homa Bay</li>
-          <li>Migori</li>
-          <li>Kisii</li>
-          <li>Nyamira</li>
-        </ul>
-      </div>
-    </section>
-
-    <section id="faq">
-      <div class="wrap">
-        <h2 class="t">Frequently asked questions</h2>
-        <details><summary>How do I order from Stermont Arcade?</summary><p>Add items to your cart on the website, enter your name and delivery details, pay by M-Pesa Paybill, then enter the M-Pesa code from your SMS to place your order. We confirm stock and the delivery fee on WhatsApp.</p></details>
-        <details><summary>Do you deliver countrywide in Kenya?</summary><p>Yes. We deliver to all 47 counties in Kenya, usually in 1-3 days. The delivery fee, if any, is confirmed before you pay.</p></details>
-        <details><summary>How do I pay?</summary><p>Pay by M-Pesa using our Paybill details shown at checkout, then enter the M-Pesa code from your confirmation SMS to place your order. Your order is processed once we verify the payment.</p></details>
-        <details><summary>What can I buy at Stermont Arcade?</summary><p>Phones and tablets, TVs and audio, appliances, health and beauty, home and office, fashion, shoes, bags, computing, gaming, supermarket, baby products, automotive, music gear, pest control and fumigation products and agrovet supplies.</p></details>
-        <details><summary>Where can I buy bed bug killer and pest control products in Kenya?</summary><p>Stermont Arcade sells bed bug killers, insecticides and pest control and fumigation supplies online. Pay by M-Pesa and we deliver to all 47 counties. If an item is not in stock, message us on WhatsApp and we will source it.</p></details>
-        <details><summary>What if an item is faulty or not what I ordered?</summary><p>Message us on WhatsApp within 48 hours of delivery with photos and we will arrange a replacement or refund.</p></details>
-        </div>
-    </section>
-
-    <section id="policies">
-      <div class="wrap">
-        <h2 class="t">Orders, returns and privacy</h2>
-        <h3 class="sub">How orders work</h3>
-        <p class="lead">Place your order on the website through the cart. We confirm stock, the total and the delivery fee before you pay. Your order is processed once payment is received.</p>
-        <h3 class="sub">Returns and refunds</h3>
-        <p class="lead">If an item arrives faulty, damaged or different from what you ordered, message us on WhatsApp within 48 hours of delivery with photos. We will arrange a replacement or refund.</p>
-        <h3 class="sub">Privacy</h3>
-        <p class="lead">We use your name, phone number and delivery details only to process and deliver your order. We do not sell your information. Read our full <a href="shipping.html">shipping</a>, <a href="returns.html">returns</a> and <a href="privacy.html">privacy</a> pages.</p>
-      </div>
-    </section>
-
-    <section id="visit">
-      <div class="wrap">
-        <h2 class="t">Visit our shop</h2>
-        <address style="font-style:normal;margin:.75rem 0 1rem">
-          <strong>Stermont Arcade</strong><br>
-          The Sarit Centre (Westlands)<br>
-          Karuna Road / Lower Kabete<br>
-          P.O. Box 14474 - 00800, Nairobi<br>
-          Open every day, Monday to Sunday, 8:00 AM to 8:00 PM<br>
-          Phone: <a href="tel:+254748888230">+254 748 888 230</a>
-        </address>
-        <div class="actions">
-          <a class="btn btn-main" href="https://www.google.com/maps/search/?api=1&amp;query=The+Sarit+Centre+Westlands+Nairobi" target="_blank" rel="noopener">Get directions</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact" class="contact">
-      <div class="wrap">
-        <h2 class="t">Contact Stermont Arcade</h2>
-        <address>
-          Shop: The Sarit Centre (Westlands), Karuna Road / Lower Kabete, Nairobi<br>
-          Shop hours: Monday to Sunday, 8:00 AM to 8:00 PM<br>
-          Online store serving all 47 counties in Kenya<br>
-          Orders answered 8:00 AM to 9:00 PM, every day<br>
-          Phone and WhatsApp: <a href="tel:+254748888230">+254 748 888 230</a><br>
-          Email for inquiries: <a href="mailto:support@stermontarcade.co.ke?subject=Inquiry%20from%20Stermont%20Arcade%20website">support@stermontarcade.co.ke</a>
-        </address>
-        <div class="actions">
-          <a class="btn btn-main" href="https://wa.me/254748888230?text=Hello%20Stermont%20Arcade" target="_blank" rel="noopener">Chat on WhatsApp</a>
-          <a class="btn btn-alt" href="mailto:support@stermontarcade.co.ke?subject=Inquiry%20from%20Stermont%20Arcade%20website">Email us</a>
-        </div>
-      </div>
-    </section>
-  <!-- seo-links:start -->
+    <ul id="grid" class="grid grid-cols-2 gap-2 px-2"></ul>
+    <p id="grid-empty" class="text-center text-mute py-10" hidden>No products match these filters.</p>
+    <div id="sentinel" class="h-10"></div>
+    <!-- seo-links:start -->
 <section class="seo-links" aria-labelledby="seo-cats"><div class="wrap">
 <style>.seo-links{padding:1.5rem 0 .5rem}.seo-links h2{font-size:1.25rem;margin:0 0 .6rem}.seo-links ul{list-style:none;display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 1.2rem;padding:0}.seo-links li a{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem;font-size:.92rem;color:var(--ink);text-decoration:none}.seo-links li a:hover{border-color:currentColor}</style>
 <h2 id="seo-cats">Shop by category</h2>
@@ -1089,505 +142,133 @@
 <p><a href="/products.html">View all 182 products</a> &middot; <a href="/c/">All categories</a></p>
 </div></section>
 <!-- seo-links:end -->
-  </main>
+  </section>
 
-  <footer>
-    <div class="wrap">&copy; 2026 Stermont Arcade. All rights reserved. &middot; <a href="c/pest-control-fumigation.html">Pest Control &amp; Fumigation</a> &middot; <a href="nairobi.html">Shop in Nairobi</a> &middot; <a href="c/">All categories</a> &middot; <a href="products.html">All products</a> &middot; <a href="blog/">Buying guides</a> &middot; <a href="shipping.html">Shipping</a> &middot; <a href="returns.html">Returns</a> &middot; <a href="privacy.html">Privacy</a> &middot; <a href="#visit">Visit us</a> &middot; <a href="#contact">Contact</a></div>
-  </footer>
+  <section id="view-categories" data-view="categories" hidden>
+    <div class="flex" style="height:calc(100dvh - 48px - 56px - env(safe-area-inset-top) - env(safe-area-inset-bottom))">
+      <aside id="cat-side" class="w-24 shrink-0 overflow-y-auto bg-gray-100 no-sb" role="tablist" aria-label="Main categories"></aside>
+      <div id="cat-main" class="flex-1 overflow-y-auto bg-white p-3"></div>
+    </div>
+  </section>
 
-  <nav class="bar" aria-label="Quick navigation" id="bar">
-    <a href="#top" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
-    <a href="#range"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 12h8M8 15h5"/></svg>Categories</a>
-    <a href="#order"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11L21 7H6"/></svg>Order</a>
-    <a href="#delivery"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h12v10H2zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>Delivery</a>
-    <a href="#contact"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>Contact</a>
-    <a href="account.html" id="bar-acct"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Account</a>
-  </nav>
+  <section id="view-deals" data-view="deals" hidden>
+    <div class="mx-2 mt-2 rounded-lg bg-gradient-to-r from-sale to-orange-500 text-white p-3 flex items-center justify-between">
+      <div><p class="font-semibold text-sm">Flash deals</p><p class="text-2xs opacity-90">Biggest discounts first</p></div>
+      <svg class="w-7 h-7"><use href="#i-bolt"/></svg>
+    </div>
+    <ul id="deals-grid" class="grid grid-cols-2 gap-2 p-2"></ul>
+  </section>
 
-  <script>
-    (function () {
-      var form = document.getElementById('search-form');
-      var input = document.getElementById('q');
-      var msg = document.getElementById('search-msg');
-      var featured = document.getElementById('featured');
-      var music = document.getElementById('music-gear');
-      var cats = document.querySelectorAll('#range .range > div');
-      var base = 'https://wa.me/254748888230?text=';
+  <section id="view-cart" data-view="cart" hidden>
+    <h2 class="px-3 pt-3 pb-2 font-semibold">Cart <span id="cart-title-count" class="text-mute font-normal"></span></h2>
+    <ul id="cart-list" class="px-2 space-y-2"></ul>
+    <div id="cart-empty" class="text-center text-mute py-16" hidden>
+      <svg class="w-12 h-12 mx-auto mb-2 opacity-40"><use href="#i-cart"/></svg>Your cart is empty
+    </div>
+    <div id="cart-total-bar" class="mx-2 mt-3 p-3 bg-white rounded-lg shadow-card flex items-center justify-between" hidden>
+      <div><p class="text-xs text-mute">Total</p><p id="cart-total" class="font-bold text-sale text-base"></p></div>
+      <button id="checkout" class="tap h-10 px-6 rounded-full bg-brand text-white font-semibold text-sm">Checkout</button>
+    </div>
+  </section>
 
-      var lastFound = 0, logT = 0, lastLogged = '';
-      /* record the search once the shopper pauses, submits, or taps a suggestion/category (words only) */
-      function logSearch(src) {
-        clearTimeout(logT);
-        var t = input.value.trim().toLowerCase().replace(/\s+/g, ' '), hint = input.getAttribute('data-src'); input.removeAttribute('data-src');
-        if (t.length < 2) { lastLogged = ''; return; }
-        if (t === lastLogged) return; lastLogged = t;
-        if (window.STM_searchLog) window.STM_searchLog(t, lastFound, hint || src);
-      }
-      /* Scroll to the first matching product group, leaving room for the sticky header (search box + tabs)
-         so the items are not hidden under it. Falls back to featured, then the "What we sell" list. */
-      function showItems() {
-        function go() {
-          var hd = document.querySelector('header'), off = (hd ? hd.getBoundingClientRect().height : 0) + 10, t = null;
-          if (!music.classList.contains('hidden')) {
-            t = [].filter.call(music.querySelectorAll('.mcat'), function (g) {
-              return !g.classList.contains('hidden') && !g.classList.contains('stm-empty') && g.querySelector('.pcard:not(.hidden):not(.vhide)');
-            })[0] || null;
-          }
-          if (!t && !featured.classList.contains('hidden')) t = featured;
-          if (!t) t = document.querySelector('#range .range > div:not(.hidden)') || document.getElementById('range');
-          window.scrollTo({ top: Math.max(0, t.getBoundingClientRect().top + window.pageYOffset - off), behavior: 'smooth' });
-        }
-        /* wait one frame so the filtered layout (and the header message) has settled before measuring */
-        if (window.requestAnimationFrame) requestAnimationFrame(function () { requestAnimationFrame(go); }); else setTimeout(go, 50);
-      }
-      window.STM_showItems = showItems;
+  <section id="view-account" data-view="account" hidden>
+    <div class="bg-brand text-white p-5 pt-6"><p class="font-semibold text-base">Your account</p><p class="text-xs opacity-80">Sign in to see and track your orders</p></div>
+    <ul class="m-2 bg-white rounded-lg divide-y divide-line shadow-card">
+      <li><a class="tap block px-4 py-3.5" href="/account.html">Sign in / My orders</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/track.html">Track an order</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/shipping.html">Delivery information</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/returns.html">Returns</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/contact.html">Contact us</a></li>
+      <li><a class="tap block px-4 py-3.5" href="https://wa.me/254748888230">Chat on WhatsApp</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/classic.html">Open the full shop</a></li>
+    </ul>
+  </section>
+</main>
 
-      /* Category buttons: jump straight to that category's products and leave the rest of the page as it is
-         (no filtering, nothing hidden). Returns false when the category has no products loaded, so the caller
-         can fall back to a normal search (which shows "Nothing listed ... Ask on WhatsApp"). */
-      function gotoCategory(term) {
-        term = String(term || '').trim().toLowerCase(); if (!term) return false;
-        var words = term.split(/\s+/).filter(function (w) { return w !== 'and' && w !== '&'; }).map(function (w) { return w.replace(/s$/, ''); });
-        function m(t) { t = t.toLowerCase(); return words.every(function (w) { return t.indexOf(w) !== -1; }); }
-        var groups = [].filter.call(music.querySelectorAll('.mcat'), function (g) { return !g.classList.contains('stm-empty') && g.querySelector('.pcard:not(.vhide)'); });
-        var g = groups.filter(function (x) { return m(x.querySelector('h3').textContent); })[0] ||
-                groups.filter(function (x) { return [].some.call(x.querySelectorAll('.pcard:not(.vhide)'), function (c) { return m(c.textContent); }); })[0];
-        if (!g) return false;
-        /* leave results mode if a search is on, so the whole page is back */
-        if (input.value) { input.value = ''; input.removeAttribute('data-src'); input.dispatchEvent(new Event('input')); }
-        /* show the department this category lives in */
-        var vg = g.closest && g.closest('.stm-vg');
-        if (vg && !vg.classList.contains('kc-on')) {
-          var tb = document.querySelector('#htabs button[data-v="' + vg.getAttribute('data-v') + '"]'); if (tb) tb.click();
-        }
-        g.classList.add('open');
-        try { if (window.STM_searchLog) window.STM_searchLog(term, g.querySelectorAll('.pcard:not(.vhide)').length, 'category'); } catch (e) {}
-        setTimeout(function () {
-          var hd = document.querySelector('header'), off = (hd ? hd.getBoundingClientRect().height : 0) + 10;
-          window.scrollTo({ top: Math.max(0, g.getBoundingClientRect().top + window.pageYOffset - off), behavior: 'smooth' });
-        }, 120);
-        return true;
-      }
-      window.STM_gotoCategory = gotoCategory;
-      function run(scroll) {
-        var q = input.value.trim().toLowerCase();
-        var found = 0;
-        if (!q) {
-          featured.classList.remove('hidden');
-          music.classList.remove('hidden');
-          music.querySelectorAll('.hidden').forEach(function (e) { e.classList.remove('hidden'); });
-          document.querySelectorAll('.mcat.open,.range>div.open').forEach(function (e) { e.classList.remove('open'); });
-          cats.forEach(function (c) {
-            c.classList.remove('hidden');
-            c.querySelectorAll('li').forEach(function (li) { li.classList.remove('hidden'); });
-          });
-          msg.textContent = '';
-          return;
-        }
-        var words = q.split(/\s+/).filter(function (w) { return w !== 'and' && w !== '&'; }).map(function (w) { return w.replace(/s$/, ''); });
-        function matches(text) {
-          text = text.toLowerCase();
-          return words.every(function (w) { return text.indexOf(w) !== -1; });
-        }
-        if (matches(featured.textContent)) { featured.classList.remove('hidden'); found++; }
-        else { featured.classList.add('hidden'); }
-        var mAny = 0;
-        music.querySelectorAll('.mcat').forEach(function (g) {
-          var gm = matches(g.querySelector('h3').textContent), n = 0;
-          g.querySelectorAll('.pcard').forEach(function (c) { var ok = gm || matches(c.textContent); c.classList.toggle('hidden', !ok); if (ok) n++; });
-          g.classList.toggle('hidden', n === 0); if (n) g.classList.add('open'); mAny += n;
-        });
-        music.classList.toggle('hidden', mAny === 0); found += mAny;
-        cats.forEach(function (c) {
-          var catMatch = matches(c.querySelector('h3').textContent);
-          var any = 0;
-          c.querySelectorAll('li').forEach(function (li) {
-            var ok = catMatch || matches(li.textContent);
-            li.classList.toggle('hidden', !ok);
-            if (ok) any++;
-          });
-          c.classList.toggle('hidden', any === 0); if (any) c.classList.add('open');
-          found += any;
-        });
-        lastFound = found;
-        if (found) {
-          msg.textContent = 'Showing results for "' + input.value.trim() + '". Clear the box to see everything.';
-          if (scroll) showItems();
-        } else {
-          msg.innerHTML = '';
-          msg.appendChild(document.createTextNode('Nothing listed for "' + input.value.trim() + '". We can still source it. '));
-          var a = document.createElement('a');
-          a.href = base + encodeURIComponent('Hello Stermont Arcade, do you have: ' + input.value.trim());
-          a.target = '_blank'; a.rel = 'noopener';
-          a.textContent = 'Ask on WhatsApp';
-          msg.appendChild(a);
-        }
-      }
-      form.addEventListener('submit', function (e) {
-        e.preventDefault(); run(true); logSearch('typed'); saveRecent(input.value);
-        /* one matching product (or an exact name match) opens straight away */
-        var vis = [].filter.call(music.querySelectorAll('.pcard'), function (c) { return !c.classList.contains('hidden') && !c.classList.contains('vhide'); });
-        var qq = input.value.trim().toLowerCase();
-        var hit = vis.length === 1 ? vis[0] : vis.filter(function (c) { return c.querySelector('h3').textContent.trim().toLowerCase() === qq; })[0];
-        if (hit) { input.blur(); openCard(hit); }
-      });
-      input.addEventListener('input', function () { run(false); clearTimeout(logT); logT = setTimeout(function () { logSearch('typed'); }, 1500); });
+<!-- ===== Bottom navigation ===== -->
+<nav id="bottom-nav" class="fixed bottom-0 inset-x-0 z-30 bg-white border-t border-line flex" style="padding-bottom:env(safe-area-inset-bottom)" aria-label="Main">
+  <button class="nav-item" data-tab="home" aria-current="page"><svg class="w-6 h-6"><use href="#i-home"/></svg>Home</button>
+  <button class="nav-item" data-tab="categories"><svg class="w-6 h-6"><use href="#i-grid"/></svg>Categories</button>
+  <button class="nav-item" data-tab="deals"><svg class="w-6 h-6"><use href="#i-bolt"/></svg>Deals<span class="badge" data-badge="deals" style="left:55%;right:auto" hidden>0</span></button>
+  <button class="nav-item" data-tab="cart"><svg class="w-6 h-6"><use href="#i-cart"/></svg>Cart<span class="badge" data-badge="cart" style="left:55%;right:auto" hidden>0</span></button>
+  <button class="nav-item" data-tab="account"><svg class="w-6 h-6"><use href="#i-user"/></svg>Account</button>
+</nav>
 
-      /* ---- Live suggestions while typing ---- */
-      var box = document.createElement('div'); box.className = 'sugg'; box.id = 'sugg'; box.setAttribute('role', 'listbox');
-      form.appendChild(box);
-      input.setAttribute('aria-controls', 'sugg'); input.setAttribute('aria-autocomplete', 'list');
-      var pool = [], seen = {}, act = -1, poolSig = '';
-      function add(t, c, el) { t = (t || '').replace(/\s+/g, ' ').trim(); var k = t.toLowerCase(); if (t && !seen[k]) { seen[k] = 1; pool.push({ t: t, c: c, el: el || null }); } }
-      /* rebuilt from the page each time, so products that load in later from the shop database are suggested too */
-      function buildPool() {
-        var n = document.querySelectorAll('#music-gear .pcard').length + document.querySelectorAll('#range li').length;
-        if (n === poolSig && pool.length) return; poolSig = n; pool = []; seen = {};
-        document.querySelectorAll('#range .range > div').forEach(function (d) {
-          var cn = d.querySelector('h3').textContent.replace(/\d+\s*$/, '').trim();
-          add(cn, 'Category');
-          d.querySelectorAll('li').forEach(function (li) { add(li.textContent, cn); });
-        });
-        document.querySelectorAll('#music-gear .mcat').forEach(function (m) {
-          var cn = ((m.querySelector('h3.sub') || m.querySelector('h3') || {}).textContent || 'Product').replace(/\d+\s*$/, '').trim();
-          add(cn, 'Category');
-          m.querySelectorAll('.pcard:not(.vhide) h3').forEach(function (h) { add(h.textContent, 'Product', h.closest('.pcard')); });
-        });
-      }
-      /* typo helper: the typed word is within one slip (missing, extra, wrong or swapped letter) of the start of a product word */
-      function lev1(a, b) {
-        if (a === b) return true; var la = a.length, lb = b.length; if (Math.abs(la - lb) > 1) return false;
-        var i = 0; while (i < la && i < lb && a[i] === b[i]) i++;
-        return a.slice(i + 1) === b.slice(i + 1) || a.slice(i + 1) === b.slice(i) || a.slice(i) === b.slice(i + 1) || (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2));
-      }
-      function near(a, b) { return a.length >= 4 && (lev1(a, b.slice(0, a.length)) || lev1(a, b.slice(0, a.length + 1)) || lev1(a, b.slice(0, a.length - 1))); }
-      function hide() { box.classList.remove('on'); box.innerHTML = ''; act = -1; }
-      function openCard(el) {
-        var g = el.closest('.mcat'); if (g) g.classList.add('open');
-        if (window.STM_openView && el._p) window.STM_openView(el);
-        else { var h = el.querySelector('h3'); if (h) h.click(); }
-      }
-      var IC_S = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/></svg>';
-      var IC_R = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>';
-      /* the shopper's last few searches stay in their own browser only */
-      function getRecent() { try { var r = JSON.parse(localStorage.getItem('stm_recent') || '[]'); return Array.isArray(r) ? r.filter(function (x) { return typeof x === 'string'; }).slice(0, 5) : []; } catch (e) { return []; } }
-      function saveRecent(t) {
-        t = (t || '').replace(/\s+/g, ' ').trim(); if (t.length < 2) return;
-        try { var r = getRecent().filter(function (x) { return x.toLowerCase() !== t.toLowerCase(); }); r.unshift(t); localStorage.setItem('stm_recent', JSON.stringify(r.slice(0, 5))); } catch (e) {}
-      }
-      function clearRecent() { try { localStorage.removeItem('stm_recent'); } catch (e) {} }
-      function pick(t, el) {
-        input.value = t; hide(); run(!el); logSearch('suggestion'); saveRecent(t); input.blur();
-        if (el) openCard(el);
-      }
-      function esc(x) { return x.replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); }
-      /* empty box, tapped: show recent searches and popular categories (like big marketplaces do) */
-      function showStart() {
-        buildPool();
-        var rec = getRecent(), pop = [];
-        pool.forEach(function (o) { if (o.c === 'Category' && pop.length < 6) pop.push(o.t); });
-        box.innerHTML = '';
-        function row(t, icon) {
-          var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'option');
-          b.innerHTML = icon + '<span class="sg-t">' + esc(t) + '</span>';
-          b.addEventListener('mousedown', function (e) { e.preventDefault(); });
-          b.addEventListener('click', function () { pick(t, null); });
-          box.appendChild(b);
-        }
-        function head(txt, clearable) {
-          var h = document.createElement('div'); h.className = 'sg-h'; h.appendChild(document.createElement('span')).textContent = txt;
-          if (clearable) {
-            var c = document.createElement('button'); c.type = 'button'; c.textContent = 'Clear';
-            c.addEventListener('mousedown', function (e) { e.preventDefault(); });
-            c.addEventListener('click', function () { clearRecent(); showStart(); });
-            h.appendChild(c);
-          }
-          box.appendChild(h);
-        }
-        if (rec.length) { head('Recent searches', true); rec.forEach(function (t) { row(t, IC_R); }); }
-        if (pop.length) { head('Popular categories', false); pop.forEach(function (t) { row(t, IC_S); }); }
-        if (!box.children.length) { box.classList.remove('on'); return; }
-        act = -1; box.classList.add('on');
-      }
-      function suggest() {
-        var q = input.value.trim().toLowerCase();
-        if (document.activeElement !== input) { hide(); return; }
-        if (q.length < 1) { showStart(); return; }
-        buildPool();
-        var ws = q.split(/\s+/).filter(function (w) { return w !== 'and' && w !== '&'; }).map(function (w) { return w.replace(/s$/, ''); });
-        function score(o) {
-          var t = o.t.toLowerCase(), words = t.split(/[^a-z0-9]+/).filter(Boolean), total = 0;
-          for (var i = 0; i < ws.length; i++) {
-            var w = ws[i], best = 9;
-            if (t.indexOf(w) === 0) best = 0;
-            else if (words.some(function (x) { return x.indexOf(w) === 0; })) best = 1;
-            else if (t.indexOf(w) !== -1) best = 2;
-            else if (words.some(function (x) { return near(w, x); })) best = 3;
-            if (best === 9) return -1; total += best;
-          }
-          return total;
-        }
-        var hits = [];
-        pool.forEach(function (o) { var sc = score(o); if (sc > -1) hits.push({ t: o.t, c: o.c, sc: sc, el: o.el }); });
-        hits.sort(function (a, b) { return a.sc - b.sc || (a.c === 'Category') - (b.c === 'Category') || a.t.length - b.t.length; });
-        hits = hits.slice(0, 8);
-        box.innerHTML = '';
-        if (!hits.length) { box.classList.remove('on'); return; }
-        hits.forEach(function (o) {
-          var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'option');
-          /* typed part in normal weight, the rest in bold - the way Jumia shows completions */
-          var i = o.t.toLowerCase().indexOf(q), label;
-          if (i > -1) label = (i ? '<b>' + esc(o.t.slice(0, i)) + '</b>' : '') + esc(o.t.slice(i, i + q.length)) + '<b>' + esc(o.t.slice(i + q.length)) + '</b>';
-          else label = '<b>' + esc(o.t) + '</b>';
-          b.innerHTML = IC_S + '<span class="sg-t">' + label + '</span><small>' + esc(o.c === 'Category' ? 'Category' : 'in ' + o.c) + '</small>';
-          b.addEventListener('mousedown', function (e) { e.preventDefault(); });
-          b.addEventListener('click', function () { pick(o.t, o.el); });
-          box.appendChild(b);
-        });
-        act = -1; box.classList.add('on');
-      }
-      input.addEventListener('input', suggest);
-      input.addEventListener('focus', suggest);
-      input.addEventListener('keydown', function (e) {
-        var bs = box.querySelectorAll('button[role=option]'); if (!bs.length || !box.classList.contains('on')) return;
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-          e.preventDefault(); act = (act + (e.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length;
-          bs.forEach(function (b, j) { b.classList.toggle('act', j === act); });
-        } else if (e.key === 'Enter' && act > -1) { e.preventDefault(); bs[act].click(); }
-        else if (e.key === 'Escape') { hide(); }
-      });
-      form.addEventListener('submit', hide);
-      document.addEventListener('click', function (e) { if (!form.contains(e.target)) hide(); });
-    })();
-  </script>
-  <script>
-    (function () {
-      var sl = document.getElementById('slides'), dots = document.getElementById('dots');
-      var n = sl.children.length, i;
-      for (i = 0; i < n; i++) dots.appendChild(document.createElement('i'));
-      function mark() {
-        var k = Math.round(sl.scrollLeft / (sl.scrollWidth / n));
-        Array.prototype.forEach.call(dots.children, function (d, j) { d.classList.toggle('on', j === k); });
-      }
-      sl.addEventListener('scroll', mark, { passive: true }); mark();
-      var q = document.getElementById('q');
-      document.querySelectorAll('.cat').forEach(function (b) {
-        b.addEventListener('click', function () {
-          /* go straight to the category's items without hiding the rest of the page */
-          if (window.STM_gotoCategory && window.STM_gotoCategory(b.getAttribute('data-q'))) return;
-          /* nothing loaded for it yet: normal search, so the shopper sees the "ask on WhatsApp" message */
-          q.value = b.getAttribute('data-q'); q.setAttribute('data-src', 'category');
-          q.dispatchEvent(new Event('input'));
-          if (window.STM_showItems) window.STM_showItems(); else document.getElementById('range').scrollIntoView({ behavior: 'smooth' });
-        });
-      });
-      var links = document.querySelectorAll('#bar a');
-      links.forEach(function (a) {
-        a.addEventListener('click', function () {
-          if (a.getAttribute('href') === '#top') { q.value = ''; q.dispatchEvent(new Event('input')); }
-        });
-      });
-      if ('IntersectionObserver' in window) {
-        var io = new IntersectionObserver(function (es) {
-          es.forEach(function (e) {
-            if (e.isIntersecting) links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id); });
-          });
-        }, { rootMargin: '-45% 0px -50% 0px' });
-        ['top', 'range', 'order', 'delivery', 'contact'].forEach(function (id) { io.observe(document.getElementById(id)); });
-      }
-    })();
-  </script>
-  <div class="ac" id="ac" role="dialog" aria-modal="true" aria-label="My account"><div class="ac-panel"><div class="ac-h"><h2>My account</h2><button class="x" id="ac-x" type="button" aria-label="Close">&times;</button></div><div class="ac-b" id="ac-b"></div></div></div>
-  <div class="om" id="om" role="dialog" aria-modal="true" aria-labelledby="om-t">
-    <div class="om-card">
-      <button class="om-x" id="om-x" aria-label="Close" type="button">&times;</button>
-      <img id="om-i" alt="">
-      <h3 id="om-t"></h3>
-      <p class="price" id="om-p"></p>
-      <p class="note" id="om-d"></p>
-      <button class="btn btn-main" id="om-add" type="button">Add to cart</button>
-      <button class="btn btn-alt" id="om-wish" type="button">&#9825; Save to wishlist</button>
-      <a class="btn btn-alt" id="om-wa" href="#" target="_blank" rel="noopener">Send only this item on WhatsApp</a>
-      <button class="btn btn-alt" id="om-sh" type="button" hidden>Share photo &amp; details on WhatsApp</button>
+<!-- ===== Overlays ===== -->
+<div id="scrim" class="scrim" aria-hidden="true"></div>
+
+<aside id="drawer-categories" class="sheet sheet-left" role="dialog" aria-modal="true" aria-label="Categories">
+  <div class="flex items-center justify-between px-4 h-bar border-b border-line">
+    <span class="font-semibold">All categories</span>
+    <button class="icon-btn" data-close aria-label="Close"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+  </div>
+  <ul id="drawer-cats" class="flex-1 overflow-y-auto"></ul>
+</aside>
+
+<section id="sheet-filters" class="sheet sheet-bottom" role="dialog" aria-modal="true" aria-label="Filters">
+  <div class="flex items-center justify-between px-4 h-12 border-b border-line">
+    <span class="font-semibold">Filters</span>
+    <button class="icon-btn" data-close aria-label="Close"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="flex-1 overflow-y-auto p-4 space-y-5">
+    <div>
+      <p class="text-xs font-semibold mb-2">Sort by</p>
+      <div id="f-sort" class="flex flex-wrap gap-2">
+        <button class="chip" data-sort="rec" aria-selected="true">Recommended</button>
+        <button class="chip" data-sort="low" aria-selected="false">Price: low to high</button>
+        <button class="chip" data-sort="high" aria-selected="false">Price: high to low</button>
+        <button class="chip" data-sort="disc" aria-selected="false">Biggest discount</button>
+      </div>
+    </div>
+    <div>
+      <p class="text-xs font-semibold mb-2">Price (KSh)</p>
+      <div class="flex items-center gap-2">
+        <input id="f-min" inputmode="numeric" placeholder="Min" class="w-full h-10 px-3 rounded-lg bg-gray-100 outline-none">
+        <span class="text-mute">to</span>
+        <input id="f-max" inputmode="numeric" placeholder="Max" class="w-full h-10 px-3 rounded-lg bg-gray-100 outline-none">
+      </div>
+    </div>
+    <label class="flex items-center justify-between text-sm">On discount only
+      <input id="f-disc" type="checkbox" class="w-5 h-5 accent-[#7c3aed]">
+    </label>
+  </div>
+  <div class="flex gap-3 p-3 border-t border-line">
+    <button id="f-reset" class="tap flex-1 h-11 rounded-full bg-gray-100 font-semibold">Reset</button>
+    <button id="f-apply" class="tap flex-1 h-11 rounded-full bg-brand text-white font-semibold">Show results</button>
+  </div>
+</section>
+
+<section id="sheet-quickbuy" class="sheet sheet-bottom" role="dialog" aria-modal="true" aria-label="Quick buy">
+  <div class="flex gap-3 p-4">
+    <div id="qb-img" class="w-24 h-24 rounded-lg shrink-0 grid place-items-center text-4xl"></div>
+    <div class="min-w-0 flex-1">
+      <p id="qb-name" class="text-sm font-medium line-clamp-2"></p>
+      <p class="mt-1"><span id="qb-price" class="text-sale font-bold text-lg"></span> <s id="qb-old" class="text-mute text-xs"></s></p>
+    </div>
+    <button class="icon-btn self-start -mt-1 -mr-2" data-close aria-label="Close"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="px-4 pb-3">
+    <p class="text-xs font-semibold mb-2">Pack size</p>
+    <div id="qb-sizes" class="flex flex-wrap gap-2"></div>
+  </div>
+  <div class="px-4 pb-4 flex items-center justify-between">
+    <span class="text-xs font-semibold">Quantity</span>
+    <div class="flex items-center gap-3">
+      <button id="qb-minus" class="icon-btn bg-gray-100 !w-8 !h-8" aria-label="Less"><svg class="w-4 h-4"><use href="#i-minus"/></svg></button>
+      <span id="qb-qty" class="w-6 text-center font-semibold">1</span>
+      <button id="qb-plus" class="icon-btn bg-gray-100 !w-8 !h-8" aria-label="More"><svg class="w-4 h-4"><use href="#i-plus"/></svg></button>
     </div>
   </div>
-  <script>
-    (function () {
-      var D = document, root = D.documentElement; root.classList.add('js');
-      var NUM = '254748888230';
-      function slug(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-      function tog(el) { el.classList.toggle('open'); }
-      function key(h, el) { h.setAttribute('role', 'button'); h.tabIndex = 0; h.addEventListener('click', function () { tog(el); });
-        h.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tog(el); } }); }
-      D.querySelectorAll('.range > div').forEach(function (c) { key(c.querySelector('h3'), c); });
-      D.querySelectorAll('#music-gear .mcat').forEach(function (g) {
-        var h = g.querySelector('h3'); g.setAttribute('data-cat', h.textContent);
-        var n = g.querySelectorAll('.pcard').length, sp = D.createElement('span'); sp.className = 'cnt'; sp.textContent = n; h.appendChild(sp);
-        key(h, g);
-      });
-      var q = D.getElementById('q');
-      D.querySelectorAll('.range li').forEach(function (li) {
-        li.addEventListener('click', function () {
-          q.value = li.textContent; q.setAttribute('data-src', 'list'); q.dispatchEvent(new Event('input'));
-          if (window.STM_showItems) window.STM_showItems(); else { var m = D.getElementById('music-gear'); (m.classList.contains('hidden') ? D.getElementById('range') : m).scrollIntoView({ behavior: 'smooth' }); }
-        });
-      });
-      var om = D.getElementById('om'), oi = D.getElementById('om-i'), ot = D.getElementById('om-t'), op = D.getElementById('om-p'),
-          od = D.getElementById('om-d'), ow = D.getElementById('om-wa'), os = D.getElementById('om-sh'), cur = null;
-      function close() { om.classList.remove('on'); D.body.style.overflow = ''; }
-      function openM(c) {
-        cur = c; if (window.STM_track) window.STM_track(c.id);
-        var name = c.querySelector('h3').textContent, price = c.querySelector('.price').textContent, img = c.querySelector('img'),
-            cat = c.closest('.mcat').getAttribute('data-cat'), id = c.id.replace(/^p-/, ''),
-            link = location.origin + location.pathname + '?item=' + id,
-            msg = 'Hello Stermont Arcade, I would like to order:\n' + name + '\nPrice: ' + price + '\n' + link;
-        oi.src = img.src; oi.alt = name; ot.textContent = name; op.textContent = price;
-        od.textContent = cat + '. Photo is for reference, ask us for stock and specs. Delivery to all 47 counties, pay by M-Pesa.';
-        ow.href = 'https://wa.me/' + NUM + '?text=' + encodeURIComponent(msg);
-        c._msg = msg; c._id = id; D.getElementById('om-add').style.display = c.classList.contains('noprice') ? 'none' : '';
-        D.getElementById('om-add').onclick = function () { window.STM.add(c); close(); };
-        os.hidden = !(navigator.share && navigator.canShare && img.src.indexOf('data:image/jpeg') === 0);
-        om.classList.add('on'); D.body.style.overflow = 'hidden';
-      }
-      os.addEventListener('click', function () {
-        if (!cur) return;
-        fetch(oi.src).then(function (r) { return r.blob(); }).then(function (b) {
-          var f = new File([b], cur._id + '.jpg', { type: 'image/jpeg' });
-          if (navigator.canShare({ files: [f] })) return navigator.share({ files: [f], text: cur._msg });
-          return navigator.share({ text: cur._msg });
-        }).catch(function () {});
-      });
-      D.querySelectorAll('#music-gear .pcard').forEach(function (c) {
-        c.id = 'p-' + slug(c.querySelector('h3').textContent);
-        if (!c.classList.contains('noprice')) { var ob = c.querySelector('.btn'), nb = D.createElement('button'); nb.type = 'button'; nb.className = 'btn btn-main'; nb.textContent = 'Add to cart'; ob.replaceWith(nb);
-        nb.addEventListener('click', function () { window.STM.add(c, nb); }); }
-        c.querySelector('h3').style.cursor = 'pointer'; c.querySelector('h3').addEventListener('click', function () { openM(c); });
-        c.querySelector('img').addEventListener('click', function () { openM(c); });
-      });
-      D.getElementById('om-x').addEventListener('click', close);
-      om.addEventListener('click', function (e) { if (e.target === om) close(); });
-      D.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
-      var it = new URLSearchParams(location.search).get('item');
-      if (it) { var c = D.getElementById('p-' + it); if (c) { c.closest('.mcat').classList.add('open'); c.scrollIntoView(); openM(c); } }
-
-      /* ---- My account panel: wishlist, recently viewed, address book ---- */
-      (function () {
-        var NS = 'http://www.w3.org/2000/svg';
-        var AC = D.getElementById('ac'), AB = D.getElementById('ac-b'), view = 'main';
-        var SB = 'sb-oewvtbnmyombbtggamor-auth-token';
-        function get(k) { try { return JSON.parse(localStorage.getItem(k)) || null; } catch (e) { return null; } }
-        function put(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-        function el(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
-        function sess() { var x = get(SB); return x && x.user && (!x.expires_at || x.expires_at * 1000 > Date.now()) ? x : null; }
-        function ico(d) { var s = D.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 24 24'); var p = D.createElementNS(NS, 'path'); p.setAttribute('d', d); s.appendChild(p); return s; }
-        function ids(k) { return (get(k) || []).filter(function (i) { return D.getElementById(i); }); }
-        window.STM_track = function (id) {
-          var r = (get('stm_recent') || []).filter(function (i) { return i !== id; }); r.unshift(id); put('stm_recent', r.slice(0, 20));
-          var w = (get('stm_wish') || []).indexOf(id) > -1, b = D.getElementById('om-wish');
-          b.innerHTML = w ? '&#9829; Saved to wishlist' : '&#9825; Save to wishlist';
-        };
-        D.getElementById('om-wish').addEventListener('click', function () {
-          if (!cur) return; var w = get('stm_wish') || [], i = w.indexOf(cur.id);
-          if (i > -1) w.splice(i, 1); else w.unshift(cur.id); put('stm_wish', w); window.STM_track(cur.id);
-        });
-        function open() { view = 'main'; render(); AC.classList.add('on'); D.body.style.overflow = 'hidden'; }
-        function shut() { AC.classList.remove('on'); D.body.style.overflow = ''; }
-        function row(parent, label, path, act, count) {
-          var r = act && act.href ? el('a', 'ac-row') : el('button', 'ac-row'); if (act && act.href) r.href = act.href; else r.type = 'button';
-          r.appendChild(ico(path)); r.appendChild(el('span', 'l', label)); if (count != null) r.appendChild(el('span', 'c', count));
-          if (act && act.fn) r.addEventListener('click', act.fn); parent.appendChild(r); return r;
-        }
-        function items(key, title) {
-          var wrap = D.createDocumentFragment(), list = ids(key);
-          if (!list.length) { wrap.appendChild(el('p', 'ac-empty', key === 'stm_wish' ? 'Nothing saved yet. Open a product and tap "Save to wishlist".' : 'Products you open will show here.')); return wrap; }
-          list.forEach(function (id) {
-            var c = D.getElementById(id), d = el('div', 'ac-it'), im = el('img'); im.src = c.querySelector('img').src; im.alt = '';
-            var m = el('div', 'm'); m.appendChild(el('b', null, c.querySelector('h3').textContent)); m.appendChild(el('small', null, c.querySelector('.price').textContent));
-            d.appendChild(im); d.appendChild(m);
-            if (key === 'stm_wish') { var x = el('button', null, '×'); x.setAttribute('aria-label', 'Remove'); x.addEventListener('click', function (e) { e.stopPropagation(); put('stm_wish', (get('stm_wish') || []).filter(function (i) { return i !== id; })); render(); }); d.appendChild(x); }
-            d.addEventListener('click', function () { var g = c.closest('.mcat'); if (g) g.classList.add('open'); shut(); openM(c); });
-            wrap.appendChild(d);
-          });
-          return wrap;
-        }
-        function sub(title, content) {
-          var bk = el('button', 'ac-row', 'Back'); bk.type = 'button'; bk.style.fontWeight = '700'; bk.addEventListener('click', function () { view = 'main'; render(); });
-          AB.appendChild(bk); AB.appendChild(el('div', 'ac-sec', title)); AB.appendChild(content);
-        }
-        function render() {
-          AB.textContent = ''; var S = sess();
-          if (view === 'wish') return sub('My wishlist', items('stm_wish'));
-          if (view === 'recent') return sub('Recently viewed', items('stm_recent'));
-          if (view === 'addr') {
-            var f = D.createDocumentFragment(), c = get('stm_cust') || {};
-            [['Name', c.name], ['Phone', c.phone], ['Email', c.email], ['County', c.county], ['Address', c.addr]].forEach(function (k) { if (k[1]) { var d = el('div', 'ac-kv'); d.appendChild(el('small', null, k[0])); d.appendChild(el('b', null, k[1])); f.appendChild(d); } });
-            if (!f.childNodes.length) f.appendChild(el('p', 'ac-empty', 'No saved address yet. It is saved when you place your first order.'));
-            else { var cl = el('button', 'ac-out', 'Clear saved details'); cl.type = 'button'; cl.addEventListener('click', function () { try { localStorage.removeItem('stm_cust'); } catch (e) {} render(); }); f.appendChild(cl); }
-            return sub('Address book', f);
-          }
-          var md = S ? (S.user.user_metadata || {}) : {}, hi = el('div', 'ac-hi');
-          if (S) { hi.appendChild(el('h3', null, 'Welcome ' + ((md.full_name || '').split(' ')[0] || 'back') + '!')); hi.appendChild(el('p', null, S.user.email || '')); }
-          else { hi.appendChild(el('h3', null, 'Welcome to Stermont Arcade')); hi.appendChild(el('p', null, 'Log in to see your orders.')); }
-          AB.appendChild(hi);
-          if (!S) { var lg = el('a', 'ac-login', 'Log in or create account'); lg.href = 'account.html'; AB.appendChild(lg); }
-          var bt = el('div', 'ac-btns'), a1 = el('a', 'ac-call', 'Call us'), a2 = el('a', 'ac-wa', 'WhatsApp');
-          a1.href = 'tel:+254748888230'; a2.href = 'https://wa.me/' + NUM + '?text=' + encodeURIComponent('Hello Stermont Arcade'); a2.target = '_blank'; a2.rel = 'noopener';
-          bt.appendChild(a1); bt.appendChild(a2); AB.appendChild(bt);
-          AB.appendChild(el('div', 'ac-sec', 'Need assistance?'));
-          row(AB, 'Help & Support', 'M12 17v-5M12 8h.01M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', { fn: function () { shut(); D.getElementById('contact').scrollIntoView({ behavior: 'smooth' }); } });
-          AB.appendChild(el('div', 'ac-sec', 'My account'));
-          row(AB, 'Orders', 'M4 8l2-4h12l2 4v12H4zM4 8h16M9 12h6', { href: 'account.html' });
-          row(AB, 'Wishlist', 'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z', { fn: function () { view = 'wish'; render(); } }, ids('stm_wish').length || null);
-          row(AB, 'Recently viewed', 'M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 8v4l3 2', { fn: function () { view = 'recent'; render(); } }, ids('stm_recent').length || null);
-          AB.appendChild(el('div', 'ac-sec', 'My settings'));
-          row(AB, 'Address book', 'M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z', { fn: function () { view = 'addr'; render(); } });
-          row(AB, 'Account management', 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4 21c0-4 3.6-6 8-6s8 2 8 6', { href: 'account.html' });
-          row(AB, 'Privacy policy', 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z', { href: 'privacy.html' });
-          if (S) { var lo = el('button', 'ac-out', 'Logout'); lo.type = 'button'; lo.addEventListener('click', function () { try { localStorage.removeItem(SB); } catch (e) {} shut(); location.reload(); }); AB.appendChild(lo); }
-        }
-        D.getElementById('ac-x').addEventListener('click', shut);
-        AC.addEventListener('click', function (e) { if (e.target === AC) shut(); });
-        D.addEventListener('keydown', function (e) { if (e.key === 'Escape' && AC.classList.contains('on')) shut(); });
-        ['#acctbtn', '#bar-acct', 'nav.desk a[href="account.html"]'].forEach(function (sel) {
-          var a = D.querySelector(sel); if (a) a.addEventListener('click', function (e) { e.preventDefault(); open(); });
-        });
-      })();
-    })();
-  </script>
-  <div class="dr" id="dr">
-    <div class="dr-panel" role="dialog" aria-modal="true" aria-labelledby="dr-t">
-      <div class="dr-h"><button class="dr-back" id="dr-back" type="button" aria-label="Back" hidden>&larr;</button><h2 id="dr-t">Your cart</h2><button class="x" id="dr-x" type="button" aria-label="Close">&times;</button></div>
-      <ol class="steps" id="steps"><li>Cart</li><li>Details</li><li>Review</li></ol>
-      <div class="dr-b" id="dr-b"></div>
-      <div class="dr-f" id="dr-f"></div>
-    </div>
+  <div class="flex gap-3 p-3 border-t border-line">
+    <button id="qb-add" class="tap flex-1 h-11 rounded-full bg-brand-soft text-brand font-semibold">Add to cart</button>
+    <button id="qb-buy" class="tap flex-1 h-11 rounded-full bg-brand text-white font-semibold">Buy now</button>
   </div>
-  <button class="cartbar" id="cartbar" type="button"><span id="cartbar-l">View cart</span><span id="cartbar-t"></span></button>
-  <script>
-    try { if (localStorage.getItem('sb-oewvtbnmyombbtggamor-auth-token')) document.getElementById('acctbtn').classList.add('in'); } catch (e) {}
-  </script>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="search-log.js" defer></script>
-<script src="checkout-deferred.js?v=2" defer></script>
-<script src="storefront-live.js?v=8" defer></script>
-<script src="img-protect.js" defer></script>
-<script src="account-panel.js?v=3" defer></script>
-<script src="chat.js?v=2" defer></script>
-<script src="product-reviews.js?v=2" defer></script>
-<script>
-(function () {
-  var t = document.getElementById('htabs'), q = document.getElementById('q'), cats = document.querySelectorAll('#cats .cat');
-  if (!t || !q || !cats.length) return;
-  var all = [];
-  function mark(b) { all.forEach(function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); }); if (b && b.scrollIntoView) { try { b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); } catch (e) {} } }
-  function tab(label, fn) { var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.textContent = label; b.onclick = function () { mark(b); fn(); }; all.push(b); t.appendChild(b); return b; }
-  var first = tab('ALL', function () { q.value = ''; q.dispatchEvent(new Event('input')); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-  [].slice.call(cats, 0, 10).forEach(function (c) { tab(c.lastChild.textContent.trim().replace(/\s*&\s*/g, ' & '), function () { c.click(); }); });
-  mark(first);
-  q.addEventListener('input', function () { if (!q.value.trim()) mark(first); });
-})();
-</script>
-<script src="advert-banner.js" defer></script>
+</section>
+
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 top-[64px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
+
+<script src="/mobile-shell/app.js"></script>
+<script src="/analytics.js"></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
-<script src="/analytics.js" defer></script></body>
+</body>
 </html>

@@ -16,7 +16,7 @@ const ls = {
 /* ---------- 1. Data: live Supabase catalog ----------
    One fetch of every active product row + the category tree (small: ~225 rows). Pack sizes of one product are separate
    rows that share `variant_group`; they are folded into ONE card with a `sizes` list, each size carrying its own price.
-   Names come from ../product-names.json (the heading each product page shows, rebuilt with the site); if that file is
+   Names come from /product-names.json (the heading each product page shows, rebuilt with the site); if that file is
    missing the plain database name is used. Filtering, sorting and paging then run in memory, so every filter is instant. */
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
 const api = path => fetch(SB + '/rest/v1/' + path, { headers: { apikey: KEY }, cache: 'no-store' })
@@ -59,7 +59,7 @@ function loadCatalog() {
     catalogP = Promise.all([
       api('products?active=eq.true&select=id,slug,name,category_id,price,old_price,stock,featured,images,unit,variant_group,variant_label&order=created_at.asc'),
       api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
-      fetch('../product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}))
+      fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}))
     ]).then(([rows, cats, names]) => buildCatalog(rows, cats, names)).catch(e => { catalogP = null; throw e; });  // a failed load can be retried
   }
   return catalogP;
@@ -223,7 +223,7 @@ const SKELETON = `<li class="card pointer-events-none" aria-hidden="true"><div c
 const skeletons = n => SKELETON.repeat(n);
 
 const grid = $('#grid'), sentinel = $('#sentinel'), EMPTY_TEXT = $('#grid-empty').textContent;
-function showGridError() { const el = $('#grid-empty'); el.innerHTML = 'Could not load products. <button class="underline text-brand" data-retry>Try again</button>'; el.hidden = false; }
+function showGridError() { const el = $('#grid-empty'); el.innerHTML = 'Could not load products. <button class="underline text-brand" data-retry>Try again</button><br><a class="underline text-brand" href="/classic.html">Open the full shop</a>'; el.hidden = false; }
 const feed = { page: 1, hasMore: true, loading: false, token: 0, items: new Map() };
 
 function query() {
@@ -364,7 +364,15 @@ $('#cart-list').addEventListener('click', e => {
   const cart = store.get().cart.map(i => i.key === b.dataset.qty ? { ...i, qty: i.qty + +b.dataset.d } : i).filter(i => i.qty > 0);
   store.set({ cart });
 });
-$('#checkout').addEventListener('click', () => toast('Prototype: M-Pesa checkout would start here'));
+/* Checkout: the shop's own checkout (M-Pesa, delivery fees, order e-mails) lives on /classic.html. The cart lines are handed over
+   under `stm_handoff`; that page adds them through its STM.add once its product cards exist, then opens its cart. */
+$('#checkout').addEventListener('click', () => {
+  const cart = store.get().cart; if (!cart.length) return;
+  try { localStorage.setItem('stm_handoff', JSON.stringify(cart.map(i => ({ rowId: i.rowId, qty: i.qty, price: i.price, name: i.name, size: i.size })))); }
+  catch { toast('Could not start checkout. Please allow site storage and try again.'); return; }
+  store.set({ cart: [] });
+  location.href = '/classic.html?checkout=1';
+});
 
 /* ---------- 11. Wiring ---------- */
 let toastTimer;
