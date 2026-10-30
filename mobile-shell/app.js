@@ -142,11 +142,13 @@ function syncOverlays() {
    domain and a product could not be copied, shared or reopened. The base entry under it stays "/", so Back returns to the list. */
 const BASE_TITLE = document.title;
 const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
-const productUrl = () => qb.p ? '/?product=' + encodeURIComponent(sizeOf(qb.p, qb.size).slug || qb.p.slug) : undefined;
+/* The address is the product's own page, /p/<slug>.html (+ "#<size slug>" when the chosen size is not the page's own): a copied or shared link then
+   previews as this product, from that page's head. On a phone the page sends people back here (/?product=<slug>, see seo-shell-redirect.mjs). */
+const productUrl = () => { if (!qb.p) return undefined; const z = sizeOf(qb.p, qb.size).slug || qb.p.slug; return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); };
 function syncProductMeta() {   // tab title + address follow the open product (and the chosen size); both return to normal when it closes
   const open = qb.p && stack.some(id => PRODUCT_OVERLAYS.includes(id));
   document.title = open ? qb.p.name + ' | Stermont Arcade' : BASE_TITLE;
-  if (open) { const u = productUrl(); if (u && location.pathname + location.search !== u) history.replaceState(history.state, '', u); }
+  if (open) { const u = productUrl(); if (u && location.pathname + location.search + location.hash !== u) history.replaceState(history.state, '', u); }
 }
 function openOverlay(id) {
   if (stack.includes(id)) return;

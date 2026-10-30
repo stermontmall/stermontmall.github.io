@@ -1,3 +1,19 @@
+# HANDOFF - Product links preview as the product (branch `wip-product-link-preview`, 2026-10-30)
+Owner: "Wrong preview" for https://stermontarcade.co.ke/?product=abasi-5-ec-50-ml (WhatsApp/Facebook/Google showed the home page title and logo). A static host cannot give `/?product=` its own head, so the address is now the product's own page.
+## Done
+- [x] `app.js?v=6`: the address of an open product is `/p/<slug>.html` (+ `#<size slug>` when the chosen size is not the page's own size). Copy or share it and the preview is that product (title, photo, description from the generated page). All 182 shell products have a `/p/<slug>.html` page (checked against the database, 2026-10-30).
+- [x] `seo-shell-redirect.mjs` (new): puts a small script in every product page (182 pages, not the redirect stubs of extra sizes): a phone (not a crawler or link-preview bot, not a desktop screen, not `?classic=1`) goes to `/?product=<slug or #size slug>`, which opens the product in the shell, and the shell shows `/p/<slug>.html` again. Added to `.github/workflows/product-pages.yml` after the owner-title step (`continue-on-error`, idempotent, and the file is in the watched paths), so every rebuild keeps it. Pages were also updated now in this commit.
+- [x] Old `/?product=` links keep working (the redirect target); desktop still goes to `/p/<slug>.html`. Share button (previous section) kept.
+- [x] `shell.test.py` = 106/106 (new "redirect:" checks run the REAL generated page: phone lands in the shell on that product and size; Googlebot, WhatsApp and desktop keep the page; `?classic=1` keeps it). `buy-name.test.mjs` 49 and `seo-titles.test.mjs` 35 still pass.
+- [x] MERGED TO `main` on 2026-10-30 after 106/106 (fixture data; the generator and the live site could not be run from the sandbox). Revert the merge commit to undo (the workflow step goes with it; the next rebuild rewrites the pages without the script).
+## Left
+- [ ] RISK to watch: phones now leave `/p/` pages for the shell. Crawlers are excluded by user agent, so Google should still read the product pages; watch Search Console "Pages" for `/p/` URLs over the next weeks (drop in "Indexed" or "Page with redirect" means revert).
+- [ ] After the next "Build product pages" run, confirm a rebuilt `p/abasi-5-ec.html` still contains `<!--stm-shell-->` (the generator rewrites the page, the new step puts the script back).
+- [ ] Phone check: open stermontarcade.co.ke twice, open a product, copy the address, paste it in WhatsApp (the preview should be the product), open it in a new tab (should open the shell on that product), press Back.
+- [ ] Sizes other than the page's own: `/p/abasi-5-ec.html#abasi-5-ec-50-ml` previews as the group page (all sizes), which is the page Google indexes.
+
+---
+
 # HANDOFF - Check of `/?product=<slug>` links (branch `wip-product-links-check`, 2026-10-30)
 Owner sent https://stermontarcade.co.ke/?product=abasi-5-ec-50-ml and asked to "fix issue for all product links". GitHub + Supabase were connected for this session. `fetchProducts()` -> Supabase was NOT redone (already on `main`, Step 4 below).
 ## Checked
