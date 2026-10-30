@@ -1,3 +1,20 @@
+# HANDOFF - Checkout no longer lands on the old home view (branch `wip-shell-checkout-view`, 2026-10-30)
+Owner report: on the mobile shell, Checkout "takes me to my old home screen view". Cause: Checkout hands the cart to `/classic.html?checkout=1`, which IS the old home page; it showed its whole home view (and a wait of up to ~12 s) behind the cart drawer, and closing the drawer left the customer there.
+`fetchProducts()` -> Supabase was NOT redone: it is Step 4 below (`app.js` already reads `products`, `categories`, `product-names.json`).
+
+## Done
+- [x] `classic.html`: "checkout mode" when `stm_handoff` exists. An early head script adds `stm-co stm-co-wait` to `<html>` and clears the shop's `stm_cart` (so retries never double the lines); CSS hides everything except the checkout drawer, the toast and the price-changed notice, and shows "Preparing your checkout..." until the cart opens. The old home view is never visible.
+- [x] Closing the checkout (X, backdrop or Back) goes to `/` (the shell). If the shop cart is empty at that moment (order done, or all removed) the shell cart is cleared too; otherwise the shell cart is kept.
+- [x] `mobile-shell/app.js`: the Checkout button no longer empties the shell cart at handoff, so a cancelled checkout loses nothing.
+- [x] `shell.test.py` = 69/69 (was 65): old home hidden in checkout mode, closing returns to `/`, cancelled checkout keeps the shell cart, finished order clears it. The old "shell cart emptied by the handoff" check was replaced by these.
+
+## Left
+- [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request ("Merge"), after `shell.test.py` 69/69 but BEFORE the phone check below (fixture data only). If it misbehaves, revert the merge commit.
+- [ ] Phone check, still open: add 2 items in the shell, tap Checkout, you should see only the checkout sheet (no home page), close it and land back on the shell with the items still in the cart; then one real small order and confirm the shell cart is empty afterwards.
+- [ ] Not tested against the live site/database (sandbox). Everything else from the sections below stays open.
+
+---
+
 # HANDOFF - Mobile shell becomes the home page (branch `wip-shell-home`, 2026-10-30)
 Owner request: "Replace everything, I need the mobile shell setup" (the shell was only at /mobile-shell/ and did not show on the website).
 

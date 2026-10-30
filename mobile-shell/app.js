@@ -370,8 +370,7 @@ $('#checkout').addEventListener('click', () => {
   const cart = store.get().cart; if (!cart.length) return;
   try { localStorage.setItem('stm_handoff', JSON.stringify(cart.map(i => ({ rowId: i.rowId, qty: i.qty, price: i.price, name: i.name, size: i.size })))); }
   catch { toast('Could not start checkout. Please allow site storage and try again.'); return; }
-  store.set({ cart: [] });
-  location.href = '/classic.html?checkout=1';
+  location.href = '/classic.html?checkout=1';   // the shell cart stays until the order is finished (classic.html clears it) so a cancelled checkout loses nothing
 });
 
 /* ---------- 11. Wiring ---------- */

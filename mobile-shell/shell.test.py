@@ -237,8 +237,23 @@ with sync_playwright() as p:
     check('the shop cart opens by itself with the shell items and prices', 'Hot Plate' in cart_txt and 'Air Fryer' in cart_txt and '2,500' in cart_txt and '6,500' in cart_txt, cart_txt[:200])
     check('quantities carried over (1 hot plate + 2 air fryers, KSh 15,500)', '15,500' in cart_txt, cart_txt[:300])
     check('handoff is consumed (no double add on reload)', p4.evaluate("localStorage.getItem('stm_handoff')") is None and 'checkout=1' not in p4.url)
-    check('the shell cart was emptied by the handoff', json.loads(p4.evaluate("localStorage.getItem('shell.cart')") or '[]') == [])
+    check('the shell cart is kept until the order is finished (a cancelled checkout loses nothing)', len(json.loads(p4.evaluate("localStorage.getItem('shell.cart')") or '[]')) == 2)
+    check('checkout mode: the old home page is not shown behind the checkout', p4.evaluate("document.documentElement.classList.contains('stm-co') && !document.documentElement.classList.contains('stm-co-wait') && [...document.querySelectorAll('.pcard, #featured, header, .hd-r')].every(e => e.getBoundingClientRect().width === 0 || getComputedStyle(e).visibility === 'hidden' || e.offsetParent === null)"))
+    p4.locator('#dr-x').click(); p4.wait_for_function("location.pathname === '/'", timeout=8000)
+    check('closing the checkout goes back to the shell, not the old home page', p4.url == BASE + '/', p4.url)
+    p4.wait_for_selector('#grid .card[data-id]')
+    check('cancelled checkout: the shell cart still has its items', json.loads(p4.evaluate("localStorage.getItem('shell.cart')") or '[]') != [])
     c4.close()
+
+    # a finished order (empty shop cart) clears the shell cart when the checkout is closed
+    c4b = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c4b)
+    p4b = c4b.new_page()
+    p4b.add_init_script("if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('shell.cart', JSON.stringify([{key:'home-2|Standard',id:'home-2',rowId:'home-2',name:'Kettle 1.8L',size:'Standard',qty:1,price:1800}])); localStorage.setItem('stm_handoff', JSON.stringify([{rowId:'home-2',qty:1,price:1800,name:'Kettle 1.8L',size:'Standard'}])); }")
+    p4b.goto(f'{BASE}/classic.html?checkout=1'); p4b.wait_for_selector('#dr.on', timeout=15000)
+    p4b.evaluate("localStorage.setItem('stm_cart', '{}')")
+    p4b.locator('#dr-x').click(); p4b.wait_for_function("location.pathname === '/'", timeout=8000)
+    check('finished order: the shell cart is cleared', json.loads(p4b.evaluate("localStorage.getItem('shell.cart')") or '[]') == [])
+    c4b.close()
 
     # a price that changed since the customer saw it is never charged: the line is skipped and the customer is told
     c5 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c5)

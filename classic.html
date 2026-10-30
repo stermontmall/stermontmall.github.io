@@ -446,6 +446,16 @@
     .search .sugg .sg-h button{display:inline;width:auto;padding:0;border:0;background:transparent;color:var(--orange);font-size:.78rem;font-weight:700;letter-spacing:0;text-transform:none}
     .search .sugg .sg-h button:hover{background:transparent;text-decoration:underline}
   </style>
+<style id="stm-co-css">
+/* Checkout mode: the mobile shell sent a cart here. Show only the checkout drawer, never the old home page. */
+html.stm-co body>*:not(#dr):not(#toast):not([role=alert]){display:none!important}
+html.stm-co body{background:#fff}
+html.stm-co.stm-co-wait body::before{content:"Preparing your checkout\2026";position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:#fff;color:#444;font:600 16px/1.4 system-ui,sans-serif}
+</style>
+<script>
+/* Runs before the checkout script loads: if the shell left a cart (stm_handoff), start in checkout mode with a clean shop cart so lines are never doubled. */
+try { if (localStorage.getItem('stm_handoff')) { document.documentElement.className += ' stm-co stm-co-wait'; localStorage.removeItem('stm_cart'); } } catch (e) {}
+</script>
 </head>
 <body>
   <header>
@@ -1608,7 +1618,7 @@
     var ready = window.STM && items.every(function (i) { return document.getElementById('p-' + i.rowId); });
     if (!ready && tries < 80) return;                      /* wait up to ~12 s for the catalog to build the cards */
     clearInterval(timer);
-    if (!ready) { note('The shop is still loading your items. Reload this page to continue to checkout.'); return; }   /* handoff kept, so a reload retries */
+    if (!ready) { document.documentElement.classList.remove('stm-co', 'stm-co-wait'); note('The shop is still loading your items. Reload this page to continue to checkout.'); return; }   /* handoff kept, so a reload retries */
     var skipped = [];
     items.forEach(function (i) {
       var card = document.getElementById('p-' + i.rowId), pe = card.querySelector('.price'), shown = pe ? parseInt(pe.textContent.replace(/\D/g, ''), 10) : NaN;
@@ -1618,6 +1628,15 @@
     try { localStorage.removeItem('stm_handoff'); } catch (e) {}
     if (skipped.length) note('Please add these again from the shop, their price changed: ' + skipped.join(', ') + '.');
     window.STM.open();
+    var root = document.documentElement; root.classList.remove('stm-co-wait');
+    /* Closing the checkout (X, backdrop, or Back) returns to the shell, never to the old home page. If the shop cart is empty the order is done (or everything was removed), so the shell cart is cleared too; otherwise the shell cart is kept. */
+    var dr = document.getElementById('dr'), leaving = false;
+    function leave() {
+      if (leaving || dr.classList.contains('on')) return; leaving = true;
+      try { if (!Object.keys(JSON.parse(localStorage.getItem('stm_cart') || '{}') || {}).length) localStorage.setItem('shell.cart', '[]'); } catch (e) {}
+      location.replace('/');
+    }
+    new MutationObserver(leave).observe(dr, { attributes: true, attributeFilter: ['class'] });
   }, 150);
 })();
 </script>
