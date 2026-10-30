@@ -3,13 +3,13 @@
 import sys, threading, http.server, socketserver, functools, os, tempfile, json, base64, time
 from playwright.sync_api import sync_playwright
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root: the shell reads ../product-names.json
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root: the shell reads /product-names.json
 OUT = tempfile.gettempdir()
 H = functools.partial(http.server.SimpleHTTPRequestHandler, directory=ROOT)
 H.log_message = lambda *a, **k: None
 srv = socketserver.TCPServer(('127.0.0.1', 0), H); port = srv.server_address[1]
 threading.Thread(target=srv.serve_forever, daemon=True).start()
-URL = f'http://127.0.0.1:{port}/mobile-shell/index.html'
+URL = f'http://127.0.0.1:{port}/'
 
 
 # ---- Supabase fixture: the shell talks to the real REST API in production; here the three requests it makes are answered locally ----
@@ -54,6 +54,9 @@ def on_rest(route):
 def mock_network(ctx):
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
+    for host in ('https://www.googletagmanager.com/**', 'https://cdn.jsdelivr.net/**', 'https://www.google-analytics.com/**', 'https://*.google-analytics.com/**'):
+        ctx.route(host, lambda r: r.fulfill(status=200, content_type='application/javascript', body=''))   # analytics.js loads these in production; the sandbox has no internet
+    ctx.route('**/rest/v1/stock*', lambda r: serve(r, []))
     ctx.route('**/product-names.json*', lambda r: serve(r, NAMES_FIX))
     ctx.route('https://img.test/ok.png', lambda r: r.fulfill(status=200, content_type='image/png', body=PNG))
     ctx.route('https://img.test/broken.jpg', lambda r: r.abort())
@@ -199,7 +202,7 @@ with sync_playwright() as p:
     FAIL[0] = True
     p2 = ctx.new_page(); p2.goto(URL)
     p2.wait_for_selector('#grid-empty:not([hidden])', timeout=8000)
-    check('network failure shows a retry link, no stuck skeletons', 'Could not load products' in p2.locator('#grid-empty').inner_text() and p2.locator('#grid .card[aria-hidden="true"]').count() == 0)
+    check('network failure shows a retry link, no stuck skeletons', 'Could not load products' in p2.locator('#grid-empty').inner_text() and p2.locator('#grid-empty a[href="/classic.html"]').count() == 1 and p2.locator('#grid .card[aria-hidden="true"]').count() == 0)
     FAIL[0] = False
     p2.locator('[data-retry]').click(); p2.wait_for_selector('#grid .card[data-id]')
     check('retry loads the products', p2.locator('#grid .card[data-id]').count() >= 12 and p2.locator('#grid-empty').is_hidden())
@@ -212,6 +215,53 @@ with sync_playwright() as p:
     p3.goto(URL); p3.wait_for_selector('#grid .card[data-id]')
     check('stale mock-era cart lines are dropped', p3.locator('#bottom-nav [data-badge="cart"]').is_hidden())
     c3.close()
+
+    # ---- the shell is now the home page (/): SEO head, handoff to the proven checkout, redirects ----
+    BASE = URL.rstrip('/')
+    html = pg.content()
+    check('home page keeps the SEO head (title, canonical, index robots, JSON-LD)', '<title>Stermont Arcade | Online Shopping Store in Kenya</title>' in html and 'rel="canonical" href="https://stermontarcade.co.ke/"' in html and 'index, follow' in html and html.count('application/ld+json') >= 2 and 'noindex' not in html)
+    check('home page carries the seo-links markers the build bot fills (crawlable category + product links)', html.count('<!-- seo-links:start -->') == 1 and html.count('<!-- seo-links:end -->') == 1 and '/c/' in html and '/p/' in html)
+    cls = open(os.path.join(ROOT, 'classic.html'), encoding='utf-8').read()
+    check('classic.html (old home) is noindex so only / is indexed', 'content="noindex, follow"' in cls and 'index, follow, max-image' not in cls)
+
+    c4 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c4)
+    p4 = c4.new_page(); e4 = []; p4.on('pageerror', lambda e: e4.append(str(e)))
+    p4.add_init_script("if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('shell.cart', JSON.stringify([{key:'home-0|Standard',id:'home-0',rowId:'home-0',name:'Heavy-Duty Hot Plate Pro',size:'Standard',qty:1,price:2500,emoji:'x',bg:'#fff'},{key:'home-1|Standard',id:'home-1',rowId:'home-1',name:'Air Fryer 5L',size:'Standard',qty:2,price:6500,emoji:'x',bg:'#fff'}])); }")
+    p4.goto(URL); p4.wait_for_selector('#grid .card[data-id]')
+    p4.locator('#bottom-nav [data-tab="cart"]').click()
+    p4.locator('#checkout').click()
+    p4.wait_for_url('**/classic.html*', timeout=8000)
+    check('Checkout hands the customer to the full shop checkout', '/classic.html' in p4.url)
+    p4.wait_for_selector('#dr.on', timeout=15000)
+    cart_txt = p4.locator('#dr').inner_text()
+    check('the shop cart opens by itself with the shell items and prices', 'Hot Plate' in cart_txt and 'Air Fryer' in cart_txt and '2,500' in cart_txt and '6,500' in cart_txt, cart_txt[:200])
+    check('quantities carried over (1 hot plate + 2 air fryers, KSh 15,500)', '15,500' in cart_txt, cart_txt[:300])
+    check('handoff is consumed (no double add on reload)', p4.evaluate("localStorage.getItem('stm_handoff')") is None and 'checkout=1' not in p4.url)
+    check('the shell cart was emptied by the handoff', json.loads(p4.evaluate("localStorage.getItem('shell.cart')") or '[]') == [])
+    c4.close()
+
+    # a price that changed since the customer saw it is never charged: the line is skipped and the customer is told
+    c5 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c5)
+    p5 = c5.new_page()
+    p5.add_init_script("if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('stm_handoff', JSON.stringify([{rowId:'home-0',qty:1,price:1999,name:'Hot Plate',size:'Standard'},{rowId:'home-2',qty:1,price:1800,name:'Kettle 1.8L',size:'Standard'}])); }")
+    p5.goto(f'{BASE}/classic.html?checkout=1'); p5.wait_for_selector('[role=alert]', timeout=15000)
+    check('changed price: customer is told which item to add again', 'Hot Plate' in p5.locator('[role=alert]').inner_text())
+    p5.wait_for_selector('#dr.on', timeout=5000); t5 = p5.locator('#dr').inner_text()
+    check('changed price: only the unchanged item reached the cart', 'Kettle' in t5 and '1,800' in t5 and '1,999' not in t5 and '2,500' not in t5, t5[:200])
+    c5.close()
+
+    # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
+    c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)
+    p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_function("location.pathname !== '/'", timeout=15000); p6.wait_for_timeout(1500)
+    check('old /#p-... product link opens the full shop and that product (it then shows the straight /p/ URL)', p6.url.endswith('/classic.html#p-home-0') or '/p/' in p6.url, p6.url)
+    p6.goto(f'{BASE}/mobile-shell/'); p6.wait_for_function("location.pathname === '/'", timeout=15000)
+    check('/mobile-shell/ forwards to the home page', p6.url == BASE + '/', p6.url)
+    c6.close()
+    c7 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c7)
+    p7 = c7.new_page(); p7.goto(URL); p7.wait_for_function("location.pathname === '/classic.html'", timeout=15000)
+    check('desktop screens keep the full classic shop', '/classic.html' in p7.url, p7.url)
+    c7.close()
+    check('no page errors during the handoff flow', not e4, e4[:3])
 
     check('no console/page errors', not errors, errors[:3])
     b.close()
