@@ -242,7 +242,7 @@ with sync_playwright() as p:
 
     # ---- the shell is now the home page (/): SEO head, handoff to the proven checkout, redirects ----
     BASE = URL.rstrip('/')
-    html = pg.content()
+    html = pg.evaluate("fetch('/').then(r => r.text())")   # the HTML the server sends (the live page's title changes while a product is open)
     check('home page keeps the SEO head (title, canonical, index robots, JSON-LD)', '<title>Stermont Arcade | Online Shopping Store in Kenya</title>' in html and 'rel="canonical" href="https://stermontarcade.co.ke/"' in html and 'index, follow' in html and html.count('application/ld+json') >= 2 and 'noindex' not in html)
     check('home page carries the seo-links markers the build bot fills (crawlable category + product links)', html.count('<!-- seo-links:start -->') == 1 and html.count('<!-- seo-links:end -->') == 1 and '/c/' in html and '/p/' in html)
     cls = open(os.path.join(ROOT, 'classic.html'), encoding='utf-8').read()

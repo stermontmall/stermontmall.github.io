@@ -7,7 +7,8 @@ Owner: "There are no product links on my website after clicking on an item... it
 - [x] `index.html`: a wide desktop screen sends `/?product=<slug>` to `/p/<slug>.html`; `app.js?v=4` (cache-bust rule).
 - [x] `shell.test.py`: 14 new "address:" checks.
 ## Left
-- [ ] NOT MERGED. Last full run 93/94: one check fails and has not been identified yet (run `python3 mobile-shell/shell.test.py | grep ^FAIL`). Do not merge until it is 94/94.
+- [x] Tests 94/94 (fixture data only). The one failure was the SEO-head check reading the live page, whose tab title is the product name while a product is open; it now reads the HTML the server sends.
+- [ ] NOT MERGED: waiting for the owner's "Merge" and the phone check below.
 - [ ] Shared `/?product=` links show the home page's preview card (WhatsApp/Facebook), not the product's, because the shell is one page. Sharing `/p/<slug>.html` gives the product preview but opens the old-style page. Owner to choose.
 - [ ] Phone check: open a product, confirm the address bar shows `?product=...`, copy it, open it in a new tab, press Back.
 
