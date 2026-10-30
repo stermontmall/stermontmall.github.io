@@ -1,3 +1,14 @@
+# HANDOFF - Shell showed the old version after a merge (branch `wip-shell-cache-bust`, 2026-10-30)
+Owner: after the product-details merge the sheet had no details block. The Pages build had succeeded, so the phone was running the cached old `app.js` / `index.html` (`app.js` had no version in its URL).
+## Done
+- [x] `index.html` loads `/mobile-shell/app.js?v=2` and `tailwind.css?v=2`; `sw.js` cache `stermont-v4` (old workers and caches are replaced on the next visit). `renderDetails()` returns quietly if an older cached `index.html` has no `#qb-details`. Tests 72/72.
+- [x] MERGED TO `main` at the owner's request pattern ("Merge" for each change), tests 72/72 on fixture data.
+## Left
+- [ ] RULE for every future change to `mobile-shell/app.js` or `tailwind.css`: bump the `?v=` number in `index.html` in the same commit, or phones keep the old file for up to 10 minutes (GitHub Pages cache) and until the service worker updates. Open the site twice after a deploy.
+- [ ] Phone check of the details block after the second visit.
+
+---
+
 # HANDOFF - Product details in the shell sheet (branch `wip-shell-product-details`, 2026-10-30)
 Owner: "Item seo, descriptions, all details missing". The product sheet only showed name, price, size and quantity.
 ## Done
