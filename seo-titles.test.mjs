@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { pageTitle, pageName, applyPage } from './seo-titles.mjs';
+import { pageTitle, pageName, applyPage, fitTitle } from './seo-titles.mjs';
 
 let n = 0; const ok = (a, b, m) => { assert.equal(a, b, m); n++; };
 const row = { seo_name: 'Top-Rated Absolute 375SC Systemic Fungicide', seo_title: 'Top-Rated Absolute 375SC Systemic Fungicide (1L) \u2013 Best Price in Kenya | Stermont Arcade' };
@@ -22,6 +22,20 @@ ok(pageName({ seo_name: null, seo_title: row.seo_title }, true), 'Top-Rated Abso
 ok(pageName({ seo_title: '' }, false), '');
 const dash = { seo_name: "Trendy Men's Casual Sports Sneaker - Black", seo_title: "Trendy Men's Casual Sports Sneaker - Black \u2013 Best Price in Kenya | Stermont Arcade" };
 ok(pageName(dash, false), "Trendy Men's Casual Sports Sneaker - Black");
+
+// fitTitle: the daily SEO check flags titles over 75 characters. Order: brand tail, "Best Price" -> "Price", " \u2013 ..." tail, word-boundary cut.
+const dudu = '#1 Rated Dudu-Stop 25EC Bedbug & Cockroach Killer (100ml) \u2013 Best Price in Kenya | Stermont Arcade';          // 97
+ok(fitTitle('Short Name \u2013 Price in Kenya | Stermont Arcade'), 'Short Name \u2013 Price in Kenya | Stermont Arcade');      // already fits: unchanged, brand kept
+ok(fitTitle(row.seo_title), 'Top-Rated Absolute 375SC Systemic Fungicide (1L) \u2013 Best Price in Kenya');                    // 1: drop the brand tail
+ok(fitTitle(dudu), '#1 Rated Dudu-Stop 25EC Bedbug & Cockroach Killer (100ml) \u2013 Price in Kenya');                           // 2: "Best Price" -> "Price"
+ok(fitTitle('Original Black Smartphone Gift Bundle with Watch & Power Bank \u2013 Price in Kenya | Stermont Arcade'), 'Original Black Smartphone Gift Bundle with Watch & Power Bank');   // 3: drop the tail
+ok(fitTitle('Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliet Kilo Lima Mike November Oscar Papa'), 'Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliet Kilo Lima');   // 4: word boundary, no half word ("Mike" would make 77)
+ok(fitTitle('Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliet Kilo Lima (4GB/64GB Edition Pack Extra'), 'Alpha Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliet Kilo Lima');         // no unclosed bracket left
+ok(fitTitle(dudu, 0), dudu, 'max 0 = no limit');
+ok(fitTitle(dudu, 100), dudu);
+ok(fitTitle(''), '');
+for (const t of [dudu, row.seo_title, e.seo_title, 'x'.repeat(120), 'Word '.repeat(30)]) { assert.ok(fitTitle(t).length <= 75, fitTitle(t)); n++; }
+assert.ok(fitTitle(dudu).startsWith('#1 Rated Dudu-Stop 25EC'), 'lead word and product name stay'); n++;
 
 // a page as generate-products.mjs builds it
 const ld = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
@@ -56,12 +70,12 @@ writeFileSync(join(dir, 'rows.json'), JSON.stringify([
 const log = execFileSync('node', ['seo-titles.mjs'], { env: { ...process.env, P_DIR: join(dir, 'p'), NAMES_FILE: join(dir, 'names.json'), SEO_TITLES_JSON: join(dir, 'rows.json') }, encoding: 'utf8', cwd: process.cwd() });
 const abs = readFileSync(join(dir, 'p', 'abs.html'), 'utf8'), eu = readFileSync(join(dir, 'p', 'euro.html'), 'utf8'), no = readFileSync(join(dir, 'p', 'none.html'), 'utf8');
 console.log(log.trim());
-assert.match(abs, /<title>Top-Rated Absolute 375SC Systemic Fungicide \u2013 Best Price in Kenya \| Stermont Arcade<\/title>/); n++;
+assert.match(abs, /<title>Top-Rated Absolute 375SC Systemic Fungicide \u2013 Best Price in Kenya<\/title>/); n++;      // brand tail dropped to fit 75
 assert.match(abs, /<h1>Top-Rated Absolute 375SC Systemic Fungicide<\/h1>/); n++;
-assert.match(eu, /<title>Original Euroken 50x55 Standing Cooker \(3G\+1E\) \u2013 Best Price in Kenya \| Stermont Arcade<\/title>/); n++;
+assert.match(eu, /<title>Original Euroken 50x55 Standing Cooker \(3G\+1E\) \u2013 Best Price in Kenya<\/title>/); n++;
 assert.match(eu, /<h1>Original Euroken 50x55 Standing Cooker \(3G\+1E\)<\/h1>/); n++;
 assert.match(no, /<title>Old title<\/title>/); n++; assert.match(no, /<h1>Untouched<\/h1>/); n++;
 const names = JSON.parse(readFileSync(join(dir, 'names.json'), 'utf8'));
 ok(names.keep, 'K'); ok(names['abs-1l'], row.seo_name); ok(names['abs-250'], row.seo_name); ok(names['abs-50'], row.seo_name); ok(names.euro, e.seo_name); ok(names.none, undefined);
-assert.match(log, /2 page\(s\) updated/); n++; assert.doesNotMatch(log, /whose H1 is not/); n++;
+assert.match(log, /2 page\(s\) updated/); n++; assert.match(log, /2 title\(s\) shortened to 75/); n++; assert.doesNotMatch(log, /whose H1 is not/); n++;
 console.log(`OK: ${n} checks, 0 violations`);

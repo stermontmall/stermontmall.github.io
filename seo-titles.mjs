@@ -15,6 +15,11 @@
 //     If the title has no " - " in it (e.g. "Name 1L | Ingredient | KSh 1,800"), the name is products.seo_name, so "|" never reaches the H1.
 //   - pack-size page (it contains the "Available sizes" box): the page covers every size, so a size in brackets is left out of the title and name
 //     (products.seo_name is the title head without it); the rest of the title is unchanged.
+// Length limit (added 2026-10-30, branch wip-seo-title-length): the daily SEO check flags a <title> longer than 75 characters and Google cuts
+// long titles off, but most of the owner's titles are 80-97 characters. fitTitle() shortens ONLY what goes into <title>, og:title and twitter:title,
+// in this order, stopping at the first step that fits: (1) drop the " | Stermont Arcade" brand tail, (2) "Best Price in Kenya" -> "Price in Kenya",
+// (3) drop the " \u2013 ..." tail, (4) cut at a word boundary. The owner's products.seo_title / seo_name in Supabase and the visible H1 are never changed,
+// the lead word and the product name always stay. Set SEO_TITLE_MAX=0 to switch it off (the titles are then applied exactly as written).
 // Never fails the build: any problem is logged and the page keeps its generated wording.
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 
@@ -23,6 +28,8 @@ const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';   // public anon k
 const DIR = process.env.P_DIR || 'p';
 const NAMES_FILE = process.env.NAMES_FILE || 'product-names.json';
 const SEP = ' \u2013 ';
+const BRAND = ' | Stermont Arcade';
+const MAX_TITLE = process.env.SEO_TITLE_MAX === undefined ? 75 : Number(process.env.SEO_TITLE_MAX);   // 0 = no limit
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const unesc = s => String(s ?? '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
@@ -36,6 +43,23 @@ export function pageTitle(row, multiSize) {
   const i = full.indexOf(SEP);
   const head = String(row.seo_name || '').trim();
   return i > 0 && head ? head + full.slice(i) : full;
+}
+
+// Shortens a title to at most `max` characters (see the header comment for the order). A title that already fits is returned unchanged.
+export function fitTitle(title, max = MAX_TITLE) {
+  let t = String(title || '').trim();
+  if (!max || t.length <= max) return t;
+  if (t.endsWith(BRAND)) t = t.slice(0, -BRAND.length).trim();
+  if (t.length <= max) return t;
+  const price = t.replace(/ \u2013 Best Price in Kenya$/, ' \u2013 Price in Kenya');
+  if (price.length <= max) return price;
+  const i = t.lastIndexOf(SEP);
+  if (i > 0) { t = t.slice(0, i).trim(); if (t.length <= max) return t; }
+  let c = t.slice(0, max);
+  if (t[max] !== ' ') c = c.replace(/\s+\S*$/, '');                                    // do not leave half a word
+  const open = c.lastIndexOf('(');
+  if (open > 0 && open > c.lastIndexOf(')')) c = c.slice(0, open);                  // or an unclosed bracket
+  return c.replace(/[\s,;:(\[\u2013-]+$/, '');
 }
 
 // Visible name (H1) for a page: the title up to " - "; on a pack-size page products.seo_name (no size in brackets) when it is set.
@@ -87,7 +111,7 @@ async function main() {
   }
   if (!rows.some(r => r.seo_title)) { console.log('seo-titles: no seo_title values found, nothing to do.'); return; }
 
-  let applied = 0, same = 0, noMatch = 0, viaSibling = 0, multi = 0;
+  let applied = 0, same = 0, noMatch = 0, viaSibling = 0, multi = 0, shortened = 0;
   const odd = [], nameOf = {};
   for (const f of readdirSync(DIR)) {
     if (!f.endsWith('.html')) continue;
@@ -104,8 +128,10 @@ async function main() {
     }
     const isMulti = h.includes('>Available sizes<');
     if (isMulti) multi++;
-    const title = pageTitle(row, isMulti), name = pageName(row, isMulti);
-    if (!title || !name) { noMatch++; continue; }
+    const full = pageTitle(row, isMulti), name = pageName(row, isMulti);
+    if (!full || !name) { noMatch++; continue; }
+    const title = fitTitle(full);
+    if (title !== full) shortened++;
     const out = applyPage(h, title, name);
     if (out === h) same++; else { writeFileSync(file, out); applied++; }
     for (const x of [id, ...((own && own.variant_group && groupAll[own.variant_group]) || [])]) nameOf[x] = name;
@@ -122,7 +148,7 @@ async function main() {
       if (listed) writeFileSync(NAMES_FILE, JSON.stringify(names));
     } catch (e) { console.log('seo-titles: could not update ' + NAMES_FILE + ': ' + e.message); }
   } else console.log(`seo-titles: ${NAMES_FILE} not found, shop list keeps database names.`);
-  console.log(`seo-titles: ${applied} page(s) updated, ${same} already correct, ${noMatch} without an owner title (left as generated); ${multi} pack-size page(s), ${viaSibling} matched through another size; ${listed} shop-list name(s) set.`);
+  console.log(`seo-titles: ${applied} page(s) updated, ${same} already correct, ${noMatch} without an owner title (left as generated); ${multi} pack-size page(s), ${viaSibling} matched through another size; ${listed} shop-list name(s) set; ${shortened} title(s) shortened to ${MAX_TITLE || 'no'} characters or less.`);
   if (odd.length) console.log(`seo-titles: ${odd.length} page(s) whose H1 is not the owner's name:\n  ` + odd.slice(0, 25).join('\n  '));
 }
 
