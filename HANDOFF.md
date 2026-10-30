@@ -1,3 +1,25 @@
+# HANDOFF - "Buy" before every product name (branch `wip-buy-prefix`, 2026-10-30)
+Owner request: "Can I include the word Buy before each product name? If so apply on all products." Yes: "Buy" is a normal commercial-intent word, and nothing in the repo blocks it.
+
+## Done
+- [x] `seo-meta.mjs`: `buyName(name)` (idempotent: a name already starting with "Buy" is left alone; "Buyer ..." still gets one). `pdpH1` uses it, so every generated product page H1 is "Buy <lead word> <name>".
+- [x] `seo-titles.mjs`: the owner's names (products.seo_name / seo_title head) get the same prefix on the visible H1 and in `product-names.json`. The last breadcrumb, JSON-LD names and `<title>` / og / twitter titles keep the plain name.
+- [x] `product-names.json` now carries "Buy ..." for every product id, so the shop list, the shop product view (it copies the page H1) and `mobile-shell/` all show it.
+- [x] Orders stay plain: `checkout-deferred.js` `info()` strips a leading "Buy " (cart, checkout, order rows, e-mails, WhatsApp all use it) and `storefront-live.js` strips it in the product enquiry text. `index.html` loads `storefront-live.js?v=8` and `checkout-deferred.js?v=2`.
+- [x] Tests: `node buy-name.test.mjs` = 49 checks, 0 violations (builder cases, H1 = "Buy" + previous H1, title never gets "Buy"); `node seo-titles.test.mjs` = 35 checks OK. Browser check with a mocked catalog (headless Chromium, not committed): card shows "Buy Heavy-Duty Hot Plate", the cart line shows "Heavy-Duty Hot Plate".
+
+## Not changed on purpose (say so if you want them too)
+- Database names (`products.name`, `seo_name`, `seo_title`) are untouched, so the admin catalog, stock and sales reports keep plain names. One `seo_name` already starts with "Buy"; the builder does not double it.
+- `<title>`, meta description, og/twitter titles: the 60-character limit and the owner's exact Google titles win. Many generated titles have no spare 4 characters.
+- JSON-LD `name`, the last breadcrumb, `merchant-feed.xml` (Google Shopping rejects promotional words in feed titles), category and guide pages.
+
+## Left
+- [ ] Merge to `main` (this touches `seo-meta.mjs` and `seo-titles.mjs`, both watched by `product-pages.yml`, so the rebuild starts by itself; "Run workflow" rebuilds at once). Then check 3 live product pages (pack-size, single-size, one without an owner title), the shop list card, the shop product view and one order/cart line (must be plain).
+- [ ] Pre-existing, not touched: `node seo-meta.test.mjs` already fails on `main` before this change (it still expects "Best Price in Kenya" in the tagline and older `pdpHeadings` wording). It needs its expectations brought up to date.
+- [ ] To undo: in `pdpH1` return the old value (drop `buyName`), and in `seo-titles.mjs` remove the three `buyName(...)` calls; the strip lines in checkout/storefront are harmless without it.
+
+---
+
 # HANDOFF - Mobile-first shell prototype (branch `wip-mobile-shell`, 2026-10-30)
 Owner brief: mobile shell with the layout and interaction patterns of a large Kenyan marketplace's mobile site (sticky header with search + live cart badge, chips, sidebar categories, bottom nav, history-aware sheets, 2-column dense product grid, skeletons). Built as a STANDALONE prototype in `mobile-shell/`; the live `index.html`, `storefront-live.js` and the generators are untouched.
 
