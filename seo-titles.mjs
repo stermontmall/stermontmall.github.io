@@ -5,9 +5,9 @@
 //
 // What is changed on a matched page:
 //   - <title>, og:title, twitter:title      = the owner's title
-//   - the visible <h1> and the last crumb   = the owner's name (the title up to " - ")
+//   - the visible <h1> = "Buy " + the owner's name (the title up to " - "); the last crumb keeps the plain name
 //   - JSON-LD Product / ProductGroup name and the last BreadcrumbList item
-//   - product-names.json (the shop list and the shop product view read it) for the page id and every pack size of it
+//   - product-names.json (the shop list and the shop product view read it; "Buy " + name) for the page id and every pack size of it
 //
 // How a page is matched: <meta name="stm-id"> holds the product id. A product with several pack sizes is ONE page that carries the id of its
 // earliest size (see generate-products.mjs). If that size has no seo_title but another size of the same product has, the earliest size that has one is used.
@@ -17,6 +17,7 @@
 //     (products.seo_name is the title head without it); the rest of the title is unchanged.
 // Never fails the build: any problem is logged and the page keeps its generated wording.
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { buyName } from './seo-meta.mjs';   // "Buy" before the visible name: the H1 and product-names.json get it, <title>, breadcrumb and JSON-LD keep the plain name
 
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
 const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';   // public anon key, same one generate-products.mjs uses
@@ -56,7 +57,7 @@ export function applyPage(h, title, name) {
   return h.replace(/<title>[\s\S]*?<\/title>/, () => `<title>${t}</title>`)
     .replace(/(<meta property="og:title" content=")[^"]*(">)/, (_, a, b) => a + t + b)
     .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, (_, a, b) => a + t + b)
-    .replace(/<h1>[\s\S]*?<\/h1>/, () => `<h1>${n}</h1>`)
+    .replace(/<h1>[\s\S]*?<\/h1>/, () => `<h1>${esc(buyName(name))}</h1>`)
     .replace(/(<nav class="bc">[\s\S]*? \u203a )([^<\u203a]*)(<\/nav>)/, (_, a, b, c) => a + n + c)
     .replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g, (all, j) => {
       try {
@@ -108,10 +109,10 @@ async function main() {
     if (!title || !name) { noMatch++; continue; }
     const out = applyPage(h, title, name);
     if (out === h) same++; else { writeFileSync(file, out); applied++; }
-    for (const x of [id, ...((own && own.variant_group && groupAll[own.variant_group]) || [])]) nameOf[x] = name;
+    for (const x of [id, ...((own && own.variant_group && groupAll[own.variant_group]) || [])]) nameOf[x] = buyName(name);
     // audit: the visible H1 must now be the owner's name
     const h1 = (out.match(/<h1>([\s\S]*?)<\/h1>/) || [])[1];
-    if (!h1 || norm(h1) !== norm(name)) odd.push(`${f}: H1 "${unesc(h1)}" vs name "${name}"`);
+    if (!h1 || norm(h1) !== norm(buyName(name))) odd.push(`${f}: H1 "${unesc(h1)}" vs name "${name}"`);
   }
   // the shop list and the shop product view read product-names.json (id -> heading), so they carry the same names as the pages
   let listed = 0;
