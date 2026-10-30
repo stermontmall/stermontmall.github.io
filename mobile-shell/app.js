@@ -42,7 +42,7 @@ function buildCatalog(rows, cats, names) {
     const rep = live[0], c = byId.get(rep.category_id), top = topOf(c); if (!c || !top) return;
     const low = sizes[0], img = (live.map(r => (r.images || [])[0]).find(Boolean)) || '';
     out.push({
-      id: key, cat: top.slug, catName: top.name, sub: c.parent_id ? c.name : '', name: (names && names[rep.id]) || rep.name,
+      id: key, slug: rs[0].slug || '', cat: top.slug, catName: top.name, sub: c.parent_id ? c.name : '', name: (names && names[rep.id]) || rep.name,   // slug: earliest size = the group's generated /p/ page
       img, emoji: ICONS[top.slug] || '🛍️', bg: BGS[hashStr(key) % BGS.length],
       price: low.price, old: low.old, sizes, featured: !!rep.featured, rating: 0, reviews: 0   // no ratings exist in the database
     });
@@ -66,6 +66,9 @@ function loadCatalog() {
 }
 const discOf = p => p.old ? Math.round((1 - p.price / p.old) * 100) : 0;
 const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
+/* Address-bar link of a product: its generated page, /p/<slug>.html. Opening a product shows this address (so the link can be copied and shared);
+   Back restores the previous address. Every pack size's own /p/ address forwards to the group page, so the earliest size's slug is always valid. */
+const productUrl = p => (p && p.slug) ? '/p/' + encodeURIComponent(p.slug) + '.html' : undefined;
 /* thumbnail markup: the product photo, or the category emoji when there is none (or it fails to load, see the error listener in section 11) */
 const thumb = p => p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" decoding="async" data-emoji="${esc(p.emoji)}" style="width:100%;height:100%;object-fit:contain;background:#fff">` : p.emoji;
 
@@ -121,7 +124,8 @@ store.subscribe((s, prev) => {
 /* ---------- 3. Overlays wired to browser history ----------
    Opening pushes a history entry holding the overlay stack; the device Back button (popstate)
    pops it and closes the overlay instead of leaving the page. UI close buttons call history.back()
-   so the history stays in sync. Reload or forward into a stale entry never reopens a sheet. */
+   so the history stays in sync. Reload or forward into a stale entry never reopens a sheet.
+   An overlay can also carry an address (the product sheet shows /p/<slug>.html); Back restores the address of the entry below it. */
 const OVERLAYS = ['drawer-categories', 'sheet-filters', 'sheet-quickbuy', 'page-product'];
 let stack = [];
 let afterClose = null;
@@ -138,10 +142,10 @@ function syncOverlays() {
   scrim.classList.toggle('open', stack.length > 0);
   document.body.classList.toggle('no-scroll', stack.length > 0);
 }
-function openOverlay(id) {
+function openOverlay(id, url) {
   if (stack.includes(id)) return;
   stack.push(id);
-  history.pushState({ tab: store.get().tab, stack: [...stack] }, '');
+  history.pushState({ tab: store.get().tab, stack: [...stack] }, '', url);   // url undefined = the address stays as it is
   syncOverlays();
   const el = $('#' + id); const f = el.querySelector('button,input'); if (f) f.focus({ preventScroll: true });
 }
@@ -387,13 +391,13 @@ async function renderPP() {
   if (!pp.img && imgs[0]) $('#pp-img').innerHTML = thumb({ img: imgs[0], emoji: p.emoji });
   $('#pp-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-pp-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: p.emoji })}</button>`).join('') : '';
 }
-function openProductPage() { if (!qb.p) return; pp.img = ''; renderPP(); $('#pp-body').scrollTop = 0; openOverlay('page-product'); }
+function openProductPage() { if (!qb.p) return; pp.img = ''; renderPP(); $('#pp-body').scrollTop = 0; openOverlay('page-product'); }   // the address is already the product's (set by the sheet)
 $('#qb-page').addEventListener('click', e => { e.preventDefault(); openProductPage(); });   // the href stays as a fallback (new tab / no script)
 document.addEventListener('click', e => {
   const t = e.target; let el;
   if ((el = t.closest('[data-pp-size]'))) { qb.size = el.dataset.ppSize; pp.img = ''; renderPP(); renderQB(); return; }
   if ((el = t.closest('[data-pp-photo]'))) { pp.img = el.dataset.ppPhoto; $('#pp-img').innerHTML = thumb({ img: pp.img, emoji: qb.p.emoji }); return; }
-  if ((el = t.closest('[data-pp-open]'))) { const x = PRODUCTS.find(y => y.id === el.dataset.ppOpen); if (!x) return; qb.p = x; qb.size = x.sizes[0].label; qb.qty = 1; qb.shown = ''; pp.img = ''; renderPP(); renderQB(); $('#pp-body').scrollTop = 0; return; }
+  if ((el = t.closest('[data-pp-open]'))) { const x = PRODUCTS.find(y => y.id === el.dataset.ppOpen); if (!x) return; qb.p = x; qb.size = x.sizes[0].label; qb.qty = 1; qb.shown = ''; pp.img = ''; renderPP(); renderQB(); $('#pp-body').scrollTop = 0; const u = productUrl(x); if (u) history.replaceState(history.state, '', u); return; }   // the address follows the product shown
   if (t.closest('[data-pp-retry]')) return renderPP();
   if (t.closest('[data-pp-cart]')) return closeAllThen(() => goTab('cart'));
 });
@@ -404,7 +408,7 @@ $('#pp-buy').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty);
 
 function openQuickBuy(id) {
   const p = feed.items.get(id); if (!p) return;
-  qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
+  qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy', productUrl(p));   // the address bar now shows the product link
 }
 $('#qb-sizes').addEventListener('click', e => { const b = e.target.closest('[data-size]'); if (b) { qb.size = b.dataset.size; renderQB(); } });
 $('#qb-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderQB(); });
