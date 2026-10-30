@@ -122,7 +122,7 @@ store.subscribe((s, prev) => {
    Opening pushes a history entry holding the overlay stack; the device Back button (popstate)
    pops it and closes the overlay instead of leaving the page. UI close buttons call history.back()
    so the history stays in sync. Reload or forward into a stale entry never reopens a sheet. */
-const OVERLAYS = ['drawer-categories', 'sheet-filters', 'sheet-quickbuy'];
+const OVERLAYS = ['drawer-categories', 'sheet-filters', 'sheet-quickbuy', 'page-product'];
 let stack = [];
 let afterClose = null;
 let opener = null;
@@ -152,7 +152,7 @@ function closeAllThen(fn) { // close every overlay, then run fn once history has
 }
 window.addEventListener('popstate', e => {
   const st = e.state || { tab: 'home', stack: [] };
-  stack = (st.stack || []).filter(id => OVERLAYS.includes(id) && !(id === 'sheet-quickbuy' && !qb.p));
+  stack = (st.stack || []).filter(id => OVERLAYS.includes(id) && !((id === 'sheet-quickbuy' || id === 'page-product') && !qb.p));
   if (st.tab && st.tab !== store.get().tab) showTab(st.tab);
   syncOverlays();
   if (!stack.length && opener) { opener.focus?.({ preventScroll: true }); opener = null; }
@@ -361,6 +361,47 @@ document.addEventListener('click', e => {
   if (ph && qb.p) { $('#qb-img').innerHTML = thumb({ img: ph.dataset.photo, emoji: qb.p.emoji }); return; }
   if (e.target.closest('[data-retry-details]') && qb.p) { const id = sizeOf(qb.p, qb.size).rowId; renderDetails(id); }
 });
+/* ---------- 9b. Product page: the full product view, inside the shell (replaces the link to the old /p/ page) ----------
+   It shares the selection (product, size, quantity) with the quick-buy sheet, so both always agree. Opening it pushes one history entry,
+   so Back returns to the sheet / list the customer came from. The generated /p/<slug>.html pages stay as they are for Google. */
+const pp = { img: '' };
+async function renderPP() {
+  const p = qb.p; if (!p) return;
+  const sz = sizeOf(p, qb.size), off = sz.old ? Math.round((1 - sz.price / sz.old) * 100) : 0, rowId = sz.rowId;
+  $('#pp-title').textContent = p.name; $('#pp-name').textContent = p.name;
+  $('#pp-img').style.background = '#fff'; $('#pp-img').innerHTML = thumb({ img: pp.img || p.img, emoji: p.emoji });
+  $('#pp-price').textContent = 'KSh ' + fmt(sz.price); $('#pp-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : ''; $('#pp-off').textContent = off ? '-' + off + '%' : '';
+  $('#pp-qty').textContent = qb.qty;
+  $('#pp-sizes').innerHTML = p.sizes.map(x => `<button class="chip !h-9 !px-4" data-pp-size="${esc(x.label)}" aria-selected="${x.label === qb.size}">${esc(x.label)}</button>`).join('');
+  const rel = PRODUCTS.filter(x => x.cat === p.cat && x.id !== p.id).sort((a, b) => (b.sub === p.sub) - (a.sub === p.sub)).slice(0, 8);
+  $('#pp-related-wrap').hidden = !rel.length;
+  $('#pp-related').innerHTML = rel.map(x => `<button class="tap" data-pp-open="${esc(x.id)}" style="flex:none;width:112px;text-align:left"><span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:112px;height:112px;background:#fff;border:1px solid #e5e7eb">${thumb(x)}</span><span class="line-clamp-2 text-xs" style="display:block;margin-top:4px">${esc(x.name)}</span><span class="text-xs font-bold text-sale">KSh ${fmt(x.price)}</span></button>`).join('');
+  $('#pp-desc').textContent = 'Loading details\u2026'; $('#pp-meta').textContent = ''; $('#pp-photos').innerHTML = '';
+  const d = await detailsFor(rowId);
+  if (!qb.p || sizeOf(qb.p, qb.size).rowId !== rowId) return;
+  if (!d) { $('#pp-desc').innerHTML = 'Could not load the details. <button class="underline text-brand" data-pp-retry>Try again</button>'; return; }
+  const left = Number(d.stock), low = Number(d.low_at) || 5;
+  $('#pp-meta').textContent = [d.unit ? 'Unit: ' + d.unit : '', left > 0 ? (left <= low ? 'Only ' + left + ' left' : 'In stock') : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
+  $('#pp-desc').textContent = (d.description || '').trim() || 'No description yet. Ask us on WhatsApp for more details.';
+  const imgs = (d.images || []).filter(Boolean);
+  if (!pp.img && imgs[0]) $('#pp-img').innerHTML = thumb({ img: imgs[0], emoji: p.emoji });
+  $('#pp-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-pp-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: p.emoji })}</button>`).join('') : '';
+}
+function openProductPage() { if (!qb.p) return; pp.img = ''; renderPP(); $('#pp-body').scrollTop = 0; openOverlay('page-product'); }
+$('#qb-page').addEventListener('click', e => { e.preventDefault(); openProductPage(); });   // the href stays as a fallback (new tab / no script)
+document.addEventListener('click', e => {
+  const t = e.target; let el;
+  if ((el = t.closest('[data-pp-size]'))) { qb.size = el.dataset.ppSize; pp.img = ''; renderPP(); renderQB(); return; }
+  if ((el = t.closest('[data-pp-photo]'))) { pp.img = el.dataset.ppPhoto; $('#pp-img').innerHTML = thumb({ img: pp.img, emoji: qb.p.emoji }); return; }
+  if ((el = t.closest('[data-pp-open]'))) { const x = PRODUCTS.find(y => y.id === el.dataset.ppOpen); if (!x) return; qb.p = x; qb.size = x.sizes[0].label; qb.qty = 1; qb.shown = ''; pp.img = ''; renderPP(); renderQB(); $('#pp-body').scrollTop = 0; return; }
+  if (t.closest('[data-pp-retry]')) return renderPP();
+  if (t.closest('[data-pp-cart]')) return closeAllThen(() => goTab('cart'));
+});
+$('#pp-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderPP(); renderQB(); });
+$('#pp-minus').addEventListener('click', () => { qb.qty = Math.max(1, qb.qty - 1); renderPP(); renderQB(); });
+$('#pp-add').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty); toast('Added to cart'); });
+$('#pp-buy').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty); closeAllThen(() => goTab('cart')); });
+
 function openQuickBuy(id) {
   const p = feed.items.get(id); if (!p) return;
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');

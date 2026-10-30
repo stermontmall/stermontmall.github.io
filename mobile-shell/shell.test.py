@@ -128,6 +128,20 @@ with sync_playwright() as p:
     check('details: link to the full product page of that size', pg.locator('#qb-page').get_attribute('href') == '/p/agro-abc-250ml.html' and pg.locator('#qb-page').is_visible(), pg.locator('#qb-page').get_attribute('href'))
     check('details: extra photos listed and tapping one changes the main photo', pg.locator('#qb-photos [data-photo]').count() == 2 and (pg.locator('#qb-photos [data-photo]').nth(1).click() or True) and pg.locator('#qb-img img').count() == 1)
     pg.screenshot(path=f'{OUT}/shot-details.png')
+    # the full product page opens INSIDE the shell (no navigation to /p/...)
+    url_before = pg.url
+    pg.locator('#qb-page').click()
+    pg.wait_for_selector('#page-product.open', timeout=5000)
+    pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Absolute')", timeout=5000)
+    check('product page opens inside the shell (same URL, shell still loaded)', pg.url == url_before and pg.locator('#bottom-nav').count() == 1, pg.url)
+    check('product page shows name, price, sizes, description, unit and trust lines', 'Absolute 375SC Fungicide' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
+    pg.screenshot(path=f'{OUT}/shot-product-page.png')
+    check('product page: similar products listed', pg.locator('#pp-related [data-pp-open]').count() >= 1)
+    pg.locator('#pp-sizes [data-pp-size="1 Litre"]').click()
+    check('product page: picking a size updates the price', pg.locator('#pp-price').inner_text() == 'KSh 6,450', pg.locator('#pp-price').inner_text())
+    pg.locator('#pp-sizes [data-pp-size="250 ml"]').click()
+    pg.go_back(); pg.wait_for_function("!document.querySelector('#page-product.open')", timeout=5000)
+    check('Back from the product page returns to the sheet, still on the shell', pg.locator('#sheet-quickbuy.open').count() == 1 and pg.url == url_before, pg.url)
     pg.go_back(); pg.wait_for_timeout(350)
 
     # forward must not reopen a stale sheet with no data? (it has data in-session, so allowed); just ensure no errors
@@ -274,6 +288,19 @@ with sync_playwright() as p:
     p5.wait_for_selector('#dr.on', timeout=5000); t5 = p5.locator('#dr').inner_text()
     check('changed price: only the unchanged item reached the cart', 'Kettle' in t5 and '1,800' in t5 and '1,999' not in t5 and '2,500' not in t5, t5[:200])
     c5.close()
+
+    # product page: Add to cart and Buy now work from the full page
+    c8 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c8)
+    p8 = c8.new_page(); p8.goto(URL); p8.wait_for_selector('#grid .card[data-id]')
+    p8.locator('#grid .card[data-id="agro-abc"] [data-add]').click(); p8.wait_for_selector('#sheet-quickbuy.open')
+    p8.locator('#qb-page').click(); p8.wait_for_selector('#page-product.open')
+    p8.locator('#pp-plus').click(); p8.locator('#pp-add').click()
+    check('product page: Add to cart adds the chosen size and quantity', p8.locator('#bottom-nav [data-badge="cart"]').inner_text() == '2', p8.locator('#bottom-nav [data-badge="cart"]').inner_text())
+    p8.locator('#pp-related [data-pp-open]').first.click()
+    check('product page: a similar product replaces the one shown', 'Absolute' not in p8.locator('#pp-name').inner_text())
+    p8.locator('#pp-buy').click(); p8.wait_for_selector('#view-cart:not([hidden])', timeout=5000)
+    check('product page: Buy now lands on the Cart tab with both items', p8.locator('#page-product.open').count() == 0 and p8.locator('#view-cart').is_visible() and p8.locator('#cart-list li').count() == 2, p8.locator('#cart-list li').count())
+    c8.close()
 
     # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
     c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)

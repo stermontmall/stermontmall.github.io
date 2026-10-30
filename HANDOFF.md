@@ -1,3 +1,17 @@
+# HANDOFF - Product page inside the shell (branch `wip-shell-product-page`, 2026-10-30)
+Owner: "View the full product page takes you to the old website view. Make it the mobile shell view... maintain the mobile shell UI everywhere."
+## Done
+- [x] `index.html` + `app.js` (section 9b): a full-screen product page inside the shell (`#page-product`, overlay #4 in the history stack). Opened from the sheet's "See full product details" link (the `href` to `/p/<slug>.html` stays as a fallback). Shows: big photo (whole, not cropped) + photo strip, name, price/old price/% off, unit + stock, pack-size chips, quantity stepper, M-Pesa / 47 counties / Sarit Centre pickup lines, the full description, "More like this" (same category/sub-category), and a sticky Add to cart / Buy now bar. It shares the selection with the sheet; Back returns to the sheet, then the list; Buy now and the cart icon go to the Cart tab. The generated `/p/` pages are untouched (they are what Google indexes).
+- [x] Fixed on the way: the WhatsApp button covered "Buy now" and the Account tab. It now sits above the bottom nav and hides while a sheet or page is open (`index.html` style block).
+- [x] `index.html` loads `app.js?v=3` (cache-bust rule below). `shell.test.py` = 80/80 (new: opens in the shell without leaving `/`, content, size price, similar products, Back order, Add to cart quantities, Buy now).
+## Left (everything else that still leaves the shell UI)
+- [ ] Pages the shell links to still have the old look: `/c/*.html` category pages, `/account.html`, `/track.html`, `/shipping.html`, `/returns.html`, `/contact.html`, `/classic.html` ("Open the full shop"). The checkout itself still runs in `classic.html` in checkout mode (drawer only). Proposed next: a shared shell header + bottom nav for those pages, and native Track / Account tabs.
+- [ ] Visitors landing on `/p/<slug>.html` from Google still get the old page layout (kept on purpose for SEO until decided).
+- [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request ("Merge"), tests 80/80 (fixture data only). Revert the merge commit if it misbehaves.
+- [ ] Phone check: open a product, tap "See full product details", try sizes, Add to cart, Back.
+
+---
+
 # HANDOFF - Shell showed the old version after a merge (branch `wip-shell-cache-bust`, 2026-10-30)
 Owner: after the product-details merge the sheet had no details block. The Pages build had succeeded, so the phone was running the cached old `app.js` / `index.html` (`app.js` had no version in its URL).
 ## Done
