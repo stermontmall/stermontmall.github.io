@@ -1,3 +1,12 @@
+# HANDOFF - Shell product photos shown whole (branch `wip-shell-product-images`, 2026-10-30)
+Owner: "Fix real product images". Screenshot from the phone showed TVs and tall photos cut off in the grid.
+## Done
+- [x] `mobile-shell/app.js` `thumb()`: `object-fit:cover` -> `object-fit:contain` on a white background, so the whole photo shows on grid cards, the quick-buy sheet and cart lines (nothing cropped). Failed photos still fall back to the category emoji. `shell.test.py` = 69/69.
+## Left
+- [ ] Phone check on the real photos. If "real product images" meant something else (wrong photo on a product, missing photos, blurry/heavy photos), tell me which product; the photos are still the full-size Storage files (no resize), see the "Photos" item below.
+
+---
+
 # HANDOFF - Checkout no longer lands on the old home view (branch `wip-shell-checkout-view`, 2026-10-30)
 Owner report: on the mobile shell, Checkout "takes me to my old home screen view". Cause: Checkout hands the cart to `/classic.html?checkout=1`, which IS the old home page; it showed its whole home view (and a wait of up to ~12 s) behind the cart drawer, and closing the drawer left the customer there.
 `fetchProducts()` -> Supabase was NOT redone: it is Step 4 below (`app.js` already reads `products`, `categories`, `product-names.json`).

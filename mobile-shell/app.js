@@ -67,7 +67,7 @@ function loadCatalog() {
 const discOf = p => p.old ? Math.round((1 - p.price / p.old) * 100) : 0;
 const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
 /* thumbnail markup: the product photo, or the category emoji when there is none (or it fails to load, see the error listener in section 11) */
-const thumb = p => p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" decoding="async" data-emoji="${esc(p.emoji)}" style="width:100%;height:100%;object-fit:cover">` : p.emoji;
+const thumb = p => p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" decoding="async" data-emoji="${esc(p.emoji)}" style="width:100%;height:100%;object-fit:contain;background:#fff">` : p.emoji;
 
 /* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
 async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 12 }) {
