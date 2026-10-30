@@ -37,7 +37,7 @@ function buildCatalog(rows, cats, names) {
   groups.forEach((rs, key) => {
     const live = rs.filter(r => r.stock > 0);
     if (!live.length) return;                                   // sold out everywhere: not shown in the shell
-    const sizes = live.map(r => ({ rowId: r.id, label: r.variant_label || 'Standard', price: Number(r.price), old: Number(r.old_price) > Number(r.price) ? Number(r.old_price) : 0 }))
+    const sizes = live.map(r => ({ rowId: r.id, slug: r.slug || '', label: r.variant_label || 'Standard', price: Number(r.price), old: Number(r.old_price) > Number(r.price) ? Number(r.old_price) : 0 }))
       .sort((a, b) => a.price - b.price);
     const rep = live[0], c = byId.get(rep.category_id), top = topOf(c); if (!c || !top) return;
     const low = sizes[0], img = (live.map(r => (r.images || [])[0]).find(Boolean)) || '';
@@ -121,12 +121,24 @@ store.subscribe((s, prev) => {
 /* ---------- 3. Overlays wired to browser history ----------
    Opening pushes a history entry holding the overlay stack; the device Back button (popstate)
    pops it and closes the overlay instead of leaving the page. UI close buttons call history.back()
-   so the history stays in sync. Reload or forward into a stale entry never reopens a sheet. */
+   so the history stays in sync. Reload or forward into a stale entry never reopens a sheet.
+   A product sheet / product page also puts the product's own link (/p/<slug>.html) in the address bar, so the link can be copied,
+   shared and reloaded; Back restores the previous address (/) by itself because each entry keeps its own URL. */
 const OVERLAYS = ['drawer-categories', 'sheet-filters', 'sheet-quickbuy', 'page-product'];
 let stack = [];
 let afterClose = null;
 let opener = null;
 const scrim = $('#scrim');
+const baseTitle = document.title;
+const productOpen = () => stack.includes('sheet-quickbuy') || stack.includes('page-product');
+const productUrl = () => { const sz = qb.p && sizeOf(qb.p, qb.size); return sz && sz.slug ? '/p/' + encodeURIComponent(sz.slug) + '.html' : ''; };
+/* keep the address bar and tab title on the product that is open (called when the size or the product changes) */
+function syncProductUrl() {
+  if (!productOpen() || !qb.p) return;
+  const u = productUrl() || '/';
+  if (location.pathname !== u) history.replaceState(history.state, '', u);
+  document.title = qb.p.name + ' | Stermont Arcade';
+}
 
 function syncOverlays() {
   OVERLAYS.forEach(id => {
@@ -141,7 +153,9 @@ function syncOverlays() {
 function openOverlay(id) {
   if (stack.includes(id)) return;
   stack.push(id);
-  history.pushState({ tab: store.get().tab, stack: [...stack] }, '');
+  const u = (id === 'sheet-quickbuy' || id === 'page-product') ? productUrl() : '';   // other overlays keep the current address
+  history.pushState({ tab: store.get().tab, stack: [...stack] }, '', u || undefined);
+  if (u) document.title = qb.p.name + ' | Stermont Arcade';
   syncOverlays();
   const el = $('#' + id); const f = el.querySelector('button,input'); if (f) f.focus({ preventScroll: true });
 }
@@ -155,6 +169,11 @@ window.addEventListener('popstate', e => {
   stack = (st.stack || []).filter(id => OVERLAYS.includes(id) && !((id === 'sheet-quickbuy' || id === 'page-product') && !qb.p));
   if (st.tab && st.tab !== store.get().tab) showTab(st.tab);
   syncOverlays();
+  if (productOpen()) syncProductUrl();                                  // the entry's address matches the size that is selected now
+  else {
+    document.title = baseTitle;
+    if (location.pathname.startsWith('/p/')) history.replaceState({ tab: st.tab || 'home', stack: [] }, '', '/');   // a stale product entry (reload / forward) never leaves a product address on the shell
+  }
   if (!stack.length && opener) { opener.focus?.({ preventScroll: true }); opener = null; }
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
@@ -337,6 +356,7 @@ function renderQB() {
   $('#qb-qty').textContent = qb.qty;
   $('#qb-sizes').innerHTML = p.sizes.map(s => `<button class="chip !h-9 !px-4" data-size="${esc(s.label)}" aria-selected="${s.label === qb.size}">${esc(s.label)}</button>`).join('');
   if (qb.shown !== sz.rowId) { qb.shown = sz.rowId; renderDetails(sz.rowId); }   // quantity changes do not reload the details
+  syncProductUrl();                                                                // the address bar follows the chosen size
 }
 /* Details (description, unit, stock, extra photos, page link) are fetched when a product is opened, not with the list: the descriptions are long
    (about 500 words for the agrochemicals), so loading all of them up front would slow the grid. Only named columns are read (never `cost`). */
@@ -368,6 +388,7 @@ const pp = { img: '' };
 async function renderPP() {
   const p = qb.p; if (!p) return;
   const sz = sizeOf(p, qb.size), off = sz.old ? Math.round((1 - sz.price / sz.old) * 100) : 0, rowId = sz.rowId;
+  syncProductUrl();                                                                // the address bar follows the chosen size / product
   $('#pp-title').textContent = p.name; $('#pp-name').textContent = p.name;
   $('#pp-img').style.background = '#fff'; $('#pp-img').innerHTML = thumb({ img: pp.img || p.img, emoji: p.emoji });
   $('#pp-price').textContent = 'KSh ' + fmt(sz.price); $('#pp-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : ''; $('#pp-off').textContent = off ? '-' + off + '%' : '';
