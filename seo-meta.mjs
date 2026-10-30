@@ -74,12 +74,10 @@ export function pdpH1(name, ctx = {}) {
   return `${lead} ${base}`;
 }
 
-// One visible line under the H1 on the product page. Same claims as the meta description (genuine only where true).
-//   "Best Price in Kenya · 100% genuine & high-potency · M-Pesa checkout · Delivery to all 47 counties"
+// One visible line under the H1 on the product page. Only facts that are true for every product (no price or quality superlatives):
+//   "M-Pesa checkout · Delivery to all 47 counties · Pickup at Sarit Centre, Westlands"
 export function pdpTagline(ctx = {}) {
-  const desc = DESCRIPTOR[productType(ctx.catSlug)];
-  const claim = isGenuine(ctx) ? `100% genuine & ${desc}` : desc.charAt(0).toUpperCase() + desc.slice(1);
-  return `Best Price in Kenya \u00b7 ${claim} \u00b7 M-Pesa checkout \u00b7 Delivery to all 47 counties`;
+  return 'M-Pesa checkout \u00b7 Delivery to all 47 counties \u00b7 Pickup at Sarit Centre, Westlands';
 }
 
 // PDP meta title, max 60 characters.
@@ -173,5 +171,5 @@ export function pdpHeadings(catSlug) {
   const features = isPest(catSlug) ? 'Powerful Features & Target Dudu Control'
     : PCPB_CATS.has(catSlug) ? 'Powerful Features & Target Crop Protection'
     : null;
-  return { features, guide: 'Reliable Quality & Application Guide', price: 'Best Price & Countrywide Kenya Delivery', delivery: 'Delivery to Nairobi & All 47 Counties' };
+  return { features, guide: 'Reliable Quality & Application Guide', price: 'Price, M-Pesa Checkout & Kenya Delivery', delivery: 'Delivery to Nairobi & All 47 Counties' };
 }
