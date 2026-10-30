@@ -37,7 +37,7 @@ function buildCatalog(rows, cats, names) {
   groups.forEach((rs, key) => {
     const live = rs.filter(r => r.stock > 0);
     if (!live.length) return;                                   // sold out everywhere: not shown in the shell
-    const sizes = live.map(r => ({ rowId: r.id, label: r.variant_label || 'Standard', price: Number(r.price), old: Number(r.old_price) > Number(r.price) ? Number(r.old_price) : 0 }))
+    const sizes = live.map(r => ({ rowId: r.id, label: r.variant_label || 'Standard', stock: Number(r.stock) || 0, price: Number(r.price), old: Number(r.old_price) > Number(r.price) ? Number(r.old_price) : 0 }))
       .sort((a, b) => a.price - b.price);
     const rep = live[0], c = byId.get(rep.category_id), top = topOf(c); if (!c || !top) return;
     const low = sizes[0], img = (live.map(r => (r.images || [])[0]).find(Boolean)) || '';
@@ -66,6 +66,8 @@ function loadCatalog() {
 }
 const discOf = p => p.old ? Math.round((1 - p.price / p.old) * 100) : 0;
 const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
+/* most one order line can hold: the size's stock, never more than 99 (cart lines saved before this field existed have no stock and keep the 99 cap) */
+const maxQty = stock => Math.min(99, Number.isFinite(stock) ? Math.max(1, stock) : 99);
 /* thumbnail markup: the product photo, or the category emoji when there is none (or it fails to load, see the error listener in section 11) */
 const thumb = p => p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" decoding="async" data-emoji="${esc(p.emoji)}" style="width:100%;height:100%;object-fit:cover">` : p.emoji;
 
@@ -331,15 +333,24 @@ function openQuickBuy(id) {
   const p = feed.items.get(id); if (!p) return;
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; renderQB(); openOverlay('sheet-quickbuy');
 }
-$('#qb-sizes').addEventListener('click', e => { const b = e.target.closest('[data-size]'); if (b) { qb.size = b.dataset.size; renderQB(); } });
-$('#qb-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderQB(); });
+$('#qb-sizes').addEventListener('click', e => { const b = e.target.closest('[data-size]'); if (b) { qb.size = b.dataset.size; qb.qty = Math.min(qb.qty, maxQty(sizeOf(qb.p, qb.size).stock)); renderQB(); } });   // a smaller size may have less stock
+$('#qb-plus').addEventListener('click', () => {
+  const max = maxQty(sizeOf(qb.p, qb.size).stock);
+  if (qb.qty >= max) { if (max < 99) toast('Only ' + max + ' in stock'); return; }
+  qb.qty++; renderQB();
+});
 $('#qb-minus').addEventListener('click', () => { qb.qty = Math.max(1, qb.qty - 1); renderQB(); });
+/* Adds qty of one size, never taking the cart line above that size's stock. Returns the message to show. */
 function addToCart(p, size, qty) {
   const sz = sizeOf(p, size), key = p.id + '|' + sz.label, cart = store.get().cart.map(i => ({ ...i })), hit = cart.find(i => i.key === key);
-  if (hit) hit.qty += qty; else cart.push({ key, id: p.id, rowId: sz.rowId, name: p.name, size: sz.label, qty, price: sz.price, img: p.img, emoji: p.emoji, bg: p.bg });
+  const max = maxQty(sz.stock), add = Math.min(qty, max - (hit ? hit.qty : 0));
+  if (add <= 0) return 'All ' + max + ' in stock are already in your cart';
+  if (hit) { hit.qty += add; hit.stock = sz.stock; }
+  else cart.push({ key, id: p.id, rowId: sz.rowId, name: p.name, size: sz.label, qty: add, stock: sz.stock, price: sz.price, img: p.img, emoji: p.emoji, bg: p.bg });
   store.set({ cart });
+  return add < qty ? 'Added ' + add + ': that is all we have in stock' : 'Added to cart';
 }
-$('#qb-add').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty); toast('Added to cart'); closeTop(); });
+$('#qb-add').addEventListener('click', () => { toast(addToCart(qb.p, qb.size, qb.qty)); closeTop(); });
 $('#qb-buy').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty); goTab('cart'); });
 
 /* ---------- 10. Cart view ---------- */
@@ -361,8 +372,10 @@ store.subscribe(s => {
 });
 $('#cart-list').addEventListener('click', e => {
   const b = e.target.closest('[data-qty]'); if (!b) return;
-  const cart = store.get().cart.map(i => i.key === b.dataset.qty ? { ...i, qty: i.qty + +b.dataset.d } : i).filter(i => i.qty > 0);
-  store.set({ cart });
+  const cart = store.get().cart, line = cart.find(i => i.key === b.dataset.qty); if (!line) return;
+  const d = +b.dataset.d, max = maxQty(line.stock);
+  if (d > 0 && line.qty >= max) { if (max < 99) toast('Only ' + max + ' in stock'); return; }
+  store.set({ cart: cart.map(i => i.key === line.key ? { ...i, qty: i.qty + d } : i).filter(i => i.qty > 0) });
 });
 $('#checkout').addEventListener('click', () => toast('Prototype: M-Pesa checkout would start here'));
 
@@ -378,7 +391,7 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-tab]'))) return goTab(el.dataset.tab);
   if ((el = t.closest('[data-open]'))) { opener = el; if (el.dataset.open === 'sheet-filters') { draftSort = store.get().filters.sort; syncFilterUI(); } return openOverlay(el.dataset.open); }
   if ((el = t.closest('[data-close]'))) return closeTop();
-  if ((el = t.closest('[data-add]'))) { const p = feed.items.get(el.dataset.add); if (p) { if (p.sizes.length > 1) openQuickBuy(p.id); else { addToCart(p, p.sizes[0].label, 1); toast('Added to cart'); } } return; }   // several pack sizes: pick the size first
+  if ((el = t.closest('[data-add]'))) { const p = feed.items.get(el.dataset.add); if (p) { if (p.sizes.length > 1) openQuickBuy(p.id); else toast(addToCart(p, p.sizes[0].label, 1)); } return; }   // several pack sizes: pick the size first
   if (t.closest('[data-retry]')) return refreshGrid();
   if (t.closest('[data-retry-deals]')) return renderDeals();
   if ((el = t.closest('#chips [data-chip]'))) return selectCategory(el.dataset.chip);
