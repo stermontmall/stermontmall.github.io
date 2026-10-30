@@ -12,6 +12,7 @@
 // How a page is matched: <meta name="stm-id"> holds the product id. A product with several pack sizes is ONE page that carries the id of its
 // earliest size (see generate-products.mjs). If that size has no seo_title but another size of the same product has, the earliest size that has one is used.
 //   - single-size page: the title is used exactly as the owner wrote it, the name is the title head (size in brackets kept).
+//     If the title has no " - " in it (e.g. "Name 1L | Ingredient | KSh 1,800"), the name is products.seo_name, so "|" never reaches the H1.
 //   - pack-size page (it contains the "Available sizes" box): the page covers every size, so a size in brackets is left out of the title and name
 //     (products.seo_name is the title head without it); the rest of the title is unchanged.
 // Never fails the build: any problem is logged and the page keeps its generated wording.
@@ -38,12 +39,15 @@ export function pageTitle(row, multiSize) {
 }
 
 // Visible name (H1) for a page: the title up to " - "; on a pack-size page products.seo_name (no size in brackets) when it is set.
+// A single-size title without " - " uses products.seo_name when it is set (otherwise the whole title, as before).
 export function pageName(row, multiSize) {
   const full = String(row.seo_title || '').trim();
   if (!full) return '';
   const i = full.indexOf(SEP);
   const head = i > 0 ? full.slice(0, i).trim() : full;
-  return multiSize ? (String(row.seo_name || '').trim() || head) : head;
+  const own = String(row.seo_name || '').trim();
+  if (multiSize) return own || head;
+  return i > 0 ? head : (own || head);
 }
 
 // Rewrites one built product page. Exported for tests.
