@@ -7,6 +7,8 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 try { await import('./seo-product-extras.mjs'); } catch (e) { console.log('seo-product-extras skipped:', e.message); }
 // Then the small clean-ups (seo-fixes.mjs): no repeated "Buy <product>" in meta descriptions, clean JSON-LD description. To switch it off, delete this line.
 try { await import('./seo-fixes.mjs'); } catch (e) { console.log('seo-fixes skipped:', e.message); }
+// Then the rich-content pass (seo-rich-content.mjs): price-by-size table, local delivery towns + phone, how to order, PCPB link. To switch it off, delete this line.
+try { await import('./seo-rich-content.mjs'); } catch (e) { console.log('seo-rich-content skipped:', e.message); }
 const O = JSON.parse(readFileSync('seo-overrides.json', 'utf8'));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s;
