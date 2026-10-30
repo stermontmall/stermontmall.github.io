@@ -50,7 +50,12 @@ def serve(route, body, ctype='application/json'):
     route.fulfill(status=200, content_type=ctype, body=body if isinstance(body, (bytes, str)) else json.dumps(body), headers={'access-control-allow-origin': '*'})
 def on_rest(route):
     if FAIL[0]: return route.fulfill(status=503, body='down', headers={'access-control-allow-origin': '*'})
-    serve(route, ROWS if '/rest/v1/products' in route.request.url else CATS_FIX)
+    url = route.request.url
+    if '/rest/v1/products' in url and 'id=eq.' in url:   # details of one row, fetched when a product is opened
+        rid = url.split('id=eq.')[1].split('&')[0]
+        r = next((x for x in ROWS if x['id'] == rid), None)
+        return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK])])
+    serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
 def mock_network(ctx):
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
@@ -118,6 +123,11 @@ with sync_playwright() as p:
     check('sizes listed smallest price first', pg.locator('#qb-sizes .chip').all_inner_texts() == ['50 ml', '100 ml', '250 ml', '1 Litre'], pg.locator('#qb-sizes .chip').all_inner_texts())
     pg.locator('#qb-sizes [data-size="250 ml"]').click()
     check('each size shows its own price', pg.locator('#qb-price').inner_text() == 'KSh 1,550' and pg.locator('#qb-old').inner_text() == 'KSh 1,782', pg.locator('#qb-price').inner_text())
+    pg.wait_for_function("document.querySelector('#qb-desc').innerText.includes('ABOUT Absolute')", timeout=5000)
+    check('details: description, unit and stock of the chosen size are shown', 'line one' in pg.locator('#qb-desc').inner_text() and pg.locator('#qb-meta').inner_text() == 'Unit: Each \u00b7 In stock', pg.locator('#qb-meta').inner_text())
+    check('details: link to the full product page of that size', pg.locator('#qb-page').get_attribute('href') == '/p/agro-abc-250ml.html' and pg.locator('#qb-page').is_visible(), pg.locator('#qb-page').get_attribute('href'))
+    check('details: extra photos listed and tapping one changes the main photo', pg.locator('#qb-photos [data-photo]').count() == 2 and (pg.locator('#qb-photos [data-photo]').nth(1).click() or True) and pg.locator('#qb-img img').count() == 1)
+    pg.screenshot(path=f'{OUT}/shot-details.png')
     pg.go_back(); pg.wait_for_timeout(350)
 
     # forward must not reopen a stale sheet with no data? (it has data in-session, so allowed); just ensure no errors

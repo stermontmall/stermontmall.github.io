@@ -1,3 +1,16 @@
+# HANDOFF - Product details in the shell sheet (branch `wip-shell-product-details`, 2026-10-30)
+Owner: "Item seo, descriptions, all details missing". The product sheet only showed name, price, size and quantity.
+## Done
+- [x] `app.js` (section 9) + `index.html`: opening a product now loads, for the chosen size, `description`, `unit`, `stock`/`low_at`, `slug` and `images` from Supabase (`products?id=eq.<rowId>`, named columns only, never `cost`; cached per row, fetched on open and when the size changes). The sheet shows a Details block: unit and "In stock" / "Only N left" / "Out of stock", extra photos (tap one to swap the main photo), the full description (plain text, line breaks kept, the block scrolls inside the sheet), and a "View the full product page" link to `/p/<slug>.html`, the generated SEO page with the owner's titles and full markup. A failed fetch shows "Try again".
+- [x] Descriptions are NOT loaded with the list on purpose (about 500 words for each agrochemical).
+- [x] `shell.test.py` = 72/72 (new: description/unit/stock, page link, extra photos).
+## Left
+- [ ] Phone check on real data. The shell still shows the product name from `product-names.json` (the page H1, with the "Buy" prefix); the SEO `<title>`/meta stay on the `/p/` page, which the shell does not rewrite. If "SEO" meant something else, tell me where it is missing.
+- [ ] The floating WhatsApp button overlaps the "Buy now" button in the sheet (seen in the screenshot); not changed.
+- [ ] Single-size products add straight to the cart from the card's plus button; tap the card to see details.
+
+---
+
 # HANDOFF - Shell product photos shown whole (branch `wip-shell-product-images`, 2026-10-30)
 Owner: "Fix real product images". Screenshot from the phone showed TVs and tall photos cut off in the grid.
 ## Done
