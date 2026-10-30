@@ -29,7 +29,7 @@
 
 <!-- ===== Header / app bar (sticky) ===== -->
 <header id="appbar" class="sticky top-0 z-30 bg-white shadow-sm" style="padding-top:env(safe-area-inset-top)">
-  <div class="flex items-center gap-1 px-2 h-bar">
+  <div class="relative z-10 bg-white flex items-center gap-1 px-2 h-bar">
     <button class="icon-btn" data-open="drawer-categories" aria-label="All categories"><svg class="w-6 h-6"><use href="#i-menu"/></svg></button>
     <form id="search-form" role="search" class="relative flex-1">
       <input id="search" type="search" enterkeyhint="search" autocomplete="off" placeholder="Search pest control, agrovet, phones..." class="w-full h-9 pl-9 pr-3 rounded-full bg-gray-100 text-sm outline-none focus:ring-2 focus:ring-brand/40 transition-[height] duration-200">
@@ -39,7 +39,7 @@
     <button class="icon-btn" data-tab="account" aria-label="Account"><svg class="w-6 h-6"><use href="#i-user"/></svg></button>
   </div>
   <div id="chips-wrap">
-    <nav id="chips" role="tablist" aria-label="Sub-categories" class="flex gap-2 px-3 pb-2 overflow-x-auto no-sb"></nav>
+    <nav id="chips" role="tablist" aria-label="Sub-categories" class="flex gap-2 px-3 py-1.5 overflow-x-auto no-sb"></nav>
   </div>
 </header>
 
@@ -47,6 +47,7 @@
 <main id="views" class="pb-[calc(56px+env(safe-area-inset-bottom)+8px)]">
 
   <section id="view-home" data-view="home">
+    <div class="h-11" aria-hidden="true"></div><!-- room for the chip row that hangs under the header -->
     <div class="flex gap-2 overflow-x-auto no-sb px-3 py-2 text-2xs text-brand font-medium">
       <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">M-Pesa checkout</span>
       <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">Delivery to all 47 counties</span>
@@ -181,7 +182,7 @@
   </div>
 </section>
 
-<div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-[76px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 top-[64px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
 
 <script src="app.js"></script>
 </body>

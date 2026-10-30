@@ -46,9 +46,10 @@
   .sheet-left { @apply inset-y-0 left-0 w-[84%] max-w-[340px] flex flex-col; transform: translateX(-100%); padding-top: env(safe-area-inset-top); }
 }
 
-/* Collapse the chip row while scrolling down (header "compact" mode) */
-#chips-wrap { max-height: 44px; transition: max-height .2s ease-out, opacity .2s; }
-#appbar.is-compact #chips-wrap { max-height: 0; opacity: 0; overflow: hidden; }
+/* Header keeps a fixed height. The chip row hangs under the search row and slides up behind it
+   when scrolling down, so toggling never shifts layout or the scroll position. */
+#chips-wrap { position: absolute; left: 0; right: 0; top: 100%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); transition: transform .2s ease-out, opacity .2s; }
+#appbar.is-compact #chips-wrap { transform: translateY(-100%); opacity: 0; pointer-events: none; }
 #appbar.is-compact #search { height: 34px; }
 
 @keyframes shimmer { from { background-position: 200% 0 } to { background-position: -200% 0 } }
