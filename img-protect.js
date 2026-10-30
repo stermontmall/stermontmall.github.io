@@ -59,3 +59,8 @@
 (function () {
   try { var p = location.pathname; if (!/^\/(c|p)\//.test(p) && p !== '/products.html') return; var x = document.createElement('script'); x.src = '/kili-pages.js?v=1'; x.defer = true; document.head.appendChild(x); } catch (e) {}
 })();
+
+/* Kilimall-style Categories page (see /categories.html): every "Categories" button of the mobile bottom menu opens it (see /cat-nav.js). */
+(function () {
+  try { if (/admin|upload-photos|^\/categories/.test(location.pathname)) return; var c = document.createElement('script'); c.src = '/cat-nav.js?v=1'; c.defer = true; document.head.appendChild(c); } catch (e) {}
+})();

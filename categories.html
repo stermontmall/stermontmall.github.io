@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en-KE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>All Categories | Stermont Arcade</title>
+<meta name="description" content="Browse every Stermont Arcade category: Top Categories, TV and audio, phones, home and kitchen, appliances, pest control and agrovet.">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#7c3aed">
+<link rel="icon" href="/favicon.png">
+<style>
+:root{--p:#7c3aed;--pd:#2a0e5c;--ink:#1b1230;--mute:#6b6b80;--line:#e6e1f5;--bg:#f6f3fd;--side:#efeaf9}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{display:flex;flex-direction:column;height:100dvh;padding-bottom:calc(60px + env(safe-area-inset-bottom,0px));background:var(--bg);color:var(--ink);font:16px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:inherit;text-decoration:none}
+header{flex:none;position:relative;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:calc(.55rem + env(safe-area-inset-top,0px)) .8rem .6rem}
+.hr{display:flex;align-items:center;gap:.7rem}
+.hr img{height:30px;width:auto;display:block}
+.hr a.lg{flex:none}
+form{position:relative;flex:1;min-width:0}
+form input{width:100%;font:inherit;font-size:.95rem;border:1.5px solid var(--p);border-radius:999px;padding:.5rem 1rem;color:var(--ink);background:#fff;outline:none}
+#dd{position:absolute;left:0;right:0;top:calc(100% + .3rem);background:#fff;border-radius:14px;box-shadow:0 12px 32px rgba(31,27,46,.28);max-height:60vh;overflow-y:auto;z-index:40}
+#dd[hidden]{display:none}
+#dd a{display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;border-bottom:1px solid #f0ecfa;font-weight:600;font-size:.9rem}
+#dd img{width:42px;height:42px;object-fit:contain;border-radius:8px;flex:none}
+#dd small{display:block;color:var(--p);font-weight:800}
+#dd p{margin:0;padding:.8rem;font-size:.9rem}
+main{flex:1;min-height:0;display:flex}
+#side{flex:none;width:28%;min-width:96px;max-width:140px;overflow-y:auto;background:var(--side);-webkit-overflow-scrolling:touch}
+#side button{display:block;width:100%;border:0;border-left:4px solid transparent;background:none;font:inherit;font-size:.8rem;font-weight:600;line-height:1.25;color:var(--ink);text-align:center;padding:1rem .35rem;cursor:pointer;word-break:break-word}
+#side button .e{display:block;font-size:1.5rem;margin-bottom:.25rem}
+#side button[aria-selected=true]{background:#fff;border-left-color:var(--p);color:var(--p);font-weight:800}
+#side button:focus-visible,.t:focus-visible,.va:focus-visible,#bn a:focus-visible{outline:3px solid var(--p);outline-offset:-3px}
+#pane{flex:1;min-width:0;overflow-y:auto;margin:.5rem .5rem .5rem .4rem;padding:.9rem .7rem 1.2rem;background:#fff;border-radius:14px;-webkit-overflow-scrolling:touch}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.9rem;padding-bottom:.6rem;border-bottom:1px solid var(--line)}
+.ph h1{margin:0;font-size:1rem;font-weight:800}
+.va{flex:none;font-size:.78rem;font-weight:700;color:var(--p)}
+.va[hidden]{display:none}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.1rem .5rem}
+.t{position:relative;display:flex;flex-direction:column;align-items:center;gap:.4rem;text-align:center;font-size:.76rem;font-weight:500;line-height:1.2}
+.t .im{display:grid;place-items:center;width:100%;max-width:72px;aspect-ratio:1;border-radius:14px;background:var(--bg);font-size:1.9rem;overflow:hidden}
+.t .im img{width:100%;height:100%;object-fit:contain;background:#fff;display:block}
+.t .l{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.t.e{opacity:.6}
+.t .soon{position:absolute;top:-.25rem;right:calc(50% - 40px);background:#6b6b80;color:#fff;font-size:.6rem;font-weight:700;border-radius:999px;padding:.05rem .4rem}
+.msg{padding:2rem .5rem;text-align:center;color:var(--mute);font-size:.9rem}
+.msg button{border:0;background:none;color:var(--p);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+#bn{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -2px 10px rgba(31,27,46,.08)}
+#bn a{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:.45rem 0 .4rem;font-size:.68rem;font-weight:600;color:var(--mute)}
+#bn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#bn a[aria-current=page]{color:var(--p)}
+body.kp-nav #wa-float{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+#toast{position:fixed;left:50%;bottom:calc(78px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;max-width:90vw;background:var(--pd);color:#fff;font-size:.85rem;border-radius:12px;padding:.6rem .9rem;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1;pointer-events:auto}
+#toast a{color:#bef264;font-weight:700;text-decoration:underline}
+@media(min-width:760px){#side{max-width:200px}.grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body class="kp-nav">
+<header>
+  <div class="hr">
+    <a class="lg" href="/" aria-label="Stermont Arcade home"><img src="/logo-horizontal.png" alt="Stermont Arcade" height="30"></a>
+    <form id="sf" role="search" autocomplete="off">
+      <input id="q" type="search" placeholder="Search products" aria-label="Search products" enterkeyhint="search">
+      <div id="dd" hidden></div>
+    </form>
+  </div>
+</header>
+<main>
+  <nav id="side" role="tablist" aria-label="Categories" aria-orientation="vertical"></nav>
+  <section id="pane" aria-live="polite"><p class="msg">Loading categories&hellip;</p></section>
+</main>
+<nav id="bn" aria-label="Main menu">
+  <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+  <a href="/categories.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Categories</a>
+  <a href="/track.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg>Order</a>
+  <a href="/shipping.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 6h13v10H1zM14 10h5l3 3v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>Delivery</a>
+  <a href="/contact.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 17v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3l2 5-2.5 1.5a14 14 0 0 0 7 7L15 13l5 2z"/></svg>Contact</a>
+  <a href="/account.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Account</a>
+</nav>
+<div id="toast" role="status"></div>
+<noscript><p class="msg">Turn on JavaScript to browse categories, or <a href="/c/">open the category list</a>.</p></noscript>
+<script>
+/* Stermont Arcade - Kilimall-style Categories page.
+   Reads the live category tree from Supabase: left = top-level categories (sort_order), right = the sub-categories of the
+   selected one. The first item (is_promo = Kili Featured) shows "Top Categories": every category with a top_label, in top_sort order.
+   Tile picture = categories.image_url, else a photo of one of your products in that category (or its children), else an emoji.
+   A category with no products stays visible and shows "Soon" instead of opening an empty page. */
+(function () {
+  'use strict';
+  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', WA = '254748888230';
+  var D = document;
+  function $(s) { return D.querySelector(s); }
+  function el(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  function api(p) { return fetch(SB + '/rest/v1/' + p, { headers: { apikey: KEY }, cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); }
+  function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
+  var ICON = { 'pest-control-fumigation': '\uD83E\uDEB3', agrovet: '\uD83C\uDF31', 'phones-accessories': '\uD83D\uDCF1', 'tv-audio-video': '\uD83D\uDCFA', appliances: '\uD83C\uDF73', 'home-kitchen': '\uD83C\uDFE0',
+    fashion: '\uD83D\uDC57', shoes: '\uD83D\uDC5F', bags: '\uD83D\uDC5C', 'watches-jewellery': '\u231A', 'computers-accessories': '\uD83D\uDCBB', 'health-beauty': '\uD83D\uDC84', automotive: '\uD83D\uDE97', 'baby-products': '\uD83E\uDDF8', 'kili-featured': '\u2B50' };
+  var cats = [], byId = {}, kids = {}, own = {}, photo = {}, totMemo = {}, cur = 0;
+
+  function topOf(c) { while (c && c.parent_id && byId[c.parent_id]) c = byId[c.parent_id]; return c; }
+  function emo(c) { var t = topOf(c); return (t && ICON[t.slug]) || '\uD83D\uDECD\uFE0F'; }
+  function tot(c) {
+    if (totMemo[c.id] != null) return totMemo[c.id];
+    var n = own[c.id] || 0; (kids[c.id] || []).forEach(function (k) { n += tot(k); });
+    return (totMemo[c.id] = n);
+  }
+  function pic(c) {
+    if (c.image_url) return c.image_url;
+    if (photo[c.id]) return photo[c.id];
+    var ks = kids[c.id] || [];
+    for (var i = 0; i < ks.length; i++) { var u = pic(ks[i]); if (u) return u; }
+    return '';
+  }
+  function soon(n) {
+    var t = $('#toast'); t.textContent = n + ' is coming soon. ';
+    var a = el('a', '', 'Ask on WhatsApp'); a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Hello Stermont Arcade, do you have ' + n + '?'); a.target = '_blank'; a.rel = 'noopener';
+    t.appendChild(a); t.classList.add('on'); clearTimeout(soon.t); soon.t = setTimeout(function () { t.classList.remove('on'); }, 3800);
+  }
+  function tile(c, label) {
+    var n = tot(c), a = el('a', 't' + (n ? '' : ' e')), im = el('span', 'im'), u = pic(c);
+    a.href = n ? '/c/' + encodeURIComponent(c.slug) + '.html' : '#';
+    if (u) { var i = new Image(); i.src = u; i.alt = ''; i.loading = 'lazy'; i.decoding = 'async'; i.onerror = function () { im.textContent = emo(c); }; im.appendChild(i); } else im.textContent = emo(c);
+    a.appendChild(im); a.appendChild(el('span', 'l', label));
+    if (!n) { a.appendChild(el('span', 'soon', 'Soon')); a.onclick = function (e) { e.preventDefault(); soon(label); }; }
+    return a;
+  }
+  function pane(c) {
+    var p = $('#pane'); p.textContent = '';
+    var head = el('div', 'ph'), items;
+    head.appendChild(el('h1', '', c.is_promo ? 'Top Categories' : c.name));
+    if (c.is_promo) {
+      items = cats.filter(function (x) { return x.top_label && x.top_sort != null; }).sort(function (a, b) { return a.top_sort - b.top_sort; });
+      if (!items.length) items = (kids[0] || []).filter(function (x) { return !x.is_promo; });
+    } else {
+      items = kids[c.id] || [];
+      if (tot(c) > 0) {
+        var va = el('a', 'va', 'View all \u203A'); va.href = '/c/' + encodeURIComponent(c.slug) + '.html'; va.hidden = true; head.appendChild(va);
+        fetch(va.href, { method: 'HEAD' }).then(function (r) { if (r.ok && cur === c.id) va.hidden = false; }).catch(function () {});   /* only shown when that category page exists */
+      }
+    }
+    p.appendChild(head);
+    var g = el('div', 'grid');
+    if (!items.length) items = [c];
+    items.forEach(function (x) { g.appendChild(tile(x, c.is_promo ? x.top_label : x.name)); });
+    p.appendChild(g); p.scrollTop = 0;
+  }
+  function select(c, keepHash) {
+    cur = c.id;
+    [].forEach.call($('#side').children, function (b) { b.setAttribute('aria-selected', String(Number(b.getAttribute('data-id')) === c.id)); });
+    pane(c);
+    if (!keepHash) { try { history.replaceState(null, '', '#' + c.slug); } catch (e) {} }
+  }
+  function side() {
+    var s = $('#side'); s.textContent = '';
+    (kids[0] || []).forEach(function (c) {
+      var b = el('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('data-id', c.id); b.setAttribute('aria-selected', 'false');
+      if (c.is_promo) b.appendChild(el('span', 'e', '\u2B50'));
+      b.appendChild(D.createTextNode(c.name)); b.onclick = function () { select(c); };
+      s.appendChild(b);
+    });
+  }
+  function fail() {
+    var p = $('#pane'); p.textContent = ''; var m = el('p', 'msg', 'Could not load categories. '); var b = el('button', '', 'Try again'); b.type = 'button'; b.onclick = load; m.appendChild(b); p.appendChild(m);
+  }
+  function load() {
+    $('#pane').innerHTML = '<p class="msg">Loading categories&hellip;</p>';
+    Promise.all([
+      api('categories?select=id,name,slug,parent_id,sort_order,is_promo,top_label,top_sort,image_url&order=sort_order.asc,id.asc'),
+      api('products?active=eq.true&select=category_id,stock,images')
+    ]).then(function (r) {
+      cats = r[0]; byId = {}; kids = {}; own = {}; photo = {}; totMemo = {};
+      cats.forEach(function (c) { byId[c.id] = c; (kids[c.parent_id || 0] = kids[c.parent_id || 0] || []).push(c); });
+      r[1].forEach(function (p) {
+        if (!p.category_id) return; own[p.category_id] = (own[p.category_id] || 0) + 1;
+        var im = (p.images || [])[0]; if (im && (!photo[p.category_id] || (p.stock > 0 && !photo['L' + p.category_id]))) { photo[p.category_id] = im; if (p.stock > 0) photo['L' + p.category_id] = 1; }
+      });
+      if (!(kids[0] || []).length) return fail();
+      side();
+      var want = decodeURIComponent((location.hash || '').slice(1)), first = (kids[0] || []).filter(function (c) { return c.slug === want; })[0] || kids[0][0];
+      select(first, true);
+      var sb = $('#side [aria-selected="true"]'); if (sb && sb.scrollIntoView) sb.scrollIntoView({ block: 'nearest' });
+    }).catch(fail);
+  }
+  load();
+
+  /* header search with instant product suggestions (same behaviour as the category pages) */
+  var q = $('#q'), dd = $('#dd'), tm = null, last = '';
+  function render(rows, s) {
+    dd.textContent = ''; var seen = {}, n = 0;
+    rows.forEach(function (r) {
+      var k = String(r.name || '').toLowerCase(); if (!k || seen[k]) return; seen[k] = 1; n++;
+      var a = el('a'); a.href = '/p/' + encodeURIComponent(r.slug || r.id) + '.html';
+      var im = (r.images || []).filter(Boolean)[0]; if (im) { var i = new Image(); i.src = im; i.alt = ''; i.loading = 'lazy'; a.appendChild(i); }
+      var t = el('span', '', r.name); t.appendChild(el('small', '', money(r.price))); a.appendChild(t); dd.appendChild(a);
+    });
+    if (!n) { var p = el('p', '', 'No match for "' + s + '". '); var w = el('a', '', 'Ask us on WhatsApp'); w.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Hello Stermont Arcade, do you have: ' + s + '?'); w.style.cssText = 'display:inline;padding:0;border:0;color:#16a34a'; p.appendChild(w); dd.appendChild(p); }
+    dd.hidden = false;
+  }
+  function run(s) {
+    var term = s.replace(/[*(),%\\]/g, ' ').replace(/\s+/g, ' ').trim(); if (term.length < 2) return; last = term;
+    api('products?active=eq.true&name=ilike.' + encodeURIComponent('*' + term.replace(/ /g, '*') + '*') + '&select=id,slug,name,price,images&order=name.asc&limit=8')
+      .then(function (rows) { if (term === last) render(rows, s); }).catch(function () {});
+  }
+  q.addEventListener('input', function () { clearTimeout(tm); var s = q.value.trim(); if (s.length < 2) { dd.hidden = true; return; } tm = setTimeout(function () { run(s); }, 220); });
+  $('#sf').addEventListener('submit', function (e) { e.preventDefault(); var a = dd.querySelector('a[href^="/p/"]'); if (a) location.href = a.href; else if (q.value.trim().length > 1) run(q.value.trim()); });
+  D.addEventListener('click', function (e) { if (!$('#sf').contains(e.target)) dd.hidden = true; });
+  D.addEventListener('keydown', function (e) { if (e.key === 'Escape') dd.hidden = true; });
+})();
+</script>
+<script src="/img-protect.js" defer></script>
+</body>
+</html>
