@@ -182,7 +182,7 @@
     var s = q('.st'), sold = p.stock <= 0; s.className = 'st' + (sold ? ' out' : p.stock <= 5 ? ' low' : '');
     s.textContent = sold ? 'Sold out' : p.stock <= 5 ? 'Only ' + p.stock + ' left' : 'In stock';
     var avail = sold ? 'Currently sold out' : p.stock <= 5 ? 'Only ' + p.stock + ' left' : 'In stock';
-    var sum = ['Hello Stermont Arcade, I would like to enquire about this item:', '', 'Product: ' + p.name, 'Price: ' + money(p.price) + (p.unit && !p.variant_label ? ' / ' + p.unit : ''),
+    var sum = ['Hello Stermont Arcade, I would like to enquire about this item:', '', 'Product: ' + p.name.replace(/^Buy\s+/i, ''), 'Price: ' + money(p.price) + (p.unit && !p.variant_label ? ' / ' + p.unit : ''),
       'Availability: ' + avail].concat(p.categories && p.categories.name ? ['Category: ' + p.categories.name] : [], ['Ref: ' + p.id, 'Link: ' + location.origin + purl(p.id), '', 'Please confirm availability and the delivery fee to my location.']).join('\n');
     var wl = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(sum); q('.wa').href = wl; q('.wat').href = wl;
     var th = q('.thumbs'); th.textContent = ''; th.hidden = imgs.length < 2;

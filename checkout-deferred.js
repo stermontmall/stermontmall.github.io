@@ -52,7 +52,7 @@
       function info(id) {
         var el = D.getElementById(id); if (!el) return null;
         var im = el.querySelector('img'), p = parseInt(el.querySelector('.price').textContent.replace(/\D/g, ''), 10);
-        return { id: id, name: el.querySelector('h3').textContent, price: p || 0, img: im ? im.src : '' };
+        return { id: id, name: el.querySelector('h3').textContent.replace(/^Buy\s+/i, ''), price: p || 0, img: im ? im.src : '' };   /* the shop shows "Buy <name>"; cart, orders, e-mails and WhatsApp keep the plain name */
       }
       function totals() {
         var L = [], n = 0, s = 0;
