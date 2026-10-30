@@ -1,3 +1,15 @@
+# HANDOFF - Check of `/?product=<slug>` links (branch `wip-product-links-check`, 2026-10-30)
+Owner sent https://stermontarcade.co.ke/?product=abasi-5-ec-50-ml and asked to "fix issue for all product links". GitHub + Supabase were connected for this session. `fetchProducts()` -> Supabase was NOT redone (already on `main`, Step 4 below).
+## Checked
+- [x] The slug exists: `products.slug = abasi-5-ec-50-ml` (active, in stock, group `abasi-5-ec`, 5 sizes); `p/abasi-5-ec-50-ml.html` exists.
+- [x] Headless phone browser (390x780) with the REAL Abasi rows and categories from Supabase: `/?product=abasi-5-ec-50-ml` opens the full product page in the shell, sizes 50 ml to 1 Litre listed, no page errors. So the code on `main` handles the link.
+- [x] What the server sends for that link is the HOME page head: title "Stermont Arcade | Online Shopping Store in Kenya", og:image logo, canonical `/`. This is why WhatsApp/Facebook previews and Google show the home page for every `?product=` link (the open item below, 2026-10-30 "Product addresses").
+## Left
+- [ ] Owner decision: a static host cannot give `/?product=` its own preview. Options: (a) keep as is; (b) a Share button in the shell that shares `/p/<slug>.html` (right preview, opens the old-style page); (c) make `/p/*.html` send phones to `/?product=<slug>` (right preview + shell look, but Google may read the redirect as the product pages moving to `/`, so Search Console must be watched).
+- [ ] Phone check of the link on the live site (open twice after a deploy; service worker). If it still shows the home page on a phone, clear site data once for stermontarcade.co.ke.
+
+---
+
 # HANDOFF - Product addresses in the shell (branch `wip-shell-product-urls`, 2026-10-30)
 Owner: "There are no product links on my website after clicking on an item... it's only the domain name stermontarcade.co.ke. Fix that." Cause: every `history.pushState` in `mobile-shell/app.js` had no URL, so opening a product never changed the address bar.
 `fetchProducts()` -> Supabase was NOT redone: it is Step 4 below (`app.js` already reads `products`, `categories`, `product-names.json`).
