@@ -53,6 +53,21 @@ if (!posts.length) { console.log('No blog posts found - leaving index and sitema
   }
 }
 
+// ---- home page (index.html): rewrite only the guides strip between its markers (8 newest posts) ----
+{
+  const S = '<!--BLOG-STRIP-START-->', E = '<!--BLOG-STRIP-END-->';
+  if (existsSync('index.html')) {
+    const idx = readFileSync('index.html', 'utf8'), a = idx.indexOf(S), b = idx.indexOf(E);
+    if (a < 0 || b < a) console.log('index.html has no guides-strip markers - leaving it alone.');
+    else {
+      const latest = [...posts].sort((x, y) => (y.published || '').localeCompare(x.published || '') || x.title.localeCompare(y.title)).slice(0, 8);
+      const html = latest.map(p => `<a class="gcard" href="/blog/${p.slug}.html"><b>${esc(p.title)}</b>${p.desc ? `<span>${esc(clip(p.desc, 90))}</span>` : ''}</a>`).join('\n');
+      const next = idx.slice(0, a + S.length) + '\n' + html + '\n' + idx.slice(b);
+      if (next !== idx) { writeFileSync('index.html', next); console.log(`Updated the guides strip on index.html (${latest.length} posts).`); } else console.log('index.html guides strip already up to date.');
+    }
+  }
+}
+
 // ---- sitemap.xml: rewrite only the /blog/ entries ----
 if (existsSync('sitemap.xml')) {
   const sm0 = readFileSync('sitemap.xml', 'utf8'), oldMod = {}, MARK = '@@BLOG@@';

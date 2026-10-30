@@ -257,6 +257,7 @@ new IntersectionObserver(es => { if (es[0].isIntersecting && store.get().tab ===
 function refreshGrid() {
   const s = store.get(), cat = CATS.find(c => c.id === s.chip);
   $('#grid-title').textContent = s.q ? `Results for "${s.q}"` : s.sub || (cat ? cat.name : 'Recommended for you');
+  $('#blog-strip').hidden = !!(s.q || s.sub || s.chip !== 'all');   // the guides strip belongs to the plain home view only
   renderChips(); loadPage(true);
 }
 async function renderDeals() {

@@ -66,7 +66,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="stylesheet" href="/mobile-shell/tailwind.css">
   <style>/* the build bot rewrites the crawler links between the seo-links markers (generate-products.mjs); these variables style them */
-  :root{--panel:#f3f4f6;--line:#e5e7eb;--ink:#1f2937}.seo-links .wrap{padding:0 12px 8px}.seo-links h2{color:var(--ink)}</style>
+  :root{--panel:#f3f4f6;--line:#e5e7eb;--ink:#1f2937}.seo-links .wrap{padding:0 12px 8px}.seo-links h2{color:var(--ink)}
+.bstrip{padding:4px 0 10px}.bstrip-h{display:flex;align-items:baseline;justify-content:space-between;padding:0 12px 6px}.bstrip-h h2{font-size:14px;font-weight:700;color:var(--ink);margin:0}.bstrip-h a{font-size:12px;color:#7c3aed;font-weight:600}
+.bstrip-row{display:flex;gap:8px;overflow-x:auto;padding:0 12px 4px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}.bstrip-row::-webkit-scrollbar{display:none}
+.gcard{flex:0 0 220px;scroll-snap-align:start;display:flex;flex-direction:column;gap:4px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--ink);text-decoration:none}.gcard b{font-size:13px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.gcard span{font-size:11px;color:#6b7280;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}</style>
   <script>
   /* Desktop screens keep the full classic shop; old shared /#p-... product links open it too. The shell is the phone home page. */
   (function () {
@@ -121,6 +124,19 @@
       <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">Pickup at Sarit Centre, Westlands</span>
       <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">WhatsApp +254 748 888 230</span>
     </div>
+    <section id="blog-strip" class="bstrip" aria-labelledby="blog-h">
+      <div class="bstrip-h"><h2 id="blog-h">Buying guides &amp; tips</h2><a href="/blog/">All guides &rsaquo;</a></div>
+      <div class="bstrip-row"><!--BLOG-STRIP-START-->
+<a class="gcard" href="/blog/how-to-disinfect-a-poultry-house-kenya.html"><b>Clean and Disinfect a Poultry House Between Batches</b><span>Learn the step-by-step biosecurity process to clean and disinfect your poultry house in…</span></a>
+<a class="gcard" href="/blog/pest-control-products-for-hotels-and-restaurants-kenya.html"><b>Hotel &amp; Restaurant Pest Control Guide Kenya | Stermont Arcade</b><span>Practical guide for hotel, restaurant, and rental managers in Kenya on pest inspection,…</span></a>
+<a class="gcard" href="/blog/cockroach-gel-spray-or-powder-kenya.html"><b>Cockroach gel, spray or powder: which suits your home in Kenya?</b><span>Compare cockroach gel baits, sprays and powders for Kenyan homes and kitchens: where…</span></a>
+<a class="gcard" href="/blog/how-to-get-rid-of-ants-at-home-kenya.html"><b>How to get rid of ants at home in Kenya: a practical guide</b><span>Find the ant trail, remove food and water, then choose bait or spray. A practical guide…</span></a>
+<a class="gcard" href="/blog/how-to-read-an-insecticide-label-kenya.html"><b>How to read an insecticide label: PCPB, ingredients and warnings</b><span>A plain guide to reading an insecticide label in Kenya: the PCPB registration, active…</span></a>
+<a class="gcard" href="/blog/rat-poison-glue-board-or-trap-kenya.html"><b>Rat poison, glue board or snap trap: how to choose in Kenya</b><span>Compare rat bait, glue boards and snap traps for homes, shops and farms in Kenya: where…</span></a>
+<a class="gcard" href="/blog/termite-control-at-home-kenya.html"><b>Termite control at home in Kenya: signs, prevention and options</b><span>Learn the signs of termites in Kenyan homes, simple ways to prevent them, and the…</span></a>
+<a class="gcard" href="/blog/where-to-buy-bed-bug-killer-in-kenya.html"><b>Where to buy bed bug killer in Kenya: what to check first</b><span>Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and…</span></a>
+<!--BLOG-STRIP-END--></div>
+    </section>
     <div class="flex items-center justify-between px-3 pb-2">
       <h1 id="grid-title" class="text-sm font-semibold">Recommended for you</h1>
       <button id="open-filters" data-open="sheet-filters" class="tap flex items-center gap-1 text-xs text-ink px-2 h-8 rounded-full bg-white shadow-card">
@@ -175,6 +191,7 @@
     <div class="bg-brand text-white p-5 pt-6"><p class="font-semibold text-base">Your account</p><p class="text-xs opacity-80">Sign in to see and track your orders</p></div>
     <ul class="m-2 bg-white rounded-lg divide-y divide-line shadow-card">
       <li><a class="tap block px-4 py-3.5" href="/account.html">Sign in / My orders</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/blog/">Buying guides &amp; blog</a></li>
       <li><a class="tap block px-4 py-3.5" href="/track.html">Track an order</a></li>
       <li><a class="tap block px-4 py-3.5" href="/shipping.html">Delivery information</a></li>
       <li><a class="tap block px-4 py-3.5" href="/returns.html">Returns</a></li>
@@ -203,6 +220,7 @@
     <button class="icon-btn" data-close aria-label="Close"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
   </div>
   <ul id="drawer-cats" class="flex-1 overflow-y-auto"></ul>
+  <a href="/blog/" class="tap block px-4 py-3.5 border-t border-line text-sm font-semibold">Buying guides &amp; blog</a>
 </aside>
 
 <section id="sheet-filters" class="sheet sheet-bottom" role="dialog" aria-modal="true" aria-label="Filters">
