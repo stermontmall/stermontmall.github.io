@@ -7,6 +7,7 @@ Owner: "View the full product page takes you to the old website view. Make it th
 ## Left (everything else that still leaves the shell UI)
 - [ ] Pages the shell links to still have the old look: `/c/*.html` category pages, `/account.html`, `/track.html`, `/shipping.html`, `/returns.html`, `/contact.html`, `/classic.html` ("Open the full shop"). The checkout itself still runs in `classic.html` in checkout mode (drawer only). Proposed next: a shared shell header + bottom nav for those pages, and native Track / Account tabs.
 - [ ] Visitors landing on `/p/<slug>.html` from Google still get the old page layout (kept on purpose for SEO until decided).
+- [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request ("Merge"), tests 80/80 (fixture data only). Revert the merge commit if it misbehaves.
 - [ ] Phone check: open a product, tap "See full product details", try sizes, Add to cart, Back.
 
 ---
