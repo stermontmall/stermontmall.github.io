@@ -327,7 +327,7 @@ $('#f-reset').addEventListener('click', () => {
 });
 
 /* ---------- 9. Quick buy sheet ---------- */
-const qb = { p: null, size: '', qty: 1 };
+const qb = { p: null, size: '', qty: 1, shown: '' };
 function renderQB() {
   const { p } = qb; if (!p) return;
   const sz = sizeOf(p, qb.size);
@@ -336,10 +336,33 @@ function renderQB() {
   $('#qb-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : '';
   $('#qb-qty').textContent = qb.qty;
   $('#qb-sizes').innerHTML = p.sizes.map(s => `<button class="chip !h-9 !px-4" data-size="${esc(s.label)}" aria-selected="${s.label === qb.size}">${esc(s.label)}</button>`).join('');
+  if (qb.shown !== sz.rowId) { qb.shown = sz.rowId; renderDetails(sz.rowId); }   // quantity changes do not reload the details
 }
+/* Details (description, unit, stock, extra photos, page link) are fetched when a product is opened, not with the list: the descriptions are long
+   (about 500 words for the agrochemicals), so loading all of them up front would slow the grid. Only named columns are read (never `cost`). */
+const details = new Map();
+const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
+async function renderDetails(rowId) {
+  const box = $('#qb-details'); box.hidden = false;
+  $('#qb-meta').textContent = ''; $('#qb-desc').textContent = 'Loading details\u2026'; $('#qb-photos').innerHTML = ''; $('#qb-page').hidden = true;
+  const d = await detailsFor(rowId);
+  if (!qb.p || sizeOf(qb.p, qb.size).rowId !== rowId) return;          // another size or product was chosen meanwhile
+  if (!d) { $('#qb-desc').innerHTML = 'Could not load the details. <button class="underline text-brand" data-retry-details>Try again</button>'; return; }
+  const left = Number(d.stock), low = Number(d.low_at) || 5;
+  $('#qb-meta').textContent = [d.unit ? 'Unit: ' + d.unit : '', left > 0 ? (left <= low ? 'Only ' + left + ' left' : 'In stock') : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
+  $('#qb-desc').textContent = (d.description || '').trim() || 'No description yet. Ask us on WhatsApp for more details.';
+  const imgs = (d.images || []).filter(Boolean);
+  $('#qb-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: qb.p.emoji })}</button>`).join('') : '';
+  if (d.slug) { $('#qb-page').href = '/p/' + encodeURIComponent(d.slug) + '.html'; $('#qb-page').hidden = false; }
+}
+document.addEventListener('click', e => {
+  const ph = e.target.closest('[data-photo]');
+  if (ph && qb.p) { $('#qb-img').innerHTML = thumb({ img: ph.dataset.photo, emoji: qb.p.emoji }); return; }
+  if (e.target.closest('[data-retry-details]') && qb.p) { const id = sizeOf(qb.p, qb.size).rowId; renderDetails(id); }
+});
 function openQuickBuy(id) {
   const p = feed.items.get(id); if (!p) return;
-  qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; renderQB(); openOverlay('sheet-quickbuy');
+  qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
 }
 $('#qb-sizes').addEventListener('click', e => { const b = e.target.closest('[data-size]'); if (b) { qb.size = b.dataset.size; renderQB(); } });
 $('#qb-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderQB(); });
