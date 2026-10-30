@@ -1,6 +1,6 @@
 /* Stermont Arcade mobile shell prototype.
-   Vanilla JS, no framework. Data is mocked: swap fetchProducts() for the Supabase call.
-   Sections: 1 data  2 store + badges  3 history-backed overlays  4 tabs  5 header scroll
+   Vanilla JS, no framework. Data is live: products + categories come from Supabase (section 1).
+   Sections: 1 data (Supabase)  2 store + badges  3 history-backed overlays  4 tabs  5 header scroll
              6 grid + skeletons  7 categories  8 filters  9 quick buy  10 cart  11 wiring */
 (() => {
 'use strict';
@@ -13,57 +13,78 @@ const ls = {
   set(k, v) { try { localStorage.setItem('shell.' + k, JSON.stringify(v)); } catch {} }
 };
 
-/* ---------- 1. Mock data (deterministic) ---------- */
-const CATS = [
-  { id: 'pest', name: 'Pest Control', icon: '🪳', subs: ['Insecticides', 'Bed bug killers', 'Rodenticides', 'Fumigation', 'Sprayers', 'Baits & traps'],
-    items: ['Bed Bug Killer Spray', 'Cockroach Gel Bait', 'Rat Poison Blocks', 'Mosquito Fogging Concentrate', 'Knapsack Sprayer 16L', 'Ant & Termite Killer', 'Fly Bait Granules', 'Fumigation Tablets'] },
-  { id: 'agro', name: 'Agrovet & Farm', icon: '🌱', subs: ['Fungicides', 'Herbicides', 'Fertilizers', 'Growth boosters', 'Crop insecticides', 'Seed care'],
-    items: ['Systemic Fungicide', 'Broad-spectrum Herbicide', 'Foliar Fertilizer', 'Rooting Hormone Powder', 'Crop Insecticide EC', 'Calcium Booster', 'Seed Treatment', 'Sticky Trap Roll'] },
-  { id: 'phones', name: 'Phones & Tablets', icon: '📱', subs: ['Smartphones', 'Tablets', 'Power banks', 'Earbuds', 'Chargers', 'Smartwatches'],
-    items: ['Smartphone 4GB/128GB', 'Budget Phone 3GB/64GB', 'Tablet 10-inch', 'Power Bank 20000mAh', 'Wireless Earbuds', 'Phone Case', 'Fast Charger 33W', 'Smartwatch'] },
-  { id: 'tv', name: 'TVs & Audio', icon: '📺', subs: ['Smart TVs', 'Soundbars', 'Speakers', 'Home theatre', 'Mounts', 'Cables'],
-    items: ['32" Smart TV', '43" Frameless TV', 'Soundbar 2.1', 'Bluetooth Speaker', 'Home Theatre System', 'TV Wall Mount', 'HDMI Cable 2m', 'Streaming Stick'] },
-  { id: 'home', name: 'Home Appliances', icon: '🍳', subs: ['Air fryers', 'Kettles', 'Blenders', 'Microwaves', 'Cookers', 'Fans'],
-    items: ['Air Fryer 5L', 'Electric Kettle 1.8L', 'Blender 1.5L', 'Microwave 20L', 'Rice Cooker 1.8L', 'Hot Plate', 'Iron Box', 'Standing Fan'] },
-  { id: 'fashion', name: 'Fashion', icon: '👟', subs: ['Sneakers', 'Shirts', 'Handbags', 'Jackets', 'Watches', 'Accessories'],
-    items: ['Running Sneakers', 'Men Polo Shirt', 'Ladies Handbag', 'Denim Jacket', 'Wrist Watch', 'Sunglasses', 'Leather Belt', 'School Backpack'] },
-  { id: 'computing', name: 'Computing', icon: '💻', subs: ['Laptops', 'Mice', 'Keyboards', 'Storage', 'Monitors', 'Networking'],
-    items: ['Laptop 15.6" 8GB', 'Wireless Mouse', 'Mechanical Keyboard', 'USB Flash Drive 64GB', 'External HDD 1TB', 'Laptop Bag', 'Monitor 24"', 'WiFi Router'] }
-];
+/* ---------- 1. Data: live Supabase catalog ----------
+   One fetch of every active product row + the category tree (small: ~225 rows). Pack sizes of one product are separate
+   rows that share `variant_group`; they are folded into ONE card with a `sizes` list, each size carrying its own price.
+   Names come from ../product-names.json (the heading each product page shows, rebuilt with the site); if that file is
+   missing the plain database name is used. Filtering, sorting and paging then run in memory, so every filter is instant. */
+const SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+const api = path => fetch(SB + '/rest/v1/' + path, { headers: { apikey: KEY }, cache: 'no-store' })
+  .then(r => { if (!r.ok) throw new Error('Supabase HTTP ' + r.status); return r.json(); });
+const ICONS = { 'pest-control-fumigation': '🪳', agrovet: '🌱', 'phones-accessories': '📱', 'tv-audio-video': '📺', appliances: '🍳', 'home-kitchen': '🏠',
+  fashion: '👗', shoes: '👟', bags: '👜', 'watches-jewellery': '⌚', 'computers-accessories': '💻', 'health-beauty': '💄', automotive: '🚗', 'baby-products': '🧸', others: '🛍️' };
 const BGS = ['#ede9fe', '#fce7f3', '#dcfce7', '#fef3c7', '#e0f2fe', '#ffe4e6', '#f1f5f9'];
-const SIZE_SETS = [['50 ml', '100 ml', '250 ml', '1 L'], ['Standard'], ['Small', 'Medium', 'Large'], ['Standard', 'Bundle of 2']];
-const PRODUCTS = (() => {
-  let seed = 7; const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-  const out = [];
-  CATS.forEach((c, ci) => c.items.forEach((name, i) => {
-    const price = Math.round((150 + rnd() * rnd() * 60000) / 10) * 10;
-    const hasOld = rnd() > 0.35;
-    out.push({
-      id: c.id + '-' + i, cat: c.id, sub: c.subs[i % c.subs.length], name, emoji: c.icon, bg: BGS[(ci + i) % BGS.length],
-      price, old: hasOld ? Math.round(price * (1.12 + rnd() * 0.5) / 10) * 10 : 0,
-      rating: Math.round((3.4 + rnd() * 1.6) * 10) / 10, reviews: Math.round(3 + rnd() * 400),
-      sizes: SIZE_SETS[(ci + i) % SIZE_SETS.length]
-    });
-  }));
-  return out;
-})();
-const discOf = p => p.old ? Math.round((1 - p.price / p.old) * 100) : 0;
+const hashStr = s => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
+let CATS = [];      // [{id: top-level slug, name, icon, subs: [sub-category names]}], built from the live data
+let PRODUCTS = [];  // one entry per product (pack sizes folded in)
 
-/* Replace the body of this with the Supabase query. Must resolve {items, hasMore}. */
-function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 12 }) {
-  return new Promise(res => setTimeout(() => {
-    let r = PRODUCTS.filter(p => (cat === 'all' || p.cat === cat) && (!sub || p.sub === sub) &&
-      (!q || p.name.toLowerCase().includes(q.toLowerCase())) && (!min || p.price >= min) && (!max || p.price <= max) && (!disc || discOf(p) > 0));
-    if (sort === 'low') r.sort((a, b) => a.price - b.price);
-    else if (sort === 'high') r.sort((a, b) => b.price - a.price);
-    else if (sort === 'disc') r.sort((a, b) => discOf(b) - discOf(a));
-    res({ items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size });
-  }, 450));
+function buildCatalog(rows, cats, names) {
+  const byId = new Map(cats.map(c => [c.id, c]));
+  const topOf = c => (c && c.parent_id && byId.get(c.parent_id)) || c;
+  const groups = new Map();
+  rows.forEach(r => { const k = r.variant_group || r.id; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(r); });
+  const out = [];
+  groups.forEach((rs, key) => {
+    const live = rs.filter(r => r.stock > 0);
+    if (!live.length) return;                                   // sold out everywhere: not shown in the shell
+    const sizes = live.map(r => ({ rowId: r.id, label: r.variant_label || 'Standard', price: Number(r.price), old: Number(r.old_price) > Number(r.price) ? Number(r.old_price) : 0 }))
+      .sort((a, b) => a.price - b.price);
+    const rep = live[0], c = byId.get(rep.category_id), top = topOf(c); if (!c || !top) return;
+    const low = sizes[0], img = (live.map(r => (r.images || [])[0]).find(Boolean)) || '';
+    out.push({
+      id: key, cat: top.slug, catName: top.name, sub: c.parent_id ? c.name : '', name: (names && names[rep.id]) || rep.name,
+      img, emoji: ICONS[top.slug] || '🛍️', bg: BGS[hashStr(key) % BGS.length],
+      price: low.price, old: low.old, sizes, featured: !!rep.featured, rating: 0, reviews: 0   // no ratings exist in the database
+    });
+  });
+  PRODUCTS = out;
+  const have = new Set(out.map(p => p.cat)), subHave = new Set(out.filter(p => p.sub).map(p => p.cat + '|' + p.sub));
+  CATS = cats.filter(c => !c.parent_id && !c.is_promo && have.has(c.slug)).sort((a, b) => a.sort_order - b.sort_order || a.id - b.id)
+    .map(c => ({ id: c.slug, name: c.name, icon: ICONS[c.slug] || '🛍️',
+      subs: cats.filter(s => s.parent_id === c.id && subHave.has(c.slug + '|' + s.name)).sort((a, b) => a.sort_order - b.sort_order || a.id - b.id).map(s => s.name) }));
+}
+let catalogP = null;
+function loadCatalog() {
+  if (!catalogP) {
+    catalogP = Promise.all([
+      api('products?active=eq.true&select=id,slug,name,category_id,price,old_price,stock,featured,images,unit,variant_group,variant_label&order=created_at.asc'),
+      api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
+      fetch('../product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}))
+    ]).then(([rows, cats, names]) => buildCatalog(rows, cats, names)).catch(e => { catalogP = null; throw e; });  // a failed load can be retried
+  }
+  return catalogP;
+}
+const discOf = p => p.old ? Math.round((1 - p.price / p.old) * 100) : 0;
+const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
+/* thumbnail markup: the product photo, or the category emoji when there is none (or it fails to load, see the error listener in section 11) */
+const thumb = p => p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" decoding="async" data-emoji="${esc(p.emoji)}" style="width:100%;height:100%;object-fit:cover">` : p.emoji;
+
+/* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
+async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 12 }) {
+  await loadCatalog();
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const r = PRODUCTS.filter(p => (cat === 'all' || p.cat === cat) && (!sub || p.sub === sub) && (!min || p.price >= min) && (!max || p.price <= max) && (!disc || discOf(p) > 0) &&
+    (!words.length || words.every(w => (p.name + ' ' + p.catName + ' ' + p.sub).toLowerCase().includes(w))));
+  if (sort === 'low') r.sort((a, b) => a.price - b.price);
+  else if (sort === 'high') r.sort((a, b) => b.price - a.price);
+  else if (sort === 'disc') r.sort((a, b) => discOf(b) - discOf(a));
+  else r.sort((a, b) => b.featured - a.featured);               // recommended: featured first, then the catalog order (sort is stable)
+  return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size };
 }
 
 /* ---------- 2. Store + live badges ---------- */
 const store = (() => {
-  let s = { tab: 'home', cart: ls.get('cart', []), dealsNew: ls.get('dealsNew', 5), chip: 'all', sub: '', q: '', filters: { sort: 'rec', min: 0, max: 0, disc: false } };
+  let s = { tab: 'home', cart: ls.get('cart', []).filter(i => i.rowId), dealsNew: ls.get('dealsNew', 5), chip: 'all', sub: '', q: '', filters: { sort: 'rec', min: 0, max: 0, disc: false } };
   const subs = new Set();
   return {
     get: () => s,
@@ -175,15 +196,15 @@ function goTab(tab) {
 const stars = r => `<span class="stars" style="--fill:${(r / 5 * 100).toFixed(0)}%" role="img" aria-label="${r} out of 5"></span>`;
 function cardHTML(p) {
   const d = discOf(p);
-  return `<li class="card" data-id="${p.id}">
-    <div class="relative aspect-square grid place-items-center text-6xl" style="background:${p.bg}">${p.emoji}
+  return `<li class="card" data-id="${esc(p.id)}">
+    <div class="relative aspect-square grid place-items-center text-6xl" style="background:${p.bg};overflow:hidden">${thumb(p)}
       ${d ? `<span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-sale text-white text-2xs font-semibold">-${d}%</span>` : ''}
     </div>
     <div class="p-2">
       <p class="text-xs leading-4 line-clamp-2 min-h-8">${esc(p.name)}</p>
-      <p class="mt-1 flex items-baseline gap-1 flex-wrap"><span class="text-sale font-bold text-sm">KSh ${fmt(p.price)}</span>${p.old ? `<s class="text-mute text-2xs">${fmt(p.old)}</s>` : ''}</p>
+      <p class="mt-1 flex items-baseline gap-1 flex-wrap"><span class="text-sale font-bold text-sm">${p.sizes.length > 1 ? 'From ' : ''}KSh ${fmt(p.price)}</span>${p.old ? `<s class="text-mute text-2xs">${fmt(p.old)}</s>` : ''}</p>
       <div class="mt-1 flex items-center justify-between">
-        <span class="flex items-center gap-1 text-2xs text-mute">${stars(p.rating)}<span>(${p.reviews})</span></span>
+        <span class="flex items-center gap-1 text-2xs text-mute">${p.rating ? `${stars(p.rating)}<span>(${p.reviews})</span>` : p.sizes.length > 1 ? `${p.sizes.length} sizes` : ''}</span>
         <button class="icon-btn bg-brand text-white !w-7 !h-7" data-add="${p.id}" aria-label="Add ${esc(p.name)} to cart"><svg class="w-4 h-4"><use href="#i-plus"/></svg></button>
       </div>
     </div></li>`;
@@ -191,7 +212,8 @@ function cardHTML(p) {
 const SKELETON = `<li class="card pointer-events-none" aria-hidden="true"><div class="skel aspect-square !rounded-none"></div><div class="p-2 space-y-2"><div class="skel h-3 w-full"></div><div class="skel h-3 w-2/3"></div><div class="skel h-4 w-1/2"></div></div></li>`;
 const skeletons = n => SKELETON.repeat(n);
 
-const grid = $('#grid'), sentinel = $('#sentinel');
+const grid = $('#grid'), sentinel = $('#sentinel'), EMPTY_TEXT = $('#grid-empty').textContent;
+function showGridError() { const el = $('#grid-empty'); el.innerHTML = 'Could not load products. <button class="underline text-brand" data-retry>Try again</button>'; el.hidden = false; }
 const feed = { page: 1, hasMore: true, loading: false, token: 0, items: new Map() };
 
 function query() {
@@ -204,13 +226,20 @@ async function loadPage(reset) {
   if (!feed.hasMore) return;
   const token = feed.token; feed.loading = true;
   grid.insertAdjacentHTML('beforeend', skeletons(reset ? 6 : 4));
-  const { items, hasMore } = await fetchProducts({ ...query(), page: feed.page });
+  let res;
+  try { res = await fetchProducts({ ...query(), page: feed.page }); }
+  catch (e) {
+    if (token !== feed.token) return;
+    $$('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
+    feed.loading = false; feed.hasMore = false; showGridError(); return;
+  }
   if (token !== feed.token) return;            // a newer query started: drop this stale answer
+  const { items, hasMore } = res;
   $$('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
   items.forEach(p => feed.items.set(p.id, p));
   grid.insertAdjacentHTML('beforeend', items.map(cardHTML).join(''));
   feed.page++; feed.hasMore = hasMore; feed.loading = false;
-  $('#grid-empty').hidden = grid.children.length > 0;
+  const em = $('#grid-empty'); em.textContent = EMPTY_TEXT; em.hidden = grid.children.length > 0;
   if (feed.hasMore && store.get().tab === 'home' && sentinel.getBoundingClientRect().top < innerHeight + 400) loadPage(false);
 }
 new IntersectionObserver(es => { if (es[0].isIntersecting && store.get().tab === 'home') loadPage(false); }, { rootMargin: '400px' }).observe(sentinel);
@@ -223,16 +252,17 @@ function refreshGrid() {
 async function renderDeals() {
   const el = $('#deals-grid'); if (el.dataset.loaded) return;
   el.innerHTML = skeletons(6);
-  const { items } = await fetchProducts({ sort: 'disc', disc: true, size: 24 });
+  let items;
+  try { ({ items } = await fetchProducts({ sort: 'disc', disc: true, size: 24 })); }
+  catch (e) { el.innerHTML = '<li class="text-center text-mute py-10" style="grid-column:1/-1">Could not load deals. <button class="underline text-brand" data-retry-deals>Try again</button></li>'; return; }
   items.forEach(p => feed.items.set(p.id, p));
   el.innerHTML = items.map(cardHTML).join(''); el.dataset.loaded = '1';
 }
 
 /* ---------- 7. Chips, category view, drawer ---------- */
-const CHIPS = [{ id: 'all', name: 'For you' }, ...CATS];
 function renderChips() {
-  const s = store.get();
-  $('#chips').innerHTML = CHIPS.map(c => `<button class="chip" role="tab" data-chip="${c.id}" aria-selected="${c.id === s.chip}">${esc(c.name)}</button>`).join('');
+  const s = store.get(), CHIPS = [{ id: 'all', name: 'For you' }, ...CATS];
+  $('#chips').innerHTML = CHIPS.map(c => `<button class="chip" role="tab" data-chip="${esc(c.id)}" aria-selected="${c.id === s.chip}">${esc(c.name)}</button>`).join('');
   $('#chips [aria-selected="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
 }
 function selectCategory(chip, sub = '') {
@@ -240,16 +270,20 @@ function selectCategory(chip, sub = '') {
   if (store.get().tab !== 'home') goTab('home'); // goTab keeps history consistent
   refreshGrid();
 }
-let sideCat = CATS[0].id;
+let sideCat = '';
 function renderCategoriesView() {
-  $('#cat-side').innerHTML = CATS.map(c => `<button class="cat-side" role="tab" data-side="${c.id}" aria-selected="${c.id === sideCat}">${esc(c.name)}</button>`).join('');
-  const c = CATS.find(x => x.id === sideCat);
-  $('#cat-main').innerHTML = `<button class="tap w-full text-left mb-3 flex items-center justify-between font-semibold" data-cat-all="${c.id}">${esc(c.name)}<span class="text-xs text-brand font-normal">View all &rsaquo;</span></button>
-    <ul class="grid grid-cols-3 gap-y-4 gap-x-2">${c.subs.map(sb => `<li><button class="tap w-full flex flex-col items-center gap-1.5" data-cat="${c.id}" data-sub="${esc(sb)}">
+  const c = CATS.find(x => x.id === sideCat) || CATS[0];
+  if (!c) { $('#cat-side').innerHTML = ''; $('#cat-main').innerHTML = '<p class="text-mute text-sm py-6 text-center">Loading categories&hellip;</p>'; return; }
+  sideCat = c.id;
+  $('#cat-side').innerHTML = CATS.map(x => `<button class="cat-side" role="tab" data-side="${esc(x.id)}" aria-selected="${x.id === sideCat}">${esc(x.name)}</button>`).join('');
+  $('#cat-main').innerHTML = `<button class="tap w-full text-left mb-3 flex items-center justify-between font-semibold" data-cat-all="${esc(c.id)}">${esc(c.name)}<span class="text-xs text-brand font-normal">View all &rsaquo;</span></button>
+    <ul class="grid grid-cols-3 gap-y-4 gap-x-2">${c.subs.map(sb => `<li><button class="tap w-full flex flex-col items-center gap-1.5" data-cat="${esc(c.id)}" data-sub="${esc(sb)}">
       <span class="w-14 h-14 rounded-full grid place-items-center text-2xl" style="background:${BGS[sb.length % BGS.length]}">${c.icon}</span>
       <span class="text-xs text-center leading-4">${esc(sb)}</span></button></li>`).join('')}</ul>`;
 }
-$('#drawer-cats').innerHTML = CATS.map(c => `<li><button class="tap w-full flex items-center gap-3 px-4 py-3.5 border-b border-line text-left" data-drawer-cat="${c.id}"><span class="text-xl">${c.icon}</span>${esc(c.name)}</button></li>`).join('');
+function renderDrawer() {
+  $('#drawer-cats').innerHTML = CATS.map(c => `<li><button class="tap w-full flex items-center gap-3 px-4 py-3.5 border-b border-line text-left" data-drawer-cat="${esc(c.id)}"><span class="text-xl">${c.icon}</span>${esc(c.name)}</button></li>`).join('');
+}
 
 /* ---------- 8. Filters sheet ---------- */
 const activeFilterCount = f => (f.sort !== 'rec') + !!f.min + !!f.max + f.disc;
@@ -274,26 +308,25 @@ $('#f-reset').addEventListener('click', () => {
 
 /* ---------- 9. Quick buy sheet ---------- */
 const qb = { p: null, size: '', qty: 1 };
-const sizePrice = (p, size) => Math.round(p.price * (1 + p.sizes.indexOf(size) * 0.45) / 10) * 10; // mock: bigger packs cost more
 function renderQB() {
   const { p } = qb; if (!p) return;
-  const price = sizePrice(p, qb.size);
-  $('#qb-img').style.background = p.bg; $('#qb-img').textContent = p.emoji;
-  $('#qb-name').textContent = p.name; $('#qb-price').textContent = 'KSh ' + fmt(price);
-  $('#qb-old').textContent = p.old ? 'KSh ' + fmt(Math.round(price * p.old / p.price / 10) * 10) : '';
+  const sz = sizeOf(p, qb.size);
+  $('#qb-img').style.background = p.bg; $('#qb-img').style.overflow = 'hidden'; $('#qb-img').innerHTML = thumb(p);
+  $('#qb-name').textContent = p.name; $('#qb-price').textContent = 'KSh ' + fmt(sz.price);
+  $('#qb-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : '';
   $('#qb-qty').textContent = qb.qty;
-  $('#qb-sizes').innerHTML = p.sizes.map(s => `<button class="chip !h-9 !px-4" data-size="${esc(s)}" aria-selected="${s === qb.size}">${esc(s)}</button>`).join('');
+  $('#qb-sizes').innerHTML = p.sizes.map(s => `<button class="chip !h-9 !px-4" data-size="${esc(s.label)}" aria-selected="${s.label === qb.size}">${esc(s.label)}</button>`).join('');
 }
 function openQuickBuy(id) {
   const p = feed.items.get(id); if (!p) return;
-  qb.p = p; qb.size = p.sizes[0]; qb.qty = 1; renderQB(); openOverlay('sheet-quickbuy');
+  qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; renderQB(); openOverlay('sheet-quickbuy');
 }
 $('#qb-sizes').addEventListener('click', e => { const b = e.target.closest('[data-size]'); if (b) { qb.size = b.dataset.size; renderQB(); } });
 $('#qb-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderQB(); });
 $('#qb-minus').addEventListener('click', () => { qb.qty = Math.max(1, qb.qty - 1); renderQB(); });
 function addToCart(p, size, qty) {
-  const key = p.id + '|' + size, cart = store.get().cart.map(i => ({ ...i })), hit = cart.find(i => i.key === key);
-  if (hit) hit.qty += qty; else cart.push({ key, id: p.id, name: p.name, size, qty, price: sizePrice(p, size), emoji: p.emoji, bg: p.bg });
+  const sz = sizeOf(p, size), key = p.id + '|' + sz.label, cart = store.get().cart.map(i => ({ ...i })), hit = cart.find(i => i.key === key);
+  if (hit) hit.qty += qty; else cart.push({ key, id: p.id, rowId: sz.rowId, name: p.name, size: sz.label, qty, price: sz.price, img: p.img, emoji: p.emoji, bg: p.bg });
   store.set({ cart });
 }
 $('#qb-add').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty); toast('Added to cart'); closeTop(); });
@@ -306,7 +339,7 @@ store.subscribe(s => {
   $('#cart-empty').hidden = n > 0; $('#cart-total-bar').hidden = n === 0;
   $('#cart-total').textContent = 'KSh ' + fmt(cartTotal(s));
   $('#cart-list').innerHTML = s.cart.map(i => `<li class="flex gap-3 bg-white rounded-lg p-2 shadow-card">
-    <div class="w-20 h-20 rounded-lg shrink-0 grid place-items-center text-4xl" style="background:${i.bg}">${i.emoji}</div>
+    <div class="w-20 h-20 rounded-lg shrink-0 grid place-items-center text-4xl" style="background:${i.bg};overflow:hidden">${thumb(i)}</div>
     <div class="flex-1 min-w-0 flex flex-col justify-between">
       <div><p class="text-xs line-clamp-2">${esc(i.name)}</p><p class="text-2xs text-mute">${esc(i.size)}</p></div>
       <div class="flex items-center justify-between"><span class="text-sale font-bold">KSh ${fmt(i.price)}</span>
@@ -335,7 +368,9 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-tab]'))) return goTab(el.dataset.tab);
   if ((el = t.closest('[data-open]'))) { opener = el; if (el.dataset.open === 'sheet-filters') { draftSort = store.get().filters.sort; syncFilterUI(); } return openOverlay(el.dataset.open); }
   if ((el = t.closest('[data-close]'))) return closeTop();
-  if ((el = t.closest('[data-add]'))) { const p = feed.items.get(el.dataset.add); if (p) { addToCart(p, p.sizes[0], 1); toast('Added to cart'); } return; }
+  if ((el = t.closest('[data-add]'))) { const p = feed.items.get(el.dataset.add); if (p) { if (p.sizes.length > 1) openQuickBuy(p.id); else { addToCart(p, p.sizes[0].label, 1); toast('Added to cart'); } } return; }   // several pack sizes: pick the size first
+  if (t.closest('[data-retry]')) return refreshGrid();
+  if (t.closest('[data-retry-deals]')) return renderDeals();
   if ((el = t.closest('#chips [data-chip]'))) return selectCategory(el.dataset.chip);
   if ((el = t.closest('[data-side]'))) { sideCat = el.dataset.side; return renderCategoriesView(); }
   if ((el = t.closest('[data-cat-all]'))) return selectCategory(el.dataset.catAll);
@@ -343,6 +378,7 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-drawer-cat]'))) { const id = el.dataset.drawerCat; return closeAllThen(() => selectCategory(id)); }
   if ((el = t.closest('.card[data-id]'))) return openQuickBuy(el.dataset.id);
 });
+document.addEventListener('error', e => { const i = e.target; if (i && i.tagName === 'IMG' && i.dataset.emoji) i.replaceWith(document.createTextNode(i.dataset.emoji)); }, true); // photo failed: show the category emoji
 $('#search-form').addEventListener('submit', e => {
   e.preventDefault(); $('#search').blur();
   store.set({ q: $('#search').value.trim(), chip: 'all', sub: '' });
@@ -350,5 +386,6 @@ $('#search-form').addEventListener('submit', e => {
   refreshGrid();
 });
 
-renderCategoriesView(); syncFilterUI(); refreshGrid();
+syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
+loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); }).catch(() => {});   // categories appear once the data is in
 })();
