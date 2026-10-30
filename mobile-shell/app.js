@@ -343,7 +343,8 @@ function renderQB() {
 const details = new Map();
 const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
 async function renderDetails(rowId) {
-  const box = $('#qb-details'); box.hidden = false;
+  const box = $('#qb-details'); if (!box) return;                  // an older cached index.html has no details block: leave the sheet as it was
+  box.hidden = false;
   $('#qb-meta').textContent = ''; $('#qb-desc').textContent = 'Loading details\u2026'; $('#qb-photos').innerHTML = ''; $('#qb-page').hidden = true;
   const d = await detailsFor(rowId);
   if (!qb.p || sizeOf(qb.p, qb.size).rowId !== rowId) return;          // another size or product was chosen meanwhile
