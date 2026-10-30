@@ -94,8 +94,16 @@
     "desc": "Original Bayer Baraki pellets rat and mice poison, 1kg box, from {price}. Pay via M-Pesa, nationwide delivery across Kenya. Fast, secure checkout."
   },
   "zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre": {
-    "title": "Buy Zagro Ultraxide Disinfectant 1L in Kenya | {price}",
-    "desc": "Buy Zagro Ultraxide 1L poultry & livestock disinfectant at {price}. Kills bacteria, viruses & fungi. Pay by M-Pesa. Delivery to all 47 counties in Kenya."
+    "title": "Buy Zagro Ultraxide Disinfectant 1L – Price in Kenya | {price}",
+    "desc": "Buy Zagro Ultraxide 1L poultry & livestock disinfectant at {price}. Kills bacteria, viruses & fungi. Pay by M-Pesa. Delivery to all 47 counties in Kenya.",
+    "faq": [
+      ["What is Zagro Ultraxide disinfectant used for?", "Zagro Ultraxide is a broad-spectrum disinfectant that combines glutaraldehyde and a quaternary ammonium compound. It is used on poultry houses, pig pens, dairy parlours, hatcheries, egg stores, equipment, vehicles and foot or wheel dips."],
+      ["What are the active ingredients in Zagro Ultraxide?", "Each litre contains Glutaraldehyde 150 g/L and Benzalkonium chloride 100 g/L. It is made by Zagro and sold here in a 1 litre pack."],
+      ["How much water does 1 litre of Zagro Ultraxide make?", "At the standard 1:150 rate for livestock buildings and equipment, 1 litre makes about 150 litres of solution (about 133 ml per 20 L knapsack). For general strong disinfection use 1:100 (about 200 ml per 20 L). Always check the label on your pack."],
+      ["Can I use Zagro Ultraxide in a footbath or wheel dip?", "Yes. Use the building rate and refresh the solution often, because dirt and manure weaken it."],
+      ["How do I apply Zagro Ultraxide on a poultry house?", "Remove birds, feed and bedding, scrub off dung and dirt, then spray every surface until thoroughly wet with the diluted solution. Let the surfaces dry before restocking."],
+      ["What safety steps should I follow with Zagro Ultraxide?", "It is for veterinary use. Wear gloves, goggles and a mask when handling the concentrate, avoid contact with eyes and skin, and rinse your equipment after use."]
+    ]
   },
   "ampligo-150-zc-insecticide-50-ml": {
     "title": "Ampligo 150 ZC Insecticide 50ml in Kenya | Stermont Arcade",
