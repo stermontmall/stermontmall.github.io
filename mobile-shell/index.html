@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#7c3aed">
+<meta name="robots" content="noindex, nofollow"><!-- prototype: keep out of Google until it replaces the live shop -->
+<title>Mobile shell prototype | Stermont Arcade</title>
+<link rel="stylesheet" href="tailwind.css">
+</head>
+<body class="min-h-dvh">
+
+<!-- ===== Icon sprite (stroke icons, 24x24) ===== -->
+<svg width="0" height="0" class="absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></g></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.5l2.2 10.5h9.6L19.5 8H6.2"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></g></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20c1-4 4-5.5 7.5-5.5s6.5 1.5 7.5 5.5"/></g></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5v8.5a1 1 0 01-1 1h-4.5v-6h-5v6H5a1 1 0 01-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></g></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5.5 13.5H11L10 21l7.5-10.5H12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- ===== Header / app bar (sticky) ===== -->
+<header id="appbar" class="sticky top-0 z-30 bg-white shadow-sm" style="padding-top:env(safe-area-inset-top)">
+  <div class="flex items-center gap-1 px-2 h-bar">
+    <button class="icon-btn" data-open="drawer-categories" aria-label="All categories"><svg class="w-6 h-6"><use href="#i-menu"/></svg></button>
+    <form id="search-form" role="search" class="relative flex-1">
+      <input id="search" type="search" enterkeyhint="search" autocomplete="off" placeholder="Search pest control, agrovet, phones..." class="w-full h-9 pl-9 pr-3 rounded-full bg-gray-100 text-sm outline-none focus:ring-2 focus:ring-brand/40 transition-[height] duration-200">
+      <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-mute"><use href="#i-search"/></svg>
+    </form>
+    <button class="icon-btn" data-tab="cart" aria-label="Cart"><svg class="w-6 h-6"><use href="#i-cart"/></svg><span class="badge" data-badge="cart" hidden>0</span></button>
+    <button class="icon-btn" data-tab="account" aria-label="Account"><svg class="w-6 h-6"><use href="#i-user"/></svg></button>
+  </div>
+  <div id="chips-wrap">
+    <nav id="chips" role="tablist" aria-label="Sub-categories" class="flex gap-2 px-3 pb-2 overflow-x-auto no-sb"></nav>
+  </div>
+</header>
+
+<!-- ===== Views (one visible at a time) ===== -->
+<main id="views" class="pb-[calc(56px+env(safe-area-inset-bottom)+8px)]">
+
+  <section id="view-home" data-view="home">
+    <div class="flex gap-2 overflow-x-auto no-sb px-3 py-2 text-2xs text-brand font-medium">
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">M-Pesa checkout</span>
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">Delivery to all 47 counties</span>
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">Pickup at Sarit Centre, Westlands</span>
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">WhatsApp +254 748 888 230</span>
+    </div>
+    <div class="flex items-center justify-between px-3 pb-2">
+      <h1 id="grid-title" class="text-sm font-semibold">Recommended for you</h1>
+      <button id="open-filters" data-open="sheet-filters" class="tap flex items-center gap-1 text-xs text-ink px-2 h-8 rounded-full bg-white shadow-card">
+        <svg class="w-4 h-4"><use href="#i-filter"/></svg>Filter<span id="filter-count" class="text-brand font-semibold" hidden></span>
+      </button>
+    </div>
+    <ul id="grid" class="grid grid-cols-2 gap-2 px-2"></ul>
+    <p id="grid-empty" class="text-center text-mute py-10" hidden>No products match these filters.</p>
+    <div id="sentinel" class="h-10"></div>
+  </section>
+
+  <section id="view-categories" data-view="categories" hidden>
+    <div class="flex" style="height:calc(100dvh - 48px - 56px - env(safe-area-inset-top) - env(safe-area-inset-bottom))">
+      <aside id="cat-side" class="w-24 shrink-0 overflow-y-auto bg-gray-100 no-sb" role="tablist" aria-label="Main categories"></aside>
+      <div id="cat-main" class="flex-1 overflow-y-auto bg-white p-3"></div>
+    </div>
+  </section>
+
+  <section id="view-deals" data-view="deals" hidden>
+    <div class="mx-2 mt-2 rounded-lg bg-gradient-to-r from-sale to-orange-500 text-white p-3 flex items-center justify-between">
+      <div><p class="font-semibold text-sm">Flash deals</p><p class="text-2xs opacity-90">Biggest discounts first</p></div>
+      <svg class="w-7 h-7"><use href="#i-bolt"/></svg>
+    </div>
+    <ul id="deals-grid" class="grid grid-cols-2 gap-2 p-2"></ul>
+  </section>
+
+  <section id="view-cart" data-view="cart" hidden>
+    <h2 class="px-3 pt-3 pb-2 font-semibold">Cart <span id="cart-title-count" class="text-mute font-normal"></span></h2>
+    <ul id="cart-list" class="px-2 space-y-2"></ul>
+    <div id="cart-empty" class="text-center text-mute py-16" hidden>
+      <svg class="w-12 h-12 mx-auto mb-2 opacity-40"><use href="#i-cart"/></svg>Your cart is empty
+    </div>
+    <div id="cart-total-bar" class="mx-2 mt-3 p-3 bg-white rounded-lg shadow-card flex items-center justify-between" hidden>
+      <div><p class="text-xs text-mute">Total</p><p id="cart-total" class="font-bold text-sale text-base"></p></div>
+      <button id="checkout" class="tap h-10 px-6 rounded-full bg-brand text-white font-semibold text-sm">Checkout with M-Pesa</button>
+    </div>
+  </section>
+
+  <section id="view-account" data-view="account" hidden>
+    <div class="bg-brand text-white p-5 pt-6"><p class="font-semibold text-base">Hello, shopper</p><p class="text-xs opacity-80">Sign in to track your orders</p></div>
+    <ul class="m-2 bg-white rounded-lg divide-y divide-line shadow-card">
+      <li><a class="tap block px-4 py-3.5" href="#">My orders</a></li>
+      <li><a class="tap block px-4 py-3.5" href="#">Wishlist</a></li>
+      <li><a class="tap block px-4 py-3.5" href="https://wa.me/254748888230">Chat on WhatsApp</a></li>
+    </ul>
+  </section>
+</main>
+
+<!-- ===== Bottom navigation ===== -->
+<nav id="bottom-nav" class="fixed bottom-0 inset-x-0 z-30 bg-white border-t border-line flex" style="padding-bottom:env(safe-area-inset-bottom)" aria-label="Main">
+  <button class="nav-item" data-tab="home" aria-current="page"><svg class="w-6 h-6"><use href="#i-home"/></svg>Home</button>
+  <button class="nav-item" data-tab="categories"><svg class="w-6 h-6"><use href="#i-grid"/></svg>Categories</button>
+  <button class="nav-item" data-tab="deals"><svg class="w-6 h-6"><use href="#i-bolt"/></svg>Deals<span class="badge" data-badge="deals" style="left:55%;right:auto" hidden>0</span></button>
+  <button class="nav-item" data-tab="cart"><svg class="w-6 h-6"><use href="#i-cart"/></svg>Cart<span class="badge" data-badge="cart" style="left:55%;right:auto" hidden>0</span></button>
+  <button class="nav-item" data-tab="account"><svg class="w-6 h-6"><use href="#i-user"/></svg>Account</button>
+</nav>
+
+<!-- ===== Overlays ===== -->
+<div id="scrim" class="scrim" aria-hidden="true"></div>
+
+<aside id="drawer-categories" class="sheet sheet-left" role="dialog" aria-modal="true" aria-label="Categories">
+  <div class="flex items-center justify-between px-4 h-bar border-b border-line">
+    <span class="font-semibold">All categories</span>
+    <button class="icon-btn" data-close aria-label="Close"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+  </div>
+  <ul id="drawer-cats" class="flex-1 overflow-y-auto"></ul>
+</aside>
+
+<section id="sheet-filters" class="sheet sheet-bottom" role="dialog" aria-modal="true" aria-label="Filters">
+  <div class="flex items-center justify-between px-4 h-12 border-b border-line">
+    <span class="font-semibold">Filters</span>
+    <button class="icon-btn" data-close aria-label="Close"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="flex-1 overflow-y-auto p-4 space-y-5">
+    <div>
+      <p class="text-xs font-semibold mb-2">Sort by</p>
+      <div id="f-sort" class="flex flex-wrap gap-2">
+        <button class="chip" data-sort="rec" aria-selected="true">Recommended</button>
+        <button class="chip" data-sort="low" aria-selected="false">Price: low to high</button>
+        <button class="chip" data-sort="high" aria-selected="false">Price: high to low</button>
+        <button class="chip" data-sort="disc" aria-selected="false">Biggest discount</button>
+      </div>
+    </div>
+    <div>
+      <p class="text-xs font-semibold mb-2">Price (KSh)</p>
+      <div class="flex items-center gap-2">
+        <input id="f-min" inputmode="numeric" placeholder="Min" class="w-full h-10 px-3 rounded-lg bg-gray-100 outline-none">
+        <span class="text-mute">to</span>
+        <input id="f-max" inputmode="numeric" placeholder="Max" class="w-full h-10 px-3 rounded-lg bg-gray-100 outline-none">
+      </div>
+    </div>
+    <label class="flex items-center justify-between text-sm">On discount only
+      <input id="f-disc" type="checkbox" class="w-5 h-5 accent-[#7c3aed]">
+    </label>
+  </div>
+  <div class="flex gap-3 p-3 border-t border-line">
+    <button id="f-reset" class="tap flex-1 h-11 rounded-full bg-gray-100 font-semibold">Reset</button>
+    <button id="f-apply" class="tap flex-1 h-11 rounded-full bg-brand text-white font-semibold">Show results</button>
+  </div>
+</section>
+
+<section id="sheet-quickbuy" class="sheet sheet-bottom" role="dialog" aria-modal="true" aria-label="Quick buy">
+  <div class="flex gap-3 p-4">
+    <div id="qb-img" class="w-24 h-24 rounded-lg shrink-0 grid place-items-center text-4xl"></div>
+    <div class="min-w-0 flex-1">
+      <p id="qb-name" class="text-sm font-medium line-clamp-2"></p>
+      <p class="mt-1"><span id="qb-price" class="text-sale font-bold text-lg"></span> <s id="qb-old" class="text-mute text-xs"></s></p>
+    </div>
+    <button class="icon-btn self-start -mt-1 -mr-2" data-close aria-label="Close"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="px-4 pb-3">
+    <p class="text-xs font-semibold mb-2">Pack size</p>
+    <div id="qb-sizes" class="flex flex-wrap gap-2"></div>
+  </div>
+  <div class="px-4 pb-4 flex items-center justify-between">
+    <span class="text-xs font-semibold">Quantity</span>
+    <div class="flex items-center gap-3">
+      <button id="qb-minus" class="icon-btn bg-gray-100 !w-8 !h-8" aria-label="Less"><svg class="w-4 h-4"><use href="#i-minus"/></svg></button>
+      <span id="qb-qty" class="w-6 text-center font-semibold">1</span>
+      <button id="qb-plus" class="icon-btn bg-gray-100 !w-8 !h-8" aria-label="More"><svg class="w-4 h-4"><use href="#i-plus"/></svg></button>
+    </div>
+  </div>
+  <div class="flex gap-3 p-3 border-t border-line">
+    <button id="qb-add" class="tap flex-1 h-11 rounded-full bg-brand-soft text-brand font-semibold">Add to cart</button>
+    <button id="qb-buy" class="tap flex-1 h-11 rounded-full bg-brand text-white font-semibold">Buy now</button>
+  </div>
+</section>
+
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-[76px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

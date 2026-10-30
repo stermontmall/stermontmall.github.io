@@ -1,0 +1,62 @@
+@import "tailwindcss";
+@config "./tailwind.config.js";
+
+/* Touch response: every tappable thing gets this */
+@utility tap {
+  transition: transform .1s ease-out, opacity .1s ease-out;
+  &:active { transform: scale(.94); opacity: .8; }
+}
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body { @apply bg-page text-ink text-sm antialiased; overscroll-behavior-y: none; }
+  body.no-scroll { overflow: hidden; }
+  button { @apply select-none; touch-action: manipulation; }
+}
+
+@layer components {
+  .icon-btn { @apply relative grid place-items-center w-10 h-10 rounded-full tap; }
+  .badge { @apply absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-sale text-white text-2xs font-semibold grid place-items-center leading-none; }
+  .badge[hidden] { display: none; }
+  .badge.bump { animation: bump .28s ease-out; }
+
+  .chip { @apply shrink-0 px-3 h-8 rounded-full bg-gray-100 text-ink text-xs font-medium tap whitespace-nowrap; }
+  .chip[aria-selected="true"] { @apply bg-brand text-white; }
+
+  .nav-item { @apply relative flex flex-col items-center justify-center gap-0.5 flex-1 h-nav text-mute text-2xs tap; }
+  .nav-item svg { @apply transition-transform duration-200 ease-out; }
+  .nav-item[aria-current="page"] { @apply text-brand font-semibold; }
+  .nav-item[aria-current="page"] svg { transform: scale(1.18) translateY(-1px); }
+
+  .cat-side { @apply block w-full px-2 py-3.5 text-xs text-left text-mute bg-transparent border-l-[3px] border-transparent tap; }
+  .cat-side[aria-selected="true"] { @apply bg-white text-brand font-semibold border-brand; }
+
+  .card { @apply bg-white rounded-lg overflow-hidden shadow-card tap; }
+  .stars { position: relative; display: inline-block; width: 60px; height: 12px; background: linear-gradient(90deg, #f59e0b var(--fill, 0%), #d1d5db var(--fill, 0%)); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='12' viewBox='0 0 60 12'%3E%3Cg fill='%23000'%3E%3Cpath id='s' d='M6 .5l1.7 3.6 3.8.5-2.8 2.7.7 3.9L6 9.3 2.6 11.2l.7-3.9L.5 4.6l3.8-.5z'/%3E%3Cuse href='%23s' x='12'/%3E%3Cuse href='%23s' x='24'/%3E%3Cuse href='%23s' x='36'/%3E%3Cuse href='%23s' x='48'/%3E%3C/g%3E%3C/svg%3E") center / 60px 12px no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='12' viewBox='0 0 60 12'%3E%3Cg fill='%23000'%3E%3Cpath id='s' d='M6 .5l1.7 3.6 3.8.5-2.8 2.7.7 3.9L6 9.3 2.6 11.2l.7-3.9L.5 4.6l3.8-.5z'/%3E%3Cuse href='%23s' x='12'/%3E%3Cuse href='%23s' x='24'/%3E%3Cuse href='%23s' x='36'/%3E%3Cuse href='%23s' x='48'/%3E%3C/g%3E%3C/svg%3E") center / 60px 12px no-repeat; }
+
+  /* Skeleton shimmer */
+  .skel { @apply bg-gray-200 rounded; background-image: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent); background-size: 200% 100%; animation: shimmer 1.2s infinite linear; }
+
+  /* Overlays */
+  .scrim { @apply fixed inset-0 z-40 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-200; }
+  .scrim.open { @apply opacity-100 pointer-events-auto; }
+  .sheet { @apply fixed z-50 bg-white transition-transform duration-300 ease-out; visibility: hidden; }
+  .sheet.open { visibility: visible; transform: none !important; }
+  .sheet-bottom { @apply inset-x-0 bottom-0 rounded-t-2xl shadow-sheet max-h-[85dvh] flex flex-col; transform: translateY(100%); padding-bottom: env(safe-area-inset-bottom); }
+  .sheet-left { @apply inset-y-0 left-0 w-[84%] max-w-[340px] flex flex-col; transform: translateX(-100%); padding-top: env(safe-area-inset-top); }
+}
+
+/* Collapse the chip row while scrolling down (header "compact" mode) */
+#chips-wrap { max-height: 44px; transition: max-height .2s ease-out, opacity .2s; }
+#appbar.is-compact #chips-wrap { max-height: 0; opacity: 0; overflow: hidden; }
+#appbar.is-compact #search { height: 34px; }
+
+@keyframes shimmer { from { background-position: 200% 0 } to { background-position: -200% 0 } }
+@keyframes bump { 40% { transform: scale(1.45) } }
+
+.no-sb { scrollbar-width: none; }
+.no-sb::-webkit-scrollbar { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
