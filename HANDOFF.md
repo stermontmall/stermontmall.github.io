@@ -1,3 +1,26 @@
+# HANDOFF - Mobile shell becomes the home page (branch `wip-shell-home`, 2026-10-30)
+Owner request: "Replace everything, I need the mobile shell setup" (the shell was only at /mobile-shell/ and did not show on the website).
+
+## Done
+- [x] Step 1 `classic.html` = the previous home page, unchanged except: `noindex, follow` (only `/` is indexed; its canonical already pointed to `/`) and a small script at the end that receives the shell cart (see Step 3).
+- [x] Step 2 `index.html` = the shell (phones). It keeps the old home page's SEO head (title, description, canonical, hreflang, og/twitter, both JSON-LD blocks, `index, follow`), `/analytics.js` (GA4) and the service worker registration. It also keeps the `<!-- seo-links:start/end -->` block that `generate-products.mjs` rewrites on every build (plain crawlable links to every category and many products), placed at the end of the Home view; without it Google would see a JavaScript-only page.
+  - Desktop screens (min-width 900px with a mouse) and old shared `/#p-...` product links are sent to `/classic.html` (hash kept), so desktop visitors and old WhatsApp/Facebook links keep working.
+  - `/mobile-shell/` now forwards to `/` (the page there is only a redirect). `mobile-shell/app.js` reads `/product-names.json` (absolute path now).
+  - Account tab: real links (sign in / orders `/account.html`, `/track.html`, shipping, returns, contact, WhatsApp, "Open the full shop"). The error state of the grid also links to `/classic.html`.
+- [x] Step 3 Checkout = the existing, proven flow (M-Pesa STK/paybill, county delivery fees, vouchers, order e-mails, receipts). The shell's Checkout button saves its cart lines as `stm_handoff` and opens `/classic.html?checkout=1`; that page waits for its product cards (up to ~12 s), adds each line through its own `STM.add`, removes `stm_handoff`, and opens the cart. A line whose price on the shop page differs from the price shown in the shell is NOT added and the customer gets a red notice naming it (never charge an unseen price). If the cards do not load in time the handoff is kept, so a reload retries. The shell cart is emptied on handoff.
+- [x] Tests: `python3 mobile-shell/shell.test.py` = 65/65 (was 51). New checks: SEO head and markers on `/`, classic is noindex, shell items + quantities + total (KSh 15,500) arrive in the real shop cart and its drawer opens, handoff consumed, changed price refused with a notice, `/#p-...` and desktop redirects, `/mobile-shell/` forwards, fallback link. All with fixture data in headless Chromium (analytics hosts stubbed).
+
+## Left
+- [ ] NOT TESTED against the real site/database (the sandbox cannot reach Supabase or the live domain). After the merge, on a phone: open stermontarcade.co.ke twice (the first visit installs the new service worker copy), confirm 182 products and the home look, add 2 items, tap Checkout, confirm the shop cart opens with the same items and prices, and do ONE real small order end to end (STK push / paybill, order e-mail, order row in the admin).
+- [ ] After the next "Build product pages" run (or Run workflow), confirm `index.html` still contains the seo-links block with fresh links (the generator rewrites it in place).
+- [ ] Not wired in the shell (still only in `/classic.html`): live chat, product reviews, advert banner/posters, recent-orders panel, wishlist, sign-in panel, the blog link. The Account tab links to the pages that exist.
+- [ ] Desktop uses `/classic.html`. A desktop version of the shell is not built.
+- [ ] Google: the old home page is now `noindex` and a desktop-width visit to `/` is redirected by JavaScript; Search Console should show `/` indexed with the new content within days. Watch "Pages" for `/` and `/classic.html`.
+- [ ] Known limit: a multi-size product whose cheapest size is not the page's first row can show "From <lowest>" on that row's shop card; the handoff refuses such a line (price differs) and tells the customer to add it from the shop. Worth a look if customers report the notice.
+- To undo quickly: revert the merge commit, or `git mv index.html shell-home.html && git mv classic.html index.html` and set the robots tag of `index.html` back to `index, follow, max-image-preview:large, max-snippet:-1`.
+
+---
+
 # HANDOFF - Mobile shell: live Deals badge (branch `wip-mobile-shell-deals-badge`, 2026-10-30)
 Continues the "Left" list of the mobile-shell section below. The item "wire `fetchProducts()` to the Supabase products table" was NOT redone: it is Step 4 below and `mobile-shell/app.js` on `main` already reads `products`, `categories` and `../product-names.json`.
 
