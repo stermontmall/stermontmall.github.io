@@ -1,0 +1,44 @@
+name: render-batch-06
+# Temporary: runs the batch 06 tests, renders the 10 blog posts and commits them to this branch with a report.
+# Triggered only by a push that changes this file on wip-seo-batch-06. Delete the file after the run.
+on:
+  push:
+    branches: [wip-seo-batch-06]
+    paths: ['.github/workflows/render-batch-06.yml']
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: wip-seo-batch-06
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Tests, render, report
+        run: |
+          R=seo-pest/ci-report-06.txt
+          : > $R
+          run() { echo "== $*" >> $R; "$@" >> $R 2>&1; echo "exit $?" >> $R; echo >> $R; }
+          run node seo-pest/build.test.mjs
+          run node seo-pest/blog-build.mjs blogs-06
+          run node seo-pest/blog.test.mjs
+          run node seo-titles.test.mjs
+          run node buy-name.test.mjs
+          echo "== md5 of builder output per group (compare with md5(description) in Supabase)" >> $R
+          node -e "
+          import('./seo-pest/build.mjs').then(async m => {
+            const fs = await import('node:fs'); const c = await import('node:crypto');
+            const items = JSON.parse(fs.readFileSync('seo-pest/batch-06.json','utf8'));
+            for (const p of items) console.log(p.group, c.createHash('md5').update(m.renderText(p)).digest('hex'), m.words(m.renderText(p)));
+          });" >> $R 2>&1
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "render-bot"
+          git config user.email "render-bot@users.noreply.github.com"
+          git add -A blog blog-topics.json seo-pest/ci-report-06.txt
+          git diff --cached --quiet || git commit -m "CI: batch 06 blog pages and test report"
+          git push origin HEAD:wip-seo-batch-06
