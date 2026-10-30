@@ -26,6 +26,8 @@ const words = s => (String(s).match(/\S+/g) || []).length;
 const STOP = new Set(['kenya', 'how', 'to', 'in', 'a', 'an', 'the', 'and', 'or', 'of', 'for', 'your', 'you', 'at', 'on', 'is', 'are', 'what', 'why', 'with', 'home', 'guide', 'buying', 'buy', 'online', 'tips', 'basics']);
 const tokens = s => new Set(String(s).toLowerCase().replace(/\.html$/, '').split(/[^a-z0-9]+/).map(w => w.replace(/s$/, '')).filter(w => w && !STOP.has(w)));
 const jaccard = (a, b) => { let i = 0; for (const x of a) if (b.has(x)) i++; const u = a.size + b.size - i; return u ? i / u : 0; };
+// <title> = the article title + the brand, once (a title the model already ended with the brand must not get it twice)
+const withBrand = t => String(t).replace(/\s*[|\u2013-]\s*Stermont Arcade.*$/i, '').trim() + ' | Stermont Arcade';
 const titleOf = f => { try { const m = readFileSync(f, 'utf8').match(/<title>([^<]*)<\/title>/i); return m ? unesc(m[1]).replace(/\s*[|\u2013-]\s*Stermont Arcade.*$/i, '').trim() : ''; } catch { return ''; } };
 
 if (!KEY && !GKEY) { console.error('No API key: add the repository secret GEMINI_API_KEY (free) or ANTHROPIC_API_KEY. Nothing written.'); out('written', 'false'); process.exit(1); }
@@ -188,7 +190,7 @@ const catHtml = cats.length ? `<div class="box"><strong>Shop this category</stro
 const relHtml = related.length ? `<h2>Related guides</h2>\n<ul class="rel">${related.map(r => `<li><a href="${r.path}">${esc(r.title)}</a></li>`).join('')}</ul>` : '';
 const html = `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(art.title)} | Stermont Arcade</title><meta name="description" content="${esc(art.description)}">
+<title>${esc(withBrand(art.title))}</title><meta name="description" content="${esc(art.description)}">
 <link rel="canonical" href="${url}"><meta name="robots" content="index, follow, max-image-preview:large">
 <meta property="og:type" content="article"><meta property="og:site_name" content="Stermont Arcade"><meta property="og:locale" content="en_KE">
 <meta property="og:title" content="${esc(art.title)}"><meta property="og:description" content="${esc(art.description)}"><meta property="og:url" content="${url}">
