@@ -84,7 +84,7 @@ async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min 
 
 /* ---------- 2. Store + live badges ---------- */
 const store = (() => {
-  let s = { tab: 'home', cart: ls.get('cart', []).filter(i => i.rowId), dealsNew: ls.get('dealsNew', 5), chip: 'all', sub: '', q: '', filters: { sort: 'rec', min: 0, max: 0, disc: false } };
+  let s = { tab: 'home', cart: ls.get('cart', []).filter(i => i.rowId), dealsNew: 0, chip: 'all', sub: '', q: '', filters: { sort: 'rec', min: 0, max: 0, disc: false } };   // dealsNew stays 0 (badge hidden) until the catalog is loaded, see syncDealsBadge
   const subs = new Set();
   return {
     get: () => s,
@@ -94,6 +94,16 @@ const store = (() => {
 })();
 const cartCount = s => s.cart.reduce((n, i) => n + i.qty, 0);
 const cartTotal = s => s.cart.reduce((n, i) => n + i.qty * i.price, 0);
+
+/* Deals badge = discounted products that are new since the last visit to the Deals tab.
+   "Discounted" is the same rule as the Deals tab (discOf > 0, lowest size). `shell.dealsSeen` holds the count seen at the last visit. */
+let dealsCount = 0;
+function syncDealsBadge() {
+  dealsCount = PRODUCTS.filter(p => discOf(p) > 0).length;
+  const onDeals = store.get().tab === 'deals';
+  if (onDeals) ls.set('dealsSeen', dealsCount);
+  store.set({ dealsNew: onDeals ? 0 : Math.max(0, dealsCount - ls.get('dealsSeen', 0)) });
+}
 
 function setBadge(name, n, prev) {
   $$(`[data-badge="${name}"]`).forEach(el => {
@@ -105,7 +115,7 @@ function setBadge(name, n, prev) {
 store.subscribe((s, prev) => {
   setBadge('cart', cartCount(s), cartCount(prev));
   setBadge('deals', s.dealsNew, prev.dealsNew);
-  ls.set('cart', s.cart); ls.set('dealsNew', s.dealsNew);
+  ls.set('cart', s.cart);
 });
 
 /* ---------- 3. Overlays wired to browser history ----------
@@ -163,7 +173,7 @@ function showTab(tab) {
   $$('#bottom-nav .nav-item').forEach(b => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   $('#chips-wrap').hidden = tab !== 'home';
   $('#appbar').classList.remove('is-compact');
-  if (tab === 'deals') { store.set({ dealsNew: 0 }); renderDeals(); }
+  if (tab === 'deals') { ls.set('dealsSeen', dealsCount); store.set({ dealsNew: 0 }); renderDeals(); }
   window.scrollTo(0, scrollPos[tab] || 0);
 }
 function goTab(tab) {
@@ -387,5 +397,5 @@ $('#search-form').addEventListener('submit', e => {
 });
 
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
-loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); }).catch(() => {});   // categories appear once the data is in
+loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); }).catch(() => {});   // categories and the Deals badge appear once the data is in
 })();
