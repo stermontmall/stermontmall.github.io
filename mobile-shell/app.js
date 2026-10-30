@@ -8,6 +8,8 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = n => Number(n).toLocaleString('en-KE');
+/* search text: lower case, letters and digits only, single spaces ("Absolute 375SC – 250 ml" -> "absolute 375sc 250 ml") */
+const norm = s => String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const ls = {
   get(k, d) { try { return JSON.parse(localStorage.getItem('shell.' + k)) ?? d; } catch { return d; } },
   set(k, v) { try { localStorage.setItem('shell.' + k, JSON.stringify(v)); } catch {} }
@@ -41,10 +43,14 @@ function buildCatalog(rows, cats, names) {
       .sort((a, b) => a.price - b.price);
     const rep = live[0], c = byId.get(rep.category_id), top = topOf(c); if (!c || !top) return;
     const low = sizes[0], img = (live.map(r => (r.images || [])[0]).find(Boolean)) || '';
+    const nm = (names && names[rep.id]) || rep.name, sb = c.parent_id ? c.name : '';
+    /* what the search looks at: name, department, sub-category and the pack sizes ("1 Litre", "250 ml"); hayFlat has no spaces so "20ml" finds "20 ml" */
+    const hay = norm([nm, top.name, sb].concat(sizes.map(s => s.label).filter(l => l !== 'Standard')).join(' '));
     out.push({
-      id: key, cat: top.slug, catName: top.name, sub: c.parent_id ? c.name : '', name: (names && names[rep.id]) || rep.name,
+      id: key, cat: top.slug, catName: top.name, sub: sb, name: nm,
       img, emoji: ICONS[top.slug] || '🛍️', bg: BGS[hashStr(key) % BGS.length],
-      price: low.price, old: low.old, sizes, featured: !!rep.featured, rating: 0, reviews: 0   // no ratings exist in the database
+      price: low.price, old: low.old, sizes, featured: !!rep.featured, rating: 0, reviews: 0,   // no ratings exist in the database
+      nameN: norm(nm), hay, hayFlat: hay.replace(/ /g, '')
     });
   });
   PRODUCTS = out;
@@ -69,17 +75,21 @@ const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
 /* thumbnail markup: the product photo, or the category emoji when there is none (or it fails to load, see the error listener in section 11) */
 const thumb = p => p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" decoding="async" data-emoji="${esc(p.emoji)}" style="width:100%;height:100%;object-fit:contain;background:#fff">` : p.emoji;
 
-/* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
+/* Resolves {items, hasMore, total}; rejects when Supabase cannot be reached (the grid shows a retry link).
+   Search: every word typed must be found in the product's name, department, sub-category or pack sizes (letters/digits only, so punctuation never gets in the way).
+   Plurals work ("phones" finds "phone"), spacing does not matter ("bedbug" finds "Bed Bug", "20ml" finds "20 ml"), and the best name matches come first. */
 async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 12 }) {
   await loadCatalog();
-  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const phrase = norm(q), words = phrase.split(' ').filter(Boolean), flat = phrase.replace(/ /g, '');
+  const has = (p, w) => p.hay.includes(w) || p.hayFlat.includes(w) || (w.length > 3 && w.endsWith('s') && p.hay.includes(w.slice(0, -1)));
   const r = PRODUCTS.filter(p => (cat === 'all' || p.cat === cat) && (!sub || p.sub === sub) && (!min || p.price >= min) && (!max || p.price <= max) && (!disc || discOf(p) > 0) &&
-    (!words.length || words.every(w => (p.name + ' ' + p.catName + ' ' + p.sub).toLowerCase().includes(w))));
+    (!words.length || words.every(w => has(p, w)) || p.hayFlat.includes(flat)));
+  const rank = p => (!words.length ? 0 : p.nameN.includes(phrase) ? 3 : words.every(w => p.nameN.includes(w)) ? 2 : 1);
   if (sort === 'low') r.sort((a, b) => a.price - b.price);
   else if (sort === 'high') r.sort((a, b) => b.price - a.price);
   else if (sort === 'disc') r.sort((a, b) => discOf(b) - discOf(a));
-  else r.sort((a, b) => b.featured - a.featured);               // recommended: featured first, then the catalog order (sort is stable)
-  return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size };
+  else r.sort((a, b) => rank(b) - rank(a) || b.featured - a.featured);   // recommended: best search match first, then featured, then the catalog order (sort is stable)
+  return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size, total: r.length };
 }
 
 /* ---------- 2. Store + live badges ---------- */
@@ -230,6 +240,19 @@ function query() {
   const s = store.get();
   return { cat: s.chip, sub: s.sub, q: s.q, ...s.filters };
 }
+/* nothing to show: say why and offer the way out (clear the search / the filters, or ask on WhatsApp) */
+function setEmpty() {
+  const em = $('#grid-empty'), s = store.get();
+  if (grid.children.length) { em.hidden = true; return; }
+  const filtered = activeFilterCount(s.filters) > 0;
+  if (s.q) {
+    em.innerHTML = `No results for &ldquo;${esc(s.q)}&rdquo;.<br>` + (filtered ? '<button class="underline text-brand" data-reset-filters>Clear filters</button> &middot; ' : '') +
+      '<button class="underline text-brand" data-clear-search>Clear search</button><br>' +
+      `Cannot find it? <a class="underline text-brand" target="_blank" rel="noopener" href="https://wa.me/254748888230?text=${encodeURIComponent('Hello Stermont Arcade, do you have: ' + s.q + '?')}">Ask us on WhatsApp</a>`;
+  } else if (filtered) em.innerHTML = esc(EMPTY_TEXT) + '<br><button class="underline text-brand" data-reset-filters>Clear filters</button>';
+  else em.textContent = EMPTY_TEXT;
+  em.hidden = false;
+}
 async function loadPage(reset) {
   if (feed.loading && !reset) return;
   if (reset) { feed.page = 1; feed.hasMore = true; feed.token++; grid.innerHTML = ''; $('#grid-empty').hidden = true; }
@@ -244,12 +267,13 @@ async function loadPage(reset) {
     feed.loading = false; feed.hasMore = false; showGridError(); return;
   }
   if (token !== feed.token) return;            // a newer query started: drop this stale answer
-  const { items, hasMore } = res;
+  const { items, hasMore, total } = res;
   $$('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
   items.forEach(p => feed.items.set(p.id, p));
   grid.insertAdjacentHTML('beforeend', items.map(cardHTML).join(''));
   feed.page++; feed.hasMore = hasMore; feed.loading = false;
-  const em = $('#grid-empty'); em.textContent = EMPTY_TEXT; em.hidden = grid.children.length > 0;
+  const term = store.get().q; if (term) $('#grid-title').textContent = `${total} result${total === 1 ? '' : 's'} for "${term}"`;
+  setEmpty();
   if (feed.hasMore && store.get().tab === 'home' && sentinel.getBoundingClientRect().top < innerHeight + 400) loadPage(false);
 }
 new IntersectionObserver(es => { if (es[0].isIntersecting && store.get().tab === 'home') loadPage(false); }, { rootMargin: '400px' }).observe(sentinel);
@@ -322,9 +346,8 @@ $('#f-apply').addEventListener('click', () => {
   store.set({ filters: { sort: draftSort, min: +$('#f-min').value || 0, max: +$('#f-max').value || 0, disc: $('#f-disc').checked } });
   syncFilterUI(); refreshGrid(); closeTop();
 });
-$('#f-reset').addEventListener('click', () => {
-  draftSort = 'rec'; store.set({ filters: { sort: 'rec', min: 0, max: 0, disc: false } }); syncFilterUI(); refreshGrid();
-});
+function resetFilters() { draftSort = 'rec'; store.set({ filters: { sort: 'rec', min: 0, max: 0, disc: false } }); syncFilterUI(); }
+$('#f-reset').addEventListener('click', () => { resetFilters(); refreshGrid(); });
 
 /* ---------- 9. Quick buy sheet ---------- */
 const qb = { p: null, size: '', qty: 1, shown: '' };
@@ -363,7 +386,8 @@ document.addEventListener('click', e => {
 });
 /* ---------- 9b. Product page: the full product view, inside the shell (replaces the link to the old /p/ page) ----------
    It shares the selection (product, size, quantity) with the quick-buy sheet, so both always agree. Opening it pushes one history entry,
-   so Back returns to the sheet / list the customer came from. The generated /p/<slug>.html pages stay as they are for Google. */
+   so Back returns to the sheet / list the customer came from. The generated /p/<slug>.html pages stay as they are for Google.
+   Tapping a product in the list or in Deals opens THIS full-screen page straight away (openProduct); the small sheet is only used to pick a pack size from the + button. */
 const pp = { img: '' };
 async function renderPP() {
   const p = qb.p; if (!p) return;
@@ -405,6 +429,12 @@ $('#pp-buy').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty);
 function openQuickBuy(id) {
   const p = feed.items.get(id); if (!p) return;
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
+}
+/* tapping a product: the details open FULL SCREEN (the product page), not in the small sheet */
+function openProduct(id) {
+  const p = feed.items.get(id); if (!p) return;
+  qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = '';
+  openProductPage();
 }
 $('#qb-sizes').addEventListener('click', e => { const b = e.target.closest('[data-size]'); if (b) { qb.size = b.dataset.size; renderQB(); } });
 $('#qb-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderQB(); });
@@ -454,6 +484,41 @@ function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.style.opacity = 1;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.style.opacity = 0, 1600);
 }
+
+/* Search: results appear while you type (after a short pause), on Enter / the keyboard Search key, and when you tap the magnifier.
+   Emptying the box (or its little x) brings the normal list back. Every word typed must match (see fetchProducts). */
+const searchBox = $('#search'), searchForm = $('#search-form');
+let searchTimer = 0;
+function applySearch(raw, force) {
+  clearTimeout(searchTimer);
+  const term = String(raw).replace(/\s+/g, ' ').trim();
+  if (!force && term === store.get().q) return;
+  store.set({ q: term, chip: 'all', sub: '' });
+  if (store.get().tab !== 'home') goTab('home');
+  refreshGrid();
+  window.scrollTo({ top: 0 });
+}
+(() => {   // the magnifier icon was only a picture: make it a real Search button
+  const ic = searchForm.querySelector('svg'); if (!ic || ic.closest('button')) return;
+  const b = document.createElement('button');
+  b.type = 'submit'; b.setAttribute('aria-label', 'Search');
+  b.style.cssText = 'position:absolute;left:0;top:0;bottom:0;width:38px;display:grid;place-items:center;background:none;border:0;padding:0;border-radius:9999px 0 0 9999px';
+  ic.setAttribute('class', 'w-4 h-4 text-mute');
+  ic.replaceWith(b); b.appendChild(ic);
+})();
+searchBox.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const t = searchBox.value.trim();
+  if (!t) return applySearch('');                                   // box emptied: back to the normal list
+  if (t.length >= 2) searchTimer = setTimeout(() => applySearch(searchBox.value), 350);
+});
+searchBox.addEventListener('search', () => applySearch(searchBox.value));   // the little x in the box
+searchForm.addEventListener('submit', e => {
+  e.preventDefault(); searchBox.blur();
+  const s = store.get();
+  applySearch(searchBox.value, s.chip !== 'all' || !!s.sub || s.tab !== 'home');   // same words already showing: nothing to reload
+});
+
 document.addEventListener('click', e => {
   const t = e.target;
   let el;
@@ -463,20 +528,16 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-add]'))) { const p = feed.items.get(el.dataset.add); if (p) { if (p.sizes.length > 1) openQuickBuy(p.id); else { addToCart(p, p.sizes[0].label, 1); toast('Added to cart'); } } return; }   // several pack sizes: pick the size first
   if (t.closest('[data-retry]')) return refreshGrid();
   if (t.closest('[data-retry-deals]')) return renderDeals();
+  if (t.closest('[data-clear-search]')) { searchBox.value = ''; return applySearch(''); }
+  if (t.closest('[data-reset-filters]')) { resetFilters(); return refreshGrid(); }
   if ((el = t.closest('#chips [data-chip]'))) return selectCategory(el.dataset.chip);
   if ((el = t.closest('[data-side]'))) { sideCat = el.dataset.side; return renderCategoriesView(); }
   if ((el = t.closest('[data-cat-all]'))) return selectCategory(el.dataset.catAll);
   if ((el = t.closest('[data-cat]'))) return selectCategory(el.dataset.cat, el.dataset.sub);
   if ((el = t.closest('[data-drawer-cat]'))) { const id = el.dataset.drawerCat; return closeAllThen(() => selectCategory(id)); }
-  if ((el = t.closest('.card[data-id]'))) return openQuickBuy(el.dataset.id);
+  if ((el = t.closest('.card[data-id]'))) return openProduct(el.dataset.id);   // full-screen product page
 });
 document.addEventListener('error', e => { const i = e.target; if (i && i.tagName === 'IMG' && i.dataset.emoji) i.replaceWith(document.createTextNode(i.dataset.emoji)); }, true); // photo failed: show the category emoji
-$('#search-form').addEventListener('submit', e => {
-  e.preventDefault(); $('#search').blur();
-  store.set({ q: $('#search').value.trim(), chip: 'all', sub: '' });
-  if (store.get().tab !== 'home') goTab('home');
-  refreshGrid();
-});
 
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
 loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); }).catch(() => {});   // categories and the Deals badge appear once the data is in
