@@ -1,3 +1,10 @@
+# HANDOFF - Shell product photos shown whole (branch `wip-shell-product-images`, 2026-10-30)
+Owner: "Fix real product images". Screenshot from the phone showed TVs and tall photos cut off in the grid.
+## Done
+- [x] `mobile-shell/app.js` `thumb()`: `object-fit:cover` -> `object-fit:contain` on a white background, so the whole photo shows on grid cards, the quick-buy sheet and cart lines (nothing cropped). Failed photos still fall back to the category emoji. `shell.test.py` = 69/69.
+## Left
+- [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request ("Yes"), tests 69/69 (fixture data).
+- [ ] Phone check on the real photos. If "real product images" meant something else (wrong photo on a product, missing photos, blurry/heavy photos), tell me which product; the photos are still the full-size Storage files (no resize), see the "Photos" item below.
 # HANDOFF - Categories tab: icon rail + photo tiles (branch `wip-shell-categories-grid`, 2026-10-30)
 Owner sent a screenshot of another store's category page and asked "make it open categories like this". Layout pattern only (no artwork, names or copy from that store).
 ## Done
