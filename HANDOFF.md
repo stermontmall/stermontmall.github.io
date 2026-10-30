@@ -4,6 +4,7 @@ Owner sent a screenshot of another store's category page and asked "make it open
 - [x] `mobile-shell/app.js` `renderCategoriesView()`: left rail now shows an icon above each name (selected = white with a brand bar); the rail starts on "Top Categories", whose right panel is a 3-column grid of every top-level category with a photo; picking a category shows its sub-categories as a 3-column grid of photo tiles ("View all" on top). Tiles use the first real product photo of that category/sub-category (`photoOf`), emoji if none or if the photo fails. Tapping a tile opens the Home grid filtered to it (unchanged behaviour). Inline styles only, so `tailwind.css` did not need a rebuild.
 - [x] `shell.test.py` = 69/69; checked with phone-size screenshots (fixture photos).
 ## Left
+- [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request ("Merge"), after `shell.test.py` 69/69 (fixture photos only). Revert the merge commit if it misbehaves.
 - [ ] Phone check with the real photos. Rail icons are still emoji; custom line icons would be a separate job. A category with no sub-categories shows one "All <name>" tile.
 
 ---
