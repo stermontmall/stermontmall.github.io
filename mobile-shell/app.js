@@ -409,6 +409,14 @@ document.addEventListener('click', e => {
   if (t.closest('[data-pp-retry]')) return renderPP();
   if (t.closest('[data-pp-cart]')) return closeAllThen(() => goTab('cart'));
 });
+/* Share: the link to give out is the product's own page /p/<slug>.html. It carries the product's title, photo and description in its head, so
+   WhatsApp / Facebook / Google show the product. (A /?product= address is one shell page, so it can only preview as the home page.) */
+$('#pp-share').addEventListener('click', async () => {
+  if (!qb.p) return;
+  const url = location.origin + '/p/' + encodeURIComponent(qb.p.slug) + '.html', title = qb.p.name + ' | Stermont Arcade';
+  try { if (navigator.share) { await navigator.share({ title, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { toast(url); }
+});
 $('#pp-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderPP(); renderQB(); });
 $('#pp-minus').addEventListener('click', () => { qb.qty = Math.max(1, qb.qty - 1); renderPP(); renderQB(); });
 $('#pp-add').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty); toast('Added to cart'); });
