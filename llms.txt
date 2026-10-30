@@ -89,6 +89,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 183 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 182 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
