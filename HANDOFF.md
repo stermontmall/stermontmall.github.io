@@ -1,3 +1,19 @@
+# HANDOFF - Check of `/?product=<slug>` links (branch `wip-product-links-check`, 2026-10-30)
+Owner sent https://stermontarcade.co.ke/?product=abasi-5-ec-50-ml and asked to "fix issue for all product links". GitHub + Supabase were connected for this session. `fetchProducts()` -> Supabase was NOT redone (already on `main`, Step 4 below).
+## Checked
+- [x] The slug exists: `products.slug = abasi-5-ec-50-ml` (active, in stock, group `abasi-5-ec`, 5 sizes); `p/abasi-5-ec-50-ml.html` exists.
+- [x] Headless phone browser (390x780) with the REAL Abasi rows and categories from Supabase: `/?product=abasi-5-ec-50-ml` opens the full product page in the shell, sizes 50 ml to 1 Litre listed, no page errors. So the code on `main` handles the link.
+- [x] What the server sends for that link is the HOME page head: title "Stermont Arcade | Online Shopping Store in Kenya", og:image logo, canonical `/`. This is why WhatsApp/Facebook previews and Google show the home page for every `?product=` link (the open item below, 2026-10-30 "Product addresses").
+## Done
+- [x] Owner chose "Fix" on the options below; I took the recommended one (b). `index.html` + `app.js` (`?v=5`): a Share button in the product page header. It shares (or copies, with a "Link copied" notice) `/p/<slug>.html`, the generated page whose head carries the product's own title, photo and description, so WhatsApp/Facebook/Google show the product. The address bar keeps `/?product=<slug>`. `shell.test.py` = 97/97 (3 new "share:" checks, fixture data).
+- [x] MERGED TO `main` on 2026-10-30 after 97/97. Revert the merge commit if it misbehaves.
+## Left
+- [ ] Open for the owner: a copied address-bar link (`/?product=`) still previews as the home page (static host). Option (c), `/p/*.html` sending phones to `/?product=<slug>`, would fix that too, but Google may read it as the product pages moving to `/`; not done.
+- [ ] A shared `/p/<slug>.html` link opens the old-style page on a phone (the earlier open item).
+- [ ] Phone check of the link on the live site (open twice after a deploy; service worker). If it still shows the home page on a phone, clear site data once for stermontarcade.co.ke.
+
+---
+
 # HANDOFF - Product addresses in the shell (branch `wip-shell-product-urls`, 2026-10-30)
 Owner: "There are no product links on my website after clicking on an item... it's only the domain name stermontarcade.co.ke. Fix that." Cause: every `history.pushState` in `mobile-shell/app.js` had no URL, so opening a product never changed the address bar.
 `fetchProducts()` -> Supabase was NOT redone: it is Step 4 below (`app.js` already reads `products`, `categories`, `product-names.json`).

@@ -203,6 +203,7 @@
   <div style="display:flex;align-items:center;gap:8px;height:48px;padding:0 8px;background:#fff;border-bottom:1px solid #e5e7eb;flex:none">
     <button class="icon-btn" data-close aria-label="Back"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
     <p id="pp-title" style="flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></p>
+    <button class="icon-btn" id="pp-share" aria-label="Share this product"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg></button>
     <button class="icon-btn" data-pp-cart aria-label="Open cart"><svg class="w-6 h-6"><use href="#i-cart"/></svg></button>
   </div>
   <div id="pp-body" style="flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:16px">
@@ -324,7 +325,7 @@
 
 <div id="toast" class="fixed left-1/2 -translate-x-1/2 top-[64px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
 
-<script src="/mobile-shell/app.js?v=4"></script>
+<script src="/mobile-shell/app.js?v=5"></script>
 <script src="/analytics.js"></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
 </body>
