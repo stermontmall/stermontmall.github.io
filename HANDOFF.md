@@ -5,11 +5,12 @@ Continues the "Left" list of the mobile-shell section below. The item "wire `fet
 - [x] Real data re-checked with read-only SQL (2026-10-30): 225 active rows, all in stock, 182 products after pack sizes are folded (the number the shell should show), 180 of them have an old price above their lowest size's price. A browser check on the real site is still open (see Left).
 - [x] `app.js` (commit 1): the Deals badge was a mock "5". It now counts products whose lowest size is discounted (`discOf(p) > 0`, the same rule as the Deals tab) and shows how many are NEW since the last visit to Deals (`shell.dealsSeen` in localStorage). Visiting Deals saves the current count and clears the badge; it comes back only when more discounted products appear. It stays hidden until the catalog has loaded (and if loading fails). With today's data the first visit shows "99+" (180 deals). The old stored `dealsNew` value is no longer read or written.
 - [x] `shell.test.py` (commit 2): "deals badge starts at 5" now expects 19 (the discounted products in the fixture, listed in a comment next to `DEALS_EXPECTED`), plus one new check that the badge stays cleared after a reload: 51 checks.
+- [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request, WITHOUT a test run (breaks the "merge only when tested" rule; the owner chose it). Only `mobile-shell/app.js`, `mobile-shell/shell.test.py` and this file changed; the page is `noindex`, so no live shop page or generator is affected.
 
 ## Left
-- [ ] NOT RUN: `python3 mobile-shell/shell.test.py` has not been run on this branch. The sandbox I worked in has Playwright and Chromium but no network and no git, so I could not copy the repo into it. Run it (expect 51 checks, 0 failures) before merging. Branch is NOT merged to `main`.
+- [ ] NOT RUN: `python3 mobile-shell/shell.test.py` has not been run since this change. The sandbox I worked in has Playwright and Chromium but no network and no git, so I could not copy the repo into it. Run it (expect 51 checks, 0 failures). If it fails, revert the merge or fix forward.
 - [ ] If the test fails on the badge checks, look first at `syncDealsBadge()` in `app.js` (called from the `loadCatalog().then(...)` line at the end) and at `showTab('deals')`, which saves `dealsSeen`.
-- [ ] Everything still open in the mobile-shell "Left" list below stays open: real-browser check on `/mobile-shell/` with the live data (expect 182 products), how the shell replaces or merges with the home page, photo sizes, real phones, unwired fields, and the checkout button (needs M-Pesa / WhatsApp decisions from the owner).
+- [ ] Everything still open in the mobile-shell "Left" list below stays open: real-browser check on `/mobile-shell/` with the live data (expect 182 products and a "99+" Deals badge on a first visit), how the shell replaces or merges with the home page, photo sizes, real phones, unwired fields, and the checkout button (needs M-Pesa / WhatsApp decisions from the owner).
 
 ---
 
@@ -54,7 +55,7 @@ Owner brief: mobile shell with the layout and interaction patterns of a large Ke
 - [ ] Not tested: real phones (iOS Safari bottom-bar behaviour, Android gesture back), landscape, screen readers beyond the basic roles. The live site was not compared side by side with the marketplace site it is modelled on (I did not open it).
 - [ ] Check the shell on the real data in a browser: the sandbox cannot reach Supabase (proxy 403), so only the fixture run above and the SQL data check exist. Open `/mobile-shell/` after merge, confirm 182 products, the chips order (sort_order), names, photos, a multi-size product's prices.
 - [ ] Photos are the full-size files from Storage (no resize endpoint used); if the grid feels heavy on mobile data, serve smaller copies.
-- [ ] Deals badge ("5") on the bottom nav is still a mock number; it should become the count of discounted products (223 of 225 rows have an old price, so almost everything is a "deal"). UPDATE 2026-10-30: code written on `wip-mobile-shell-deals-badge` (see the top section); stays open until that branch is tested and merged.
+- [x] Deals badge ("5") on the bottom nav was a mock number; it is now the count of new discounted products. Done 2026-10-30 on `wip-mobile-shell-deals-badge` and merged to `main` untested (see the top section).
 - [ ] Not wired: stock limits per size, `unit`, `description` (not fetched on purpose; list view does not need it).
 - [ ] Checkout button is a toast. The real flow (M-Pesa, WhatsApp order) is not built.
 
