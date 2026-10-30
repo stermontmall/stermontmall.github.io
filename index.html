@@ -65,6 +65,7 @@
   <link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#7c3aed"><link rel="apple-touch-icon" href="/icon-192.png">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="stylesheet" href="/mobile-shell/tailwind.css?v=2">
+<style>/* WhatsApp button: sit above the bottom nav, and get out of the way while a sheet or page is open (it covered Buy now) */#wa-float{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}body.no-scroll #wa-float{display:none!important}</style>
   <style>/* the build bot rewrites the crawler links between the seo-links markers (generate-products.mjs); these variables style them */
   :root{--panel:#f3f4f6;--line:#e5e7eb;--ink:#1f2937}.seo-links .wrap{padding:0 12px 8px}.seo-links h2{color:var(--ink)}</style>
   <script>
@@ -195,6 +196,53 @@
 </nav>
 
 <!-- ===== Overlays ===== -->
+<!-- ===== Product page (full screen, inside the shell) ===== -->
+<section id="page-product" class="sheet" role="dialog" aria-modal="true" aria-label="Product" style="z-index:55;top:0;right:0;bottom:0;left:0;transform:translateX(100%);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);background:#f3f4f6">
+  <div style="display:flex;align-items:center;gap:8px;height:48px;padding:0 8px;background:#fff;border-bottom:1px solid #e5e7eb;flex:none">
+    <button class="icon-btn" data-close aria-label="Back"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+    <p id="pp-title" style="flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></p>
+    <button class="icon-btn" data-pp-cart aria-label="Open cart"><svg class="w-6 h-6"><use href="#i-cart"/></svg></button>
+  </div>
+  <div id="pp-body" style="flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:16px">
+    <div style="background:#fff">
+      <div id="pp-img" class="grid place-items-center text-6xl" style="width:100%;aspect-ratio:1/1;max-height:60dvh;overflow:hidden;background:#fff"></div>
+      <div id="pp-photos" style="display:flex;gap:8px;overflow-x:auto;padding:0 16px 12px"></div>
+      <div style="padding:4px 16px 16px">
+        <h1 id="pp-name" style="font-size:16px;font-weight:600;line-height:1.35"></h1>
+        <p style="margin-top:6px"><span id="pp-price" class="text-sale font-bold" style="font-size:22px"></span> <s id="pp-old" class="text-mute text-xs"></s> <span id="pp-off" class="text-xs font-semibold text-sale"></span></p>
+        <p id="pp-meta" class="text-xs text-mute" style="margin-top:4px"></p>
+      </div>
+    </div>
+    <div style="background:#fff;margin-top:8px;padding:12px 16px">
+      <p class="text-xs font-semibold mb-2">Pack size</p>
+      <div id="pp-sizes" class="flex flex-wrap gap-2"></div>
+      <div class="flex items-center justify-between" style="margin-top:14px">
+        <span class="text-xs font-semibold">Quantity</span>
+        <div class="flex items-center gap-3">
+          <button id="pp-minus" class="icon-btn bg-gray-100 !w-8 !h-8" aria-label="Less"><svg class="w-4 h-4"><use href="#i-minus"/></svg></button>
+          <span id="pp-qty" class="w-6 text-center font-semibold">1</span>
+          <button id="pp-plus" class="icon-btn bg-gray-100 !w-8 !h-8" aria-label="More"><svg class="w-4 h-4"><use href="#i-plus"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div style="background:#fff;margin-top:8px;padding:12px 16px;font-size:12px;line-height:1.7">
+      <p>&#10003; Pay with M-Pesa at checkout</p><p>&#10003; Delivery to all 47 counties</p><p>&#10003; Pickup at Sarit Centre, Westlands, Nairobi</p>
+    </div>
+    <div style="background:#fff;margin-top:8px;padding:12px 16px">
+      <p class="text-xs font-semibold mb-2">Product details</p>
+      <div id="pp-desc" style="white-space:pre-line;font-size:13px;line-height:1.55;overflow-wrap:anywhere"></div>
+    </div>
+    <div id="pp-related-wrap" style="background:#fff;margin-top:8px;padding:12px 0 12px 16px" hidden>
+      <p class="text-xs font-semibold mb-2">More like this</p>
+      <div id="pp-related" style="display:flex;gap:10px;overflow-x:auto;padding-right:16px"></div>
+    </div>
+  </div>
+  <div style="flex:none;display:flex;gap:12px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e5e7eb">
+    <button id="pp-add" class="tap flex-1 h-11 rounded-full bg-brand-soft text-brand font-semibold">Add to cart</button>
+    <button id="pp-buy" class="tap flex-1 h-11 rounded-full bg-brand text-white font-semibold">Buy now</button>
+  </div>
+</section>
+
 <div id="scrim" class="scrim" aria-hidden="true"></div>
 
 <aside id="drawer-categories" class="sheet sheet-left" role="dialog" aria-modal="true" aria-label="Categories">
@@ -256,7 +304,7 @@
     <p id="qb-meta" class="text-xs text-mute mb-2"></p>
     <div id="qb-photos" class="flex gap-2 mb-2" style="overflow-x:auto"></div>
     <div id="qb-desc" style="white-space:pre-line;font-size:13px;line-height:1.5;overflow-wrap:anywhere"></div>
-    <a id="qb-page" class="inline-block mt-2 text-xs text-brand underline" hidden>View the full product page &rsaquo;</a>
+    <a id="qb-page" class="inline-block mt-2 text-xs text-brand underline" hidden>See full product details &rsaquo;</a>
   </div>
   <div class="px-4 pb-4 flex items-center justify-between">
     <span class="text-xs font-semibold">Quantity</span>
@@ -274,7 +322,7 @@
 
 <div id="toast" class="fixed left-1/2 -translate-x-1/2 top-[64px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
 
-<script src="/mobile-shell/app.js?v=2"></script>
+<script src="/mobile-shell/app.js?v=3"></script>
 <script src="/analytics.js"></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
 </body>
