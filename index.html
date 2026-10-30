@@ -72,7 +72,9 @@
   /* Desktop screens keep the full classic shop; old shared /#p-... product links open it too. The shell is the phone home page. */
   (function () {
     var wide = window.matchMedia && matchMedia('(min-width:900px) and (pointer:fine)').matches;
-    if (wide || /^#p-/.test(location.hash)) location.replace('/classic.html' + location.search + location.hash);
+    var prod = /[?&]product=([^&#]+)/.exec(location.search);   // shell product address: desktop opens the full product page of that product
+    if (wide && prod) location.replace('/p/' + prod[1] + '.html');
+    else if (wide || /^#p-/.test(location.hash)) location.replace('/classic.html' + location.search + location.hash);
   })();
   </script>
 </head>
@@ -322,7 +324,7 @@
 
 <div id="toast" class="fixed left-1/2 -translate-x-1/2 top-[64px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
 
-<script src="/mobile-shell/app.js?v=3"></script>
+<script src="/mobile-shell/app.js?v=4"></script>
 <script src="/analytics.js"></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
 </body>

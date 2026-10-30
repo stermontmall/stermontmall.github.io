@@ -1,3 +1,19 @@
+# HANDOFF - Product addresses in the shell (branch `wip-shell-product-urls`, 2026-10-30)
+Owner: "There are no product links on my website after clicking on an item... it's only the domain name stermontarcade.co.ke. Fix that." Cause: every `history.pushState` in `mobile-shell/app.js` had no URL, so opening a product never changed the address bar.
+`fetchProducts()` -> Supabase was NOT redone: it is Step 4 below (`app.js` already reads `products`, `categories`, `product-names.json`).
+## Done
+- [x] `app.js`: an open product (sheet or full page) has the address `/?product=<slug of the chosen size>`; choosing another size replaces the address (no extra history entry); the tab title is "<name> | Stermont Arcade" and both return to normal when it closes. The base entry stays `/`, so Back goes to the list.
+- [x] `app.js`: `/?product=<slug>` (any pack size's slug) opens that product's full page inside the shell once the catalog is loaded (also on reload); an unknown or sold-out slug shows "That product is no longer available".
+- [x] `index.html`: a wide desktop screen sends `/?product=<slug>` to `/p/<slug>.html`; `app.js?v=4` (cache-bust rule).
+- [x] `shell.test.py`: 14 new "address:" checks.
+## Left
+- [x] Tests 94/94 (fixture data only). The one failure was the SEO-head check reading the live page, whose tab title is the product name while a product is open; it now reads the HTML the server sends.
+- [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request ("Merge"), tests 94/94 (fixture data only). Revert the merge commit if it misbehaves.
+- [ ] Shared `/?product=` links show the home page's preview card (WhatsApp/Facebook), not the product's, because the shell is one page. Sharing `/p/<slug>.html` gives the product preview but opens the old-style page. Owner to choose.
+- [ ] Phone check: open a product, confirm the address bar shows `?product=...`, copy it, open it in a new tab, press Back.
+
+---
+
 # HANDOFF - Product page inside the shell (branch `wip-shell-product-page`, 2026-10-30)
 Owner: "View the full product page takes you to the old website view. Make it the mobile shell view... maintain the mobile shell UI everywhere."
 ## Done

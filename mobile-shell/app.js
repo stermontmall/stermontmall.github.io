@@ -37,12 +37,12 @@ function buildCatalog(rows, cats, names) {
   groups.forEach((rs, key) => {
     const live = rs.filter(r => r.stock > 0);
     if (!live.length) return;                                   // sold out everywhere: not shown in the shell
-    const sizes = live.map(r => ({ rowId: r.id, label: r.variant_label || 'Standard', price: Number(r.price), old: Number(r.old_price) > Number(r.price) ? Number(r.old_price) : 0 }))
+    const sizes = live.map(r => ({ rowId: r.id, slug: r.slug, label: r.variant_label || 'Standard', price: Number(r.price), old: Number(r.old_price) > Number(r.price) ? Number(r.old_price) : 0 }))
       .sort((a, b) => a.price - b.price);
     const rep = live[0], c = byId.get(rep.category_id), top = topOf(c); if (!c || !top) return;
     const low = sizes[0], img = (live.map(r => (r.images || [])[0]).find(Boolean)) || '';
     out.push({
-      id: key, cat: top.slug, catName: top.name, sub: c.parent_id ? c.name : '', name: (names && names[rep.id]) || rep.name,
+      id: key, slug: rep.slug, cat: top.slug, catName: top.name, sub: c.parent_id ? c.name : '', name: (names && names[rep.id]) || rep.name,
       img, emoji: ICONS[top.slug] || '🛍️', bg: BGS[hashStr(key) % BGS.length],
       price: low.price, old: low.old, sizes, featured: !!rep.featured, rating: 0, reviews: 0   // no ratings exist in the database
     });
@@ -138,11 +138,21 @@ function syncOverlays() {
   scrim.classList.toggle('open', stack.length > 0);
   document.body.classList.toggle('no-scroll', stack.length > 0);
 }
+/* A product has its own address: /?product=<slug of the chosen size>. The shell is one page, so without this the address bar stayed on the bare
+   domain and a product could not be copied, shared or reopened. The base entry under it stays "/", so Back returns to the list. */
+const BASE_TITLE = document.title;
+const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
+const productUrl = () => qb.p ? '/?product=' + encodeURIComponent(sizeOf(qb.p, qb.size).slug || qb.p.slug) : undefined;
+function syncProductMeta() {   // tab title + address follow the open product (and the chosen size); both return to normal when it closes
+  const open = qb.p && stack.some(id => PRODUCT_OVERLAYS.includes(id));
+  document.title = open ? qb.p.name + ' | Stermont Arcade' : BASE_TITLE;
+  if (open) { const u = productUrl(); if (u && location.pathname + location.search !== u) history.replaceState(history.state, '', u); }
+}
 function openOverlay(id) {
   if (stack.includes(id)) return;
   stack.push(id);
-  history.pushState({ tab: store.get().tab, stack: [...stack] }, '');
-  syncOverlays();
+  history.pushState({ tab: store.get().tab, stack: [...stack] }, '', PRODUCT_OVERLAYS.includes(id) ? productUrl() : undefined);
+  syncOverlays(); syncProductMeta();
   const el = $('#' + id); const f = el.querySelector('button,input'); if (f) f.focus({ preventScroll: true });
 }
 const closeTop = () => { if (stack.length) history.back(); };
@@ -154,11 +164,12 @@ window.addEventListener('popstate', e => {
   const st = e.state || { tab: 'home', stack: [] };
   stack = (st.stack || []).filter(id => OVERLAYS.includes(id) && !((id === 'sheet-quickbuy' || id === 'page-product') && !qb.p));
   if (st.tab && st.tab !== store.get().tab) showTab(st.tab);
-  syncOverlays();
+  syncOverlays(); syncProductMeta();
   if (!stack.length && opener) { opener.focus?.({ preventScroll: true }); opener = null; }
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
-history.replaceState({ tab: 'home', stack: [] }, ''); // a reload lands on a clean base entry
+const DEEP = new URLSearchParams(location.search).get('product');   // /?product=<slug>: a shared or reloaded product address, opened after the catalog loads
+history.replaceState({ tab: 'home', stack: [] }, '', DEEP ? location.pathname : undefined); // a reload lands on a clean base entry
 scrim.addEventListener('click', closeTop);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop(); });
 syncOverlays();
@@ -337,6 +348,7 @@ function renderQB() {
   $('#qb-qty').textContent = qb.qty;
   $('#qb-sizes').innerHTML = p.sizes.map(s => `<button class="chip !h-9 !px-4" data-size="${esc(s.label)}" aria-selected="${s.label === qb.size}">${esc(s.label)}</button>`).join('');
   if (qb.shown !== sz.rowId) { qb.shown = sz.rowId; renderDetails(sz.rowId); }   // quantity changes do not reload the details
+  syncProductMeta();
 }
 /* Details (description, unit, stock, extra photos, page link) are fetched when a product is opened, not with the list: the descriptions are long
    (about 500 words for the agrochemicals), so loading all of them up front would slow the grid. Only named columns are read (never `cost`). */
@@ -405,6 +417,12 @@ $('#pp-buy').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty);
 function openQuickBuy(id) {
   const p = feed.items.get(id); if (!p) return;
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
+}
+function openDeepLink(slug) {   // the full product page for a /?product=<slug> address (any pack size's slug works)
+  const p = PRODUCTS.find(x => x.slug === slug || x.sizes.some(z => z.slug === slug));
+  if (!p) { toast('That product is no longer available'); return; }
+  qb.p = p; qb.size = (p.sizes.find(z => z.slug === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
+  renderQB(); openProductPage();
 }
 $('#qb-sizes').addEventListener('click', e => { const b = e.target.closest('[data-size]'); if (b) { qb.size = b.dataset.size; renderQB(); } });
 $('#qb-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderQB(); });
@@ -479,5 +497,5 @@ $('#search-form').addEventListener('submit', e => {
 });
 
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
-loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); }).catch(() => {});   // categories and the Deals badge appear once the data is in
+loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (DEEP) openDeepLink(DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
 })();
