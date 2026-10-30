@@ -1,3 +1,27 @@
+# HANDOFF - Conversion-copy pilot, ONE product (branch `wip-seo-pilot`, 2026-10-30)
+Owner brief: new "Conversion Copywriter & Local SEO" format (SEO title <65, meta title <60, meta description 140-155, description with hook / features / specs / how-to / what's in the box, 5-8 Kenya tags), to be applied to the remaining ~144 products in batches of 10. Owner said: fix ONE first, send a link, then proceed.
+
+## Done
+- [x] Pilot product chosen: Navigator 100 SC Insecticide 1 Litre (`navigator-100-sc-insecticide-1-litre`; no owner Google title yet; catalog text holds alpha-cypermethrin 100 g/L). Copy is in `seo-pilot/navigator-100-sc.json` (452 words, SEO title 57 chars, meta title 58, meta description 146 chars with price, 8 tags).
+- [x] Old description saved in Supabase `description_backup`, batch `pilot-01-navigator` (1 row).
+
+## NOT done (blocked)
+- [ ] The Supabase write (description, `seo_name`, `seo_title`) was cancelled when I ran it, so the live product still has the OLD text. Nothing on the site changed.
+- [ ] Meta description override (`seo-overrides.json`) not added yet; it only makes sense together with the Supabase write.
+
+## Decisions
+- No invented numbers: the catalog has no dilution rate or coverage for Navigator, so the text says "see the product label". Same rule as the agro batches.
+- No "Original / Genuine / #1 / Certified / Safe" claims: nothing in the repo backs them.
+- Product pages show the description as plain text (HTML is escaped), so the copy uses CAPITAL headings and bullets, not HTML.
+- Tags have no database column; they are kept in the pilot JSON file only.
+- The site's title mechanism: `seo_name` = visible product name (H1), `seo_title` = `<title>` tag, both applied by `seo-titles.mjs` after each build; the meta description comes from `seo-overrides.json`.
+
+## Left
+- [ ] Owner to say how to continue: allow the Supabase write for this one product (or paste the text in admin), then rebuild and check the live page.
+- [ ] Then batches of 10 (about 14 more), pest control first.
+
+---
+
 # HANDOFF - Mobile-first shell prototype (branch `wip-mobile-shell`, 2026-10-30)
 Owner brief: mobile shell with the layout and interaction patterns of a large Kenyan marketplace's mobile site (sticky header with search + live cart badge, chips, sidebar categories, bottom nav, history-aware sheets, 2-column dense product grid, skeletons). Built as a STANDALONE prototype in `mobile-shell/`; the live `index.html`, `storefront-live.js` and the generators are untouched.
 
