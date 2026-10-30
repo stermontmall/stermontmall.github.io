@@ -1,0 +1,41 @@
+== node seo-pest/build.test.mjs
+566 checks, 0 violations
+exit 0
+
+== node seo-pest/blog-build.mjs blogs-06
+blog/icon-10cs-residual-mosquito-spray-how-it-works-kenya.html  469 words
+blog/single-feed-rat-bait-bayer-baraki-pellets-kenya.html  473 words
+blog/bromarat-bait-stations-how-many-and-where-kenya.html  467 words
+blog/fuko-kil-rats-and-moles-small-farms-kitchen-gardens-kenya.html  460 words
+blog/miratex-pellets-20g-or-240g-which-pack-kenya.html  467 words
+blog/rat-poison-for-a-house-or-small-shop-rat-kill-kenya.html  462 words
+blog/rat-control-in-warehouses-and-stores-rodent-kill-500g-kenya.html  443 words
+blog/wax-block-rat-bait-for-damp-places-rodilon-kenya.html  447 words
+blog/rat-control-in-a-poultry-house-tatua-bait-blocks-kenya.html  467 words
+blog/termites-in-timber-and-gardens-gradometer-480ec-kenya.html  459 words
+exit 0
+
+== node seo-pest/blog.test.mjs
+755 checks, 0 violations
+exit 0
+
+== node seo-titles.test.mjs
+seo-titles: 2 page(s) updated, 0 already correct, 1 without an owner title (left as generated); 1 pack-size page(s), 1 matched through another size; 4 shop-list name(s) set.
+OK: 35 checks, 0 violations
+exit 0
+
+== node buy-name.test.mjs
+OK: 49 checks, 0 violations
+exit 0
+
+== md5 of builder output per group (compare with md5(description) in Supabase)
+icon-10cs-mosquito-insecticide ba95a867e3ceb71f8337879e253177e1 554
+bayer-baraki-pellets-rat-and-mice-poison c620fa59e29d66864fb91080ee134115 588
+bromarat-0-005-rb-rodent-bait 4a82d2189ac6cbcb8b36598f09907f97 574
+fuko-kil-rat-poison 19ff4a1dd6863854aeb47e45106d74e8 544
+miratex-pellets-rat-and-mice-killer-bait 5fc7dac66b15f1531f960f986dcc4ead 549
+rat-kill-pellets 4a28e9ae074207ad1adc8f2acdde0ca3 477
+rodent-kill-rat-pellets 3ac043f0dff2fb276c5a7134bdfd2dd4 507
+rodilon-wax-blocks 48dd97c31bc7b69f50d606898d67609c 484
+syngenta-tatua-rat-and-mice-poison-blocks 0e5ead87ce8d01c0238a0114313578b5 531
+gradometer-480ec-termiticide 1b69aef077294decf01022bbae44263e 542
