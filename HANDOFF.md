@@ -1,3 +1,13 @@
+# HANDOFF - Categories tab: icon rail + photo tiles (branch `wip-shell-categories-grid`, 2026-10-30)
+Owner sent a screenshot of another store's category page and asked "make it open categories like this". Layout pattern only (no artwork, names or copy from that store).
+## Done
+- [x] `mobile-shell/app.js` `renderCategoriesView()`: left rail now shows an icon above each name (selected = white with a brand bar); the rail starts on "Top Categories", whose right panel is a 3-column grid of every top-level category with a photo; picking a category shows its sub-categories as a 3-column grid of photo tiles ("View all" on top). Tiles use the first real product photo of that category/sub-category (`photoOf`), emoji if none or if the photo fails. Tapping a tile opens the Home grid filtered to it (unchanged behaviour). Inline styles only, so `tailwind.css` did not need a rebuild.
+- [x] `shell.test.py` = 69/69; checked with phone-size screenshots (fixture photos).
+## Left
+- [ ] Phone check with the real photos. Rail icons are still emoji; custom line icons would be a separate job. A category with no sub-categories shows one "All <name>" tile.
+
+---
+
 # HANDOFF - Checkout no longer lands on the old home view (branch `wip-shell-checkout-view`, 2026-10-30)
 Owner report: on the mobile shell, Checkout "takes me to my old home screen view". Cause: Checkout hands the cart to `/classic.html?checkout=1`, which IS the old home page; it showed its whole home view (and a wait of up to ~12 s) behind the cart drawer, and closing the drawer left the customer there.
 `fetchProducts()` -> Supabase was NOT redone: it is Step 4 below (`app.js` already reads `products`, `categories`, `product-names.json`).
