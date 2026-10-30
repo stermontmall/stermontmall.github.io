@@ -1,3 +1,28 @@
+# HANDOFF - Mobile shell: real catalogue data (branch `wip-mobile-shell-data`, 2026-10-30)
+Follow-up to the prototype below. Goal from the "Left" list: replace the mock `fetchProducts()` with the Supabase `products` table. NOT merged to `main` yet (see Left).
+
+## Done
+- [x] Step 1 `mobile-shell/app.js` section 1 now reads Supabase with the public key (same key and project as `storefront-live.js`): `categories` (id, name, slug, parent_id, sort_order, is_promo) and `products?active=eq.true` (id, name, price, old_price, stock, images, featured, category_id, variant_group, variant_label, unit, created_at), plus `../product-names.json` for the page headings (falls back to the database name). `cost` is deliberately NOT requested. Loaded once, then filtered / sorted / paged in the browser (225 active products, about 140 pack-size groups: small enough that a server query per filter is not worth the extra requests).
+- [x] Pack sizes: rows with the same `variant_group` are ONE card ("From KSh x", "3 sizes"). Each size is its own row with its own price, old price and stock. The + button on a multi-size card opens the size sheet instead of adding a random size; single-size cards still add directly.
+- [x] Real photos (`images[0]`) over the emoji placeholder; a photo that fails to load is removed so the emoji shows. Chips, Categories side list and drawer are built from the real top-level categories that have products (promo categories such as "Kili Featured" and empty ones are not chips; their products still show under "For you" and Deals). Sub-categories come from `parent_id`.
+- [x] Stock: sold-out products are sorted last, show "Sold out" and cannot be added; sold-out sizes are disabled; quantity is capped at the size's stock (also in the cart).
+- [x] Deals badge = number of discounted products (an `old_price` above `price`), cleared when the Deals tab is opened. Cart storage key changed to `shell.cart2` so old prototype carts with mock items are dropped.
+- [x] Load failure: the grid shows "Could not load products. Tap to retry." (same for Deals) instead of endless skeletons.
+- [x] Removed: the mock catalogue, the fake star ratings and the mock size pricing (`price x (1 + 0.45 x index)`).
+- [x] Tested (headless Chromium 390x780, touch): `python3 mobile-shell/shell.test.py` = 52 checks, 0 failures, run 3 times. Supabase is replaced by fixture data through Playwright routes, so the test never calls the real project. New checks: request uses `active=eq.true` + public key, photo fallback, chips from real categories, one card per pack-size group, size sheet (disabled sold-out size, per-size price, cart line keeps `sku`), sold-out last and not addable, `product-names.json` heading on the card, Deals from a promo category, retry after a failed load.
+- [x] RLS checked with SQL: `anon` may SELECT `categories` and `products where active`; writes are staff-only. The sandbox cannot reach supabase.co (proxy 403), so the live call was NOT made from here.
+
+## Left
+- [ ] Open `/mobile-shell/` on a phone after the merge and confirm real products, photos and prices load (first real-network run).
+- [ ] Ratings: the card no longer shows stars (there is no per-product rating in `products`; `reviews` has 3 rows keyed by `product_name`). Decide whether to show approved-review averages.
+- [ ] Cart prices are saved when the item is added; the real checkout must re-read price and stock from Supabase before charging.
+- [ ] Security note for the owner: `anon` can read `products.cost` (purchase price) through the public key (`has_column_privilege` = true). The shell does not request it, but anyone can. Fix = revoke column SELECT on `cost` from `anon` / `authenticated` or move it to a staff-only table; check admin and storefront code that selects `*` first. Not changed.
+- [ ] Merge `wip-mobile-shell-data` to `main` only after the phone check above. The page is `noindex` and reachable only at /mobile-shell/, so a merge changes no live page.
+- [ ] Still open from the prototype list: decide how this replaces/merges with the home page; real checkout (M-Pesa / WhatsApp); real-device and screen-reader checks.
+- [ ] The daily SEO issue (#25, 199 problems) is a separate item: see the SEO section added to this file when it is worked.
+
+---
+
 # HANDOFF - Mobile-first shell prototype (branch `wip-mobile-shell`, 2026-10-30)
 Owner brief: mobile shell with the layout and interaction patterns of a large Kenyan marketplace's mobile site (sticky header with search + live cart badge, chips, sidebar categories, bottom nav, history-aware sheets, 2-column dense product grid, skeletons). Built as a STANDALONE prototype in `mobile-shell/`; the live `index.html`, `storefront-live.js` and the generators are untouched.
 
@@ -10,7 +35,7 @@ Owner brief: mobile shell with the layout and interaction patterns of a large Ke
 
 ## Left
 - [x] Merged to `main` on 2026-10-30 at the owner's request ("fix direct"). It only adds `mobile-shell/` (page is `noindex`, reachable at /mobile-shell/) and this note; no live page or generator changed.
-- [ ] Wire real data: `fetchProducts()` -> Supabase `products` (names from `product-names.json`, pack sizes from the grouped rows, real photos instead of emoji). The mock price for a pack size is `price x (1 + 0.45 x index)`; real prices come from each pack-size row.
+- [x] Wire real data: `fetchProducts()` -> Supabase `products`: done on branch `wip-mobile-shell-data` (see the section above), not merged yet.
 - [ ] Decide how this replaces or merges with the existing home page (`storefront-live.js` already has a product view that pushes `/p/<slug>.html`; the new sheets use their own history entries).
 - [ ] Not tested: real phones (iOS Safari bottom-bar behaviour, Android gesture back), landscape, screen readers beyond the basic roles. The live site was not compared side by side with the marketplace site it is modelled on (I did not open it).
 - [ ] Checkout button is a toast. The real flow (M-Pesa, WhatsApp order) is not built.
