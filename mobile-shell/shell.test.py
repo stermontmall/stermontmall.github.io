@@ -41,6 +41,9 @@ ROWS += [row('home-1', 24, 'Air Fryer 5L', 6500, 7800), row('home-2', 24, 'Kettl
 ROWS += [row('home-soldout', 24, 'Gone Item', 100, 120, stock=0)]
 NAMES_FIX = {'home-0': 'Heavy-Duty Hot Plate Pro'}   # product-names.json heading; every other product falls back to its database name
 FAIL = [False]
+# Products the Deals badge should count: in stock, lowest size has an old price above its price. 19 = hot plate, Absolute (one folded product),
+# 4 bed bug sprays (pest-3 has no old price), the powder, 8 phones, Sulphur Dust, 3 kitchen items; the sold-out item and Copper Fungicide do not count.
+DEALS_EXPECTED = 19
 
 def serve(route, body, ctype='application/json'):
     time.sleep(0.4)   # a real network round trip, so the skeleton state is observable
@@ -92,7 +95,7 @@ with sync_playwright() as p:
     check('cart badge hidden when empty', all(not e.is_visible() for e in pg.locator('[data-badge="cart"]').all()))
     pg.locator('[data-add]').first.click()
     check('cart badge shows 1 (header + nav)', pg.locator('#bottom-nav [data-badge="cart"]').inner_text() == '1' and pg.locator('#appbar [data-badge="cart"]').inner_text() == '1')
-    check('deals badge starts at 5', pg.locator('#bottom-nav [data-badge="deals"]').inner_text() == '5')
+    check('deals badge = number of discounted products (not the old mock 5)', pg.locator('#bottom-nav [data-badge="deals"]').inner_text() == str(DEALS_EXPECTED), pg.locator('#bottom-nav [data-badge="deals"]').inner_text())
 
     # quick buy + back button
     h0 = pg.evaluate('history.length')
@@ -190,6 +193,7 @@ with sync_playwright() as p:
     pg.locator('#grid .card[data-id]').first.locator('p').first.click()
     pg.reload(); pg.wait_for_selector('#grid .card[data-id]')
     check('reload while sheet open lands clean', pg.locator('#sheet-quickbuy.open').count() == 0)
+    check('deals badge stays cleared after reload (nothing new since the visit to Deals)', pg.locator('#bottom-nav [data-badge="deals"]').is_hidden())
 
     # Supabase down: the grid offers a retry instead of hanging on skeletons, and recovers
     FAIL[0] = True
