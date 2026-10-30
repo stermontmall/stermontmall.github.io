@@ -8,7 +8,7 @@ Owner: "There are no product links on my website after clicking on an item... it
 - [x] `shell.test.py`: 14 new "address:" checks.
 ## Left
 - [x] Tests 94/94 (fixture data only). The one failure was the SEO-head check reading the live page, whose tab title is the product name while a product is open; it now reads the HTML the server sends.
-- [ ] NOT MERGED: waiting for the owner's "Merge" and the phone check below.
+- [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request ("Merge"), tests 94/94 (fixture data only). Revert the merge commit if it misbehaves.
 - [ ] Shared `/?product=` links show the home page's preview card (WhatsApp/Facebook), not the product's, because the shell is one page. Sharing `/p/<slug>.html` gives the product preview but opens the old-style page. Owner to choose.
 - [ ] Phone check: open a product, confirm the address bar shows `?product=...`, copy it, open it in a new tab, press Back.
 
