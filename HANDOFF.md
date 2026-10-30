@@ -1,3 +1,20 @@
+# HANDOFF - Daily SEO check: titles over 75 characters (branch `wip-seo-title-length`, 2026-10-30)
+Issue #72 "Daily SEO check 2026-10-30" (earlier #25 was the same family): 124 problems, ALL of one kind, "Title longer than 75 characters (Google cuts it off)". 123 are product pages and nearly all carry the owner's exact PDF titles (`products.seo_title`: 131 of the 141 stored titles are over 75, longest 97, typical "Name (size) - Best Price in Kenya | Stermont Arcade"). 1 is a blog post. NOT merged to `main` yet: it needs the owner's yes (see Left), because it changes what the owner decided on 2026-10-29 ("PDF wording wins, kept exactly").
+
+## Done
+- [x] `seo-titles.mjs`: new `fitTitle()` shortens ONLY the `<title>`, og:title and twitter:title to at most 75 characters, in this order, stopping at the first step that fits: (1) drop the " | Stermont Arcade" tail, (2) "Best Price in Kenya" -> "Price in Kenya", (3) drop the " - ..." tail, (4) cut at a word boundary (never half a word or an open bracket). Lead word ("#1 Rated", "Original"...) and product name always stay. `products.seo_title` / `seo_name` in Supabase, the visible H1, JSON-LD names and `product-names.json` are NOT touched. `SEO_TITLE_MAX=0` switches it off (titles then applied exactly as written); `SEO_TITLE_MAX=<n>` changes the limit. The workflow log line now ends with "N title(s) shortened to 75 characters or less."
+- [x] Checked on the real built pages (copy of the repo, 246 product pages, then the real `seo-check.mjs`): 123 titles shortened (117 by dropping the brand tail, 5 by "Best Price" -> "Price", 1 by dropping the tail), longest result 75, report went from 124 problems to 1 (the blog post, fixed next).
+- [x] `blog/pest-control-products-for-hotels-and-restaurants-kenya.html`: the brand was in the title twice ("... | Stermont Arcade | Stermont Arcade", 87 chars); now once (61). `blog-write.mjs` got `withBrand()` so a title the model already ended with the brand never gets it twice again.
+- [x] Tests: `node seo-titles.test.mjs` = 51 checks, 0 violations (new: each shortening step, no half word, no open bracket, limit 0, lead word kept; end-to-end titles now expected without the brand tail).
+
+## Left
+- [ ] OWNER DECISION before merging: shortened titles lose " | Stermont Arcade" on 117 pages and "Best" in "Best Price in Kenya" on 5. Examples: "Top-Rated Absolute 375SC Systemic Fungicide (1L) - Best Price in Kenya | Stermont Arcade" -> "Top-Rated Absolute 375SC Systemic Fungicide (1L) - Best Price in Kenya"; "#1 Rated Dudu-Stop 25EC Bedbug & Cockroach Killer (100ml) - Best Price in Kenya | Stermont Arcade" -> "... (100ml) - Price in Kenya". Alternative that keeps every title exactly as written: raise the limit in `seo-check.mjs` (line with `title.length > 75`) to 100 so the daily report stops flagging them (Google will still cut them in search results, they are 80-97 characters).
+- [ ] After the merge: `seo-titles.mjs` is a watched path of `product-pages.yml`, so the merge triggers the rebuild; the next "Daily SEO check" issue should show 0 title problems. Check 3 live pages (one with a lead word like "#1 Rated", one pack-size page, one single-size page).
+- [ ] Found, not fixed: `node seo-meta.test.mjs` fails on `main` too ("bad tagline/H1: ... | M-Pesa checkout ... Pickup at Sarit Centre, Westlands"), so its test expectation is older than the tagline text. Not part of this change.
+- [ ] This file is also edited on branch `wip-mobile-shell-data` (new section at the top); whoever merges second resolves a trivial conflict by keeping both sections.
+
+---
+
 # HANDOFF - Mobile-first shell prototype (branch `wip-mobile-shell`, 2026-10-30)
 Owner brief: mobile shell with the layout and interaction patterns of a large Kenyan marketplace's mobile site (sticky header with search + live cart badge, chips, sidebar categories, bottom nav, history-aware sheets, 2-column dense product grid, skeletons). Built as a STANDALONE prototype in `mobile-shell/`; the live `index.html`, `storefront-live.js` and the generators are untouched.
 
