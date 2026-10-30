@@ -280,16 +280,26 @@ function selectCategory(chip, sub = '') {
   if (store.get().tab !== 'home') goTab('home'); // goTab keeps history consistent
   refreshGrid();
 }
-let sideCat = '';
+let sideCat = '__top';
+/* Photo for a tile: the first product photo in that category (and sub-category); the emoji shows if there is none or it fails to load. */
+const photoOf = (cat, sub) => (PRODUCTS.find(p => p.cat === cat && (!sub || p.sub === sub) && p.img) || {}).img || '';
+const tile = (attrs, label, img, emoji, bg) => `<li><button class="tap w-full flex flex-col items-center gap-1.5" ${attrs}>
+      <span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:64px;height:64px;background:${bg}">${thumb({ img, emoji })}</span>
+      <span class="text-xs text-center leading-4">${esc(label)}</span></button></li>`;
 function renderCategoriesView() {
-  const c = CATS.find(x => x.id === sideCat) || CATS[0];
-  if (!c) { $('#cat-side').innerHTML = ''; $('#cat-main').innerHTML = '<p class="text-mute text-sm py-6 text-center">Loading categories&hellip;</p>'; return; }
-  sideCat = c.id;
-  $('#cat-side').innerHTML = CATS.map(x => `<button class="cat-side" role="tab" data-side="${esc(x.id)}" aria-selected="${x.id === sideCat}">${esc(x.name)}</button>`).join('');
+  if (!CATS.length) { $('#cat-side').innerHTML = ''; $('#cat-main').innerHTML = '<p class="text-mute text-sm py-6 text-center">Loading categories&hellip;</p>'; return; }
+  const c = sideCat === '__top' ? null : (CATS.find(x => x.id === sideCat) || null);
+  sideCat = c ? c.id : '__top';
+  const rail = (id, icon, name) => `<button class="cat-side" role="tab" data-side="${esc(id)}" aria-selected="${id === sideCat}" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 4px"><span style="font-size:26px;line-height:1">${icon}</span><span>${esc(name)}</span></button>`;
+  $('#cat-side').innerHTML = rail('__top', '⭐', 'Top Categories') + CATS.map(x => rail(x.id, x.icon, x.name)).join('');
+  if (!c) {
+    $('#cat-main').innerHTML = `<div class="mb-3 font-semibold">Top Categories</div>
+      <ul class="grid grid-cols-3 gap-y-4 gap-x-2">${CATS.map(x => tile(`data-cat-all="${esc(x.id)}"`, x.name, photoOf(x.id), x.icon, '#fff')).join('')}</ul>`;
+    return;
+  }
   $('#cat-main').innerHTML = `<button class="tap w-full text-left mb-3 flex items-center justify-between font-semibold" data-cat-all="${esc(c.id)}">${esc(c.name)}<span class="text-xs text-brand font-normal">View all &rsaquo;</span></button>
-    <ul class="grid grid-cols-3 gap-y-4 gap-x-2">${c.subs.map(sb => `<li><button class="tap w-full flex flex-col items-center gap-1.5" data-cat="${esc(c.id)}" data-sub="${esc(sb)}">
-      <span class="w-14 h-14 rounded-full grid place-items-center text-2xl" style="background:${BGS[sb.length % BGS.length]}">${c.icon}</span>
-      <span class="text-xs text-center leading-4">${esc(sb)}</span></button></li>`).join('')}</ul>`;
+    <ul class="grid grid-cols-3 gap-y-4 gap-x-2">${c.subs.length ? c.subs.map(sb => tile(`data-cat="${esc(c.id)}" data-sub="${esc(sb)}"`, sb, photoOf(c.id, sb), c.icon, '#fff')).join('')
+      : tile(`data-cat-all="${esc(c.id)}"`, 'All ' + c.name, photoOf(c.id), c.icon, '#fff')}</ul>`;
 }
 function renderDrawer() {
   $('#drawer-cats').innerHTML = CATS.map(c => `<li><button class="tap w-full flex items-center gap-3 px-4 py-3.5 border-b border-line text-left" data-drawer-cat="${esc(c.id)}"><span class="text-xl">${c.icon}</span>${esc(c.name)}</button></li>`).join('');
