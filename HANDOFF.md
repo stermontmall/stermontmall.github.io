@@ -1,3 +1,21 @@
+# HANDOFF - SEO: titles shortened to 60 characters, in batches of 10 (branch `wip-seo-audit-batches`, 2026-10-30)
+Owner: "fix the best SEO on my products ... correct the errors ... batches of 10". Audit 2026-10-30: all 182 active products already have 300+ word descriptions (agro batches 01-04 and the rest), so the real errors were: (1) 124 product titles of 71-97 characters (Google cuts at about 60, so "Price in Kenya" was lost), (2) `seo-meta.test.mjs` failing on `main` (stale expectations), (3) two H1s in `index.html` (the shell product page heading).
+## How the titles are shortened (rule, same for every batch)
+- Keep the owner's name and keywords; drop " | Stermont Arcade" and "Best" first, then a generic lead word (Top-Quality, Elegant, Sturdy, Effective, Heavy-Duty, Premium ...) and a trailing "(...)" only when still over 60. "Original" and "Reliable" stay when they fit. Result: "<name> – Price in Kenya", at most 60 characters where possible; hand-written where the rule left it long.
+- Pack-size pages (several sizes, one page) also get the shorter `seo_name` (the page title is built from it). Single-size pages: only `seo_title` changes (the H1 comes from its first part).
+- Tables in Supabase: `seo_title_backup_20261030` (EVERY old seo_name/seo_title before any change) and `seo_title_plan_20261030` (old/new values per row, `done` = written). Restore one: `update products p set seo_title = b.seo_title, seo_name = b.seo_name from seo_title_backup_20261030 b where b.id = p.id and p.id = '<id>'`.
+- Pages pick the new titles up on the next "Build product pages" run (every 3 hours; `seo-titles.mjs`).
+## Done
+- [x] Batch 1 (10 products, 2026-10-30): poultry dust, smartphone gift bundle, Tecno Spark Go 3, Euroken 50x55 cooker, Glamstar 20L microwave, Nunix cooker, Ramtons steam iron, SONAR water dispenser, Dahua monitor, OURSTART watch. All 48-60 characters.
+- [x] `seo-meta.test.mjs`: expectations brought up to date (tagline, "Price, M-Pesa Checkout & Kenya Delivery" heading, "Buy" + owner name H1): 1126 checks, 0 violations.
+- [x] `index.html`: the shell product page heading is an `h2` now (home page keeps one `h1`); `app.js?v=7`. `shell.test.py` 106/106.
+## Left
+- [ ] Batches 2 onward: 114 title rows still over 60 (see `select * from seo_title_plan_20261030 where not done`); 19 groups are the long ones the rule cannot shorten and need hand-written titles.
+- [ ] 49 products have no owner title; they use the generated title from `seo-meta.mjs` (already 60 or less).
+- [ ] After the next rebuild: `node seo-check.mjs` should list far fewer long titles; spot-check 3 pages.
+
+---
+
 # HANDOFF - Product links preview as the product (branch `wip-product-link-preview`, 2026-10-30)
 Owner: "Wrong preview" for https://stermontarcade.co.ke/?product=abasi-5-ec-50-ml (WhatsApp/Facebook/Google showed the home page title and logo). A static host cannot give `/?product=` its own head, so the address is now the product's own page.
 ## Done
