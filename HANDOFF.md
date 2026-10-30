@@ -5,6 +5,7 @@ Owner: "Item seo, descriptions, all details missing". The product sheet only sho
 - [x] Descriptions are NOT loaded with the list on purpose (about 500 words for each agrochemical).
 - [x] `shell.test.py` = 72/72 (new: description/unit/stock, page link, extra photos).
 ## Left
+- [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request ("Merge"), tests 72/72 (fixture data only). Revert the merge commit if it misbehaves.
 - [ ] Phone check on real data. The shell still shows the product name from `product-names.json` (the page H1, with the "Buy" prefix); the SEO `<title>`/meta stay on the `/p/` page, which the shell does not rewrite. If "SEO" meant something else, tell me where it is missing.
 - [ ] The floating WhatsApp button overlaps the "Buy now" button in the sheet (seen in the screenshot); not changed.
 - [ ] Single-size products add straight to the cart from the card's plus button; tap the card to see details.
