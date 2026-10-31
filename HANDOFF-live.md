@@ -2,6 +2,21 @@
 Last saved: 2026-10-31 10:35 (Africa/Nairobi), claude.ai chat session with GitHub + Supabase connectors only (NO node, NO clone, NO network). USAGE LIMIT earlier hit at ~10:25 (resets 14:30).
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
+## NEWEST (Claude Code session, 2026-10-31 11:05 Africa/Nairobi): services quote requests + admin portal
+Owner: "Connect github and supabase. Check handoff. Incorporate all services features on my admin portal and fix everything (responsiveness, response). Add an option of placing an order on services like products, but NO payment: ask for a QUOTE; the notification goes to info@stermontarcade.co.ke the same way product-order notifications do. Autosave on handoff."
+### Done
+- [x] 10:58 GitHub connected (stermontmall/stermontmall.github.io, push access) and cloned to /home/claude/stermontmall.github.io; Supabase project oewvtbnmyombbtggamor (eu-west-1, ACTIVE_HEALTHY) connected.
+- [x] 11:05 branch `wip-services-quotes-admin` created from main (6ae8a11).
+### In progress
+- [ ] Reading how product orders notify (checkout-deferred.js: Web3Forms + EmailJS), how admin.html lists orders and loads admin-*.js tabs, and the live Supabase schema.
+### Next
+1. [ ] Supabase table `service_quotes` (insert-only for anon, staff read/update) via migration; copy SQL into `setup-service-quotes.sql`.
+2. [ ] Quote request form on `/services/` hub and the 8 generated pages (no payment), sends the same staff alert to info@stermontarcade.co.ke.
+3. [ ] Admin portal: "Service quotes" tab (list, status, notes, reply by WhatsApp/email), responsive fixes.
+4. [ ] Tests, PR, owner says "Merge" after phone check.
+### Blocked / owner
+- none yet
+
 ## NEWEST (chat, 10:35): services pages get the mobile shell look + two untested commits on main
 Owner: "page is boring, not sure it uses the mobile shell ... make it appealing and professionally adopt the mobile shell; automatic save on handoff".
 FINDING: nothing under `services/` loaded `shell-chrome.js` on `main`. The hub redesign sits on `wip-services-shell-look` (c066e71) with NO PR merged; the 8 generated service pages and 8 guides had the old plain look.
