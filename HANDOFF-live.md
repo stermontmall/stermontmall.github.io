@@ -1,28 +1,29 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 09:10 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
+Last saved: 2026-10-31 09:30 (Africa/Nairobi). GitHub + Supabase connected; NO clone this session (GitHub tools only), so nothing below was run.
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST: Services in the shop Categories tab (branch `wip-shop-services-categories`, 2026-10-31 09:10 Africa/Nairobi)
-Owner asked for Services also in the Categories tab. PR #86 (drawer link) is merged. In progress: `renderCategoriesView()` in `mobile-shell/app.js` adds a "Services" link (`/services/`) to the left rail (after Top Categories) and as the first tile of Top Categories; `index.html` `app.js?v=10` -> `v=11`. It is a link, not a product category, so it opens the services page.
-- [ ] NEXT: `python3 mobile-shell/shell.test.py`, PR, merge; owner reloads the shop twice and opens Categories.
-- [ ] STILL OPEN: `services/sitemap-services.xml` in `sitemap.xml`/Search Console; owner confirms claims and price ranges.
+## NEWEST: Services copy to 600+ words, tenders, all cities (branch `wip-services-600-words`, 2026-10-31 09:30 Africa/Nairobi)
+Owner (after phone screenshots of `/services/`): "add content to all the services, at least 600 words; creative, high-intent words; Nairobi and all cities in Kenya; appeal to organisational tenders; autosave on handoff".
+FINDING: `services/word-counts.json` on `main` says the 8 landing pages already have 617-912 words, but the 8 guides have 373-543 words, and the hub `/services/` (`services/app.js`, 15 accordion items) shows only about 60 words per item. The hub is what the owner saw.
+### Done (branch pushed, not merged)
+- [x] `services/services-more.json` (new): per service a "contracts, institutions and tenders" section, a "near me: Nairobi, Mombasa, Kisumu, Nakuru, Eldoret and beyond" section and 5 search phrases; per guide 3-4 sections (quotation checklist, tenders, cities, safety). All 8 services and all 8 guides.
+- [x] `services/build-services.mjs`: also reads `services-more.json` (appended after `services-extra.json`), and prints `UNDER 600 WORDS:` for any page below 600.
+### In progress / Next (exact commands)
+- [ ] RUN: `node services/build-services.mjs && cat services/word-counts.json` (or Actions > "Build services pages" on this branch). Expect no `UNDER 600 WORDS` line. If a guide is still short, add a section for it in `services-more.json` and re-run. Generated pages are NOT edited by hand.
+- [ ] HUB (what the owner saw): the 15 accordion items in `services/app.js` are short. Options: (a) each item gets a "Read the full service page and price" link to its landing page (pest items -> pest page, cleaning items -> deep-cleaning page, CCTV -> cctv page, plumbing and electrical -> electrical-plumbing page, inverter -> solar page; 4G antenna and electric fence have NO landing page yet); (b) 15 separate pages of 600+ words each. Owner to choose. Not started.
+- [ ] Merge to `main` only after the generator runs clean and 2 pages + 1 guide are opened on a phone. `services/sitemap-services.xml` is still not in `sitemap.xml` or Search Console.
+### Blocked / owner
+- Owner to confirm: the claims (90-day guarantee, low-odour, genuine parts, licensed staff), the price ranges, and the SERVICE AREAS. The copy says crews are based in Nairobi and Kitale, and that for every other town the customer sends the location and we confirm how we can help and the travel cost. It does NOT claim we serve every city. Change that sentence if you do.
+- TENDERS: the copy does NOT claim any registration or licence (KRA PIN, business registration, NCA, PCPB, AGPO and so on). It says "tell us which compliance documents your tender requires and we confirm what we can supply". Give the real list of documents you hold and I will add them to every page.
+- Words kept out on purpose: "best", "100%", "certified", "non-toxic", "eco-friendly", "guaranteed" (outside the 90-day wording).
 
-## (previous) Services link in the shop (branch `wip-shop-services-link`, 2026-10-31 09:00 Africa/Nairobi)
-Owner: the Services section is not reachable from the shop ("All categories" drawer had no Services). In progress: `mobile-shell/app.js` `renderDrawer()` now puts a "Services" link to `/services/` first in the drawer; `index.html` `app.js?v=9` -> `v=10`. PR #84 (services hub links, violet theme) is merged and deployed (pages build #722 green).
-- [ ] NEXT: `python3 mobile-shell/shell.test.py` (expect all pass), PR, merge, then owner reloads the shop twice (service worker) and opens All categories.
+## (previous) Services in the shop Categories tab (branch `wip-shop-services-categories`, 2026-10-31 09:10 Africa/Nairobi)
+PR #86 (drawer link) and PR #87 (Categories tab link, `app.js?v=11`, shell.test.py 133/133) are MERGED. Phone check still open: reload the shop twice and open Categories.
 - [ ] STILL OPEN: `services/sitemap-services.xml` in `sitemap.xml`/Search Console; owner confirms claims and price ranges.
 
 ## (previous) Services polish PR (branch `wip-services-polish`, 2026-10-31 09:05 Africa/Nairobi)
-- [x] PR #83 (8 services + 8 guides) is merged and the pages are live on `main`.
-- [x] `wip-services-polish` (hub `/services/` now links the 8 pages and guides, `services-extra.json` adds longer sections, violet theme) was checked: both JSON files parse, `node services/build-services.mjs` rebuilds with NO diff, all 9 hub links resolve. PR opened to `main`.
-- [ ] NEXT: merge that PR, then open 2 service pages + 1 guide in a browser (not tested in one). Command to re-check: `node services/build-services.mjs && git status --short` (expect empty).
-- [ ] STILL OPEN: add `services/sitemap-services.xml` to `sitemap.xml` or Search Console; owner confirms claims (90-day guarantee, low-odour, genuine parts, licensed staff, Kitale in areas) and the price ranges; then the doubled "Buy" check and batch 09.
-
-## (previous) NEWEST: Services SEO pages (branch `wip-services-seo-pages`, 2026-10-31 08:20)
-Owner uploaded the Services Blueprint PDF: "Expound on the SEO and blogs, best descriptions of the services in Kenya, use the prices in range, autosave". Full notes: `services/HANDOFF.md` (section on top).
-- [x] `services/services-data.json` (8 services + 8 guides, PDF price ranges), `services/build-services.mjs` (tested on a fixture only), `.github/workflows/services-build.yml`.
-- [ ] NEXT: run the workflow "Build services pages" on that branch (or `node services/build-services.mjs`), open 2 pages + 1 guide, fix any JSON typo it reports, then merge to `main`.
-- [ ] Owner confirms claims (90-day guarantee, low-odour, genuine parts, licensed staff) and the price ranges; link `/services/` to the new pages; add `services/sitemap-services.xml` to Search Console.
+- [x] PR #83 (8 services + 8 guides) and PR #84 (hub links the 8 pages and guides, `services-extra.json`, violet theme) are merged and live on `main`.
+- [ ] Open 2 service pages + 1 guide in a browser (not tested in one). Re-check: `node services/build-services.mjs && git status --short` (expect empty on `main`).
 
 ## IN PROGRESS before this (session started 07:45), still open
 Owner: "Fix [doubled Buy], and continue with items description and seo and autosave on handoff".
