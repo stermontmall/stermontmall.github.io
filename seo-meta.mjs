@@ -40,8 +40,8 @@ const isAgro = catSlug => PCPB_CATS.has(catSlug) && !PEST_CATS.has(catSlug);
 export const POWER = {
   pest:    ['Powerful', 'Fast-Acting', 'Heavy-Duty', 'High-Potency', 'Long-Lasting'],      // home/premises pest control
   agro:    ['Powerful', 'High-Potency', 'Fast-Acting', 'Proven', 'Effective'],             // crop chemicals
-  farm:    ['Quality', 'Reliable', 'Proven', 'Effective'],                                 // other farm / vet inputs
-  general: ['Top', 'Reliable', 'Quality', 'Premium']                                        // everything else
+  farm:    ['Top-Quality', 'Reliable', 'Proven', 'Effective'],                             // other farm / vet inputs
+  general: ['Top-Quality', 'Reliable', 'Premium']                                          // everything else
 };
 // Descriptor used inside meta descriptions ("Buy 100% genuine & high-potency <name>").
 export const DESCRIPTOR = { pest: 'high-potency', agro: 'high-potency', farm: 'quality', general: 'top-quality' };
@@ -71,13 +71,13 @@ export const trustName = (name, ctx) => (isGenuine(ctx) && !hasTrustWord(name) ?
 // Cart, order, e-mail and WhatsApp lines strip it again (checkout-deferred.js info(), storefront-live.js enquiry text), so orders keep the plain product name.
 export const buyName = n => { const s = String(n || '').replace(/\s+/g, ' ').trim(); return !s || /^buy\b/i.test(s) ? s : `Buy ${s}`; };
 
-// Visible H1 on the product page: the same lead word the title uses ("Original" when true, otherwise a type-appropriate power word),
-// so what shoppers read on the page matches the search listing. Never repeats a word the name already starts with.
+// Visible H1 on the product page. No length limit here, so it carries BOTH words: "Original" when it is true (known brand or farm input)
+// followed by a type-appropriate power word ("Buy Original Powerful Bazooka 18EC Insecticide", "Buy Top-Quality Hand Pressure Sprayer").
+// A name that already starts with one of these lead words is left alone, so a word is never repeated.
 export function pdpH1(name, ctx = {}) {
   const base = String(name || '').replace(/\s+/g, ' ').trim();
   if (hasLeadWord(base)) return buyName(base);
-  const lead = isGenuine(ctx) ? 'Original' : powerWord(base, ctx);
-  return buyName(`${lead} ${base}`);
+  return buyName([isGenuine(ctx) ? 'Original' : '', powerWord(base, ctx), base].filter(Boolean).join(' '));
 }
 
 // One visible line under the H1 on the product page. Only facts that are true for every product (no price or quality superlatives):
@@ -90,7 +90,7 @@ export function pdpTagline(ctx = {}) {
 //   Best:   "<Original|Power word> <name> – Best Price in Kenya | Stermont Arcade"
 // "Original" leads when it is true (known brand or farm input); otherwise a type-appropriate power word leads.
 // Long names cannot fit all of that in 60 characters, so wording is dropped from the least important end:
-// store name, then "Best", then the lead word, then the name itself is shortened. "Price in Kenya" is kept as long as possible.
+// store name, then "Best", then the name itself is shortened. The lead word is always kept, and so is "Price in Kenya".
 // (Products with an owner-supplied products.seo_title get that exact title afterwards from seo-titles.mjs.)
 export function pdpTitle(name, ctx = {}) {
   const base = String(name || '').replace(/\s+/g, ' ').trim();
@@ -100,14 +100,11 @@ export function pdpTitle(name, ctx = {}) {
     `${led} – Best Price in Kenya | ${STORE}`,
     `${led} – Price in Kenya | ${STORE}`,
     `${led} – Best Price in Kenya`,
-    `${base} – Best Price in Kenya | ${STORE}`,
-    `${led} – Price in Kenya`,
-    `${base} – Price in Kenya | ${STORE}`,
-    `${base} – Best Price in Kenya`,
-    `${base} – Price in Kenya`
+    `${led} – Price in Kenya`
   ];
   const hit = tiers.find(t => t.length <= TITLE_MAX);
-  return hit || `${clip(base, TITLE_MAX - ' – Price in Kenya'.length)} – Price in Kenya`;
+  // Name too long even without the store name: keep the lead word (Original / power word) and clip the product name instead.
+  return hit || `${clip(led, TITLE_MAX - ' – Price in Kenya'.length)} – Price in Kenya`;
 }
 
 // PDP meta description, max 155 characters.
