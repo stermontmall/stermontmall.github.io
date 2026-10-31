@@ -1,0 +1,244 @@
+{
+ "published": "2026-10-31",
+ "pests": [
+  {
+   "name": "Bed bugs",
+   "slug": "bed-bugs",
+   "group": "Household crawling insects",
+   "varieties": [
+    "Common bed bug (Cimex lectularius)",
+    "Tropical bed bug (Cimex hemipterus)",
+    "Nymphs and eggs"
+   ]
+  },
+  {
+   "name": "Cockroaches",
+   "slug": "cockroaches",
+   "group": "Household crawling insects",
+   "varieties": [
+    "German cockroach",
+    "American cockroach",
+    "Oriental cockroach",
+    "Brown-banded cockroach",
+    "Smokybrown cockroach"
+   ]
+  },
+  {
+   "name": "Termites",
+   "slug": "termites",
+   "group": "Wood and structural pests",
+   "varieties": [
+    "Subterranean termites",
+    "Drywood termites",
+    "Mound-building termites",
+    "Flying termites (swarmers)"
+   ]
+  },
+  {
+   "name": "Rats and mice",
+   "slug": "rodents",
+   "group": "Rodents and wildlife",
+   "varieties": [
+    "Black rat (roof rat)",
+    "Norway rat (brown rat)",
+    "House mouse",
+    "Field rats and mice"
+   ]
+  },
+  {
+   "name": "Ants",
+   "slug": "ants",
+   "group": "Household crawling insects",
+   "varieties": [
+    "Pharaoh ants",
+    "Sugar and kitchen ants",
+    "Carpenter ants",
+    "Safari (driver) ants"
+   ]
+  },
+  {
+   "name": "Fleas and jiggers",
+   "slug": "fleas",
+   "group": "Biting and blood-feeding pests",
+   "varieties": [
+    "Cat flea (Ctenocephalides felis)",
+    "Dog flea (Ctenocephalides canis)",
+    "Rat flea (Xenopsylla cheopis)",
+    "Jigger (sand flea, Tunga penetrans)"
+   ]
+  },
+  {
+   "name": "Ticks",
+   "slug": "ticks",
+   "group": "Biting and blood-feeding pests",
+   "varieties": [
+    "Brown dog tick (Rhipicephalus sanguineus)",
+    "Brown ear tick (Rhipicephalus appendiculatus)",
+    "Tropical bont tick (Amblyomma variegatum)",
+    "Blue ticks (Rhipicephalus microplus)"
+   ]
+  },
+  {
+   "name": "Mosquitoes",
+   "slug": "mosquitoes",
+   "group": "Biting and blood-feeding pests",
+   "varieties": [
+    "Anopheles mosquitoes",
+    "Aedes mosquitoes (including Aedes aegypti)",
+    "Culex mosquitoes"
+   ]
+  },
+  {
+   "name": "Houseflies and other flies",
+   "slug": "flies",
+   "group": "Flying insects",
+   "varieties": [
+    "Housefly (Musca domestica)",
+    "Blowflies and flesh flies",
+    "Fruit flies",
+    "Drain and moth flies",
+    "Stable flies and horn flies"
+   ]
+  },
+  {
+   "name": "Lice",
+   "slug": "lice",
+   "group": "Biting and blood-feeding pests",
+   "varieties": [
+    "Head lice (Pediculus humanus capitis)",
+    "Body lice (Pediculus humanus humanus)",
+    "Pubic lice",
+    "Poultry and livestock lice"
+   ]
+  },
+  {
+   "name": "Mites",
+   "slug": "mites",
+   "group": "Biting and blood-feeding pests",
+   "varieties": [
+    "Scabies mite (Sarcoptes scabiei)",
+    "House dust mites",
+    "Bird and rodent mites",
+    "Poultry red mite (Dermanyssus gallinae)",
+    "Spider mites and other crop mites"
+   ]
+  },
+  {
+   "name": "Bees, wasps and hornets",
+   "slug": "bees-wasps-and-hornets",
+   "group": "Flying insects",
+   "varieties": [
+    "Paper wasps (Polistes)",
+    "Mud daubers and potter wasps",
+    "Honey bees (Apis mellifera)",
+    "Carpenter bees (Xylocopa)",
+    "Large hornet-like wasps"
+   ]
+  },
+  {
+   "name": "Spiders",
+   "slug": "spiders",
+   "group": "Spiders and scorpions",
+   "varieties": [
+    "Common house spiders",
+    "Huntsman and wall spiders",
+    "Button spiders (Latrodectus)",
+    "Baboon spiders and large ground spiders"
+   ]
+  },
+  {
+   "name": "Scorpions",
+   "slug": "scorpions",
+   "group": "Spiders and scorpions",
+   "varieties": [
+    "Thick-tailed scorpions (Parabuthus)",
+    "Burrowing and rock scorpions (Opistophthalmus)",
+    "Small yellow or brown scorpions"
+   ]
+  },
+  {
+   "name": "Centipedes and millipedes",
+   "slug": "centipedes-and-millipedes",
+   "group": "Household crawling insects",
+   "varieties": [
+    "Large centipedes (Scolopendra)",
+    "House centipedes",
+    "Millipedes"
+   ]
+  },
+  {
+   "name": "Silverfish",
+   "slug": "silverfish",
+   "group": "Fabric and pantry pests",
+   "varieties": [
+    "Common silverfish (Lepisma saccharina)",
+    "Firebrats",
+    "Other bristletails"
+   ]
+  },
+  {
+   "name": "Clothes moths",
+   "slug": "clothes-moths",
+   "group": "Fabric and pantry pests",
+   "varieties": [
+    "Webbing clothes moth (Tineola bisselliella)",
+    "Casemaking clothes moth (Tinea pellionella)",
+    "Pantry moths (for comparison)"
+   ]
+  },
+  {
+   "name": "Carpet beetles",
+   "slug": "carpet-beetles",
+   "group": "Fabric and pantry pests",
+   "varieties": [
+    "Varied carpet beetle (Anthrenus verbasci)",
+    "Black carpet beetle (Attagenus)",
+    "Furniture carpet beetle"
+   ]
+  },
+  {
+   "name": "Stored grain pests",
+   "slug": "stored-grain-pests",
+   "group": "Farm and stored-product pests",
+   "varieties": [
+    "Maize weevil (Sitophilus zeamais)",
+    "Larger grain borer (Prostephanus truncatus)",
+    "Angoumois grain moth (Sitotroga cerealella)",
+    "Bean bruchids (bean weevils)",
+    "Flour beetles and grain beetles"
+   ]
+  },
+  {
+   "name": "Snakes",
+   "slug": "snakes",
+   "group": "Rodents and wildlife",
+   "varieties": [
+    "Puff adder",
+    "Cobras, including spitting cobras",
+    "Mambas and boomslangs",
+    "Harmless snakes"
+   ]
+  },
+  {
+   "name": "Bats and birds",
+   "slug": "bats-and-birds",
+   "group": "Rodents and wildlife",
+   "varieties": [
+    "Insect-eating bats",
+    "Fruit bats",
+    "Feral pigeons",
+    "Sparrows, starlings and weaver birds"
+   ]
+  },
+  {
+   "name": "Locusts and grasshoppers",
+   "slug": "locusts",
+   "group": "Farm and stored-product pests",
+   "varieties": [
+    "Desert locust (Schistocerca gregaria)",
+    "Variegated grasshopper (Zonocerus variegatus)",
+    "Other grasshoppers"
+   ]
+  }
+ ]
+}

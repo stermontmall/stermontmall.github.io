@@ -156,6 +156,29 @@ const business = {
 const out = [];
 const write = (rel, txt) => { const f = path.join(dir, rel); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, txt); out.push(rel); };
 
+// ---- Pest pages (owner 2026-10-31: every common pest variety, detailed, professional SEO) ----
+// Source: services/pests-src/*.json ({ pests: [...] }). Output: services/pests/<slug>.html, services/pests/index.html, services/pests-data.json.
+// The build fails if a page uses a banned claim word, a related slug does not exist, or a required field is missing.
+const PEST_LANDING = 'pest-control-fumigation-nairobi';
+const PEST_BANNED = /\b(best|100\s?%|permanent(ly)?|guarantee[ds]?|certified|licen[sc]ed|non-toxic|eco-friendly|kitale)\b/i;
+const pests = [];
+{
+  const psrc = path.join(dir, 'pests-src');
+  if (fs.existsSync(psrc)) for (const f of fs.readdirSync(psrc).filter(f => f.endsWith('.json')).sort()) pests.push(...JSON.parse(fs.readFileSync(path.join(psrc, f), 'utf8')).pests);
+  const slugs = new Set(pests.map(p => p.slug)); const bad = [];
+  if (slugs.size !== pests.length) bad.push('duplicate pest slug');
+  for (const p of pests) {
+    for (const k of ['slug', 'name', 'group', 'title', 'desc', 'h1', 'lead', 'intro', 'varieties', 'signs', 'risk', 'causes', 'prevent', 'approach', 'faqs', 'related']) if (!p[k] || (Array.isArray(p[k]) && !p[k].length)) bad.push(`${p.slug}: missing ${k}`);
+    if ((p.faqs || []).length < 4) bad.push(`${p.slug}: needs at least 4 FAQs`);
+    for (const r of p.related || []) if (!slugs.has(r) || r === p.slug) bad.push(`${p.slug}: bad related slug ${r}`);
+    const m = JSON.stringify(p).match(PEST_BANNED); if (m) bad.push(`${p.slug}: banned word "${m[0]}"`);
+    if (p.title && p.title.length > 70) bad.push(`${p.slug}: title over 70 characters`);
+    if (p.desc && (p.desc.length < 80 || p.desc.length > 170)) bad.push(`${p.slug}: description should be 80-170 characters (${p.desc.length})`);
+  }
+  if (bad.length) { console.error('PEST DATA PROBLEMS:\n' + bad.join('\n')); process.exit(1); }
+}
+const pestLinksSection = () => `<h2>Pests we treat: every common variety in Kenya</h2><p>Each pest has its own page with the varieties found in Kenya, the signs to look for, health risks, prevention and how we treat it. <a href="/services/pests/">See all ${pests.length} pests</a>.</p><div class="grid">${pests.map(p => `<a href="/services/pests/${p.slug}.html">${esc(p.name)}<small>${esc(p.group)}</small></a>`).join('')}</div>`;
+
 for (const s of data.services) {
   const url = `${SITE}/services/${s.slug}.html`;
   const guide = data.guides.find(g => g.service === s.slug);
@@ -186,7 +209,7 @@ ${s.intro.map(p => `<p>${esc(p)}</p>`).join('')}
 <h2>What is included</h2><ul class="checks">${s.included.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
 <h2>How it works</h2><ol class="steps">${s.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
 <h2>What decides the price</h2><ul class="checks">${s.priceFactors.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
-${s.extraSections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).join('')}`).join('')}
+${s.extraSections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).join('')}`).join('')}${s.slug === PEST_LANDING && pests.length ? pestLinksSection() : ''}
 <h2>Who we serve</h2><p>${esc(s.audience)}</p>
 <h2>Where we work</h2><p>${esc(s.areas)}</p>
 ${coverageBlock(s.name)}
@@ -238,7 +261,75 @@ ${hero({ eyebrow: 'Guides', h1: 'Service guides for Nairobi and Kenya', lead: 'S
   write('guides/index.html', h);
 }
 
-const urls = ['/services/', '/services/guides/', ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`)];
+// ---- Pest pages: one page per pest, a pests index, and pests-data.json (read by the admin "Services overview" tab) ----
+if (pests.length) {
+  counts.pests = {};
+  const parent = data.services.find(x => x.slug === PEST_LANDING);
+  const costGuide = data.guides.find(g => g.service === PEST_LANDING);
+  const parentUrl = `/services/${PEST_LANDING}.html`;
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+  const pestCoverage = p => `<h2>${esc(p.name)} treatment in all 47 counties</h2><p>We take requests for ${esc(p.name.toLowerCase())} from all 47 counties in Kenya. Nairobi is our home market, with our head office at The Sarit Centre in Westlands, and we put the big cities first: ${BIG_CITIES.join(', ')}. For any other county, send your town and the problem on WhatsApp and we confirm the schedule and any travel cost before you pay.</p><p>Counties we take bookings from: ${COUNTIES.join(', ')}.</p>`;
+  for (const p of pests) {
+    const url = `${SITE}/services/pests/${p.slug}.html`;
+    const lc = p.name.toLowerCase();
+    const ask = wa(`Hello Stermont Arcade, I need help with ${lc}. My location is: `);
+    const rel = p.related.map(r => pests.find(x => x.slug === r));
+    const jsonld = [
+      { '@context': 'https://schema.org', '@type': 'Service', name: p.h1, serviceType: 'Pest control: ' + p.name, description: p.desc, url, provider: business, areaServed: business.areaServed },
+      { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: p.faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+      { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+        { '@type': 'ListItem', position: 2, name: 'Services', item: SITE + '/services/' },
+        { '@type': 'ListItem', position: 3, name: 'Pests', item: SITE + '/services/pests/' },
+        { '@type': 'ListItem', position: 4, name: p.name, item: url }] }
+    ];
+    let h = head({ title: p.title, desc: p.desc, url, extra: jsonld.map(ld).join('') });
+    h += `<nav class="crumbs"><a href="/">Home</a> / <a href="/services/">Services</a> / <a href="/services/pests/">Pests</a> / ${esc(p.name)}</nav>
+${hero({ eyebrow: p.group, h1: p.h1, lead: esc(p.lead), cta: `<a class="btn light" href="${ask}">Get a quote on WhatsApp</a><a class="btn ghost" href="#faq">Common questions</a>`, chips: ['Inspection first', 'Quote after inspection', 'Nairobi and all 47 counties'] })}
+${p.intro.map(x => `<p>${esc(x)}</p>`).join('')}
+<h2>Types of ${esc(lc)} found in Kenya</h2>${p.varieties.map(v => `<h3>${esc(v.n)}</h3><p>${esc(v.d)}</p>`).join('')}
+<h2>Signs of ${esc(lc)}</h2><ul class="checks">${p.signs.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
+<h2>${esc(p.riskTitle || 'Why it matters')}</h2>${p.risk.map(x => `<p>${esc(x)}</p>`).join('')}
+<h2>What attracts ${esc(lc)}</h2><ul class="checks">${p.causes.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
+<h2>How to prevent ${esc(lc)}</h2><ul class="checks">${p.prevent.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
+${p.scope ? `<h2>What we do and what we do not do</h2><p>${esc(p.scope)}</p>` : ''}
+<h2>How we deal with ${esc(lc)}</h2>${p.approach.map(x => `<p>${esc(x)}</p>`).join('')}<ol class="steps">${parent.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
+${p.shop && fs.existsSync(path.join(dir, '..', p.shop.href.replace(/^\//, ''))) ? `<p>Prefer to start yourself? See our <a href="${p.shop.href}">${esc(p.shop.label)}</a> in the shop, and read the label before you use any product.</p>` : ''}
+<h2>What it costs</h2><p>Pest control and fumigation at Stermont Arcade ranges from ${kes(parent.priceMin)} to ${kes(parent.priceMax)}${parent.priceOpen ? '+' : ''}. The price for ${esc(lc)} depends on the pest, the size of the property and how many visits are needed, and you get the exact price after inspection. See the <a href="${parentUrl}">full pest control service page</a>${costGuide ? ` and our guide, <a href="/services/guides/${costGuide.slug}.html">${esc(costGuide.title)}</a>` : ''}.</p>
+${pestCoverage(p)}
+<h2 id="faq">Frequently asked questions about ${esc(lc)}</h2>${p.faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
+<h2>Related pests</h2><div class="grid">${rel.map(r => `<a href="/services/pests/${r.slug}.html">${esc(r.name)}<small>${esc(r.group)}</small></a>`).join('')}</div>
+<p><a class="btn" href="${ask}">Book ${esc(lc)} inspection</a> <a class="btn alt" href="/services/pests/">All pests we treat</a></p>
+<a class="btn fab" href="${ask}">Get a quote</a>` + foot;
+    counts.pests[p.slug] = words(h.slice(h.indexOf('<h1>'), h.indexOf('<h2>Related pests</h2>')));
+    write(`pests/${p.slug}.html`, h);
+  }
+  {
+    const url = `${SITE}/services/pests/`;
+    const groups = [...new Set(pests.map(p => p.group))];
+    const jsonld = [
+      { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Pests we control in Kenya', url, mainEntity: { '@type': 'ItemList', itemListElement: pests.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/services/pests/${p.slug}.html`, name: p.name })) } },
+      { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+        { '@type': 'ListItem', position: 2, name: 'Services', item: SITE + '/services/' },
+        { '@type': 'ListItem', position: 3, name: 'Pests', item: url }] }
+    ];
+    let h = head({ title: 'Pests We Control in Kenya: Every Common Variety | Stermont Arcade', desc: `Guides to ${pests.length} common pests in Kenya, from bed bugs, cockroaches and termites to rodents, mosquitoes, stored grain pests and locusts. Book an inspection.`, url, extra: jsonld.map(ld).join('') });
+    h += `<nav class="crumbs"><a href="/">Home</a> / <a href="/services/">Services</a> / Pests</nav>
+${hero({ eyebrow: 'Pest control', h1: 'Pests we control in Nairobi and across Kenya', lead: `Pick your pest to see the varieties found in Kenya, the signs, the health risks, how to prevent it and how we treat it. ${pests.length} pests, one inspection-first approach.`, cta: `<a class="btn light" href="${wa('Hello Stermont Arcade, I need pest control. The pest is: ')}">Get a quote on WhatsApp</a><a class="btn ghost" href="${parentUrl}">Pest control service</a>`, chips: ['Inspection first', 'Quote after inspection', 'Nairobi and all 47 counties'] })}
+<p>Pest control works best when you know the pest. Bed bugs, cockroaches, termites and rats each live, breed and spread in their own way, so the right treatment, the right products and the right follow-up differ. These pages explain what we look for and what you can do yourself, in plain language.</p>
+${groups.map(g => `<h2>${esc(g)}</h2><div class="grid">${pests.filter(p => p.group === g).map(p => `<a href="/services/pests/${p.slug}.html">${esc(p.name)}<small>${esc(p.lead)}</small></a>`).join('')}</div>`).join('')}
+<h2>How a pest control visit works</h2><ol class="steps">${parent.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
+${pestCoverage({ name: 'Pest control' })}
+<p><a class="btn" href="${wa('Hello Stermont Arcade, I need pest control. The pest is: ')}">Get a quote on WhatsApp</a> <a class="btn alt" href="${parentUrl}">Pest control and fumigation</a></p>
+<a class="btn fab" href="${wa('Hello Stermont Arcade, I need pest control. The pest is: ')}">Get a quote</a>` + foot;
+    counts.pests['index'] = words(h.slice(h.indexOf('<h1>')));
+    write('pests/index.html', h);
+  }
+  write('pests-data.json', JSON.stringify({ published: data.published, pests: pests.map(p => ({ name: p.name, slug: p.slug, group: p.group, varieties: p.varieties.map(v => v.n) })) }, null, 1) + '\n');
+}
+
+const urls = ['/services/', '/services/guides/', ...(pests.length ? ['/services/pests/', ...pests.map(p => `/services/pests/${p.slug}.html`)] : []), ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`)];
 write('sitemap-services.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
 
@@ -246,6 +337,6 @@ write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
 const banned = out.filter(rel => /kitale/i.test(fs.readFileSync(path.join(dir, rel), 'utf8')));
 if (banned.length) { console.error('BANNED TOWN NAME FOUND IN:', banned.join(', ')); process.exit(1); }
 
-const low = [...Object.entries(counts.services), ...Object.entries(counts.guides)].filter(([, n]) => n < 600);
+const low = [...Object.entries(counts.services), ...Object.entries(counts.guides), ...Object.entries(counts.pests || {}).filter(([k]) => k !== 'index')].filter(([, n]) => n < 600);
 console.log('wrote', out.length, 'files', JSON.stringify(counts));
 if (low.length) console.log('UNDER 600 WORDS:', JSON.stringify(low));
