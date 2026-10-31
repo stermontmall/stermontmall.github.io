@@ -43,3 +43,7 @@ Bump `?v=` in `index.html` for every `app.js` / `tailwind.css` change (cache rul
 
 ## Update 2026-10-31 07:12 (Africa/Nairobi), branch `wip-shell-static-pages`
 - [ ] Owner: "Fix all and autosave on handoff .md". In progress: step 3, shared shell header + bottom nav for account, track, shipping, returns, contact, faq, about, privacy, terms. First step: look at each page's head/body and where `index.html` defines the header/bottom nav. Category pages are merged (75c0e6f).
+
+## Update 2026-10-31 07:40 (Africa/Nairobi), branch `wip-shell-static-pages` (NOT merged)
+- [x] Written, NOT yet tested: `shell-chrome.js` (phone-only top bar with back/search/cart + bottom nav Home/Categories/Deals/Cart/Account; hides the page's own `<header>`; desktop untouched) and its `<script src="/shell-chrome.js?v=1" defer>` line in account, track, shipping, returns, contact, faq, about, privacy, terms. `app.js?v=9` now reads `/?tab=cart|categories|deals|account` and `/?q=<words>` (the links of that nav and its search box; the address is cleaned to `/`).
+- [ ] NEXT: add checks to `mobile-shell/shell.test.py` (phone: bar + nav appear on shipping.html, nav Cart goes to the shell Cart tab, search opens results, desktop and bots unchanged), run `python3 mobile-shell/shell.test.py`, commit, push, merge to main. Then phone check by the owner.

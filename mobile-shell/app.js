@@ -172,12 +172,14 @@ window.addEventListener('popstate', e => {
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
 const DEEP = new URLSearchParams(location.search).get('product');   // /?product=<slug>: a shared or reloaded product address, opened after the catalog loads
+const TAB_DEEP = new URLSearchParams(location.search).get('tab');   // /?tab=cart|categories|deals|account: the bottom nav of the static pages (shell-chrome.js)
+const Q_DEEP = (new URLSearchParams(location.search).get('q') || '').trim().slice(0, 80);   // /?q=<words>: the search box of the static pages
 const CAT_DEEP = new URLSearchParams(location.search).get('cat');   // /?cat=<slug>: a category (or sub-category) page address; /c/<slug>.html sends phones here
 /* A reload keeps the tab the customer was on: the browser hands back the state of the current history entry, and every tab hop stores its tab in it
    (goTab). The first view is Home only for a fresh visit or an unknown tab. The tab is shown at the very end of this file, once the views exist. */
 const TABS = ['home', 'categories', 'deals', 'cart', 'account'];
-const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab : 'home';
-history.replaceState({ tab: START_TAB, stack: [] }, '', (DEEP || CAT_DEEP) ? location.pathname : undefined); // a reload lands on a clean base entry (no sheet), on the same tab
+const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab : (!DEEP && !CAT_DEEP && !Q_DEEP && TABS.includes(TAB_DEEP)) ? TAB_DEEP : 'home';
+history.replaceState({ tab: START_TAB, stack: [] }, '', (DEEP || CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname : undefined); // a reload lands on a clean base entry (no sheet), on the same tab
 scrim.addEventListener('click', closeTop);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop(); });
 syncOverlays();
@@ -517,6 +519,7 @@ $('#search-form').addEventListener('submit', e => {
   refreshGrid();
 });
 
+if (Q_DEEP && !DEEP && !CAT_DEEP) { store.set({ q: Q_DEEP }); $('#search').value = Q_DEEP; }   // a search typed on a static page
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
 if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
 loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (DEEP) openDeepLink(DEEP); else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
