@@ -425,6 +425,40 @@ with sync_playwright() as p:
     check('category redirect: ?classic=1 keeps the category page on a phone', pc2.evaluate('location.pathname') == '/c/rodent-control.html', pc2.url)
     cc2.close()
 
+    # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell
+    PAGES = ['account', 'track', 'shipping', 'returns', 'contact', 'faq', 'about', 'privacy', 'terms']
+    c13 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c13)
+    p13 = c13.new_page(); e13 = []; p13.on('pageerror', lambda e: e13.append(str(e)))
+    bad = []
+    for nm in PAGES:
+        p13.goto(f'{BASE}/{nm}.html'); p13.wait_for_selector('#stm-nav', state='attached', timeout=10000)
+        ok = p13.locator('#stm-bar').is_visible() and p13.locator('#stm-nav a').count() == 5 and p13.locator('body > header').first.is_hidden() and p13.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
+        if not ok: bad.append(nm)
+    check('static pages: every page shows the shell top bar + bottom nav on a phone, its own header is hidden, no sideways scroll', not bad, bad)
+    p13.goto(f'{BASE}/shipping.html'); p13.wait_for_selector('#stm-nav', state='attached')
+    check('static pages: the page text is unchanged (still has its H1 and the delivery facts)', 'Shipping and delivery' in p13.locator('h1').first.inner_text() and '47 counties' in p13.locator('main').inner_text())
+    check('static pages: the bottom nav marks Account as the current section', p13.locator('#stm-nav a[aria-current="page"]').inner_text().strip() == 'Account')
+    p13.evaluate("localStorage.setItem('shell.cart', JSON.stringify([{qty:2},{qty:1}]))"); p13.reload(); p13.wait_for_selector('#stm-nav', state='attached')
+    check('static pages: the cart badge shows the shell cart quantity (3)', p13.locator('#stm-nav .stm-badge').inner_text() == '3' and p13.locator('#stm-bar .stm-badge').inner_text() == '3')
+    p13.locator('#stm-nav a', has_text='Cart').click(); p13.wait_for_selector('#view-cart:not([hidden])', timeout=15000)
+    check('static pages: the nav Cart link opens the shell on the Cart tab (address cleaned to /)', p13.locator('#view-cart').is_visible() and p13.evaluate('location.pathname + location.search') == '/', p13.url)
+    p13.goto(f'{BASE}/faq.html'); p13.wait_for_selector('#stm-nav', state='attached')
+    p13.locator('#stm-nav a', has_text='Categories').click(); p13.wait_for_selector('#view-categories:not([hidden])', timeout=15000)
+    check('static pages: the nav Categories link opens the shell on Categories', p13.locator('#view-categories').is_visible() and p13.locator('#view-home').is_hidden())
+    p13.goto(f'{BASE}/contact.html'); p13.wait_for_selector('#stm-bar', state='attached')
+    p13.fill('#stm-bar input', 'bed bug'); p13.keyboard.press('Enter'); p13.wait_for_selector('#grid .card[data-id]', timeout=15000); p13.wait_for_timeout(600)
+    ids = p13.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
+    check('static pages: the top-bar search opens the shell with that search (box filled, only matching products)', p13.input_value('#search') == 'bed bug' and ids and all(i.startswith('pest-') for i in ids) and p13.evaluate('location.search') == '', (p13.input_value('#search'), ids))
+    p13.goto(f'{BASE}/?tab=nonsense'); p13.wait_for_selector('#grid .card[data-id]', timeout=15000)
+    check('static pages: an unknown ?tab= value opens Home', p13.locator('#view-home').is_visible())
+    check('static pages: no page errors', not e13, e13[:3])
+    c13.close()
+    for label, kw in [('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
+        cx = b.new_context(**kw); mock_network(cx)
+        px = cx.new_page(); px.goto(f'{BASE}/shipping.html'); px.wait_for_timeout(800)
+        check(f'static pages: {label} gets the page without the shell bar', px.locator('#stm-bar').count() == 0 and px.locator('body > header').first.is_visible(), px.url)
+        cx.close()
+
     # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
     c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)
     p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_function("location.pathname !== '/'", timeout=15000); p6.wait_for_timeout(1500)

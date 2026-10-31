@@ -40,3 +40,12 @@ Bump `?v=` in `index.html` for every `app.js` / `tailwind.css` change (cache rul
 - Running `python3 mobile-shell/shell.test.py` (this session cannot) and tapping Submit on pull request forms.
 - Label data the catalog lacks (Mchwatox strength/registration, Actellic 25EC strength, Grain-Save permethrin strength, fogger fuel/capacity/output); owner to read the 8 blogs once.
 - Phone checks, Search Console watch for `/p/` URLs, fertilizer-page safety box decision, "Best Price in Kenya" wording.
+
+## Update 2026-10-31 07:12 (Africa/Nairobi), branch `wip-shell-static-pages`
+- [ ] Owner: "Fix all and autosave on handoff .md". In progress: step 3, shared shell header + bottom nav for account, track, shipping, returns, contact, faq, about, privacy, terms. First step: look at each page's head/body and where `index.html` defines the header/bottom nav. Category pages are merged (75c0e6f).
+
+## Update 2026-10-31 07:40 (Africa/Nairobi), branch `wip-shell-static-pages` (NOT merged)
+- [x] Written, NOT yet tested: `shell-chrome.js` (phone-only top bar with back/search/cart + bottom nav Home/Categories/Deals/Cart/Account; hides the page's own `<header>`; desktop untouched) and its `<script src="/shell-chrome.js?v=1" defer>` line in account, track, shipping, returns, contact, faq, about, privacy, terms. `app.js?v=9` now reads `/?tab=cart|categories|deals|account` and `/?q=<words>` (the links of that nav and its search box; the address is cleaned to `/`).
+- [x] TESTED 2026-10-31 07:55: 10 new "static pages:" checks in `shell.test.py` (bar + nav on all 9 pages, own header hidden, no sideways scroll, text unchanged, Account marked, cart badge, nav Cart/Categories open those shell tabs, top-bar search opens results, bad ?tab= opens Home, desktop untouched) = 133/133 on two runs (one run printed a stray Traceback in the local server log, not a failure; the rerun was clean). Screenshots of shipping and account looked right. Merged to `main` (see git log).
+- [ ] NEXT (owner): phone check: open stermontarcade.co.ke twice, Account tab, tap Shipping: you should see the top bar and bottom nav; tap Cart/Categories/Deals and the search. Account sign-in only works with the real Supabase script (sandbox blocks it), so check logging in once on the phone.
+- [ ] NEXT (code): step 4 = native Track and Account tabs and the checkout inside the shell (bigger jobs); `/blog/*.html`, `/guides/*.html` and `/classic.html` still use their own look (blog/guides are generated: edit the generators, not the pages).
