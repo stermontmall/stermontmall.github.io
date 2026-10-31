@@ -1,0 +1,354 @@
+{
+"pests": [
+{
+"slug": "fleas",
+"name": "Fleas and jiggers",
+"group": "Biting and blood-feeding pests",
+"title": "Flea and Jigger Control in Nairobi and Kenya | Stermont Arcade",
+"desc": "Cat, dog and rat fleas and jiggers (sand fleas) in Kenyan homes. Signs, bites, why they return, and how a home and compound treatment works.",
+"h1": "Flea and jigger control in Nairobi and across Kenya",
+"lead": "Fleas live in carpets, bedding and soil, not only on pets. Treat the animal, the home and the floor together, or they return.",
+"intro": [
+"Fleas are small, wingless, blood-feeding insects that jump. Adults live on the animal, but most of the flea population at any time is in the surroundings: eggs, larvae and pupae in carpets, bedding, cracks in floors and dusty soil. That is why treating only the pet, or only the house, so often fails.",
+"In Kenya there is one more flea to know about: the jigger, or sand flea (Tunga penetrans). The female burrows into the skin, usually of the toes and feet, and is common where floors are earthen or dusty. Jiggers need medical care for people and a clean-up of the floors and surroundings."
+],
+"varieties": [
+{ "n": "Cat flea (Ctenocephalides felis)", "d": "The flea found most often on both cats and dogs in homes. It bites people on the ankles and lower legs." },
+{ "n": "Dog flea (Ctenocephalides canis)", "d": "A close relative that behaves much the same way and is treated in the same way." },
+{ "n": "Rat flea (Xenopsylla cheopis)", "d": "Lives on rodents and bites people when the rats are gone or crowded. It is the flea linked with plague, which is one more reason to treat rodents first." },
+{ "n": "Jigger (sand flea, Tunga penetrans)", "d": "Lives in dry, sandy or dusty soil and floors and burrows into feet, especially between the toes and under the nails. Infested feet become swollen, itchy and painful and can get infected." }
+],
+"signs": [
+"Itchy red bites on the ankles and lower legs, often in clusters",
+"A pet that scratches, bites its coat or has black specks (flea dirt) in its fur",
+"Tiny dark fleas jumping on white socks or on a light cloth laid on the floor",
+"Flea dirt that leaves a reddish smear when wet on a tissue",
+"Small black dots with a white centre on the toes or soles, or swollen painful toes, which may be jiggers",
+"Fleas in bedding, sofas, carpets and the corners of rooms where the pet sleeps"
+],
+"riskTitle": "Health risks and why it matters",
+"risk": [
+"Flea bites itch and can become infected if scratched, and some people and pets are allergic. Fleas can carry tapeworm to pets. Rat fleas have been linked to plague. Jiggers cause pain, trouble walking and secondary infection, and in children they can affect school attendance. If you see signs of jiggers on yourself or a child, see a clinic or health worker, because the flea has to be removed safely and wounds cleaned."
+],
+"causes": [
+"Pets that go outside, or visiting pets and stray animals in the compound",
+"Rodents in the roof, store or yard",
+"Earthen, sandy or dusty floors and compounds, which suit jiggers",
+"Carpets, rugs and bedding that are rarely vacuumed or washed",
+"Second-hand furniture and bedding that carry eggs and pupae"
+],
+"prevent": [
+"Ask your veterinarian or agrovet for flea treatment for pets and follow the label for the species and weight",
+"Wash pet bedding hot every week and vacuum carpets, sofas and floor edges often",
+"Keep floors smooth and swept, and consider cementing earthen floors, which is a long-term answer to jiggers",
+"Keep pets and children from sleeping on bare dusty floors",
+"Control rodents in the roof and yard",
+"Keep the compound swept and free of piles of animal bedding and dry waste"
+],
+"approach": [
+"We treat the places where flea eggs and larvae collect: carpet edges, pet sleeping areas, floor cracks, under furniture and sheltered parts of the yard. Pets should be treated by your veterinarian at the same time, or the home is reinfested. We tell you what to wash, what to vacuum and when to stay out.",
+"Fleas hatch from pupae over several weeks, so a second visit is often planned. For jigger-affected homes or schools, we treat floors and sheltered dust areas, but treatment of people is for health workers, and we say so plainly."
+],
+"shop": { "href": "/c/veterinary-drugs.html", "label": "veterinary products for pets and livestock" },
+"faqs": [
+{ "q": "I treated my dog and still have fleas. Why?", "a": "Most of the flea population is in carpets, bedding and floors as eggs, larvae and pupae. The home needs treatment and cleaning at the same time as the pet." },
+{ "q": "How do I get rid of jiggers?", "a": "A health worker should remove them safely and clean the wounds. Then the floors and surroundings need cleaning and treatment so they do not return. Smooth, swept floors help a great deal." },
+{ "q": "Can fleas live on people?", "a": "They bite people but do not usually stay on them. They live on animals and in the home surroundings and jump to people from there." },
+{ "q": "Is the treatment safe for pets?", "a": "Remove pets and their bedding before treatment and bring them back when the technician says the room is ready. Pet flea treatment itself should come from your vet." }
+],
+"related": ["rodents", "ticks", "mites", "bed-bugs"]
+},
+{
+"slug": "ticks",
+"name": "Ticks",
+"group": "Biting and blood-feeding pests",
+"title": "Tick Control in Nairobi and Kenya | Stermont Arcade",
+"desc": "Brown dog ticks in homes and kennels, and cattle ticks on Kenyan farms. Health risks, prevention and how premises tick treatment works.",
+"h1": "Tick control for Kenyan homes, kennels and farms",
+"lead": "Ticks feed on blood and spread diseases to animals and sometimes to people. Treat the animal, the kennel and the surroundings.",
+"intro": [
+"Ticks are small eight-legged blood-feeders related to spiders. They climb onto animals from grass, bush and floors, attach, feed for days and drop off to lay eggs. A tick that drops off a dog in a house can lay thousands of eggs in cracks and skirting, which is how one pet can lead to a house full of ticks.",
+"In Kenya, ticks matter most on farms. Tick-borne diseases such as East Coast fever are a major cause of cattle losses, and ticks also cause wounds, weight loss and damaged hides. On the home side, the brown dog tick lives indoors in kennels, cracks and wall crevices."
+],
+"varieties": [
+{ "n": "Brown dog tick (Rhipicephalus sanguineus)", "d": "A common household tick that can complete its whole life indoors and infest kennels, rooms and walls where a dog lives." },
+{ "n": "Brown ear tick (Rhipicephalus appendiculatus)", "d": "A cattle tick in much of Kenya and the carrier of the parasite that causes East Coast fever." },
+{ "n": "Tropical bont tick (Amblyomma variegatum)", "d": "A large, brightly marked tick on cattle, sheep and goats. It causes painful bites that can become infected and spreads other livestock disease." },
+{ "n": "Blue ticks (Rhipicephalus microplus)", "d": "A one-host cattle tick that spends its whole life on one animal and is a known cause of tick fever and anaemia." }
+],
+"signs": [
+"Small grey or brown swollen bumps on the skin of dogs, cattle, goats and sheep, often around the ears, neck, belly and between the legs",
+"Ticks in or around kennels, bedding, cracks in walls and skirting",
+"Pets scratching and chewing at the same spots",
+"Livestock with weight loss, fever, swollen lymph glands or reduced milk yield, which need a veterinary check",
+"Small ticks climbing walls, curtains and ceilings in rooms where a dog lives",
+"Itchy bite marks on people after walking through long grass or visiting farms"
+],
+"riskTitle": "Health risks and why it matters",
+"risk": [
+"Ticks spread diseases that can kill livestock, such as East Coast fever, and some can spread illnesses to people, for example African tick bite fever. If a person develops fever, a rash or an eschar (a dark scab at the bite) after a tick bite, they should see a health worker. For dairy and beef farmers, tick control is a cost-saving task: it protects animals, milk and hides."
+],
+"causes": [
+"Long grass, bush and shrubs where ticks wait for animals",
+"Dogs that are not treated, or pets that roam and mix with wildlife and livestock",
+"Livestock sharing pasture with infested animals or with wild animals",
+"Cracks, crevices and wooden walls in kennels and houses where tick eggs are laid",
+"Irregular dipping or spraying of livestock"
+],
+"prevent": [
+"Keep grass cut short around the house and around animal shelters",
+"Treat pets as advised by your veterinarian and check them regularly, especially around the ears and between the toes",
+"Remove ticks with fine tweezers close to the skin and pull steadily, without twisting or crushing them",
+"Follow a regular dipping or spraying schedule for livestock, using products as the label and your veterinarian or livestock officer direct",
+"Seal wall cracks and clean kennels and bedding often",
+"Rotate pastures where you can and avoid sharing grazing with unknown animals"
+],
+"approach": [
+"For homes and kennels, we inspect cracks, skirting and bedding areas and treat the places where ticks hide and lay eggs, and we give you a list of cleaning and washing steps. Animals should be treated by your vet at the same time.",
+"For livestock, tick control involves the right acaricide, the right dilution and a regular schedule, which depends on the farm and the animal. We link ticks to our agrovet service so that a farm can get advice on spraying, products and equipment, and any treatment of animals follows your veterinarian or livestock officer's instructions."
+],
+"shop": { "href": "/c/veterinary-drugs.html", "label": "veterinary products" },
+"faqs": [
+{ "q": "How do I remove a tick safely?", "a": "Use fine tweezers, grip the tick close to the skin and pull steadily without twisting or crushing it. Clean the area and wash your hands. If a rash or fever follows, see a health worker." },
+{ "q": "Can ticks live inside the house?", "a": "Yes. The brown dog tick can complete its whole life indoors where dogs live and lay eggs in cracks and skirting boards." },
+{ "q": "How often should cattle be sprayed or dipped?", "a": "It depends on the season, the tick species and the product, so follow your veterinarian or livestock officer and the product label." },
+{ "q": "Do you treat farms?", "a": "We take farm requests from all 47 counties through our agrovet spraying and consultancy service. Send your location and the number and type of animals on WhatsApp." }
+],
+"related": ["fleas", "mites", "flies", "snakes"]
+},
+{
+"slug": "mosquitoes",
+"name": "Mosquitoes",
+"group": "Biting and blood-feeding pests",
+"title": "Mosquito Control in Nairobi and Kenya | Stermont Arcade",
+"desc": "Anopheles, Aedes and Culex mosquitoes in Kenya, the diseases they carry, breeding site checks, fogging and prevention for homes, estates and farms.",
+"h1": "Mosquito control in Nairobi and across Kenya",
+"lead": "Killing adult mosquitoes helps for a few days. Removing where they breed is what keeps numbers down.",
+"intro": [
+"Mosquitoes lay eggs in standing water, and the larvae live in it until they turn into flying adults. A bucket, a blocked gutter, an old tyre or a puddle in a plot can produce thousands of mosquitoes in a week or two. So good mosquito control is half detective work: find and fix the water, then treat the places where adults rest.",
+"Kenya has three groups of mosquitoes that matter to people. Anopheles carry malaria. Aedes, including Aedes aegypti, can spread dengue and chikungunya and bite in the daytime. Culex are a nuisance biter and can carry some other diseases, such as the filarial worm that causes lymphatic filariasis in parts of the coast."
+],
+"varieties": [
+{ "n": "Anopheles mosquitoes", "d": "The mosquitoes that carry malaria. They bite mainly at night, breed in clean sunlit pools, ponds, rice fields and puddles, and are most important around the lake and coastal regions and during rainy seasons in other areas." },
+{ "n": "Aedes mosquitoes (including Aedes aegypti)", "d": "Black and white striped, small, and active in the daytime. They breed in small containers such as pots, tyres, buckets, water tanks and blocked drains, often right inside compounds." },
+{ "n": "Culex mosquitoes", "d": "Common house mosquitoes that bite at night and breed in dirty water, such as drains, septic areas and blocked ditches. They are a nuisance, and in some places they carry other diseases." }
+],
+"signs": [
+"Mosquitoes biting in the evening, at night or during the day indoors",
+"Wriggling larvae in water in buckets, tanks, tyres, gutters, drains and puddles",
+"Dense adult mosquitoes resting in dark, cool corners, under beds and behind curtains",
+"Standing water that stays for more than about a week",
+"A rise in biting after heavy rain",
+"Several people in a household getting fever or illness after bites, which needs a health worker"
+],
+"riskTitle": "Health risks and why it matters",
+"risk": [
+"Mosquito-borne diseases cause real illness in Kenya. Malaria risk is highest in the lake and coastal regions and varies in the highlands, and dengue and chikungunya have affected coastal towns. Anyone with fever should get a test and treatment at a clinic, and not treat themselves. Mosquito control for a home, school or estate reduces bites but does not replace a net, repellents and prompt medical care."
+],
+"causes": [
+"Uncovered water tanks, drums and buckets",
+"Tyres, tins, flower pots, plant saucers and containers that collect rain",
+"Blocked gutters, drains and ditches with stagnant water",
+"Overgrown vegetation that gives adults shade to rest in",
+"Swamps, ponds and irrigation channels close to homes"
+],
+"prevent": [
+"Empty, scrub and cover water containers every week, and keep tank lids tight",
+"Remove or puncture old tyres and tins, and clear gutters and drains",
+"Fill puddles and level ground where water stands",
+"Use window and door screens and sleep under a treated net where malaria is a risk",
+"Use repellents as the label says and wear long sleeves at dusk",
+"Cut back dense bush and grass near the house"
+],
+"approach": [
+"We begin with a breeding site check in and around the property. Then we treat the places where adults rest, and the water that cannot be removed, using products suited to the site. In estates, schools and hotels we can add outdoor fogging for short-term relief before an event.",
+"Fogging reduces adult mosquitoes for a short time, and it does not stop them breeding, so we always pair it with advice on water and drains. Tell us about children, pregnant women, pets, fish ponds, bees and food crops so that we choose the right treatment."
+],
+"shop": { "href": "/c/mosquito-fly-control.html", "label": "mosquito and fly control products" },
+"faqs": [
+{ "q": "Is fogging enough to stop mosquitoes?", "a": "No. It knocks down adults for a short time. Without removing breeding water, they return. We combine fogging with a breeding site check and drainage advice." },
+{ "q": "When should I get a malaria test?", "a": "If you or a child has a fever, go to a clinic and get tested and treated. Do not wait. Mosquito control reduces bites but does not replace testing." },
+{ "q": "Do mosquitoes breed in clean water?", "a": "Yes. Many do, including the Aedes mosquitoes that breed in small clean containers. Cover or empty any container that holds water for more than a week." },
+{ "q": "Can you treat a whole estate or school?", "a": "Yes. We plan the visits by zone, and we take requests from all 47 counties. Send your location and the size of the area on WhatsApp for a quote." }
+],
+"related": ["flies", "ticks", "fleas", "bees-wasps-and-hornets"]
+},
+{
+"slug": "flies",
+"name": "Houseflies and other flies",
+"group": "Flying insects",
+"title": "Fly Control in Nairobi and Kenya | Stermont Arcade",
+"desc": "Houseflies, blowflies, fruit flies, drain flies and stable flies in Kenyan homes, restaurants and livestock farms. Find the breeding source and treat it.",
+"h1": "Fly control in Nairobi and across Kenya",
+"lead": "Flies breed in waste, manure and drains. Find that source first, or no spray will keep them away for long.",
+"intro": [
+"Flies are quick breeders. A housefly lays its eggs in rotting food, manure or waste. The eggs hatch into maggots within a day in warm weather, and the whole cycle from egg to adult can take roughly a week to ten days. That speed is why a restaurant, dairy, poultry house or market can go from a few flies to a swarm in days.",
+"Different flies breed in different places, so the first job is to name the fly. Houseflies and blowflies come from waste, meat and manure. Fruit flies come from ripe or fermenting fruit and drinks. Drain flies come from the slime inside drains. Stable flies come from wet manure and bedding on livestock farms."
+],
+"varieties": [
+{ "n": "Housefly (Musca domestica)", "d": "The common indoor fly. It feeds on food and waste, and carries germs on its feet and body, so it is a food hygiene concern." },
+{ "n": "Blowflies and flesh flies", "d": "Metallic blue or green flies drawn to meat, fish, carcasses and rubbish. A sudden increase indoors can mean something has died in a roof, wall or store." },
+{ "n": "Fruit flies", "d": "Tiny flies that gather around ripe fruit, juice, sugary drinks, bins and sink drains." },
+{ "n": "Drain and moth flies", "d": "Small fuzzy flies that rest on walls near bathrooms and floor drains, and breed in the slime inside pipes and traps." },
+{ "n": "Stable flies and horn flies", "d": "Biting flies around livestock, dairies and stables. They breed in wet manure and bedding and cause stress and reduced milk and weight gain." }
+],
+"signs": [
+"Many flies at windows, kitchens, bins and food counters",
+"Maggots in bins, drains, manure and under rotting food",
+"Fly specks (small dark dots) on walls, ceilings and light fittings",
+"A sudden swarm of large blue or green flies indoors",
+"Small fuzzy flies near bathroom and kitchen drains",
+"Cattle bunching, stamping and flicking their tails because of biting flies"
+],
+"riskTitle": "Health risks and why it matters",
+"risk": [
+"Flies pick up germs from waste, drains and manure and put them on food, plates and surfaces. They are associated with diarrhoeal illness, especially where hygiene and waste collection are weak. In food businesses, flies lead to complaints and failed inspections. On livestock farms, biting flies reduce comfort, milk yield and weight gain."
+],
+"causes": [
+"Uncovered or overflowing bins and waste areas that are not collected often enough",
+"Manure, wet bedding and spilled feed on farms and in stables",
+"Dirty drains, grease traps and unsealed floor drains",
+"Fruit, drinks and open food left out",
+"Open doors and windows without screens, and dead animals in roofs or stores"
+],
+"prevent": [
+"Use bins with tight lids, empty them daily and rinse them regularly",
+"Clean drains and grease traps often and keep them covered",
+"Remove manure and wet bedding from animal houses regularly and keep it dry and covered if it must wait",
+"Fit fly screens and self-closing doors on kitchens and food areas",
+"Keep fruit and sugary drinks covered or in the fridge",
+"If blowflies suddenly appear, check the roof, ceiling and stores for a dead animal"
+],
+"approach": [
+"We trace the flies to their breeding source and treat the source and the places where adults rest. In kitchens and food areas we focus on drains, bins and waste points. On farms we advise on manure management and treat the surfaces and shelters where flies gather.",
+"Because the source matters most, we give you a list of waste, drain and screen fixes, and we return to check that numbers are falling. For food premises, we give a dated service report."
+],
+"shop": { "href": "/c/mosquito-fly-control.html", "label": "fly and mosquito control products" },
+"faqs": [
+{ "q": "Why are there so many flies after rain?", "a": "Warm, wet weather speeds up breeding in waste, manure and drains. A good cleaning routine and covered bins matter even more then." },
+{ "q": "Why do I suddenly have large blue or green flies indoors?", "a": "A dead animal, such as a rat in the ceiling or roof, is a common cause. Look for the source, or ask us to inspect." },
+{ "q": "Can you control flies on a dairy or poultry farm?", "a": "Yes. We combine manure and bedding advice with treatment of resting surfaces. We take farm requests from all 47 counties." },
+{ "q": "Are fly traps enough?", "a": "Traps help monitor and reduce adults, but without removing the breeding source flies keep coming." }
+],
+"related": ["cockroaches", "mosquitoes", "ticks", "rodents"]
+},
+{
+"slug": "lice",
+"name": "Lice",
+"group": "Biting and blood-feeding pests",
+"title": "Lice Control for Schools and Homes in Kenya | Stermont Arcade",
+"desc": "Head, body and animal lice: how they spread in schools and crowded housing, what to do for people, and how we treat bedding areas and dormitories.",
+"h1": "Lice control for schools, homes and institutions in Kenya",
+"lead": "People are treated with medicated lotions and combing; we treat the dormitory, bedding and shared furniture so lice are not passed back.",
+"intro": [
+"Lice are tiny wingless insects that live on people or animals and feed on blood. Each kind lives on one kind of host: human head lice live on human scalps, and poultry and livestock lice live on their own animals. They spread mainly by close contact, though shared brushes, hats, bedding and school dormitory beds can help them travel.",
+"For people, the main treatment is medicated lotion or shampoo from a pharmacy or health worker, together with careful combing. That is not a pest control service. What we can do is treat the surroundings in boarding schools, dormitories, hostels and children's homes, and advise on washing and bagging linen so that lice are not passed on."
+],
+"varieties": [
+{ "n": "Head lice (Pediculus humanus capitis)", "d": "Live on the scalp and glue their eggs (nits) to hair near the skin. They spread by head-to-head contact and occasionally on shared combs, hats and bedding. They are an annoyance, not a sign of poor hygiene." },
+{ "n": "Body lice (Pediculus humanus humanus)", "d": "Live in clothing and bedding and move to the skin to feed. They are linked with crowded living conditions where washing clothes and bedding is difficult, and can spread some diseases in those conditions." },
+{ "n": "Pubic lice", "d": "Found on coarse body hair and spread by close contact. A health worker should advise on treatment." },
+{ "n": "Poultry and livestock lice", "d": "Chewing and sucking lice that live on chickens, cattle, goats and other animals, causing scratching, poor growth and reduced production." }
+],
+"signs": [
+"Constant itching of the scalp, neck and behind the ears",
+"Tiny white or yellowish nits stuck firmly to hair close to the scalp",
+"Live lice moving quickly in the hair, which are small and hard to see",
+"Scratch marks and sores on the neck and scalp",
+"Itchy skin, red marks and lice or eggs in the seams of clothes, for body lice",
+"Poultry or livestock rubbing, losing feathers or hair, or losing weight"
+],
+"riskTitle": "Why it matters",
+"risk": [
+"Head lice do not carry disease, but the itch and scratching disturb sleep and concentration and can lead to sores. In schools, they spread fast and can cause children to miss lessons. Body lice matter more where people live in crowded conditions with limited washing facilities. Anyone with persistent itching or sores should see a health worker or pharmacist."
+],
+"causes": [
+"Close contact in classrooms, dormitories and play",
+"Shared brushes, combs, hats, scarves, towels and bedding",
+"Crowded sleeping spaces with shared mattresses",
+"Limited washing facilities for clothes and bedding",
+"Contact between infested and healthy poultry or livestock"
+],
+"prevent": [
+"Teach children not to share combs, hats, scarves or hair accessories",
+"Check heads regularly with a fine-toothed comb, especially after school holidays",
+"Treat everyone who is infested at the same time, using a pharmacy or health worker's advice",
+"Wash bedding, towels and clothes hot and dry them on high heat or in strong sun, or seal them in a bag for two weeks",
+"Vacuum or brush mattresses and upholstered furniture",
+"Keep poultry houses clean and dry and treat infested birds as your veterinarian advises"
+],
+"scope": "We do not treat people. A person with lice needs a pharmacy or health worker treatment and a fine-toothed comb. We treat dormitories, bedding areas, shared furniture and poultry or animal houses where lice have been found, and we advise on washing and bagging so that lice are not passed back.",
+"approach": [
+"For boarding schools, hostels and children's homes, we inspect bed areas and shared furniture, and treat mattresses, bed frames and cracks. We tell the school what to wash, bag and dry, and when beds can be used again.",
+"For poultry and livestock, we link lice to our agrovet service. Treatment of animals follows your veterinarian's or livestock officer's advice."
+],
+"faqs": [
+{ "q": "Are head lice a sign of poor hygiene?", "a": "No. Head lice spread by contact and live on clean hair as well as dirty hair." },
+{ "q": "How long do lice live away from the head?", "a": "Only a short time, often a day or two. So the main job is treating the person and washing recently used bedding and hats." },
+{ "q": "Can you treat children for lice?", "a": "No. Children should be treated using a pharmacy or health worker's advice. We treat the dormitory and shared items." },
+{ "q": "Do you treat poultry lice?", "a": "We help farms through our agrovet service, with advice on cleaning, housing and products. Treatment of the birds follows your veterinarian's advice." }
+],
+"related": ["bed-bugs", "mites", "fleas", "ticks"]
+},
+{
+"slug": "mites",
+"name": "Mites",
+"group": "Biting and blood-feeding pests",
+"title": "Mite Control in Nairobi and Kenya | Stermont Arcade",
+"desc": "Scabies, dust mites, bird and rodent mites, poultry red mites and crop mites. Signs, what to do for people, and how we treat homes, poultry houses and farms.",
+"h1": "Mite control in Nairobi and across Kenya",
+"lead": "Mites are too small to see easily. The itch and the source tell you which kind you have and who should treat it.",
+"intro": [
+"Mites are tiny relatives of spiders. Some live on people, some on birds and rodents, some in house dust, and some on crops. Because they are so small, the first sign is often an unexplained itch or a bite rash, or a poultry house with birds in poor condition.",
+"Treatment depends on the mite. Scabies needs medical treatment for the person and everyone in close contact. House dust mites are managed by washing and cleaning. Bird and rodent mites bite people after their normal host has gone, so the nest or the host has to be found. Poultry red mites and crop mites are farm problems."
+],
+"varieties": [
+{ "n": "Scabies mite (Sarcoptes scabiei)", "d": "Burrows into human skin and causes intense itching, worse at night, often between the fingers, on the wrists and around the waist. It spreads by close skin contact and needs medical treatment." },
+{ "n": "House dust mites", "d": "Microscopic mites that feed on skin flakes in mattresses, pillows, carpets and upholstered furniture. Their droppings and body parts can trigger allergies and asthma." },
+{ "n": "Bird and rodent mites", "d": "Mites from nests in roofs, eaves, air conditioners and ceilings. They bite people when the birds or rodents leave or die." },
+{ "n": "Poultry red mite (Dermanyssus gallinae)", "d": "A blood-feeding mite that hides in cracks in poultry houses by day and feeds on birds at night. Heavy infestations cause anaemia and reduced egg laying." },
+{ "n": "Spider mites and other crop mites", "d": "Tiny mites on the underside of leaves that cause speckling, bronzing and webbing, and reduce yields in vegetables, flowers and fruit crops." }
+],
+"signs": [
+"Intense itching that is worse at night, with a rash between the fingers or on the wrists, which can point to scabies",
+"Several people in a household or institution itching at the same time",
+"Itchy bites in a room after a bird nest or rodent nest was removed or abandoned",
+"Sneezing, wheezing or a blocked nose that is worse in bed or when dusting, which can point to dust mites",
+"Poultry that are restless, pale and laying fewer eggs, with tiny red or grey specks in house cracks",
+"Speckled, yellowing leaves and fine webbing on crops"
+],
+"riskTitle": "Why it matters",
+"risk": [
+"Scabies spreads easily in crowded settings and needs prompt medical treatment, together with laundering of clothes and bedding. Dust mites worsen asthma and allergies. In poultry houses, mites reduce production and can cause serious losses. On crops, mites weaken plants and cut yields."
+],
+"causes": [
+"Close and prolonged skin contact with someone who has scabies",
+"Rarely washed bedding, pillows and upholstered furniture",
+"Bird nests and rodent nests in roofs, eaves and ceilings",
+"Cracks and crevices in poultry houses and dirty bedding",
+"Hot, dry conditions on crops and plants under stress"
+],
+"prevent": [
+"Wash bedding hot every week and dry it in strong sun or on high heat",
+"Use mattress and pillow covers and vacuum mattresses and sofas",
+"Remove old bird and rodent nests, wearing a mask and gloves, and seal entry points",
+"Keep poultry houses clean and dry and fill cracks where mites hide",
+"Scout crops weekly and look under leaves",
+"Do not share towels or clothes with someone who has scabies"
+],
+"scope": "We do not diagnose or treat scabies in people. A health worker should do that. We treat homes, dormitories, roofs, poultry houses and the places where mites hide, and we advise on washing and cleaning.",
+"approach": [
+"We inspect the site, find the source, such as a nest or a crack, and treat the places mites hide. We tell you what to wash, what to vacuum and how long to stay out of treated rooms.",
+"For poultry houses and crops, the work goes through our agrovet service, where product choice, spraying equipment and timing depend on the farm."
+],
+"shop": { "href": "/c/veterinary-drugs.html", "label": "veterinary and poultry products" },
+"faqs": [
+{ "q": "How do I know if it is scabies?", "a": "Intense itching that is worse at night, a rash between fingers and on the wrists, and others in the household itching at the same time suggest scabies. See a health worker for a diagnosis and treatment." },
+{ "q": "Can you treat dust mites?", "a": "Dust mites are managed mostly by washing bedding hot, using covers and vacuuming. We can advise and treat upholstery where suitable." },
+{ "q": "Why am I being bitten after we removed a bird nest?", "a": "The mites in the nest look for a new host when the birds are gone. Clean the area, seal entries and we can treat the space." },
+{ "q": "Can you treat poultry red mites?", "a": "Yes, through our agrovet service. Send the size of the house and the number of birds on WhatsApp." }
+],
+"related": ["lice", "fleas", "bed-bugs", "ticks"]
+}
+]
+}

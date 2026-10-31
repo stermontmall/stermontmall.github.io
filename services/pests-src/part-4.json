@@ -1,0 +1,238 @@
+{
+"pests": [
+{
+"slug": "stored-grain-pests",
+"name": "Stored grain pests",
+"group": "Farm and stored-product pests",
+"title": "Stored Grain Pest Control in Kenya | Stermont Arcade",
+"desc": "Maize weevils, larger grain borer, grain moths, bean bruchids and flour beetles in Kenyan stores. Prevention, store hygiene and treatment for farms and traders.",
+"h1": "Stored grain pest control for Kenyan farms, stores and traders",
+"lead": "Dry grain properly, clean the store, use airtight storage and protect against weevils and borers before they spread.",
+"intro": [
+"Insects can destroy a large share of a harvest in storage. Maize, beans, sorghum, rice, wheat flour, dried cassava and pulses are attacked by a handful of beetles and moths that breed inside the grain, so the damage is often hidden until the grain is full of holes and flour. For farmers, traders, schools and millers, store pests mean lost food, lost income and grain that may no longer be safe to sell or eat.",
+"Damaged and damp grain also grows moulds, and some moulds produce aflatoxins that are harmful to health. So good storage is both a food loss issue and a food safety issue. The most reliable protection is a combination: harvest on time, dry well, clean and repair the store, use airtight or hermetic storage, check regularly and treat when needed."
+],
+"varieties": [
+{ "n": "Maize weevil (Sitophilus zeamais)", "d": "A small dark snout beetle that lays eggs inside kernels. The larvae feed inside, and adults emerge through round holes. It attacks maize, rice, sorghum and other grains." },
+{ "n": "Larger grain borer (Prostephanus truncatus)", "d": "A cylindrical dark beetle that bores into maize and dried cassava, producing a lot of flour-like dust. It can cause rapid losses in stored maize and cassava chips and is a major pest in East Africa." },
+{ "n": "Angoumois grain moth (Sitotroga cerealella)", "d": "A small buff moth whose larvae feed inside kernels in the field and store, leaving round exit holes and webbing." },
+{ "n": "Bean bruchids (bean weevils)", "d": "Small beetles that lay eggs on beans and other pulses. The larvae feed inside the seed and adults emerge through small round holes." },
+{ "n": "Flour beetles and grain beetles", "d": "Small reddish-brown beetles that attack broken grain, flour and meal and give it a bad smell. They often follow the main pests in dirty or damp stores." }
+],
+"signs": [
+"Small round holes in grain, and kernels that feel light or hollow",
+"Fine flour-like dust at the bottom of sacks or bins",
+"Live weevils, beetles or small moths on sacks, walls and floors",
+"Clumped, warm or damp grain with a musty smell",
+"Webbing and clumps in flour and meal",
+"Grain that was clean at harvest becoming damaged within weeks"
+],
+"riskTitle": "Why it matters",
+"risk": [
+"Storage pests reduce the weight, quality and price of grain, and they open the way for moulds. Aflatoxin contamination has caused serious illness in Kenya in the past, so do not eat visibly mouldy grain, and do not feed it to animals. Traders and millers also face rejected loads when grain is infested."
+],
+"causes": [
+"Harvesting late, or storing grain that is not dry enough",
+"Old grain and dust left in the store, sacks and bins from the previous season",
+"Infested grain mixed with a new harvest, or insects already in the field crop",
+"Cracks, gaps and open roofs that let in pests, rodents and moisture",
+"Leaving grain in open sacks, in damp rooms or on the floor"
+],
+"prevent": [
+"Harvest on time and dry the grain well before storage: the figure commonly given for maize is about 13.5 per cent moisture",
+"Clean, sweep and repair the store before the new harvest, and remove old grain and dust",
+"Use airtight or hermetic bags and containers, which deprive insects of air",
+"Keep sacks on pallets and away from walls, and keep rodents out",
+"Inspect the grain every few weeks for holes, dust and live insects",
+"Do not mix old and new grain, and use any chemical treatment only as the label directs"
+],
+"scope": "We inspect and advise on stores, treat empty stores and surfaces, and recommend protectants and equipment through our agrovet service. Fumigating grain inside a closed store is hazardous and must follow the product label and local rules, so we plan it with you in advance and tell you what to expect.",
+"approach": [
+"We inspect the store, look at the grain, sacks and floors, identify the pest and the source, and explain what needs cleaning and repair. We treat the store structure and surfaces, and where suitable we recommend the right grain protectant or storage option for the crop and the size of the harvest.",
+"For traders and millers, we offer regular inspections and treatment of warehouses, with a dated service report. For smallholders we can advise on airtight bags and simple store improvements."
+],
+"shop": { "href": "/c/fumigation-chemicals.html", "label": "fumigation chemicals and store treatments" },
+"faqs": [
+{ "q": "Can I still use maize that has weevil holes?", "a": "Insect-damaged grain is lower quality and more likely to have moulds. Do not use grain that smells musty or is visibly mouldy, and do not feed it to animals. Ask a health or agriculture officer if in doubt." },
+{ "q": "Are hermetic bags worth it?", "a": "They are a widely recommended way to protect grain without relying on chemicals alone, if the grain is dry and the bags are undamaged. Ask us about options." },
+{ "q": "When should I treat the store?", "a": "Before the new harvest goes in. Clean and treat the empty store, then keep the grain dry and check it regularly." },
+{ "q": "Do you treat warehouses and mills?", "a": "Yes, and we take requests from all 47 counties. Send the size of the store, the crop and your location on WhatsApp." }
+],
+"related": ["rodents", "carpet-beetles", "locusts", "termites"]
+},
+{
+"slug": "snakes",
+"name": "Snakes",
+"group": "Rodents and wildlife",
+"title": "Snake Safety and Prevention in Kenya | Stermont Arcade",
+"desc": "Snake safety for Kenyan homes and compounds: what attracts snakes, how to reduce the risk, what to do after a bite and who to call. We do not handle or kill snakes.",
+"h1": "Snake safety and prevention for Kenyan homes and compounds",
+"lead": "We do not catch or kill snakes. We help you remove what attracts them, and we explain what to do if one is in your compound or someone is bitten.",
+"intro": [
+"Kenya has many snake species. Most are harmless and eat rodents, frogs and insects, but some are venomous, including puff adders, cobras (including spitting cobras), mambas, boomslangs and some vipers. Snakes enter compounds because of shelter, rodents and water, not because they are looking for people.",
+"The safest approach is to reduce the reasons for snakes to be in your compound, avoid handling them and know what to do in an emergency. If a snake is in your house or yard, keep people and pets away, keep it in sight if you can do so from a distance, and call the relevant wildlife or snake-handling service."
+],
+"varieties": [
+{ "n": "Puff adder", "d": "A heavy, well-camouflaged viper that lies still on paths and in grass and often bites when stepped on. Its bite is serious and needs hospital care." },
+{ "n": "Cobras, including spitting cobras", "d": "Snakes that raise their front, can spit venom at the eyes and bite. Flush eyes with plenty of clean water and get medical help if venom is spat in the face." },
+{ "n": "Mambas and boomslangs", "d": "Fast, slender, mostly tree- or bush-dwelling snakes that are highly venomous but usually avoid people." },
+{ "n": "Harmless snakes", "d": "House snakes, rat snakes, sand snakes and pythons are among those that eat rodents and are not a danger of venomous bites. Pythons can still bite and should not be handled." }
+],
+"signs": [
+"A snake seen in the compound, in the roof, near the drain or in a store",
+"A shed snake skin, which is a papery tube in the grass or near walls",
+"Many rodents, frogs or birds around the house, which attract snakes",
+"Piles of rubble, long grass, stacked timber and thick bush near the walls",
+"Trails or tracks in loose soil, dust or sand",
+"Unexplained disturbances in poultry houses or around rabbit hutches"
+],
+"riskTitle": "What to do in an emergency",
+"risk": [
+"After a snakebite, move the person away from the snake, keep them calm and still, remove tight rings, watches and clothing near the bite and get to a hospital quickly, ideally one known to stock antivenom. Do not cut the wound, suck the venom, apply a tourniquet or give alcohol. If venom is spat into the eyes, rinse them with a lot of clean water and seek care. A photograph of the snake from a safe distance can help the hospital, but do not delay to take one."
+],
+"causes": [
+"Rodents, frogs and birds that live around the house and store",
+"Long grass, thick bush and rubbish heaps near buildings",
+"Stacked timber, bricks, iron sheets and rubble that give shelter",
+"Gaps under doors and around pipes, and holes in walls and eaves",
+"Poultry houses, rabbit hutches and animal feed stores that attract rodents"
+],
+"prevent": [
+"Control rodents in and around the house and stores, and keep feed in sealed containers",
+"Keep grass short and clear bush, rubbish and rubble from the walls",
+"Stack timber and bricks away from buildings and raise them off the ground",
+"Seal gaps under doors and around pipes and fit door sweeps",
+"Use a torch and closed shoes at night, and do not put hands in places you cannot see",
+"Keep children and pets from playing in long grass and rubble heaps"
+],
+"scope": "We do not catch, handle or kill snakes. For snake removal contact your local wildlife authority or a trained snake handler. What we do is rodent control, compound and store inspections, and advice on sealing and clearing that make a place less attractive to snakes.",
+"approach": [
+"We inspect the building and compound and identify what draws rodents and snakes: food, shelter, water and gaps. We then control rodents and give you a list of clearing and sealing steps. Rodent control is the part of snake prevention we can do directly.",
+"We recommend that everyone in the household knows the emergency steps above and the nearest hospital that treats snakebite."
+],
+"faqs": [
+{ "q": "Can you remove a snake from my house?", "a": "No. We do not handle snakes. Keep away, keep pets inside and call your local wildlife authority or a trained snake handler." },
+{ "q": "Do snake repellents work?", "a": "We do not recommend relying on repellents. Removing food, shelter and gaps is the dependable approach." },
+{ "q": "What should I do if someone is bitten?", "a": "Keep them calm and still, remove tight items near the bite and get to a hospital quickly. Do not cut, suck or use a tourniquet." },
+{ "q": "Does rodent control reduce snakes?", "a": "It removes a food source and can make a compound less attractive. It is one of several steps." }
+],
+"related": ["rodents", "scorpions", "spiders", "bats-and-birds"]
+},
+{
+"slug": "bats-and-birds",
+"name": "Bats and birds",
+"group": "Rodents and wildlife",
+"title": "Bat and Bird Proofing in Nairobi and Kenya | Stermont Arcade",
+"desc": "Bats in roofs and pigeons or other birds on buildings: droppings, noise, health risks and humane proofing. We exclude and clean, we do not harm wildlife.",
+"h1": "Bat and bird proofing for buildings in Nairobi and across Kenya",
+"lead": "We close the entry points and protect the building. We do not poison or harm bats or birds.",
+"intro": [
+"Bats roost in roof spaces, ceilings, wall cavities and under eaves. Pigeons, sparrows, starlings and other birds nest in gutters, ledges, signboards, air-conditioner housings and roof voids. Both leave droppings that stain and corrode surfaces, block gutters and make noise and smell, and the droppings can be a health hazard when dry dust is breathed in.",
+"Bats are wild animals, and many eat large numbers of insects. The responsible approach is exclusion: closing the gaps so they cannot come back, at a time when young are not present, rather than poisoning them. For birds, we use physical barriers, netting, spikes and sealing, along with cleaning of the areas that are affected."
+],
+"varieties": [
+{ "n": "Insect-eating bats", "d": "Small bats that roost in roofs and ceilings and fly out at dusk to hunt insects. They make scratching and squeaking sounds and leave small dark droppings that crumble to powder." },
+{ "n": "Fruit bats", "d": "Larger bats that roost in trees and sometimes in roofs and feed on fruit, leaving fruit remains and droppings below the roost." },
+{ "n": "Feral pigeons", "d": "City birds that nest on ledges, balconies, signboards and roofs and leave a lot of droppings and nesting material." },
+{ "n": "Sparrows, starlings and weaver birds", "d": "Smaller birds that nest in gaps in roofs and walls, in eaves and in vents, and can block pipes and gutters." }
+],
+"signs": [
+"Scratching, squeaking or fluttering in the ceiling at dusk or dawn",
+"Droppings below eaves, on window ledges, balconies and in the roof space",
+"Dark stains and a strong smell near a roost entry point",
+"Nesting material blocking gutters, vents and air conditioner housings",
+"Birds roosting in numbers on ledges and signboards",
+"Bat or bird mites biting people in rooms below a roost"
+],
+"riskTitle": "Health risks and why it matters",
+"risk": [
+"Dry bat and bird droppings can carry fungi that may cause lung illness when the dust is breathed, so do not sweep them dry. Wet them down and wear a mask, gloves and protective clothing, or ask a professional to do the cleaning. Do not handle bats with bare hands, because bats can carry rabies-related viruses. Bird droppings are slippery, acidic, and can damage paintwork and metal."
+],
+"causes": [
+"Small gaps in the roof, eaves, fascia, vents and wall tops",
+"Quiet, warm roof spaces and ceilings with no disturbance",
+"Ledges, signboards, balconies and sheltered spots for pigeons",
+"Food waste, open bins and people feeding birds",
+"Nearby trees with fruit or insects"
+],
+"prevent": [
+"Seal gaps in the roof, eaves and vents with mesh, once the animals have gone",
+"Fit netting, spikes or sloped covers on ledges and signboards used by pigeons",
+"Cover vents and air conditioner housings with mesh",
+"Keep bins covered and do not feed birds near the building",
+"Clean droppings regularly and safely, and wear a mask",
+"Check the roof and ceilings after storms and at the end of the rainy season"
+],
+"scope": "We do not poison, trap to kill or otherwise harm bats or birds. We inspect, find the entry points, and install proofing once the animals have left, and we clean and treat the affected areas. If young bats are present, we advise on waiting until they can fly before sealing.",
+"approach": [
+"We inspect the roof, eaves and ledges, find the entry and roost points, and plan the exclusion with you. We seal entry points, install netting or spikes where suitable, and clean and treat the droppings area. Where there are mites in a roost, we treat the space after the animals have gone.",
+"Because bats and birds return to old roosts, proofing is done thoroughly, and we check the work after the first rains."
+],
+"faqs": [
+{ "q": "Will you poison the bats in my roof?", "a": "No. We use exclusion: closing the gaps after the bats have left, and not when young are present. Poison is inhumane and unsafe." },
+{ "q": "Is bat or bird dropping dust dangerous?", "a": "It can be if breathed in. Wet it before cleaning and wear a mask and gloves, or ask us to do it." },
+{ "q": "Can you stop pigeons from landing on my building?", "a": "Netting, spikes and sloped covers on ledges and signboards, together with removing food and nesting material, reduce roosting." },
+{ "q": "Do you work in shopping centres and hotels?", "a": "Yes. We take requests from all 47 counties and can plan work to avoid disturbing customers." }
+],
+"related": ["snakes", "mites", "rodents", "flies"]
+},
+{
+"slug": "locusts",
+"name": "Locusts and grasshoppers",
+"group": "Farm and stored-product pests",
+"title": "Locust and Grasshopper Control in Kenya | Stermont Arcade",
+"desc": "Desert locust and grasshopper threats to Kenyan farms: how to spot hoppers and swarms, who responds to swarms, and how farmers can protect crops.",
+"h1": "Locust and grasshopper advice for Kenyan farms",
+"lead": "Report swarms early. County and national teams run swarm control. We help farms with scouting, protection and spraying equipment.",
+"intro": [
+"The desert locust is one of the most damaging migratory pests in the world. It normally lives alone in deserts, but after good rains it breeds fast, forms bands of wingless hoppers and then flying swarms that eat crops and pasture. Kenya saw its worst locust infestation in about 70 years in 2020, with swarms reaching dozens of counties, including Samburu, Marsabit, Isiolo, Meru and Laikipia.",
+"Swarm control is run by county disaster teams, national agencies and international partners, often with aerial spraying and ground surveillance. A single farm cannot stop a large swarm. What a farm can do is watch for early signs, report them quickly and protect its own crops with advice from an agricultural officer."
+],
+"varieties": [
+{ "n": "Desert locust (Schistocerca gregaria)", "d": "The migratory locust that forms huge swarms. Young hoppers are wingless and move in bands before they grow wings and fly in swarms." },
+{ "n": "Variegated grasshopper (Zonocerus variegatus)", "d": "A brightly coloured grasshopper that feeds on vegetables, cassava and many crops in parts of Africa, especially in warm, wet regions." },
+{ "n": "Other grasshoppers", "d": "Several grasshopper species damage pasture, maize, sorghum, millet and vegetables, especially in dry spells." }
+],
+"signs": [
+"Dense bands of small wingless hoppers moving across the ground",
+"Large clouds of flying insects landing on crops and trees",
+"Plants stripped of leaves, with a heavy fall of droppings",
+"Egg pods laid in bare sandy soil, which later hatch into hoppers",
+"News of swarms in neighbouring counties or from county government and agriculture offices",
+"Sudden loss of pasture or crop in a day"
+],
+"riskTitle": "Why it matters",
+"risk": [
+"Swarms can strip fields in hours and threaten food security and livelihoods. Spraying by aircraft and ground teams is the main control method for large swarms, and can affect livestock, bees and water if used carelessly, so farmers should keep animals away from sprayed areas as advised by officers."
+],
+"causes": [
+"Good rains in desert and semi-arid breeding areas, which allow rapid breeding",
+"Wind that carries swarms across borders and into new counties",
+"Bare sandy soil for egg laying and green vegetation to feed hoppers",
+"Delays in reporting and responding to the first bands and swarms",
+"Dry spells that push grasshoppers onto crops"
+],
+"prevent": [
+"Report bands, swarms and egg-laying sites immediately to your county agriculture or administration office",
+"Scout your fields often during rains and in the weeks after",
+"Follow instructions from agriculture officers and county teams on spraying and keeping people and animals away",
+"Do not use unknown chemicals on crops or near water, and always read the label",
+"Protect water sources, beehives and fish ponds when spraying is done nearby",
+"Keep records of crop loss and photos to help any support or claims process"
+],
+"scope": "Large swarm control belongs with government agencies. Our role is limited to farm-level advice, scouting plans, and supplying and servicing the sprayers and crop protection products that suit your crop, following the label and the advice of agriculture officers.",
+"approach": [
+"Through our agrovet service we visit the farm, check the crops and surroundings, and advise on early scouting, grasshopper control and protecting crops where officers recommend it. We can also advise on sprayers and personal protective equipment so that spraying is done safely.",
+"If you see a swarm or hopper bands, report it first. Then send us a photo and location on WhatsApp if you want help with the farm."
+],
+"shop": { "href": "/c/crop-insecticides.html", "label": "crop insecticides and sprayers" },
+"faqs": [
+{ "q": "Who should I tell when I see locusts?", "a": "Tell your county agriculture or administration office straight away. They coordinate with national agencies and responders." },
+{ "q": "Can a farm control a locust swarm alone?", "a": "Not a large swarm. Early reporting and the response by county and national teams are essential. Farms can protect crops with advice from officers." },
+{ "q": "Are grasshoppers the same as locusts?", "a": "Locusts are a type of grasshopper that forms swarms. Ordinary grasshoppers still damage crops, and need scouting and sometimes control." },
+{ "q": "Is spraying safe for livestock and bees?", "a": "Only if done as the label and the officers advise. Keep animals away from sprayed areas and protect water sources and beehives." }
+],
+"related": ["stored-grain-pests", "flies", "ticks", "bats-and-birds"]
+}
+]
+}

@@ -38,9 +38,12 @@ const PAGE = {
   'inverter': 'solar-system-installation-kenya',
   'plumbing': 'electrical-plumbing-maintenance-nairobi', 'electrical': 'electrical-plumbing-maintenance-nairobi'
 };
-const more = id => PAGE[id]
+// Pest items also link to their detailed pest page (generated from services/pests-src/*.json by build-services.mjs).
+const PEST_PAGE = { 'bed-bugs': ['bed-bugs', 'bed bugs'], 'cockroaches': ['cockroaches', 'cockroaches'], 'termites': ['termites', 'termites'], 'rodents': ['rodents', 'rats and mice'] };
+const more = id => (PAGE[id]
   ? `<p><a href="/services/${PAGE[id]}.html">Read the full service page: prices, areas and FAQs</a></p>`
-  : '<p><a href="#/blog/boost-weak-4g-5g-signal-rural-kenya">Read the full 4G and 5G signal guide</a></p>';
+  : '<p><a href="#/blog/boost-weak-4g-5g-signal-rural-kenya">Read the full 4G and 5G signal guide</a></p>')
+  + (PEST_PAGE[id] ? `<p><a href="/services/pests/${PEST_PAGE[id][0]}.html">Learn about ${PEST_PAGE[id][1]}: varieties, signs and prevention</a> &middot; <a href="/services/pests/">All pests we treat</a></p>` : '');
 
 const A = [
 { slug: 'get-rid-of-bed-bugs-kenya', t: 'How to permanently get rid of bed bugs in Kenya: the ultimate chemical and heat treatment guide', x: 'Why one spray fails and how heat plus chemical treatment clears the whole life cycle.', h: `<h2>How to permanently get rid of bed bugs in Kenya</h2><p>Bed bugs travel in luggage, second-hand furniture and shared laundry, and they spread in flats, hostels and Airbnbs. Getting rid of them for good means treating every life stage.</p><h3>Signs you have bed bugs</h3><ul><li>Small red bites in lines on arms, neck or back</li><li>Tiny dark spots on sheets and mattress seams</li><li>A sweet, musty smell in heavy infestations</li></ul><h3>Why sprays alone fail</h3><p>Eggs are hard to reach and survive many sprays. Nymphs hatch days later and the cycle restarts.</p><h3>Heat plus chemical treatment</h3><p>Sustained heat penetrates mattresses and furniture where liquids cannot. A chemical treatment chosen to be gentle on surfaces then covers cracks, frames and skirting. A follow-up visit catches nymphs that hatch afterwards.</p><h3>What you can do before we arrive</h3><ul><li>Wash bedding and clothes hot and dry them on high heat</li><li>Declutter around the bed</li><li>Do not move items to other rooms, which spreads bugs</li></ul><p>See our <a href="#svc-bed-bugs">bed bug eradication service</a> and <a href="#svc-upholstery">mattress disinfection</a>.</p><h3>Frequently asked questions</h3><h4>Can bed bugs live in a clean house?</h4><p>Yes. They feed on blood, not dirt, so cleanliness does not prevent them.</p><h4>How long before I can sleep in the room again?</h4><p>We tell you after the treatment based on the method used.</p>` },

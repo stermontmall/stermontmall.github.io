@@ -1,0 +1,294 @@
+{
+"pests": [
+{
+"slug": "bed-bugs",
+"name": "Bed bugs",
+"group": "Household crawling insects",
+"title": "Bed Bug Control in Nairobi and Kenya | Stermont Arcade",
+"desc": "Bed bug signs, bites, hiding places and how treatment works in Kenyan homes, hostels and short-stay rentals. Book an inspection in Nairobi or any county.",
+"h1": "Bed bug control in Nairobi and across Kenya",
+"lead": "Small, flat, night-feeding insects that live in beds, sofas and cracks. Find them early, treat the hiding places, and stop them travelling in your luggage.",
+"intro": [
+"Bed bugs are small, wingless insects that feed on the blood of people while they sleep. An adult is roughly the size of an apple seed, flat, and reddish brown, and it swells and darkens after a meal. They do not live in dirt. They live where people sleep, which is why they turn up in clean homes, boarding school dormitories, hostels, hotels and short-stay rentals as often as anywhere else.",
+"They spread by travelling with us: in luggage, bags, second-hand beds and sofas, bedding and clothes. A single mated female carried into a flat can start an infestation that is noticed only weeks later, when the bites begin. That delay is why early inspection matters more than guessing from bite marks."
+],
+"varieties": [
+{ "n": "Common bed bug (Cimex lectularius)", "d": "The species found worldwide. It lives in mattress seams, bed frames, headboards, sofas and cracks close to where people sleep." },
+{ "n": "Tropical bed bug (Cimex hemipterus)", "d": "A closely related species found in warm regions, including parts of Africa. It looks almost the same and is treated the same way, so you do not need to tell them apart before calling for help." },
+{ "n": "Nymphs and eggs", "d": "Young bed bugs are pale and tiny and are easy to miss. Eggs are about a millimetre long and are stuck into seams and crevices, which is why one treatment is often not enough." }
+],
+"signs": [
+"Small dark spots on mattress seams, sheets or the bed frame, which are droppings",
+"Tiny rusty or red stains on bedding from crushed bugs or bites that bled",
+"Pale, empty shed skins and tiny white eggs in seams and under headboards",
+"Itchy bites in lines or clusters on skin that is uncovered at night, though some people show no reaction at all",
+"A sweet, musty smell in a room with a heavy infestation",
+"Live bugs found behind headboards, in curtain folds, inside sofa seams or behind loose wallpaper and skirting"
+],
+"riskTitle": "Why it matters",
+"risk": [
+"Bed bug bites are itchy and can become inflamed if scratched. Bed bugs are not known to pass diseases from person to person, but the broken sleep, the stress and the cost of replacing furniture are real. For a hotel, hostel, school or Airbnb, a single guest review or parent complaint can do more damage than the treatment costs."
+],
+"causes": [
+"Second-hand beds, mattresses, sofas and clothes brought home without inspection",
+"Luggage placed on beds or upholstered chairs in hotels, lodges, buses and shared rooms",
+"Shared walls and ceilings in flats and hostels, where bed bugs move between rooms through gaps and pipes",
+"Clutter around beds that gives them more places to hide",
+"Guests, visitors and new tenants who carry them in without knowing"
+],
+"prevent": [
+"Inspect any second-hand bed, mattress or sofa in bright light before it enters your home",
+"Keep luggage off beds and upholstered seats when you travel, and check the mattress seams on arrival",
+"Wash bedding and clothes hot and dry them on high heat after a trip",
+"Use a zipped mattress cover so there are fewer places to hide, and keep the bed a little away from the wall",
+"Reduce clutter under and around beds",
+"Seal cracks along skirting boards and around sockets in shared walls"
+],
+"approach": [
+"We start with an inspection of beds, headboards, sofas, curtains and the cracks behind them, so the treatment goes where the bugs actually are and not only where they bite. We then treat those hiding places and, because eggs survive the first visit, we usually plan a follow-up visit.",
+"Before the visit we ask you to strip the bed, bag linen and clothes, and wash them hot. After the visit we tell you when you can return to the room and how to avoid carrying bugs from one room to the next."
+],
+"shop": { "href": "/c/bed-bug-killers.html", "label": "bed bug killers" },
+"faqs": [
+{ "q": "How do I know it is bed bugs and not mosquitoes or fleas?", "a": "Bite marks alone cannot tell you. Look for dark droppings, rusty stains and shed skins on the mattress seams and bed frame. If you find live bugs, or the signs above, book an inspection and we confirm what it is." },
+{ "q": "Can I sleep at home after treatment?", "a": "The technician tells you the re-entry time for the product used, which depends on the room. Treated rooms are aired, and bedding is put back clean. Follow the instructions you are given on the day." },
+{ "q": "Do bed bugs spread diseases?", "a": "They are not known to pass diseases from person to person. The main problems are itchy bites, loss of sleep and the cost of replacing furniture, so treat an infestation early." },
+{ "q": "Why do bed bugs come back after treatment?", "a": "Usually because eggs hatch after the first visit, or because new bugs arrive in luggage or second-hand furniture. A follow-up visit and the prevention steps above reduce the chance of a repeat." }
+],
+"related": ["fleas", "cockroaches", "lice", "mites"]
+},
+{
+"slug": "cockroaches",
+"name": "Cockroaches",
+"group": "Household crawling insects",
+"title": "Cockroach Control in Nairobi and Kenya | Stermont Arcade",
+"desc": "German, American, Oriental, brown-banded and smokybrown cockroaches in Kenyan homes and kitchens. Signs, health risks and gel baiting. Book an inspection.",
+"h1": "Cockroach control for Nairobi homes, kitchens and offices",
+"lead": "Five cockroach species behave in five different ways. We identify yours, bait the places they hide, and fix what lets them back in.",
+"intro": [
+"Cockroaches are among the most common pests in Kenyan kitchens, restaurants, flats and hostels. They hide in dark, warm gaps during the day and come out at night to feed on crumbs, grease, pet food and rubbish. Seeing one in daylight often means the hiding places are already crowded.",
+"Not every cockroach is the same, and the treatment that works for one species can be wasted on another. A small German cockroach lives indoors near food and water. A large American or smokybrown cockroach often comes up from drains and gutters. Finding out which one you have decides where to treat."
+],
+"varieties": [
+{ "n": "German cockroach", "d": "About 13 mm long, light brown with two dark stripes behind the head. It lives indoors in kitchens, bathrooms and food areas, close to food and water, and breeds fast." },
+{ "n": "American cockroach", "d": "A large reddish-brown cockroach, about 40 to 50 mm. It likes warm, damp places such as drains, sewers and boiler rooms, and can enter ground floors through damaged pipes and gaps." },
+{ "n": "Oriental cockroach", "d": "A dark brown to almost black cockroach, about 25 to 30 mm. It prefers cool, damp places such as drains, garages and basements and cannot climb smooth vertical surfaces well." },
+{ "n": "Brown-banded cockroach", "d": "A small cockroach with light bands across the wings. It is often found away from kitchens, behind pictures, inside appliances, in furniture and in clutter." },
+{ "n": "Smokybrown cockroach", "d": "A dark brown to mahogany cockroach about 30 to 35 mm long that lives mostly outdoors but flies and can enter upper floors and roofs on warm, humid evenings." }
+],
+"signs": [
+"Live cockroaches at night, or in the day when the hiding places are full",
+"Small dark droppings like pepper or coffee grounds along cupboard edges, hinges and appliance backs",
+"Egg cases (oothecae) in drawers, behind appliances and under sinks",
+"An oily, musty smell in a room with a big infestation",
+"Chew marks on food packaging, soap and cardboard",
+"Cockroaches coming up out of floor drains, sinks and bathroom outlets at night"
+],
+"riskTitle": "Health risks and why it matters",
+"risk": [
+"Cockroaches can contaminate food and surfaces with bacteria they pick up in drains and waste. Their droppings, shed skins and saliva contain allergens that are linked to asthma, especially in children. In a restaurant, hotel or school kitchen, a cockroach sighting can also lead to a failed inspection, bad reviews and lost customers."
+],
+"causes": [
+"Food crumbs, grease and spills left overnight, and uncovered rubbish",
+"Dripping taps, wet sink areas and blocked or unsealed floor drains",
+"Cardboard boxes, paper bags and stacked clutter, which give them hiding places",
+"Gaps around pipes, door frames and appliances that let them move between rooms and flats",
+"Cockroaches arriving on deliveries, in boxes and in second-hand appliances"
+],
+"prevent": [
+"Wipe surfaces and sweep floors every night, and do not leave dirty dishes overnight",
+"Store food, pet food and dry goods in sealed containers",
+"Use covered bins and take rubbish out daily",
+"Fix leaks and dripping taps, and keep sink areas dry at night",
+"Seal gaps around pipes, skirting and appliances, and fit mesh over floor drains",
+"Throw away cardboard boxes quickly, since they hide eggs and insects"
+],
+"approach": [
+"Gel baiting is the main method for indoor cockroaches. We place small amounts of bait in the cracks, hinges and appliance gaps where cockroaches hide, away from food surfaces. Baits work over days, not minutes, because cockroaches carry the bait back to others, so expect activity to drop over a week or more and plan a follow-up check.",
+"Sprays and foggers on their own usually do not clear an infestation, because cockroaches retreat into cracks. For outdoor species such as American and smokybrown cockroaches, we also look at drains, gutters, manholes and the outside walls. In commercial kitchens we can arrange a regular visit and give you a dated service report."
+],
+"shop": { "href": "/c/cockroach-ant-killers.html", "label": "cockroach and ant killers" },
+"faqs": [
+{ "q": "Can I keep using my kitchen during treatment?", "a": "Gel baiting is placed in cracks and hiding places away from food surfaces, so kitchens can often stay in use. The technician explains what to cover and clean before and after the visit." },
+{ "q": "Why am I seeing more cockroaches after treatment?", "a": "Bait draws cockroaches out of hiding as it takes effect, so you may see more for a few days. Activity should then fall. If it does not, tell us and we check the hiding places again." },
+{ "q": "Are cockroaches a sign of a dirty house?", "a": "No. They are drawn by warmth, water and food, and they travel between flats, shops and drains. Clean homes still get them, although good hygiene makes them easier to control." },
+{ "q": "How often should a restaurant be treated?", "a": "It depends on the size of the kitchen and the risk. We recommend a schedule after inspecting the premises, and we give a dated service report for inspections." }
+],
+"related": ["ants", "rodents", "bed-bugs", "flies"]
+},
+{
+"slug": "termites",
+"name": "Termites",
+"group": "Wood and structural pests",
+"title": "Termite Control in Nairobi and Kenya | Stermont Arcade",
+"desc": "Signs of termites in Kenyan homes, how subterranean, drywood and mound-building termites differ, and how inspection and treatment work. Book a site visit.",
+"h1": "Termite control in Nairobi and across Kenya",
+"lead": "Termites eat timber, paper and plants from the inside. We find where they come from, treat the soil and the wood, and show you how to keep them out.",
+"intro": [
+"Termites feed on wood, paper and other plant material, and they usually do it out of sight. By the time a door frame sounds hollow or a roof beam sags, a colony may have worked inside it for a long time. In Kenya they damage house timbers, roof trusses, furniture, fences, books, and crops and trees on farms.",
+"Different termites need different handling. Subterranean termites live in the soil and reach buildings through mud tubes. Drywood termites live inside the wood itself and are especially linked with coastal areas. Mound-building termites build the large mounds seen on many Kenyan farms and plots. We inspect first so that we treat the right source."
+],
+"varieties": [
+{ "n": "Subterranean termites", "d": "They nest underground and travel through the soil, building mud-covered shelter tubes to cross open surfaces. Their colonies can be large, so they usually cause the most serious damage." },
+{ "n": "Drywood termites", "d": "They live inside the wood they eat in small colonies and leave tiny waste pellets called frass. Winged reproductives leaving to start new nests are one sign. They are especially common near the coast." },
+{ "n": "Mound-building termites", "d": "Species such as Macrotermes and Odontotermes build large mounds and tunnels in the soil and can feed on timber, trees and crops near a plot or a farm house." },
+{ "n": "Flying termites (swarmers)", "d": "Winged adults often leave the colony after the first heavy rains and drop their wings near lights. Discarded wings on windowsills are a sign that a colony is close." }
+],
+"signs": [
+"Mud tubes running up foundations, walls or timber",
+"Wood that sounds hollow when tapped, or paint that bubbles or blisters over timber",
+"Tiny pellet-like droppings below a wooden surface, which can mean drywood termites",
+"Discarded wings on windowsills or floors after rain",
+"Doors and windows that start to stick, or floors that sag, because timber is being weakened",
+"Soil mounds or tunnels near the house, fences or trees"
+],
+"riskTitle": "What damage to expect",
+"risk": [
+"Termites do not harm people directly, but they weaken timber, damage furniture, documents and stored goods, and can cost a lot to repair if they are left alone. Damage is often hidden behind plaster, ceilings and cupboards, so a termite check is worth doing before buying or renting a property and again whenever you see mud tubes or swarmers."
+],
+"causes": [
+"Wood in contact with soil, such as door frames, fence posts and stored timber",
+"Leaking pipes, damp walls and poor drainage that keep soil and wood moist",
+"Old tree stumps, roots and buried wood near the building",
+"Building without a soil treatment under the foundation or slab",
+"A nearby mound or a neighbouring infested building"
+],
+"prevent": [
+"Keep timber, cardboard and firewood off the ground and away from walls",
+"Repair leaks, gutters and drainage so the soil beside the walls stays dry",
+"Remove old stumps, roots and timber offcuts from the plot",
+"Treat the soil under new buildings before the slab is cast",
+"Inspect door frames, skirting and roof timber once a year, and after heavy rains",
+"Do not ignore mud tubes: scraping them away does not remove the colony"
+],
+"approach": [
+"We inspect the building and the plot, trace the tubes and damage back to where the colony is likely to be, and explain what we find. Treatment may include treating the soil around the foundation, treating affected timber, and treating or removing a nearby mound where it is the source.",
+"Termite colonies are hidden and large, so an honest treatment plan includes a follow-up inspection. We cannot promise that every colony in a plot is found on the first visit, and we explain what we could not reach. For new builds, we advise on soil treatment before the floor is cast."
+],
+"shop": { "href": "/c/termite-control.html", "label": "termite control products" },
+"faqs": [
+{ "q": "How can I tell if termites are in my roof timber?", "a": "Look for mud tubes, hollow-sounding wood, tiny pellets below beams and wings after rain. A technician can check roof timber safely and tell you the extent of the damage." },
+{ "q": "Is scraping off mud tubes enough?", "a": "No. Termites rebuild the tubes, and the colony stays where it is. Keep the tubes as evidence for the inspection and book a check." },
+{ "q": "Do I need to move out during treatment?", "a": "Often not. The technician tells you which rooms to keep clear, how long to stay out and how to air the rooms afterwards." },
+{ "q": "Can termites be prevented in a new building?", "a": "Yes. Treating the soil before the slab is cast, keeping timber off the ground, and fixing leaks early reduce the risk a great deal. Ask us before the foundation is covered." }
+],
+"related": ["ants", "rodents", "silverfish", "stored-grain-pests"]
+},
+{
+"slug": "rodents",
+"name": "Rats and mice",
+"group": "Rodents and wildlife",
+"title": "Rat and Mouse Control in Nairobi and Kenya | Stermont Arcade",
+"desc": "Black rats, Norway rats and house mice in Kenyan homes, shops and farms. Signs, health risks, exclusion and tamper-resistant bait stations. Book an inspection.",
+"h1": "Rat and mouse control in Nairobi and across Kenya",
+"lead": "Rodents chew wiring, spoil food and carry disease. We find the entry points, set safe bait stations and help you close the gaps.",
+"intro": [
+"Rats and mice live close to people because we give them food, water and shelter. They breed quickly: a small problem in a roof or a store can become a large one within a few months. They gnaw through wood, plastic and cables, which is a fire risk, and they contaminate food with urine and droppings.",
+"The first step is to find out which rodent you have and how it gets in. Rats need a gap about the width of a thumb. Mice can pass through a gap about the width of a pencil. So the job is two things at once: reduce the number of rodents with bait or traps, and close the gaps so new ones cannot replace them."
+],
+"varieties": [
+{ "n": "Black rat (roof rat)", "d": "A slim, agile climber that nests in roofs, ceilings, trees and upper floors. It is the rat most often heard running overhead at night." },
+{ "n": "Norway rat (brown rat)", "d": "A heavier burrowing rat found around drains, rubbish, basements and ground-level gaps, often near restaurants and markets." },
+{ "n": "House mouse", "d": "A small mouse that lives in kitchens, cupboards, stores and furniture, and eats small amounts from many places." },
+{ "n": "Field rats and mice", "d": "In rural areas, multimammate rats and other field rodents live around crops, stores and farm houses, and move indoors after harvest or when fields are cleared." }
+],
+"signs": [
+"Droppings along walls, behind appliances and in cupboards, stores and roofs",
+"Gnaw marks on food packets, wood, soap and cables",
+"Scratching and running sounds at night in ceilings and walls",
+"Greasy rub marks along skirting and walls where rats travel",
+"Nests of shredded paper, cloth or insulation",
+"Burrows beside foundations, compost heaps and drains, and dead rodents with a smell in the ceiling"
+],
+"riskTitle": "Health risks and why it matters",
+"risk": [
+"Rodents contaminate food and surfaces with urine, droppings and hair. Rats can carry leptospirosis, a bacterial infection spread through urine, and rodents and their fleas have been linked to plague in parts of Kenya in the past. They also chew electrical cables, and gnawed wiring is a recognised cause of fires. A restaurant, shop or warehouse with rodents risks closure and spoiled stock."
+],
+"causes": [
+"Open rubbish, uncovered bins and food waste near the building",
+"Gaps around pipes, doors, roof eaves, air vents and drains",
+"Food stored on the floor or in open sacks and containers",
+"Dense bush, piles of timber or rubble against the walls",
+"Cracked or unsealed floor drains and sewer connections"
+],
+"prevent": [
+"Store food, grain and pet food in sealed metal or thick plastic containers off the floor",
+"Use covered bins and clear rubbish daily",
+"Seal gaps with metal mesh, cement or metal plates, since rodents chew soft materials",
+"Fit door sweeps and cover vents and drains with mesh",
+"Cut back branches that touch the roof, and clear bush and rubble from walls",
+"Fix leaks, because rodents need water"
+],
+"approach": [
+"We inspect the roof, stores, kitchen, drains and the outside of the building to find runs, droppings and entry points. We then place tamper-resistant bait stations along the runs. The stations keep bait away from children, pets and birds. Where there is a risk of a dead rodent in a wall or ceiling, we say so before we start.",
+"Bait alone does not solve a rodent problem, so we give you a list of gaps to seal and food stores to protect, and we return to check the stations. In restaurants, warehouses and schools we can arrange regular visits and a dated service report."
+],
+"shop": { "href": "/c/rodent-control.html", "label": "rodent control products" },
+"faqs": [
+{ "q": "Is rat bait safe for children and pets?", "a": "Bait can be dangerous if eaten. That is why we use tamper-resistant stations placed along rodent runs and keep bait away from places children and pets can reach. Tell the technician about pets and young children before the visit." },
+{ "q": "What if a rat dies inside the wall or ceiling?", "a": "It can happen, and it may produce a smell for a while. We explain the risk before treatment and sealing gaps where possible reduces it. Good ventilation helps while the smell passes." },
+{ "q": "Why do rats keep coming back?", "a": "Usually because food, rubbish or open gaps remain. Baiting reduces the numbers, but exclusion and clean storage keep new rodents out." },
+{ "q": "Do you treat farms and stores outside Nairobi?", "a": "Yes. We take rodent control requests from all 47 counties. Send your town and the type of premises on WhatsApp and we confirm the schedule and any travel cost." }
+],
+"related": ["cockroaches", "fleas", "snakes", "stored-grain-pests"]
+},
+{
+"slug": "ants",
+"name": "Ants",
+"group": "Household crawling insects",
+"title": "Ant Control in Nairobi and Kenya | Stermont Arcade",
+"desc": "Pharaoh, carpenter, sugar and safari (driver) ants in Kenyan homes and farms. Signs, what each type needs and how treatment works. Book an inspection.",
+"h1": "Ant control in Nairobi and across Kenya",
+"lead": "Small kitchen ants, wood-nesting carpenter ants and swarming safari ants need different treatment. We identify them first.",
+"intro": [
+"Ants are social insects, so what you see on the counter is only a few workers from a much bigger colony somewhere nearby. Spraying the ones you see usually kills only the workers, and the colony sends more. Good ant control follows the trail to the nest, and uses baits that workers carry home.",
+"In Kenyan homes you meet a handful of types again and again. Tiny ants swarm over sugar and fat in the kitchen. Larger black ants may nest in damp timber. After heavy rain, long columns of safari ants can march through a compound at night. Each needs its own approach."
+],
+"varieties": [
+{ "n": "Pharaoh ants", "d": "Tiny yellow to light-brown ants that nest in walls, behind skirting and in warm spots. Spraying can scatter a colony into many new nests, so baits are used instead. They are a particular worry in hospitals and food premises." },
+{ "n": "Sugar and kitchen ants", "d": "Small ants that follow trails to sugar, syrup, fat and pet food. They usually nest outdoors and enter through cracks, windows and door frames." },
+{ "n": "Carpenter ants", "d": "Large black or dark ants that make nests in damp or rotting wood. They do not eat the wood, but the tunnels weaken it, and they leave coarse sawdust-like debris." },
+{ "n": "Safari (driver) ants", "d": "Species of Dorylus that move in long columns with large soldiers on the sides. They are nomads, so they pass through a compound in a day or two, but they can overrun poultry houses, kennels and small penned animals and give painful bites." }
+],
+"signs": [
+"Steady trails of ants along walls, windowsills and pipes to food",
+"Ants gathering around sugar, honey, fat, pet bowls and rubbish bins",
+"Small piles of sawdust-like debris under timber, which can mean carpenter ants",
+"A column of large ants entering a house or a livestock shed at night",
+"Winged ants emerging in numbers from the same spot, which shows a mature nest nearby",
+"Ants inside electrical sockets, appliances or wall cavities"
+],
+"riskTitle": "Why it matters",
+"risk": [
+"Most ants are a nuisance and a food hygiene problem rather than a danger. Pharaoh ants can spread germs in hospitals and care homes. Carpenter ants can weaken damp timber. Safari ants can overwhelm chicks, rabbits and other penned animals and bite people who stumble into a column, so farms and homes with livestock should act as soon as a column is seen."
+],
+"causes": [
+"Food crumbs, spills, sweet drinks and unsealed sugar and pet food",
+"Gaps in window frames, door frames, walls and around pipes",
+"Damp or rotting timber that suits carpenter ants",
+"Plants and mulch touching the walls, which give trails a bridge indoors",
+"Heavy rain that floods nests and drives safari ant colonies on the move"
+],
+"prevent": [
+"Wipe counters, sweep floors and seal sugar, honey and pet food in tight containers",
+"Fix leaks and replace rotten timber",
+"Seal cracks around windows, doors and pipes",
+"Trim plants and branches that touch the walls",
+"Do not spray a pharaoh ant trail, since that can scatter the colony",
+"Keep poultry houses and kennels clear and raised, and tell us quickly if a safari ant column approaches"
+],
+"approach": [
+"We identify the ant, follow the trail to the entry point and the nest where possible, and choose between baits, crack-and-crevice treatment and outdoor perimeter treatment. Baits work slowly because workers carry them back to the colony, which is the point.",
+"Safari ants are treated around the area where they enter, and livestock and pets are moved clear first. A follow-up visit is arranged if the colony is large or you have more than one nest."
+],
+"shop": { "href": "/c/cockroach-ant-killers.html", "label": "cockroach and ant killers" },
+"faqs": [
+{ "q": "Why do ants come back after I spray them?", "a": "Spraying kills the workers you see but not the nest. Baits that workers carry home, with trail and entry-point treatment, are more effective for most household ants." },
+{ "q": "Are safari ants dangerous?", "a": "Their bites are painful and a column can overrun small animals. They usually move on within a day or two, but if they are inside a livestock shed or house, move people and animals clear and call us." },
+{ "q": "Do carpenter ants damage my roof?", "a": "They tunnel in damp or rotting timber and can weaken it over time. We look for the moisture problem as well as the nest, because dry sound timber is much less attractive to them." },
+{ "q": "Can you treat ants in a restaurant or hospital?", "a": "Yes. We use baits and crack treatment away from food surfaces and give you a dated service report for inspections." }
+],
+"related": ["cockroaches", "termites", "silverfish", "flies"]
+}
+]
+}

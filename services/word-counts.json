@@ -1,6 +1,6 @@
 {
  "services": {
-  "pest-control-fumigation-nairobi": 1292,
+  "pest-control-fumigation-nairobi": 1448,
   "solar-system-installation-kenya": 1229,
   "cctv-smart-security-installation-nairobi": 1035,
   "tv-mounting-audio-visual-setup-nairobi": 1071,
@@ -18,5 +18,30 @@
   "appliance-repair-or-replace-nairobi": 670,
   "deep-cleaning-checklist-nairobi": 626,
   "water-heater-and-leak-repair-nairobi": 658
+ },
+ "pests": {
+  "bed-bugs": 1145,
+  "cockroaches": 1128,
+  "termites": 1093,
+  "rodents": 1090,
+  "ants": 1071,
+  "fleas": 1122,
+  "ticks": 1085,
+  "mosquitoes": 1049,
+  "flies": 1057,
+  "lice": 1048,
+  "mites": 1092,
+  "bees-wasps-and-hornets": 1191,
+  "spiders": 1002,
+  "scorpions": 969,
+  "centipedes-and-millipedes": 962,
+  "silverfish": 888,
+  "clothes-moths": 930,
+  "carpet-beetles": 915,
+  "stored-grain-pests": 1199,
+  "snakes": 1077,
+  "bats-and-birds": 1047,
+  "locusts": 1025,
+  "index": 895
  }
 }

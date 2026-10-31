@@ -4,6 +4,8 @@ on:
     paths:
       - 'services/services-data.json'
       - 'services/services-extra.json'
+      - 'services/services-more.json'
+      - 'services/pests-src/**'
       - 'services/build-services.mjs'
   workflow_dispatch:
 permissions:
