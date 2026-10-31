@@ -1,16 +1,16 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 10:05 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
+Last saved: 2026-10-31 10:15 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
 ## NEWEST: No Kitale, all 47 counties, big cities first (branch `wip-services-600-words`, 2026-10-31 10:05 Africa/Nairobi)
 Owner: "remove Kitale from the list but include 47 counties on the services sections; focus mostly on Nairobi and other big cities in Kenya".
-### Done (branch pushed, NOT merged)
+### Done (MERGED to `main` as PR #90, 2026-10-31 10:15 Africa/Nairobi, merge 23ce08a)
 - [x] Kitale removed from `services-extra.json`, `services-more.json` (text only, no other copy changed). The build still FAILS if the word appears in any generated file. "Our crews are based in Nairobi and Kitale" now reads "Our head office is in Westlands, Nairobi, and we take bookings from all 47 counties".
 - [x] `services/build-services.mjs`: one list of 47 counties (Nairobi, then the counties of the big cities, then the rest A to Z; the build fails unless there are exactly 47). Every landing page gets "<service> in all 47 counties" (Nairobi home market, big cities first, travel cost confirmed on WhatsApp, full county list); every guide gets "Where this applies"; JSON-LD `areaServed` lists Nairobi + 46 counties + Kenya.
 - [x] `services/index.html` (hub): hero says "Nairobi first, then Mombasa, Kisumu, Nakuru, Eldoret and the other big cities, with bookings from all 47 counties"; hub JSON-LD `areaServed` has the 47 counties.
 - [x] `node services/build-services.mjs` ran clean: 19 files, no `UNDER 600 WORDS` line, min 626 words (guide deep-cleaning-checklist), landing pages 948-1,281. All JSON files parse. Generated pages were rebuilt, not hand-edited.
 ### Next
-- [ ] Open the PR `wip-services-600-words` -> `main`; merge after 2 service pages + 1 guide + the hub are opened on a phone (reload twice: the service worker may cache `services/app.js`).
+- [ ] Phone check after the Pages build: open `/services/`, 2 service pages and 1 guide, reload twice (the service worker may cache `services/app.js`). Merged at the owner's request before this check.
 - [ ] Optional: `wip-services-deep-pest` (separate bed bug / cockroach / termite / rodent / Airbnb pages) overlaps this branch; decide the order.
 ### Blocked / owner
 - The copy now SAYS services are taken from all 47 counties (Nairobi and big cities first, travel cost confirmed per job). Owner to confirm that is true. Still unconfirmed: the claims (90-day guarantee, low-odour, genuine parts, licensed staff), price ranges, and the compliance documents for tenders (none are claimed).
