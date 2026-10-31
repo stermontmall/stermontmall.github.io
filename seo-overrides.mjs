@@ -9,6 +9,8 @@ try { await import('./seo-product-extras.mjs'); } catch (e) { console.log('seo-p
 try { await import('./seo-fixes.mjs'); } catch (e) { console.log('seo-fixes skipped:', e.message); }
 // Then the rich-content pass (seo-rich-content.mjs): price-by-size table, local delivery towns + phone, how to order, PCPB link. To switch it off, delete this line.
 try { await import('./seo-rich-content.mjs'); } catch (e) { console.log('seo-rich-content skipped:', e.message); }
+// Then the category intro (seo-category-intro.mjs): a short unique intro built from each category's own products, so category pages are not thin. To switch it off, delete this line.
+try { await import('./seo-category-intro.mjs'); } catch (e) { console.log('seo-category-intro skipped:', e.message); }
 const O = JSON.parse(readFileSync('seo-overrides.json', 'utf8'));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s;
