@@ -23,7 +23,8 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     const file = `p/${f}`; let h = readFileSync(file, 'utf8');
     if (h.includes(MARK) || !/<h1>/.test(h)) continue;   // already done, or a redirect stub
     const before = h;
-    const name = unesc(h.match(/<h1>([\s\S]*?)<\/h1>/)[1].replace(/<[^>]+>/g, '').trim());
+    // The H1 starts with the "Buy" prefix (seo-meta.mjs buyName). The headings and sentences below add their own "Buy", so drop it here (no "Buy Buy Original ...").
+    const name = unesc(h.match(/<h1>([\s\S]*?)<\/h1>/)[1].replace(/<[^>]+>/g, '').trim()).replace(/^Buy\s+/i, '');
     const nm = esc(name);
 
     // 1) price table by size
