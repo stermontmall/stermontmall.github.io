@@ -1,8 +1,13 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 09:00 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
+Last saved: 2026-10-31 09:10 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST: Services link in the shop (branch `wip-shop-services-link`, 2026-10-31 09:00 Africa/Nairobi)
+## NEWEST: Services in the shop Categories tab (branch `wip-shop-services-categories`, 2026-10-31 09:10 Africa/Nairobi)
+Owner asked for Services also in the Categories tab. PR #86 (drawer link) is merged. In progress: `renderCategoriesView()` in `mobile-shell/app.js` adds a "Services" link (`/services/`) to the left rail (after Top Categories) and as the first tile of Top Categories; `index.html` `app.js?v=10` -> `v=11`. It is a link, not a product category, so it opens the services page.
+- [ ] NEXT: `python3 mobile-shell/shell.test.py`, PR, merge; owner reloads the shop twice and opens Categories.
+- [ ] STILL OPEN: `services/sitemap-services.xml` in `sitemap.xml`/Search Console; owner confirms claims and price ranges.
+
+## (previous) Services link in the shop (branch `wip-shop-services-link`, 2026-10-31 09:00 Africa/Nairobi)
 Owner: the Services section is not reachable from the shop ("All categories" drawer had no Services). In progress: `mobile-shell/app.js` `renderDrawer()` now puts a "Services" link to `/services/` first in the drawer; `index.html` `app.js?v=9` -> `v=10`. PR #84 (services hub links, violet theme) is merged and deployed (pages build #722 green).
 - [ ] NEXT: `python3 mobile-shell/shell.test.py` (expect all pass), PR, merge, then owner reloads the shop twice (service worker) and opens All categories.
 - [ ] STILL OPEN: `services/sitemap-services.xml` in `sitemap.xml`/Search Console; owner confirms claims and price ranges.
