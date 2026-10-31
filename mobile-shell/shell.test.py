@@ -188,6 +188,8 @@ with sync_playwright() as p:
     check('leaving Home pushed an entry for the tab', pg.evaluate('history.state.tab') == 'categories')
     check('chips hidden off Home', not pg.locator('#chips-wrap').is_visible())
     pg.screenshot(path=f'{OUT}/shot-categories.png')
+    check('categories rail shows real product photos', pg.locator('#cat-side [data-side] img[src^="http"]').count() >= 1)
+    check('categories rail keeps an icon on every row', pg.evaluate("[...document.querySelectorAll('#cat-side [data-side]')].every(b => b.querySelector('img') || b.querySelector('span').textContent.trim().length > 0)"))
     pg.locator('#cat-side [data-side="agrovet"]').click()
     check('side list swaps right grid', 'Fungicides' in pg.locator('#cat-main').inner_text())
     h1_after = pg.evaluate('history.length')
