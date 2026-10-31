@@ -5,6 +5,8 @@
 //   services/guides/index.html      guides index
 //   services/sitemap-services.xml   URLs of all pages above
 //   services/word-counts.json       words of the main copy of every page (target 600 or more)
+// LOOK: every page uses the shop's mobile shell on phones (/shell-chrome.js top bar + bottom nav, /services/page.js) and the
+// same violet hero as the hub. Desktop keeps the plain full page. Never hand-edit the generated pages; edit this file.
 // OWNER RULE: the word "Kitale" must never appear in a generated page. The build fails if it does.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -47,27 +49,79 @@ const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(
 const kes = n => 'KSh ' + Number(n).toLocaleString('en-US');
 const wa = t => `https://wa.me/${WA}?text=${encodeURIComponent(t)}`;
 const ld = o => `<script type="application/ld+json">${JSON.stringify(o)}</script>`;
-const words = html => html.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<a class="btn[^>]*>[\s\S]*?<\/a>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').split(/\s+/).filter(Boolean).length;
+const words = html => html.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<a class="btn[^>]*>[\s\S]*?<\/a>/g, ' ').replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').split(/\s+/).filter(Boolean).length;
 const counts = { services: {}, guides: {} };
 
 // Same theme as the shop: violet #7c3aed (theme-color), dark violet #5b21b6 for headings, tint #f1ebff, line #e6e1f5.
 const CSS = `:root{--bg:#fff;--fg:#1e1b2e;--mut:#5f5a73;--card:#f1ebff;--brand:#7c3aed;--brand-fg:#fff;--link:#5b21b6;--line:#e6e1f5}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14111f;--fg:#ece8f7;--mut:#a79fbd;--card:#1d1830;--brand:#a78bfa;--brand-fg:#1b1033;--link:#c4b5fd;--line:#322a4a}}
-*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:calc(60px + env(safe-area-inset-top,0px))}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
-main{max-width:760px;margin:0 auto;padding:16px}
-nav.crumbs{font-size:14px;color:var(--mut);margin:4px 0 12px}nav.crumbs a{color:var(--mut)}
-h1{font-size:1.6rem;line-height:1.25;margin:.2em 0 .4em}h2{font-size:1.25rem;margin:1.6em 0 .5em;color:var(--link)}h3{font-size:1.05rem;margin:1em 0 .3em}
-.lead{font-size:1.05rem;color:var(--mut)}
-.price{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:16px 0}
-.price b{font-size:1.3rem;color:var(--link)}
-.btn{display:inline-block;background:var(--brand);color:var(--brand-fg);padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:600;margin:6px 8px 6px 0}
-.btn.alt{background:transparent;color:var(--link);border:1px solid var(--brand)}
+body.stm-chrome{padding-top:0}
+main{max-width:760px;margin:0 auto;padding:0 16px 24px}
+nav.crumbs{font-size:13px;color:var(--mut);margin:12px 0 10px}nav.crumbs a{color:var(--mut)}
+a{color:var(--link)}
+.hero{margin:0 -16px 8px;padding:24px 16px 22px;background:linear-gradient(135deg,#4c1d95,#7c3aed 55%,#a855f7);color:#fff;border-radius:0 0 26px 26px}
+.hero .eyebrow{margin:0;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;opacity:.85}
+.hero h1{color:#fff;font-size:1.55rem;line-height:1.25;margin:.35em 0 .5em}
+.hero .lead{color:rgba(255,255,255,.92);font-size:.98rem;margin:0 0 14px}
+.pricebox{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:14px;padding:12px 14px;margin:0 0 14px}
+.pricebox span{display:block;font-size:.8rem;opacity:.85}.pricebox b{display:block;font-size:1.35rem}.pricebox small{display:block;opacity:.85;line-height:1.4;margin-top:2px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;background:var(--brand);color:var(--brand-fg);padding:10px 18px;border-radius:999px;border:1px solid transparent;text-decoration:none;font-weight:600}
+.btn.light{background:#fff;color:#4c1d95}
+.btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.75)}
+.btn.alt{background:transparent;color:var(--link);border-color:var(--brand)}
+.chips{list-style:none;display:flex;gap:8px;flex-wrap:wrap;padding:0;margin:14px 0 0}
+.chips li{background:rgba(255,255,255,.16);border-radius:999px;padding:4px 12px;font-size:.82rem;margin:0}
+h2{font-size:1.2rem;line-height:1.3;margin:1.7em 0 .6em;color:var(--link);border-left:4px solid var(--brand);padding-left:10px}
+h3{font-size:1.05rem;margin:1em 0 .3em}
+p{margin:.7em 0}
+.price{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:20px 0}
+.price b{font-size:1.2rem;color:var(--link)}
 ul,ol{padding-left:1.2em}li{margin:.3em 0}
-details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;background:var(--card)}summary{cursor:pointer;font-weight:600}
-.grid{display:grid;gap:8px;grid-template-columns:1fr}.grid a{display:block;padding:10px 12px;border:1px solid var(--line);border-radius:10px;text-decoration:none;color:var(--fg)}
+ul.checks,ol.steps{list-style:none;padding:0}
+.checks li{position:relative;padding:10px 12px 10px 40px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin:8px 0}
+.checks li::before{content:"✓";position:absolute;left:14px;top:10px;color:var(--brand);font-weight:700}
+.steps{counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:12px 12px 12px 56px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin:8px 0}
+.steps li::before{content:counter(s);position:absolute;left:13px;top:11px;width:30px;height:30px;border-radius:50%;background:var(--brand);color:var(--brand-fg);display:grid;place-items:center;font-weight:700}
+details{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0;background:var(--card)}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;align-items:center;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"›";margin-left:auto;font-size:1.4rem;line-height:1;color:var(--mut);transition:transform .2s}
+details[open] summary::after{transform:rotate(90deg)}
+details p{margin:.6em 0 0}
+.tiles{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+@media (min-width:640px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;color:var(--fg)}
+.tile .art{display:grid;place-items:center;aspect-ratio:16/10;background:linear-gradient(135deg,var(--g1),var(--g2))}
+.tile .art svg{width:44px;height:44px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.tile b{display:block;padding:10px 12px 0;font-size:.92rem;line-height:1.25}
+.tile small{display:block;padding:2px 12px 12px;color:var(--mut);font-size:.8rem}
+.grid{display:grid;gap:8px;grid-template-columns:1fr}
+.grid a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--fg);background:var(--card)}
 .grid small{display:block;color:var(--mut)}
-footer{color:var(--mut);font-size:14px;margin:32px 0 8px;border-top:1px solid var(--line);padding-top:12px}a{color:var(--link)}`;
+.fab{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;padding:12px 20px;box-shadow:0 6px 18px rgba(76,29,149,.35)}
+body.stm-chrome .fab{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+footer{color:var(--mut);font-size:14px;margin:32px 0 8px;border-top:1px solid var(--line);padding-top:12px}
+@media (prefers-reduced-motion:reduce){summary::after{transition:none}}`;
+
+// One simple line icon and one violet-family gradient per service, shown on the "Other services" tiles.
+const ICONS = {
+  'pest-control-fumigation-nairobi': '<rect x="7" y="8" width="10" height="11" rx="5"/><path d="M9 8a3 3 0 016 0M12 8v11M3 10l4 2M21 10l-4 2M3 17l4-2M21 17l-4-2"/>',
+  'solar-system-installation-kenya': '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+  'cctv-smart-security-installation-nairobi': '<rect x="3" y="7" width="14" height="9" rx="2"/><path d="M17 10l4-2v8l-4-2M8 16v3h5"/>',
+  'tv-mounting-audio-visual-setup-nairobi': '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  'agrovet-spraying-crop-consultancy-kenya': '<path d="M12 21v-8M12 13c0-4 3-6 7-6 0 4-3 6-7 6zM12 15c0-3-2-5-6-5 0 3 2 5 6 5z"/>',
+  'home-appliance-repair-nairobi': '<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M8 7h2"/>',
+  'deep-cleaning-carpet-wash-nairobi': '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',
+  'electrical-plumbing-maintenance-nairobi': '<path d="M13 3L5.5 13.5H11L10 21l7.5-10.5H12z"/>'
+};
+const GRADS = [['#4c1d95', '#7c3aed'], ['#6d28d9', '#a855f7'], ['#5b21b6', '#8b5cf6'], ['#7c3aed', '#c084fc']];
+const icon = slug => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[slug] || ICONS['electrical-plumbing-maintenance-nairobi']}</svg>`;
+const tile = (o, i) => `<a class="tile" href="/services/${o.slug}.html"><span class="art" style="--g1:${GRADS[i % 4][0]};--g2:${GRADS[i % 4][1]}">${icon(o.slug)}</span><b>${esc(o.name)}</b><small>${kes(o.priceMin)} to ${kes(o.priceMax)}${o.priceOpen ? '+' : ''}</small></a>`;
+const hero = ({ eyebrow, h1, lead, priceHtml = '', cta = '', chips = [] }) => `<header class="hero"><p class="eyebrow">${esc(eyebrow)}</p><h1>${esc(h1)}</h1><p class="lead">${lead}</p>${priceHtml}${cta ? `<div class="cta">${cta}</div>` : ''}${chips.length ? `<ul class="chips">${chips.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}</header>`;
 
 function head({ title, desc, url, extra = '' }) {
   return `<!doctype html><html lang="en-KE"><head><meta charset="utf-8">
@@ -79,7 +133,7 @@ function head({ title, desc, url, extra = '' }) {
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${SITE}/icon-512.png">
 <meta name="twitter:card" content="summary"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}">
 <link rel="icon" href="/favicon.png">
-<style>${CSS}</style>${extra}</head><body><main>`;
+<style>${CSS}</style>${extra}<script src="/shell-chrome.js?v=1" defer></script><script src="/services/page.js?v=1" defer></script></head><body><main>`;
 }
 const foot = `<footer>Stermont Arcade, head office: The Sarit Centre, Karuna Road, Westlands, Nairobi. WhatsApp <a href="${wa('Hello Stermont Arcade, I need a service quote.')}">+254 748 888 230</a>. Pay by M-Pesa. Prices are estimates and are confirmed after inspection. <a href="/services/">All services</a> · <a href="/services/guides/">Guides</a> · <a href="/">Shop</a></footer></main></body></html>`;
 
@@ -120,13 +174,18 @@ for (const s of data.services) {
   const priceTxt = `${kes(s.priceMin)} to ${kes(s.priceMax)}${s.priceOpen ? '+' : ''}`;
   let h = head({ title: s.metaTitle, desc: s.metaDesc, url, extra: jsonld.map(ld).join('') });
   h += `<nav class="crumbs"><a href="/">Home</a> / <a href="/services/">Services</a> / ${esc(s.name)}</nav>
-<h1>${esc(s.h1)}</h1><p class="lead">${esc(s.short)}</p>
-<div class="price"><div>Typical price range</div><b>${priceTxt}</b><div>${esc(s.priceNote)}</div></div>
-<p><a class="btn" href="${ask}">Get a quote on WhatsApp</a><a class="btn alt" href="#faq">Common questions</a></p>
+${hero({
+    eyebrow: 'Stermont Arcade services',
+    h1: s.h1,
+    lead: esc(s.short),
+    priceHtml: `<div class="pricebox"><span>Typical price range</span><b>${priceTxt}</b><small>${esc(s.priceNote)}</small></div>`,
+    cta: `<a class="btn light" href="${ask}">Get a quote on WhatsApp</a><a class="btn ghost" href="#faq">Common questions</a>`,
+    chips: ['Quote after inspection', 'Pay by M-Pesa', 'Nairobi and all 47 counties']
+  })}
 ${s.intro.map(p => `<p>${esc(p)}</p>`).join('')}
-<h2>What is included</h2><ul>${s.included.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
-<h2>How it works</h2><ol>${s.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
-<h2>What decides the price</h2><ul>${s.priceFactors.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
+<h2>What is included</h2><ul class="checks">${s.included.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
+<h2>How it works</h2><ol class="steps">${s.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
+<h2>What decides the price</h2><ul class="checks">${s.priceFactors.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
 ${s.extraSections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).join('')}`).join('')}
 <h2>Who we serve</h2><p>${esc(s.audience)}</p>
 <h2>Where we work</h2><p>${esc(s.areas)}</p>
@@ -136,7 +195,8 @@ ${s.guaranteeNote ? `<h2>Our promise</h2><p>${esc(s.guaranteeNote)}</p>` : ''}
 ${s.searches.length ? `<h2>Popular searches in Kenya</h2><p>${s.searches.map(esc).join(' · ')}</p>` : ''}
 ${guide ? `<h2>Read the guide</h2><p><a href="/services/guides/${guide.slug}.html">${esc(guide.title)}</a></p>` : ''}
 <p><a class="btn" href="${ask}">Book ${esc(s.name)}</a></p>
-<h2>Other services</h2><div class="grid">${others.map(o => `<a href="/services/${o.slug}.html">${esc(o.name)}<small>${kes(o.priceMin)} to ${kes(o.priceMax)}${o.priceOpen ? '+' : ''}</small></a>`).join('')}</div>` + foot;
+<h2>Other services</h2><div class="tiles">${others.map((o, i) => tile(o, i)).join('')}</div>
+<a class="btn fab" href="${ask}">Get a quote</a>` + foot;
   counts.services[s.slug] = words(h.slice(h.indexOf('<h1>'), h.indexOf('<h2>Other services</h2>')));
   write(`${s.slug}.html`, h);
 }
@@ -153,13 +213,18 @@ for (const g of data.guides) {
   const ask = wa(`Hello Stermont Arcade, I read your guide and would like a quote for ${s.name}. My location is: `);
   let h = head({ title: g.title + ' | Stermont Arcade', desc: g.desc, url, extra: jsonld.map(ld).join('') });
   h += `<nav class="crumbs"><a href="/">Home</a> / <a href="/services/">Services</a> / <a href="/services/guides/">Guides</a></nav>
-<h1>${esc(g.title)}</h1>
-<p class="lead"><b>Quick answer:</b> ${esc(g.answer)}</p>
+${hero({
+    eyebrow: 'Guide',
+    h1: g.title,
+    lead: `<b>Quick answer:</b> ${esc(g.answer)}`,
+    cta: `<a class="btn light" href="${ask}">Get a quote on WhatsApp</a><a class="btn ghost" href="/services/${s.slug}.html">See the service page</a>`
+  })}
 ${g.sections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).join('')}`).join('')}
 <h2>Where this applies</h2><p>${esc(s.name)} is available in Nairobi and the other big cities (${BIG_CITIES.filter(c => c !== 'Nairobi').join(', ')}), and we take requests from all 47 counties. Send your town on WhatsApp and we confirm the schedule and any travel cost.</p>
 <h2>Questions people ask</h2>${g.faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
 <div class="price"><div>Need this done?</div><b>${esc(s.name)}: ${kes(s.priceMin)} to ${kes(s.priceMax)}${s.priceOpen ? '+' : ''}</b></div>
-<p><a class="btn" href="${ask}">Get a quote on WhatsApp</a><a class="btn alt" href="/services/${s.slug}.html">See the service page</a></p>` + foot;
+<p><a class="btn" href="${ask}">Get a quote on WhatsApp</a> <a class="btn alt" href="/services/${s.slug}.html">See the service page</a></p>
+<a class="btn fab" href="${ask}">Get a quote</a>` + foot;
   counts.guides[g.slug] = words(h.slice(h.indexOf('<h1>'), h.indexOf('<div class="price"><div>Need this done?')));
   write(`guides/${g.slug}.html`, h);
 }
@@ -167,8 +232,9 @@ ${g.sections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).jo
 {
   const url = `${SITE}/services/guides/`;
   let h = head({ title: 'Home Services Guides for Nairobi and Kenya | Stermont Arcade', desc: 'Plain-language guides on pest control, solar, CCTV, appliance repair, cleaning and more, with typical Kenyan prices.', url });
-  h += `<nav class="crumbs"><a href="/">Home</a> / <a href="/services/">Services</a> / Guides</nav><h1>Service guides for Nairobi and Kenya</h1>
-<p class="lead">Straight answers and typical prices before you book.</p><div class="grid">${data.guides.map(g => `<a href="/services/guides/${g.slug}.html">${esc(g.title)}<small>${esc(g.desc)}</small></a>`).join('')}</div>` + foot;
+  h += `<nav class="crumbs"><a href="/">Home</a> / <a href="/services/">Services</a> / Guides</nav>
+${hero({ eyebrow: 'Guides', h1: 'Service guides for Nairobi and Kenya', lead: 'Straight answers and typical prices before you book.' })}
+<h2>All guides</h2><div class="grid">${data.guides.map(g => `<a href="/services/guides/${g.slug}.html">${esc(g.title)}<small>${esc(g.desc)}</small></a>`).join('')}</div>` + foot;
   write('guides/index.html', h);
 }
 
