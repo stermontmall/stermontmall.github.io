@@ -243,6 +243,23 @@ with sync_playwright() as p:
     check('stale mock-era cart lines are dropped', p3.locator('#bottom-nav [data-badge="cart"]').is_hidden())
     c3.close()
 
+    # a reload on a tab other than Home stays on that tab (owner bug 2026-10-31: refreshing the Categories tab went back to the home page)
+    c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12)
+    p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
+    p12.goto(URL); p12.wait_for_selector('#grid .card[data-id]')
+    p12.locator('#bottom-nav [data-tab="categories"]').click()
+    p12.reload(); p12.wait_for_selector('#cat-main li', timeout=10000)
+    check('reload on Categories stays on Categories', p12.locator('#view-categories').is_visible() and p12.locator('#view-home').is_hidden() and p12.locator('#bottom-nav [data-tab="categories"][aria-current="page"]').count() == 1 and p12.evaluate('history.state.tab') == 'categories')
+    check('after that reload the home chips stay hidden', not p12.locator('#chips-wrap').is_visible())
+    p12.go_back(); p12.wait_for_timeout(400)
+    check('Back after reloading on Categories still returns to Home', p12.locator('#view-home').is_visible() and p12.locator('#bottom-nav [data-tab="home"][aria-current="page"]').count() == 1 and p12.url == URL, p12.url)
+    p12.locator('#bottom-nav [data-tab="cart"]').click(); p12.reload(); p12.wait_for_selector('#view-cart:not([hidden])', timeout=10000)
+    check('reload on Cart stays on Cart', p12.locator('#bottom-nav [data-tab="cart"][aria-current="page"]').count() == 1 and p12.locator('#view-home').is_hidden())
+    p12.locator('#bottom-nav [data-tab="deals"]').click(); p12.reload(); p12.wait_for_selector('#deals-grid .card[data-id]', timeout=10000)
+    check('reload on Deals stays on Deals and the badge stays cleared', p12.locator('#bottom-nav [data-tab="deals"][aria-current="page"]').count() == 1 and p12.locator('#bottom-nav [data-badge="deals"]').is_hidden())
+    check('no page errors while reloading on tabs', not e12, e12[:3])
+    c12.close()
+
     # ---- the shell is now the home page (/): SEO head, handoff to the proven checkout, redirects ----
     BASE = URL.rstrip('/')
     html = pg.evaluate("fetch('/').then(r => r.text())")   # the HTML the server sends (the live page's title changes while a product is open)
