@@ -5,6 +5,7 @@
 //   services/guides/index.html      guides index
 //   services/sitemap-services.xml   URLs of all pages above
 //   services/word-counts.json       words of the main copy of every page (target 600 or more)
+// OWNER RULE: the word "Kitale" must never appear in a generated page. The build fails if it does.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,12 +26,14 @@ for (const g of data.guides) {
   if (e.faqs) g.faqs = g.faqs.concat(e.faqs);
 }
 // Second extra file: tender, city and checklist sections (added after the first file's sections).
+// Its "areas" text wins over the one in services-extra.json (which still names a town the owner has banned).
 const mf = path.join(dir, 'services-more.json');
 const more = fs.existsSync(mf) ? JSON.parse(fs.readFileSync(mf, 'utf8')) : { services: {}, guides: {} };
 for (const s of data.services) {
   const e = (more.services || {})[s.slug] || {};
   s.extraSections = s.extraSections.concat(e.sections || []);
   s.searches = s.searches.concat(e.searches || []);
+  if (e.areas) s.areas = e.areas;
   if (e.faqs) s.faqs = s.faqs.concat(e.faqs);
 }
 for (const g of data.guides) {
@@ -78,12 +81,12 @@ function head({ title, desc, url, extra = '' }) {
 <link rel="icon" href="/favicon.png">
 <style>${CSS}</style>${extra}</head><body><main>`;
 }
-const foot = `<footer>Stermont Arcade, The Sarit Centre, Westlands, Nairobi. WhatsApp <a href="${wa('Hello Stermont Arcade, I need a service quote.')}">+254 748 888 230</a>. Pay by M-Pesa. Prices are estimates and are confirmed after inspection. <a href="/services/">All services</a> · <a href="/services/guides/">Guides</a> · <a href="/">Shop</a></footer></main></body></html>`;
+const foot = `<footer>Stermont Arcade, head office: The Sarit Centre, Karuna Road, Westlands, Nairobi. WhatsApp <a href="${wa('Hello Stermont Arcade, I need a service quote.')}">+254 748 888 230</a>. Pay by M-Pesa. Prices are estimates and are confirmed after inspection. <a href="/services/">All services</a> · <a href="/services/guides/">Guides</a> · <a href="/">Shop</a></footer></main></body></html>`;
 
 const business = {
   '@type': 'LocalBusiness', '@id': SITE + '/#business', name: 'Stermont Arcade', url: SITE + '/',
   telephone: '+254748888230', priceRange: 'KES',
-  areaServed: [{ '@type': 'City', name: 'Nairobi' }, { '@type': 'City', name: 'Kitale' }, { '@type': 'Country', name: 'Kenya' }],
+  areaServed: [{ '@type': 'City', name: 'Nairobi' }, { '@type': 'Country', name: 'Kenya' }],
   address: { '@type': 'PostalAddress', streetAddress: 'The Sarit Centre, Karuna Road, Westlands', addressLocality: 'Nairobi', addressCountry: 'KE' }
 };
 
@@ -161,6 +164,11 @@ ${g.sections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).jo
 const urls = ['/services/', '/services/guides/', ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`)];
 write('sitemap-services.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
+
+// Owner rule: never publish the banned town name. Fail the build (so CI commits nothing) if any generated file has it.
+const banned = out.filter(rel => /kitale/i.test(fs.readFileSync(path.join(dir, rel), 'utf8')));
+if (banned.length) { console.error('BANNED TOWN NAME FOUND IN:', banned.join(', ')); process.exit(1); }
+
 const low = [...Object.entries(counts.services), ...Object.entries(counts.guides)].filter(([, n]) => n < 600);
 console.log('wrote', out.length, 'files', JSON.stringify(counts));
 if (low.length) console.log('UNDER 600 WORDS:', JSON.stringify(low));
