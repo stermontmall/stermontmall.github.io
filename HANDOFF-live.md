@@ -56,3 +56,7 @@ Bump `?v=` in `index.html` for every `app.js` / `tailwind.css` change (cache rul
 
 ## Update 2026-10-31 07:25 (Africa/Nairobi), branch `wip-seo-batch-08` (NOT merged)
 - [ ] Owner: "proceed with batch seo, descriptions and product blogs". STARTED batch 08 (category id 31, 8 products: Air Chopper 7.5SC, Bat CRP, Darvin 50EW, Fendona 60SC, K-Othrine WG 250, Navigator 100 SC, Promax 20EC Insecticide, Tatua Demand 10CS). Plan: (1) read catalog text from Supabase, (2) `seo-pest/batch-08.json` + `node seo-pest/build.test.mjs`, (3) back up old text to `description_backup` batch `pest-batch-08`, then write `products.description`, verify MD5, (4) `seo-pest/blogs-08.json` + `node seo-pest/blog-build.mjs blogs-08` + `node seo-pest/blog.test.mjs`, (5) merge, then confirm pages/blogs after the next bot run. Nothing written to Supabase yet.
+
+## Update 2026-10-31 07:55 (Africa/Nairobi), branch `wip-seo-batch-08`
+- [x] `seo-pest/batch-08.json` committed (8 products, 491-588 words each); `node seo-pest/build.test.mjs` = 1047 checks, 0 violations. Facts only from the catalog text (mixing rates for Fendona, K-Othrine, Promax and Bat CRP are the ones the catalog already published, under `dose`).
+- [ ] NEXT: back up the 13 rows to `description_backup` batch `pest-batch-08`, then write `products.description` (ONLY description) from `node seo-pest/build.mjs batch-08` (`seo-pest/out/batch-08.sql`, git-ignored) and verify MD5 of stored text = builder output. Not written to Supabase yet.
