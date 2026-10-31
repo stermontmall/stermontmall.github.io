@@ -71,7 +71,7 @@
   :root{--panel:#f3f4f6;--line:#e5e7eb;--ink:#1f2937}.seo-links .wrap{padding:0 12px 8px}.seo-links h2{color:var(--ink)}</style>
   <script>
   /* Desktop screens keep the full classic shop; old shared /#p-... product links open it too. The shell is the phone home page.
-     Crawlers are never redirected: they must read this page (its site name, title and links), not /classic.html (noindex). */
+     Crawlers and link-preview bots are never redirected: they must read this page (its site name, title and links), not the classic copy. */
   (function () {
     if (/bot|crawl|spider|slurp|googlebot|bingbot|inspectiontool|lighthouse|pagespeed|facebookexternalhit|whatsapp/i.test(navigator.userAgent || '')) return;
     var wide = window.matchMedia && matchMedia('(min-width:900px) and (pointer:fine)').matches;
