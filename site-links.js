@@ -15,7 +15,7 @@
     var foot = document.querySelector('footer .wrap') || document.querySelector('footer');
     if (!foot || foot.getAttribute('data-site-links')) return;
     foot.setAttribute('data-site-links', '1');
-    [['About', '/about.html'], ['FAQ', '/faq.html'], ['Contact us', '/contact.html'], ['Terms', '/terms.html']].forEach(function (it) {
+    [['Services', '/services/'], ['About', '/about.html'], ['FAQ', '/faq.html'], ['Contact us', '/contact.html'], ['Terms', '/terms.html']].forEach(function (it) {
       if (foot.querySelector('a[href$="' + it[1].slice(1) + '"]')) return;
       foot.appendChild(document.createTextNode(' \u00b7 '));
       var a = document.createElement('a'); a.href = it[1]; a.textContent = it[0]; foot.appendChild(a);
