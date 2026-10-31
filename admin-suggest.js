@@ -103,3 +103,9 @@
 
   window.STMSuggest = { attach: attach, rank: rank, words: words, hide: hide };
 })();
+
+/* Loader for the admin mobile shell look (phones). It sits here because this script is already loaded by admin.html and that file is large.
+   To undo: delete this block. Code: /admin-shell.js */
+(function () {
+  try { var s = document.createElement('script'); s.src = '/admin-shell.js?v=1'; s.defer = true; document.head.appendChild(s); } catch (e) {}
+})();
