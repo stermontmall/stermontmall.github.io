@@ -288,7 +288,7 @@
       vals.media = media; vals.created_by = STMAdmin.email() || null;
       return api('/rest/v1/service_posts?select=id', { method: 'POST', headers: { Prefer: 'return=representation' }, body: vals })
         .then(function (r) { if (!r.ok) return fail(r); return r.json(); })
-        .then(function () { f.reset(); f.msg('Posted: ' + vals.title); note('Posted: ' + vals.title, true); return loadPosts(list); });
+        .then(function () { var where = vals.service_slug ? (names[vals.service_slug] || vals.service_slug) : 'General (hub)'; f.reset(); f.msg('Posted to ' + where + ': ' + vals.title); note('Posted to ' + where + ': ' + vals.title, true); return loadPosts(list); });
     });
     L.appendChild(f.el);
     var fb = h('div', 'card sm'), fr = h('div', 'sm-row');
