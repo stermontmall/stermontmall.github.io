@@ -2,10 +2,10 @@
 Last saved: 2026-10-31 10:10 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST: Real product photos in the Categories tab left rail (branch `wip-rail-photos`, 2026-10-31 10:10 Africa/Nairobi)
+## NEWEST: Real product photos in the Categories tab left rail (branch `wip-rail-photos`, MERGED as PR #92, merge 1542676, 2026-10-31 10:15 Africa/Nairobi)
 Owner: "Switch them to real photos" (the emoji icons in the Categories tab rail; the drawer was done in PR #91).
 - [x] `renderCategoriesView()` in `mobile-shell/app.js`: each category row in the rail shows a 44px box with its first real product photo (`photoOf`), emoji fallback. Top Categories (star) and Services keep their emoji. Inline styles only (no tailwind rebuild). `index.html` `app.js?v=12` -> `v=13`. `shell.test.py` = 137/137 (2 new rail checks, fixture data).
-- [ ] NEXT: merge the PR, then on the phone open the shop twice and open Categories.
+- [ ] NEXT: on the phone open the shop twice and open Categories.
 
 
 ## NEWEST: Real product photos in the All categories drawer (branch `wip-drawer-photos`, MERGED as PR #91, merge bed2044, 2026-10-31 10:00 Africa/Nairobi)
