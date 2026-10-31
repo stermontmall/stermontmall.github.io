@@ -60,3 +60,8 @@ Bump `?v=` in `index.html` for every `app.js` / `tailwind.css` change (cache rul
 ## Update 2026-10-31 07:55 (Africa/Nairobi), branch `wip-seo-batch-08`
 - [x] `seo-pest/batch-08.json` committed (8 products, 491-588 words each); `node seo-pest/build.test.mjs` = 1047 checks, 0 violations. Facts only from the catalog text (mixing rates for Fendona, K-Othrine, Promax and Bat CRP are the ones the catalog already published, under `dose`).
 - [ ] NEXT: back up the 13 rows to `description_backup` batch `pest-batch-08`, then write `products.description` (ONLY description) from `node seo-pest/build.mjs batch-08` (`seo-pest/out/batch-08.sql`, git-ignored) and verify MD5 of stored text = builder output. Not written to Supabase yet.
+
+## Update 2026-10-31 08:05 (Africa/Nairobi), branch `wip-seo-batch-08`
+- [x] Re-ran `node seo-pest/build.test.mjs` = 1047 checks, 0 violations. Read the 8 rendered texts (`node seo-pest/build.mjs batch-08` -> `seo-pest/out/batch-08.txt`) against the stored catalog text: every fact matches; the stored Air Chopper text said "100 ml pack" on all four sizes, the new text lists all four sizes.
+- [x] BACKUP written: `description_backup` batch `pest-batch-08` (13 rows, all of category 31). Restore one row: `update products p set description = b.description from description_backup b where b.id = p.id and b.batch = 'pest-batch-08' and p.id = '<id>'`.
+- [ ] IN PROGRESS: writing `products.description` for the 8 groups with the 8 statements of `seo-pest/out/batch-08.sql` (ONLY description). Then verify: `select id, md5(description)` against `md5` of each `renderText()` (node). If a write was cut off, re-run the missing groups: the statements are idempotent.
