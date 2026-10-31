@@ -8,7 +8,10 @@ RULE (owner, 2026-10-31): after EVERY step (a commit, a merge, a finding, a bloc
 
 ## Update 2026-10-31 07:08 (Africa/Nairobi)
 - [x] `python3 mobile-shell/shell.test.py` on `main` (53d9a94) = 112/112, no console/page errors (fixture data). So the reload fix (PR #81, `app.js?v=7`) is merged AND tested. Still owed by the owner: phone check (open site twice, Categories, refresh: stays on Categories).
-- [ ] Owner said "Fix all". In progress: start the "sections load in the OLD web view" item below (step 2, category pages) on branch `wip-shell-category-pages`.
+## Update 2026-10-31 07:25 (Africa/Nairobi), branch `wip-shell-category-pages` (NOT merged)
+- [x] commit 1 (pushed): `app.js?v=8` opens `/?cat=<slug>` (`openCatLink`, top-level or sub-category).
+- [x] commit 2: `seo-shell-redirect.mjs` also has `injectCat` + CLI pass over `c/` (skips `index.html`, redirect stubs; idempotent, checked on a copy: 39 of 39 then 0 of 39); workflow step renamed (it already does `git add -A ... c ...`); 11 new "category redirect:" checks. `python3 mobile-shell/shell.test.py` = 123/123. Merged to `main` (see git log). The category pages get the script on the next "Build product pages" run (tap "Run workflow" to do it now). NEXT after that run: confirm `c/rodent-control.html` has `<!--stm-shell-cat-->`; then step 3 (static pages: account, track, shipping, returns, contact, faq, about, privacy, terms get a shared shell header + bottom nav). After the "Build product pages" run confirm `c/rodent-control.html` has `<!--stm-shell-cat-->`. RISK: Search Console "Page with redirect" for `/c/` (crawlers are excluded by user agent).
+- [ ] Owner said "Fix all". (older line) start the "sections load in the OLD web view" item below (step 2, category pages) on branch `wip-shell-category-pages`.
 
 ## In progress right now
 - [ ] (may be outdated, see the update above) Shell reload fix `wip-shell-reload-tab` is NOT merged. Run `python3 mobile-shell/shell.test.py` first (expect 5 more checks than before, 0 failures). Then open https://github.com/stermontmall/stermontmall.github.io/compare/main...wip-shell-reload-tab?expand=1 , create the PR (the owner taps Submit; Claude's GitHub tool only shows a form) and merge. After the merge: open the site twice on a phone, go to Categories, refresh: it must stay on Categories.

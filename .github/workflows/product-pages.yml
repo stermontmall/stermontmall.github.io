@@ -52,7 +52,7 @@ jobs:
         continue-on-error: true
         run: node seo-titles.mjs
 
-      - name: Phones on a product page go to the mobile shell, crawlers keep the page (seo-shell-redirect.mjs)
+      - name: Phones on a product or category page go to the mobile shell, crawlers keep the page (seo-shell-redirect.mjs)
         continue-on-error: true
         run: node seo-shell-redirect.mjs
 

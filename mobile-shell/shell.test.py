@@ -388,6 +388,43 @@ with sync_playwright() as p:
     check('address: on a desktop screen it opens that product\'s full page (/p/<slug>.html)', p10.evaluate('location.pathname') == '/p/agro-abc-250ml.html', p10.url)
     c10.close()
 
+    # category pages -> shell on phones (seo-shell-redirect.mjs, injectCat). The served /c/ page is the REAL generated page with the shipped script injected.
+    import subprocess, re as _re
+    def cat_page(slug):
+        js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.injectCat(require('fs').readFileSync('c/%s.html','utf8'))))" % slug
+        return subprocess.run(['node', '-e', js], cwd=ROOT, capture_output=True, text=True, check=True).stdout
+    def serve_c(ctx):
+        def h(rt):
+            m = _re.search(r'/c/([a-z0-9-]+)\.html', rt.request.url)
+            rt.fulfill(status=200, content_type='text/html', body=cat_page(m.group(1)))
+        ctx.route('**/c/*.html*', h)
+    check('category redirect: the injected category page carries the script and the page is otherwise unchanged', 'stm-shell-cat' in cat_page('rodent-control') and 'Rodent Control' in cat_page('rodent-control'))
+    check('category redirect: injecting twice gives the same page', cat_page('rodent-control').count('stm-shell-cat') == 1)
+    c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12); serve_c(c12)
+    p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
+    p12.goto(f'{BASE}/c/pest-control-fumigation.html'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
+    ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
+    check('category redirect: a phone on a category page lands in the shell on that category (only its products)', ids and all(i.startswith('pest-') for i in ids), ids)
+    check('category redirect: the address becomes / (no leftover ?cat=)', p12.evaluate('location.pathname + location.search') == '/', p12.url)
+    p12.goto(f'{BASE}/c/bed-bug-killers.html'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
+    ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
+    check('category redirect: a sub-category page opens its parent category filtered to that sub-category', ids and all(i.startswith('pest-') for i in ids) and p12.evaluate('location.pathname') == '/', ids)
+    p12.goto(f'{BASE}/?cat=no-such-category'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
+    check('category redirect: an unknown category shows a notice and the normal home', 'no longer available' in p12.locator('#toast').inner_text(), p12.locator('#toast').inner_text())
+    check('category redirect: no page errors', not e12, e12[:3])
+    c12.close()
+    for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
+                      ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
+                      ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
+        cx = b.new_context(**kw); mock_network(cx); serve_c(cx)
+        px = cx.new_page(); px.goto(f'{BASE}/c/rodent-control.html'); px.wait_for_timeout(1500)
+        check(f'category redirect: {label} keeps the category page (no redirect)', px.evaluate('location.pathname') == '/c/rodent-control.html', px.url)
+        cx.close()
+    cc2 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc2); serve_c(cc2)
+    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/rodent-control.html?classic=1'); pc2.wait_for_timeout(1500)
+    check('category redirect: ?classic=1 keeps the category page on a phone', pc2.evaluate('location.pathname') == '/c/rodent-control.html', pc2.url)
+    cc2.close()
+
     # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
     c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)
     p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_function("location.pathname !== '/'", timeout=15000); p6.wait_for_timeout(1500)
