@@ -1,16 +1,34 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 (Africa/Nairobi), claude.ai chat session with GitHub + Supabase connectors only (NO node, NO clone, NO network). USAGE LIMIT earlier hit at ~10:25 (resets 14:30).
+Last saved: 2026-10-31 10:30 (Africa/Nairobi), claude.ai chat session with GitHub + Supabase connectors only (NO node, NO clone, NO network). USAGE LIMIT earlier hit at ~10:25 (resets 14:30).
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST (chat session after the usage limit): status of the "Fix all" 4 jobs + services hub redesign
+## NEWEST (chat, 10:30): services pages get the mobile shell look + two untested commits on main
+Owner: "page is boring, not sure it uses the mobile shell ... make it appealing and professionally adopt the mobile shell; automatic save on handoff".
+FINDING: nothing under `services/` loads `shell-chrome.js` on `main`. The hub redesign sits on `wip-services-shell-look` (c066e71) with NO PR merged; the 8 generated service pages and 8 guides use the old plain look.
+### Done
+- [x] SLIP (this chat committed straight to `main`, not on a `wip-` branch, not tested, not logged at the time). Phone-check both; undo with `git revert <sha>`:
+  - `7a29a2f` `site-links.js`: "Services" (/services/) added as the FIRST footer link on every public page (one array item, +28 bytes).
+  - `178a424` `services/app.js` (hub): link text now "Read the full service page: prices, areas and FAQs" (was "tenders, cities"); "non-staining" softened to "chosen to be gentle on fabric, wood and walls" (bed bug description, bullet, guide). NOTE: `wip-services-shell-look` has an older `app.js`; on merge keep the `main` wording for those lines.
+- [x] `services/page.js` pushed to `wip-services-shell-look` (cfc4034): after `shell-chrome.js` it moves the bottom-nav highlight from Account to Categories. Desktop: no-op.
+### In progress
+- [ ] RESTYLE THE GENERATOR on `wip-services-shell-look`: `services/build-services.mjs` gets a hero panel (violet gradient like the hub), price box, check-mark lists, numbered steps, chevron FAQ accordions, per-service icon tiles for "Other services", a floating "Get a quote" button above the shell nav, and loads `/shell-chrome.js?v=1` + `/services/page.js?v=1` (phone top bar + bottom nav). Copy, JSON-LD, word counts, 47 counties, Kitale ban unchanged. Pages are NOT hand-edited.
+  - Pushing `build-services.mjs` triggers workflow "Build services pages" on that branch (bot commit "Build services pages"). CHECK: newest commit on the branch is the bot's, and `services/pest-control-fumigation-nairobi.html` contains `shell-chrome`. If the run fails nothing is committed (Actions > Build services pages > log). Re-run by hand: `node services/build-services.mjs` and check there is no `UNDER 600 WORDS` line.
+- [ ] PR `wip-services-shell-look` -> `main`: create form shown in chat, NOT submitted. Title "Services hub: shell look, illustrated tiles, chooser, steps" (add: "and shell look for generated pages"). Owner says "Merge" after the phone check. NOT opened in a browser by any session yet.
+### Next
+1. [ ] Phone check after merge: `/services/`, 2 service pages, 1 guide (reload twice; service worker). Bottom nav must not cover the "Get a quote" button; booking sheet submit above the nav.
+2. [ ] Deep pest pages, antenna + electric fence pages, batch 09 blogs: see the sections below (need node + clone, e.g. Claude Code).
+### Blocked / owner
+- Owner to confirm claims (90-day guarantee, low-odour, genuine parts, licensed staff), price ranges, 47-county coverage.
+
+## (previous) status of the "Fix all" 4 jobs + services hub redesign
 ### Done
 - [x] JOB 1 CHECKED via GitHub code search on `main`: `p/air-chopper-7-5sc-insecticide-*.html` (4 pages) carry the batch 08 text with unchanged title; Fendona and Navigator pages carry their stored text; code search finds NO "Buy Buy" in `p/`. Supabase `products.description` md5 for Air Chopper rows is identical (bae91e88...). Nothing to fix.
 - [x] Supabase check for JOB 2: `description_backup` has batch `pest-batch-09` (5 rows, saved 2026-10-31 04:36 UTC) and the 5 sprayer products already start with the batch-09 text (2-litre hand sprayer, Generic 7L fogger, Jacto HD 550, Greenberg Bronze, Total 20L). Full MD5 compare with `node seo-pest/build.mjs batch-09` NOT done (needs node + clone).
 - [x] Services hub redesign pushed to branch `wip-services-shell-look` (commit c066e71): `services/hub.css` (new), `services/hub.js` (new), `services/index.html` (shell-chrome.js on phones, hero panel, "What do you need help with?" chooser, 8 illustrated tiles with the existing price ranges, booking steps, accordion icons, floating Book button, booking sheet z-index 61 above the shell nav z-index 50). JSON-LD, FAQ, form, ids, `app.js` unchanged. `hub.js` passes `node --check`. NOT opened in a browser.
-  - Photo slots: tile images load `/services/img/<name>.jpg` and fall back to the drawn icon (names: pest-control, solar, cctv, tv-mounting, agrovet, appliance-repair, deep-cleaning, electrical-plumbing).
+  - Photo slots: tile images load `/services/img/<n>.jpg` and fall back to the drawn icon (names: pest-control, solar, cctv, tv-mounting, agrovet, appliance-repair, deep-cleaning, electrical-plumbing).
 ### In progress / Blocked
 - [ ] PR for `wip-services-shell-look` is NOT created yet (the create form in chat was shown but not submitted). Create: base `main`, head `wip-services-shell-look`, title "Services hub: shell look, illustrated tiles, chooser, steps". Owner said "Merge" but there is no PR to merge. After merge: phone check of `/services/` (reload twice), tap a chooser chip, open a tile, open the booking sheet and confirm the submit button is above the bottom nav.
-- [ ] The 8 generated service pages and 8 guides still use the OLD look. Fix in `services/build-services.mjs` (add `<script src="/shell-chrome.js?v=1" defer>`, hub.css-style header, then run `node services/build-services.mjs`). Never hand-edit the generated pages.
+- [ ] The 8 generated service pages and 8 guides still use the OLD look. Fix in `services/build-services.mjs` (add `<script src="/shell-chrome.js?v=1" defer></script>`, hub.css-style header, then run `node services/build-services.mjs`). Never hand-edit the generated pages.
 ### Next (needs a session WITH node and a clone, e.g. Claude Code; this chat could not run any generator or test)
 1. [ ] JOB 2 batch 09: `git checkout wip-seo-batch-09 && node seo-pest/build.test.mjs`; compare MD5 of stored `products.description` for the 5 products with `node seo-pest/build.mjs batch-09` output; write `seo-pest/blogs-09.json` (5 posts, one per product group; 400-600 words; answer 30-60 words; 3+ sections, 2+ question headings; 3-6 FAQ; 2-4 body links incl. `/p/<product>.html`; no KSh prices, doses, "best", "100%", "guarantee", "certified"; related blogs that exist, e.g. `thermal-fogging-machine-what-it-does-and-what-goes-in-it-kenya`, `how-to-read-an-insecticide-label-kenya`, `how-to-disinfect-a-poultry-house-kenya`); then `node seo-pest/blog-build.mjs blogs-09`, `node seo-pest/blog.test.mjs`, PR, merge. Product page files exist for all 5 (checked).
 2. [ ] JOB 3 deep pest pages (`wip-services-deep-pest`, plan only): see the list in the section below.
