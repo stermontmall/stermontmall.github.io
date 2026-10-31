@@ -1,10 +1,11 @@
 // node services/build-services.mjs
-// Reads services/services-data.json (+ optional services-extra.json) and writes:
+// Reads services/services-data.json (+ optional services-extra.json and services-more.json) and writes:
 //   services/<slug>.html            one landing page per service
 //   services/guides/<slug>.html     one guide (blog) post per service
 //   services/guides/index.html      guides index
 //   services/sitemap-services.xml   URLs of all pages above
-//   services/word-counts.json       words of the main copy of every page (target about 600)
+//   services/word-counts.json       words of the main copy of every page (target 600 or more)
+// OWNER RULE: the word "Kitale" must never appear in a generated page. The build fails if it does.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,6 +22,22 @@ for (const s of data.services) {
 }
 for (const g of data.guides) {
   const e = (extra.guides || {})[g.slug] || {};
+  if (e.sections) g.sections = g.sections.concat(e.sections);
+  if (e.faqs) g.faqs = g.faqs.concat(e.faqs);
+}
+// Second extra file: tender, city and checklist sections (added after the first file's sections).
+// Its "areas" text wins over the one in services-extra.json (which still names a town the owner has banned).
+const mf = path.join(dir, 'services-more.json');
+const more = fs.existsSync(mf) ? JSON.parse(fs.readFileSync(mf, 'utf8')) : { services: {}, guides: {} };
+for (const s of data.services) {
+  const e = (more.services || {})[s.slug] || {};
+  s.extraSections = s.extraSections.concat(e.sections || []);
+  s.searches = s.searches.concat(e.searches || []);
+  if (e.areas) s.areas = e.areas;
+  if (e.faqs) s.faqs = s.faqs.concat(e.faqs);
+}
+for (const g of data.guides) {
+  const e = (more.guides || {})[g.slug] || {};
   if (e.sections) g.sections = g.sections.concat(e.sections);
   if (e.faqs) g.faqs = g.faqs.concat(e.faqs);
 }
@@ -64,12 +81,21 @@ function head({ title, desc, url, extra = '' }) {
 <link rel="icon" href="/favicon.png">
 <style>${CSS}</style>${extra}</head><body><main>`;
 }
-const foot = `<footer>Stermont Arcade, The Sarit Centre, Westlands, Nairobi. WhatsApp <a href="${wa('Hello Stermont Arcade, I need a service quote.')}">+254 748 888 230</a>. Pay by M-Pesa. Prices are estimates and are confirmed after inspection. <a href="/services/">All services</a> · <a href="/services/guides/">Guides</a> · <a href="/">Shop</a></footer></main></body></html>`;
+const foot = `<footer>Stermont Arcade, head office: The Sarit Centre, Karuna Road, Westlands, Nairobi. WhatsApp <a href="${wa('Hello Stermont Arcade, I need a service quote.')}">+254 748 888 230</a>. Pay by M-Pesa. Prices are estimates and are confirmed after inspection. <a href="/services/">All services</a> · <a href="/services/guides/">Guides</a> · <a href="/">Shop</a></footer></main></body></html>`;
+
+// Coverage (owner, 2026-10-31): services are bookable from ALL 47 counties; Nairobi and the big cities come first.
+// Order: Nairobi, then the counties of the big cities, then the other counties A to Z. The build fails unless there are exactly 47.
+const BIG_CITIES = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Thika', 'Nyeri', 'Meru', 'Machakos', 'Naivasha', 'Kisii', 'Kakamega', 'Malindi'];
+const FIRST_COUNTIES = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Uasin Gishu', 'Kiambu', 'Machakos', 'Kajiado', 'Nyeri', 'Meru', 'Kisii', 'Kakamega', 'Kilifi'];
+const OTHER_COUNTIES = ['Baringo', 'Bomet', 'Bungoma', 'Busia', 'Elgeyo-Marakwet', 'Embu', 'Garissa', 'Homa Bay', 'Isiolo', 'Kericho', 'Kirinyaga', 'Kitui', 'Kwale', 'Laikipia', 'Lamu', 'Makueni', 'Mandera', 'Marsabit', 'Migori', "Murang'a", 'Nandi', 'Narok', 'Nyamira', 'Nyandarua', 'Samburu', 'Siaya', 'Taita-Taveta', 'Tana River', 'Tharaka-Nithi', 'Trans Nzoia', 'Turkana', 'Vihiga', 'Wajir', 'West Pokot'];
+const COUNTIES = [...FIRST_COUNTIES, ...OTHER_COUNTIES];
+if (COUNTIES.length !== 47 || new Set(COUNTIES).size !== 47) { console.error('COUNTY LIST MUST HAVE 47 DIFFERENT COUNTIES, HAS', COUNTIES.length); process.exit(1); }
+const coverageBlock = name => `<h2>${esc(name)} in all 47 counties</h2><p>We take ${esc(name.toLowerCase())} requests from all 47 counties in Kenya. Nairobi is our home market, with our head office at The Sarit Centre in Westlands, and we put the big cities first: ${BIG_CITIES.join(', ')}. For any other county, send your town and the job on WhatsApp and we confirm the schedule and any travel cost before you pay.</p><p>Counties we take bookings from: ${COUNTIES.join(', ')}.</p>`;
 
 const business = {
   '@type': 'LocalBusiness', '@id': SITE + '/#business', name: 'Stermont Arcade', url: SITE + '/',
   telephone: '+254748888230', priceRange: 'KES',
-  areaServed: [{ '@type': 'City', name: 'Nairobi' }, { '@type': 'City', name: 'Kitale' }, { '@type': 'Country', name: 'Kenya' }],
+  areaServed: [{ '@type': 'City', name: 'Nairobi' }, ...COUNTIES.filter(c => c !== 'Nairobi').map(c => ({ '@type': 'AdministrativeArea', name: c + ' County' })), { '@type': 'Country', name: 'Kenya' }],
   address: { '@type': 'PostalAddress', streetAddress: 'The Sarit Centre, Karuna Road, Westlands', addressLocality: 'Nairobi', addressCountry: 'KE' }
 };
 
@@ -104,6 +130,7 @@ ${s.intro.map(p => `<p>${esc(p)}</p>`).join('')}
 ${s.extraSections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).join('')}`).join('')}
 <h2>Who we serve</h2><p>${esc(s.audience)}</p>
 <h2>Where we work</h2><p>${esc(s.areas)}</p>
+${coverageBlock(s.name)}
 ${s.guaranteeNote ? `<h2>Our promise</h2><p>${esc(s.guaranteeNote)}</p>` : ''}
 <h2 id="faq">Frequently asked questions</h2>${s.faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
 ${s.searches.length ? `<h2>Popular searches in Kenya</h2><p>${s.searches.map(esc).join(' · ')}</p>` : ''}
@@ -129,6 +156,7 @@ for (const g of data.guides) {
 <h1>${esc(g.title)}</h1>
 <p class="lead"><b>Quick answer:</b> ${esc(g.answer)}</p>
 ${g.sections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).join('')}`).join('')}
+<h2>Where this applies</h2><p>${esc(s.name)} is available in Nairobi and the other big cities (${BIG_CITIES.filter(c => c !== 'Nairobi').join(', ')}), and we take requests from all 47 counties. Send your town on WhatsApp and we confirm the schedule and any travel cost.</p>
 <h2>Questions people ask</h2>${g.faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
 <div class="price"><div>Need this done?</div><b>${esc(s.name)}: ${kes(s.priceMin)} to ${kes(s.priceMax)}${s.priceOpen ? '+' : ''}</b></div>
 <p><a class="btn" href="${ask}">Get a quote on WhatsApp</a><a class="btn alt" href="/services/${s.slug}.html">See the service page</a></p>` + foot;
@@ -147,4 +175,11 @@ ${g.sections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).jo
 const urls = ['/services/', '/services/guides/', ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`)];
 write('sitemap-services.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
+
+// Owner rule: never publish the banned town name. Fail the build (so CI commits nothing) if any generated file has it.
+const banned = out.filter(rel => /kitale/i.test(fs.readFileSync(path.join(dir, rel), 'utf8')));
+if (banned.length) { console.error('BANNED TOWN NAME FOUND IN:', banned.join(', ')); process.exit(1); }
+
+const low = [...Object.entries(counts.services), ...Object.entries(counts.guides)].filter(([, n]) => n < 600);
 console.log('wrote', out.length, 'files', JSON.stringify(counts));
+if (low.length) console.log('UNDER 600 WORDS:', JSON.stringify(low));
