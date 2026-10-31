@@ -1,78 +1,32 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 (session "Finish all pending tasks on the handoff"). GitHub + Supabase connected. The sandbox has no network and no clone, so tests could not be run by this session.
-RULE (owner, 2026-10-31): after EVERY step (a commit, a merge, a finding, a blocker) rewrite this file in the same minute, so a session cut off by a usage limit can be continued on another Claude account. Keep it short: Done / In progress / Next / Blocked. `HANDOFF.md` stays the long history; this file wins where they differ.
+Last saved: 2026-10-31 07:45 (Africa/Nairobi). GitHub + Supabase connected. This session has NO clone and NO network for node, so no tests can be run here (see "Tests owed").
+RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## Update 2026-10-31 07:05 (Africa/Nairobi)
-- [x] Auto-save rule made explicit in `CLAUDE.md` (branch `wip-handoff-autosave`): save at task start, task end, before long commands, and when blocked. Owner request: "Set automatic task progress saving on handoff .md".
-- [ ] FOUND: `main` log already contains "Merge pull request #81 from stermontmall/wip-shell-reload-tab" (a3449dc), so the reload fix below may ALREADY be merged. NOT verified yet. Check: `grep -n START_TAB mobile-shell/app.js; grep -n "app.js?v=" index.html` (expect `v=7`), then `python3 mobile-shell/shell.test.py` (expect 111 checks, 0 failures; run was interrupted by the owner, nothing changed).
+## IN PROGRESS (session started 07:45)
+Owner: "Fix [doubled Buy], and continue with items description and seo and autosave on handoff".
+1. [ ] FIX doubled "Buy" on every `/p/` page. FOUND 2026-10-31 07:40 on `p/mchwatox-350-sc-termiticide-1-litre.html` and `p/air-chopper-7-5sc-insecticide-100-ml.html`: the extra sections reuse the H1 text (which already starts "Buy"/"Buy Original") and add their own "Buy": heading "Buy Buy Original <name> in Nairobi, Kiambu, ...", FAQ "How can I buy Buy Original <name> in Kenya?", "Safe use of Buy Original <name>", "<name> at a glance", WhatsApp enquiry text. Not in JSON-LD, not in `<title>`, not in the H1. Cause is in the generator side (`seo-product-extras.mjs` / `generate-products.mjs` / `seo-meta.mjs` `buyName`), not in the pages. Branch `wip-fix-double-buy` (not created yet). Fix = strip a leading "Buy " (use the plain name) wherever the extras build a sentence around the name.
+2. [ ] Batch 09 = Sprayers & Equipment (category slug `sprayers-equipment`): same method as batches 05-08 (facts only from catalog text, `seo-pest/batch-09.json` or new folder, back up old text to `description_backup` batch `pest-batch-09` BEFORE writing, MD5 check, blogs-09.json 400-600 words, avoid "best", "100%", "g/L", "g/kg", "PCPB approved").
 
-## Update 2026-10-31 07:08 (Africa/Nairobi)
-- [x] `python3 mobile-shell/shell.test.py` on `main` (53d9a94) = 112/112, no console/page errors (fixture data). So the reload fix (PR #81, `app.js?v=7`) is merged AND tested. Still owed by the owner: phone check (open site twice, Categories, refresh: stays on Categories).
-## Update 2026-10-31 07:25 (Africa/Nairobi), branch `wip-shell-category-pages` (NOT merged)
-- [x] commit 1 (pushed): `app.js?v=8` opens `/?cat=<slug>` (`openCatLink`, top-level or sub-category).
-- [x] commit 2: `seo-shell-redirect.mjs` also has `injectCat` + CLI pass over `c/` (skips `index.html`, redirect stubs; idempotent, checked on a copy: 39 of 39 then 0 of 39); workflow step renamed (it already does `git add -A ... c ...`); 11 new "category redirect:" checks. `python3 mobile-shell/shell.test.py` = 123/123. Merged to `main` (see git log). The category pages get the script on the next "Build product pages" run (tap "Run workflow" to do it now). NEXT after that run: confirm `c/rodent-control.html` has `<!--stm-shell-cat-->`; then step 3 (static pages: account, track, shipping, returns, contact, faq, about, privacy, terms get a shared shell header + bottom nav). After the "Build product pages" run confirm `c/rodent-control.html` has `<!--stm-shell-cat-->`. RISK: Search Console "Page with redirect" for `/c/` (crawlers are excluded by user agent).
-- [ ] Owner said "Fix all". (older line) start the "sections load in the OLD web view" item below (step 2, category pages) on branch `wip-shell-category-pages`.
+## Audit 2026-10-31 07:40 (automation check)
+- [x] Blog tool works: bot "Update blog index and sitemap" commits 12 s after each merge (batch 07 at 03:44Z, batch 08 at 04:33Z). All 16 posts of batches 07+08 are in `blog/index.html` and `sitemap.xml`. Daily blog drafts ran 10-29 and 10-30.
+- [x] Product pages: batch 07 text is live (Mchwatox page, title unchanged). Batch 08 pages (e.g. Air Chopper) still show the OLD text: last "Update product pages and sitemap" run was 04:08Z, the batch 08 database write was 04:30Z. Next run (every 3 h) or "Run workflow" fixes it. Re-check Air Chopper, Fendona, Navigator after the next run.
+- [ ] Cannot see from here: Actions run status (SEO auto index / IndexNow, SEO index status) and Search Console. Owner: look at the Actions tab for today's runs.
 
-## In progress right now
-- [ ] (may be outdated, see the update above) Shell reload fix `wip-shell-reload-tab` is NOT merged. Run `python3 mobile-shell/shell.test.py` first (expect 5 more checks than before, 0 failures). Then open https://github.com/stermontmall/stermontmall.github.io/compare/main...wip-shell-reload-tab?expand=1 , create the PR (the owner taps Submit; Claude's GitHub tool only shows a form) and merge. After the merge: open the site twice on a phone, go to Categories, refresh: it must stay on Categories.
+## Tests owed (could not be run this session; run in a clone)
+`node seo-meta.test.mjs; node buy-name.test.mjs; node seo-titles.test.mjs; node seo-pest/build.test.mjs; node seo-pest/blog.test.mjs; python3 mobile-shell/shell.test.py` (last known on `main`: 1246, 49, 35, 1047, 1365, 133 checks, 0 violations).
 
-## Done this session
-- [x] Batch 07 blogs are ON `main` (checked 2026-10-31: the 8 posts are in `blog/`, and GitHub says `main` is up to date with `wip-seo-blogs-07`; no pull request was needed). Posts: actellic-25ec, actellic-50ec, actellic-gold-dust, grain-save-dust, mchwatox-350-sc, metro-200sc, premise-200-sc, thermal-fogging-machine. Still to confirm after the blog workflow: the 8 posts are listed in `blog/index.html` and `sitemap.xml`.
-- [x] OWNER BUG found and fixed on branch `wip-shell-reload-tab` (3 commits): refreshing the Categories tab went to Home because `mobile-shell/app.js` always reset the history entry to `{tab:'home'}` and started on Home. Now `START_TAB` is read from `history.state.tab` before that reset and shown at the end of the file (`showTab(START_TAB)`); the Deals tab only saves `dealsSeen` once the catalog count is known; `index.html` loads `app.js?v=7`; `shell.test.py` has 5 new checks (reload on Categories, Back to Home after it, reload on Cart, reload on Deals with the badge still cleared, no page errors). Diffs checked: 7+/2- in app.js, 1+/1- in index.html, 17+ in shell.test.py.
-- [x] `HANDOFF-live.md` and `CLAUDE.md` added to `main` (auto-save rule).
-
-## New owner item (2026-10-31): sections still load in the OLD web view, not the mobile shell
-Fix AFTER the reload fix is merged. Known pages that leave the shell: `/c/*.html` (category pages, generated by `generate-products.mjs` + `seo-kenya.mjs`), `/account.html`, `/track.html`, `/shipping.html`, `/returns.html`, `/contact.html`, `/privacy.html`, `/terms.html`, `/faq.html`, `/about.html`, `/blog/*.html`, `/guides/*.html`, `/classic.html` ("Open the full shop"), and the checkout (runs in `classic.html?checkout=1`). Owner wants the mobile shell UI everywhere.
-Plan (small steps, one branch each, tests first):
-1. List what each page shows on a phone (find which ones the owner means; ask once if unclear).
-2. Category pages: add `/?cat=<slug>` (and `&sub=`) to `mobile-shell/app.js` so the shell opens that category; add a phone-only redirect script to the generated `/c/` pages the same way `seo-shell-redirect.mjs` does for `/p/` (skip crawlers, preview bots, desktop, `?classic=1`); extend `product-pages.yml`; add `shell.test.py` checks. RISK: Search Console "Page with redirect" for `/c/` URLs, same watch item as `/p/`.
-3. Static pages (account, track, shipping, returns, contact, faq, about, privacy, terms): add a shared shell header + bottom nav (one small JS/CSS file) instead of redirecting them.
-4. Native Track / Account tabs and checkout inside the shell are bigger jobs; do last.
-Bump `?v=` in `index.html` for every `app.js` / `tailwind.css` change (cache rule).
+## State of `main` (2026-10-31)
+- Shell: reload keeps tab (`app.js?v=7`), `/?cat=` opens categories (`v=8`), `/?tab=`/`/?q=` (`v=9`), `shell-chrome.js` top bar + bottom nav on account, track, shipping, returns, contact, faq, about, privacy, terms; category pages (39) redirect phones to the shell. shell.test.py 133/133.
+- SEO batches 05-08 (pest control) merged: descriptions in Supabase (MD5 verified), 8+8 blogs for batches 07 and 08 on `main`.
+- `CLAUDE.md`, `HANDOFF-live.md` on `main` (auto-save rule).
 
 ## Next (from HANDOFF.md "Left", in order)
-1. Merge the shell reload fix (above).
-2. After the next "Build product pages" and blog runs: confirm `p/mchwatox-350-sc-termiticide-1-litre.html` and `p/actellic-50ec-insecticide-1-litre.html` show the new text with unchanged titles; confirm the 8 posts in `blog/index.html` and `sitemap.xml`.
-3. Batch 08 (pest control, category id 31): Air Chopper 7.5SC, Bat CRP, Darvin 50EW, Fendona 60SC, K-Othrine WG 250, Navigator 100 SC (new layout, no batch file/test/blogs) and Promax 20EC Insecticide, Tatua Demand 10CS (old layout). Same method as batches 05-07: facts only from the catalog text, `seo-pest/batch-08.json`, `node seo-pest/build.test.mjs`, back up old text in `description_backup` batch `pest-batch-08` BEFORE writing to Supabase, then blogs-08.json (400-600 words, avoid "best", "100%", "g/L", "g/kg", "PCPB approved").
-4. Then Sprayers & Equipment, Animal Feeds, Veterinary, Fertilizers, Disinfectants, Seeds, electronics, appliances, kitchen, fashion.
+1. Finish the two items above.
+2. After the next "Build product pages" run: Air Chopper and Fendona pages show the new text with unchanged titles.
+3. Shell step 4: native Track and Account tabs and checkout inside the shell (bigger jobs); `/blog`, `/guides`, `/classic.html` still use their own look (generated: edit the generators).
+4. Then Animal Feeds, Veterinary, Fertilizers, Disinfectants, Seeds, electronics, appliances, kitchen, fashion (same SEO method).
 
 ## Blocked / needs the owner
-- Running `python3 mobile-shell/shell.test.py` (this session cannot) and tapping Submit on pull request forms.
-- Label data the catalog lacks (Mchwatox strength/registration, Actellic 25EC strength, Grain-Save permethrin strength, fogger fuel/capacity/output); owner to read the 8 blogs once.
-- Phone checks, Search Console watch for `/p/` URLs, fertilizer-page safety box decision, "Best Price in Kenya" wording.
-
-## Update 2026-10-31 07:12 (Africa/Nairobi), branch `wip-shell-static-pages`
-- [ ] Owner: "Fix all and autosave on handoff .md". In progress: step 3, shared shell header + bottom nav for account, track, shipping, returns, contact, faq, about, privacy, terms. First step: look at each page's head/body and where `index.html` defines the header/bottom nav. Category pages are merged (75c0e6f).
-
-## Update 2026-10-31 07:40 (Africa/Nairobi), branch `wip-shell-static-pages` (NOT merged)
-- [x] Written, NOT yet tested: `shell-chrome.js` (phone-only top bar with back/search/cart + bottom nav Home/Categories/Deals/Cart/Account; hides the page's own `<header>`; desktop untouched) and its `<script src="/shell-chrome.js?v=1" defer>` line in account, track, shipping, returns, contact, faq, about, privacy, terms. `app.js?v=9` now reads `/?tab=cart|categories|deals|account` and `/?q=<words>` (the links of that nav and its search box; the address is cleaned to `/`).
-- [x] TESTED 2026-10-31 07:55: 10 new "static pages:" checks in `shell.test.py` (bar + nav on all 9 pages, own header hidden, no sideways scroll, text unchanged, Account marked, cart badge, nav Cart/Categories open those shell tabs, top-bar search opens results, bad ?tab= opens Home, desktop untouched) = 133/133 on two runs (one run printed a stray Traceback in the local server log, not a failure; the rerun was clean). Screenshots of shipping and account looked right. Merged to `main` (see git log).
-- [ ] NEXT (owner): phone check: open stermontarcade.co.ke twice, Account tab, tap Shipping: you should see the top bar and bottom nav; tap Cart/Categories/Deals and the search. Account sign-in only works with the real Supabase script (sandbox blocks it), so check logging in once on the phone.
-- [ ] NEXT (code): step 4 = native Track and Account tabs and the checkout inside the shell (bigger jobs); `/blog/*.html`, `/guides/*.html` and `/classic.html` still use their own look (blog/guides are generated: edit the generators, not the pages).
-
-## Update 2026-10-31 07:20 (Africa/Nairobi), live check
-- [x] On `main` (GitHub): `shell-chrome.js`, `app.js?v=9`, the 9 static pages with the script line, and the 39 category pages (the 07:08 "Update product pages" bot run already added `<!--stm-shell-cat-->`; `c/index.html` correctly has none). Merge commit df30351.
-- [ ] NOT verified on the live domain: the sandbox cannot fetch stermontarcade.co.ke (not on the allowlist). Owner: open the site twice on a phone (the service worker swaps the old copy on the second visit), then check Account > Shipping, and a category page link.
-
-## Update 2026-10-31 07:25 (Africa/Nairobi), branch `wip-seo-batch-08` (NOT merged)
-- [ ] Owner: "proceed with batch seo, descriptions and product blogs". STARTED batch 08 (category id 31, 8 products: Air Chopper 7.5SC, Bat CRP, Darvin 50EW, Fendona 60SC, K-Othrine WG 250, Navigator 100 SC, Promax 20EC Insecticide, Tatua Demand 10CS). Plan: (1) read catalog text from Supabase, (2) `seo-pest/batch-08.json` + `node seo-pest/build.test.mjs`, (3) back up old text to `description_backup` batch `pest-batch-08`, then write `products.description`, verify MD5, (4) `seo-pest/blogs-08.json` + `node seo-pest/blog-build.mjs blogs-08` + `node seo-pest/blog.test.mjs`, (5) merge, then confirm pages/blogs after the next bot run. Nothing written to Supabase yet.
-
-## Update 2026-10-31 07:55 (Africa/Nairobi), branch `wip-seo-batch-08`
-- [x] `seo-pest/batch-08.json` committed (8 products, 491-588 words each); `node seo-pest/build.test.mjs` = 1047 checks, 0 violations. Facts only from the catalog text (mixing rates for Fendona, K-Othrine, Promax and Bat CRP are the ones the catalog already published, under `dose`).
-- [ ] NEXT: back up the 13 rows to `description_backup` batch `pest-batch-08`, then write `products.description` (ONLY description) from `node seo-pest/build.mjs batch-08` (`seo-pest/out/batch-08.sql`, git-ignored) and verify MD5 of stored text = builder output. Not written to Supabase yet.
-
-## Update 2026-10-31 08:05 (Africa/Nairobi), branch `wip-seo-batch-08`
-- [x] Re-ran `node seo-pest/build.test.mjs` = 1047 checks, 0 violations. Read the 8 rendered texts (`node seo-pest/build.mjs batch-08` -> `seo-pest/out/batch-08.txt`) against the stored catalog text: every fact matches; the stored Air Chopper text said "100 ml pack" on all four sizes, the new text lists all four sizes.
-- [x] BACKUP written: `description_backup` batch `pest-batch-08` (13 rows, all of category 31). Restore one row: `update products p set description = b.description from description_backup b where b.id = p.id and b.batch = 'pest-batch-08' and p.id = '<id>'`.
-- [ ] IN PROGRESS: writing `products.description` for the 8 groups with the 8 statements of `seo-pest/out/batch-08.sql` (ONLY description). Then verify: `select id, md5(description)` against `md5` of each `renderText()` (node). If a write was cut off, re-run the missing groups: the statements are idempotent.
-
-## Update 2026-10-31 08:20 (Africa/Nairobi), branch `wip-seo-batch-08`
-- [x] WRITTEN TO SUPABASE `products.description` for all 8 groups (13 rows), ONLY `description` (`name`, `seo_name`, `seo_title` untouched). VERIFIED: `md5(description)` of every stored row = MD5 of `renderText()` from `seo-pest/batch-08.json` (Air Chopper bae91e88..., Bat CRP 864f5db6..., Darvin 805da6c2..., Fendona 530b880e..., K-Othrine 180fc710..., Navigator 12ab7ab1..., Promax 50c0ec19..., Tatua 682cc2f6...). Backup: `description_backup` batch `pest-batch-08` (13 rows). The built pages in `p/` update on the next "Build product pages" run (every 3 hours, or "Run workflow").
-- [ ] IN PROGRESS: `seo-pest/blogs-08.json` (8 posts, 400-600 words, no "best", "100%", "g/L", "g/kg", "PCPB approved"), then `node seo-pest/blog-build.mjs blogs-08` and `node seo-pest/blog.test.mjs`. Next: merge `wip-seo-batch-08` to `main` only after both tests pass.
-
-## Update 2026-10-31 08:45 (Africa/Nairobi), branch `wip-seo-batch-08`
-- [x] BLOGS: `seo-pest/blogs-08.json` (8 posts, 415-495 words) rendered to `blog/*.html` (+ `blog-topics.json` as `drafted`). Tests: `node seo-pest/blog.test.mjs` = 1365 checks, 0 violations; `node seo-pest/build.test.mjs` = 1047, 0 violations. Posts: air-chopper-7-5sc-which-pack-size-to-buy, bat-crp-bat-repellent-getting-bats-out-of-a-roof, darvin-50ew-28-ml-pack-for-bedsitters-and-rentals, fendona-60sc-residual-spray-for-hostels-and-hotels, k-othrine-wg-250-how-a-residual-wall-spray-works, navigator-100-sc-cockroaches-bed-bugs-and-mosquitoes, promax-20ec-one-concentrate-for-bed-bugs-roaches-and-fleas, tatua-demand-10cs-25-ml-sachet-indoor-mosquito-spray (all with `-kenya` suffix). No numeric mixing rates in the blogs (the label and product page hold them).
-- [x] Merging `wip-seo-batch-08` to `main` (files only; the database texts are already live).
-- [ ] NEXT: after the next "Build product pages" run, open `p/air-chopper-7-5sc-insecticide-100-ml.html` and `p/fendona-60sc-insecticide-1-litre.html`: new text, unchanged titles. After the blog workflow confirm the 8 posts in `blog/index.html` and `sitemap.xml`.
-- [ ] NEXT (batch 09): Sprayers & Equipment (category slug `sprayers-equipment`), then Animal Feeds, Veterinary, Fertilizers, Disinfectants, Seeds, electronics, appliances, kitchen, fashion. Same method (batch json from catalog text only, test, backup to `description_backup`, write, MD5 check, blogs).
-- [ ] Owner: label data the catalog lacks for batch 08: Air Chopper strength and active ingredient, Darvin 50EW active ingredient and strength, Bat CRP active ingredient, Tatua Demand 10CS active ingredient; owner to read the 8 blogs once. Fendona and K-Othrine mixing amounts in the product text are the manufacturers' published guidance (already in the catalog); confirm them against the pack.
+- Phone checks: open stermontarcade.co.ke twice (service worker), Categories refresh stays on Categories, Account > Shipping shows top bar + bottom nav, a category link opens the shell, product share preview in WhatsApp, one real small checkout, login once.
+- Label data the catalog lacks: batch 07 (Mchwatox strength/registration, Actellic 25EC strength, Grain-Save permethrin strength, fogger fuel/capacity/output); batch 08 (Air Chopper strength and active ingredient, Darvin 50EW active ingredient and strength, Bat CRP active ingredient, Tatua Demand 10CS active ingredient); agro batches 01-04. Owner to read the 16 blogs of batches 07 and 08 once.
+- Decisions: "Best Price in Kenya" wording, fertilizer-page safety box (fertilizers still get the pesticide box), Search Console watch for "Page with redirect" on `/p/` and `/c/` (phones are redirected, crawlers excluded by user agent), Cloudflare headers if the domain is proxied.
