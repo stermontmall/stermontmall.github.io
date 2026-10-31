@@ -62,7 +62,7 @@ function route() {
     v.innerHTML = `<article class="post">${post.h}<p><a href="#/blog">Back to all guides</a></p></article>`;
     $('#blog').scrollIntoView();
   } else {
-    document.title = 'Pest Control, Cleaning, CCTV and Repairs in Nairobi and Kitale | Stermont Arcade';
+    document.title = 'Pest Control, Cleaning, CCTV and Repairs in Nairobi and Across Kenya | Stermont Arcade';
     v.innerHTML = `<ul class="post-list">${A.map(a => `<li><a href="#/blog/${a.slug}">${esc(a.t)}</a><p>${esc(a.x)}</p></li>`).join('')}</ul>`;
     if (h === '#/blog') $('#blog').scrollIntoView();
   }
