@@ -112,7 +112,8 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     const file = `p/${f}`; let h = readFileSync(file, 'utf8');
     if (h.includes(MARK) || !/<h1>/.test(h)) continue;   // already done, or a redirect stub
     const nm = h.match(/<h1>([\s\S]*?)<\/h1>/), cm = h.match(/<nav class="bc">[\s\S]*?<a href="\/c\/([^"]+)\.html">([^<]*)<\/a>/), canon = (h.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
-    const name = unesc(nm[1].replace(/<[^>]+>/g, '').trim());
+    // The H1 starts with the "Buy" prefix (seo-meta.mjs buyName). Headings and sentences built around the name add their own "Buy", so drop it here (no "Buy Buy Original ...").
+    const name = unesc(nm[1].replace(/<[^>]+>/g, '').trim()).replace(/^Buy\s+/i, '');
     const slug = cm ? decodeURIComponent(cm[1]) : '', cname = cm ? cm[2] : '';
     let before = h;
     // 1) structured description
