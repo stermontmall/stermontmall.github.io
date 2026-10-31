@@ -1,11 +1,13 @@
 /* Stermont Arcade services hub: look-and-feel layer. Runs after app.js and shell-chrome.js (both deferred).
    1) puts an illustrated icon in front of every service in the accordion,
    2) on phones, turns the shell bottom nav's Deals slot into Services (this page) and un-highlights Account,
-   3) adds a floating "Get a quote" button (data-book) that now opens the quote drawer (services/quote.js, no payment).
-   To undo: remove the hub.js line from services/index.html, or delete the quote loader line below. */
+   3) adds a floating "Get a quote" button (data-book) that now opens the quote drawer (services/quote.js, no payment),
+   4) loads services/updates.js (staff posts, notices, price overrides and cover photos from the admin).
+   To undo: remove the hub.js line from services/index.html, or delete the loader lines below. */
 (() => {
 'use strict';
 try { const q = document.createElement('script'); q.src = '/services/quote.js?v=1'; q.defer = true; document.head.appendChild(q); } catch (e) {}
+try { const u = document.createElement('script'); u.src = '/services/updates.js?v=1'; u.defer = true; document.head.appendChild(u); } catch (e) {}
 const ICON = {
   'bed-bugs': 'pest', 'cockroaches': 'pest', 'termites': 'pest', 'rodents': 'pest',
   'upholstery': 'clean', 'move-in-out': 'clean', 'post-construction': 'clean', 'airbnb': 'clean', 'office-janitorial': 'clean',
