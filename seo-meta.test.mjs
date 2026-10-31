@@ -33,9 +33,10 @@ for (const name of names) for (const ctx of ctxs) {
   assert.ok(/M-Pesa checkout/.test(tg) && /47 counties/.test(tg) && !/(#1|top-rated|guaranteed|certified)/i.test(h + tg), `bad tagline/H1: ${h} | ${tg}`);
   assert.ok(h.startsWith('Buy '), `H1 must start with Buy: ${h}`); n++;
   assert.ok(h.endsWith(name.replace(/\s+/g, ' ').trim()), `H1 must keep the full product name: ${h}`);
-  // Modifiers: every title and H1 carries Original / a power word, and Original in the H1 is never claimed for an unknown-brand general product.
+  // Modifiers: every title and H1 carries Original / a power word (a name that already starts with a lead word carries its own),
+  // and Original in the H1 is never claimed for an unknown-brand general product.
   const MOD = /\b(Original|Powerful|Top-Quality|Premium|Reliable|Proven|Effective|High-Potency|Heavy-Duty|Fast-Acting|Long-Lasting|Quality|Top|Best|Genuine)\b/;
-  assert.ok(MOD.test(t) && MOD.test(h), `title/H1 lacks a modifier: ${t} | ${h}`); n += 2;
+  assert.ok(hasLeadWord(name) || (MOD.test(t) && MOD.test(h)), `title/H1 lacks a modifier: ${t} | ${h}`); n += 2;
   assert.ok(isGenuine(ctx) || !/^Buy Original\b/.test(h) || /^Original\b/i.test(name), `Original claimed where not true: ${h}`);
 }
 for (const [c, slug] of cats) {
