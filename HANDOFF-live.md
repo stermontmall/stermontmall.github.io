@@ -4,7 +4,7 @@ RULE (owner): after EVERY step rewrite this file in the same minute (Done / In p
 
 ## NEWEST (chat, 13:31): admin service posts TESTED in a browser (mocked Supabase), 1 fix, PR #98 OPEN, NOT merged
 Owner: "Connect github and supabase and check the handoff for pending tasks. I need option of uploading and editing posts for all the services. I want to manage everything from admin app. Fix and correct all errors. Save progress on handoff."
-PR: https://github.com/stermontmall/stermontmall.github.io/pull/98 (branch `wip-admin-service-media`, head a7d872e, merges cleanly with main at 13:31; merge it when the phone check passes).
+MERGED to `main` as PR #98 at 13:32 Africa/Nairobi (merge 847bc12), at the owner's request, BEFORE the phone check. Revert the merge commit to undo (tables and storage stay; nothing else depends on it). Phone check below is still open.
 ### Done
 - [x] GitHub + Supabase connected (project `oewvtbnmyombbtggamor`, healthy). Pending list = the 13:20 section below; nothing else changed on `main` since.
 - [x] `node --check` OK: `admin-service-media.js`, `admin-services.js`, `services/updates.js`, `services/page.js`, `services/hub.js`, `services/quote.js`, and BOTH inline blocks of `admin.html` (closes the "NOT checked" list of the 13:20 section).
@@ -13,7 +13,7 @@ PR: https://github.com/stermontmall/stermontmall.github.io/pull/98 (branch `wip-
 - [x] Supabase security advisors read: nothing on `service_posts`, `service_catalog` or `service_quotes`. Pre-existing and left alone: backup tables with RLS but no policy (INFO, intended lock-down); `record_sale`, `restock_product`, `record_loss`, `reverse_sale` are executable by signed-in users but each one starts with `if not is_staff() then raise exception` (checked in the function bodies); `check_voucher`, `track_order`, `rate_order_*`, `recent_purchases` are public on purpose; "leaked password protection" is OFF (Supabase dashboard > Authentication, not changeable from here); `pg_net` sits in the `public` schema.
 ### Next
 1. [ ] OWNER: PHONE TEST on the REAL site after merging #98 (the test above uses a mock, not your Supabase): admin > Services > Service media: post a photo for "Bed bugs" and a short video for "Solar System Setup", Edit one, Hide, Pin, Delete; then open `/services/pests/bed-bugs.html` and the solar page (reload twice; service worker) and look for "Latest work and updates". Then "Service settings": pause bookings or add a notice for one service and check its page and the hub tile; Reset to standard. Delete the test posts (this also deletes their files).
-2. [ ] Merge PR #98 (owner says "Merge"). Keep `main`'s `HANDOFF*.md`; the branch does not touch them.
+2. [x] PR #98 merged (see above).
 3. [ ] Still not built: pages for antenna and electric fence (posts for them show on the hub only); editing the TEXT of services and pests from the admin (pages are generated from JSON; only notice, offer line, price, bookings and cover are editable here); batch 09 blogs; the older items below.
 ### Blocked / owner
 - The mock cannot prove the real storage limits (50 MB videos, allowed types) or the real RLS; the 13:20 section lists what was checked in Supabase read-only.
