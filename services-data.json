@@ -1,0 +1,336 @@
+{
+  "business": {
+    "name": "Stermont Arcade",
+    "site": "https://stermontarcade.co.ke",
+    "phone": "+254 748 888 230",
+    "wa": "254748888230",
+    "address": "The Sarit Centre, Karuna Road, Westlands, Nairobi",
+    "hours": "Open daily 8 AM to 8 PM"
+  },
+  "services": [
+    {
+      "slug": "pest-control-fumigation-nairobi",
+      "name": "Pest Control & Fumigation",
+      "nav": "Pest control and fumigation",
+      "priceFrom": 3500, "priceTo": 25000,
+      "metaTitle": "Pest Control & Fumigation Services Nairobi | Stermont Arcade",
+      "metaDesc": "Bed bug, cockroach, rodent and termite control in Nairobi and across Kenya. Inspection first, 90-day guarantee, from KSh 3,500. Book on WhatsApp.",
+      "h1": "Pest Control and Fumigation Services in Nairobi",
+      "audience": "Homes, landlords, Airbnbs, offices and restaurants",
+      "lead": "Stermont Arcade provides pest control and fumigation for homes, landlords, Airbnb hosts, offices and restaurants in Nairobi and across Kenya. We treat bed bugs, cockroaches, rodents and termites, and every job starts with an inspection so the treatment matches the pest and the property, not a one-size-fits-all spray.",
+      "includes": [
+        "Bed bug treatment for beds, mattresses, sofas, skirting and wall cracks, using low-odour products wherever the pest allows",
+        "Cockroach control with gel baiting in kitchens, drains and cabinets",
+        "Termite soil treatment around foundations, door frames and timber",
+        "Rodent control for rats and mice, including entry-point advice",
+        "Pre-inspection with a clear explanation of what we found before we treat",
+        "A 90-day service guarantee: if the pest returns in the guarantee period, tell us and we follow up"
+      ],
+      "process": [
+        ["Tell us about the problem", "Message us on WhatsApp or call. Say which pest you see, where, and how long it has been happening. Photos help."],
+        ["Inspection", "We inspect the property, confirm the pest and the extent of the infestation, and give you a quote before any work starts."],
+        ["Treatment", "We treat the affected areas with the method that suits the pest: gel baiting for cockroaches, targeted treatment for bed bugs, soil treatment for termites, bait and proofing advice for rodents."],
+        ["Aftercare", "We explain how long to stay out of treated rooms, what to clean and what to leave, and how to stop the pest coming back."],
+        ["Follow-up", "If the problem returns within the guarantee period, contact us and we come back to deal with it."]
+      ],
+      "factors": [
+        "The pest: bed bugs, cockroaches, rodents and termites need different methods and different numbers of visits.",
+        "The size of the property and the number of rooms or units treated.",
+        "How severe and how old the infestation is.",
+        "Access: ceiling voids, soil around foundations and shared walls in apartments take longer."
+      ],
+      "areas": "We operate from the Sarit Centre in Westlands, Nairobi, and serve homes and businesses across Nairobi. We also take jobs in other counties; confirm your town on WhatsApp and we will confirm availability and any travel cost.",
+      "faqs": [
+        ["How much does pest control cost in Nairobi?", "Typical jobs run from KSh 3,500 to KSh 25,000 depending on the pest, the size of the property and how severe the problem is. We give you a firm quote after the inspection, before any treatment starts."],
+        ["How do I get rid of bed bugs?", "Bed bugs hide in mattresses, bed frames, sofas and wall cracks, so one spray rarely solves it. We inspect, treat every hiding place and give aftercare advice such as washing bedding on a hot cycle. Read our bed bug guide for what you can do before we arrive."],
+        ["Is it safe to stay in the house after fumigation?", "Follow the re-entry time we give you for each treated room. We explain it on the day. Keep children, pets and food away from treated areas until then."],
+        ["What does the 90-day guarantee cover?", "If the pest we treated comes back within 90 days, contact us and we follow up. Ask us for the exact terms when you book so you know what is covered."],
+        ["Do you treat Airbnbs, offices and restaurants?", "Yes. We work with landlords, Airbnb hosts, offices and restaurants, and we can plan visits around your opening hours."]
+      ],
+      "shop": ["bed-bug-killers", "cockroach-ant-killers", "rodent-control", "termite-control", "mosquito-fly-control"],
+      "guides": ["how-to-get-rid-of-bed-bugs-kenya", "how-to-get-rid-of-cockroaches-kenya", "termite-control-at-home-kenya", "rat-and-mouse-control-kenya", "pest-control-products-for-hotels-and-restaurants-kenya"],
+      "related": ["deep-cleaning-carpet-wash-nairobi", "agrovet-spraying-crop-consultancy-kenya"]
+    },
+    {
+      "slug": "solar-installation-maintenance-nairobi",
+      "name": "Solar System Setup & Maintenance",
+      "nav": "Solar setup and maintenance",
+      "priceFrom": 15000, "priceTo": 250000, "priceOpen": true,
+      "metaTitle": "Solar Installation & Maintenance Nairobi | Stermont Arcade",
+      "metaDesc": "Solar sizing, panel mounting, inverter setup and lithium battery wiring for homes, farms and businesses in Kenya. From KSh 15,000. Get a quote on WhatsApp.",
+      "h1": "Solar System Setup and Maintenance in Nairobi",
+      "audience": "Homeowners, off-grid farms and commercial properties",
+      "lead": "Stermont Arcade sets up and maintains solar systems for homeowners, off-grid farms and commercial properties. We size the system to your loads, mount the panels, set up the inverter and wire the lithium battery, so the system you pay for matches what you actually run.",
+      "includes": [
+        "Solar sizing based on the appliances you run and the hours you run them",
+        "Panel mounting on roofs and frames",
+        "Inverter setup and configuration",
+        "Lithium battery wiring and protection",
+        "Maintenance visits and fault checks on existing systems"
+      ],
+      "process": [
+        ["List your loads", "Send us the appliances you want to power: lights, fridge, TV, pumps, tools, and for how many hours a day."],
+        ["Site assessment and sizing", "We assess the roof or ground space, the sun exposure and the wiring, then size the panels, inverter and battery to your loads."],
+        ["Installation", "We mount the panels, install and set up the inverter, and wire the battery and protection."],
+        ["Handover", "We test the system with you and show you how to read it and what to switch off when the battery is low."]
+      ],
+      "factors": [
+        "System size: the number of panels, the inverter rating and the battery capacity.",
+        "Roof type and how hard the panels are to reach and mount.",
+        "Distance between the panels, inverter and battery, which sets the cable length.",
+        "Whether you are installing a new system or repairing and maintaining an existing one."
+      ],
+      "areas": "We serve homes, farms and businesses in Nairobi and can quote for other counties. Send your location on WhatsApp.",
+      "faqs": [
+        ["How much does solar installation cost in Kenya?", "Our solar jobs start from about KSh 15,000 for small setups and go beyond KSh 250,000 for larger systems. The final price depends on the number of panels, the inverter and the battery. We quote after we know your loads."],
+        ["What size solar system do I need?", "It depends on what you run and for how long. A few lights and a phone charger need far less than a fridge, TV and water pump. Tell us your appliances and we size the system for you."],
+        ["Do you install lithium batteries?", "Yes. Lithium battery wiring and set-up is part of our solar service."],
+        ["Can you service a solar system someone else installed?", "Yes. We check panels, wiring, the inverter and the battery on existing systems and tell you what needs fixing."]
+      ],
+      "shop": [],
+      "guides": [],
+      "related": ["electrical-plumbing-maintenance-nairobi", "cctv-security-installation-nairobi"]
+    },
+    {
+      "slug": "cctv-security-installation-nairobi",
+      "name": "CCTV & Smart Security Installation",
+      "nav": "CCTV and smart security",
+      "priceFrom": 8500, "priceTo": 85000,
+      "metaTitle": "CCTV & Security Installation Nairobi | Stermont Arcade",
+      "metaDesc": "IP camera setup with remote phone viewing, electric fencing and smart locks for estates, shops and warehouses in Nairobi. From KSh 8,500. Book a site visit.",
+      "h1": "CCTV and Smart Security Installation in Nairobi",
+      "audience": "Estates, retail stores, warehouses and apartments",
+      "lead": "Stermont Arcade installs CCTV and smart security for estates, retail stores, warehouses and apartments. We set up IP cameras you can watch from your phone, and we install electric fencing and smart locks, so you can see and control your property from anywhere.",
+      "includes": [
+        "IP camera installation and positioning",
+        "Remote mobile viewing set up on your phone",
+        "Electric fencing installation",
+        "Smart lock installation",
+        "Cable routing and a tidy finish"
+      ],
+      "process": [
+        ["Site visit", "We look at the entrances, blind spots and lighting, and agree where each camera should go."],
+        ["Quote", "You get a clear quote for cameras, recorder, cabling and any fencing or locks."],
+        ["Installation", "We mount and wire the equipment and set up recording."],
+        ["Phone set-up and handover", "We connect the system to your phone for remote viewing and show you how to review recordings."]
+      ],
+      "factors": [
+        "The number of cameras and the area they cover.",
+        "Cable length and how difficult the routes are.",
+        "Whether you add electric fencing or smart locks.",
+        "The type of property: a home, a shop and a warehouse each need different coverage."
+      ],
+      "areas": "We install across Nairobi and quote for other counties on request.",
+      "faqs": [
+        ["How much does CCTV installation cost in Nairobi?", "Jobs run from about KSh 8,500 for a small setup to about KSh 85,000 for larger sites. The cost depends on the number of cameras, the cabling and any fencing or locks."],
+        ["Can I watch my cameras on my phone?", "Yes. We set up remote mobile viewing on your phone as part of the installation."],
+        ["Do you install electric fences?", "Yes. We install electric fencing as part of our security service."],
+        ["Do you install smart locks?", "Yes. Ask us on WhatsApp which lock suits your door."]
+      ],
+      "shop": [],
+      "guides": [],
+      "related": ["solar-installation-maintenance-nairobi", "electrical-plumbing-maintenance-nairobi"]
+    },
+    {
+      "slug": "tv-mounting-home-theatre-setup-nairobi",
+      "name": "TV Mounting & Audio Visual Setup",
+      "nav": "TV mounting and audio visual setup",
+      "priceFrom": 1500, "priceTo": 7500,
+      "metaTitle": "TV Mounting & Home Theatre Setup Nairobi | Stermont Arcade",
+      "metaDesc": "Wall mounting, hidden cables and home theatre setup for homes, sports bars and boardrooms in Nairobi. From KSh 1,500. Book your slot on WhatsApp.",
+      "h1": "TV Mounting and Home Theatre Setup in Nairobi",
+      "audience": "Homes, sports bars and boardrooms",
+      "lead": "Stermont Arcade mounts TVs and sets up audio visual systems for homes, sports bars and boardrooms. We mount the screen securely, hide the cables and set up your home theatre so everything works from one remote.",
+      "includes": [
+        "Precision wall mounting for TVs",
+        "Concealed cable management",
+        "Home theatre and soundbar setup",
+        "Connecting and configuring your devices",
+        "Setup for sports bars and boardroom screens"
+      ],
+      "process": [
+        ["Tell us about your TV and wall", "Send the TV size and model, the wall type and where you want it mounted."],
+        ["Mounting", "We fix the bracket to the wall, mount the TV level and secure."],
+        ["Cables and devices", "We hide the cables and connect your decoder, console, soundbar or speakers."],
+        ["Test and handover", "We test picture and sound with you before we leave."]
+      ],
+      "factors": [
+        "TV size and weight.",
+        "Wall type: concrete, brick and drywall need different fixings.",
+        "Whether the cables must be concealed inside the wall.",
+        "The size of the audio visual setup: one TV, a home theatre or a multi-screen venue."
+      ],
+      "areas": "We mount and set up across Nairobi. Ask us about other towns.",
+      "faqs": [
+        ["How much does TV mounting cost in Nairobi?", "TV mounting and audio visual jobs run from about KSh 1,500 to KSh 7,500 depending on the TV size, the wall and the extras, such as concealed cables or home theatre setup."],
+        ["Can you hide the TV cables?", "Yes. Concealed cable management is part of the service."],
+        ["Do I need to buy the bracket from you?", "You can use your own bracket or buy one from our TV mounts and accessories category. Tell us on WhatsApp which one you have."],
+        ["Do you set up home theatres and soundbars?", "Yes. We connect and configure home theatre systems and soundbars."]
+      ],
+      "shop": ["tv-mounts-accessories", "home-theatre", "televisions", "bluetooth-speakers"],
+      "guides": ["smart-tv-buying-guide-kenya"],
+      "related": ["home-appliance-repair-nairobi", "cctv-security-installation-nairobi"]
+    },
+    {
+      "slug": "agrovet-spraying-crop-consultancy-kenya",
+      "name": "Agrovet Spraying & Crop Consultancy",
+      "nav": "Agrovet spraying and crop consultancy",
+      "priceFrom": 4500, "priceTo": 35000,
+      "metaTitle": "Agrovet Spraying & Crop Consultancy Kenya | Stermont Arcade",
+      "metaDesc": "On-farm chemical spraying, pest diagnosis, soil advice and livestock care for greenhouse, crop and livestock farmers in Kenya. From KSh 4,500.",
+      "h1": "Agrovet Spraying and Crop Consultancy in Kenya",
+      "audience": "Greenhouse owners, crop farmers and livestock farmers",
+      "lead": "Stermont Arcade provides on-farm spraying, pest diagnosis, soil advice and livestock care for greenhouse owners and crop and livestock farmers. We come to the farm, look at what is affecting your crop or animals, and help you apply the right product the right way.",
+      "includes": [
+        "On-farm application of crop chemicals",
+        "Pest and disease diagnosis on crops",
+        "Soil advisory",
+        "Livestock care advice",
+        "Product advice from our agrovet and sprayers ranges"
+      ],
+      "process": [
+        ["Describe the problem", "Tell us the crop or animal, what you see and how much of the farm is affected. Photos help."],
+        ["Farm visit and diagnosis", "We inspect the crop, soil or animals and identify the likely pest, disease or deficiency."],
+        ["Recommendation and quote", "We recommend what to apply or do, and quote the service and the products."],
+        ["Application and advice", "We apply the chemical on the farm where needed and explain the label, safety gear and waiting periods."]
+      ],
+      "factors": [
+        "The size of the area to spray and the type of crop.",
+        "The pest or disease and the number of applications needed.",
+        "Whether the job is a greenhouse, an open field or livestock.",
+        "The products used, which depend on the label and the crop."
+      ],
+      "areas": "We serve farms around Nairobi and quote for other counties. Send your location and crop on WhatsApp.",
+      "faqs": [
+        ["How much does farm spraying cost in Kenya?", "Services run from about KSh 4,500 to KSh 35,000 depending on the farm size, the crop and the products used. We quote after we understand the job."],
+        ["Can you tell me what is attacking my crop?", "Yes. Pest and disease diagnosis is part of the service. Send photos on WhatsApp or book a farm visit."],
+        ["Do you sell the chemicals and sprayers too?", "Yes. Browse our agrochemicals and sprayers and equipment categories."],
+        ["Do you help with livestock?", "Yes. We give livestock care advice and can point you to the veterinary drugs and animal feeds we stock."]
+      ],
+      "shop": ["crop-insecticides", "fungicides", "herbicides", "fertilizers", "sprayers-equipment", "veterinary-drugs", "animal-feeds"],
+      "guides": ["how-to-buy-agrovet-products-online-kenya", "how-to-read-an-insecticide-label-kenya"],
+      "related": ["pest-control-fumigation-nairobi", "deep-cleaning-carpet-wash-nairobi"]
+    },
+    {
+      "slug": "home-appliance-repair-nairobi",
+      "name": "Home Appliance Repair & Service",
+      "nav": "Home appliance repair",
+      "priceFrom": 2500, "priceTo": 12000,
+      "metaTitle": "Home Appliance Repair Nairobi | Stermont Arcade",
+      "metaDesc": "Diagnostic repair for washing machines, fridges, microwaves and ovens with genuine spare parts in Nairobi. From KSh 2,500. Book on WhatsApp.",
+      "h1": "Home Appliance Repair in Nairobi",
+      "audience": "Households and commercial laundromats",
+      "lead": "Stermont Arcade repairs and services washing machines, fridges, microwaves and ovens for households and commercial laundromats. We diagnose the fault first, tell you what is wrong, and repair it with genuine spare parts.",
+      "includes": [
+        "Diagnostic check to find the fault",
+        "Washing machine repair and service",
+        "Fridge and freezer repair",
+        "Microwave and oven repair",
+        "Genuine spare parts"
+      ],
+      "process": [
+        ["Describe the fault", "Tell us the appliance, the brand and what it is doing or not doing."],
+        ["Diagnosis", "We check the appliance and explain what has failed."],
+        ["Quote", "You get the repair cost, including parts, before we start."],
+        ["Repair and test", "We repair the appliance and test it with you."]
+      ],
+      "factors": [
+        "The appliance type and brand.",
+        "The fault: a worn part costs less than a failed main component.",
+        "The cost of the genuine spare part.",
+        "Whether the job is a home or a commercial laundromat."
+      ],
+      "areas": "We serve homes and laundromats in Nairobi. Ask us about other towns.",
+      "faqs": [
+        ["How much does appliance repair cost in Nairobi?", "Repairs run from about KSh 2,500 to KSh 12,000 depending on the appliance, the fault and the spare part. You get a quote after diagnosis."],
+        ["Which appliances do you repair?", "Washing machines, fridges, microwaves and ovens."],
+        ["Do you use genuine spare parts?", "Yes. We repair with genuine spare parts."],
+        ["Should I repair or replace my appliance?", "We tell you after diagnosis. If a repair is not worth it, browse our washing machines and fridges and freezers categories."]
+      ],
+      "shop": ["washing-machines", "fridges-freezers", "kitchen-dining"],
+      "guides": ["washing-machine-buying-guide-kenya", "how-to-choose-a-fridge-in-kenya"],
+      "related": ["electrical-plumbing-maintenance-nairobi", "tv-mounting-home-theatre-setup-nairobi"]
+    },
+    {
+      "slug": "deep-cleaning-carpet-wash-nairobi",
+      "name": "Professional Deep Cleaning & Carpet Wash",
+      "nav": "Deep cleaning and carpet wash",
+      "priceFrom": 4000, "priceTo": 20000,
+      "metaTitle": "Deep Cleaning & Carpet Wash Nairobi | Stermont Arcade",
+      "metaDesc": "Move-in, move-out and post-construction cleaning, sofa and carpet extraction, mattress sanitation and floor scrubbing in Nairobi. From KSh 4,000.",
+      "h1": "Professional Deep Cleaning and Carpet Wash in Nairobi",
+      "audience": "Move-in and move-out, post-construction, sofas and carpets",
+      "lead": "Stermont Arcade offers professional deep cleaning for move-in and move-out jobs, post-construction clean-ups, sofas, carpets and mattresses. We use deep steam vacuuming, sofa extraction and floor scrubbing to lift dirt that ordinary cleaning leaves behind.",
+      "includes": [
+        "Deep steam vacuuming",
+        "Mattress sanitation",
+        "Sofa extraction cleaning",
+        "Carpet washing",
+        "Floor scrubbing",
+        "Move-in, move-out and post-construction cleaning"
+      ],
+      "process": [
+        ["Tell us what needs cleaning", "Send the type of property, the rooms and the items: sofas, carpets, mattresses."],
+        ["Quote", "We quote based on the size and condition."],
+        ["Cleaning", "We steam, extract and scrub the agreed areas."],
+        ["Walkthrough", "We go through the result with you before we finish."]
+      ],
+      "factors": [
+        "The size of the property and the number of rooms.",
+        "The condition: post-construction dust and heavy stains take longer.",
+        "The number of sofas, carpets and mattresses.",
+        "Floor type and the scrubbing it needs."
+      ],
+      "areas": "We clean homes and offices across Nairobi. Ask us about other towns.",
+      "faqs": [
+        ["How much does deep cleaning cost in Nairobi?", "Jobs run from about KSh 4,000 to KSh 20,000 depending on the size, the condition and the items cleaned."],
+        ["Do you clean after construction?", "Yes. Post-construction cleaning is part of the service."],
+        ["Can you clean sofas and mattresses?", "Yes. We do sofa extraction cleaning and mattress sanitation."],
+        ["Do you help when I move in or out?", "Yes. Move-in and move-out cleaning is part of the service."]
+      ],
+      "shop": [],
+      "guides": [],
+      "related": ["pest-control-fumigation-nairobi", "home-appliance-repair-nairobi"]
+    },
+    {
+      "slug": "electrical-plumbing-maintenance-nairobi",
+      "name": "Electrical & Plumbing Maintenance",
+      "nav": "Electrical and plumbing maintenance",
+      "priceFrom": 2000, "priceTo": 15000,
+      "metaTitle": "Electrical & Plumbing Services Nairobi | Stermont Arcade",
+      "metaDesc": "Water heater installation, leak detection, circuit breaker fixes and rewiring for homes and property managers in Nairobi. From KSh 2,000. Book now.",
+      "h1": "Electrical and Plumbing Maintenance in Nairobi",
+      "audience": "Residential and commercial property managers",
+      "lead": "Stermont Arcade handles electrical and plumbing maintenance for homes and property managers. We install water heaters, find leaks, fix circuit breakers and rewire, so small faults get fixed before they become expensive ones.",
+      "includes": [
+        "Water heater installation",
+        "Leak detection",
+        "Circuit breaker fixes",
+        "Rewiring",
+        "Maintenance visits for property managers"
+      ],
+      "process": [
+        ["Describe the fault", "Tell us what is happening: a tripping breaker, a leak, a heater to install."],
+        ["Inspection and quote", "We check the fault and quote the repair."],
+        ["Repair or installation", "We fix or install and test."],
+        ["Handover", "We show you what was done and what to watch for."]
+      ],
+      "factors": [
+        "The type of job: an installation, a repair or a rewire.",
+        "Access to pipes and wiring.",
+        "The parts needed.",
+        "Whether it is a one-off call or regular maintenance for a property."
+      ],
+      "areas": "We serve homes and property managers in Nairobi. Ask us about other towns.",
+      "faqs": [
+        ["How much do electrical and plumbing services cost in Nairobi?", "Jobs run from about KSh 2,000 to KSh 15,000 depending on the work and the parts."],
+        ["Can you install a water heater?", "Yes. Water heater installation is part of the service."],
+        ["Can you find a hidden leak?", "Yes. Leak detection is part of the service."],
+        ["Why does my circuit breaker keep tripping?", "It can be an overloaded circuit, a faulty appliance or a wiring fault. We inspect it and tell you the cause."]
+      ],
+      "shop": ["kitchen-dining"],
+      "guides": [],
+      "related": ["solar-installation-maintenance-nairobi", "home-appliance-repair-nairobi"]
+    }
+  ]
+}
