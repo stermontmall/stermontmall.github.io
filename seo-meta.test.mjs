@@ -1,6 +1,6 @@
 // Run: node seo-meta.test.mjs   (no dependencies)
 import assert from 'node:assert/strict';
-import { pdpBadges, pdpHeadings, pdpH1, pdpTagline, pdpTitle, pdpDescription, catTitle, catDescription, powerWord, productType, hasLeadWord, TITLE_MAX, DESC_MAX } from './seo-meta.mjs';
+import { pdpBadges, pdpHeadings, pdpH1, pdpTagline, pdpTitle, pdpDescription, catTitle, catDescription, powerWord, productType, hasLeadWord, buyName, TITLE_MAX, DESC_MAX } from './seo-meta.mjs';
 
 const names = [
   'Bazooka 18EC Insecticide (1L)', 'Bazooka 18EC', 'Duduthrin 1.75EC Insecticide 1 Litre', 'Roundup Turbo 500ml',
@@ -30,7 +30,8 @@ for (const name of names) for (const ctx of ctxs) {
   assert.equal(t, pdpTitle(name, ctx), 'title must be deterministic');
   const h = pdpH1(name, ctx), tg = pdpTagline(ctx); n += 3;
   assert.ok(!/\b(\w+(?:-\w+)?) \1\b/i.test(h), `repeated word in H1: ${h}`);
-  assert.ok(/Best Price in Kenya/.test(tg) && !/(#1|top-rated|guaranteed|certified)/i.test(h + tg), `bad tagline/H1: ${h} | ${tg}`);
+  assert.ok(/M-Pesa checkout/.test(tg) && /47 counties/.test(tg) && !/(#1|top-rated|guaranteed|certified)/i.test(h + tg), `bad tagline/H1: ${h} | ${tg}`);
+  assert.ok(h.startsWith('Buy '), `H1 must start with Buy: ${h}`); n++;
   assert.ok(h.endsWith(name.replace(/\s+/g, ' ').trim()), `H1 must keep the full product name: ${h}`);
 }
 for (const [c, slug] of cats) {
@@ -59,7 +60,7 @@ assert.equal(pdpHeadings('bed-bug-killers').features, 'Powerful Features & Targe
 assert.equal(pdpHeadings('herbicides').features, 'Powerful Features & Target Crop Protection');
 assert.equal(pdpHeadings('smartphones').features, null);
 assert.equal(pdpHeadings('smartphones').guide, 'Reliable Quality & Application Guide');
-assert.equal(pdpHeadings('smartphones').price, 'Best Price & Countrywide Kenya Delivery');
+assert.equal(pdpHeadings('smartphones').price, 'Price, M-Pesa Checkout & Kenya Delivery');
 n += 8;
 
 // generate-products.mjs prints pdpHeadings().delivery as an <h2>; it must never be empty (it was, on every product page, before 2026-10-29).
@@ -82,7 +83,7 @@ const catalogNames = [
 for (const nm of catalogNames) {
   assert.ok(hasLeadWord(nm), `lead word not recognised: ${nm}`); n++;
   for (const ctx of ctxs) {
-    assert.equal(pdpH1(nm, ctx), nm, `H1 must be the owner's name unchanged: ${pdpH1(nm, ctx)}`);
+    assert.equal(pdpH1(nm, ctx), buyName(nm), `H1 must be the owner's name with only the Buy prefix: ${pdpH1(nm, ctx)}`);
     assert.ok(pdpTitle(nm, ctx).startsWith(nm.slice(0, 12)) || pdpTitle(nm, ctx).length <= TITLE_MAX, `title lost the lead word: ${pdpTitle(nm, ctx)}`); n += 2;
   }
 }
