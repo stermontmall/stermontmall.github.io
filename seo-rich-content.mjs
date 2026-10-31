@@ -1,11 +1,13 @@
 // Stermont Arcade - rich-content pass for product pages (runs from seo-overrides.mjs, after seo-product-extras.mjs).
 // Adds, using only facts the page already has or facts that are true for the whole store (shipping.html, nairobi.html):
 // 1) "Price of <product> by size" table when a product has several pack sizes (replaces the plain "Available sizes" list).
-// 2) "Buy <product> in Nairobi, Kiambu, Nakuru, Kisumu, Eldoret & Mombasa" box with the phone / WhatsApp number and a 3-step "how to order".
+// 2) "How to order <product> in Kenya" box with the phone / WhatsApp number, the delivery towns and a 3-step "how to order".
 // 3) For PCPB-regulated categories only: a link out to the Pest Control Products Board website to check registration.
 // 4) A visible "Frequently asked questions" box (price, delivery, M-Pesa, how to buy) so the FAQ schema on the page matches what visitors can read.
 // It never invents dosages, ingredients or coverage: those come from each product's own description (Supabase) and the structured sections of seo-product-extras.mjs.
 // Safe by design: every page is wrapped in try/catch, a page that already has the marker is skipped. To switch it off, delete the import line in seo-overrides.mjs.
+// wip-index-quality: the leading "Buy " of the H1 is stripped from the product name before it is reused in headings and FAQ text,
+// otherwise headings read "Buy Buy Original ..." and the page looks machine-made to Google.
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 
 const WA = '254748888230', PHONE = '+254 748 888 230';
@@ -23,7 +25,7 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     const file = `p/${f}`; let h = readFileSync(file, 'utf8');
     if (h.includes(MARK) || !/<h1>/.test(h)) continue;   // already done, or a redirect stub
     const before = h;
-    const name = unesc(h.match(/<h1>([\s\S]*?)<\/h1>/)[1].replace(/<[^>]+>/g, '').trim());
+    const name = unesc(h.match(/<h1>([\s\S]*?)<\/h1>/)[1].replace(/<[^>]+>/g, '').trim()).replace(/^Buy\s+/i, '');
     const nm = esc(name);
 
     // 1) price table by size
@@ -34,11 +36,11 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
         rows.map(r => `<tr><td>${r[1]}</td><td>${r[2]}</td><td class="${r[3]}">${r[4]}</td><td>${r[5] ? `<a href="${r[5]}">WhatsApp</a>` : '–'}</td></tr>`).join('') + '</tbody></table></div></div>';
     });
 
-    // 2) local delivery + how to order
+    // 2) local delivery + how to order (the delivery times already sit in the "Delivery to Nairobi & All 47 Counties" box, so they are not repeated here)
     const ask = `https://wa.me/${WA}?text=${encodeURIComponent(`Hello Stermont Arcade, I want to order ${name}. My town is: `)}`;
-    const local = `<div class="box how"><h2 style="margin-top:0">Buy ${nm} in Nairobi, Kiambu, Nakuru, Kisumu, Eldoret &amp; Mombasa</h2>` +
-      `<p>Stermont Arcade delivers to Nairobi, Kiambu, Nakuru, Kisumu, Eldoret, Mombasa and every other county in Kenya. Nairobi orders usually arrive the same day or the next day, and other counties usually within 1 to 3 days.</p>` +
-      `<h3 style="font-size:1.05rem;margin:.6rem 0 .2rem;color:#5b21b6">How to order</h3><ol><li>Add the product to your cart, or message us on WhatsApp.</li><li>Pay by M-Pesa and enter the M-Pesa code from your SMS.</li><li>We confirm the delivery fee for your town before you pay, then dispatch your order.</li></ol>` +
+    const local = `<div class="box how"><h2 style="margin-top:0">How to order ${nm} in Kenya</h2>` +
+      `<p>We deliver to Nairobi, Kiambu, Nakuru, Kisumu, Eldoret, Mombasa and every other county in Kenya.</p>` +
+      `<ol><li>Add the product to your cart, or message us on WhatsApp.</li><li>Pay by M-Pesa and enter the M-Pesa code from your SMS.</li><li>We confirm the delivery fee for your town before you pay, then dispatch your order.</li></ol>` +
       `<p>Call <a href="tel:+${WA}">${PHONE}</a> or <a href="${esc(ask)}" rel="noopener">order on WhatsApp</a>.</p></div>`;
     // 3) PCPB link out (regulated categories only)
     const bc = (h.match(/<nav class="bc">[\s\S]*?<\/nav>/) || [''])[0];
