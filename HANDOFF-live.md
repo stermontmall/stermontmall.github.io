@@ -1,20 +1,21 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 09:30 (Africa/Nairobi). GitHub + Supabase connected; NO clone this session (GitHub tools only), so nothing below was run.
+Last saved: 2026-10-31 09:40 (Africa/Nairobi). GitHub + Supabase connected; NO clone this session (GitHub tools only), so nothing below was run.
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST: Services copy to 600+ words, tenders, all cities (branch `wip-services-600-words`, 2026-10-31 09:30 Africa/Nairobi)
-Owner (after phone screenshots of `/services/`): "add content to all the services, at least 600 words; creative, high-intent words; Nairobi and all cities in Kenya; appeal to organisational tenders; autosave on handoff".
-FINDING: `services/word-counts.json` on `main` says the 8 landing pages already have 617-912 words, but the 8 guides have 373-543 words, and the hub `/services/` (`services/app.js`, 15 accordion items) shows only about 60 words per item. The hub is what the owner saw.
-### Done (branch pushed, not merged)
+## NEWEST: Services copy to 600+ words, tenders, all cities (branch `wip-services-600-words`, 2026-10-31 09:40 Africa/Nairobi)
+Owner (after phone screenshots of `/services/`): "add content to all the services, at least 600 words; creative, high-intent words; Nairobi and all cities in Kenya; appeal to organisational tenders; autosave on handoff". Owner chose: hub items LINK to their full pages (not 15 new pages).
+FINDING: `services/word-counts.json` on `main` says the 8 landing pages already have 617-912 words, but the 8 guides have 373-543 words, and the hub `/services/` (`services/app.js`, 15 accordion items) showed only about 60 words per item.
+### Done (branch pushed, not merged, nothing run)
 - [x] `services/services-more.json` (new): per service a "contracts, institutions and tenders" section, a "near me: Nairobi, Mombasa, Kisumu, Nakuru, Eldoret and beyond" section and 5 search phrases; per guide 3-4 sections (quotation checklist, tenders, cities, safety). All 8 services and all 8 guides.
-- [x] `services/build-services.mjs`: also reads `services-more.json` (appended after `services-extra.json`), and prints `UNDER 600 WORDS:` for any page below 600.
-### In progress / Next (exact commands)
+- [x] `services/build-services.mjs`: also reads `services-more.json` (after `services-extra.json`) and prints `UNDER 600 WORDS:` for any page below 600.
+- [x] `services/app.js`: every hub item now ends with "Read the full service page: prices, tenders, cities and FAQs" linking to its landing page. Map: pest items -> pest-control-fumigation-nairobi; sofa/carpet, move-in/out, post-construction, Airbnb, office janitorial -> deep-cleaning-carpet-wash-nairobi; CCTV and electric fence -> cctv-smart-security-installation-nairobi; inverter -> solar-system-installation-kenya; plumbing and electrical -> electrical-plumbing-maintenance-nairobi; 4G/5G antenna has no landing page, so it links to its guide `#/blog/boost-weak-4g-5g-signal-rural-kenya` on the hub.
+### Next (exact commands)
 - [ ] RUN: `node services/build-services.mjs && cat services/word-counts.json` (or Actions > "Build services pages" on this branch). Expect no `UNDER 600 WORDS` line. If a guide is still short, add a section for it in `services-more.json` and re-run. Generated pages are NOT edited by hand.
-- [ ] HUB (what the owner saw): the 15 accordion items in `services/app.js` are short. Options: (a) each item gets a "Read the full service page and price" link to its landing page (pest items -> pest page, cleaning items -> deep-cleaning page, CCTV -> cctv page, plumbing and electrical -> electrical-plumbing page, inverter -> solar page; 4G antenna and electric fence have NO landing page yet); (b) 15 separate pages of 600+ words each. Owner to choose. Not started.
-- [ ] Merge to `main` only after the generator runs clean and 2 pages + 1 guide are opened on a phone. `services/sitemap-services.xml` is still not in `sitemap.xml` or Search Console.
+- [ ] Open a PR from `wip-services-600-words` to `main`; merge only after the generator runs clean and 2 pages + 1 guide + the hub links are opened on a phone (reload twice: the service worker may cache `services/app.js`).
+- [ ] Optional: a landing page for 4G/5G antenna setup and electric fence (the two hub items without their own page); `services/sitemap-services.xml` is still not in `sitemap.xml` or Search Console.
 ### Blocked / owner
 - Owner to confirm: the claims (90-day guarantee, low-odour, genuine parts, licensed staff), the price ranges, and the SERVICE AREAS. The copy says crews are based in Nairobi and Kitale, and that for every other town the customer sends the location and we confirm how we can help and the travel cost. It does NOT claim we serve every city. Change that sentence if you do.
-- TENDERS: the copy does NOT claim any registration or licence (KRA PIN, business registration, NCA, PCPB, AGPO and so on). It says "tell us which compliance documents your tender requires and we confirm what we can supply". Give the real list of documents you hold and I will add them to every page.
+- TENDERS: the copy does NOT claim any registration or licence (KRA PIN, business registration, NCA, PCPB, AGPO and so on). It says "tell us which compliance documents your tender requires and we confirm what we can supply". Give the real list of documents you hold and they will be added to every page.
 - Words kept out on purpose: "best", "100%", "certified", "non-toxic", "eco-friendly", "guaranteed" (outside the 90-day wording).
 
 ## (previous) Services in the shop Categories tab (branch `wip-shop-services-categories`, 2026-10-31 09:10 Africa/Nairobi)
