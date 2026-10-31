@@ -1,22 +1,22 @@
 {
  "services": {
-  "pest-control-fumigation-nairobi": 1146,
-  "solar-system-installation-kenya": 1078,
-  "cctv-smart-security-installation-nairobi": 880,
-  "tv-mounting-audio-visual-setup-nairobi": 914,
-  "agrovet-spraying-crop-consultancy-kenya": 889,
-  "home-appliance-repair-nairobi": 850,
-  "deep-cleaning-carpet-wash-nairobi": 889,
-  "electrical-plumbing-maintenance-nairobi": 813
+  "pest-control-fumigation-nairobi": 1281,
+  "solar-system-installation-kenya": 1218,
+  "cctv-smart-security-installation-nairobi": 1024,
+  "tv-mounting-audio-visual-setup-nairobi": 1060,
+  "agrovet-spraying-crop-consultancy-kenya": 1033,
+  "home-appliance-repair-nairobi": 987,
+  "deep-cleaning-carpet-wash-nairobi": 1036,
+  "electrical-plumbing-maintenance-nairobi": 948
  },
  "guides": {
-  "pest-control-cost-nairobi": 750,
-  "solar-system-cost-kenya": 663,
-  "cctv-installation-cost-nairobi": 597,
-  "tv-wall-mounting-guide-kenya": 611,
-  "farm-spraying-guide-kenya": 591,
-  "appliance-repair-or-replace-nairobi": 620,
-  "deep-cleaning-checklist-nairobi": 544,
-  "water-heater-and-leak-repair-nairobi": 609
+  "pest-control-cost-nairobi": 798,
+  "solar-system-cost-kenya": 713,
+  "cctv-installation-cost-nairobi": 647,
+  "tv-wall-mounting-guide-kenya": 662,
+  "farm-spraying-guide-kenya": 641,
+  "appliance-repair-or-replace-nairobi": 670,
+  "deep-cleaning-checklist-nairobi": 626,
+  "water-heater-and-leak-repair-nairobi": 658
  }
 }

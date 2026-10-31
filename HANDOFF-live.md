@@ -1,8 +1,22 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 09:40 (Africa/Nairobi). GitHub + Supabase connected; NO clone this session (GitHub tools only), so nothing below was run.
+Last saved: 2026-10-31 10:05 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST: Services copy to 600+ words, tenders, all cities (branch `wip-services-600-words`, 2026-10-31 09:40 Africa/Nairobi)
+## NEWEST: No Kitale, all 47 counties, big cities first (branch `wip-services-600-words`, 2026-10-31 10:05 Africa/Nairobi)
+Owner: "remove Kitale from the list but include 47 counties on the services sections; focus mostly on Nairobi and other big cities in Kenya".
+### Done (branch pushed, NOT merged)
+- [x] Kitale removed from `services-extra.json`, `services-more.json` (text only, no other copy changed). The build still FAILS if the word appears in any generated file. "Our crews are based in Nairobi and Kitale" now reads "Our head office is in Westlands, Nairobi, and we take bookings from all 47 counties".
+- [x] `services/build-services.mjs`: one list of 47 counties (Nairobi, then the counties of the big cities, then the rest A to Z; the build fails unless there are exactly 47). Every landing page gets "<service> in all 47 counties" (Nairobi home market, big cities first, travel cost confirmed on WhatsApp, full county list); every guide gets "Where this applies"; JSON-LD `areaServed` lists Nairobi + 46 counties + Kenya.
+- [x] `services/index.html` (hub): hero says "Nairobi first, then Mombasa, Kisumu, Nakuru, Eldoret and the other big cities, with bookings from all 47 counties"; hub JSON-LD `areaServed` has the 47 counties.
+- [x] `node services/build-services.mjs` ran clean: 19 files, no `UNDER 600 WORDS` line, min 626 words (guide deep-cleaning-checklist), landing pages 948-1,281. All JSON files parse. Generated pages were rebuilt, not hand-edited.
+### Next
+- [ ] Open the PR `wip-services-600-words` -> `main`; merge after 2 service pages + 1 guide + the hub are opened on a phone (reload twice: the service worker may cache `services/app.js`).
+- [ ] Optional: `wip-services-deep-pest` (separate bed bug / cockroach / termite / rodent / Airbnb pages) overlaps this branch; decide the order.
+### Blocked / owner
+- The copy now SAYS services are taken from all 47 counties (Nairobi and big cities first, travel cost confirmed per job). Owner to confirm that is true. Still unconfirmed: the claims (90-day guarantee, low-odour, genuine parts, licensed staff), price ranges, and the compliance documents for tenders (none are claimed).
+
+
+## (previous) Services copy to 600+ words, tenders, all cities (branch `wip-services-600-words`, 2026-10-31 09:40 Africa/Nairobi)
 Owner (after phone screenshots of `/services/`): "add content to all the services, at least 600 words; creative, high-intent words; Nairobi and all cities in Kenya; appeal to organisational tenders; autosave on handoff". Owner chose: hub items LINK to their full pages (not 15 new pages).
 FINDING: `services/word-counts.json` on `main` says the 8 landing pages already have 617-912 words, but the 8 guides have 373-543 words, and the hub `/services/` (`services/app.js`, 15 accordion items) showed only about 60 words per item.
 ### Done (branch pushed, not merged, nothing run)
