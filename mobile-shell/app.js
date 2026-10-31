@@ -311,9 +311,11 @@ function renderCategoriesView() {
   if (!CATS.length) { $('#cat-side').innerHTML = ''; $('#cat-main').innerHTML = '<p class="text-mute text-sm py-6 text-center">Loading categories&hellip;</p>'; return; }
   const c = sideCat === '__top' ? null : (CATS.find(x => x.id === sideCat) || null);
   sideCat = c ? c.id : '__top';
-  const rail = (id, icon, name) => `<button class="cat-side" role="tab" data-side="${esc(id)}" aria-selected="${id === sideCat}" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 4px"><span style="font-size:26px;line-height:1">${icon}</span><span>${esc(name)}</span></button>`;
+  /* Rail icon: a real product photo of that category (emoji if none or it fails to load); Top Categories keeps its star. */
+  const railIcon = (icon, img) => img ? `<span class="grid place-items-center overflow-hidden rounded-lg shrink-0" style="width:44px;height:44px;font-size:24px;line-height:1;background:#fff;border:1px solid #eee">${thumb({ img, emoji: icon })}</span>` : `<span style="font-size:26px;line-height:1">${icon}</span>`;
+  const rail = (id, icon, name, img) => `<button class="cat-side" role="tab" data-side="${esc(id)}" aria-selected="${id === sideCat}" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 4px">${railIcon(icon, img)}<span>${esc(name)}</span></button>`;
   const svcRail = `<a class="cat-side" href="/services/" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 4px;text-decoration:none;color:inherit"><span style="font-size:26px;line-height:1">\u{1F6E0}\uFE0F</span><span>Services</span></a>`;
-  $('#cat-side').innerHTML = rail('__top', '⭐', 'Top Categories') + svcRail + CATS.map(x => rail(x.id, x.icon, x.name)).join('');
+  $('#cat-side').innerHTML = rail('__top', '⭐', 'Top Categories') + svcRail + CATS.map(x => rail(x.id, x.icon, x.name, photoOf(x.id))).join('');
   if (!c) {
     $('#cat-main').innerHTML = `<div class="mb-3 font-semibold">Top Categories</div>
       <ul class="grid grid-cols-3 gap-y-4 gap-x-2"><li><a class="tap w-full flex flex-col items-center gap-1.5" href="/services/" style="text-decoration:none;color:inherit"><span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:64px;height:64px;background:#f3ecff">\u{1F6E0}\uFE0F</span><span class="text-xs text-center leading-4">Services</span></a></li>${CATS.map(x => tile(`data-cat-all="${esc(x.id)}"`, x.name, photoOf(x.id), x.icon, '#fff')).join('')}</ul>`;
