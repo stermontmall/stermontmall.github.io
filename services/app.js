@@ -29,6 +29,19 @@ const S = [
 ] }
 ];
 
+// Each hub item links to the landing page that holds the full 600+ word write-up, prices and FAQs.
+// The 4G antenna item has no landing page yet, so it links to its guide on this page.
+const PAGE = {
+  'bed-bugs': 'pest-control-fumigation-nairobi', 'cockroaches': 'pest-control-fumigation-nairobi', 'termites': 'pest-control-fumigation-nairobi', 'rodents': 'pest-control-fumigation-nairobi',
+  'upholstery': 'deep-cleaning-carpet-wash-nairobi', 'move-in-out': 'deep-cleaning-carpet-wash-nairobi', 'post-construction': 'deep-cleaning-carpet-wash-nairobi', 'airbnb': 'deep-cleaning-carpet-wash-nairobi', 'office-janitorial': 'deep-cleaning-carpet-wash-nairobi',
+  'cctv': 'cctv-smart-security-installation-nairobi', 'electric-fence': 'cctv-smart-security-installation-nairobi',
+  'inverter': 'solar-system-installation-kenya',
+  'plumbing': 'electrical-plumbing-maintenance-nairobi', 'electrical': 'electrical-plumbing-maintenance-nairobi'
+};
+const more = id => PAGE[id]
+  ? `<p><a href="/services/${PAGE[id]}.html">Read the full service page: prices, tenders, cities and FAQs</a></p>`
+  : '<p><a href="#/blog/boost-weak-4g-5g-signal-rural-kenya">Read the full 4G and 5G signal guide</a></p>';
+
 const A = [
 { slug: 'get-rid-of-bed-bugs-kenya', t: 'How to permanently get rid of bed bugs in Kenya: the ultimate chemical and heat treatment guide', x: 'Why one spray fails and how heat plus chemical treatment clears the whole life cycle.', h: `<h2>How to permanently get rid of bed bugs in Kenya</h2><p>Bed bugs travel in luggage, second-hand furniture and shared laundry, and they spread in flats, hostels and Airbnbs. Getting rid of them for good means treating every life stage.</p><h3>Signs you have bed bugs</h3><ul><li>Small red bites in lines on arms, neck or back</li><li>Tiny dark spots on sheets and mattress seams</li><li>A sweet, musty smell in heavy infestations</li></ul><h3>Why sprays alone fail</h3><p>Eggs are hard to reach and survive many sprays. Nymphs hatch days later and the cycle restarts.</p><h3>Heat plus chemical treatment</h3><p>Sustained heat penetrates mattresses and furniture where liquids cannot. A non-staining chemical treatment then covers cracks, frames and skirting. A follow-up visit catches nymphs that hatch afterwards.</p><h3>What you can do before we arrive</h3><ul><li>Wash bedding and clothes hot and dry them on high heat</li><li>Declutter around the bed</li><li>Do not move items to other rooms, which spreads bugs</li></ul><p>See our <a href="#svc-bed-bugs">bed bug eradication service</a> and <a href="#svc-upholstery">mattress disinfection</a>.</p><h3>Frequently asked questions</h3><h4>Can bed bugs live in a clean house?</h4><p>Yes. They feed on blood, not dirt, so cleanliness does not prevent them.</p><h4>How long before I can sleep in the room again?</h4><p>We tell you after the treatment based on the method used.</p>` },
 { slug: 'pest-control-restaurants-commercial-kitchens', t: 'Choosing the best pest control methods for restaurants and commercial kitchens', x: 'Gel baiting, exclusion and sanitation habits that keep kitchens inspection-ready.', h: `<h2>Pest control for restaurants and commercial kitchens</h2><p>Pests in a kitchen mean lost customers and possible closure by health inspectors. The best approach is prevention plus targeted treatment that does not contaminate food.</p><h3>Cockroach gel baiting</h3><p>Low-odour gel is placed in cracks, hinges and appliance gaps, away from food surfaces, so service can continue without evacuation. See <a href="#svc-cockroaches">cockroach gel baiting</a>.</p><h3>Rodent exclusion</h3><p>Tamper-resistant bait stations outside, and sealed gaps around pipes and doors, keep rats out. See <a href="#svc-rodents">rodent control</a>.</p><h3>Sanitation habits that matter</h3><ul><li>Cover and empty waste bins daily</li><li>Clear grease traps and floor drains regularly</li><li>Store dry goods off the floor in sealed containers</li><li>Fix dripping taps, since pests need water</li></ul><h3>Keep records</h3><p>Ask for a dated service report after every visit. It helps with inspections and shows what was treated.</p><h3>Frequently asked questions</h3><h4>How often should a restaurant be treated?</h4><p>Frequency depends on size and risk, and we recommend a schedule after inspecting your premises.</p><h4>Can the kitchen stay open?</h4><p>Often yes for gel baiting. We confirm before the visit.</p>` },
@@ -38,7 +51,7 @@ const A = [
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const ALL = S.flatMap(c => c.items);
 
-$('#catalog').innerHTML = S.map(c => `<h3>${esc(c.c)}</h3>` + c.items.map(i => `<details class="svc" id="svc-${i.id}"><summary>${esc(i.n)}</summary><p>${esc(i.d)}</p><ul>${i.b.map(x => `<li>${esc(x)}</li>`).join('')}</ul><h4>${esc(i.q)}</h4><p>${esc(i.a)}</p><button class="btn" data-book="${i.id}">Book this service</button></details>`).join('')).join('');
+$('#catalog').innerHTML = S.map(c => `<h3>${esc(c.c)}</h3>` + c.items.map(i => `<details class="svc" id="svc-${i.id}"><summary>${esc(i.n)}</summary><p>${esc(i.d)}</p><ul>${i.b.map(x => `<li>${esc(x)}</li>`).join('')}</ul><h4>${esc(i.q)}</h4><p>${esc(i.a)}</p>${more(i.id)}<button class="btn" data-book="${i.id}">Book this service</button></details>`).join('')).join('');
 $('#f-svc').innerHTML = '<option value="">Choose a service</option>' + ALL.map(i => `<option value="${i.id}">${esc(i.n)}</option>`).join('');
 
 function route() {
