@@ -1,8 +1,14 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 08:20 (Africa/Nairobi). GitHub + Supabase connected. This session has NO clone; node ran only in a sandbox on a fixture.
+Last saved: 2026-10-31 09:05 (Africa/Nairobi). GitHub + Supabase connected; this session had a clone and ran node on the real data.
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST: Services SEO pages (branch `wip-services-seo-pages`, 2026-10-31 08:20)
+## NEWEST: Services polish PR (branch `wip-services-polish`, 2026-10-31 09:05 Africa/Nairobi)
+- [x] PR #83 (8 services + 8 guides) is merged and the pages are live on `main`.
+- [x] `wip-services-polish` (hub `/services/` now links the 8 pages and guides, `services-extra.json` adds longer sections, violet theme) was checked: both JSON files parse, `node services/build-services.mjs` rebuilds with NO diff, all 9 hub links resolve. PR opened to `main`.
+- [ ] NEXT: merge that PR, then open 2 service pages + 1 guide in a browser (not tested in one). Command to re-check: `node services/build-services.mjs && git status --short` (expect empty).
+- [ ] STILL OPEN: add `services/sitemap-services.xml` to `sitemap.xml` or Search Console; owner confirms claims (90-day guarantee, low-odour, genuine parts, licensed staff, Kitale in areas) and the price ranges; then the doubled "Buy" check and batch 09.
+
+## (previous) NEWEST: Services SEO pages (branch `wip-services-seo-pages`, 2026-10-31 08:20)
 Owner uploaded the Services Blueprint PDF: "Expound on the SEO and blogs, best descriptions of the services in Kenya, use the prices in range, autosave". Full notes: `services/HANDOFF.md` (section on top).
 - [x] `services/services-data.json` (8 services + 8 guides, PDF price ranges), `services/build-services.mjs` (tested on a fixture only), `.github/workflows/services-build.yml`.
 - [ ] NEXT: run the workflow "Build services pages" on that branch (or `node services/build-services.mjs`), open 2 pages + 1 guide, fix any JSON typo it reports, then merge to `main`.
