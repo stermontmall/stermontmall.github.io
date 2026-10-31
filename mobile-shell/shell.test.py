@@ -171,6 +171,10 @@ with sync_playwright() as p:
     # drawer
     pg.locator('[data-open="drawer-categories"]').click()
     check('category drawer opens', pg.locator('#drawer-categories.open').count() == 1)
+    rows = pg.locator('#drawer-cats [data-drawer-cat]').count()
+    with_img = pg.locator('#drawer-cats [data-drawer-cat] img[src^="http"]').count()
+    check('drawer rows show real product photos', with_img >= 1, with_img)
+    check('drawer rows without a photo keep the category emoji', pg.evaluate("[...document.querySelectorAll('#drawer-cats [data-drawer-cat]')].every(b => b.querySelector('img') || b.querySelector('span').textContent.trim().length > 0)"), rows)
     pg.locator('[data-drawer-cat="phones-accessories"]').click()
     pg.wait_for_timeout(900)
     check('drawer category selects chip, closes drawer', pg.locator('#drawer-categories.open').count() == 0 and pg.locator('#chips [data-chip="phones-accessories"][aria-selected="true"]').count() == 1)
