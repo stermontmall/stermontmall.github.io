@@ -73,11 +73,11 @@
     });
   }
   function svcSelect(cur, first) {
-    var s = h('select');
-    (first || []).forEach(function (o) { s.appendChild(new Option(o[1], o[0])); });
+    var s = h('select'), fixed = first || [];
+    fixed.forEach(function (o) { s.appendChild(new Option(o[1], o[0])); });
     groups.forEach(function (g) { var og = D.createElement('optgroup'); og.label = g.label; g.items.forEach(function (it) { og.appendChild(new Option(it[1], it[0])); }); s.appendChild(og); });
-    if (cur && !names[cur]) s.appendChild(new Option(cur, cur));
-    s.value = cur || (first && first.length ? first[0][0] : '');
+    if (cur && !names[cur] && !fixed.some(function (o) { return o[0] === cur; })) s.appendChild(new Option(cur, cur));
+    s.value = cur || (fixed.length ? fixed[0][0] : '');
     return s;
   }
   function viewUrl(slug) {
@@ -238,7 +238,7 @@
           Object.assign(p, fields); paint(list); note('Saved: ' + p.title, true); return removeObjects(removed);   /* files the staff removed are deleted only after the save worked */
         });
     }, function () { paint(list); });
-    c.parentNode.replaceChild(ed.el, c); ed.el.scrollIntoView && ed.el.scrollIntoView({ block: 'start' });
+    c.parentNode.replaceChild(ed.el, c); if (ed.el.scrollIntoView) ed.el.scrollIntoView({ block: 'start' });
   }
   function card(p, list) {
     var c = h('div', 'card sm'), top = h('div', 'top'), l = h('div');
@@ -303,7 +303,8 @@
   /* ---------- service settings (public.service_catalog) ---------- */
   function catCard(slug, L) {
     var row = cat[slug] || {}, d = defs[slug] || {}, c = h('div', 'card sm'), top = h('div', 'top'), l = h('div');
-    var cover = row.cover_url || null, newCover = null, dropCover = false;
+    var cover = row.cover_url || null, newCover = null, dropCover = false, er = h('div', 'err');
+    er.hidden = true;
     l.appendChild(h('div', 'ref', names[slug] || slug)); l.appendChild(h('div', 'when', cat[slug] ? 'Customised' + (row.updated_by ? ' by ' + row.updated_by : '') + (row.updated_at ? ' \u00b7 ' + STMAdmin.fmt(row.updated_at) : '') : 'Standard page (nothing changed)'));
     top.appendChild(l); top.appendChild(h('span', 'badge ' + (row.active === false ? 'b-declined' : 'b-paid'), row.active === false ? 'Not booking' : 'Booking')); c.appendChild(top);
     var ck = h('label', 'sm-chk'); var ac = h('input'); ac.type = 'checkbox'; ac.checked = row.active !== false; ck.appendChild(ac); ck.appendChild(D.createTextNode('Taking new bookings and quotes')); c.appendChild(ck);
@@ -329,7 +330,7 @@
       er.hidden = true; prepare(f).then(function (it) { newCover = { it: it, prev: URL.createObjectURL(it.blob) }; dropCover = false; showCover(); }).catch(function (e) { er.textContent = human(e); er.hidden = false; });
     };
     rm.onclick = function () { newCover = null; dropCover = true; showCover(); };
-    var er = h('div', 'err'); er.hidden = true; c.appendChild(er);
+    c.appendChild(er);
     var a = h('div', 'acts'); var go = h('button', 'btn', 'Save settings'); go.type = 'button'; a.appendChild(go);
     var u = viewUrl(slug); if (u) { var vw = h('a', 'btn alt', 'View page'); vw.href = u; vw.target = '_blank'; vw.rel = 'noopener'; a.appendChild(vw); }
     if (cat[slug]) { var rs = h('button', 'btn no', 'Reset to standard'); rs.type = 'button'; rs.onclick = function () { ask('Reset ' + (names[slug] || slug) + '?', 'The notice, offer line, price override and cover photo are removed and the page goes back to its standard content.', 'Reset', function () { reset(); }); }; a.appendChild(rs); }
@@ -350,8 +351,9 @@
         if (nmin > nmax) { er.textContent = 'The first price must not be higher than the second.'; er.hidden = false; return; }
       }
       busy = true; go.disabled = true; go.textContent = 'Saving...';
-      var path = null, up = null;
-      (newCover ? (path = mkPath('cover-' + slug, newCover.it.ext), upload(newCover.it, path).then(function () { up = path; })) : Promise.resolve()).then(function () {
+      var up = null, first = Promise.resolve();
+      if (newCover) { var path = mkPath('cover-' + slug, newCover.it.ext); first = upload(newCover.it, path).then(function () { up = path; }); }
+      first.then(function () {
         var body = { slug: slug, active: ac.checked, price_min: nmin, price_max: nmax, price_open: nmin == null ? null : po.checked, price_note: pn.value.trim() || null, headline: hd.value.trim() || null, notice: nt.value.trim() || null,
           cover_url: up ? pubUrl(up) : (dropCover ? null : cover), updated_by: STMAdmin.email() || null, updated_at: new Date().toISOString() };
         return api('/rest/v1/service_catalog?on_conflict=slug&select=*', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: body })
@@ -392,7 +394,7 @@
         body.textContent = ''; if (view === 'settings') settingsView(body); else postsView(body);
       }
       body.appendChild(h('div', 'empty', 'Loading...'));
-      loadServices().then(go);
+      loadServices().then(go, go);
     }
   };
 })();
