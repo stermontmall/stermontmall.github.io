@@ -325,7 +325,8 @@ function renderCategoriesView() {
 }
 function renderDrawer() {
   const svc = `<li><a href="/services/" class="tap w-full flex items-center gap-3 px-4 py-3.5 border-b border-line text-left font-semibold text-brand"><span class="text-xl">\u{1F6E0}\uFE0F</span>Services<span class="ml-auto text-xs font-normal">Pest control, CCTV, solar &rsaquo;</span></a></li>`;
-  $('#drawer-cats').innerHTML = svc + CATS.map(c => `<li><button class="tap w-full flex items-center gap-3 px-4 py-3.5 border-b border-line text-left" data-drawer-cat="${esc(c.id)}"><span class="text-xl">${c.icon}</span>${esc(c.name)}</button></li>`).join('');
+  /* Each category shows a real product photo from the shop (first product with a photo in it); the emoji shows if there is none or it fails to load. */
+  $('#drawer-cats').innerHTML = svc + CATS.map(c => `<li><button class="tap w-full flex items-center gap-3 px-4 py-2.5 border-b border-line text-left" data-drawer-cat="${esc(c.id)}"><span class="grid place-items-center overflow-hidden rounded-lg text-xl shrink-0" style="width:44px;height:44px;background:#fff;border:1px solid #eee">${thumb({ img: photoOf(c.id), emoji: c.icon })}</span>${esc(c.name)}</button></li>`).join('');
 }
 
 /* ---------- 8. Filters sheet ---------- */

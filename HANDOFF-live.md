@@ -1,6 +1,12 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 10:15 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
+Last saved: 2026-10-31 09:55 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
+
+## NEWEST: Real product photos in the All categories drawer (branch `wip-drawer-photos`, 2026-10-31 09:55 Africa/Nairobi)
+Owner (phone screenshot of the drawer): "let the photos used here be real product photos on my website". Cause: `renderDrawer()` in `mobile-shell/app.js` showed the category emoji.
+- [x] Each drawer row now shows a 44px box with the first real product photo of that category (`photoOf`, same source as the Categories tab tiles); the emoji stays if the category has no photo or the photo fails. The Services row keeps its tools emoji (it is a page, not a product category). `index.html` `app.js?v=11` -> `v=12`. `shell.test.py` = 135/135 (2 new drawer checks, fixture data).
+- [ ] NEXT: merge PR, then on the phone open the shop twice (service worker), open All categories. Not changed: the left rail icons in the Categories tab are still emoji.
+
 
 ## NEWEST: No Kitale, all 47 counties, big cities first (branch `wip-services-600-words`, 2026-10-31 10:05 Africa/Nairobi)
 Owner: "remove Kitale from the list but include 47 counties on the services sections; focus mostly on Nairobi and other big cities in Kenya".
