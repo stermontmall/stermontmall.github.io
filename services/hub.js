@@ -1,10 +1,11 @@
 /* Stermont Arcade services hub: look-and-feel layer. Runs after app.js and shell-chrome.js (both deferred).
    1) puts an illustrated icon in front of every service in the accordion,
    2) on phones, turns the shell bottom nav's Deals slot into Services (this page) and un-highlights Account,
-   3) adds a floating "Book a service" button that opens the existing booking sheet.
-   To undo: remove the hub.js line from services/index.html. */
+   3) adds a floating "Get a quote" button (data-book) that now opens the quote drawer (services/quote.js, no payment).
+   To undo: remove the hub.js line from services/index.html, or delete the quote loader line below. */
 (() => {
 'use strict';
+try { const q = document.createElement('script'); q.src = '/services/quote.js?v=1'; q.defer = true; document.head.appendChild(q); } catch (e) {}
 const ICON = {
   'bed-bugs': 'pest', 'cockroaches': 'pest', 'termites': 'pest', 'rodents': 'pest',
   'upholstery': 'clean', 'move-in-out': 'clean', 'post-construction': 'clean', 'airbnb': 'clean', 'office-janitorial': 'clean',
@@ -35,7 +36,7 @@ try {
 } catch (e) {}
 try {
   const fab = document.createElement('button');
-  fab.type = 'button'; fab.className = 'btn primary fab'; fab.setAttribute('data-book', ''); fab.textContent = 'Book a service';
+  fab.type = 'button'; fab.className = 'btn primary fab'; fab.setAttribute('data-book', ''); fab.textContent = 'Get a quote';
   document.body.appendChild(fab);
 } catch (e) {}
 })();
