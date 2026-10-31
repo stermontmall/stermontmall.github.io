@@ -6,6 +6,7 @@
 // 3) Product page: "Safe use" box for agrochemical and pest control products (label, PCPB number, PPE, pre-harvest interval). Generic rules only, never dosages.
 // 4) Product page: breadcrumb with the parent hub (Home > Agrochemicals > Crop Insecticides > product) + matching BreadcrumbList JSON-LD.
 // 5) Product page and category page: links to related categories, buying guides and the "cheapest" price guide.
+// wip-index-quality: the leading "Buy " of the H1 is stripped from the product name used in headings ("Safe use of ...", "... at a glance").
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 
 const SITE = 'https://stermontarcade.co.ke';
@@ -112,7 +113,7 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     const file = `p/${f}`; let h = readFileSync(file, 'utf8');
     if (h.includes(MARK) || !/<h1>/.test(h)) continue;   // already done, or a redirect stub
     const nm = h.match(/<h1>([\s\S]*?)<\/h1>/), cm = h.match(/<nav class="bc">[\s\S]*?<a href="\/c\/([^"]+)\.html">([^<]*)<\/a>/), canon = (h.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
-    const name = unesc(nm[1].replace(/<[^>]+>/g, '').trim());
+    const name = unesc(nm[1].replace(/<[^>]+>/g, '').trim()).replace(/^Buy\s+/i, '');
     const slug = cm ? decodeURIComponent(cm[1]) : '', cname = cm ? cm[2] : '';
     let before = h;
     // 1) structured description
