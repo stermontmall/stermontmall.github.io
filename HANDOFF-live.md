@@ -2,6 +2,16 @@
 Last saved: 2026-10-31 11:55 (Africa/Nairobi), claude.ai chat session with GitHub + Supabase connectors (no clone; sandbox has node for syntax checks only, no network). USAGE LIMIT earlier hit at ~10:25 (resets 14:30).
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
+## NEWEST (chat, 12:10): "Fix all pending" = pest pages (branch `wip-services-pest-pages`, from `main` 7638fa3), IN PROGRESS
+Checked 12:05: `node --check` OK on admin-services.js, services/quote.js, hub.js, page.js, app.js and both inline blocks of admin.html (all merged in PR #96). `wip-services-shell-look` is ALREADY IN `main` (PR #93), so the compare link main...wip-services-shell-look has nothing to compare.
+### In progress
+- [ ] Generator support in `services/build-services.mjs` (reads `services/pests-src/*.json`, writes `services/pests/<slug>.html`, `services/pests/index.html`, `services/pests-data.json`, adds URLs to `sitemap-services.xml`, links from the pest landing page). Fails the build on banned words (best, 100%, permanently, guarantee, certified, licensed, non-toxic, eco-friendly, Kitale).
+- [ ] Content: 22 pests in `services/pests-src/part-1..4.json`. Facts checked against sources: cockroach species and management (UC IPM), drywood vs subterranean termites (termiteweb), FAO larger grain borer manual (control list only), Nation article on 2020 locust swarms (counties, county teams run spraying). The rest is standard textbook biology written conservatively; owner or an entomologist should read once.
+- Re-run: `node services/build-services.mjs` (expect no UNDER 600 WORDS line).
+### Next
+1. Workflow `.github/workflows/services-build.yml` must also watch `services/pests-src/**` and `services/services-more.json`.
+2. Batch 09 blogs, antenna + electric fence pages (needs the "no price" mode), Quote drawer phone test: see the sections below.
+
 ## NEWEST (chat, 11:55): services QUOTE REQUESTS (no payment) + admin portal tabs: CODE COMPLETE on `wip-services-quotes-v2`, PR next, NOT merged
 Owner: "Connect github and supabase. Check handoff. Incorporate all services features on my admin portal and fix everything (responsiveness, response). Add an option of placing an order on services like products, but NO payment: ask for a QUOTE; the notification goes to info@stermontarcade.co.ke like product orders. Autosave on handoff. Also include ALL pests (research every variety, not a few), detailed, professional Google SEO. Commit or merge each done task."
 NOTE: an earlier Claude Code session made branch `wip-services-quotes-admin` (main + one handoff commit, nothing else). IGNORE it; work is on `wip-services-quotes-v2`, branched from `wip-services-shell-look` (so it builds on the restyled generator). Merge order: `wip-services-shell-look` PR first, then this branch. This branch's own copy of HANDOFF-live.md is OLD (10:25); this file on `main` wins, do not copy the branch one over it.
