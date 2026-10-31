@@ -1,3 +1,8 @@
+# HANDOFF - SEO batch 08: 8 pest-control products + 8 blogs (branch `wip-seo-batch-08`, 2026-10-31)
+STATUS: MERGED to `main`. Descriptions written to Supabase for all 13 rows with every stored text MD5-equal to `seo-pest/build.mjs` output; backup in `description_backup` batch `pest-batch-08`; `seo-pest/batch-08.json` (1047 checks) and `seo-pest/blogs-08.json` (1365 checks) pass, 0 violations. Details and the next steps are in `HANDOFF-live.md`.
+
+---
+
 # HANDOFF - SEO batch 07 code + test fixes, session of 2026-10-31 (branch `wip-seo-batch-07`, IN PROGRESS)
 Owner: "Finish all pending tasks on the handoff". GitHub + Supabase connected. The sandbox cannot reach the live site (WebFetch allowlist), so live checks were done on the committed files only.
 ## Done
