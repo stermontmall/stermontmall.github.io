@@ -1,8 +1,14 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 09:10 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
+Last saved: 2026-10-31 09:30 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST: Services in the shop Categories tab (branch `wip-shop-services-categories`, 2026-10-31 09:10 Africa/Nairobi)
+## NEWEST: In-depth pest control pages (branch `wip-services-deep-pest`, 2026-10-31 09:30 Africa/Nairobi)
+Owner: services copy is too shallow; wants researched, high-intent, Kenyan-market SEO, bed bugs 600+ words. Plan: `services/services-deep.json` (new) + `services/build-services.mjs` renders static pages `/services/<slug>.html` from it (own URL each, so they can rank). Batch 1 = pest control: `bed-bug-control-nairobi` (1,000+ words), `cockroach-control-nairobi`, `termite-control-nairobi`, `rodent-control-nairobi`, `airbnb-short-stay-pest-control-nairobi`. Parent page `pest-control-fumigation-nairobi` and the hub link to them; sitemap-services.xml includes them.
+- Research done: bed bug life cycle (eggs 6-10 days, 5 nymph stages, 21 days warm to 4+ months cool), Kenyan competitor pages list treatment types and prices but give NO customer preparation steps (our angle), Airbnb host risks (refunds, reviews).
+- [ ] NEXT: build (`node services/build-services.mjs`), check `services/word-counts.json`, PR, merge. Then batch 2: solar, CCTV, TV mounting, agrovet spraying, appliance repair, deep cleaning, electrical and plumbing (same method, one page per sub-service).
+- Claims NOT written because unverified: heat treatment (the old hub accordion in `services/app.js` says "thermal heat" and "permanently get rid of bed bugs": owner to confirm or soften), named products, "low-odour", licences, number of jobs done, any testimonials or review counts.
+
+## (previous) Services in the shop Categories tab (branch `wip-shop-services-categories`, 2026-10-31 09:10 Africa/Nairobi)
 Owner asked for Services also in the Categories tab. PR #86 (drawer link) is merged. In progress: `renderCategoriesView()` in `mobile-shell/app.js` adds a "Services" link (`/services/`) to the left rail (after Top Categories) and as the first tile of Top Categories; `index.html` `app.js?v=10` -> `v=11`. It is a link, not a product category, so it opens the services page.
 - [ ] NEXT: `python3 mobile-shell/shell.test.py`, PR, merge; owner reloads the shop twice and opens Categories.
 - [ ] STILL OPEN: `services/sitemap-services.xml` in `sitemap.xml`/Search Console; owner confirms claims and price ranges.
