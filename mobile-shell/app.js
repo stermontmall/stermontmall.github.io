@@ -26,6 +26,7 @@ const ICONS = { 'pest-control-fumigation': '🪳', agrovet: '🌱', 'phones-acce
 const BGS = ['#ede9fe', '#fce7f3', '#dcfce7', '#fef3c7', '#e0f2fe', '#ffe4e6', '#f1f5f9'];
 const hashStr = s => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
 let CATS = [];      // [{id: top-level slug, name, icon, subs: [sub-category names]}], built from the live data
+let CATROWS = [];   // every category row (top-level and sub), to resolve a /?cat=<slug> address
 let PRODUCTS = [];  // one entry per product (pack sizes folded in)
 
 function buildCatalog(rows, cats, names) {
@@ -47,7 +48,7 @@ function buildCatalog(rows, cats, names) {
       price: low.price, old: low.old, sizes, featured: !!rep.featured, rating: 0, reviews: 0   // no ratings exist in the database
     });
   });
-  PRODUCTS = out;
+  PRODUCTS = out; CATROWS = cats;
   const have = new Set(out.map(p => p.cat)), subHave = new Set(out.filter(p => p.sub).map(p => p.cat + '|' + p.sub));
   CATS = cats.filter(c => !c.parent_id && !c.is_promo && have.has(c.slug)).sort((a, b) => a.sort_order - b.sort_order || a.id - b.id)
     .map(c => ({ id: c.slug, name: c.name, icon: ICONS[c.slug] || '🛍️',
@@ -171,11 +172,12 @@ window.addEventListener('popstate', e => {
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
 const DEEP = new URLSearchParams(location.search).get('product');   // /?product=<slug>: a shared or reloaded product address, opened after the catalog loads
+const CAT_DEEP = new URLSearchParams(location.search).get('cat');   // /?cat=<slug>: a category (or sub-category) page address; /c/<slug>.html sends phones here
 /* A reload keeps the tab the customer was on: the browser hands back the state of the current history entry, and every tab hop stores its tab in it
    (goTab). The first view is Home only for a fresh visit or an unknown tab. The tab is shown at the very end of this file, once the views exist. */
 const TABS = ['home', 'categories', 'deals', 'cart', 'account'];
 const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab : 'home';
-history.replaceState({ tab: START_TAB, stack: [] }, '', DEEP ? location.pathname : undefined); // a reload lands on a clean base entry (no sheet), on the same tab
+history.replaceState({ tab: START_TAB, stack: [] }, '', (DEEP || CAT_DEEP) ? location.pathname : undefined); // a reload lands on a clean base entry (no sheet), on the same tab
 scrim.addEventListener('click', closeTop);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop(); });
 syncOverlays();
@@ -438,6 +440,11 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
   qb.p = p; qb.size = (p.sizes.find(z => z.slug === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
   renderQB(); openProductPage();
 }
+function openCatLink(slug) {   // the Home grid filtered to a /?cat=<slug> address: a top-level category, or a sub-category (its top-level parent + the sub name)
+  const c = CATROWS.find(x => x.slug === slug), top = c && (c.parent_id ? CATROWS.find(x => x.id === c.parent_id) : c), t = top && CATS.find(x => x.id === top.slug);
+  if (!t) { toast('That category is no longer available'); return; }
+  selectCategory(t.id, c.parent_id && t.subs.includes(c.name) ? c.name : '');
+}
 $('#qb-sizes').addEventListener('click', e => { const b = e.target.closest('[data-size]'); if (b) { qb.size = b.dataset.size; renderQB(); } });
 $('#qb-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderQB(); });
 $('#qb-minus').addEventListener('click', () => { qb.qty = Math.max(1, qb.qty - 1); renderQB(); });
@@ -512,5 +519,5 @@ $('#search-form').addEventListener('submit', e => {
 
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
 if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
-loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (DEEP) openDeepLink(DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
+loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (DEEP) openDeepLink(DEEP); else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
 })();
