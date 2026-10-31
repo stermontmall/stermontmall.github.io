@@ -11,6 +11,7 @@ const SITE = 'https://stermontarcade.co.ke';
 export const DATE = '2026-10-30';
 export const words = s => (String(s).match(/\S+/g) || []).length;
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+const unesc = s => String(s).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');   // titles read back from generated pages are already escaped
 const plain = s => String(s).replace(/\[\[\/[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\[\[|\]\]/g, '');
 const linksOf = s => [...String(s).matchAll(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g)].map(m => m[1]);
 // the page style is read from blog-write.mjs so these posts always match the generated ones
@@ -30,8 +31,8 @@ export function renderPost(a) {
   const nice = new Date(DATE + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
   const section = s => `<h2>${esc(s.heading)}</h2>\n${s.paragraphs.map(para).join('\n')}${s.bullets && s.bullets.length ? `\n<ul>${s.bullets.map(b => `<li>${inline(b)}</li>`).join('')}</ul>` : ''}`;
   const faqHtml = `<h2>Frequently asked questions</h2>\n${a.faq.map(([q, an]) => `<h3>${esc(q)}</h3>\n<p>${esc(an)}</p>`).join('\n')}`;
-  const catTitle = (() => { try { const m = fs.readFileSync(path.join(root, 'c', a.cat + '.html'), 'utf8').match(/<h1[^>]*>([^<]*)<\/h1>/i); return m ? m[1].trim() : 'Browse the category'; } catch { return 'Browse the category'; } })();
-  const relTitle = r => { try { const m = fs.readFileSync(path.join(root, 'blog', r + '.html'), 'utf8').match(/<h1[^>]*>([\s\S]*?)<\/h1>/i); return m ? m[1].replace(/<[^>]+>/g, '').trim() : r; } catch { return r; } };
+  const catTitle = (() => { try { const m = fs.readFileSync(path.join(root, 'c', a.cat + '.html'), 'utf8').match(/<h1[^>]*>([^<]*)<\/h1>/i); return m ? unesc(m[1].trim()) : 'Browse the category'; } catch { return 'Browse the category'; } })();
+  const relTitle = r => { try { const m = fs.readFileSync(path.join(root, 'blog', r + '.html'), 'utf8').match(/<h1[^>]*>([\s\S]*?)<\/h1>/i); return m ? unesc(m[1].replace(/<[^>]+>/g, '').trim()) : r; } catch { return r; } };
   const catHtml = `<div class="box"><strong>Shop this category</strong><ul class="rel"><li><a href="/c/${a.cat}.html">${esc(catTitle)}</a></li><li><a href="/p/${a.product}.html">See the product and its sizes</a></li></ul></div>`;
   const relHtml = a.related.length ? `<h2>Related guides</h2>\n<ul class="rel">${a.related.map(r => `<li><a href="/blog/${r}.html">${esc(relTitle(r))}</a></li>`).join('')}</ul>` : '';
   return `<!doctype html>

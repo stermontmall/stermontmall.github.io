@@ -1,3 +1,23 @@
+# HANDOFF - SEO batch 06: Icon 10CS + 8 rodent products + Gradometer, 10 products (branch `wip-seo-batch-06`, 2026-10-30)
+Owner: "continue product SEO in batches of 10 per session; don't touch the product title; SEO and product blogs, 400-600 words, perfect the craft". `fetchProducts()` -> Supabase was NOT redone: already on `main` (Step 4 of the mobile-shell section below).
+An earlier session on this branch did the work below but never wrote it up; this section records what was FOUND and CHECKED on 2026-10-30 (GitHub + Supabase only, no repo clone, so no node scripts were run).
+## Done
+- [x] Batch 06 = Icon 10CS (Mosquito & Fly), the 8 Rodent Control products (Bayer Baraki, Bromarat 0.005 RB, Fuko-Kil, Miratex, Rat-Kill, Rodent-Kill, Rodilon, Syngenta Tatua blocks) and the first Termite Control product by name (Gradometer 480EC). 14 rows.
+- [x] CODE on the branch: `seo-pest/batch-06.json` (facts from the catalog text only), `seo-pest/build.mjs` (new optional `doseTitle`, used by Baraki: "PLACEMENT AMOUNTS (NO MIXING)"), `seo-pest/build.test.mjs` (new optional `strength` list: concentrations the catalog already states, "100 g/L" for Icon and "480 g/L" for Gradometer, are not counted as doses). Both changes are backward compatible with batch 05.
+- [x] WRITTEN TO SUPABASE `products.description` for all 14 rows (found already written). Old text is in `public.description_backup` batch `pest-batch-06` (14 rows). Restore one row: `update products p set description = b.description from description_backup b where b.id = p.id and b.batch = 'pest-batch-06' and p.id = '<id>'`. ONLY `description` changed; `name`, `seo_name`, `seo_title` untouched.
+- [x] CHECKED IN SQL on the stored text (same rules as `build.test.mjs`): 477-588 words each, no banned phrase, no dose outside the catalog's own Baraki placement amounts, order line, label pointer, 3 FAQs, all 8 sections, one text per group, no paragraph shared between products. Read side by side with `batch-06.json`: same text. NOT done: MD5 of stored text vs builder output (needs `node`).
+- [x] BLOGS written: `seo-pest/blogs-06.json` (10 posts, one per product). Reviewed by hand: facts match the catalog text, no price, no guarantee, no "best". Every link target exists on the branch (10 `/p/` pages, `/c/mosquito-fly-control`, `/c/rodent-control`, `/c/termite-control`, the 6 related guides).
+- [x] HANDOFF.md mistake fixed: the first commit of this section accidentally dropped the older sections below; they are restored in the next commit (compare with `main` if in doubt).
+## Left
+- [ ] RENDER AND TEST THE BLOGS (not done: needs a clone, the renderer reads `blog-write.mjs`, `c/*.html` and `blog/*.html`). In a clone of this branch run: `node seo-pest/build.test.mjs`, `node seo-pest/blog-build.mjs blogs-06`, `node seo-pest/blog.test.mjs`, then commit `blog/*.html` and `blog-topics.json`. Fix any word count, title (20-70 chars), description (70-160 chars) or answer (30-60 words) the test flags in `blogs-06.json`, then re-render.
+- [ ] Optional: verify MD5 of each stored description against `node seo-pest/build.mjs batch-06` output (`out/batch-06.sql`).
+- [ ] MERGE to `main` only after the three commands above pass. The database texts are already live, so a failed blog test does not undo them; the branch only adds files.
+- [ ] After the next "Build product pages" run (every 3 hours): open `p/bayer-baraki-pellets-rat-and-mice-poison-10-g.html` and `p/gradometer-480ec-termiticide-1-litre.html`, confirm the new text shows and the title is unchanged. After the blog workflow: confirm the 10 posts are in `blog/index.html` and `sitemap.xml`.
+- [ ] Owner to read the 10 blogs once. Baraki keeps the placement amounts the catalog already published (50-75 g per station for rats, 15-20 g for mice); confirm them against the Bayer pack. Active ingredients are named only where the catalog states them (difethialone, lambda-cyhalothrin, chlorpyrifos).
+- [ ] Next session = batch 07: the remaining Termite Control products (Mchwatox 350 SC, Metro 200SC, Premise 200 SC) and the first Fumigation Chemicals products; then Sprayers & Equipment, Animal Feeds, Veterinary, Fertilizers, Disinfectants, Seeds, electronics, appliances, kitchen, fashion.
+
+---
+
 # HANDOFF - SEO batch 05: 10 pest-control products + 10 product blogs (branch `wip-seo-batch-05`, 2026-10-30)
 Owner: "continue product SEO in batches of 10 per session; don't touch the product title; SEO and product blogs, 400-600 words, perfect the craft". GitHub + Supabase connected. `fetchProducts()` -> Supabase was NOT redone: it is already on `main` (Step 4 of the mobile-shell section below; `app.js` reads `products`, `categories`, `product-names.json`).
 ## Done
@@ -8,7 +28,7 @@ Owner: "continue product SEO in batches of 10 per session; don't touch the produ
 - [x] MERGED TO `main` on 2026-10-30 after both test files passed again on the merged tree (280 + 364 checks). Revert the merge commit to remove the posts and the code; the database texts are restored with the backup statement above.
 - [x] Also run, unchanged: `node seo-titles.test.mjs` 35 OK, `node buy-name.test.mjs` 49 OK. No site code changed, so `shell.test.py` was not re-run.
 ## Left
-- [ ] Next session = batch 06: Icon 10CS, the 8 Rodent Control products, and the first Termite Control product by name. Then Termite Control, Fumigation Chemicals, Sprayers & Equipment, Animal Feeds, Veterinary, Fertilizers, Disinfectants, Seeds, then electronics, appliances, kitchen and fashion (about 133 products left, 13 sessions). Same recipe: `seo-pest/batch-06.json`, backup table, write, verify MD5, blogs.
+- [x] Batch 06: see the section above.
 - [ ] After the next "Build product pages" run (every 3 hours): open `p/bedlam-200sl-insecticide-15-ml.html` and `p/promax-20-ec-odourless-bed-bug-insecticide.html`, confirm the new text shows and the title is unchanged. After the blog workflow: confirm the 10 posts are in `blog/index.html` and `sitemap.xml`.
 - [ ] Owner to read the 10 blogs once (they say only what the catalog says; no prices, no doses). Promax keeps the rates the catalog already published (25 ml per litre, one sachet makes 2 litres); every other product says "dilute as the label directs".
 - [ ] Not tested live (sandbox cannot reach the live site); content tests only.
@@ -52,7 +72,7 @@ Owner sent https://stermontarcade.co.ke/?product=abasi-5-ec-50-ml and asked to "
 Owner: "There are no product links on my website after clicking on an item... it's only the domain name stermontarcade.co.ke. Fix that." Cause: every `history.pushState` in `mobile-shell/app.js` had no URL, so opening a product never changed the address bar.
 `fetchProducts()` -> Supabase was NOT redone: it is Step 4 below (`app.js` already reads `products`, `categories`, `product-names.json`).
 ## Done
-- [x] `app.js`: an open product (sheet or full page) has the address `/?product=<slug of the chosen size>`; choosing another size replaces the address (no extra history entry); the tab title is "<name> | Stermont Arcade" and both return to normal when it closes. The base entry stays `/`, so Back goes to the list.
+- [x] `app.js`: an open product (sheet or full page) has the address `/?product=<slug of the chosen size>`; choosing another size replaces the address (no extra history entry); the tab title is "<n> | Stermont Arcade" and both return to normal when it closes. The base entry stays `/`, so Back goes to the list.
 - [x] `app.js`: `/?product=<slug>` (any pack size's slug) opens that product's full page inside the shell once the catalog is loaded (also on reload); an unknown or sold-out slug shows "That product is no longer available".
 - [x] `index.html`: a wide desktop screen sends `/?product=<slug>` to `/p/<slug>.html`; `app.js?v=4` (cache-bust rule).
 - [x] `shell.test.py`: 14 new "address:" checks.
@@ -117,7 +137,7 @@ Owner sent a screenshot of another store's category page and asked "make it open
 - [x] `shell.test.py` = 69/69; checked with phone-size screenshots (fixture photos).
 ## Left
 - [x] MERGED TO `main` on 2026-10-30 at the owner's explicit request ("Merge"), after `shell.test.py` 69/69 (fixture photos only). Revert the merge commit if it misbehaves.
-- [ ] Phone check with the real photos. Rail icons are still emoji; custom line icons would be a separate job. A category with no sub-categories shows one "All <name>" tile.
+- [ ] Phone check with the real photos. Rail icons are still emoji; custom line icons would be a separate job. A category with no sub-categories shows one "All <n>" tile.
 
 ---
 
@@ -183,7 +203,7 @@ Continues the "Left" list of the mobile-shell section below. The item "wire `fet
 Owner request: "Can I include the word Buy before each product name? If so apply on all products." Yes: "Buy" is a normal commercial-intent word, and nothing in the repo blocks it.
 
 ## Done
-- [x] `seo-meta.mjs`: `buyName(name)` (idempotent: a name already starting with "Buy" is left alone; "Buyer ..." still gets one). `pdpH1` uses it, so every generated product page H1 is "Buy <lead word> <name>".
+- [x] `seo-meta.mjs`: `buyName(name)` (idempotent: a name already starting with "Buy" is left alone; "Buyer ..." still gets one). `pdpH1` uses it, so every generated product page H1 is "Buy <lead word> <n>".
 - [x] `seo-titles.mjs`: the owner's names (products.seo_name / seo_title head) get the same prefix on the visible H1 and in `product-names.json`. The last breadcrumb, JSON-LD names and `<title>` / og / twitter titles keep the plain name.
 - [x] `product-names.json` now carries "Buy ..." for every product id, so the shop list, the shop product view (it copies the page H1) and `mobile-shell/` all show it.
 - [x] Orders stay plain: `checkout-deferred.js` `info()` strips a leading "Buy " (cart, checkout, order rows, e-mails, WhatsApp all use it) and `storefront-live.js` strips it in the product enquiry text. `index.html` loads `storefront-live.js?v=8` and `checkout-deferred.js?v=2`.

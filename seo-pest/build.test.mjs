@@ -15,7 +15,9 @@ for (const f of fs.readdirSync(dir).filter(f => /^batch-\d+\.json$/.test(f))) {
     const t = renderText(p), w = words(t), id = `${f} ${p.group}`;
     ok(w >= 400 && w <= 600, `${id}: ${w} words (need 400-600)`);
     for (const re of BANNED) ok(!re.test(t), `${id}: banned phrase ${re}`);
-    if (!p.dose) ok(!DOSE.test(t), `${id}: contains a dose and the batch file has no label data (dose)`);
+    // "strength" lists active-ingredient concentrations the catalog already states (e.g. "100 g/L"); they are not doses
+    const noStrength = (p.strength || []).reduce((s, x) => s.split(x).join(''), t);
+    if (!p.dose) ok(!DOSE.test(noStrength), `${id}: contains a dose and the batch file has no label data (dose)`);
     ok(p.faq.length >= 3, `${id}: needs 3 or more FAQs`);
     ok(/WhatsApp \+254 748 888 230/.test(t) && /M-Pesa/.test(t) && /47 counties/.test(t), `${id}: order line missing`);
     ok(t.startsWith(p.name), `${id}: title line must start with the product name`);

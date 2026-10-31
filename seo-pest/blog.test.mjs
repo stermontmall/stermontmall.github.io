@@ -31,6 +31,7 @@ for (const f of fs.readdirSync(dir).filter(f => /^blogs-\d+\.json$/.test(f))) {
     ok(!fs.existsSync(path.join(root, 'blog', a.slug + '.html')) || fs.readFileSync(path.join(root, 'blog', a.slug + '.html'), 'utf8') === renderPost(a), `${id}: blog file exists and differs`);
     const h = renderPost(a);
     for (const m of h.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)) { try { JSON.parse(m[1].replace(/\\u003c/g, '<')); checks++; } catch { checks++; bad.push(`${id}: invalid JSON-LD`); } }
+    ok(!/&amp;(amp|lt|gt|quot|#39);/.test(h), `${id}: double-escaped entity (shows as "&amp;" on the page)`);
     ok((h.match(/<h1>/g) || []).length === 1, `${id}: needs exactly one h1`);
     ok(/<link rel="canonical" href="https:\/\/stermontarcade\.co\.ke\/blog\/[^"]+\.html">/.test(h), `${id}: canonical`);
     ok(/<style>\*\{box-sizing/.test(h), `${id}: page style missing`);

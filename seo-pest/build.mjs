@@ -10,7 +10,7 @@ export const words = s => (String(s).match(/\S+/g) || []).length;
 export function renderText(p) {
   const L = [`${p.name} (${p.sizes})`, '', p.lead, '', 'KEY FEATURES', ...p.features.map(f => `• ${f}`), '', 'SPECIFICATIONS', ...p.specs.map(f => `• ${f}`), ''];
   L.push('WHERE IT HELPS', p.helps, '');
-  if (p.dose) L.push('MIXING RATES (FROM THE PRODUCT LABEL)', ...p.dose.map(f => `• ${f}`), '');
+  if (p.dose) L.push(p.doseTitle || 'MIXING RATES (FROM THE PRODUCT LABEL)', ...p.dose.map(f => `• ${f}`), '');
   L.push('HOW TO USE IT', p.use, '', 'BEFORE YOU START', ...p.before.map(f => `• ${f}`), '', 'SAFETY', p.safety, '', 'STORAGE', p.storage, '');
   L.push('FREQUENTLY ASKED QUESTIONS', ...p.faq.flatMap(([q, a]) => [q, a, '']));
   L.push('ORDER', `Order ${p.name} online, pay by M-Pesa and get delivery to all 47 counties, or pick up at The Sarit Centre, Westlands, Nairobi. Questions? WhatsApp +254 748 888 230.`);
