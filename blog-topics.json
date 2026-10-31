@@ -198,7 +198,8 @@
         "/products.html",
         "/blog/how-to-order-and-pay-by-mpesa-online-kenya.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "drafted": "2026-10-31"
     },
     {
       "slug": "bed-bugs-in-hostels-and-rentals-kenya",
