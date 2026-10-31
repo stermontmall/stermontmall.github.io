@@ -2,8 +2,12 @@
 Last saved: 2026-10-31 (session "Finish all pending tasks on the handoff"). GitHub + Supabase connected. The sandbox has no network and no clone, so tests could not be run by this session.
 RULE (owner, 2026-10-31): after EVERY step (a commit, a merge, a finding, a blocker) rewrite this file in the same minute, so a session cut off by a usage limit can be continued on another Claude account. Keep it short: Done / In progress / Next / Blocked. `HANDOFF.md` stays the long history; this file wins where they differ.
 
+## Update 2026-10-31 07:05 (Africa/Nairobi)
+- [x] Auto-save rule made explicit in `CLAUDE.md` (branch `wip-handoff-autosave`): save at task start, task end, before long commands, and when blocked. Owner request: "Set automatic task progress saving on handoff .md".
+- [ ] FOUND: `main` log already contains "Merge pull request #81 from stermontmall/wip-shell-reload-tab" (a3449dc), so the reload fix below may ALREADY be merged. NOT verified yet. Check: `grep -n START_TAB mobile-shell/app.js; grep -n "app.js?v=" index.html` (expect `v=7`), then `python3 mobile-shell/shell.test.py` (expect 111 checks, 0 failures; run was interrupted by the owner, nothing changed).
+
 ## In progress right now
-- [ ] Shell reload fix `wip-shell-reload-tab` is NOT merged. Run `python3 mobile-shell/shell.test.py` first (expect 5 more checks than before, 0 failures). Then open https://github.com/stermontmall/stermontmall.github.io/compare/main...wip-shell-reload-tab?expand=1 , create the PR (the owner taps Submit; Claude's GitHub tool only shows a form) and merge. After the merge: open the site twice on a phone, go to Categories, refresh: it must stay on Categories.
+- [ ] (may be outdated, see the update above) Shell reload fix `wip-shell-reload-tab` is NOT merged. Run `python3 mobile-shell/shell.test.py` first (expect 5 more checks than before, 0 failures). Then open https://github.com/stermontmall/stermontmall.github.io/compare/main...wip-shell-reload-tab?expand=1 , create the PR (the owner taps Submit; Claude's GitHub tool only shows a form) and merge. After the merge: open the site twice on a phone, go to Categories, refresh: it must stay on Categories.
 
 ## Done this session
 - [x] Batch 07 blogs are ON `main` (checked 2026-10-31: the 8 posts are in `blog/`, and GitHub says `main` is up to date with `wip-seo-blogs-07`; no pull request was needed). Posts: actellic-25ec, actellic-50ec, actellic-gold-dust, grain-save-dust, mchwatox-350-sc, metro-200sc, premise-200-sc, thermal-fogging-machine. Still to confirm after the blog workflow: the 8 posts are listed in `blog/index.html` and `sitemap.xml`.
