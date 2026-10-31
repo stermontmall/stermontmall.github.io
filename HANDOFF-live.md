@@ -1,8 +1,26 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 10:35 (Africa/Nairobi), claude.ai chat session with GitHub + Supabase connectors only (NO node, NO clone, NO network). USAGE LIMIT earlier hit at ~10:25 (resets 14:30).
+Last saved: 2026-10-31 11:35 (Africa/Nairobi), claude.ai chat session with GitHub + Supabase connectors (no clone; sandbox has node for syntax checks only). USAGE LIMIT earlier hit at ~10:25 (resets 14:30).
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST (chat, 10:35): services pages get the mobile shell look + two untested commits on main
+## NEWEST (chat, 11:35): services QUOTE REQUESTS (no payment) + admin portal tabs
+Owner: "Connect github and supabase. Check handoff. Incorporate all services features on my admin portal and fix everything (responsiveness, response). Add an option of placing an order on services like products, but NO payment: ask for a QUOTE; the notification goes to info@stermontarcade.co.ke like product orders. Autosave on handoff. Also include ALL pests (research every variety, not a few), detailed, professional Google SEO." Owner then said: commit/merge done tasks before continuing.
+NOTE: an earlier Claude Code session made branch `wip-services-quotes-admin` (main + one handoff commit, nothing else). IGNORE it; work is on `wip-services-quotes-v2`, branched from `wip-services-shell-look` (so it builds on the restyled generator). Merge order: `wip-services-shell-look` PR first, then this branch.
+### Done
+- [x] GitHub (stermontmall/stermontmall.github.io) and Supabase (project oewvtbnmyombbtggamor, eu-west-1, healthy) both connected and working.
+- [x] Supabase migration `service_quotes_table` APPLIED LIVE (11:25): table `public.service_quotes` (ref SQ-XXXXXX, service, name, phone +254..., email, county, location, date, slot, details, status new/contacted/quoted/won/lost, quote_amount, staff_notes, handled_by/at), RLS: anon+authenticated INSERT only with status 'new' and no staff fields; staff (`is_staff()`) all; customer reads own. Tested with `set local role anon` (insert ok, cannot read, cannot set status won); test rows rolled back, 0 rows. SQL committed on `wip-services-quotes-v2` as `setup-service-quotes.sql` (cfdaeb5).
+- [x] FOUND how product orders notify: `checkout-deferred.js` inserts into `orders` with the publishable key, then EmailJS (service `service_zoho`, key `PayiXKhM6gVQLHYAE`, template `template_n60yao4` takes `to_email` + `html_body`; fallback `template_cv2qjgm`; last fallback Web3Forms key in that file) to `info@stermontarcade.co.ke`. Quotes will copy this exactly.
+- [x] FOUND how admin works: `admin.html` NAV array + `TABS_OK` + `EXTRA` arrays + `render()` branch; extra tabs are separate scripts (`admin-extras.js` etc.) that expose `mount(L, tab)`.
+### In progress (design decided, NOT written yet)
+- [ ] `services/quote.js` (new, self-contained drawer, no payment: service, county, town, date, slot, details, name, phone, email; honeypot + 30 s cooldown; inserts `service_quotes`, sends staff alert + customer confirmation via EmailJS, WhatsApp link on the success screen). Loaded by adding a dynamic loader to `services/page.js` (generated pages) and `services/hub.js` (hub); it intercepts `[data-book]` buttons and the `wa.me` quote/book links in capture phase, so NO generator edit and NO `app.js`/`index.html` edit is needed (old booking sheet stays in the HTML, unused: clean up later with sed in Claude Code).
+- [ ] `admin-services.js` (new) with tabs "Quote requests" and "Services overview"; edit `admin.html` (NAV group "Services", `TABS_OK`, `EXTRA`, `render()` branch, script tag, `?quote=SQ-..` deep link).
+### Next
+1. [ ] Write quote.js, admin-services.js, admin.html edit; `node --check` each; push on `wip-services-quotes-v2`; PR; owner says "Merge" after phone check (submit one test request, see it in admin, see the email at info@).
+2. [ ] PESTS (owner: all varieties, detailed, professional SEO): needs `services/services-deep.json` + generator support (see "(previous) Fix all" section, job 3). Cover at least: bed bugs, cockroaches (German, American, Oriental, Brown-banded), termites (subterranean, drywood), rodents (black rat, Norway rat, house mouse), ants, fleas, ticks, mosquitoes, houseflies, bees/wasps/hornets, spiders, scorpions, centipedes, silverfish, moths, lice, mites, snakes (exclusion advice), weevils and stored-grain pests, locusts. No unverified claims.
+3. [ ] Owner to confirm: claims (90-day guarantee, low-odour), price ranges, 47-county coverage, staff table includes every admin email.
+### Blocked / owner
+- Nothing blocked. Do NOT merge anything to main without phone check.
+
+## (previous) services pages get the mobile shell look + two untested commits on main (chat, 10:35)
 Owner: "page is boring, not sure it uses the mobile shell ... make it appealing and professionally adopt the mobile shell; automatic save on handoff".
 FINDING: nothing under `services/` loaded `shell-chrome.js` on `main`. The hub redesign sits on `wip-services-shell-look` (c066e71) with NO PR merged; the 8 generated service pages and 8 guides had the old plain look.
 ### Done
@@ -27,7 +45,7 @@ FINDING: nothing under `services/` loaded `shell-chrome.js` on `main`. The hub r
 - [x] Services hub redesign pushed to branch `wip-services-shell-look` (commit c066e71): `services/hub.css` (new), `services/hub.js` (new), `services/index.html` (shell-chrome.js on phones, hero panel, "What do you need help with?" chooser, 8 illustrated tiles with the existing price ranges, booking steps, accordion icons, floating Book button, booking sheet z-index 61 above the shell nav z-index 50). JSON-LD, FAQ, form, ids, `app.js` unchanged. `hub.js` passes `node --check`. NOT opened in a browser.
   - Photo slots: tile images load `/services/img/<n>.jpg` and fall back to the drawn icon (names: pest-control, solar, cctv, tv-mounting, agrovet, appliance-repair, deep-cleaning, electrical-plumbing).
 ### In progress / Blocked
-- [ ] PR for `wip-services-shell-look` is NOT created yet (see the NEWEST section above).
+- [ ] PR for `wip-services-shell-look` is NOT created yet (see the section above).
 ### Next (needs a session WITH node and a clone, e.g. Claude Code; this chat could not run any generator or test)
 1. [ ] JOB 2 batch 09: `git checkout wip-seo-batch-09 && node seo-pest/build.test.mjs`; compare MD5 of stored `products.description` for the 5 products with `node seo-pest/build.mjs batch-09` output; write `seo-pest/blogs-09.json` (5 posts, one per product group; 400-600 words; answer 30-60 words; 3+ sections, 2+ question headings; 3-6 FAQ; 2-4 body links incl. `/p/<product>.html`; no KSh prices, doses, "best", "100%", "guarantee", "certified"; related blogs that exist, e.g. `thermal-fogging-machine-what-it-does-and-what-goes-in-it-kenya`, `how-to-read-an-insecticide-label-kenya`, `how-to-disinfect-a-poultry-house-kenya`); then `node seo-pest/blog-build.mjs blogs-09`, `node seo-pest/blog.test.mjs`, PR, merge. Product page files exist for all 5 (checked).
 2. [ ] JOB 3 deep pest pages (`wip-services-deep-pest`, plan only): see the list in the section below.
