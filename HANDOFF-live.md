@@ -6,6 +6,10 @@ RULE (owner, 2026-10-31): after EVERY step (a commit, a merge, a finding, a bloc
 - [x] Auto-save rule made explicit in `CLAUDE.md` (branch `wip-handoff-autosave`): save at task start, task end, before long commands, and when blocked. Owner request: "Set automatic task progress saving on handoff .md".
 - [ ] FOUND: `main` log already contains "Merge pull request #81 from stermontmall/wip-shell-reload-tab" (a3449dc), so the reload fix below may ALREADY be merged. NOT verified yet. Check: `grep -n START_TAB mobile-shell/app.js; grep -n "app.js?v=" index.html` (expect `v=7`), then `python3 mobile-shell/shell.test.py` (expect 111 checks, 0 failures; run was interrupted by the owner, nothing changed).
 
+## Update 2026-10-31 07:08 (Africa/Nairobi)
+- [x] `python3 mobile-shell/shell.test.py` on `main` (53d9a94) = 112/112, no console/page errors (fixture data). So the reload fix (PR #81, `app.js?v=7`) is merged AND tested. Still owed by the owner: phone check (open site twice, Categories, refresh: stays on Categories).
+- [ ] Owner said "Fix all". In progress: start the "sections load in the OLD web view" item below (step 2, category pages) on branch `wip-shell-category-pages`.
+
 ## In progress right now
 - [ ] (may be outdated, see the update above) Shell reload fix `wip-shell-reload-tab` is NOT merged. Run `python3 mobile-shell/shell.test.py` first (expect 5 more checks than before, 0 failures). Then open https://github.com/stermontmall/stermontmall.github.io/compare/main...wip-shell-reload-tab?expand=1 , create the PR (the owner taps Submit; Claude's GitHub tool only shows a form) and merge. After the merge: open the site twice on a phone, go to Categories, refresh: it must stay on Categories.
 
