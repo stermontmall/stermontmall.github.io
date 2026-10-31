@@ -1,10 +1,10 @@
 // node services/build-services.mjs
-// Reads services/services-data.json (+ optional services-extra.json) and writes:
+// Reads services/services-data.json (+ optional services-extra.json and services-more.json) and writes:
 //   services/<slug>.html            one landing page per service
 //   services/guides/<slug>.html     one guide (blog) post per service
 //   services/guides/index.html      guides index
 //   services/sitemap-services.xml   URLs of all pages above
-//   services/word-counts.json       words of the main copy of every page (target about 600)
+//   services/word-counts.json       words of the main copy of every page (target 600 or more)
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,6 +21,20 @@ for (const s of data.services) {
 }
 for (const g of data.guides) {
   const e = (extra.guides || {})[g.slug] || {};
+  if (e.sections) g.sections = g.sections.concat(e.sections);
+  if (e.faqs) g.faqs = g.faqs.concat(e.faqs);
+}
+// Second extra file: tender, city and checklist sections (added after the first file's sections).
+const mf = path.join(dir, 'services-more.json');
+const more = fs.existsSync(mf) ? JSON.parse(fs.readFileSync(mf, 'utf8')) : { services: {}, guides: {} };
+for (const s of data.services) {
+  const e = (more.services || {})[s.slug] || {};
+  s.extraSections = s.extraSections.concat(e.sections || []);
+  s.searches = s.searches.concat(e.searches || []);
+  if (e.faqs) s.faqs = s.faqs.concat(e.faqs);
+}
+for (const g of data.guides) {
+  const e = (more.guides || {})[g.slug] || {};
   if (e.sections) g.sections = g.sections.concat(e.sections);
   if (e.faqs) g.faqs = g.faqs.concat(e.faqs);
 }
@@ -147,4 +161,6 @@ ${g.sections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).jo
 const urls = ['/services/', '/services/guides/', ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`)];
 write('sitemap-services.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
+const low = [...Object.entries(counts.services), ...Object.entries(counts.guides)].filter(([, n]) => n < 600);
 console.log('wrote', out.length, 'files', JSON.stringify(counts));
+if (low.length) console.log('UNDER 600 WORDS:', JSON.stringify(low));
