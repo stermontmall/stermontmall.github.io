@@ -323,7 +323,8 @@ function renderCategoriesView() {
       : tile(`data-cat-all="${esc(c.id)}"`, 'All ' + c.name, photoOf(c.id), c.icon, '#fff')}</ul>`;
 }
 function renderDrawer() {
-  $('#drawer-cats').innerHTML = CATS.map(c => `<li><button class="tap w-full flex items-center gap-3 px-4 py-3.5 border-b border-line text-left" data-drawer-cat="${esc(c.id)}"><span class="text-xl">${c.icon}</span>${esc(c.name)}</button></li>`).join('');
+  const svc = `<li><a href="/services/" class="tap w-full flex items-center gap-3 px-4 py-3.5 border-b border-line text-left font-semibold text-brand"><span class="text-xl">\u{1F6E0}\uFE0F</span>Services<span class="ml-auto text-xs font-normal">Pest control, CCTV, solar &rsaquo;</span></a></li>`;
+  $('#drawer-cats').innerHTML = svc + CATS.map(c => `<li><button class="tap w-full flex items-center gap-3 px-4 py-3.5 border-b border-line text-left" data-drawer-cat="${esc(c.id)}"><span class="text-xl">${c.icon}</span>${esc(c.name)}</button></li>`).join('');
 }
 
 /* ---------- 8. Filters sheet ---------- */
