@@ -1,8 +1,13 @@
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
-Last saved: 2026-10-31 09:05 (Africa/Nairobi). GitHub + Supabase connected; this session had a clone and ran node on the real data.
+Last saved: 2026-10-31 09:00 (Africa/Nairobi). GitHub + Supabase connected; clone available this session.
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST: Services polish PR (branch `wip-services-polish`, 2026-10-31 09:05 Africa/Nairobi)
+## NEWEST: Services link in the shop (branch `wip-shop-services-link`, 2026-10-31 09:00 Africa/Nairobi)
+Owner: the Services section is not reachable from the shop ("All categories" drawer had no Services). In progress: `mobile-shell/app.js` `renderDrawer()` now puts a "Services" link to `/services/` first in the drawer; `index.html` `app.js?v=9` -> `v=10`. PR #84 (services hub links, violet theme) is merged and deployed (pages build #722 green).
+- [ ] NEXT: `python3 mobile-shell/shell.test.py` (expect all pass), PR, merge, then owner reloads the shop twice (service worker) and opens All categories.
+- [ ] STILL OPEN: `services/sitemap-services.xml` in `sitemap.xml`/Search Console; owner confirms claims and price ranges.
+
+## (previous) Services polish PR (branch `wip-services-polish`, 2026-10-31 09:05 Africa/Nairobi)
 - [x] PR #83 (8 services + 8 guides) is merged and the pages are live on `main`.
 - [x] `wip-services-polish` (hub `/services/` now links the 8 pages and guides, `services-extra.json` adds longer sections, violet theme) was checked: both JSON files parse, `node services/build-services.mjs` rebuilds with NO diff, all 9 hub links resolve. PR opened to `main`.
 - [ ] NEXT: merge that PR, then open 2 service pages + 1 guide in a browser (not tested in one). Command to re-check: `node services/build-services.mjs && git status --short` (expect empty).
