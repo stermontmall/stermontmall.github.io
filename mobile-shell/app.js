@@ -171,7 +171,11 @@ window.addEventListener('popstate', e => {
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
 const DEEP = new URLSearchParams(location.search).get('product');   // /?product=<slug>: a shared or reloaded product address, opened after the catalog loads
-history.replaceState({ tab: 'home', stack: [] }, '', DEEP ? location.pathname : undefined); // a reload lands on a clean base entry
+/* A reload keeps the tab the customer was on: the browser hands back the state of the current history entry, and every tab hop stores its tab in it
+   (goTab). The first view is Home only for a fresh visit or an unknown tab. The tab is shown at the very end of this file, once the views exist. */
+const TABS = ['home', 'categories', 'deals', 'cart', 'account'];
+const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab : 'home';
+history.replaceState({ tab: START_TAB, stack: [] }, '', DEEP ? location.pathname : undefined); // a reload lands on a clean base entry (no sheet), on the same tab
 scrim.addEventListener('click', closeTop);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop(); });
 syncOverlays();
@@ -186,7 +190,7 @@ function showTab(tab) {
   $$('#bottom-nav .nav-item').forEach(b => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   $('#chips-wrap').hidden = tab !== 'home';
   $('#appbar').classList.remove('is-compact');
-  if (tab === 'deals') { ls.set('dealsSeen', dealsCount); store.set({ dealsNew: 0 }); renderDeals(); }
+  if (tab === 'deals') { if (dealsCount) ls.set('dealsSeen', dealsCount); store.set({ dealsNew: 0 }); renderDeals(); }   // dealsCount is 0 until the catalog is in (a reload on Deals): syncDealsBadge saves it then
   window.scrollTo(0, scrollPos[tab] || 0);
 }
 function goTab(tab) {
@@ -507,5 +511,6 @@ $('#search-form').addEventListener('submit', e => {
 });
 
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
+if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
 loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (DEEP) openDeepLink(DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
 })();
