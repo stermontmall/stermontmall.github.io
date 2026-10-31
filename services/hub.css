@@ -1,0 +1,47 @@
+/* Services hub look (loaded after styles.css, hub page only). Tokens come from styles.css, so dark mode follows. */
+.hero2{margin:0 -16px;padding:26px 16px 24px;background:linear-gradient(135deg,#4c1d95,#7c3aed 55%,#a855f7);color:#fff;border-radius:0 0 26px 26px}
+.hero2 .eyebrow{margin:0;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;opacity:.85}
+.hero2 h1{color:#fff;font-size:1.5rem;margin:.35em 0 .5em}
+.hero2 .lead{color:rgba(255,255,255,.9);font-size:.95rem;margin:0 0 16px}
+.hero2 .cta{display:flex;gap:10px;flex-wrap:wrap}
+.hero2 .btn.light{background:#fff;color:#4c1d95;border-color:#fff}
+.hero2 .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.75);text-decoration:none;display:inline-flex;align-items:center}
+.chips{list-style:none;display:flex;gap:8px;flex-wrap:wrap;padding:0;margin:16px 0 0}
+.chips li{background:rgba(255,255,255,.16);border-radius:999px;padding:4px 12px;font-size:.82rem}
+
+.need{display:flex;flex-wrap:wrap;gap:8px}
+.need a{display:inline-flex;align-items:center;min-height:40px;padding:8px 14px;background:var(--card);border:1px solid var(--line);border-radius:999px;color:var(--tx);text-decoration:none;font-size:.9rem}
+.need a:active{background:var(--line)}
+
+.tiles{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0;margin:0}
+.tiles li{display:flex}
+@media (min-width:640px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{flex:1;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;color:var(--tx);text-decoration:none;box-shadow:0 1px 3px rgba(30,27,46,.07)}
+.tile .art{position:relative;display:grid;place-items:center;aspect-ratio:4/3;background:linear-gradient(135deg,var(--g1),var(--g2))}
+.tile .art svg{width:54px;height:54px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.tile .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tile .tx{padding:10px 12px 12px}
+.tile b{display:block;font-size:.95rem;line-height:1.25}
+.tile small{display:block;margin-top:4px;color:var(--mute);font-size:.8rem;line-height:1.35}
+
+.steps{counter-reset:s;list-style:none;display:grid;gap:10px;padding:0;margin:0}
+.steps li{counter-increment:s;position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 14px 58px}
+.steps li::before{content:counter(s);position:absolute;left:14px;top:14px;width:30px;height:30px;border-radius:50%;background:var(--brand);color:var(--brand-fg);display:grid;place-items:center;font-weight:700}
+.steps b{display:block}.steps span{color:var(--mute);font-size:.92rem}
+
+.trust{list-style:none;display:grid;gap:8px;padding:0;margin:12px 0 0;font-size:.92rem;color:var(--mute)}
+.trust li::before{content:"\2713";color:var(--brand);font-weight:700;margin-right:8px}
+
+#catalog h3{margin:1.6em 0 .6em;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.svc summary{display:flex;align-items:center;gap:12px;list-style:none}
+.svc summary::-webkit-details-marker{display:none}
+.svc summary::after{content:"\203A";margin-left:auto;font-size:1.4rem;line-height:1;color:var(--mute);transition:transform .2s}
+.svc[open] summary::after{transform:rotate(90deg)}
+.svc .ico{flex:none;width:38px;height:38px;padding:8px;border-radius:11px;background:linear-gradient(135deg,var(--g1,#7c3aed),var(--g2,#a855f7));fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+
+.fab{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:40;border-radius:999px;padding:12px 20px;box-shadow:0 6px 18px rgba(76,29,149,.35)}
+body.stm-chrome .fab{bottom:calc(72px + env(safe-area-inset-bottom))}
+
+/* the shell bottom nav is z-index 50: keep the booking sheet above it */
+.scrim{z-index:60}.sheet{z-index:61}
+@media (prefers-reduced-motion:reduce){.svc summary::after{transition:none}}
