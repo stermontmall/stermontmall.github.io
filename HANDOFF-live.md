@@ -2,7 +2,7 @@
 Last saved: 2026-10-31 11:55 (Africa/Nairobi), claude.ai chat session with GitHub + Supabase connectors (no clone; sandbox has node for syntax checks only, no network). USAGE LIMIT earlier hit at ~10:25 (resets 14:30).
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
 
-## NEWEST (chat, 12:50): PEST PAGES DONE and pushed on `wip-services-pest-pages`, PR next, NOT merged
+## NEWEST (chat, 12:15): PEST PAGES MERGED to `main` (PR #97, merge 52ed6bf, 09:08 UTC); Pages deploy + services build green. Phone check still open
 Owner: "Fix all pending on handoff". `node --check` OK on admin-services.js, services/quote.js, hub.js, page.js, app.js and both inline blocks of admin.html (all merged in PR #96). `wip-services-shell-look` is ALREADY in `main` (PR #93): the compare link main...wip-services-shell-look has nothing to compare.
 ### Done
 - [x] 22 pest pages + index: `services/pests-src/part-1..4.json` (source) -> `node services/build-services.mjs` -> `services/pests/<slug>.html` (888-1,199 words each, index 895), `services/pests/index.html`, `services/pests-data.json` (read by admin "Services overview"), URLs added to `services/sitemap-services.xml`, "Pests we treat" grid added to the pest landing page, hub items for bed bugs / cockroaches / termites / rodents link to their pest page (`services/app.js`, `index.html` loads `app.js?v=2`).
@@ -13,7 +13,7 @@ Owner: "Fix all pending on handoff". `node --check` OK on admin-services.js, ser
 - Checked against sources this session: cockroach species and management (UC IPM note), drywood vs subterranean termites (termiteweb.com), FAO larger grain borer manual (control measures list only), Nation article on Kenya locusts (counties named, county teams run spraying; the article gives no farmer reporting steps, so "report to your county agriculture office" is general advice, not quoted from it).
 - NOT checked line by line: everything else is standard biology written conservatively (bed bug, flea, tick, mosquito, fly, lice, mite, spider, scorpion, centipede, moth, beetle, snake, bat and bird sections). Search results returned titles only. OWNER or an entomologist should read the 22 pages once. Items worth a second look: "swarms reached dozens of counties in 2020" (locusts), "about 13.5 per cent moisture" for maize, button spiders and baboon spiders in Kenya, scorpion genera, the claim that Aedes mosquitoes breed in clean water.
 ### Next
-1. [ ] Open the PR `wip-services-pest-pages` -> `main`; merge only after the owner reads the pages and checks `/services/pests/` and 2 pest pages on a phone (reload twice; service worker). Search Console: submit `services/sitemap-services.xml` (still not in `sitemap.xml`).
+1. [x] PR #97 merged at the owner's request (before the phone check). STILL OPEN: owner reads the pages and checks `/services/pests/` and 2 pest pages on a phone (reload twice; service worker). Search Console: submit `services/sitemap-services.xml` (still not in `sitemap.xml`).
 2. [ ] Phone test of the quote drawer (see the 11:55 section): one real test quote, then delete the row.
 3. [ ] Batch 09 blogs, antenna + electric fence pages (needs a "no price" mode in the generator): see the sections below.
 
