@@ -40,3 +40,6 @@ Bump `?v=` in `index.html` for every `app.js` / `tailwind.css` change (cache rul
 - Running `python3 mobile-shell/shell.test.py` (this session cannot) and tapping Submit on pull request forms.
 - Label data the catalog lacks (Mchwatox strength/registration, Actellic 25EC strength, Grain-Save permethrin strength, fogger fuel/capacity/output); owner to read the 8 blogs once.
 - Phone checks, Search Console watch for `/p/` URLs, fertilizer-page safety box decision, "Best Price in Kenya" wording.
+
+## Update 2026-10-31 07:12 (Africa/Nairobi), branch `wip-shell-static-pages`
+- [ ] Owner: "Fix all and autosave on handoff .md". In progress: step 3, shared shell header + bottom nav for account, track, shipping, returns, contact, faq, about, privacy, terms. First step: look at each page's head/body and where `index.html` defines the header/bottom nav. Category pages are merged (75c0e6f).
