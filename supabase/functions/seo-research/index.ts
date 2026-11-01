@@ -100,7 +100,11 @@ Deno.serve(async (req: Request) => {
     });
     if (!userCheck.ok) return reply({ error: "Valid Supabase user session required" }, 401);
     const user = await userCheck.json();
-    if (!user?.id) return reply({ error: "Authenticated user could not be verified" }, 401);
+    if (!user?.id || !user?.email) return reply({ error: "Authenticated user could not be verified" }, 401);
+    const staffCheck = await db("staff?email=ilike." + encodeURIComponent(String(user.email).trim()) + "&select=email&limit=1");
+    if (!staffCheck.ok) throw new Error("Could not verify SEO Doctor staff access: " + await staffCheck.text());
+    const staffRows = await staffCheck.json();
+    if (!Array.isArray(staffRows) || staffRows.length !== 1) return reply({ error: "Staff access required" }, 403);
 
     const body = await req.json();
     const targets = Array.isArray(body.targets) ? body.targets.slice(0, 8) : [];
@@ -158,7 +162,7 @@ Deno.serve(async (req: Request) => {
         method: "PATCH",
         body: JSON.stringify({
           finished_at: new Date().toISOString(),
-          status: failures.length === targets.length ? "failed" : failures.length ? "completed_with_errors" : "completed",
+          status: failures.length ? "failed" : "completed",
           pages_scanned: targets.length,
           proposals_created: saved,
           error: failures.length ? JSON.stringify(failures) : null,
