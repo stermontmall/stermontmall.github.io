@@ -59,7 +59,17 @@ const expected = [
   "bugnil-20ec-insecticide-25-ml",
   "actellic-25ec-insecticide-1-litre",
   "fuko-kil-rat-poison-25-g",
-  "air-chopper-7-5sc-insecticide-100-ml"
+  "air-chopper-7-5sc-insecticide-100-ml",
+  "kynofos-21-elite-feed-phosphate-25-kg",
+  "gut-bio-animal-feed-supplement-100-g",
+  "layer-premix-for-poultry-feed-25-kg",
+  "salinomycin-coccidiostat-feed-additive-25-kg",
+  "lysine-feed-amino-acid-25-kg",
+  "mastercop-60sc-copper-fungicide-1-litre",
+  "milthane-super-fungicide-1-kg",
+  "pegasus-500sc-insecticide-1-litre",
+  "rodent-kill-rat-pellets-500-g",
+  "dudu-stop-25ec-bedbug-cockroach-killer-100-ml"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
