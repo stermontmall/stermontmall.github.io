@@ -1,3 +1,19 @@
+## AUTOMATION SAFETY AND SEO QUALITY CHECKPOINT (2026-11-01)
+Status: IN PROGRESS on `automation/review-first-blog-and-catalog-seo`; PR pending.
+- [x] Confirmed latest post-merge daily SEO audit passed: 364 pages checked, 65 size-redirect pages skipped, no problems found.
+- [x] Confirmed blog index and sitemap rebuild succeeded after the new Kenya online-shopping guide merged.
+- [x] Confirmed Pages deployment subsequently succeeded (run 41285617792).
+- [x] Changed automated daily blog drafting to create review-only pull requests; removed automatic merge/publish step so generated content cannot go live without human approval.
+- [x] Expanded catalog health report to flag short product descriptions (<100 characters) and missing product names, in addition to missing photos/descriptions, duplicate products, price and suspicious-stock checks.
+- [x] Expanded daily SEO checks to detect duplicate titles, duplicate meta descriptions and thin blog articles (<350 words), alongside existing metadata, H1, canonical, image-alt, JSON-LD, internal-link and sitemap checks.
+- [ ] Run syntax/tests and inspect resulting audit report; adjust any false positives before merge.
+- [ ] Verify Search Console service-account secrets and permissions before claiming automated Google indexing status/ranking data.
+- [ ] Product auto-import remains dependent on a verified supplier feed/API or trusted source file; do not invent product facts, price, stock or images.
+- Safety: AI blog drafts require human review for factual accuracy, originality, usefulness, links and safety before merge.
+- Autosave: this checkpoint is committed with the automation changes; continue updating after each meaningful batch.
+
+---
+
 ## AUDIT COVERAGE CHECKPOINT (2026-11-01)
 - [x] Services build workflow succeeded on the service-title fix branch; it regenerated the affected service guide pages.
 - [x] Added `services/**` to daily SEO audit triggers so future service and guide edits are checked automatically.

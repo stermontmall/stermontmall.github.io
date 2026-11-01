@@ -1,0 +1,58 @@
+name: SEO pull request quality gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'seo-*.mjs'
+      - 'generate-products.mjs'
+      - 'data-health.mjs'
+      - 'blog-write.mjs'
+      - 'blog-topics.json'
+      - 'blog/**'
+      - 'p/**'
+      - 'c/**'
+      - 'guides/**'
+      - 'services/**'
+      - '*.html'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seo-pr-quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check JavaScript syntax
+        run: |
+          node --check seo-check.mjs
+          node --check data-health.mjs
+          node --check blog-write.mjs
+          node --check generate-products.mjs
+          node --check seo-meta.mjs
+      - name: Test product and category SEO metadata
+        run: node seo-meta.test.mjs
+      - name: Run full on-page SEO audit
+        run: node seo-check.mjs > seo-pr-report.md
+      - name: Add audit summary
+        if: always()
+        run: |
+          if [ -f seo-pr-report.md ]; then
+            cat seo-pr-report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: seo-pr-audit-report
+          path: seo-pr-report.md
+          if-no-files-found: ignore
