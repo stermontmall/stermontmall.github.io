@@ -605,3 +605,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Crop insecticide copy remains label-first; appliance content covers compatibility, installation, electrical/gas safety and care; drinkware content covers cleaning and safe use.
 - [x] Extended regression coverage from 117 to 127 IDs (10 new canonical product entries; existing Ramtons entry retained); checked word limits, unique copy, plain-text safety and unsupported-claim guardrails.
 - [ ] Run full SEO PR gate and generated-page audit; merge only on success and verify deployment.
+
+
+## 2026-11-01 — Product content batch 22
+- [x] Added two product-specific sections for Xiaomi Poco C71, Nunix WLD-560 cooker, Tecno Spark Go 3, Familly aerosol insecticide, Xiaomi Redmi 15C, Samsung Galaxy A06, Green Killer sticky fly rolls, 2L hand sprayer, ElectroMate 20L oven and ElectroMate 1000W dry iron.
+- [x] Covered phone variant/network checks, qualified gas/electrical installation, aerosol flammability and room safety, hygiene, sprayer inspection and appliance electrical/heat safety.
+- [x] Extended regression coverage from 127 to 137 IDs; checked word limits, distinct copy, plain-text safety and unsupported-claim guardrails.
+- [ ] Run full SEO PR gate and generated-page audit; merge only on success and verify deployment.
