@@ -22,7 +22,7 @@ let redirects = 0, checked = 0;
 
 for (const f of pages) {
   const h = readFileSync(f, 'utf8');
-  if (/<meta\\s+name=[\"']robots[\"']\\s+content=[\"'][^\"']*noindex/i.test(h)) continue; // private, utility and error pages are intentionally excluded from indexing
+  if (/<meta\s+name=["']robots["']\s+content=["'][^"']*noindex/i.test(h)) continue; // private, utility and error pages are intentionally excluded from indexing
   if (/http-equiv="refresh"/i.test(h)) { redirects++; continue; }   // size-variant redirect pages
   checked++;
   const title = unesc((h.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || '');
