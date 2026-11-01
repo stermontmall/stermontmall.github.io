@@ -25,11 +25,11 @@ try {
   let issues;
   await new SeoAnalyzer({ verbose: false })
     .inputFiles(files)
-    .addRule('titleLengthRule', { min: 10, max: 75 })
-    .addRule('metaBaseRule', { list: ['description', 'viewport'] })
-    .addRule('metaSocialRule', { properties: ['og:title', 'og:description', 'og:image', 'twitter:card'] })
-    .addRule('canonicalLinkRule')
-    .addRule('imgTagWithAltAttributeRule')
+    .useRule('titleLengthRule', { min: 10, max: 75 })
+    .useRule('metaBaseRule', { list: ['description', 'viewport'] })
+    .useRule('metaSocialRule', { properties: ['og:title', 'og:description', 'og:image', 'twitter:card'] })
+    .useRule('canonicalLinkRule')
+    .useRule('imgTagWithAltAttributeRule')
     .outputObject(report => { issues = report; })
     .run();
 
