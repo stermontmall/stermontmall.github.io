@@ -45,7 +45,7 @@ function audit(t: any) {
   const total = checks.reduce((n, c) => n + c.weight, 0);
   const score = Math.round(checks.reduce((n, c) => n + (c.passed ? c.weight : 0), 0) / total * 100);
   const failed = checks.filter(c => !c.passed);
-  const pageTopic = String(metrics.h1Text || title || t.slug || "the page topic").replace(/\\s+/g, " ").trim().slice(0, 180);
+  const pageTopic = String(metrics.h1Text || title || t.slug || "the page topic").replace(/\s+/g, " ").trim().slice(0, 180);
   const observedSubtopics = Array.isArray(metrics.h2Texts)
     ? metrics.h2Texts.map((x: unknown) => String(x || "").trim()).filter(Boolean).slice(0, 8)
     : [];
