@@ -47,6 +47,7 @@ for (const token of [
   'grid.append(k)'
 ]) if (!doctor.includes(token)) throw new Error(`Missing SEO Doctor audit feature: ${token}`);
 const edge = readFileSync('supabase/functions/seo-research/index.ts', 'utf8');
+if (!edge.includes('url.pathname.endsWith("/")') || !edge.includes('public HTML page')) throw new Error('SEO research must accept public directory landing pages discovered in sitemaps.');
 const reviewEdge = readFileSync('supabase/functions/seo-review/index.ts', 'utf8');
 for (const token of ['superseded-', 'superseded_count', 'staff access', 'status=eq.pending']) {
   if (!reviewEdge.includes(token)) throw new Error(`Missing SEO review safety: ${token}`);
