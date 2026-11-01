@@ -177,7 +177,9 @@ const expected = [
   "xiaomi-redmi-15c-8gb-ram-plus-256gb-8gb-plus-256gb",
   "waanzilish-mens-black-feather-casual-sneakers",
   "womens-white-tassel-charm-sneakers-black-heel",
-  "xuanku-unisex-white-gold-fashion-sport-sneakers"
+  "xuanku-unisex-white-gold-fashion-sport-sneakers",
+  "kekkila-peatmoss",
+  "light-duty-safety-helmet-standard",
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
