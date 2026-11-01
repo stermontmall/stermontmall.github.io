@@ -1,3 +1,13 @@
+## SESSION UPDATE (2026-11-01): previous SEO PR reconciled
+- [x] Inspected PR #115 against current main file-by-file. All 21 page/content and blog-title-normalizer changes were already present on main; remaining differences in seo-check.mjs and seo-daily.yml were newer main improvements, not missing changes.
+- [x] Closed PR #115 as superseded and documented the reason in its conversation: https://github.com/stermontmall/stermontmall.github.io/pull/115
+- [x] Retrieved and inspected the PR #118 quality-gate audit artifact: 364 pages checked, 65 size-redirect pages skipped, zero findings. Syntax checks and SEO metadata tests passed.
+- [ ] Still run the daily SEO audit on the exact post-PR-#118 main commit; the last scheduled daily report predates PR #118.
+- [ ] Review Search Console/Merchant Center and supplier-feed access only when owner credentials/trusted data are available.
+- Autosave: this update records the reconciliation; add another checkpoint after the next audit batch.
+
+---
+
 ## CURRENT SESSION CHECKPOINT (2026-11-01): resume prior SEO and automation work
 Status: REVIEWED; next action is to reconcile the older open SEO-fixes PR with current main.
 - [x] Recovered the prior handoff from HANDOFF-live.md and inspected current GitHub branches, pull requests and Actions runs.
