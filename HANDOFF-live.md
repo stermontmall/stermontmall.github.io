@@ -841,3 +841,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Adopted competitor-style internal navigation: generated homepage SEO links now include the existing services hub, pest-control service information, pest-specific termite/bed-bug pages, bulk product quotes and Nairobi pickup/delivery information.
 - [x] Pest-control product category pages now cross-link to the existing professional-service information, creating a product-shopping path and a service-enquiry path without merging the two intents.
 - [ ] Important owner verification before promoting service claims: existing `services/services-data.json` advertises KSh 3,500–25,000 prices, a 90-day guarantee and delivery/coverage claims. Confirm these are genuinely offered, current and fulfilable. Do not add more service promises until confirmed.
+
+
+## SESSION CHECKPOINT (2026-11-01): owner-confirmed service experience and guarantee
+- [x] Owner confirms SterMont has an experienced service team and has delivered its professional services for three years; the website itself is new.
+- [x] Owner confirms the advertised 90-day pest-control service guarantee is genuinely honoured.
+- [x] Prepared trust messaging that distinguishes the new website from the established service operation, and explains that the 90-day guarantee applies to the same pest returning in the treated area, with terms confirmed in the quote.
+- [ ] Run service-page build and SEO/accessibility checks; merge only if validation passes, then verify the live services hub and pest-control page.
+- Note: three years is owner-provided business information, not independently audited. Do not imply the website has existed for three years.

@@ -214,6 +214,7 @@ ${hero({
     chips: ['Quote after inspection', 'Pay by M-Pesa', 'Nairobi and all 47 counties']
   })}
 ${s.intro.map(p => `<p>${esc(p)}</p>`).join('')}
+<p><strong>Three years of hands-on service experience:</strong> Stermont Arcade has a new website, but our service work is not new. Our experienced team has been delivering professional services for three years. We confirm the scope, availability and final quote with you before work begins.</p>
 <h2>What is included</h2><ul class="checks">${s.included.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
 <h2>How it works</h2><ol class="steps">${s.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
 <h2>What decides the price</h2><ul class="checks">${s.priceFactors.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
