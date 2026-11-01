@@ -129,8 +129,10 @@ Deno.serve(async (req: Request) => {
       }
       let url: URL;
       try { url = new URL(t.url); } catch { return reply({ error: "Invalid target URL" }, 400); }
-      if (url.origin !== SITE || !url.pathname.endsWith(".html") && url.pathname !== "/") {
-        return reply({ error: "Target must be an HTML page on the Stermont Arcade site" }, 400);
+      const allowedPath = url.pathname === "/" || url.pathname.endsWith("/") || url.pathname.endsWith(".html");
+      const privatePath = /^\/(admin|account|checkout|cart|auth)(\/|$)/i.test(url.pathname);
+      if (url.origin !== SITE || !allowedPath || privatePath) {
+        return reply({ error: "Target must be a public HTML page on the Stermont Arcade site" }, 400);
       }
     }
 
