@@ -96,6 +96,18 @@ export function pdpTitle(name, ctx = {}) {
   const base = String(name || '').replace(/\s+/g, ' ').trim();
   const lead = hasLeadWord(base) ? '' : (isGenuine(ctx) ? 'Original' : powerWord(base, ctx));
   const led = lead ? `${lead} ${base}` : base;
+  // Ordinary retail products: lead with the action shoppers use when ready to buy.
+  // Keep the high-intent phrase "Price in Kenya"; add "Online" when the full name fits.
+  if (productType(ctx.catSlug) === 'general') {
+    const tiers = [
+      `Buy ${led} Online – Price in Kenya`,
+      `Buy ${led} – Price in Kenya`
+    ];
+    const hit = tiers.find(t => t.length <= TITLE_MAX);
+    const prefix = 'Buy ';
+    const suffix = ' – Price in Kenya';
+    return hit || prefix + clip(led, TITLE_MAX - prefix.length - suffix.length) + suffix;
+  }
   const tiers = [
     `${led} – Best Price in Kenya | ${STORE}`,
     `${led} – Price in Kenya | ${STORE}`,
@@ -103,7 +115,7 @@ export function pdpTitle(name, ctx = {}) {
     `${led} – Price in Kenya`
   ];
   const hit = tiers.find(t => t.length <= TITLE_MAX);
-  // Name too long even without the store name: keep the lead word (Original / power word) and clip the product name instead.
+  // Name too long even without the store name: keep the lead word and clip the product name.
   return hit || `${clip(led, TITLE_MAX - ' – Price in Kenya'.length)} – Price in Kenya`;
 }
 

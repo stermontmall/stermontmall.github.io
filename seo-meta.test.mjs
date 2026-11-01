@@ -23,6 +23,9 @@ for (const name of names) for (const ctx of ctxs) {
   assert.ok(t.length <= TITLE_MAX, `title ${t.length}: ${t}`);
   assert.ok(d.length <= DESC_MAX, `desc ${d.length}: ${d}`);
   assert.ok(/Price in Kenya/.test(t), `title lacks Price in Kenya: ${t}`);
+  if (productType(ctx.catSlug) === 'general') {
+    assert.ok(t.startsWith('Buy '), `ordinary retail title must lead with Buy: ${t}`);
+  }
   assert.ok(/M-Pesa/.test(d) && /Kenya/.test(d), `desc lacks M-Pesa/Kenya: ${d}`);
   assert.ok(!/PCPB/i.test(t + d), `PDP must not claim PCPB: ${t} | ${d}`);
   assert.ok(!/(#1|top-rated|guaranteed|certified)/i.test(t + d), `unverifiable claim: ${t} | ${d}`);
