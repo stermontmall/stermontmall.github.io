@@ -19,6 +19,7 @@ const pages = [...new Set([...rootPages, ...['p','c','blog','services','guides']
 const unesc = t => String(t).replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');   // measure what Google sees, not the escaped HTML
 const exists = path => { path = decodeURIComponent(path.split('#')[0].split('?')[0]); if (!path || path === '/') path = '/index.html'; if (path.endsWith('/')) path += 'index.html'; return existsSync('.' + path); };
 let redirects = 0, checked = 0;
+const titlePages = new Map(), descPages = new Map();
 
 for (const f of pages) {
   const h = readFileSync(f, 'utf8');
@@ -29,6 +30,13 @@ for (const f of pages) {
   const dm = h.match(/<meta name=["']description["'] content=(?:"([^"]*)"|'([^']*)')/i), desc = dm ? unesc(dm[1] || dm[2] || '') : '';   // blog posts use single quotes, product pages double
   if (!title.trim()) add('Missing page title', f); else if (title.length > 75) add('Title longer than 75 characters (Google cuts it off)', f);
   if (!desc.trim()) add('Missing meta description', f); else if (desc.length < 70) add('Meta description under 70 characters', f); else if (desc.length > 165) add('Meta description over 165 characters', f);
+  if (title.trim()) { const k = title.trim().toLowerCase(); (titlePages.get(k) || titlePages.set(k, []).get(k)).push(f); }
+  if (desc.trim()) { const k = desc.trim().toLowerCase(); (descPages.get(k) || descPages.set(k, []).get(k)).push(f); }
+  if (f.startsWith('blog/') && f !== 'blog/index.html') {
+    const textOnly = h.replace(/<script[\\s\\S]*?<\\/script>/gi, ' ').replace(/<style[\\s\\S]*?<\\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').replace(/\\s+/g, ' ').trim();
+    const words = textOnly ? textOnly.split(' ').length : 0;
+    if (words < 350) add(`Thin blog article (${words} words; review usefulness and completeness)`, f);
+  }
   if (!/<link rel=["']canonical["']/i.test(h)) add('Missing canonical link', f);
   const h1 = (h.match(/<h1[\s>]/gi) || []).length;
   if (h1 !== 1) add(h1 ? 'More than one H1 heading' : 'Missing H1 heading', f);
@@ -50,6 +58,8 @@ for (const f of pages) {
 for (const sm of ['sitemap.xml', 'sitemap-products.xml', 'services/sitemap-services.xml']) if (existsSync(sm))
   for (const m of readFileSync(sm, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) { const u = m[1].replace(SITE, ''); if (u.startsWith('/') && !exists(u)) add('Sitemap lists a page that does not exist', `${sm}: ${u}`); }
 
+for (const [value, list] of titlePages) if (list.length > 1) for (const f of list) add('Duplicate page title', f);
+for (const [value, list] of descPages) if (list.length > 1) for (const f of list) add('Duplicate meta description', f);
 const total = Object.values(issues).reduce((n, a) => n + a.length, 0);
 let out = `# Daily SEO check\n\nChecked ${checked} pages (${redirects} size-redirect pages skipped). ${total ? `Found **${total}** things to fix.` : 'No problems found. 🎉'}\n`;
 for (const [what, list] of Object.entries(issues).sort((a, b) => b[1].length - a[1].length)) {
