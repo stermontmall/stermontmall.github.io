@@ -1,3 +1,14 @@
+## SERVICE GUIDE TITLE CHECKPOINT (2026-11-01)
+Status: IN PROGRESS on `fix/service-guide-seo-titles`; PR to follow.
+- [x] After PR #110 merged, the updated daily SEO audit passed and reduced findings from 39 to 8 across 363 indexable pages (65 size redirects skipped).
+- [x] Remaining 8 findings are all overlong service-guide/service-hub titles.
+- [x] Updated the service-page generator to cap guide SEO titles at 70 characters while retaining the full visible H1 and Article headline.
+- [x] Shortened the services hub title and matching Open Graph/Twitter titles.
+- [ ] Rebuild service pages, run the daily audit, verify zero remaining title-length findings.
+- Autosave: checkpoint saved on this branch.
+
+---
+
 ## SEO AUDIT FIX CHECKPOINT (2026-11-01): resolve daily report findings
 Status: IN PROGRESS on `fix/seo-audit-findings-nov-2026`; PR to follow.
 - [x] Reviewed the live daily audit report: 370 pages checked, 65 size redirects skipped, 39 findings.
