@@ -362,5 +362,37 @@
         "After washing, reshape the garments and dry them as directed rather than exposing them to excessive heat. Store the set clean and fully dry. If you are buying it as a gift, confirm the recipient's preferred size and current availability before placing the order."
       ]
     }
+  ],
+  "vision-plus-double-door-refrigerator": [
+    {
+      "heading": "Check dimensions and kitchen access before delivery",
+      "paragraphs": [
+        "Before choosing a double-door refrigerator, measure the space where it will stand and the route it must take to reach the kitchen. Check height, width and depth, including any handles or protruding parts, and measure doorways, stairs and turns along the delivery route. The current listing does not state the exact capacity or external dimensions, so ask us to confirm the model details before paying if space is limited.",
+        "Allow the clearance recommended by the manufacturer around the appliance and make sure the doors can open fully without hitting cabinets or walls. Position the refrigerator on a level floor, away from direct sunlight and cooking appliances, and use a suitable electrical socket as described in the user manual."
+      ]
+    },
+    {
+      "heading": "Organise groceries and look after the door seals",
+      "paragraphs": [
+        "Use the freezer for foods intended to remain frozen and keep chilled groceries in the refrigerator compartment. Store food in covered containers, separate raw meat from ready-to-eat items and avoid overfilling shelves so cold air can circulate. Let hot food cool safely before placing it inside, following food-safety guidance for perishable items.",
+        "Wipe spills promptly and clean the door seals so they can close properly. If the manual permits, clean the interior with a soft cloth and mild solution, then dry surfaces before restocking. Do not scrape ice with sharp objects or attempt electrical repairs yourself. If cooling becomes unreliable or the door seal is damaged, contact a qualified appliance technician."
+      ]
+    }
+  ],
+  "roch-mechanical-microwave-oven": [
+    {
+      "heading": "Choose suitable containers and heat food evenly",
+      "paragraphs": [
+        "Use containers marked as microwave-safe, such as suitable glass or ceramic dishes, and avoid metal utensils, aluminium foil and dishes with metallic decoration. If you are unsure about a container, do not place it in the microwave. Arrange food in an even layer where possible and stir or rotate it during heating when appropriate so hot and cool spots are reduced. Allow food to stand briefly after heating and check that it is hot throughout before serving.",
+        "Mechanical dials make it straightforward to set a time and power level, but the correct setting depends on the food, quantity and starting temperature. Begin with a shorter heating time and add more if needed rather than overheating food. Follow the instructions supplied with the exact Roch model for defrosting and power-level guidance."
+      ]
+    },
+    {
+      "heading": "Position, clean and maintain the microwave safely",
+      "paragraphs": [
+        "Place the microwave on a stable, level surface and leave the ventilation clearance specified in its manual. Keep the air openings unobstructed and avoid placing the appliance near water or a source of excessive heat. Do not operate it empty, and stop using it if the door, hinges, latch or seal appear damaged.",
+        "Unplug the appliance before cleaning the exterior or moving it. Wipe food splashes from the cavity with a soft damp cloth and dry it afterwards; avoid abrasive pads and harsh chemicals. Never remove the outer casing or attempt to repair internal microwave components yourself, because high-voltage parts can remain dangerous even when unplugged."
+      ]
+    }
   ]
 }
