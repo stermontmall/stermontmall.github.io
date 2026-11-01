@@ -148,6 +148,15 @@ const allText = [  "abasi-5-ec-50-ml",
   "actellic-50ec-insecticide-500-ml",
   "bedlam-200sl-insecticide-50-ml-2",
   "bedlam-200sl-insecticide-100-ml",
+  "bromarat-0-005-rb-rodent-bait-100-g",
+  "miratex-pellets-rat-and-mice-killer-bait-240-g",
+  "air-chopper-7-5sc-insecticide-15-ml-3-pk",
+  "air-chopper-7-5sc-insecticide-250-ml",
+  "air-chopper-7-5sc-insecticide-1-litre",
+  "agro-lambda-5ec-insecticide-100-ml",
+  "agro-lambda-5ec-insecticide-1-litre",
+  "actellic-gold-dust-100-g",
+  "actellic-gold-dust-500-g",
 ];
 for (const [id, sections] of Object.entries(content)) {
   assert.ok(Array.isArray(sections) && sections.length >= 2, id + ': add at least two useful sections');
