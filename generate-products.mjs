@@ -236,15 +236,38 @@ const INFO = {
       ['Can I buy rat poison online and pay by M-Pesa?', 'Yes. Add it to your cart on stermontarcade.co.ke and pay by M-Pesa. We confirm stock and delivery before dispatch.'],
       ['How do I use rodent bait safely?', 'Place it only where children, pets and livestock cannot reach, usually in covered stations along walls and runways, wear gloves and follow the label.']
     ] },
-  'termite-control': { h1: 'Termite Control in Kenya', title: 'Termite Control Products in Kenya | Stermont Arcade',
-    desc: 'Buy termite control products online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Termiticides and treatments for buildings, fences and timber.',
-    guide: `<h2>How to choose a termite control product in Kenya</h2>
-<p>Termites damage timber, fences and buildings from the soil or from inside the structure. Treatment depends on where they are, so read the label to see whether a product is meant for soil, timber or existing buildings, and check for a PCPB registration number. Large or hidden infestations in buildings are best handled by a licensed pest control operator.</p>
-<ul><li><b>Find the source.</b> Look for mud tubes, hollow timber and soil mounds.</li><li><b>Reduce moisture and wood-to-soil contact.</b></li><li><b>Apply as the label directs</b>, using protective wear.</li></ul>
-<p>Protective gear: <a href="/c/sprayers-equipment.html">sprayers, masks and gloves</a>.</p>`,
+  'termite-control': { h1: 'Termite Control Products in Kenya', title: 'Termite Control Products in Kenya | Stermont Arcade',
+    desc: 'Compare termite treatment products in Kenya for soil, timber and buildings. Pay by M-Pesa; delivery to all 47 counties.',
+    intro: 'Shop termite control products for homes, construction projects, landlords, farms and property maintenance. Compare the exact product label and intended use before choosing: a treatment designed for soil is not automatically suitable for timber or indoor surfaces.',
+    guide: `<h2>How to choose termite treatment products in Kenya</h2>
+<p>Termites can damage structural timber, doors, fence posts, stored wood and buildings. The right product depends on the target site and the use printed on its label. Start by identifying whether you need a product for pre-construction soil treatment, an existing building, timber or a smaller outdoor area. Do not choose a chemical based on its name alone: read the full label and confirm the intended pest, application site and method.</p>
+<h3>Match the product to the job</h3>
+<ul>
+<li><b>Before construction:</b> check whether the label specifically permits pre-construction soil treatment and whether the project requires a qualified applicator.</li>
+<li><b>Existing buildings:</b> look for a label that covers the relevant structure or treatment site. Hidden or widespread activity may need inspection by a licensed pest control operator.</li>
+<li><b>Timber, posts and fences:</b> confirm that the product is labelled for the particular timber use and whether it is intended for surface or soil application.</li>
+<li><b>Small outdoor areas:</b> check the label's target pest, permitted location and application method before buying.</li>
+</ul>
+<h3>What to check before you order</h3>
+<ul>
+<li><b>Registration and label:</b> check the PCPB registration details where applicable, the product name, target pest and permitted use.</li>
+<li><b>Pack size:</b> compare the listed pack size with the job and the label. A larger pack is not automatically the right choice.</li>
+<li><b>Application equipment:</b> confirm whether the label allows the sprayer or equipment you plan to use. Browse <a href="/c/sprayers-equipment.html">sprayers and protective equipment</a>.</li>
+<li><b>Safety instructions:</b> check the required protective wear, site preparation, re-entry instructions, storage and disposal directions.</li>
+</ul>
+<h3>Reduce conditions that attract termites</h3>
+<p>Repair leaks, improve drainage, reduce persistent dampness and avoid leaving untreated wood in direct contact with soil where practical. Keep timber off the ground during storage and inspect vulnerable areas regularly. These steps support a treatment plan but do not replace a correctly selected and labelled product.</p>
+<h3>When to involve a professional</h3>
+<p>For structural damage, active mud tubes inside a building, a large infestation or any treatment involving enclosed or occupied spaces, seek an assessment from a licensed pest control operator. Do not improvise chemical mixtures, increase a dose or apply a product to a site that is not listed on its label.</p>
+<p>For practical background, read our guides to <a href="/blog/termite-control-at-home-kenya.html">termite control at home in Kenya</a>, <a href="/blog/mchwatox-350-sc-soil-treatment-before-you-build-kenya.html">soil treatment before building</a> and <a href="/blog/metro-200sc-termiticide-fence-posts-and-small-jobs-kenya.html">termite treatment for fence posts and small jobs</a>. You can also compare related <a href="/c/pest-control-fumigation.html">pest control and fumigation products</a>.</p>
+<p><b>Ordering from Stermont Arcade:</b> compare the products listed on this page, check the pack and stock details, then order online or ask us to confirm a product's listed details before payment. Pay by M-Pesa; delivery is available across Kenya, with the fee confirmed before payment.</p>`,
     faq: [
-      ['How do I get rid of termites in Kenya?', 'Locate the source, reduce moisture and apply a PCPB-registered termite product exactly as its label directs. For large infestations in buildings, call a licensed pest control operator.'],
-      ['Do you deliver termite products to all counties?', 'Yes. We deliver to all 47 counties, usually within 1 to 3 days, and confirm the delivery fee before you pay.']
+      ['Which termite treatment product should I choose in Kenya?', 'Choose by the exact application site and intended use on the product label, such as soil, an existing structure or timber. Check registration details where applicable and ask a qualified professional if the infestation affects a building.'],
+      ['Can I use a soil termiticide on timber?', 'Not unless the product label specifically permits that use. Soil, timber and structural treatments are not automatically interchangeable.'],
+      ['What should I check before buying termite control products?', 'Check the target pest, permitted application site, registration details where applicable, pack size, equipment requirements and safety instructions on the label.'],
+      ['Can I pay for termite control products by M-Pesa?', 'Yes. Order through Stermont Arcade and follow the M-Pesa checkout instructions. Confirm stock and the delivery fee before payment.'],
+      ['Do you deliver termite products across Kenya?', 'Delivery is available across all 47 counties, usually within 1 to 3 days. The delivery fee is confirmed before payment.'],
+      ['When should I call a pest control professional?', 'Seek a licensed pest control operator for structural infestations, significant timber damage, large sites or treatments involving occupied or enclosed spaces.']
     ] },
   'fumigation-chemicals': { h1: 'Fumigation Chemicals in Kenya', title: 'Fumigation Chemicals in Kenya | Stermont Arcade',
     desc: 'Buy fumigation chemicals online in Kenya. Pay by M-Pesa, delivery to all 47 counties.', intro: 'Chemicals for fumigation of stores, grain and premises. Use only as directed on the label, and use a licensed operator for large jobs.',
