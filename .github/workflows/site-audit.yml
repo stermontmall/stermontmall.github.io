@@ -6,6 +6,12 @@ on:
   schedule:
     - cron: '0 7 * * 2'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/site-audit.yml'
+      - '.pa11yci.json'
+      - 'seo-analyzer-run.mjs'
 
 permissions:
   contents: read
@@ -26,7 +32,7 @@ jobs:
             --max-concurrency 8 --timeout 20 --max-retries 2
             './*.html'
           output: ./lychee-report.md
-          fail: false
+          fail: true
           jobSummary: true
       - uses: actions/upload-artifact@v4
         if: always()
