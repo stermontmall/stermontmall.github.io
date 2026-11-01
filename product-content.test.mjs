@@ -15,7 +15,9 @@ const expected = [
   "dahua-full-hd-gaming-monitor",
   "glamstar-double-door-refrigerator",
   "elite-tailoring-mustard-yellow-blazer-piece",
-  "elite-tailoring-royal-blue-textured-blazer-piece"
+  "elite-tailoring-royal-blue-textured-blazer-piece",
+  "itel-smartphone",
+  "nunix-gas-and-electric-cooker"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
