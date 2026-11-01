@@ -1,4 +1,5 @@
-# Daily read-only sales and service-lead report. Opens/refreshes a GitHub issue when follow-up is overdue.
+# Daily read-only sales and service lead data check.
+# This repository is public: never publish customer or business metrics in issues, logs, summaries or artifacts.
 name: Daily sales and leads
 
 on:
@@ -8,7 +9,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 concurrency:
   group: daily-sales-leads
@@ -25,29 +25,9 @@ jobs:
           node-version: 20
       - name: Test privacy and read-only guardrails
         run: node --test sales-leads-report.test.mjs
-      - name: Build report from Supabase
+      - name: Read sales and service lead data privately on this runner
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: node sales-leads-report.mjs
-      - name: Save private operational report
-        uses: actions/upload-artifact@v4
-        with:
-          name: sales-leads-report
-          path: sales-leads-report.md
-          retention-days: 30
-      - name: Open or refresh follow-up reminder
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          count=$(cat sales-leads-count.txt)
-          existing=$(gh issue list --state open --search "Sales and service follow-up in:title" --json number --jq '.[0].number // empty')
-          if [ "$count" -gt 0 ]; then
-            if [ -n "$existing" ]; then
-              gh issue edit "$existing" --body-file sales-leads-report.md
-              gh issue comment "$existing" --body "Daily follow-up report refreshed."
-            else
-              gh issue create --title "Sales and service follow-up $(date -u +%F)" --body-file sales-leads-report.md
-            fi
-          elif [ -n "$existing" ]; then
-            gh issue close "$existing" --comment "No overdue new orders or service enquiries remain in the latest report."
-          fi
+      - name: Confirm safe completion without publishing business data
+        run: echo "Private sales data check completed. No customer or business metrics were published."
