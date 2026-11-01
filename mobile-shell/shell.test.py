@@ -16,10 +16,10 @@ URL = f'http://127.0.0.1:{port}/'
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 OK, BROKEN = 'https://img.test/ok.png', 'https://img.test/broken.jpg'
 CATS_FIX = [
-    dict(id=31, name='Pest Control & Fumigation', slug='pest-control-fumigation', parent_id=None, sort_order=15, is_promo=False),
-    dict(id=32, name='Bed Bug Killers', slug='bed-bug-killers', parent_id=31, sort_order=0, is_promo=False),
-    dict(id=1, name='Agrovet', slug='agrovet', parent_id=None, sort_order=16, is_promo=False),
-    dict(id=71, name='Fungicides', slug='fungicides', parent_id=1, sort_order=0, is_promo=False),
+    dict(id=31, name='Outdoor & Garden', slug='garden-outdoors', parent_id=None, sort_order=15, is_promo=False),
+    dict(id=32, name='Garden Care', slug='garden-care', parent_id=31, sort_order=0, is_promo=False),
+    dict(id=1, name='Home & Living', slug='home-living', parent_id=None, sort_order=16, is_promo=False),
+    dict(id=71, name='Garden Tools', slug='garden-tools', parent_id=1, sort_order=0, is_promo=False),
     dict(id=75, name='Phones & Accessories', slug='phones-accessories', parent_id=None, sort_order=4, is_promo=False),
     dict(id=2, name='Phones & Tablets', slug='phones-tablets', parent_id=75, sort_order=0, is_promo=False),
     dict(id=79, name='Home & Kitchen', slug='home-kitchen', parent_id=None, sort_order=5, is_promo=False),
@@ -31,18 +31,18 @@ def row(id, cat, name, price, old, featured=False, group=None, label=None, stock
     return dict(id=id, slug=id, name=name, category_id=cat, price=str(price), old_price=str(old), stock=stock, featured=featured,
                 images=[img] if img else [], unit=None, variant_group=group, variant_label=label)
 ROWS = [row('home-0', 24, 'Hot Plate', 2500, 3000, featured=True)]
-ROWS += [row(f'agro-abc-{l.replace(" ", "")}', 71, 'Absolute 375SC Fungicide', pr, int(pr * 1.15), featured=True, group='agro-abc', label=l)
+ROWS += [row(f'garden-set-{l.replace(" ", "")}', 71, 'Garden Hose Connector Set', pr, int(pr * 1.15), featured=True, group='garden-set', label=l)
          for l, pr in [('1 Litre', 6450), ('250 ml', 1550), ('100 ml', 690), ('50 ml', 390)]]
-ROWS += [row(f'pest-{i}', 32, f'Bed Bug Spray {i}', 300 + i * 250, 300 + i * 250 + 60 * (i % 3)) for i in range(1, 6)]
-ROWS += [row('pest-broken', 32, 'Bed Bug Powder', 450, 520, img=BROKEN)]
+ROWS += [row(f'outdoor-{i}', 32, f'Garden Hose Nozzle {i}', 300 + i * 250, 300 + i * 250 + 60 * (i % 3)) for i in range(1, 6)]
+ROWS += [row('outdoor-broken', 32, 'Plant Pot Set', 450, 520, img=BROKEN)]
 ROWS += [row(f'phone-{i}', 2, f'Phone Model {i}', 9000 + i * 4000, 9000 + i * 4000 + 1500) for i in range(1, 9)]
-ROWS += [row('agro-1', 71, 'Copper Fungicide', 1200, 1200), row('agro-2', 71, 'Sulphur Dust', 800, 900)]
+ROWS += [row('garden-1', 71, 'Watering Can', 1200, 1200), row('garden-2', 71, 'Garden Gloves', 800, 900)]
 ROWS += [row('home-1', 24, 'Air Fryer 5L', 6500, 7800), row('home-2', 24, 'Kettle 1.8L', 1800, 2100), row('home-3', 24, 'Blender', 3200, 3900)]
 ROWS += [row('home-soldout', 24, 'Gone Item', 100, 120, stock=0)]
 NAMES_FIX = {'home-0': 'Heavy-Duty Hot Plate Pro'}   # product-names.json heading; every other product falls back to its database name
 FAIL = [False]
-# Products the Deals badge should count: in stock, lowest size has an old price above its price. 19 = hot plate, Absolute (one folded product),
-# 4 bed bug sprays (pest-3 has no old price), the powder, 8 phones, Sulphur Dust, 3 kitchen items; the sold-out item and Copper Fungicide do not count.
+# Products the Deals badge should count: in stock, lowest size has an old price above its price. 19 = hot plate, Garden Hose Connector Set (one folded product),
+# 4 garden hose sprays (outdoor-3 has no old price), the powder, 8 phones, Garden Gloves, 3 kitchen items; the sold-out item and Watering Can do not count.
 DEALS_EXPECTED = 19
 
 def serve(route, body, ctype='application/json'):
@@ -93,13 +93,13 @@ with sync_playwright() as p:
     check('2-column grid', pg.evaluate("getComputedStyle(document.querySelector('#grid')).gridTemplateColumns.split(' ').length") == 2)
     check('discount badge renders, no invented star ratings', pg.locator('#grid .bg-sale').count() > 0 and pg.locator('#grid .stars').count() == 0)
     check('name comes from product-names.json when present', pg.locator('#grid .card[data-id="home-0"] p').first.inner_text() == 'Heavy-Duty Hot Plate Pro')
-    check('database name used when the heading file has no entry', 'Bed Bug Spray 1' in pg.locator('#grid').inner_text() or pg.locator('#grid .card[data-id^="pest-"]').count() >= 1)
+    check('database name used when the heading file has no entry', 'Garden Hose Nozzle 1' in pg.locator('#grid').inner_text() or pg.locator('#grid .card[data-id^="outdoor-"]').count() >= 1)
     check('real product photo is rendered', pg.locator('#grid .card[data-id="home-0"] img[src="https://img.test/ok.png"]').count() == 1)
     pg.wait_for_timeout(200)
-    check('broken photo falls back to the category emoji', pg.locator('#grid .card[data-id="pest-broken"] img').count() == 0 and '🪳' in pg.locator('#grid .card[data-id="pest-broken"]').inner_text())
-    check('pack sizes fold into ONE card with a From price', pg.locator('#grid .card[data-id="agro-abc"]').count() == 1 and 'From KSh 390' in pg.locator('#grid .card[data-id="agro-abc"]').inner_text() and '4 sizes' in pg.locator('#grid .card[data-id="agro-abc"]').inner_text())
+    check('broken photo falls back to the category emoji', pg.locator('#grid .card[data-id="outdoor-broken"] img').count() == 0 and '🛍️' in pg.locator('#grid .card[data-id="outdoor-broken"]').inner_text())
+    check('pack sizes fold into ONE card with a From price', pg.locator('#grid .card[data-id="garden-set"]').count() == 1 and 'From KSh 390' in pg.locator('#grid .card[data-id="garden-set"]').inner_text() and '4 sizes' in pg.locator('#grid .card[data-id="garden-set"]').inner_text())
     check('sold-out product is hidden', pg.locator('#grid .card[data-id="home-soldout"]').count() == 0)
-    check('chips come from the live categories (promo + empty ones left out)', pg.locator('#chips .chip').all_inner_texts() == ['For you', 'Phones & Accessories', 'Home & Kitchen', 'Pest Control & Fumigation', 'Agrovet'], pg.locator('#chips .chip').all_inner_texts())
+    check('chips come from the live categories (promo + empty ones left out)', pg.locator('#chips .chip').all_inner_texts() == ['For you', 'Phones & Accessories', 'Home & Kitchen', 'Outdoor & Garden', 'Home & Living'], pg.locator('#chips .chip').all_inner_texts())
     pg.screenshot(path=f'{OUT}/shot-home.png')
 
     # badges
@@ -121,23 +121,23 @@ with sync_playwright() as p:
     check('scroll unlocked after close', not pg.evaluate("document.body.classList.contains('no-scroll')"))
 
     # multi-size product: the plus button asks for a size instead of silently adding the smallest
-    pg.locator('#grid .card[data-id="agro-abc"] [data-add]').click()
+    pg.locator('#grid .card[data-id="garden-set"] [data-add]').click()
     check('plus on a multi-size card opens the size sheet', pg.locator('#sheet-quickbuy.open').count() == 1 and pg.locator('#bottom-nav [data-badge="cart"]').inner_text() == '1')
     check('sizes listed smallest price first', pg.locator('#qb-sizes .chip').all_inner_texts() == ['50 ml', '100 ml', '250 ml', '1 Litre'], pg.locator('#qb-sizes .chip').all_inner_texts())
     pg.locator('#qb-sizes [data-size="250 ml"]').click()
     check('each size shows its own price', pg.locator('#qb-price').inner_text() == 'KSh 1,550' and pg.locator('#qb-old').inner_text() == 'KSh 1,782', pg.locator('#qb-price').inner_text())
-    pg.wait_for_function("document.querySelector('#qb-desc').innerText.includes('ABOUT Absolute')", timeout=5000)
+    pg.wait_for_function("document.querySelector('#qb-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
     check('details: description, unit and stock of the chosen size are shown', 'line one' in pg.locator('#qb-desc').inner_text() and pg.locator('#qb-meta').inner_text() == 'Unit: Each · In stock', pg.locator('#qb-meta').inner_text())
-    check('details: link to the full product page of that size', pg.locator('#qb-page').get_attribute('href') == '/p/agro-abc-250ml.html' and pg.locator('#qb-page').is_visible(), pg.locator('#qb-page').get_attribute('href'))
+    check('details: link to the full product page of that size', pg.locator('#qb-page').get_attribute('href') == '/p/garden-set-250ml.html' and pg.locator('#qb-page').is_visible(), pg.locator('#qb-page').get_attribute('href'))
     check('details: extra photos listed and tapping one changes the main photo', pg.locator('#qb-photos [data-photo]').count() == 2 and (pg.locator('#qb-photos [data-photo]').nth(1).click() or True) and pg.locator('#qb-img img').count() == 1)
     pg.screenshot(path=f'{OUT}/shot-details.png')
     # the full product page opens INSIDE the shell (no navigation to /p/...)
     url_before = pg.url
     pg.locator('#qb-page').click()
     pg.wait_for_selector('#page-product.open', timeout=5000)
-    pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Absolute')", timeout=5000)
+    pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
     check('product page opens inside the shell (same URL, shell still loaded)', pg.url == url_before and pg.locator('#bottom-nav').count() == 1, pg.url)
-    check('product page shows name, price, sizes, description, unit and trust lines', 'Absolute 375SC Fungicide' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
+    check('product page shows name, price, sizes, description, unit and trust lines', 'Garden Hose Connector Set' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
     pg.screenshot(path=f'{OUT}/shot-product-page.png')
     check('product page: similar products listed', pg.locator('#pp-related [data-pp-open]').count() >= 1)
     pg.locator('#pp-sizes [data-pp-size="1 Litre"]').click()
@@ -190,8 +190,8 @@ with sync_playwright() as p:
     pg.screenshot(path=f'{OUT}/shot-categories.png')
     check('categories rail shows real product photos', pg.locator('#cat-side [data-side] img[src^="http"]').count() >= 1)
     check('categories rail keeps an icon on every row', pg.evaluate("[...document.querySelectorAll('#cat-side [data-side]')].every(b => b.querySelector('img') || b.querySelector('span').textContent.trim().length > 0)"))
-    pg.locator('#cat-side [data-side="agrovet"]').click()
-    check('side list swaps right grid', 'Fungicides' in pg.locator('#cat-main').inner_text())
+    pg.locator('#cat-side [data-side="home-living"]').click()
+    check('side list swaps right grid', 'Garden Tools' in pg.locator('#cat-main').inner_text())
     h1_after = pg.evaluate('history.length')
     pg.locator('#bottom-nav [data-tab="deals"]').click()
     check('hopping between non-home tabs replaces the entry', pg.evaluate('history.state.tab') == 'deals' and pg.evaluate('history.length') == h1_after)
@@ -244,7 +244,7 @@ with sync_playwright() as p:
     # a cart saved by the old mock prototype (no rowId) is dropped, not shown with fake prices
     c3 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c3)
     p3 = c3.new_page()
-    p3.add_init_script("localStorage.setItem('shell.cart', JSON.stringify([{key:'pest-0|50 ml',id:'pest-0',name:'Mock',size:'50 ml',qty:2,price:100,emoji:'x',bg:'#fff'}]))")
+    p3.add_init_script("localStorage.setItem('shell.cart', JSON.stringify([{key:'outdoor-0|50 ml',id:'outdoor-0',name:'Mock',size:'50 ml',qty:2,price:100,emoji:'x',bg:'#fff'}]))")
     p3.goto(URL); p3.wait_for_selector('#grid .card[data-id]')
     check('stale mock-era cart lines are dropped', p3.locator('#bottom-nav [data-badge="cart"]').is_hidden())
     c3.close()
@@ -293,7 +293,7 @@ with sync_playwright() as p:
     check('checkout mode: the old home page is not shown behind the checkout', p4.evaluate("document.documentElement.classList.contains('stm-co') && !document.documentElement.classList.contains('stm-co-wait') && [...document.querySelectorAll('.pcard, #featured, header, .hd-r')].every(e => e.getBoundingClientRect().width === 0 || getComputedStyle(e).visibility === 'hidden' || e.offsetParent === null)"))
     p4.locator('#dr-x').click(); p4.wait_for_function("location.pathname === '/'", timeout=8000)
     check('closing the checkout goes back to the shell, not the old home page', p4.url == BASE + '/', p4.url)
-    p4.wait_for_selector('#grid .card[data-id]')
+    p4.wait_for_selector('#view-cart', state='visible')
     check('cancelled checkout: the shell cart still has its items', json.loads(p4.evaluate("localStorage.getItem('shell.cart')") or '[]') != [])
     c4.close()
 
@@ -320,12 +320,12 @@ with sync_playwright() as p:
     # product page: Add to cart and Buy now work from the full page
     c8 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c8)
     p8 = c8.new_page(); p8.goto(URL); p8.wait_for_selector('#grid .card[data-id]')
-    p8.locator('#grid .card[data-id="agro-abc"] [data-add]').click(); p8.wait_for_selector('#sheet-quickbuy.open')
+    p8.locator('#grid .card[data-id="garden-set"] [data-add]').click(); p8.wait_for_selector('#sheet-quickbuy.open')
     p8.locator('#qb-page').click(); p8.wait_for_selector('#page-product.open')
     p8.locator('#pp-plus').click(); p8.locator('#pp-add').click()
     check('product page: Add to cart adds the chosen size and quantity', p8.locator('#bottom-nav [data-badge="cart"]').inner_text() == '2', p8.locator('#bottom-nav [data-badge="cart"]').inner_text())
     p8.locator('#pp-related [data-pp-open]').first.click()
-    check('product page: a similar product replaces the one shown', 'Absolute' not in p8.locator('#pp-name').inner_text())
+    check('product page: a similar product replaces the one shown', 'Garden Hose Connector Set' not in p8.locator('#pp-name').inner_text())
     p8.locator('#pp-buy').click(); p8.wait_for_selector('#view-cart:not([hidden])', timeout=5000)
     check('product page: Buy now lands on the Cart tab with both items', p8.locator('#page-product.open').count() == 0 and p8.locator('#view-cart').is_visible() and p8.locator('#cart-list li').count() == 2, p8.locator('#cart-list li').count())
     c8.close()
@@ -337,20 +337,20 @@ with sync_playwright() as p:
     p9.goto(URL); p9.wait_for_selector('#grid .card[data-id]')
     base_title = p9.title()
     check('address: home is the bare "/" address', p9.evaluate('location.pathname + location.search') == '/')
-    p9.locator('#grid .card[data-id="agro-abc"] p').first.click(); p9.wait_for_selector('#sheet-quickbuy.open')
-    check('address: opening a product puts its own page address (/p/<slug>.html + size) in the address bar', p9.evaluate('location.pathname + location.hash') == '/p/agro-abc-1Litre.html#agro-abc-50ml', p9.url)
-    check('address: tab title shows the product', 'Absolute 375SC Fungicide' in p9.title() and p9.title().endswith('| Stermont Arcade'), p9.title())
+    p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#sheet-quickbuy.open')
+    check('address: opening a product puts its own page address (/p/<slug>.html + size) in the address bar', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-50ml', p9.url)
+    check('address: tab title shows the product', 'Garden Hose Connector Set' in p9.title() and p9.title().endswith('| Stermont Arcade'), p9.title())
     p9.locator('#qb-sizes [data-size="250 ml"]').click()
-    check('address: choosing another size updates the address (no extra history entry)', p9.evaluate('location.pathname + location.hash') == '/p/agro-abc-1Litre.html#agro-abc-250ml', p9.url)
+    check('address: choosing another size updates the address (no extra history entry)', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml', p9.url)
     p9.locator('#qb-page').click(); p9.wait_for_selector('#page-product.open')
-    check('address: the full product page keeps the same address', p9.evaluate('location.pathname + location.hash') == '/p/agro-abc-1Litre.html#agro-abc-250ml', p9.url)
+    check('address: the full product page keeps the same address', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml', p9.url)
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
-    check('address: Back from the page returns to the sheet, address unchanged', p9.locator('#sheet-quickbuy.open').count() == 1 and p9.evaluate('location.hash') == '#agro-abc-250ml')
+    check('address: Back from the page returns to the sheet, address unchanged', p9.locator('#sheet-quickbuy.open').count() == 1 and p9.evaluate('location.hash') == '#garden-set-250ml')
     p9.go_back(); p9.wait_for_function("!document.querySelector('#sheet-quickbuy.open')")
     check('address: closing the product restores "/" and the page title', p9.evaluate('location.pathname + location.search') == '/' and p9.title() == base_title, p9.url + ' | ' + p9.title())
-    p9.goto(f'{BASE}/?product=agro-abc-250ml'); p9.wait_for_selector('#page-product.open', timeout=10000)
-    check('address: opening the address shows that product page with that size', 'Absolute 375SC Fungicide' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
-    check('address: the address stays after load and the tab title shows the product', p9.evaluate('location.pathname + location.hash') == '/p/agro-abc-1Litre.html#agro-abc-250ml' and 'Absolute' in p9.title())
+    p9.goto(f'{BASE}/?product=garden-set-250ml'); p9.wait_for_selector('#page-product.open', timeout=10000)
+    check('address: opening the address shows that product page with that size', 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
+    check('address: the address stays after load and the tab title shows the product', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml' and 'Garden Hose Connector Set' in p9.title())
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
     check('address: Back from an opened address lands on the shell home ("/")', p9.evaluate('location.pathname + location.search') == '/' and p9.locator('#view-home').is_visible(), p9.url)
     p9.reload(); p9.wait_for_selector('#grid .card[data-id]')
@@ -373,10 +373,10 @@ with sync_playwright() as p:
     def serve_p(ctx): pass   # mock_network already serves the real generated product page for every /p/*.html address
     c11 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c11); serve_p(c11)
     p11 = c11.new_page(); e11 = []; p11.on('pageerror', lambda e: e11.append(str(e)))
-    p11.goto(f'{BASE}/p/agro-abc-1Litre.html#agro-abc-250ml'); p11.wait_for_selector('#page-product.open', timeout=15000)
-    check('redirect: a phone opening a product page link lands in the shell on that product and size', 'Absolute 375SC Fungicide' in p11.locator('#pp-name').inner_text() and p11.locator('#pp-price').inner_text() == 'KSh 1,550', p11.locator('#pp-price').inner_text())
-    check('redirect: the address is the product page address again (copy/share keeps its preview)', p11.evaluate('location.pathname + location.hash') == '/p/agro-abc-1Litre.html#agro-abc-250ml', p11.url)
-    p11.goto(f'{BASE}/p/agro-abc-1Litre.html'); p11.wait_for_selector('#page-product.open', timeout=15000)
+    p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml'); p11.wait_for_selector('#page-product.open', timeout=15000)
+    check('redirect: a phone opening a product page link lands in the shell on that product and size', 'Garden Hose Connector Set' in p11.locator('#pp-name').inner_text() and p11.locator('#pp-price').inner_text() == 'KSh 1,550', p11.locator('#pp-price').inner_text())
+    check('redirect: the address is the product page address again (copy/share keeps its preview)', p11.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml', p11.url)
+    p11.goto(f'{BASE}/p/garden-set-1Litre.html'); p11.wait_for_selector('#page-product.open', timeout=15000)
     check('redirect: without a size in the hash the page\'s own size opens', p11.locator('#pp-price').inner_text() == 'KSh 6,450', p11.locator('#pp-price').inner_text())
     check('redirect: no page errors', not e11, e11[:3])
     c11.close()
@@ -384,16 +384,16 @@ with sync_playwright() as p:
                       ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_p(cx)
-        px = cx.new_page(); px.goto(f'{BASE}/p/agro-abc-1Litre.html'); px.wait_for_timeout(1500)
-        check(f'redirect: {label} keeps the product page (no redirect)', px.evaluate('location.pathname') == '/p/agro-abc-1Litre.html' and px.locator('#page-product').count() == 0, px.url)
+        px = cx.new_page(); px.goto(f'{BASE}/p/garden-set-1Litre.html'); px.wait_for_timeout(1500)
+        check(f'redirect: {label} keeps the product page (no redirect)', px.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and px.locator('#page-product').count() == 0, px.url)
         cx.close()
     cc = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc); serve_p(cc)
-    pc = cc.new_page(); pc.goto(f'{BASE}/p/agro-abc-1Litre.html?classic=1'); pc.wait_for_timeout(1500)
-    check('redirect: ?classic=1 keeps the old page on a phone', pc.evaluate('location.pathname') == '/p/agro-abc-1Litre.html', pc.url)
+    pc = cc.new_page(); pc.goto(f'{BASE}/p/garden-set-1Litre.html?classic=1'); pc.wait_for_timeout(1500)
+    check('redirect: ?classic=1 keeps the old page on a phone', pc.evaluate('location.pathname') == '/p/garden-set-1Litre.html', pc.url)
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
-    p10 = c10.new_page(); p10.goto(f'{BASE}/?product=agro-abc-250ml'); p10.wait_for_function("location.pathname !== '/'", timeout=15000)
-    check('address: on a desktop screen it opens that product\'s full page (/p/<slug>.html)', p10.evaluate('location.pathname') == '/p/agro-abc-250ml.html', p10.url)
+    p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_function("location.pathname !== '/'", timeout=15000)
+    check('address: on a desktop screen it opens that product\'s full page (/p/<slug>.html)', p10.evaluate('location.pathname') == '/p/garden-set-250ml.html', p10.url)
     c10.close()
 
     # category pages -> shell on phones (seo-shell-redirect.mjs, injectCat). The served /c/ page is the REAL generated page with the shipped script injected.
@@ -406,17 +406,17 @@ with sync_playwright() as p:
             m = _re.search(r'/c/([a-z0-9-]+)\.html', rt.request.url)
             rt.fulfill(status=200, content_type='text/html', body=cat_page(m.group(1)))
         ctx.route('**/c/*.html*', h)
-    check('category redirect: the injected category page carries the script and the page is otherwise unchanged', 'stm-shell-cat' in cat_page('rodent-control') and 'Rodent Control' in cat_page('rodent-control'))
-    check('category redirect: injecting twice gives the same page', cat_page('rodent-control').count('stm-shell-cat') == 1)
+    check('category redirect: the injected category page carries the script and the page is otherwise unchanged', 'stm-shell-cat' in cat_page('garden-outdoors') and 'Garden' in cat_page('garden-outdoors'))
+    check('category redirect: injecting twice gives the same page', cat_page('garden-outdoors').count('stm-shell-cat') == 1)
     c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12); serve_c(c12)
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
-    p12.goto(f'{BASE}/c/pest-control-fumigation.html'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
+    p12.goto(f'{BASE}/c/garden-outdoors.html'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('category redirect: a phone on a category page lands in the shell on that category (only its products)', ids and all(i.startswith('pest-') for i in ids), ids)
+    check('category redirect: a phone on a category page lands in the shell on that category (only its products)', ids and all(i.startswith('outdoor-') for i in ids), ids)
     check('category redirect: the address becomes / (no leftover ?cat=)', p12.evaluate('location.pathname + location.search') == '/', p12.url)
-    p12.goto(f'{BASE}/c/bed-bug-killers.html'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
+    p12.goto(f'{BASE}/c/kitchen-dining.html'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('category redirect: a sub-category page opens its parent category filtered to that sub-category', ids and all(i.startswith('pest-') for i in ids) and p12.evaluate('location.pathname') == '/', ids)
+    check('category redirect: a sub-category page opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname') == '/', ids)
     p12.goto(f'{BASE}/?cat=no-such-category'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     check('category redirect: an unknown category shows a notice and the normal home', 'no longer available' in p12.locator('#toast').inner_text(), p12.locator('#toast').inner_text())
     check('category redirect: no page errors', not e12, e12[:3])
@@ -425,12 +425,12 @@ with sync_playwright() as p:
                       ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_c(cx)
-        px = cx.new_page(); px.goto(f'{BASE}/c/rodent-control.html'); px.wait_for_timeout(1500)
-        check(f'category redirect: {label} keeps the category page (no redirect)', px.evaluate('location.pathname') == '/c/rodent-control.html', px.url)
+        px = cx.new_page(); px.goto(f'{BASE}/c/garden-outdoors.html'); px.wait_for_timeout(1500)
+        check(f'category redirect: {label} keeps the category page (no redirect)', px.evaluate('location.pathname') == '/c/garden-outdoors.html', px.url)
         cx.close()
     cc2 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc2); serve_c(cc2)
-    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/rodent-control.html?classic=1'); pc2.wait_for_timeout(1500)
-    check('category redirect: ?classic=1 keeps the category page on a phone', pc2.evaluate('location.pathname') == '/c/rodent-control.html', pc2.url)
+    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1'); pc2.wait_for_timeout(1500)
+    check('category redirect: ?classic=1 keeps the category page on a phone', pc2.evaluate('location.pathname') == '/c/garden-outdoors.html', pc2.url)
     cc2.close()
 
     # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell
@@ -454,10 +454,10 @@ with sync_playwright() as p:
     p13.locator('#stm-nav a', has_text='Categories').click(); p13.wait_for_selector('#view-categories:not([hidden])', timeout=15000)
     check('static pages: the nav Categories link opens the shell on Categories', p13.locator('#view-categories').is_visible() and p13.locator('#view-home').is_hidden())
     p13.goto(f'{BASE}/contact.html'); p13.wait_for_selector('#stm-bar', state='attached')
-    p13.fill('#stm-bar input', 'bed bug'); p13.keyboard.press('Enter'); p13.wait_for_selector('#grid .card[data-id]', timeout=15000); p13.wait_for_timeout(600)
+    p13.fill('#stm-bar input', 'nozzle'); p13.keyboard.press('Enter'); p13.wait_for_selector('#grid .card[data-id]', timeout=15000); p13.wait_for_timeout(600)
     ids = p13.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('static pages: the top-bar search opens the shell with that search (box filled, only matching products)', p13.input_value('#search') == 'bed bug' and ids and all(i.startswith('pest-') for i in ids) and p13.evaluate('location.search') == '', (p13.input_value('#search'), ids))
-    p13.goto(f'{BASE}/?tab=nonsense'); p13.wait_for_selector('#grid .card[data-id]', timeout=15000)
+    check('static pages: the top-bar search opens the shell with that search (box filled, only matching products)', p13.input_value('#search') == 'nozzle' and ids and all(i.startswith('outdoor-') for i in ids) and p13.evaluate('location.search') == '', (p13.input_value('#search'), ids))
+    p13.evaluate("sessionStorage.removeItem('shell.activeTab')"); p13.goto(f'{BASE}/?tab=nonsense'); p13.wait_for_selector('#grid .card[data-id]', timeout=15000)
     check('static pages: an unknown ?tab= value opens Home', p13.locator('#view-home').is_visible())
     check('static pages: no page errors', not e13, e13[:3])
     c13.close()
