@@ -1,5 +1,5 @@
-# Stermont Arcade - weekly technical checks on general pages and ordinary retail.
-# The SEO analyzer and accessibility checks intentionally use a safe-page allowlist.
+# Stermont Arcade - weekly technical checks on general pages and sampled ordinary-retail routes.
+# Content optimization remains scoped to ordinary consumer products only.
 name: Site audit
 
 on:
@@ -42,15 +42,15 @@ jobs:
           if-no-files-found: ignore
 
   lighthouse-general-pages:
-    name: Performance (general pages only)
+    name: Performance (sampled site routes)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Run Unlighthouse on general pages
-        run: npx --yes unlighthouse-ci --site https://stermontarcade.co.ke --build-static --exclude-urls '^/(p/|c/|blog/)' --samples 1 --no-cache
+      - name: Run Unlighthouse on sampled site routes
+        run: npx --yes unlighthouse-ci --site https://stermontarcade.co.ke --build-static --samples 1 --no-cache
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -59,14 +59,14 @@ jobs:
           if-no-files-found: ignore
 
   accessibility:
-    name: Accessibility (Pa11y, safe-page allowlist)
+    name: Accessibility (Pa11y, sampled safe routes)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Run Pa11y on safe key pages
+      - name: Run Pa11y on sampled safe routes
         run: |
           if npx --yes pa11y-ci --config .pa11yci.json --json > pa11y-report.json; then
             status=0
@@ -92,7 +92,7 @@ jobs:
           if-no-files-found: ignore
 
   seo-rules:
-    name: On-page technical rules (scoped pages)
+    name: On-page technical rules (sampled safe routes)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
