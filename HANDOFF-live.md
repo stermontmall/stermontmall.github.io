@@ -795,3 +795,12 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [ ] Await PR validation and post-merge Site audit before declaring 19/19 accessibility.
 - [x] Live Supabase `mpesa-callback` Edge Function deployed as version 17: success requires matching requested/received amount and a non-empty M-Pesa receipt; mismatches are recorded as `amount_mismatch` and are not treated as paid.
 - [ ] No live M-Pesa transaction was run. Verify with a controlled low-value test before considering payment flow end-to-end validated.
+
+
+## SESSION CHECKPOINT (2026-11-01): PR #178 merged — final sampled contrast defect
+- [x] PR #178 passed the SEO PR quality gate (run 41314206502).
+- [x] Squash-merged PR #178 to main: 09aa7004d3f639abbdcbea3090d5d6c0f48e7551.
+- [x] Corrected the purchase notification close-button text contrast on `/products.html` from `#8b86a0` to `#78738d`; added `recent-orders.js` to Site audit triggers and syntax checks.
+- [x] GitHub Pages build stage succeeded for run 41314402856; deploy stage was queued at checkpoint time.
+- [ ] Verify deploy stage and fresh Site audit 41314403234 (Pa11y, broken links, SEO rules and performance) before claiming the live site is fully clean.
+- [ ] Earlier audit 41313721384 (pre-PR #178) documented the one old contrast issue; it is not the post-fix result.
