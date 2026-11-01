@@ -453,3 +453,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Added model-specific compatibility/setup guidance for the monitor, measurement/food-storage guidance for the refrigerator, and occasion/fit/care advice for each blazer.
 - [x] Avoided guessing the monitor's size, refresh rate, response time or cable bundle, and the refrigerator's capacity/dimensions. Added all four entries to the product-content regression test.
 - [ ] Run quality gate, merge only after audit passes, and verify production page build/deployment.
+
+
+## 2026-11-01 — Product content batch 05 (in progress)
+- [x] Confirmed previous product-page generation run 41293012141 completed successfully; 246 product HTML files are present and 24 model-specific content entries are in product-content.json.
+- [x] Reviewed AILYONS Double Burner Glass Gas Cooker page (327 existing words). Added practical counter/cookware planning, qualified LPG setup, leak-response, and cool-down/cleaning guidance, without inventing burner ratings or dimensions.
+- [x] Added product to the distinct-content regression test. Supplementary section text remains plain text and within the 140–320 word guardrail.
+- [ ] Run PR checks, merge only after success, then verify generated product page and deployment.
