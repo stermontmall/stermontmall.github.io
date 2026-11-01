@@ -129,7 +129,14 @@ const expected = [
   "von-twin-tub-semi-automatic-washing-machine-7-5kg-7-5-kg",
   "vic-20000mah-power-bank-with-led-display-and-flashlight-20000mah",
   "smart-raha-life-3-piece-tumbler-and-bottle-set-purple-260ml-700ml-1200ml",
-  "haier-90l-single-door-direct-cool-fridge-black-90-litres"
+  "haier-90l-single-door-direct-cool-fridge-black-90-litres",
+  "xiaomi-poco-c71-3gb-ram-64gb",
+  "nunix-wld-560-3g1e-3-gas-hot-plate-cooker-with-gas-oven",
+  "tecno-spark-go-3-4gb-ram-64gb",
+  "xiaomi-redmi-15c-8gb-ram-256gb",
+  "samsung-galaxy-a06-4gb-ram-64gb",
+  "electromate-20l-electric-oven-1500w",
+  "electromate-1000w-dry-iron-box-blue-and-white",
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
