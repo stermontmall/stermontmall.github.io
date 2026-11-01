@@ -1,3 +1,8 @@
+## SESSION CHECKPOINT (2026-11-02): complete sitemap submission coverage
+- [x] Confirmed `robots.txt` already advertises four sitemap files, including `/services/sitemap-services.xml`.
+- [x] Found the Google Search Console submission script omitted the service sitemap even though robots.txt advertises it. Added the service sitemap to the daily/on-demand submission list and a regression assertion.
+- [ ] Verify the updated PR quality gate, then browser-test the SEO tools and confirm deployment before merge.
+
 ## SESSION CHECKPOINT (2026-11-02): CI test repair
 - [x] Read the prior Daily SEO check job log: the SEO Doctor test failed before reaching later checks because the test itself evaluated `'offset='+offset` with an undefined variable. Changed the assertion to the literal `offset=` token.
 - [x] Removed the inappropriate Node `--check` invocation for a Deno TypeScript Edge Function; retained static safety assertions for the tracked source instead.
