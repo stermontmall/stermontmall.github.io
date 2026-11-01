@@ -79,9 +79,13 @@ for (const token of [
   'Technical issues such as canonical tags, schema and image alt text need separate fixes',
   'Shop ',
   'slice(0,20)',
-  'Product ID mismatch'
+  'Product ID mismatch',
+  'function preview(name,desc)',
+  "Buy '+n+' in Kenya. ",
+  'product name once',
+  'Do not add unverified M-Pesa'
 ]) if (!optimizer.includes(token)) throw new Error(`Missing product SEO optimizer safeguard or feature: ${token}`);
 execFileSync(process.execPath, ['--check', 'product-seo-optimizer.js'], { stdio: 'inherit' });
-if (!adminHtml.includes('product-seo-optimizer.js?v=3')) throw new Error('Admin must load the current product SEO optimizer.');
+if (!adminHtml.includes('product-seo-optimizer.js?v=4')) throw new Error('Admin must load the current product SEO optimizer.');
 if (!adminHtml.includes('seo-doctor.js?v=13')) throw new Error('Admin must load the current SEO Doctor bundle.');
 console.log('Product SEO Optimizer regression checks passed.');
