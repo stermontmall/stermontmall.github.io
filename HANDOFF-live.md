@@ -747,3 +747,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [ ] Code review of M-Pesa flow found a possible callback timing race (callback may arrive before mpesa_payments row insert) and payment-success metadata should be checked against requested amount/receipt. No payment code or live settings changed; validate safely before any changes because this affects customer payments.
 - [ ] Google Search Console's 14 not-indexed URLs and Merchant Center account diagnostics still require owner-side account access. IndexNow accepts URL notifications but does not guarantee Google indexing.
 - Autosave: this checkpoint is committed directly to main.
+
+
+## SESSION CHECKPOINT (2026-11-01): final all-products accessibility defects
+- [x] Post-PR #173 live sampled Pa11y audit improved to 18/19 pages passing. Remaining failures isolated to products.html: search form injected by kili-pages.js has no submit button, and dynamically rendered old prices use low-contrast #8b86a0.
+- [x] Branch fix/products-page-final-a11y-2026-11 adds an explicit labelled submit button to the injected product search form, reserves input space for it, and changes old-price text to #78738d.
+- [ ] Run SEO PR quality gate, merge if green, then verify a fresh Pa11y audit reaches 19/19.
+- [ ] Mobile performance audit from the same Site audit run is still in progress; inspect Unlighthouse report before performance edits.
