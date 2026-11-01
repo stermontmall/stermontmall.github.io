@@ -12,8 +12,8 @@ const allText = [];
 for (const [id, sections] of Object.entries(content)) {
   assert.ok(Array.isArray(sections) && sections.length >= 2, id + ': add at least two useful sections');
   const text = sections.flatMap(s => [s.heading, ...(s.paragraphs || []), ...(s.bullets || [])]).join(' ');
-  const count = text.trim().split(/\\s+/).filter(Boolean).length;
-  assert.ok(count >= 120 && count <= 300, id + ': supplementary content should be useful, not padded (' + count + ' words)');
+  const count = text.trim().split(/\s+/).filter(Boolean).length;
+  assert.ok(count >= 140 && count <= 210, id + ': supplementary content should be useful, not padded (' + count + ' words)');
   assert.ok(sections.every(s => s.heading && Array.isArray(s.paragraphs) && s.paragraphs.length), id + ': every section needs a heading and paragraphs');
   assert.ok(!/<[^>]+>/.test(text), id + ': store plain text and escape at render time');
   assert.ok(!/guaranteed|#1 rated|top-rated|certified/i.test(text), id + ': remove unsupported claims');
