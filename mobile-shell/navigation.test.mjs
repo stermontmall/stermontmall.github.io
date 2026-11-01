@@ -18,6 +18,7 @@ function resolve({ search = '', saved = null, historyState = null } = {}) {
     DEEP: new URLSearchParams(search).get('product'),
     CAT_DEEP: new URLSearchParams(search).get('cat'),
     Q_DEEP: (new URLSearchParams(search).get('q') || '').trim().slice(0, 80),
+    TAB_DEEP: new URLSearchParams(search).get('tab'),
     sessionStorage: { getItem: key => key === 'shell.activeTab' ? saved : null },
     history: { state: historyState },
   };
