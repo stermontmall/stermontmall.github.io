@@ -89,7 +89,7 @@ console.log('SEO Doctor rating dashboard regression checks passed.');
 const optimizer = readFileSync('product-seo-optimizer.js', 'utf8');
 for (const token of [
   'Product SEO Optimizer',
-  '/rest/v1/products?select=id,slug,name,description,images,categories(name,slug)',
+  '/rest/v1/products?select=id,slug,name,description,images,categories(name,slug),created_at&active=eq.true&order=created_at.asc&limit=1000',
   'meta[name="stm-id"]',
   'Save reviewed description',
   "'/functions/v1/seo-review'",
@@ -103,12 +103,16 @@ for (const token of [
   'Shop ',
   'slice(0,20)',
   'Product ID mismatch',
+  'function pageSlug(p,allIds,used)',
+  'async function resolvePage(p,url)',
+  'meta[http-equiv="refresh"]',
+  'duplicate/redirect aliases skipped',
   'function preview(name,desc)',
   "Buy '+n+' in Kenya. ",
   'product name once',
   'Do not add unverified M-Pesa'
 ]) if (!optimizer.includes(token)) throw new Error(`Missing product SEO optimizer safeguard or feature: ${token}`);
 execFileSync(process.execPath, ['--check', 'product-seo-optimizer.js'], { stdio: 'inherit' });
-if (!adminHtml.includes('product-seo-optimizer.js?v=5')) throw new Error('Admin must load the current product SEO optimizer.');
+if (!adminHtml.includes('product-seo-optimizer.js?v=6')) throw new Error('Admin must load the current product SEO optimizer.');
 if (!adminHtml.includes('seo-doctor.js?v=17')) throw new Error('Admin must load the current SEO Doctor bundle.');
 console.log('Product SEO Optimizer regression checks passed.');
