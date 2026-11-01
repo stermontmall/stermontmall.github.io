@@ -60,7 +60,7 @@ if (adminHtml.includes('seo-doctor.js?v=11')) throw new Error('Admin must not lo
 
 const ratingDoctor = readFileSync('seo-doctor.js', 'utf8');
 for (const token of ['Overall site rating', 'Product page rating', 'Category page rating', 'Technical SEO rating', 'ratingLabel(v)', 'No matching pages were scanned']) if (!ratingDoctor.includes(token)) throw new Error(`Missing SEO rating dashboard feature: ${token}`);
-if (!adminHtml.includes('seo-doctor.js?v=12')) throw new Error('Admin must load SEO Doctor rating dashboard cache version.');
+if (!adminHtml.includes('seo-doctor.js?v=13')) throw new Error('Admin must load the current SEO Doctor cache version including the product optimizer.');
 console.log('SEO Doctor rating dashboard regression checks passed.');
 
 const optimizer = readFileSync('product-seo-optimizer.js', 'utf8');
