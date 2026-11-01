@@ -1,3 +1,10 @@
+## SESSION CHECKPOINT (2026-11-02): SEO admin reliability update
+- [x] Production logs confirmed the product catalogue query succeeds (HTTP 200; 225 active products) and the SEO proposal queue GET succeeds (HTTP 200).
+- [x] Production logs pinpointed approval failures: HTTP 409 from the unique `(target_type, target_slug, status)` constraint when an approved proposal already exists for the same page.
+- [x] Deployed `seo-review` Edge Function v2: validates the authenticated staff member, supersedes the prior same-status decision before applying the new one, and attempts rollback if the new decision cannot be saved.
+- [x] PR #221 created on `wip-seo-admin-tools-reliability-2026-11-02`: front-end approval/rejection now calls the Edge Function; sitemap discovery now reads `robots.txt`, product/image/service sitemaps, nested sitemap indexes, reports page failures and applies request timeouts.
+- [ ] Finish tracked Edge Function source + regression tests; wait for SEO PR quality gate; test live browser tabs and deployment before merge.
+
 ## SESSION CHECKPOINT (2026-11-02): SEO admin reliability investigation
 - [x] Confirmed Supabase product catalogue endpoint returns HTTP 200 and 225 active products are present; proposal queue GET also returns HTTP 200.
 - [x] Identified approval failures in Supabase logs: PATCH returned HTTP 409 because the unique constraint `(target_type, target_slug, status)` blocks a new proposal from becoming approved when an older approved proposal exists for the same target.
