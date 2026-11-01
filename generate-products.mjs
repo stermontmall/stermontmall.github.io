@@ -10,6 +10,8 @@ const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
 const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
 const WHATSAPP = '254748888230';
 const BRAND = 'Stermont Arcade';
+// Hand-written, model-specific buying guidance. Only add entries after checking the live catalogue description.
+const PRODUCT_CONTENT = existsSync('product-content.json') ? JSON.parse(readFileSync('product-content.json', 'utf8')) : {};
 // Real product brand for Google. Add more brands here any time; if none matches, the store name is used.
 const BRANDS = ['Alagzi', 'Kungu Nil', 'Greenlife', 'Zagro', 'Alonze', 'Pentagon', 'Absolute', 'Abasi', 'Hisense', 'Samsung', 'LG', 'Tecno', 'Infinix', 'Itel', 'Oppo', 'Xiaomi', 'Redmi', 'Apple', 'Nokia', 'Sony', 'JBL', 'TCL', 'Syinix', 'Vitron', 'Ramtons', 'Von', 'Mika', 'Nunix', 'Sayona', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Philips', 'Bruhm', 'Rockstar', 'Snake'];
 const brandOf = name => { const n = ` ${String(name).toLowerCase()} `; const hit = BRANDS.filter(b => n.includes(` ${b.toLowerCase()} `)).sort((a, b) => b.length - a.length)[0]; return hit || BRAND; };
@@ -39,6 +41,12 @@ async function getProducts() {
     if (r.ok) return fixProducts(await r.json());
   }
   throw new Error('Could not read products from Supabase');
+}
+
+function productContentHtml(p) {
+  const sections = PRODUCT_CONTENT[p.id];
+  if (!Array.isArray(sections) || !sections.length) return '';
+  return `<div class="box product-content"><h2 style="margin-top:0">More about ${esc(p.name)}</h2>${sections.map(s => `<section><h3>${esc(s.heading)}</h3>${(s.paragraphs || []).map(x => `<p>${esc(x)}</p>`).join('')}${s.bullets?.length ? `<ul>${s.bullets.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</section>`).join('')}</div>`;
 }
 
 const CSS = `*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1f1b2e;background:#faf9fd}
@@ -431,6 +439,7 @@ for (const p of products) {
 <div class="box">✔ Pay by M-Pesa &nbsp; ✔ Delivery to all 47 counties &nbsp; ✔ 48-hour returns on faulty items</div></div></div>
 ${sizeBox}
 ${`<div class="box"><h2 style="margin-top:0">About ${esc(p.name)}</h2><div class="desc">${esc(productDescription)}</div></div>`}
+${productContentHtml(p)}
 ${seoBoxes}
 ${buyerNotes}
 ${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
