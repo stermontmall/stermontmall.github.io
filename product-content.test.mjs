@@ -3,9 +3,13 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 const content = JSON.parse(readFileSync('product-content.json', 'utf8'));
 const expected = [
-  'hisense-55a6qken-4k-uhd-smart-tv-with-tv-guard-and-wall-mount-55-inch',
-  'hisense-ref205dr-double-door-fridge-with-water-dispenser-205-litres',
-  'hisense-hmc6mbk-7-in-1-pressure-cooker'
+  "hisense-55a6qken-4k-uhd-smart-tv-with-tv-guard-and-wall-mount-55-inch",
+  "hisense-ref205dr-double-door-fridge-with-water-dispenser-205-litres",
+  "hisense-hmc6mbk-7-in-1-pressure-cooker",
+  "samsung-43u8000f-crystal-uhd-4k-smart-tv-43-inch",
+  "samsung-galaxy-a55-5g-1-piece",
+  "tcl-75c6k-qd-mini-led-4k-smart-tv-75-inch",
+  "vitron-htc4300qfs-qled-android-smart-tv-with-wall-mount-43-inch"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
