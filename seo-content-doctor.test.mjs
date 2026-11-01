@@ -21,7 +21,7 @@ for (const token of [
   'Technical Audit & Editorial Review',
   "Prefer:'return=representation'",
   'no proposal row was updated',
-  'does not publish or change live pages',
+  'publish content, or change live pages',
   'pending editorial review'
 ]) if (!admin.includes(token)) throw new Error(`Missing admin approval safeguard: ${token}`);
 if (admin.includes('queued for the site publishing pipeline')) throw new Error('Do not claim an approval publishes content.');
