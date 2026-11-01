@@ -394,5 +394,37 @@
         "Unplug the appliance before cleaning the exterior or moving it. Wipe food splashes from the cavity with a soft damp cloth and dry it afterwards; avoid abrasive pads and harsh chemicals. Never remove the outer casing or attempt to repair internal microwave components yourself, because high-voltage parts can remain dangerous even when unplugged."
       ]
     }
+  ],
+  "vision-plus-32-inch-full-hd-smart-tv-with-free-wall-bracket": [
+    {
+      "heading": "Set up the TV and wall bracket correctly",
+      "paragraphs": [
+        "This Vision Plus package is listed as a 32-inch Full HD smart TV with a free wall bracket and a 24-month warranty. Before installation, check that the bracket and its fixings are suitable for the wall material and the TV's mounting points. Use a level to position the screen and make sure the chosen height is comfortable from the main viewing position. If you are not confident about drilling or wall fixing, use a qualified installer.",
+        "If you prefer to use a stand, place the TV on a stable, level surface with enough room for ventilation. Keep the screen away from direct sunlight and strong reflections. Measure the route to the room and the available wall or cabinet space before arranging delivery."
+      ]
+    },
+    {
+      "heading": "Connect streaming devices and keep warranty details",
+      "paragraphs": [
+        "Connect the TV to a reliable Wi-Fi network and sign in to the services you intend to use. Netflix, YouTube and Prime Video are listed as supported apps, but paid subscriptions may be needed for some content. Check the exact ports on the model if you plan to connect a decoder, game console or sound system, and confirm whether the required cables are included.",
+        "Keep the purchase receipt, packaging details and warranty information in a safe place. Read the warranty terms for coverage, exclusions and the correct service process. Avoid opening the TV or attempting internal repairs, as this can create safety risks and may affect warranty coverage."
+      ]
+    }
+  ],
+  "ultra-smart-watch-with-bluetooth-calling-and-ocean-strap-grey": [
+    {
+      "heading": "Pair the watch and understand its everyday features",
+      "paragraphs": [
+        "This Ultra-style watch is listed with Bluetooth calling, a full-touch display, fitness and health tracking, and a grey silicone ocean strap. Pair it with a compatible Android or iOS phone using the companion app specified in the watch instructions. Keep Bluetooth enabled during setup, grant only the permissions you are comfortable with, and check that call and message notifications are enabled on both the phone and the app.",
+        "Bluetooth calling depends on a connection to the paired phone and may not work when the phone is out of range or Bluetooth is disabled. Confirm the exact app name, phone compatibility and included charging cable before ordering if these details are important to you."
+      ]
+    },
+    {
+      "heading": "Wear, charge and clean the watch safely",
+      "paragraphs": [
+        "Adjust the strap so it feels secure without being too tight, especially during exercise or warm weather. Wipe the watch and strap with a soft cloth after use and dry them before charging. Do not assume the watch is waterproof or safe for swimming unless the exact model has a verified water-resistance rating in its manual.",
+        "Use the supplied or manufacturer-recommended charger and avoid exposing the battery to excessive heat. Activity and health readings are general wellness estimates and should not be used to diagnose, monitor or treat a medical condition. If a reading seems unusual, rely on appropriate professional advice rather than the watch alone."
+      ]
+    }
   ]
 }
