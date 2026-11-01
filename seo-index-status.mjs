@@ -15,7 +15,7 @@ const SITE = 'https://stermontarcade.co.ke';
 const raw = process.env.GSC_SERVICE_ACCOUNT_JSON, property = process.env.GSC_PROPERTY;
 if (!raw || !property) {
   console.log('# Google indexing status\n\nNot switched on yet. Add the `GSC_SERVICE_ACCOUNT_JSON` and `GSC_PROPERTY` secrets (same ones as the sitemap ping) and run this again.');
-  process.exit(0);
+  process.exit(1);
 }
 
 const MAX = Number(process.env.MAX_URLS) || 250;
@@ -36,6 +36,7 @@ const locs = f => (existsSync(f) ? [...readFileSync(f, 'utf8').matchAll(/<loc>([
 const products = locs('sitemap-products.xml').filter(u => u.includes('/p/'));
 const others = [...locs('sitemap.xml'), ...locs('sitemap-products.xml').filter(u => !u.includes('/p/'))];
 const urls = [...new Set([...products, ...others])].slice(0, MAX);
+if (!urls.length) { console.error('No URLs found in sitemap.xml or sitemap-products.xml.'); process.exit(1); }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const inspect = async url => {
@@ -60,7 +61,7 @@ for (const u of urls) { results.push(await inspect(u)); await sleep(250); }
 const firstError = results.find(r => r.error);
 if (results.length && results.every(r => r.error)) {
   console.log('# Google indexing status\n\nGoogle refused every check: `' + firstError.error + '`\n\nUsually the service account is not added as a user on this property. In Search Console open Settings > Users and permissions > Add user, paste the service account email (`' + key.client_email + '`) and give it **Full** or **Restricted** access. Also check that `GSC_PROPERTY` matches the property exactly (for example `sc-domain:stermontarcade.co.ke`).');
-  process.exit(0);
+  process.exit(1);
 }
 
 const ok = results.filter(r => !r.error);
@@ -100,6 +101,12 @@ if (notIndexed.length) {
   for (const r of notIndexed) out.push(`| ${short(r.url)} | ${r.state} | ${r.crawled || 'never'} | ${r.canonical ? short(r.canonical) : ''} |`);
   out.push('');
 }
-if (firstError) out.push(`Some pages could not be checked (example: \`${firstError.error}\`).`, '');
+if (firstError) {
+  out.push('## Pages that could not be checked');
+  out.push('| Page | Error |', '|---|---|');
+  for (const r of results.filter(x => x.error)) out.push(`| ${short(r.url)} | ${r.error} |`);
+  out.push('');
+}
 out.push('_Google decides what to index. This report shows what is blocking each page; it cannot force indexing._');
 console.log(out.join('\n'));
+if (results.some(r => r.error)) process.exitCode = 1;
