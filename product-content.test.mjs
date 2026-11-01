@@ -22,7 +22,9 @@ const expected = [
   "ramtons-steam-iron-with-vertical-and-variable-steam",
   "skyworth-32-inch-eye-care-google-tv-32-inch",
   "smartphone-gift-bundle-led-watch-power-bank-earbuds",
-  "urban-comfort-womens-green-fleece-tracksuit"
+  "urban-comfort-womens-green-fleece-tracksuit",
+  "vision-plus-double-door-refrigerator",
+  "roch-mechanical-microwave-oven"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
