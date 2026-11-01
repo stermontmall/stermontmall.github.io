@@ -16,6 +16,8 @@ for (const token of [
   'Depth without filler',
   'never invents claims'
 ]) if (!src.includes(token)) throw new Error(`Missing content rule: ${token}`);
+const gscSitemaps = readFileSync('seo-google-sitemaps.mjs', 'utf8');
+if (!gscSitemaps.includes('${SITE}/services/sitemap-services.xml')) throw new Error('Google Search Console submission must include the service sitemap.');
 const admin = readFileSync('seo-doctor.js', 'utf8');
 for (const token of [
   'Technical Audit & Editorial Review',
