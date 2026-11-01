@@ -11,6 +11,7 @@ on:
       - 'generate-products.mjs'
       - 'blog/**'
       - 'guides/**'
+      - 'services/**'
       - '*.html'
       - '.github/workflows/seo-daily.yml'
   schedule:
