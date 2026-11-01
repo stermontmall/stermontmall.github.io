@@ -206,3 +206,13 @@ export function pdpHeadings(catSlug) {
     : null;
   return { features, guide: 'Reliable Quality & Application Guide', price: 'Price, M-Pesa Checkout & Kenya Delivery', delivery: 'Delivery to Nairobi & All 47 Counties' };
 }
+
+
+// Variant URLs must identify the selected pack size. The mobile shell reads the
+// variant slug from the fragment and opens that exact size on the canonical page.
+export function pdpVariantUrl(path, variantSlug, baseSlug, site = 'https://stermontarcade.co.ke') {
+  const slug = String(variantSlug || '').trim();
+  const base = String(baseSlug || '').trim();
+  return String(site).replace(/\\/$/, '') + String(path || '') +
+    (slug && slug !== base ? '#' + encodeURIComponent(slug) : '');
+}
