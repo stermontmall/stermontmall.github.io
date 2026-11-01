@@ -39,7 +39,7 @@ jobs:
           APPLY: ${{ inputs.apply_changes && '1' || '0' }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: node price-watch.mjs > price-watch.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: price-watch

@@ -39,7 +39,7 @@ jobs:
           output: ./lychee-report.md
           fail: true
           jobSummary: true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: lychee-report
@@ -56,7 +56,7 @@ jobs:
           node-version: 20
       - name: Run Unlighthouse on sampled site routes
         run: npx --yes unlighthouse-ci --site https://stermontarcade.co.ke --build-static --samples 1 --no-cache
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: unlighthouse-report
@@ -90,7 +90,7 @@ jobs:
             console.log(out);
           "
           exit "$status"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: pa11y-report
@@ -109,7 +109,7 @@ jobs:
         run: npm install --no-save --no-package-lock seo-analyzer
       - name: Run the rules
         run: node seo-analyzer-run.mjs | tee seo-analyzer-report.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: seo-analyzer-report
