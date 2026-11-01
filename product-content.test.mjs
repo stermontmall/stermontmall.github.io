@@ -99,7 +99,17 @@ const expected = [
   "infinito-sc-687-5-fungicide-500-ml",
   "kerol-disinfectant-fluid-1-litre",
   "bat-crp-bat-repellent-1-litre",
-  "maxigrow-zinc-and-boron-1-litre"
+  "maxigrow-zinc-and-boron-1-litre",
+  "maguguma-top-500-sc-herbicide-1-litre",
+  "levafas-diamond-fluke-and-worm-drench-1-litre",
+  "olvet-drench-albendazole-2-5-percent-500-ml",
+  "nilzan-plus-drench-1-litre",
+  "mchwatox-350-sc-termiticide-1-litre",
+  "norbrook-milking-salve-100-g",
+  "navigator-100-sc-insecticide-1-litre",
+  "livergen-plus-poultry-liver-tonic-500-ml",
+  "milestone-extreme-390-sc-fungicide-1-litre",
+  "digester-supper-69-ew-herbicide-5-litres"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
