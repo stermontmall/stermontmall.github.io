@@ -65,13 +65,51 @@
   function toast(msg) { var e = $('cx-err'); if (e) { e.textContent = msg; e.hidden = false; } }
 
   /* ---------- Supabase (re-uses the admin's saved session) ---------- */
+  function stored() { try { return JSON.parse(localStorage.getItem(SK)); } catch (e) { return null; } }
+  var renewing = null;
   function token() {
-    var s; try { s = JSON.parse(localStorage.getItem(SK)); } catch (e) {}
+    var s = stored();
     if (!s) return Promise.reject(new Error('Signed out'));
     if (Date.now() < s.exp) return Promise.resolve(s.access_token);
-    return fetch(SB + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: s.refresh_token }) })
-      .then(function (r) { if (!r.ok) throw new Error('Session expired, sign in again'); return r.json(); })
-      .then(function (j) { s.access_token = j.access_token; s.refresh_token = j.refresh_token; s.exp = Date.now() + (j.expires_in || 3600) * 1000 - 60000; localStorage.setItem(SK, JSON.stringify(s)); return s.access_token; });
+    /* The admin page owns the primary session refresh. Reuse it instead of racing its refresh token. */
+    if (window.STMAdmin && typeof STMAdmin.ready === 'function') {
+      return STMAdmin.ready().then(function () {
+        var fresh = stored();
+        if (!fresh || !fresh.access_token) throw new Error('Signed out');
+        return fresh.access_token;
+      }, function () { throw new Error('Session expired, sign in again'); });
+    }
+    /* Outside the admin shell, serialize refreshes: Supabase refresh tokens rotate on use. */
+    if (!renewing) {
+      renewing = fetch(SB + '/auth/v1/token?grant_type=refresh_token', {
+        method: 'POST',
+        headers: { apikey: KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: s.refresh_token })
+      }).then(function (r) {
+        if (!r.ok) throw new Error('Session expired, sign in again');
+        return r.json();
+      }).then(function (j) {
+        s.access_token = j.access_token;
+        s.refresh_token = j.refresh_token;
+        s.exp = Date.now() + (j.expires_in || 3600) * 1000 - 60000;
+        localStorage.setItem(SK, JSON.stringify(s));
+        return s.access_token;
+      }).then(function (v) {
+        renewing = null;
+        return v;
+      }, function (e) {
+        renewing = null;
+        throw e;
+      });
+    }
+    return renewing;
+  }
+  /* Replace an endless loading state with the existing retry UI after 30 seconds. */
+  function withTimeout(promise, ms) {
+    return new Promise(function (resolve, reject) {
+      var timer = setTimeout(function () { reject(new Error('The server took too long to answer')); }, ms);
+      promise.then(function (value) { clearTimeout(timer); resolve(value); }, function (error) { clearTimeout(timer); reject(error); });
+    });
   }
   function call(path, o) {
     o = o || {};
@@ -584,13 +622,13 @@
     mountStock: function (c) {
       root = c; view = renderStockView; if (!D.getElementById('cx-css')) { var s = el('style'); s.id = 'cx-css'; s.textContent = css; D.head.appendChild(s); }
       root.innerHTML = '<div class="empty">Loading stock…</div>';
-      var go = function () { root.innerHTML = '<div class="empty">Loading stock…</div>'; load().then(renderStockView).catch(function (e) { root.innerHTML = '<div class="err">Could not load stock (' + esc(e.message) + ').</div><p><button class="btn" id="cx-retry" type="button" style="width:100%">Try again</button></p>'; var r = $('cx-retry'); if (r) r.onclick = go; }); }; go();
+      var go = function () { root.innerHTML = '<div class="empty">Loading stock…</div>'; withTimeout(load(), 30000).then(renderStockView).catch(function (e) { root.innerHTML = '<div class="err">Could not load stock (' + esc(e.message) + ').</div><p><button class="btn" id="cx-retry" type="button" style="width:100%">Try again</button></p>'; var r = $('cx-retry'); if (r) r.onclick = go; }); }; go();
     },
     mount: function (c) {
       root = c; view = render; if (!D.getElementById('cx-css')) { var s = el('style'); s.id = 'cx-css'; s.textContent = css; D.head.appendChild(s); }
       var pt = $('ptitle'), ps = $('psub'); if (pt) pt.textContent = '🛍️ Catalog'; if (ps) ps.textContent = 'Products, prices, restocks and the sales ledger';
       root.innerHTML = '<div class="empty">Loading catalog…</div>';
-      var go = function () { root.innerHTML = '<div class="empty">Loading catalog…</div>'; load().then(render).catch(function (e) { root.innerHTML = '<div class="err">Could not load the catalog (' + esc(e.message) + ').' + (/signed out|expired/i.test(e.message) ? ' Please sign in again.' : ' Check your internet, or run setup-catalog.sql in Supabase.') + '</div><p><button class="btn" id="cx-retry" type="button" style="width:100%">Try again</button></p>'; var r = $('cx-retry'); if (r) r.onclick = go; }); }; go();
+      var go = function () { root.innerHTML = '<div class="empty">Loading catalog…</div>'; withTimeout(load(), 30000).then(render).catch(function (e) { root.innerHTML = '<div class="err">Could not load the catalog (' + esc(e.message) + ').' + (/signed out|expired/i.test(e.message) ? ' Please sign in again.' : ' Check your internet, or run setup-catalog.sql in Supabase.') + '</div><p><button class="btn" id="cx-retry" type="button" style="width:100%">Try again</button></p>'; var r = $('cx-retry'); if (r) r.onclick = go; }); }; go();
     }
   };
 })();
