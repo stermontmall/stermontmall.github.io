@@ -1,6 +1,5 @@
 # Stermont Arcade - drafts one new blog post every day from the next "pending" topic in blog-topics.json.
-# Each draft is opened as a pull request and then MERGED AUTOMATICALLY, so the post goes live with no manual step.
-# (To go back to manual review, delete the "Merge the pull request automatically" step and the one after it.)
+# Every draft is opened as a pull request for human review. It is NEVER published automatically.
 # Needs ONE repository secret: GEMINI_API_KEY (free, from aistudio.google.com/apikey) or ANTHROPIC_API_KEY (Settings > Secrets and variables > Actions).
 # Also needs Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests" turned on.
 # Runs: every day at 09:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
@@ -19,7 +18,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  actions: write
 
 concurrency:
   group: blog-writer
