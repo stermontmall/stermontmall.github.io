@@ -79,7 +79,17 @@ const expected = [
   "actellic-gold-dust-1-kg",
   "kelvin-dudu-dust-100-g",
   "thunder-od-145-foliar-insecticide-1-litre",
-  "tecamin-max-foliar-fertilizer-1-litre"
+  "tecamin-max-foliar-fertilizer-1-litre",
+  "tatua-advion-cockroach-gel-bait-4-x-30-g",
+  "systema-50ec-insecticide-1-litre",
+  "tecto-500sc-fungicide-1-litre",
+  "tatua-demand-10cs-insecticide-25-ml",
+  "promax-20ec-insecticide-1-litre",
+  "rimeta-gold-300sc-fungicide-1-litre",
+  "popvet-total-dog-dewormer-4-tablets",
+  "ranger-480ec-insecticide-1-litre",
+  "rootex-6-rooting-hormone-50-g",
+  "poultry-dust-insecticide-powder-200-g"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
