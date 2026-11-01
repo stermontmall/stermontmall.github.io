@@ -69,7 +69,7 @@
     }
     function process() {
       if (running) return;
-      var chosen = rows.filter(function (r) { return r.file || r.url.value.trim(); });
+      var chosen = rows.filter(function (r) { return !r.done && (r.file || r.url.value.trim()); });
       if (!chosen.length) return;
       var incomplete = chosen.filter(function (r) { return !r.file || !r.url.value.trim(); });
       if (incomplete.length) { alert('Each product needs both a photo and its exact source product URL.'); return; }
