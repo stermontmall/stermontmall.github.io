@@ -26,7 +26,7 @@ async function db(path: string, init: RequestInit = {}) {
 function audit(t: any) {
   const title = String(t.title || "").trim();
   const description = String(t.description || "").trim();
-  const plain = String(t.existing || "").replace(/\\s+/g, " ").trim();
+  const plain = String(t.existing || "").replace(/\s+/g, " ").trim();
   const issues: string[] = Array.isArray(t.issues) ? t.issues.map((x: any) => String(x)) : [];
   if (!title) issues.push("Missing page title: add a unique, descriptive title.");
   else if (title.length < 25 || title.length > 65) issues.push("Title length is " + title.length + " characters; review for a concise, descriptive search title.");
