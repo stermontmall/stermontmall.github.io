@@ -1,3 +1,16 @@
+## SEO AUTOMATION CHECKPOINT (2026-11-01): regression tests run before product rebuilds
+Status: IMPLEMENTED on `chore/seo-regression-tests-autosave`; PR to follow.
+- [x] Confirmed the product-page workflow after PR #107: product generation, Kenya SEO enrichment, owner title overrides, mobile crawler handling, and saving generated pages all completed successfully. IndexNow notification was still running at last check; deployment/indexing is not inferred from that run.
+- [x] Added `node seo-meta.test.mjs` as a required step before product-page generation, so invalid shared title/description rules stop the rebuild rather than silently publishing bad metadata.
+- [x] Added the same regression test to the daily SEO workflow and configured that workflow to run on relevant SEO-generator/test changes as well as its daily schedule.
+- [ ] Verify the new PR checks pass, then merge.
+- [ ] Run full site audit and fix issues found in the actual report.
+- [ ] Verify live pages and Search Console; GSC credentials remain an owner-side requirement for Google indexing/opportunity reports.
+- Autosave: this handoff checkpoint is committed with the code changes; keep updating after each meaningful batch.
+- Safety: catalogue factual accuracy remains source-bound; do not invent product efficacy, ingredients, directions, price or stock.
+
+---
+
 ## SEO FOLLOW-THROUGH (2026-11-01): extend secondary analyzer coverage
 Status: IMPLEMENTED on `wip-seo-full-site-audit`; PR pending.
 - [x] Expanded `seo-analyzer-run.mjs` to recursively inspect public HTML pages in products, categories, blog, services and guides, plus eligible root pages.
