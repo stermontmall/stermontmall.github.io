@@ -1,3 +1,19 @@
+## SESSION CHECKPOINT (2026-11-01): product content and sprayer guide
+- [x] Continued the content-quality branch `seo/content-quality-expansion-2026-11`; no changes published to the live site.
+- [x] Added category-aware product buying guidance in `generate-products.mjs` for PCPB-regulated pest/crop products, phones/tablets, computing, TVs/audio, appliances, sprayers and farm inputs. The guidance tells shoppers what to verify and avoids invented product specs, warranty claims, certifications and chemical rates.
+- [x] Added a safe fallback description for catalogue items whose supplied description is missing or shorter than 100 characters; existing descriptions of 100+ characters are preserved.
+- [x] Improved category-page ordering context (M-Pesa, nationwide delivery, Sarit Centre pickup; delivery fees confirmed before payment).
+- [x] Added `blog/how-to-choose-a-knapsack-sprayer-kenya.html` (about 800 words), internal links to verified sprayer listings, FAQ/Article/Breadcrumb JSON-LD, canonical URL and a short Kiswahili summary.
+- [x] Added the article to `blog/index.html` and marked its topic as drafted in `blog-topics.json`.
+- [x] Open PR #119: https://github.com/stermontmall/stermontmall.github.io/pull/119
+- [x] Confirmed all new article internal links exist in the repository.
+- [ ] Wait for latest PR #119 SEO quality gate (run 41288942916) to finish; inspect its full audit artifact and fix any issues introduced by this work.
+- [ ] After review/merge, allow product-pages workflow to rebuild product/category pages from live catalogue; allow blog-build workflow to update blog index and sitemap; verify Pages deploy and daily SEO audit.
+- [ ] Product-specific specifications still need supplier/catalogue verification. Do not fabricate missing RAM/storage, dimensions, warranties, ingredients, PCPB registration, stock or pricing.
+- Autosave: this checkpoint is committed on the feature branch. Live website remains unchanged until PR review and merge.
+
+---
+
 ## FINAL CI RESULT (2026-11-01): PR #119 production-equivalent audit
 - [x] Updated the PR quality gate to rebuild blog titles/index/sitemap, regenerate product and category pages from the public live catalogue, run the same SEO enrichment passes as production, and then audit the generated output.
 - [x] Final PR #119 run 41287720738 completed successfully: JS syntax, metadata tests, blog rebuild, product/category generation, SEO enrichment and on-page audit all passed.
