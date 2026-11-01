@@ -39,7 +39,17 @@ const expected = [
   "ipcone-16-inch-wall-mounted-fan-black-3-speed-control",
   "ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd",
   "abasi-5-ec",
-  "alonze-50ec-abamectin-insecticide-1-litre"
+  "alonze-50ec-abamectin-insecticide-1-litre",
+  "pentagon-50ec-insecticide-1-litre",
+  "zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre",
+  "absolute-375sc-systemic-fungicide-greenlife-1-litres",
+  "promax-20-ec-odourless-bed-bug-insecticide",
+  "bayer-baraki-pellets-rat-and-mice-poison-10-g",
+  "premise-200-sc-termiticide-50-ml",
+  "gradometer-480ec-termiticide-1-litre",
+  "metro-200sc-termiticide-25-ml",
+  "syngenta-tatua-rat-and-mice-poison-blocks",
+  "actellic-50ec-insecticide-1-litre"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
