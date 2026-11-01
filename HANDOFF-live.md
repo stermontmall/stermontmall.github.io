@@ -1,3 +1,9 @@
+## SESSION CHECKPOINT (2026-11-02): SEO research accepts sitemap landing pages
+- [x] Found a compatibility issue: the expanded sitemap scan includes public directory URLs (for example `/services/`), but `seo-research` previously rejected every non-root URL that did not end in `.html`.
+- [x] Updated and deployed `seo-research` Edge Function v18 to accept public directory landing pages while still rejecting private admin/account/checkout/cart/auth paths and off-site URLs.
+- [x] Added a regression assertion for directory-page support; source is tracked in `supabase/functions/seo-research/index.ts`.
+- [ ] Final PR quality gate and live browser verification remain pending.
+
 ## SESSION CHECKPOINT (2026-11-02): Product SEO canonical-route fix
 - [x] Confirmed the Product SEO scan was constructing URLs directly from `products.slug`, which does not always match the product-page generator's route selection and alias redirects.
 - [x] Compared active catalogue rows with `sitemap-products.xml`: 225 active records versus 223 listed URLs; found old/duplicate slug aliases and an example alias page that redirects to a different canonical product ID.
