@@ -775,3 +775,15 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [ ] Mobile performance optimization, Google Search Console not-indexed URL investigation, Merchant Center account diagnostics, Supabase privileged-function review, and M-Pesa callback/amount validation remain outstanding.
 - [ ] No live checkout/payment tests or live credential changes performed.
 - Autosave: this checkpoint committed directly to main.
+
+
+## SESSION CHECKPOINT (2026-11-01): M-Pesa callback validation hardening
+- [x] Retrieved current live Supabase Edge Function source for `mpesa-callback` (version 16) and reviewed the existing pending-only update/replay handling.
+- [x] Deployed `mpesa-callback` version 17 directly to project `oewvtbnmyombbtggamor` with JWT verification remaining OFF for the Safaricom webhook.
+- [x] Callback now loads the matching pending payment's stored requested amount and requires both a matching received amount (to 2 decimal places) and a non-empty M-Pesa receipt before setting status to `success`.
+- [x] Successful callbacks with missing receipt or mismatched amount are recorded as `amount_mismatch` with a manual-verification explanation; they are not reported as successful by checkout polling.
+- [x] Re-read deployed Edge Function source and verified version 17 contains the amount/receipt checks.
+- [ ] No live M-Pesa payment was initiated; end-to-end validation requires a controlled low-value transaction and confirmation that Daraja callback metadata matches the stored amount/receipt.
+- [ ] Further review remains: phone-number consistency between STK prompt and order contact, callback authentication/secret rotation, payment/order atomicity, and abuse limits. Do not claim these are fixed.
+- [ ] Mobile performance, current Pa11y/performance audit completion, owner-side Google Search Console inspection, Merchant Center diagnostics and remaining Supabase advisor findings still require separate work.
+- Autosave: checkpoint committed directly to main.
