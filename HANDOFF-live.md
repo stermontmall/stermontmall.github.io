@@ -1,3 +1,17 @@
+## SEO, BLOG AND PRODUCT-CONTENT EXPANSION (2026-11-01)
+Status: IMPLEMENTED ON `seo/content-quality-expansion-2026-11`; PR validation pending.
+- [x] Added category-specific buying checklists to generated product pages for pesticides, farm inputs, phones, computers, TVs/audio, appliances and sprayers. Guidance is explicit about confirming missing specifications and does not invent technical claims.
+- [x] Removed duplicated M-Pesa / 47-counties boilerplate from generated category intros and separated a concise ordering/delivery note.
+- [x] Added a new Kenya knapsack sprayer buying guide with a comparison table, safe equipment-selection guidance, FAQs, Article/Breadcrumb/FAQ structured data and links to the current verified sprayer listings.
+- [x] Marked the matching blog queue topic as drafted to prevent duplicate AI generation.
+- [ ] Run the SEO pull-request quality gate: JS syntax, SEO metadata tests, full page audit; inspect the audit artifact.
+- [ ] After merge, allow the blog index/sitemap and product-page workflows to rebuild, then confirm Pages deployment and live URLs.
+- [ ] Product database descriptions remain incomplete for some SKUs (e.g. the currently listed hand sprayer and several knapsack models have no catalogue description in their generated pages). Do not invent model specs, ingredient claims, warranty, certifications, prices or stock. To fully populate those fields, obtain an owner-approved supplier catalogue / manufacturer datasheets / product photos and update the catalogue through its authorised admin import process.
+- [ ] Search Console performance/indexing and Merchant Center diagnostics still require owner-side access; no ranking position is guaranteed.
+- [x] Autosave: this handoff checkpoint is committed on the working branch; continue updating after CI and review.
+
+---
+
 ## SESSION UPDATE (2026-11-01): previous SEO PR reconciled
 - [x] Inspected PR #115 against current main file-by-file. All 21 page/content and blog-title-normalizer changes were already present on main; remaining differences in seo-check.mjs and seo-daily.yml were newer main improvements, not missing changes.
 - [x] Closed PR #115 as superseded and documented the reason in its conversation: https://github.com/stermontmall/stermontmall.github.io/pull/115
