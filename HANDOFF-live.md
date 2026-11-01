@@ -1,15 +1,18 @@
-## SESSION CHECKPOINT (2026-11-01): handoff review and mobile tab reload fix
+## SESSION CHECKPOINT (2026-11-01): continued handoff review and PR cleanup
 
-- [x] Recovered the current project handoff and checked the open pull requests, recent merged content batches, the mobile shell implementation, and the recorded outstanding tasks.
-- [x] Confirmed product-content PRs #119, #121 and #124 are merged. PR #124's latest recorded quality gate passed (run 41290555091); the earlier "still open" notes for #119/#124 are stale.
-- [x] Confirmed the current daily SEO report #122 reports 365 pages checked, 65 size-redirect pages skipped and no findings. Separate Google indexing report #123 still lists 14 URLs not indexed; Google Search Console request-indexing and editorial review remain owner-side.
-- [x] Found the recorded mobile-shell defect: reload on Categories can lose the selected tab when the browser does not preserve history.state.
-- [x] Created branch `fix/mobile-shell-tab-reload-2026-11` and PR #149: https://github.com/stermontmall/stermontmall.github.io/pull/149. It persists the selected tab in sessionStorage as a fallback, preserves explicit deep-link precedence, bumps the app script URL to v=14 and service-worker cache to v5, and strengthens the regression test by clearing history.state before reload.
-- [x] Corrected the regression test's Python comment syntax after review of the diff. The test now explicitly clears `history.state` before reload; source-level verification confirms the new fallback and cache-bust changes are present on the PR branch.
-- [ ] PR #149 still requires an actual `python3 mobile-shell/shell.test.py` run and review before merge; the GitHub connector currently exposes no status checks for its head commit. No production deployment has been made.
-- [ ] PR #57 (SEO title/H1 modifiers) and PR #6 (admin catalog session renewal/timeout) remain open and have no review threads. Do not merge blindly: #57 was authored against older SEO code and needs reconciliation with current main; #6 has only fixture testing and explicitly lacks live-browser verification.
-- [ ] Remaining owner-only tasks: real-phone checkout and tab checks; owner review of batch 07/08 blogs; supply missing manufacturer/label data; Search Console indexing requests; confirm wording and safety-box decisions. Do not fabricate product specifications or perform live customer checkout.
-- Autosave: mobile-tab fix is committed on its feature branch; this checkpoint is committed directly to main.
+- [x] PR #149 merged to `main` (merge commit `1eacad007aaf98fe14764a6c083c3524768989d2`). It stores the selected mobile-shell tab in `sessionStorage` as a fallback, keeps explicit deep links higher priority, bumps `app.js?v=14` and the service-worker cache to v5, and adds a regression case that clears `history.state` before refreshing Categories.
+- [x] PR #149 SEO quality gate run 41298903713 passed all 12 workflow steps, including JavaScript syntax, metadata/content tests, generated product/category pages and full on-page audit. Important: that workflow does NOT execute `python3 mobile-shell/shell.test.py`; the new history-loss regression case still needs the headless Chromium test run and a real-phone check.
+- [x] Closed stale PR #57. Its title/H1 changes were based on an older SEO implementation and conflict with current `main` rules (notably the no-auto-`Best Price in Kenya` title policy and current `Buy` H1 handling). Do not revive that branch without a fresh gap analysis.
+- [x] Closed superseded PR #6; its old branch would overwrite newer catalogue/pricing code.
+- [x] Ported the intended admin catalog session-renewal and loading-timeout fix to current-main branch PR #152. Quality-gate run 41299179272 passed all 12 steps, including JavaScript syntax, metadata/content tests, live-catalogue generation, SEO enrichment and full on-page audit.
+- [x] Closed duplicate PR #151; PR #152 is the single active replacement for #6.
+- [ ] PR #152 still needs a live signed-in admin-browser test with an expired or near-expiry session before merge. Do not ask anyone to share admin credentials in chat.
+- [ ] Run `python3 mobile-shell/shell.test.py` with Playwright/Chromium against the merged PR #149 tree; the test now specifically clears `history.state` before the Categories refresh.
+- [x] Confirmed the old doubled-`Buy` issue has no remaining literal `Buy Buy` matches in the repository search; no additional code change was necessary.
+- [ ] Owner-side checks remain: phone/service-worker checks, opening two service pages and one guide in a browser, real checkout using a test order (not a real customer purchase), editorial review, Search Console review, and decisions on approved marketing wording/safety content.
+- [ ] Product catalogue/SEO work that depends on verified manufacturer or label information remains blocked until those facts are supplied and checked. No unverified product claims were added in this session.
+- Autosave: this checkpoint is committed directly to `main`; active code review is PR #152 only.
+
 
 ---
 
