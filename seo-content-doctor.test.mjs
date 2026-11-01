@@ -62,3 +62,18 @@ const ratingDoctor = readFileSync('seo-doctor.js', 'utf8');
 for (const token of ['Overall site rating', 'Product page rating', 'Category page rating', 'Technical SEO rating', 'ratingLabel(v)', 'No matching pages were scanned']) if (!ratingDoctor.includes(token)) throw new Error(`Missing SEO rating dashboard feature: ${token}`);
 if (!adminHtml.includes('seo-doctor.js?v=12')) throw new Error('Admin must load SEO Doctor rating dashboard cache version.');
 console.log('SEO Doctor rating dashboard regression checks passed.');
+
+const optimizer = readFileSync('product-seo-optimizer.js', 'utf8');
+for (const token of [
+  'Product SEO Optimizer',
+  '/rest/v1/products?select=id,slug,name,description,images,categories(name,slug)',
+  'meta[name="stm-id"]',
+  'Save reviewed description',
+  "Prefer:'return=representation'",
+  'expected exactly one updated product',
+  'No products changed'
+]) if (!optimizer.includes(token)) throw new Error(`Missing product SEO optimizer safeguard or feature: ${token}`);
+execFileSync(process.execPath, ['--check', 'product-seo-optimizer.js'], { stdio: 'inherit' });
+if (!adminHtml.includes('product-seo-optimizer.js?v=1')) throw new Error('Admin must load the product SEO optimizer.');
+if (!adminHtml.includes('seo-doctor.js?v=13')) throw new Error('Admin must load the current SEO Doctor bundle.');
+console.log('Product SEO Optimizer regression checks passed.');
