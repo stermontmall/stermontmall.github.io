@@ -321,7 +321,7 @@ for (const p of products) {
   // Meta title (max 60 chars) and description (max 155 chars) come from seo-meta.mjs: "[Original] <name> \u2013 Price in Kenya | Stermont Arcade".
   // "Original / genuine" is only claimed for known brands and farm inputs; the price stays in the Product schema and on the page.
   const ctx = { brand: brandOf(p.name), catSlug: cat?.slug };
-  const title = pdpTitle(p.name, ctx), desc = pdpDescription(p.name, ctx), h1 = pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
+  const title = pdpTitle(p.name, ctx), desc = pdpDescription(p.name, ctx, p.description), h1 = pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
   NAMES[p.id] = h1; (p.variants || []).forEach(v => { NAMES[v.id] = h1; });
   // Related products rotate through the category (the 6 that follow this one, wrapping round), so EVERY product, including the newest, gets links from other product pages.
   const related = (() => {
