@@ -92,7 +92,7 @@ for (const token of [
   '/rest/v1/products?select=id,slug,name,description,images,categories(name,slug),created_at&active=eq.true&order=created_at.asc&limit=1000',
   'meta[name="stm-id"]',
   'Save reviewed description',
-  ""Prefer:'return=representation'"",
+  "Prefer:'return=representation'",
   'expected exactly one updated product',
   'No products changed',
   'Prepare safe fixes',
