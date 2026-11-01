@@ -1,9 +1,9 @@
 ## NEW TASK (2026-11-01): improve site-wide SEO audit coverage
-Status: IMPLEMENTED on `wip-seo-audit-coverage`; PR review/merge pending.
+Status: MERGED to `main` as PR #105 (merge commit ccb434b).
 - [x] Expanded `seo-check.mjs` from a partial audit (products, categories, blogs, home) to recursively include public HTML pages in `services/` and `guides/`, plus root-level public pages.
 - [x] Added `services/sitemap-services.xml` to broken/missing-page checks alongside the main and product sitemaps.
 - [x] Aligned homepage Open Graph and Twitter title text with its actual canonical HTML title (both previously still said "Online Shopping Store in Kenya" while `<title>` says "Online Store Kenya").
-- [ ] After merge, run GitHub Actions > Daily SEO check and review the report; then address actual page-level errors from the report.
+- [x] PR #105 merged. Next: run GitHub Actions > Daily SEO check and review the report; then address actual page-level errors from the report.
 - Note: live site could not be fetched from this session, and Google Search Console ranking/indexing data has not been inspected. Existing GSC workflows need `GSC_SERVICE_ACCOUNT_JSON` and `GSC_PROPERTY` secrets.
 - Google first-place rankings cannot be guaranteed; focus is technical crawlability, useful unique pages, accurate metadata, internal links and Search Console feedback.
 
