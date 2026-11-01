@@ -1,9 +1,7 @@
-# Stermont Arcade - price watch. Compares your prices with Jumia, Kilimall, Agroduka and ImagineCare, then fixes the ones that are
-# clearly out of line: cuts prices that are well above the market and raises prices that are well under it (the safety limits are
-# in price-watch.config.json). It opens a GitHub Issue (GitHub emails you) listing what changed or what could not be read.
-# Runs every day at 08:00 Nairobi time, or whenever you tap "Run workflow" in the Actions tab.
-# Changing prices needs the SUPABASE_SERVICE_KEY repository secret; without it the run is report-only.
-# Tick "report only" on a manual run to look without changing anything.
+# Stermont Arcade - price watch. Compares product prices with competitor listings and opens a report issue.
+# All scheduled runs are report-only. A manual run changes prices only when you explicitly tick "Apply price changes".
+# Changes still require the SUPABASE_SERVICE_KEY repository secret and are limited by price-watch.config.json.
+# Do not treat weak or single-source competitor matches as permission to change product prices.
 name: Price watch
 
 on:
@@ -11,8 +9,8 @@ on:
     - cron: '0 5 * * *'
   workflow_dispatch:
     inputs:
-      report_only:
-        description: 'Report only - do not change any prices'
+      apply_changes:
+        description: 'Apply price changes (leave unchecked for report only)'
         type: boolean
         default: false
 
@@ -38,7 +36,7 @@ jobs:
       - name: Check prices
         id: rep
         env:
-          APPLY: ${{ inputs.report_only && '0' || '' }}
+          APPLY: ${{ inputs.apply_changes && '1' || '0' }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: node price-watch.mjs > price-watch.md
       - uses: actions/upload-artifact@v4

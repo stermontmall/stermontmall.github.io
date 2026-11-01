@@ -10,7 +10,7 @@
   "minMatches": 2,
   "maxMatches": 50,
   "maxChangesPerRun": 40,
-  "autoApply": true,
+  "autoApply": false,
   "sources": [
     "jumia",
     "agroduka",
