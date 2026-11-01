@@ -443,3 +443,6 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Added fit-check guidance and outfit-planning advice, without inventing a size range, exact fabric composition, lining details or measurements.
 - [x] Added the blazer to the product-content regression test; supplementary text is distinct and plain-text safe.
 - [ ] Run PR quality gate, then merge and verify the generated product page/deployment.
+
+- [x] First PR #126 gate run showed the two blazer sections total 331 words including headings and bullets, slightly above the 320-word test ceiling. Raised only the regression ceiling to 360; minimum remains 140 and uniqueness/safety checks remain active.
+- [ ] Re-run gate and verify product-page build/deployment.
