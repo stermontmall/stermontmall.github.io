@@ -59,8 +59,18 @@ const adminHtml = readFileSync('admin.html', 'utf8');
 if (adminHtml.includes('seo-doctor.js?v=11')) throw new Error('Admin must not load the stale SEO Doctor script cache version.');
 
 const ratingDoctor = readFileSync('seo-doctor.js', 'utf8');
+for (const token of [
+  "ps.filter(p=>Number(p.seo_score_before)!==100)",
+  "Showing '+actionable.length+' pending item(s) that need improvement.",
+  'Perfect 100/100 items are hidden.',
+  'offset='+offset,
+  'h1Text:',
+  'h2Texts:'
+]) if (!ratingDoctor.includes(token)) throw new Error(`Missing SEO Doctor queue/filter/context feature: ${token}`);
+if (ratingDoctor.includes('&limit=30')) throw new Error('SEO Doctor must not truncate the pending proposal queue at 30.');
+
 for (const token of ['Overall site rating', 'Product page rating', 'Category page rating', 'Technical SEO rating', 'ratingLabel(v)', 'No matching pages were scanned']) if (!ratingDoctor.includes(token)) throw new Error(`Missing SEO rating dashboard feature: ${token}`);
-if (!adminHtml.includes('seo-doctor.js?v=13')) throw new Error('Admin must load the current SEO Doctor cache version including the product optimizer.');
+if (!adminHtml.includes('seo-doctor.js?v=14')) throw new Error('Admin must load the current SEO Doctor cache version including the product optimizer.');
 console.log('SEO Doctor rating dashboard regression checks passed.');
 
 const optimizer = readFileSync('product-seo-optimizer.js', 'utf8');
@@ -87,5 +97,5 @@ for (const token of [
 ]) if (!optimizer.includes(token)) throw new Error(`Missing product SEO optimizer safeguard or feature: ${token}`);
 execFileSync(process.execPath, ['--check', 'product-seo-optimizer.js'], { stdio: 'inherit' });
 if (!adminHtml.includes('product-seo-optimizer.js?v=4')) throw new Error('Admin must load the current product SEO optimizer.');
-if (!adminHtml.includes('seo-doctor.js?v=13')) throw new Error('Admin must load the current SEO Doctor bundle.');
+if (!adminHtml.includes('seo-doctor.js?v=14')) throw new Error('Admin must load the current SEO Doctor bundle.');
 console.log('Product SEO Optimizer regression checks passed.');
