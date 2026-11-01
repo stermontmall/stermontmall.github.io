@@ -116,6 +116,7 @@ assert.equal(pdpVariantUrl('/p/premise-200-sc-termiticide-50-ml.html', 'premise-
   'https://stermontarcade.co.ke/p/premise-200-sc-termiticide-50-ml.html#premise-200-sc-termiticide-1-litre');
 assert.equal(pdpVariantUrl('/p/item.html', '', 'item'), 'https://stermontarcade.co.ke/p/item.html');
 assert.equal(pdpVariantUrl('/p/item.html', 'size a', 'item'), 'https://stermontarcade.co.ke/p/item.html#size%20a');
+assert.equal(pdpVariantUrl('/p/item.html', 'item-xl', 'item', 'https://shop.example/'), 'https://shop.example/p/item.html#item-xl');
 n += 4;
 
 console.log(`OK: ${n} checks, 0 violations`);
