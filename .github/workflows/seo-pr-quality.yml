@@ -49,7 +49,13 @@ jobs:
           node blog-build.mjs
       - name: Build product and category pages from the live public catalogue
         run: node generate-products.mjs
-      - name: Run full on-page SEO audit against generated pages
+      - name: Apply the same SEO enrichment passes used by production
+        run: |
+          node seo-kenya.mjs
+          node seo-overrides.mjs
+          node seo-titles.mjs
+          node seo-shell-redirect.mjs
+      - name: Run full on-page SEO audit against production-equivalent generated pages
         run: node seo-check.mjs > seo-pr-report.md
       - name: Add audit summary
         if: always()
