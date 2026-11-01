@@ -19,7 +19,10 @@ const expected = [
   "itel-smartphone",
   "nunix-gas-and-electric-cooker",
   "portable-wireless-bluetooth-speaker",
-  "ramtons-steam-iron-with-vertical-and-variable-steam"
+  "ramtons-steam-iron-with-vertical-and-variable-steam",
+  "skyworth-32-inch-eye-care-google-tv-32-inch",
+  "smartphone-gift-bundle-led-watch-power-bank-earbuds",
+  "urban-comfort-womens-green-fleece-tracksuit"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
