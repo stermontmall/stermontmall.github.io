@@ -10,6 +10,7 @@ on:
       - 'seo-meta.mjs'
       - 'seo-meta.test.mjs'
       - 'seo-check.mjs'
+      - 'seo-doctor.js'
       - 'seo-content-doctor.mjs'
       - 'seo-content-doctor.test.mjs'
       - 'generate-products.mjs'
@@ -36,7 +37,7 @@ jobs:
           node-version: 20
       - name: Test shared SEO metadata rules
         run: node seo-meta.test.mjs
-      - name: Test Content Doctor rules
+      - name: Test Content Doctor rules and Admin SEO Doctor syntax
         run: node seo-content-doctor.test.mjs
       - name: Run technical SEO check
         run: node seo-check.mjs > seo-report.md
