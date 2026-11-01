@@ -732,3 +732,18 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [ ] Run JavaScript syntax checks and inspect the branch diff; open PR and wait for validation.
 - [ ] After merge, rerun Site audit and Build product pages; verify Pa11y findings and generated output. No live-host verification beyond the GitHub Pages deployment status is claimed.
 - Autosave: all changes and this checkpoint are committed on branch fix/site-accessibility-and-build-retry-2026-11.
+
+
+## SESSION CHECKPOINT (2026-11-01): PR #173 accessibility and build-publish reliability merged
+- [x] PR #173 passed SEO pull-request quality gate (run 41312699679).
+- [x] Squash-merged PR #173 to main: e4e780193ae78dd5afe84165af9f88d1ec372b4d.
+- [x] Shop search input now has accessible name and query parameter; keyboard/screen-reader submit control added.
+- [x] Mobile shell search now has a visible submit control and adjusted input spacing.
+- [x] Blog CTA green darkened from #16a34a to #008933 to address measured 3.3:1 white-text contrast.
+- [x] Product-page publishing now fetches/rebases and retries rejected pushes up to three times.
+- [x] Site audit triggers now include storefront search, mobile shell and blog changes.
+- [ ] Main-branch workflows queued after merge: Site audit 41313139696; Build product pages 41313139683; SEO auto index 41313139706; Pages deploy 41313139590. Verify conclusions and artifacts.
+- [ ] Earlier pre-merge Site audit (41312374941) still had Pa11y failure and performance run in progress; it predates PR #173 fixes. Do not claim accessibility/performance clean until post-merge audit confirms.
+- [ ] Code review of M-Pesa flow found a possible callback timing race (callback may arrive before mpesa_payments row insert) and payment-success metadata should be checked against requested amount/receipt. No payment code or live settings changed; validate safely before any changes because this affects customer payments.
+- [ ] Google Search Console's 14 not-indexed URLs and Merchant Center account diagnostics still require owner-side account access. IndexNow accepts URL notifications but does not guarantee Google indexing.
+- Autosave: this checkpoint is committed directly to main.
