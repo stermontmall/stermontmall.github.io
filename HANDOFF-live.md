@@ -591,3 +591,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Crop and structural pest-control content remains label-first, with environmental and professional-use safeguards.
 - [x] Extended regression coverage from 97 to 107 IDs; checked word limits, distinct text, plain-text safety and unsupported-claim guardrails.
 - [ ] Run full SEO PR gate and generated-page audit; merge only on success and verify deployment.
+
+
+## 2026-11-01 — Product content batch 20
+- [x] Added two distinct sections for Compliant 560SC, BioDistinction Extra 700SC, Commander 240EC, Bazooka 18EC, Beanpro 480SL, Cropgrow Super Gel, Albafas 10% Albendazole Drench, Catapult 480SL, Chariot 500SC and Bradley 500SC.
+- [x] Veterinary drench content requires label and veterinary confirmation and avoids dosage instructions; crop-input content covers crop/animal suitability, storage, drift and resistance safeguards without inventing rates.
+- [x] Extended regression coverage from 107 to 117 IDs; checked word limits, distinct text, plain-text safety and unsupported-claim guardrails.
+- [ ] Run full SEO PR gate and generated-page audit; merge only on success and verify deployment.
