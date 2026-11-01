@@ -38,6 +38,7 @@ for (const token of [
   "'/services/sitemap-services.xml'",
   'new AbortController()',
   'Sitemaps checked:',
+  'is outside the site origin',
   'weighted',
   'canonicalValid',
   'imagesWithAlt',
