@@ -1,0 +1,53 @@
+# Daily read-only sales and service-lead report. Opens/refreshes a GitHub issue when follow-up is overdue.
+name: Daily sales and leads
+
+on:
+  schedule:
+    - cron: '30 3 * * *' # 06:30 Nairobi (UTC+3)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: daily-sales-leads
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Test privacy and read-only guardrails
+        run: node --test sales-leads-report.test.mjs
+      - name: Build report from Supabase
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node sales-leads-report.mjs
+      - name: Save private operational report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sales-leads-report
+          path: sales-leads-report.md
+          retention-days: 30
+      - name: Open or refresh follow-up reminder
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          count=$(cat sales-leads-count.txt)
+          existing=$(gh issue list --state open --search "Sales and service follow-up in:title" --json number --jq '.[0].number // empty')
+          if [ "$count" -gt 0 ]; then
+            if [ -n "$existing" ]; then
+              gh issue edit "$existing" --body-file sales-leads-report.md
+              gh issue comment "$existing" --body "Daily follow-up report refreshed."
+            else
+              gh issue create --title "Sales and service follow-up $(date -u +%F)" --body-file sales-leads-report.md
+            fi
+          elif [ -n "$existing" ]; then
+            gh issue close "$existing" --comment "No overdue new orders or service enquiries remain in the latest report."
+          fi
