@@ -505,3 +505,14 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Saved two model-specific sections in product-content.json: practical counter/cookware planning and safe LPG setup, leak response, glass-top cleaning and maintenance.
 - [x] Added the product ID to the exact expected-content regression list; test ceiling remains 360 words and safety/unsupported-claim checks remain active.
 - [ ] Validate current PR against main, run quality gate/product generation, merge only after checks pass, then confirm deployment.
+
+
+## 2026-11-01 — Product content batch 11 (in progress)
+- [x] Recovered the current main-branch handoff and confirmed the product-content regression suite covers 25 reviewed product IDs.
+- [x] Reviewed the generated catalogue pages and original descriptions for Kenwood Air Fryer HFP30.000BK (~383 words), Hisense 43A6QKEN TV bundle (~389 words), and Harman Kardon Onyx Studio 9 speaker (~406 words).
+- [x] Added two model-specific sections per product covering portion planning and non-stick care; 4K viewing, source compatibility and safe bundle installation; and Bluetooth pairing, single-unit expectations and safe speaker care.
+- [x] Kept all advice within facts shown on the catalogue pages and avoided inventing unlisted ports, accessories, wireless pairing features, water-resistance ratings or warranty terms.
+- [x] Extended the distinct-content regression test to cover all three reviewed products; the existing 140–360-word supplementary-content guardrail remains in force.
+- [ ] Run the SEO pull-request quality gate and inspect its full audit artifact; merge only if every required check passes.
+- [ ] After merge, verify product-page regeneration, GitHub Pages deployment and the daily SEO audit.
+- Autosave: changes are committed on `seo/product-content-batch-11-2026-11`; nothing is published to the live site until review and merge.
