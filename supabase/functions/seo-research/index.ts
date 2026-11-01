@@ -45,11 +45,19 @@ function audit(t: any) {
   const total = checks.reduce((n, c) => n + c.weight, 0);
   const score = Math.round(checks.reduce((n, c) => n + (c.passed ? c.weight : 0), 0) / total * 100);
   const failed = checks.filter(c => !c.passed);
+  const pageTopic = String(metrics.h1Text || title || t.slug || "the page topic").replace(/\\s+/g, " ").trim().slice(0, 180);
+  const observedSubtopics = Array.isArray(metrics.h2Texts)
+    ? metrics.h2Texts.map((x: unknown) => String(x || "").trim()).filter(Boolean).slice(0, 8)
+    : [];
+  const pageTypeLabel = ({ service: "service", product: "product", category: "category", blog: "guide or article", page: "web page" } as Record<string, string>)[String(t.type)] || "web page";
   const summary = [
     "## Automated on-page SEO assessment",
     "This is a deterministic technical/content-structure checklist based on the live HTML supplied by the browser. It is not keyword-volume research, a Google ranking measurement, competitor research, backlink analysis or a guarantee of ranking improvement.",
     `## Weighted score: ${score}/100`,
     "Weights are visible and reflect basic on-page hygiene. A passing check does not prove that the page is useful, accurate or competitive.",
+    `## Page-specific context: ${pageTypeLabel}`,
+    `Observed page topic from its H1/title: "${pageTopic}". Treat this as a candidate topic, not a validated keyword.`,
+    ...(observedSubtopics.length ? [`Observed H2 sections: ${observedSubtopics.join(" | ")}.`] : ["No H2 section text was supplied to this audit."]),
     "## Evidence",
     ...checks.map(c => `- ${c.passed ? "PASS" : "REVIEW"} · ${c.label} (${c.weight} points): ${c.detail}`),
     "## Highest-priority improvements",
@@ -64,6 +72,12 @@ function audit(t: any) {
     "",
     "## Fix first",
     ...(failed.length ? failed.sort((a,b) => b.weight-a.weight).map((c,i) => `${i+1}. ${c.label} — ${c.detail}`) : ["No automated technical/content-structure failure was detected."]),
+    "",
+    "## Page-specific search-intent hypotheses (not keyword research)",
+    `- Start by checking whether the page fully answers the customer need implied by its observed topic: "${pageTopic}".`,
+    ...(observedSubtopics.length ? [`- Review these existing sections for completeness and duplication: ${observedSubtopics.join("; ")}.`] : ["- Add only genuinely useful subheadings based on customer questions; no section headings were detected by this scan."]),
+    `- Page type detected by the audit input: ${pageTypeLabel}. Keep the page focused on that intent rather than mixing unrelated product, service and informational terms.`,
+    "- Validate any target phrase and search demand in Google Search Console before changing copy; this free audit does not estimate search volume or competitor difficulty.",
     "",
     "## Copywriting requirements",
     "- Preserve the page's real product/service facts, availability, prices, warranties, locations and policies. Verify every claim with the business owner or source data.",
