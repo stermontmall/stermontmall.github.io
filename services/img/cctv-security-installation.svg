@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+<title id="title">CCTV and smart security camera installation</title>
+<desc id="desc">Illustration of a modern outdoor IP security camera mounted on a building, monitoring a secure entrance.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#111b3a"/><stop offset="1" stop-color="#253e78"/></linearGradient>
+  <linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f8fafc"/><stop offset="1" stop-color="#b8c7dc"/></linearGradient>
+  <linearGradient id="lens" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#60a5fa"/><stop offset="1" stop-color="#172554"/></linearGradient>
+</defs>
+<rect width="1200" height="675" rx="34" fill="url(#bg)"/>
+<circle cx="935" cy="135" r="175" fill="#60a5fa" opacity=".10"/>
+<path d="M0 510 340 350l250 95 260-170 350 155v245H0Z" fill="#0b1530" opacity=".65"/>
+<path d="M0 560 310 430v245H0Zm310-130 230-95v230H310Zm230-95 210 80v165H540Zm210 80 310-145v310H750Z" fill="#263b68" opacity=".55"/>
+<g transform="translate(225 140)">
+  <path d="M140 240h95v150h-95z" fill="#8da4c5"/>
+  <path d="M165 240v-65c0-22 18-40 40-40h90" fill="none" stroke="#dce8f7" stroke-width="24" stroke-linecap="round"/>
+  <path d="M278 135h95c26 0 47 21 47 47v32" fill="none" stroke="#dce8f7" stroke-width="24" stroke-linecap="round"/>
+  <path d="M365 202 490 202q35 0 35 35v65q0 35-35 35H365q-35 0-35-35v-65q0-35 35-35Z" fill="url(#body)" stroke="#fff" stroke-width="8"/>
+  <path d="M500 222h40q35 0 35 35v25q0 35-35 35h-40Z" fill="#8da4c5"/>
+  <circle cx="532" cy="269" r="52" fill="#0f172a" stroke="#e2e8f0" stroke-width="10"/>
+  <circle cx="532" cy="269" r="35" fill="url(#lens)"/>
+  <circle cx="519" cy="256" r="10" fill="#dbeafe" opacity=".8"/>
+  <path d="M382 218h90" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".65"/>
+  <circle cx="370" cy="270" r="8" fill="#64748b"/><circle cx="370" cy="300" r="8" fill="#64748b"/>
+  <path d="M548 325 620 390" stroke="#60a5fa" stroke-width="4" stroke-dasharray="9 12" opacity=".7"/>
+  <path d="M610 378 655 420 580 420Z" fill="#60a5fa" opacity=".16"/>
+</g>
+<g fill="none" stroke="#93c5fd" stroke-width="5" opacity=".75"><path d="M790 225q95 45 0 90"/><path d="M825 190q155 80 0 160"/><path d="M860 155q215 115 0 230"/></g>
+<g transform="translate(820 425)">
+  <path d="M0 85V15l105-60 105 60v70" fill="#dbeafe" opacity=".14" stroke="#bfdbfe" stroke-width="5"/>
+  <rect x="72" y="45" width="65" height="85" rx="7" fill="#1e3a8a" stroke="#bfdbfe" stroke-width="5"/>
+  <path d="M104 45v85" stroke="#bfdbfe" stroke-width="4"/>
+  <circle cx="120" cy="88" r="5" fill="#93c5fd"/>
+  <path d="M-15 130h240" stroke="#93c5fd" stroke-width="6" stroke-linecap="round"/>
+</g>
+<g font-family="Arial,sans-serif" fill="#fff"><text x="70" y="82" font-size="30" font-weight="700" letter-spacing="4">STERMONT ARCADE</text><text x="70" y="610" font-size="34" font-weight="700">SMART CCTV • REMOTE VIEWING • SECURE ACCESS</text><text x="70" y="648" font-size="18" fill="#bfdbfe">Custom service illustration</text></g>
+</svg>
