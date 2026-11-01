@@ -16,6 +16,8 @@ on:
       - 'seo-overrides.json'
       - 'seo-titles.mjs'
       - 'seo-shell-redirect.mjs'
+      - 'product-content.json'
+      - 'product-content.test.mjs'
       - 'seo-kenya.mjs'
       - '.github/workflows/product-pages.yml'
 
@@ -40,6 +42,9 @@ jobs:
 
       - name: Test shared SEO metadata rules
         run: node seo-meta.test.mjs
+
+      - name: Test hand-written product content
+        run: node product-content.test.mjs
 
       - name: Build pages and sitemap from the live catalog
         run: node generate-products.mjs

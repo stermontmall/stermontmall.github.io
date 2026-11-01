@@ -6,6 +6,8 @@ on:
     paths:
       - 'seo-*.mjs'
       - 'generate-products.mjs'
+      - 'product-content.json'
+      - 'product-content.test.mjs'
       - 'data-health.mjs'
       - 'blog-write.mjs'
       - 'blog-build.mjs'
@@ -40,9 +42,12 @@ jobs:
           node --check data-health.mjs
           node --check blog-write.mjs
           node --check generate-products.mjs
+          node --check product-content.test.mjs
           node --check seo-meta.mjs
       - name: Test product and category SEO metadata
         run: node seo-meta.test.mjs
+      - name: Test hand-written product content
+        run: node product-content.test.mjs
       - name: Normalize blog titles and rebuild blog index and sitemap
         run: |
           node seo-blog-titles.mjs
