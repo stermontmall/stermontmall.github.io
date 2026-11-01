@@ -828,3 +828,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] User instruction is not to silently alter product prices or facts. New branch `safety/price-watch-explicit-approval-2026-11` changes `price-watch.config.json` to `autoApply: false` and changes the workflow to report-only for every scheduled run.
 - [x] A manual run now requires the explicit `Apply price changes` checkbox to opt in; no price changes are made by default.
 - [ ] Validate and merge PR after checks. Existing reported KSh 820 price is not reverted automatically; review against the actual supplier/stock price before changing it.
+
+
+## SESSION CHECKPOINT (2026-11-01): Termite category buyer-guide improvement
+- [x] Reviewed the existing termite category page generator and its short buying guidance.
+- [x] Branch `seo/termite-category-buyer-guide-2026-11` expands the termite category page with clearer buyer intent: soil vs existing-building vs timber use, label and registration checks, pack-size selection, equipment compatibility, safety and professional-treatment boundaries.
+- [x] Added internal links to the existing termite and sprayer buying guides and related pest-control category; expanded FAQs around selection, M-Pesa and delivery.
+- [ ] Run product-page generation, SEO PR quality gate, and site audit before merge. This is a content change only; it does not claim SterMont provides fumigation services.
+- [ ] Confirm live rendered page and generated metadata after deployment; Google indexing and ranking are not guaranteed.
