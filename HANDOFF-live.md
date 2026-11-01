@@ -664,3 +664,13 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [ ] Search Console and Merchant Center owner reports remain unavailable inside this chat despite the owner's Windsor.ai connection; continue technical work without inventing analytics or feed findings.
 - [ ] Keep product-specific chemical copy label-first; do not add dosage, treatment directions, registration or ingredients unless verified from current approved manufacturer/PCPB documentation.
 - Autosave: this checkpoint is committed directly to main.
+
+
+## SESSION CHECKPOINT (2026-11-01): legacy Premise URL compatibility fix
+- [x] Created PR #170: `fix/premise-200-sc-legacy-url-2026-11`.
+- [x] Added `p/premise-200-sc-termiticide-50-ml.htm` as a static compatibility page that redirects browsers to the existing canonical `.html` page, preserves query strings/fragments, declares the canonical destination and is marked `noindex,follow`.
+- [x] Left the generated canonical product page, catalogue price and product data unchanged; the compatibility URL is not added to the sitemap.
+- [ ] Wait for PR quality-gate result, review it, and merge only if checks pass.
+- [ ] After deployment, test the legacy URL on the live host and confirm it reaches the canonical page; then inspect both URLs in Search Console.
+- Note: static-host meta-refresh/JavaScript redirect is a compatibility fallback, not a server-side HTTP 301. Confirm the live host's behaviour before describing it as a permanent redirect.
+- Autosave: checkpoint included in PR #170 branch.
