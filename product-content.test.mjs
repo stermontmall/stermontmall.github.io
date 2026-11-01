@@ -130,6 +130,16 @@ const expected = [
   "vic-20000mah-power-bank-with-led-display-and-flashlight-20000mah",
   "smart-raha-life-3-piece-tumbler-and-bottle-set-purple-260ml-700ml-1200ml",
   "haier-90l-single-door-direct-cool-fridge-black-90-litres"
+  "xiaomi-poco-c71-3gb-ram-plus-64gb",
+  "tecno-spark-go-3-4gb-ram-plus-64gb-4gb-plus-64gb",
+  "xiaomi-redmi-15c-8gb-ram-plus-256gb-8gb-plus-256gb",
+  "samsung-galaxy-a06-4gb-ram-plus-64gb-4gb-plus-64gb",
+  "familly-insect-killer-super-strength-aerosol-spray-aerosol-can",
+  "green-killer-fly-catch-trap-sticky-rolls-5-packs-20-rolls",
+  "2-litre-hand-pressure-sprayer-2-litres",
+  "electromate-20l-electric-oven-1500w",
+  "electromate-1000w-dry-iron-box-blue-and-white",
+  "ailyons-2-burner-table-top-gas-cooker-with-6kg-regulator-1-5m-pipe-and-clips",
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
