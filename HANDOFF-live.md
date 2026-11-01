@@ -804,3 +804,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] GitHub Pages build stage succeeded for run 41314402856; deploy stage was queued at checkpoint time.
 - [ ] Verify deploy stage and fresh Site audit 41314403234 (Pa11y, broken links, SEO rules and performance) before claiming the live site is fully clean.
 - [ ] Earlier audit 41313721384 (pre-PR #178) documented the one old contrast issue; it is not the post-fix result.
+
+
+## SESSION CHECKPOINT (2026-11-01): M-Pesa callback phone binding
+- [x] Deployed `mpesa-callback` version 18 after re-reading version 17.
+- [x] In addition to amount equality and receipt presence, callback success now requires the Safaricom callback phone number to match the phone number stored for that STK request.
+- [x] Verified deployed version 18 source includes stored-phone lookup and normalized callback/stored phone equality.
+- [ ] Controlled end-to-end sandbox or low-value production payment test still required; no real customer transaction was initiated.
+- [ ] If Safaricom callback omits PhoneNumber metadata, the payment is deliberately held for manual verification rather than marked paid.
