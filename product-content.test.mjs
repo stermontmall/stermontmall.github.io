@@ -69,7 +69,17 @@ const expected = [
   "milthane-super-fungicide-1-kg",
   "pegasus-500sc-insecticide-1-litre",
   "rodent-kill-rat-pellets-500-g",
-  "dudu-stop-25ec-bedbug-cockroach-killer-100-ml"
+  "dudu-stop-25ec-bedbug-cockroach-killer-100-ml",
+  "agro-lambda-5ec-insecticide-250-ml",
+  "grain-save-dust-permethrin-500-g",
+  "weed-out-480sl-glyphosate-herbicide-5-litres",
+  "fendona-60sc-insecticide-1-litre",
+  "lava-100ec-insecticide-100-ml",
+  "jacto-hd-550-knapsack-sprayer-20-litres",
+  "actellic-gold-dust-1-kg",
+  "kelvin-dudu-dust-100-g",
+  "thunder-od-145-foliar-insecticide-1-litre",
+  "tecamin-max-foliar-fertilizer-1-litre"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];

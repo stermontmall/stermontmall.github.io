@@ -562,3 +562,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Crop protection, rodenticide and household insecticide content remains label-first and safety-focused.
 - [x] Extended regression coverage from 57 to 67 IDs; validated word limits, distinct text, plain-text safety and claim guardrails.
 - [ ] Run full PR quality gate and generated-page audit; merge only if successful and verify deployment.
+
+
+## 2026-11-01 — Product content batch 16
+- [x] Added model-specific buyer and handling guidance for Agro-Lambda 5EC, Grain-Save Dust, Weed-Out 480SL, Fendona 60SC, Lava 100EC, Jacto HD 550 sprayer, Actellic Gold Dust, Kelvin Dudu Dust, Thunder OD 145 and Tecamin Max.
+- [x] Covered label/registration checks, grain and food safety, glyphosate drift precautions, indoor pesticide exposure prevention, sprayer inspection and fertilizer compatibility without inventing rates or guarantees.
+- [x] Extended regression coverage from 67 to 77 product IDs; checked 140–360-word range, distinct plain text and claim guardrails.
+- [ ] Run full SEO PR gate and generated-page audit; merge only on success and verify production deployment.
