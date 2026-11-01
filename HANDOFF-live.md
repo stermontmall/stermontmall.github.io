@@ -1,3 +1,12 @@
+## SEO FOLLOW-THROUGH (2026-11-01): extend secondary analyzer coverage
+Status: IMPLEMENTED on `wip-seo-full-site-audit`; PR pending.
+- [x] Expanded `seo-analyzer-run.mjs` to recursively inspect public HTML pages in products, categories, blog, services and guides, plus eligible root pages.
+- [ ] Run Site audit after merge and inspect its report; this analyzer currently reports rather than fixes content errors.
+- [ ] Continue page-specific metadata/content corrections from actual audit findings.
+- [ ] Verify live HTTP responses, canonical destinations, sitemap reachability and Google indexing via Search Console. No GSC credentials/report data available in this session.
+- [ ] Review Core Web Vitals report and resolve measured mobile issues.
+- Safety: do not bulk-generate product claims, application instructions, prices or availability; preserve accurate catalog facts and owner-approved product details.
+
 ## NEW TASK (2026-11-01): improve site-wide SEO audit coverage
 Status: MERGED to `main` as PR #105 (merge commit ccb434b).
 - [x] Expanded `seo-check.mjs` from a partial audit (products, categories, blogs, home) to recursively include public HTML pages in `services/` and `guides/`, plus root-level public pages.
