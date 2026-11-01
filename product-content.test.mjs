@@ -128,8 +128,8 @@ const expected = [
   "euroken-50x55-standing-cooker-3-gas-1-electric-with-50l-electric-oven",
   "von-twin-tub-semi-automatic-washing-machine-7-5kg-7-5-kg",
   "vic-20000mah-power-bank-with-led-display-and-flashlight-20000mah",
-  "ramtons-steam-iron-with-vertical-and-variable-steam",
-  "smart-raha-life-3-piece-tumbler-and-bottle-set-purple-260ml-700ml-1200ml"
+  "smart-raha-life-3-piece-tumbler-and-bottle-set-purple-260ml-700ml-1200ml",
+  "haier-90l-single-door-direct-cool-fridge-black-90-litres"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
