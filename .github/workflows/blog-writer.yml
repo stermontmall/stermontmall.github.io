@@ -62,19 +62,7 @@ jobs:
           git push origin "$branch"
           gh pr create --base main --head "$branch" \
             --title "Blog post: $TITLE" \
-            --body "Automatic post, merged automatically. To undo, revert the merge commit."
+            --body "Automatically drafted for editorial review. Please verify factual accuracy, usefulness, originality, links and safety before merging. This workflow does not publish posts automatically."
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
-      - name: Merge the pull request automatically
-        if: steps.draft.outputs.written == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh pr merge "${{ steps.pr.outputs.branch }}" --squash --delete-branch
-
-      # A merge made with the built-in token does not start the other workflows,
-      # so start the blog index and sitemap rebuild by hand.
-      - name: Rebuild blog index and sitemap
-        if: steps.draft.outputs.written == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run blog-build.yml --ref main
+      # The post is published only after a human reviews and merges its pull request.
