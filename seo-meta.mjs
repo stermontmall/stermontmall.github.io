@@ -213,6 +213,7 @@ export function pdpHeadings(catSlug) {
 export function pdpVariantUrl(path, variantSlug, baseSlug, site = 'https://stermontarcade.co.ke') {
   const slug = String(variantSlug || '').trim();
   const base = String(baseSlug || '').trim();
-  return String(site).replace(/\\/$/, '') + String(path || '') +
+  const root = String(site);
+  return (root.endsWith('/') ? root.slice(0, -1) : root) + String(path || '') +
     (slug && slug !== base ? '#' + encodeURIComponent(slug) : '');
 }
