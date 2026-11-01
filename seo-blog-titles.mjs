@@ -5,9 +5,9 @@ import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 const BRAND = ' | Stermont Arcade';
 const MAX_TITLE = 70;
 const clip = (value, max) => {
-  const s = String(value || '').replace(/\\s+/g, ' ').trim();
+  const s = String(value || '').replace(/\s+/g, ' ').trim();
   if (s.length <= max) return s;
-  let out = s.slice(0, max - 1).replace(/\\s+\\S*$/, '').replace(/[|,:;–-]+$/, '').trim();
+  let out = s.slice(0, max - 1).replace(/\s+\S*$/, '').replace(/[|,:;–-]+$/, '').trim();
   return out + '…';
 };
 const decode = s => String(s).replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
@@ -16,8 +16,8 @@ let changed = 0;
 for (const file of readdirSync('blog').filter(x => x.endsWith('.html') && x !== 'index.html')) {
   const path = 'blog/' + file;
   const before = readFileSync(path, 'utf8');
-  if (/<meta\\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(before)) continue;
-  const m = before.match(/<title>([\\s\\S]*?)<\\/title>/i);
+  if (/<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(before)) continue;
+  const m = before.match(/<title>([\s\S]*?)<\/title>/i);
   if (!m) continue;
   const current = decode(m[1]);
   const base = current.endsWith(BRAND) ? current.slice(0, -BRAND.length).trim() : current;
@@ -25,8 +25,8 @@ for (const file of readdirSync('blog').filter(x => x.endsWith('.html') && x !== 
   if (title.length <= MAX_TITLE && title !== current) {
     const safe = encode(title);
     let next = before.replace(m[0], '<title>' + safe + '</title>');
-    next = next.replace(/(<meta\\s+property=["']og:title["']\\s+content=["'])[^"']*(["'])/i, '$1' + safe + '$2');
-    next = next.replace(/(<meta\\s+name=["']twitter:title["']\\s+content=["'])[^"']*(["'])/i, '$1' + safe + '$2');
+    next = next.replace(/(<meta\s+property=["']og:title["']\s+content=["'])[^"']*(["'])/i, '$1' + safe + '$2');
+    next = next.replace(/(<meta\s+name=["']twitter:title["']\s+content=["'])[^"']*(["'])/i, '$1' + safe + '$2');
     if (next !== before) { writeFileSync(path, next); changed++; }
   }
 }
