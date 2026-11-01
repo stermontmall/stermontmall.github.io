@@ -154,4 +154,43 @@ for (const [id, sections] of Object.entries(content)) {
     reusableText.set(key, id);
   }
 }
+// Detect sentence-level template reuse across different product entries. A paragraph can
+// be lightly rewritten while still reusing most of its sentences, so paragraph-level
+// uniqueness alone is not a sufficient content-quality check.
+const sentenceOwners = new Map();
+const splitSentences = value => value.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+const normalizeSentence = value => value.toLowerCase()
+  .replace(/[^a-z0-9]+/g, ' ')
+  .replace(/\\s+/g, ' ')
+  .trim();
+for (const [id, sections] of Object.entries(content)) {
+  for (const section of sections) {
+    for (const value of [...(section.paragraphs || []), ...(section.bullets || [])]) {
+      for (const raw of splitSentences(value)) {
+        const sentence = normalizeSentence(raw);
+        if (sentence.split(' ').filter(Boolean).length < 7) continue;
+        if (!sentenceOwners.has(sentence)) sentenceOwners.set(sentence, new Set());
+        sentenceOwners.get(sentence).add(id);
+      }
+    }
+  }
+}
+for (const [id, sections] of Object.entries(content)) {
+  let sentenceCount = 0;
+  let reusedSentenceCount = 0;
+  for (const section of sections) {
+    for (const value of [...(section.paragraphs || []), ...(section.bullets || [])]) {
+      for (const raw of splitSentences(value)) {
+        const sentence = normalizeSentence(raw);
+        if (sentence.split(' ').filter(Boolean).length < 7) continue;
+        sentenceCount++;
+        if ((sentenceOwners.get(sentence)?.size || 0) > 1) reusedSentenceCount++;
+      }
+    }
+  }
+  const reusedPercent = sentenceCount ? (reusedSentenceCount / sentenceCount) * 100 : 0;
+  assert.ok(reusedPercent <= 30,
+    id + ': ' + reusedSentenceCount + '/' + sentenceCount + ' sentences are reused across product entries (' + reusedPercent.toFixed(1) + '%; maximum 30%)');
+}
+
 console.log('OK: ' + Object.keys(content).length + ' product content entries; model-specific sections validated.');
