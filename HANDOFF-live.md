@@ -538,3 +538,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Extended the content regression test for both product IDs.
 - [x] Kept the new copy focused on label checks, safe handling, storage and responsible use; no new application rates or unverified claims.
 - [ ] Run Node regression, generated-page build and full SEO audit before considering merge.
+
+
+## 2026-11-01 — Product content batch 13
+- [x] Added two distinct buyer-guidance sections for 10 canonical catalogue products: Pentagon 50EC, Zagro Ultraxide, Absolute 375SC, Promax 20EC, Bayer Baraki, Premise 200SC, Gradometer 480EC, Metro 200SC, Syngenta Tatua bait blocks and Actellic 50EC.
+- [x] Focused pesticide/disinfectant/rodenticide copy on current label and registration checks, safe storage, exposure prevention, professional assessment and environmental safeguards; avoided application rates and bait-placement instructions.
+- [x] Extended the exact-ID regression suite from 37 to 47 entries.
+- [x] Checked every entry for two sections, 140–360 words, plain-text safety, distinct copy and unsupported promotional claims.
+- [ ] Run the full PR quality gate and generated-page audit; merge only if all checks pass, then verify deployment.
