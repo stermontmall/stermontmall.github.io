@@ -1,3 +1,9 @@
+## NEW TASK (2026-11-01 10:02 Africa/Nairobi): repair supplied Premise product URL
+Status: IN PROGRESS on `wip-seo-premise-url`; repository access verified (admin + push).
+- Finding: owner supplied `/p/premise-200-sc-termiticide-50-ml.htm`, but the repository contains only the canonical `.html` page. The `.htm` path is absent (GitHub 404); the canonical `.html` page already has title, description, canonical, robots, Open Graph/Twitter metadata and Product/FAQ/Breadcrumb JSON-LD.
+- Planned fix: add a small `.htm` compatibility page that redirects to the existing canonical `.html` URL, declares that canonical, and is noindex so it does not create a duplicate indexed product page. Do not edit generated `p/` pages or change the product title.
+- Next: run syntax/content checks if possible; push branch; review PR before merging. Live host test unavailable through this session.
+
 # HANDOFF-live - newest progress log (read this FIRST, then HANDOFF.md)
 Last saved: 2026-10-31 13:31 (Africa/Nairobi), claude.ai chat session with GitHub + Supabase connectors (no clone; sandbox has node for syntax checks only, no network). USAGE LIMIT earlier hit at ~10:25 (resets 14:30).
 RULE (owner): after EVERY step rewrite this file in the same minute (Done / In progress / Next / Blocked) so a session cut off by a usage limit can continue on another account. `HANDOFF.md` stays the long history; this file wins where they differ.
