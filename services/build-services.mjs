@@ -123,6 +123,14 @@ const icon = slug => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[slug] 
 const tile = (o, i) => `<a class="tile" href="/services/${o.slug}.html"><span class="art" style="--g1:${GRADS[i % 4][0]};--g2:${GRADS[i % 4][1]}">${icon(o.slug)}</span><b>${esc(o.name)}</b><small>${kes(o.priceMin)} to ${kes(o.priceMax)}${o.priceOpen ? '+' : ''}</small></a>`;
 const hero = ({ eyebrow, h1, lead, priceHtml = '', cta = '', chips = [] }) => `<header class="hero"><p class="eyebrow">${esc(eyebrow)}</p><h1>${esc(h1)}</h1><p class="lead">${lead}</p>${priceHtml}${cta ? `<div class="cta">${cta}</div>` : ''}${chips.length ? `<ul class="chips">${chips.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}</header>`;
 
+const seoGuideTitle = value => {
+  const brand = ' | Stermont Arcade', max = 70;
+  let base = String(value || '').replace(/\\s+/g, ' ').trim();
+  const room = max - brand.length;
+  if (base.length > room) base = base.slice(0, room - 1).replace(/\\s+\\S*$/, '').replace(/[|,:;–-]+$/, '').trim() + '…';
+  return base + brand;
+};
+
 function head({ title, desc, url, extra = '' }) {
   return `<!doctype html><html lang="en-KE"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -234,7 +242,7 @@ for (const g of data.guides) {
     { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: g.faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }
   ];
   const ask = wa(`Hello Stermont Arcade, I read your guide and would like a quote for ${s.name}. My location is: `);
-  let h = head({ title: g.title + ' | Stermont Arcade', desc: g.desc, url, extra: jsonld.map(ld).join('') });
+  let h = head({ title: seoGuideTitle(g.title), desc: g.desc, url, extra: jsonld.map(ld).join('') });
   h += `<nav class="crumbs"><a href="/">Home</a> / <a href="/services/">Services</a> / <a href="/services/guides/">Guides</a></nav>
 ${hero({
     eyebrow: 'Guide',
