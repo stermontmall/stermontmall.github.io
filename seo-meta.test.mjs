@@ -24,6 +24,11 @@ for (const name of names) for (const ctx of ctxs) {
   assert.ok(d.length <= DESC_MAX, `desc ${d.length}: ${d}`);
   assert.ok(/Price in Kenya/.test(t), `title lacks Price in Kenya: ${t}`);
   assert.ok(/M-Pesa/.test(d) && /Kenya/.test(d), `desc lacks M-Pesa/Kenya: ${d}`);
+  const specific = pdpDescription(name, ctx, 'Designed for use on suitable surfaces. Check the label and follow the supplied instructions.');
+  assert.ok(specific.length <= DESC_MAX && specific.includes('Designed for use'), `catalogue detail missing: ${specific}`);
+  assert.ok(specific.includes('M-Pesa') && specific.includes('47 counties'), `Kenya purchase context missing: ${specific}`);
+  assert.notEqual(specific, pdpDescription(name, ctx), 'product-specific copy should differ from generic fallback');
+  n += 4;
   assert.ok(!/PCPB/i.test(t + d), `PDP must not claim PCPB: ${t} | ${d}`);
   assert.ok(!/(#1|top-rated|guaranteed|certified)/i.test(t + d), `unverifiable claim: ${t} | ${d}`);
   assert.ok(!/\b(\w+(?:-\w+)?) \1\b/i.test(t), `repeated word: ${t}`);
