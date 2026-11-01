@@ -11,7 +11,11 @@ const expected = [
   "tcl-75c6k-qd-mini-led-4k-smart-tv-75-inch",
   "vitron-htc4300qfs-qled-android-smart-tv-with-wall-mount-43-inch",
   "32-inch-frameless-qled-smart-android-tv-free-accessories",
-  "classic-mens-black-formal-blazer"
+  "classic-mens-black-formal-blazer",
+  "dahua-full-hd-gaming-monitor",
+  "glamstar-double-door-refrigerator",
+  "elite-tailoring-mustard-yellow-blazer-piece",
+  "elite-tailoring-royal-blue-textured-blazer-piece"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
