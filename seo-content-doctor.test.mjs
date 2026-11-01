@@ -19,8 +19,8 @@ for (const token of [
 const admin = readFileSync('seo-doctor.js', 'utf8');
 for (const token of [
   'Technical Audit & Editorial Review',
-  "Prefer:'return=representation'",
-  'no proposal row was updated',
+  "'/functions/v1/seo-review'",
+  'superseded_count',
   'publish content, or change live pages',
   'pending editorial review'
 ]) if (!admin.includes(token)) throw new Error(`Missing admin approval safeguard: ${token}`);
@@ -30,7 +30,12 @@ console.log('SEO Content Doctor + Admin SEO Doctor syntax tests passed.');
 
 const doctor = readFileSync('seo-doctor.js', 'utf8');
 for (const token of [
-  "fetch('/sitemap.xml'",
+  'function readSitemaps()',
+  "'/sitemap-products.xml'",
+  "'/sitemap-images.xml'",
+  "'/services/sitemap-services.xml'",
+  'new AbortController()',
+  'Sitemaps checked:',
   'weighted',
   'canonicalValid',
   'imagesWithAlt',
@@ -39,6 +44,11 @@ for (const token of [
   'grid.append(k)'
 ]) if (!doctor.includes(token)) throw new Error(`Missing SEO Doctor audit feature: ${token}`);
 const edge = readFileSync('supabase/functions/seo-research/index.ts', 'utf8');
+const reviewEdge = readFileSync('supabase/functions/seo-review/index.ts', 'utf8');
+for (const token of ['superseded-', 'superseded_count', 'staff access', 'status=eq.pending']) {
+  if (!reviewEdge.includes(token)) throw new Error(`Missing SEO review safety: ${token}`);
+}
+execFileSync(process.execPath, ['--check', 'supabase/functions/seo-review/index.ts'], { stdio: 'inherit' });
 for (const token of [
   'weighted-onpage-audit-v2',
   'Unique descriptive title',
@@ -70,7 +80,7 @@ for (const token of [
 if (ratingDoctor.includes('&limit=30')) throw new Error('SEO Doctor must not truncate the pending proposal queue at 30.');
 
 for (const token of ['Overall site rating', 'Product page rating', 'Category page rating', 'Technical SEO rating', 'ratingLabel(v)', 'No matching pages were scanned']) if (!ratingDoctor.includes(token)) throw new Error(`Missing SEO rating dashboard feature: ${token}`);
-if (!adminHtml.includes('seo-doctor.js?v=14')) throw new Error('Admin must load the current SEO Doctor cache version including the product optimizer.');
+if (!adminHtml.includes('seo-doctor.js?v=16')) throw new Error('Admin must load the current SEO Doctor cache version including the product optimizer.');
 console.log('SEO Doctor rating dashboard regression checks passed.');
 
 const optimizer = readFileSync('product-seo-optimizer.js', 'utf8');
@@ -79,7 +89,7 @@ for (const token of [
   '/rest/v1/products?select=id,slug,name,description,images,categories(name,slug)',
   'meta[name="stm-id"]',
   'Save reviewed description',
-  "Prefer:'return=representation'",
+  "'/functions/v1/seo-review'",
   'expected exactly one updated product',
   'No products changed',
   'Prepare safe fixes',
@@ -96,6 +106,6 @@ for (const token of [
   'Do not add unverified M-Pesa'
 ]) if (!optimizer.includes(token)) throw new Error(`Missing product SEO optimizer safeguard or feature: ${token}`);
 execFileSync(process.execPath, ['--check', 'product-seo-optimizer.js'], { stdio: 'inherit' });
-if (!adminHtml.includes('product-seo-optimizer.js?v=4')) throw new Error('Admin must load the current product SEO optimizer.');
-if (!adminHtml.includes('seo-doctor.js?v=14')) throw new Error('Admin must load the current SEO Doctor bundle.');
+if (!adminHtml.includes('product-seo-optimizer.js?v=5')) throw new Error('Admin must load the current product SEO optimizer.');
+if (!adminHtml.includes('seo-doctor.js?v=16')) throw new Error('Admin must load the current SEO Doctor bundle.');
 console.log('Product SEO Optimizer regression checks passed.');
