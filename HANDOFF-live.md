@@ -1,3 +1,18 @@
+## SESSION CHECKPOINT (2026-11-01): SEO audit coverage restored; live SEO follow-through pending
+
+- [x] Recovered this handoff and reviewed the latest SEO work and owner-side blockers before changing the repository.
+- [x] Reviewed PR #168, "Restore sampled SEO and accessibility audit coverage", including its exact diff and the PR quality-gate workflow result (run 41309672997: completed successfully).
+- [x] Merged PR #168 to main (squash commit a5f1615fcff6594822e78cec90342ce308bd429e). The weekly audit now samples general pages, ordinary retail product pages, category pages and shopping-guide blog posts; Pa11y coverage is expanded and Lighthouse no longer excludes /p/, /c/ and /blog/ routes.
+- [ ] Verify the post-merge SEO, product-pages and GitHub Pages deployment workflows on main; no post-merge workflow result has yet been confirmed in this session.
+- [ ] Run/inspect the next full daily SEO audit artifact and fix only verified page-level findings.
+- [ ] Owner-side Search Console/Merchant Center follow-up remains required: the prior handoff records 14 URLs not indexed in the 2026-11-01 report. Inspect current URL diagnostics, sitemap status, impressions/clicks/queries and Merchant Center issues with the authorised owner account. Google controls indexing; no ranking or sales guarantee.
+- [ ] The Search Console XLSX previously mentioned was not retrievable from the current working file context; request re-upload if its query/page data is needed for specific opportunity prioritisation.
+- [ ] Product copy gaps remain source-bound: use approved manufacturer/supplier details only; do not invent product specifications, registration, ingredients, warranties, prices or stock.
+- [ ] After workflow verification, test representative live product/category/blog URLs, canonical targets, robots directives, sitemap reachability, structured data and mobile Core Web Vitals. Confirm the live host rather than assuming a successful repository check means Google has indexed a page.
+- Autosave: this checkpoint is committed directly to main. Continue from the unchecked items above.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-01): handoff review, merged fixes and remaining owner checks
 
 - [x] PR #149 merged to `main` (merge commit `1eacad007aaf98fe14764a6c083c3524768989d2`). The mobile shell now saves the selected tab in `sessionStorage` as a fallback, preserves explicit deep-link precedence, uses `app.js?v=14` and service-worker cache v5, and has a regression case that clears `history.state` before refreshing Categories.
