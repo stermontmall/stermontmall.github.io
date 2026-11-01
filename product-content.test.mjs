@@ -26,7 +26,8 @@ const expected = [
   "vision-plus-double-door-refrigerator",
   "roch-mechanical-microwave-oven",
   "vision-plus-32-inch-full-hd-smart-tv-with-free-wall-bracket",
-  "ultra-smart-watch-with-bluetooth-calling-and-ocean-strap-grey"
+  "ultra-smart-watch-with-bluetooth-calling-and-ocean-strap-grey",
+  "ailyons-double-burner-glass-gas-cooker-regulator-pipe"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
