@@ -8,6 +8,7 @@ on:
     paths:
       - 'blog/*.html'
       - 'blog-build.mjs'
+      - 'seo-blog-titles.mjs'
   workflow_dispatch:
 
 permissions:
@@ -29,6 +30,8 @@ jobs:
         with:
           node-version: 20
 
+      - name: Normalize blog SEO title lengths
+        run: node seo-blog-titles.mjs
       - name: Rebuild blog index and sitemap entries
         run: node blog-build.mjs
 
@@ -36,7 +39,7 @@ jobs:
         run: |
           git config user.name "bot"
           git config user.email "bot@users.noreply.github.com"
-          git add blog/index.html sitemap.xml
+          git add blog/*.html blog/index.html sitemap.xml
           if git diff --cached --quiet; then
             echo "Nothing changed - no commit needed."
           else
