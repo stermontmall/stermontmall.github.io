@@ -254,6 +254,8 @@ with sync_playwright() as p:
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
     p12.goto(URL); p12.wait_for_selector('#grid .card[data-id]')
     p12.locator('#bottom-nav [data-tab="categories"]').click()
+    # Simulate browsers/restores that lose history.state on refresh; sessionStorage must still restore the tab.
+    p12.evaluate("history.replaceState(null, '', location.href)")
     p12.reload(); p12.wait_for_selector('#cat-main li', timeout=10000)
     check('reload on Categories stays on Categories', p12.locator('#view-categories').is_visible() and p12.locator('#view-home').is_hidden() and p12.locator('#bottom-nav [data-tab="categories"][aria-current="page"]').count() == 1 and p12.evaluate('history.state.tab') == 'categories')
     check('after that reload the home chips stay hidden', not p12.locator('#chips-wrap').is_visible())

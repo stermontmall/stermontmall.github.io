@@ -178,7 +178,10 @@ const CAT_DEEP = new URLSearchParams(location.search).get('cat');   // /?cat=<sl
 /* A reload keeps the tab the customer was on: the browser hands back the state of the current history entry, and every tab hop stores its tab in it
    (goTab). The first view is Home only for a fresh visit or an unknown tab. The tab is shown at the very end of this file, once the views exist. */
 const TABS = ['home', 'categories', 'deals', 'cart', 'account'];
-const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab : (!DEEP && !CAT_DEEP && !Q_DEEP && TABS.includes(TAB_DEEP)) ? TAB_DEEP : 'home';
+const SAVED_TAB = (() => { try { const t = sessionStorage.getItem('shell.activeTab'); return TABS.includes(t) ? t : null; } catch { return null; } })();
+const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab
+  : (!DEEP && !CAT_DEEP && !Q_DEEP && TABS.includes(TAB_DEEP)) ? TAB_DEEP
+  : (!DEEP && !CAT_DEEP && !Q_DEEP && SAVED_TAB) ? SAVED_TAB : 'home';
 history.replaceState({ tab: START_TAB, stack: [] }, '', (DEEP || CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname : undefined); // a reload lands on a clean base entry (no sheet), on the same tab
 scrim.addEventListener('click', closeTop);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop(); });
@@ -189,6 +192,7 @@ const scrollPos = {};
 function showTab(tab) {
   const prev = store.get().tab;
   scrollPos[prev] = window.scrollY;
+  try { sessionStorage.setItem('shell.activeTab', tab); } catch {}
   store.set({ tab });
   $$('[data-view]').forEach(v => v.hidden = v.dataset.view !== tab);
   $$('#bottom-nav .nav-item').forEach(b => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
