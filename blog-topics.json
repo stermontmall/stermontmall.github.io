@@ -923,7 +923,9 @@
         "/c/crop-insecticides.html",
         "/c/herbicides.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "drafted": "2026-11-01",
+      "note": "Added a human-written buying guide using verified live category listings; check current stock and details before ordering."
     },
     {
       "slug": "how-to-choose-a-crop-insecticide-kenya",
