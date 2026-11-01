@@ -47,7 +47,10 @@ for (const token of [
   'Structured data presence',
   'Research limitations',
   'draft_markdown: brief',
-  '/auth/v1/user'
+  '/auth/v1/user',
+  'staff?email=ilike.',
+  'Staff access required'
 ]) if (!edge.includes(token)) throw new Error(`Missing SEO research safeguard: ${token}`);
+if (edge.includes('completed_with_errors')) throw new Error('Research run status must match the database status constraint.');
 if (edge.includes('draft_markdown: plain')) throw new Error('SEO Doctor must not label copied page text as a generated draft.');
 console.log('SEO Doctor weighted audit, evidence and draft safeguards passed.');
