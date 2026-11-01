@@ -754,3 +754,7 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Branch fix/products-page-final-a11y-2026-11 adds an explicit labelled submit button to the injected product search form, reserves input space for it, and changes old-price text to #78738d.
 - [ ] Run SEO PR quality gate, merge if green, then verify a fresh Pa11y audit reaches 19/19.
 - [ ] Mobile performance audit from the same Site audit run is still in progress; inspect Unlighthouse report before performance edits.
+
+
+- [x] Expanded the SEO PR gate to syntax-check kili-pages.js and trigger on its changes.
+- [x] Expanded the live Site audit trigger to rerun when kili-pages.js changes, ensuring the exact search/price accessibility fixes are tested.
