@@ -132,7 +132,15 @@ const expected = [
   "haier-90l-single-door-direct-cool-fridge-black-90-litres"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
-const allText = [];
+const allText = [  "abasi-5-ec-50-ml",
+  "abasi-5-ec-100-ml",
+  "abasi-5-ec-250-ml",
+  "abasi-5-ec-500-ml",
+  "alonze-50ec-abamectin-insecticide-25-ml",
+  "alonze-50ec-abamectin-insecticide-50-ml",
+  "alonze-50ec-abamectin-insecticide-100-ml",
+  "alonze-50ec-abamectin-insecticide-250-ml",
+];
 for (const [id, sections] of Object.entries(content)) {
   assert.ok(Array.isArray(sections) && sections.length >= 2, id + ': add at least two useful sections');
   const text = sections.flatMap(s => [s.heading, ...(s.paragraphs || []), ...(s.bullets || [])]).join(' ');
