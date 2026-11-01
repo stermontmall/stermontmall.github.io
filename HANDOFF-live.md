@@ -469,3 +469,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Added vertical/variable steam use, fabric-label checks, tank care and electrical safety guidance for the Ramtons iron.
 - [x] Extended regression test for both pages.
 - [ ] Run full SEO quality gate; merge only on success and verify deployment.
+
+
+## 2026-11-01 — Product content batch 08 (in progress)
+- [x] Reviewed Skyworth 32-inch Eye Care Google TV (~345 words), smartphone gift bundle (~330), and Urban Comfort women's fleece tracksuit (~318).
+- [x] Added placement/streaming/eye-comfort guidance for the TV; exact-model and accessory verification for the phone bundle; fit and fleece-care advice for the tracksuit.
+- [x] Avoided inventing phone specifications, subscription inclusions, TV port counts, tracksuit measurements or accessory performance claims.
+- [x] Extended the content regression test to cover all three pages.
+- [ ] Run quality gate, merge only on pass, and verify generated pages/deployment.
