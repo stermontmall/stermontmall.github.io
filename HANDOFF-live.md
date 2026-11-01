@@ -1,3 +1,10 @@
+## SESSION CHECKPOINT (2026-11-02): Product SEO canonical-route fix
+- [x] Confirmed the Product SEO scan was constructing URLs directly from `products.slug`, which does not always match the product-page generator's route selection and alias redirects.
+- [x] Compared active catalogue rows with `sitemap-products.xml`: 225 active records versus 223 listed URLs; found old/duplicate slug aliases and an example alias page that redirects to a different canonical product ID.
+- [x] Updated Product SEO to reproduce the generator's slug-selection rules (including creation order and ID collisions), follow canonical/meta-refresh redirects, audit only when the final `stm-id` matches the database product, and count genuine duplicate aliases separately from unreachable pages.
+- [x] Bumped `product-seo-optimizer.js` to v6 and added regression assertions for route selection, redirect resolution and alias handling.
+- [ ] Run the full PR quality gate on the final branch head, then perform live browser checks of Product SEO, sitemap scan, Market Research, and approval/rejection before merge.
+
 ## SESSION CHECKPOINT (2026-11-02): complete sitemap submission coverage
 - [x] Confirmed `robots.txt` already advertises four sitemap files, including `/services/sitemap-services.xml`.
 - [x] Found the Google Search Console submission script omitted the service sitemap even though robots.txt advertises it. Added the service sitemap to the daily/on-demand submission list and a regression assertion.
