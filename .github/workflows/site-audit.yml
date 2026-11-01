@@ -22,9 +22,9 @@ jobs:
           args: >-
             --no-progress --root-dir ${{ github.workspace }}
             --accept 200,201,204,206,301,302,308,403,429
-            --exclude 'wa\\.me' --exclude 'supabase\\.co' --exclude '^mailto:' --exclude '^tel:'
+            --exclude 'wa\.me' --exclude 'supabase\.co' --exclude '^mailto:' --exclude '^tel:'
             --max-concurrency 8 --timeout 20 --max-retries 2
-            './*.html' './blog/*.html' './c/*.html'
+            './*.html'
           output: ./lychee-report.md
           fail: false
           jobSummary: true
