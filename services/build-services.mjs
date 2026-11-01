@@ -125,9 +125,9 @@ const hero = ({ eyebrow, h1, lead, priceHtml = '', cta = '', chips = [] }) => `<
 
 const seoGuideTitle = value => {
   const brand = ' | Stermont Arcade', max = 70;
-  let base = String(value || '').replace(/\\s+/g, ' ').trim();
+  let base = String(value || '').replace(/\s+/g, ' ').trim();
   const room = max - brand.length;
-  if (base.length > room) base = base.slice(0, room - 1).replace(/\\s+\\S*$/, '').replace(/[|,:;–-]+$/, '').trim() + '…';
+  if (base.length > room) base = base.slice(0, room - 1).replace(/\s+\S*$/, '').replace(/[|,:;–-]+$/, '').trim() + '…';
   return base + brand;
 };
 
