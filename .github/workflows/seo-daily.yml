@@ -3,6 +3,13 @@
 name: Daily SEO check
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'seo-meta.mjs'
+      - 'seo-meta.test.mjs'
+      - 'generate-products.mjs'
+      - '.github/workflows/seo-daily.yml'
   schedule:
     - cron: '0 6 * * *'
   workflow_dispatch:
@@ -19,6 +26,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Test shared SEO metadata rules
+        run: node seo-meta.test.mjs
       - name: Run the check
         run: node seo-check.mjs > seo-report.md
       - name: Publish the report as an issue
