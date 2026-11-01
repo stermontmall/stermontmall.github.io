@@ -812,3 +812,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Verified deployed version 18 source includes stored-phone lookup and normalized callback/stored phone equality.
 - [ ] Controlled end-to-end sandbox or low-value production payment test still required; no real customer transaction was initiated.
 - [ ] If Safaricom callback omits PhoneNumber metadata, the payment is deliberately held for manual verification rather than marked paid.
+
+
+## SESSION CHECKPOINT (2026-11-01): PR #178 live verification
+- [x] PR #178 merged; primary Pages deployment run 41314402856 completed successfully (build, deploy, report-build-status).
+- [x] The subsequent HANDOFF checkpoint Pages deployment run 41314446021 also completed successfully.
+- [x] Fresh post-merge Site audit 41314403234: Pa11y passed 19/19 sampled pages; Lychee broken-link check passed; on-page technical SEO rules passed.
+- [ ] Unlighthouse performance scan in Site audit 41314403234 was still running at the last check; inspect its final report before making performance claims or optimizing.
+- [x] Supabase `mpesa-callback` version 18 additionally binds callback PhoneNumber to the stored STK request phone, alongside amount equality and receipt validation.
