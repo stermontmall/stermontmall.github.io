@@ -12,16 +12,16 @@ for (const token of [
   'Safety/trust information',
   'Useful FAQ content',
   'Strong booking next step',
-  'Useful internal connections',
+  'Helpful internal connections',
   'Depth without filler',
-  'does not invent claims'
+  'never invents claims'
 ]) if (!src.includes(token)) throw new Error(`Missing content rule: ${token}`);
 const admin = readFileSync('seo-doctor.js', 'utf8');
 for (const token of [
   'Technical Audit & Editorial Review',
   "Prefer:'return=representation'",
   'no proposal row was updated',
-  'This does not publish or change the live page',
+  'does not publish or change live pages',
   'pending editorial review'
 ]) if (!admin.includes(token)) throw new Error(`Missing admin approval safeguard: ${token}`);
 if (admin.includes('queued for the site publishing pipeline')) throw new Error('Do not claim an approval publishes content.');
