@@ -140,6 +140,14 @@ const allText = [  "abasi-5-ec-50-ml",
   "alonze-50ec-abamectin-insecticide-50-ml",
   "alonze-50ec-abamectin-insecticide-100-ml",
   "alonze-50ec-abamectin-insecticide-250-ml",
+  "absolute-375sc-systemic-fungicide-greenlife-50-ml",
+  "absolute-375sc-systemic-fungicide-greenlife-100-ml",
+  "absolute-375sc-systemic-fungicide-greenlife-250-ml",
+  "actellic-50ec-insecticide-100-ml",
+  "actellic-50ec-insecticide-250-ml",
+  "actellic-50ec-insecticide-500-ml",
+  "bedlam-200sl-insecticide-50-ml-2",
+  "bedlam-200sl-insecticide-100-ml",
 ];
 for (const [id, sections] of Object.entries(content)) {
   assert.ok(Array.isArray(sections) && sections.length >= 2, id + ': add at least two useful sections');
