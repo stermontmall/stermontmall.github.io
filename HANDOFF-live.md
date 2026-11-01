@@ -652,3 +652,15 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Replaced repeated blocks with product-specific purchase, variant-check and safe-use guidance, retaining chemical label and veterinary safeguards where relevant.
 - [x] Added a regression assertion that rejects paragraph or bullet reuse across different product pages.
 - [ ] Run regression suite, product-page generation and Kenyan SEO/on-page audit; merge only after all checks pass, then verify deployment.
+
+
+## SESSION CHECKPOINT (2026-11-01): resumed SEO work without owner attachment
+- [x] Recovered the current main-branch handoff and confirmed the latest daily SEO report is GitHub issue #169: 365 pages checked, 65 size-redirect pages skipped, zero reported SEO findings.
+- [x] Confirmed the current main-branch audit covers root pages plus product, category, blog, service and guide HTML; checks titles, descriptions, canonicals, H1s, image alt text, JSON-LD validity, product photos/descriptions/Product schema, internal links and sitemap targets.
+- [x] Confirmed the existing Premise 200 SC generated page has a Kenya-focused title and meta description, canonical URL, index/follow directive, product price metadata, social preview metadata, product image alt text, and label-first buying guidance. No chemical application instructions or unsupported technical specifications were added.
+- [x] Confirmed the generated repository path is `p/premise-200-sc-termiticide-50-ml.html`; the originally shared public URL used a `.htm` suffix. Treat that as a legacy URL/redirect check to verify on the live host, not as proof that the canonical .html page is broken.
+- [x] Confirmed one unrelated open PR (#158) remains; do not merge it as part of SEO work without reviewing its mobile-shell scope and checks.
+- [ ] Next: verify the live legacy .htm URL resolves to the canonical .html page, and verify the live canonical, sitemap entry and structured product data using a browser/Google inspection. Repository audit alone does not prove live-host behaviour or Google indexing.
+- [ ] Search Console and Merchant Center owner reports remain unavailable inside this chat despite the owner's Windsor.ai connection; continue technical work without inventing analytics or feed findings.
+- [ ] Keep product-specific chemical copy label-first; do not add dosage, treatment directions, registration or ingredients unless verified from current approved manufacturer/PCPB documentation.
+- Autosave: this checkpoint is committed directly to main.
