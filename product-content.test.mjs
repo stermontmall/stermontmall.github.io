@@ -137,7 +137,6 @@ const expected = [
   "samsung-galaxy-a06-4gb-ram-64gb",
   "electromate-20l-electric-oven-1500w",
   "electromate-1000w-dry-iron-box-blue-and-white",
-,
   "euroken-50x55-standing-cooker-3-gas-plus-1-electric-with-50l-electric-oven-50x55-cm",
   "ipcone-16-inch-stand-fan-black-adjustable-height-and-tilt",
   "nunix-wld-560-3g1e-3-gas-plus-hot-plate-cooker-with-gas-oven-50x55-cm",
