@@ -185,11 +185,12 @@
 <script src="admin-blog.js?v=1"></script>
 <script src="admin-services.js?v=1"></script>
 <script src="admin-service-media.js?v=1"></script>
+<script src="admin-overview.js?v=1"></script>
 <script>
 (function () {
   var D = document, SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
-  var TABS_OK = ['pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'services', 'media'], TK = 'stm_admin_tab';
-  function savedTab() { try { var t = (location.hash || '').replace('#', '') || localStorage.getItem(TK); return TABS_OK.indexOf(t) > -1 ? t : 'pending'; } catch (e) { return 'pending'; } }
+  var TABS_OK = ['dashboard', 'pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'services', 'media'], TK = 'stm_admin_tab';
+  function savedTab() { try { var t = (location.hash || '').replace('#', '') || localStorage.getItem(TK); return TABS_OK.indexOf(t) > -1 ? t : 'dashboard'; } catch (e) { return 'pending'; } }
   function rememberTab(t) { try { localStorage.setItem(TK, t); history.replaceState(null, '', location.pathname + location.search + '#' + t); } catch (e) {} }
   var sess = null, orders = [], tab = savedTab(), q = '';
   var qs = new URLSearchParams(location.search), want = { ref: qs.get('ref'), action: qs.get('action'), quote: qs.get('quote') };
@@ -270,8 +271,9 @@
 
   function count(s) { return orders.filter(function (o) { return (o.status || 'pending') === s; }).length; }
   var ORDER_TABS = ['pending', 'paid', 'declined', 'all'];
-  var EXTRA = ['stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'services', 'media'];
+  var EXTRA = ['dashboard', 'stock', 'catalog', 'bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'services', 'media'];
   var NAV = [
+    ['Overview', [['dashboard', '🏠', 'Dashboard', 'Private overview of orders, service enquiries and recent business activity']]],
     ['Orders', [['pending', '🕒', 'Pending', 'Orders waiting for payment confirmation'], ['paid', '✅', 'Confirmed', 'Paid orders: packing, delivery and receipts'], ['declined', '🚫', 'Declined', 'Orders that were not paid'], ['all', '📋', 'All orders', 'Every order, newest first']]],
     ['Services', [['quotes', '📨', 'Quote requests', 'Customers asking for a service quote (no payment taken): call, quote, then mark won or lost'], ['services', '🧰', 'Services overview', 'Every service and pest page, demand by service and town, and links to copy'], ['media', '🖼️', 'Service media', 'Upload photos and videos of your work and post them on the service pages']]],
     ['Store', [['catalog', '🛍️', 'Catalog & ledger', 'Products, prices, restocks, COGS, profit and the financial ledger'], ['stock', '📦', 'Stock', 'Switch products in or out of stock'], ['bulk', '📥', 'Bulk import', 'Add many products from a spreadsheet, and attach photos to items that have none']]],
@@ -308,6 +310,7 @@
     var L = $('list'); L.textContent = '';
     $('q').hidden = EXTRA.indexOf(tab) > -1;
     if (window.STMServices && tab !== 'quotes') STMServices.stop();   /* quote list auto-refresh only runs while that tab is open */
+    if (tab === 'dashboard') { if (!window.STMOverview) { L.innerHTML = '<div class="err">The dashboard script did not load. Refresh the page.</div>'; return; } STMOverview.mount(L); return; }
     if (tab === 'quotes' || tab === 'services') { if (!window.STMServices) { L.innerHTML = '<div class="err">The services script did not load. Refresh the page (Ctrl+F5).</div>'; return; } var dq = want.quote; want.quote = null; STMServices.mount(L, tab, dq); return; }
     if (tab === 'media') { if (!window.STMServiceMedia) { L.innerHTML = '<div class="err">The media script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMServiceMedia.mount(L); return; }
     if (tab === 'sales' || tab === 'mpesa' || tab === 'searches') { if (!window.STMInsights) { L.innerHTML = '<div class="err">The insights script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMInsights.mount(L, tab); return; }
