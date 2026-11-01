@@ -39,6 +39,12 @@ for (const name of names) for (const ctx of ctxs) {
   assert.ok(hasLeadWord(name) || (MOD.test(t) && MOD.test(h)), `title/H1 lacks a modifier: ${t} | ${h}`); n += 2;
   assert.ok(isGenuine(ctx) || !/^Buy Original\b/.test(h) || /^Original\b/i.test(name), `Original claimed where not true: ${h}`);
 }
+const specific = pdpDescription('Sample Product', { catSlug: 'smartphones' }, 'Designed for use on suitable surfaces. Check the label and follow the supplied instructions.');
+assert.ok(specific.length <= DESC_MAX && specific.includes('Designed for use'), `catalogue detail missing: ${specific}`);
+assert.ok(specific.includes('M-Pesa') && specific.includes('47 counties'), `Kenya purchase context missing: ${specific}`);
+assert.notEqual(specific, pdpDescription('Sample Product', { catSlug: 'smartphones' }), 'product-specific copy should differ from generic fallback');
+n += 4;
+
 for (const [c, slug] of cats) {
   const t = catTitle(c), d = catDescription(c, slug); n += 2;
   assert.ok(t.length <= TITLE_MAX, `cat title ${t.length}: ${t}`);

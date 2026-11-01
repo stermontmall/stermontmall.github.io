@@ -109,8 +109,26 @@ export function pdpTitle(name, ctx = {}) {
 
 // PDP meta description, max 155 characters.
 //   "Buy 100% genuine & high-potency <name> in Kenya at Stermont Arcade. Fast M-Pesa checkout, Sarit Centre Westlands pickup, or countrywide delivery."
-export function pdpDescription(name, ctx = {}) {
+export function pdpDescription(name, ctx = {}, productDescription = '') {
   const n = String(name || '').replace(/\s+/g, ' ').trim();
+  // Prefer one factual, product-specific sentence from the catalogue over repeating the same generic snippet on every PDP.
+  // Strip markup before extracting; the original description remains visible on the page and in Product JSON-LD.
+  const source = String(productDescription || '').replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'").replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
+    .replace(/[•▪●]/g, ' ').replace(/\s+/g, ' ').trim();
+  const first = (source.match(/^.*?[.!?](?=\s|$)/) || [source])[0].trim();
+  const fact = first.length >= 28 && first.length <= 260 ? first : source;
+  const prefix = `Buy ${n} in Kenya: `;
+  const suffix = '. Pay by M-Pesa; delivery to 47 counties.';
+  const room = DESC_MAX - prefix.length - suffix.length;
+  if (fact.length >= 28 && room >= 24) {
+    const candidate = prefix + clip(fact, room) + suffix;
+    if (candidate.length <= DESC_MAX) return candidate;
+  }
+
+  // Short/empty catalogue descriptions fall back to the established Kenya-specific wording.
   const desc = DESCRIPTOR[productType(ctx.catSlug)];
   const gen = isGenuine(ctx) ? `100% genuine & ${desc} ` : `${desc} `;
   const tiers = [

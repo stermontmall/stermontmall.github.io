@@ -253,3 +253,12 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - Phone checks: open stermontarcade.co.ke twice (service worker), Categories refresh stays on Categories, Account > Shipping, category link opens the shell, WhatsApp preview, one real small checkout, login once.
 - Label data the catalog lacks: batch 07 (Mchwatox, Actellic 25EC, Grain-Save, fogger), batch 08 (Air Chopper, Darvin 50EW, Bat CRP, Tatua Demand 10CS), agro batches 01-04. Read the 16 blogs of batches 07 and 08 once.
 - Decisions: "Best Price in Kenya" wording, fertilizer-page safety box, Search Console watch for "Page with redirect", Cloudflare headers if proxied.
+
+
+## 2026-11-01 — Kenya product SEO scalability (branch `seo-kenya-product-descriptions`)
+- [x] Audited the product-page SEO pipeline: `generate-products.mjs` builds every PDP from the live Supabase catalogue; `seo-meta.mjs` generates product metadata; `seo-overrides.mjs` and `seo-titles.mjs` apply approved owner mappings; `.github/workflows/product-pages.yml` rebuilds every 3 hours and after SEO generator changes.
+- [x] Identified a catalogue-wide weakness: product meta descriptions mostly repeated generic checkout/delivery wording instead of using each item's own factual catalogue description.
+- [x] Updated the shared SEO description builder to prefer a short factual sentence from the product's existing description, then append Kenya purchase context (M-Pesa and delivery to 47 counties). Short or missing descriptions keep the established fallback.
+- [x] Wired the live product generator to pass each product's existing description into the shared SEO function; added regression checks for length, factual detail and Kenyan purchase context.
+- [ ] Run the Node test suite and review generated sample pages before merging. After merge, the product-pages workflow will rebuild catalogue pages.
+- [ ] Remaining audit: duplicate/thin product descriptions, image alt text, Product schema, category assignment, internal links and owner SEO mapping coverage. This is not yet a claim that every catalogue item has been individually reviewed.
