@@ -22,8 +22,7 @@ function resolve({ search = '', saved = null, historyState = null } = {}) {
     sessionStorage: { getItem: key => key === 'shell.activeTab' ? saved : null },
     history: { state: historyState },
   };
-  vm.runInNewContext(productionBlock, context);
-  return context.START_TAB;
+  return vm.runInNewContext(productionBlock + '\\nSTART_TAB', context);
 }
 
 assert.equal(resolve(), 'home', 'fresh visits start on Home');
