@@ -923,7 +923,8 @@
         "/c/crop-insecticides.html",
         "/c/herbicides.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "note": "Hand-written article added on seo/content-quality-expansion-2026-11; review before merge."
     },
     {
       "slug": "how-to-choose-a-crop-insecticide-kenya",

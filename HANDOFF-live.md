@@ -1,3 +1,56 @@
+## SESSION CHECKPOINT (2026-11-01): product content and sprayer guide
+- [x] Continued the content-quality branch `seo/content-quality-expansion-2026-11`; no changes published to the live site.
+- [x] Added category-aware product buying guidance in `generate-products.mjs` for PCPB-regulated pest/crop products, phones/tablets, computing, TVs/audio, appliances, sprayers and farm inputs. The guidance tells shoppers what to verify and avoids invented product specs, warranty claims, certifications and chemical rates.
+- [x] Added a safe fallback description for catalogue items whose supplied description is missing or shorter than 100 characters; existing descriptions of 100+ characters are preserved.
+- [x] Improved category-page ordering context (M-Pesa, nationwide delivery, Sarit Centre pickup; delivery fees confirmed before payment).
+- [x] Added `blog/how-to-choose-a-knapsack-sprayer-kenya.html` (about 800 words), internal links to verified sprayer listings, FAQ/Article/Breadcrumb JSON-LD, canonical URL and a short Kiswahili summary.
+- [x] Added the article to `blog/index.html` and marked its topic as drafted in `blog-topics.json`.
+- [x] Open PR #119: https://github.com/stermontmall/stermontmall.github.io/pull/119
+- [x] Confirmed all new article internal links exist in the repository.
+- [ ] Wait for latest PR #119 SEO quality gate (run 41288942916) to finish; inspect its full audit artifact and fix any issues introduced by this work.
+- [ ] After review/merge, allow product-pages workflow to rebuild product/category pages from live catalogue; allow blog-build workflow to update blog index and sitemap; verify Pages deploy and daily SEO audit.
+- [ ] Product-specific specifications still need supplier/catalogue verification. Do not fabricate missing RAM/storage, dimensions, warranties, ingredients, PCPB registration, stock or pricing.
+- Autosave: this checkpoint is committed on the feature branch. Live website remains unchanged until PR review and merge.
+
+---
+
+## FINAL CI RESULT (2026-11-01): PR #119 production-equivalent audit
+- [x] Updated the PR quality gate to rebuild blog titles/index/sitemap, regenerate product and category pages from the public live catalogue, run the same SEO enrichment passes as production, and then audit the generated output.
+- [x] Final PR #119 run 41287720738 completed successfully: JS syntax, metadata tests, blog rebuild, product/category generation, SEO enrichment and on-page audit all passed.
+- [x] Inspected final audit artifact: 365 pages checked, 65 size-redirect pages skipped, zero findings.
+- [ ] Human review required before merge/publish; verify the sprayer article's editorial accuracy and current catalogue listings.
+- [ ] Owner to provide approved manufacturer/supplier specifications for blank product descriptions before actual catalogue descriptions can be filled.
+- [ ] After approval and merge, confirm product-page rebuild, blog index/sitemap, Pages deployment, Search Console indexing and Merchant Center status.
+- Autosave: final validation checkpoint saved on the working branch.
+
+---
+
+## VALIDATION UPDATE (2026-11-01): content expansion PR #119
+- [x] PR #119 SEO quality gate passed: JavaScript syntax checks and product/category SEO metadata tests passed.
+- [x] Full SEO audit artifact reviewed: 365 pages checked, 65 size-redirect pages skipped, zero findings.
+- [x] Product page changes are additive buying guidance only; no catalogue prices, stock, payment, checkout or customer records changed.
+- [x] New sprayer guide is over the audit's thin-content threshold and includes links to live product/category pages, FAQs and Article/Breadcrumb/FAQ structured data.
+- [ ] PR #119 remains open for owner review before publishing; after merge confirm blog index/sitemap rebuild, product page rebuild and Pages deployment.
+- [ ] Continue filling blank product-description fields only from owner-approved supplier/manufacturer data; some currently listed sprayers have no description in the source catalogue.
+- Note: a main-branch Pages deployment attempt for a handoff-only commit was rejected because an earlier deployment was still in progress; the earlier Pages deployment completed successfully. This was a deployment concurrency conflict, not a site build failure.
+- Autosave: validation results saved here.
+
+---
+
+## SEO, BLOG AND PRODUCT-CONTENT EXPANSION (2026-11-01)
+Status: IMPLEMENTED ON `seo/content-quality-expansion-2026-11`; PR validation pending.
+- [x] Added category-specific buying checklists to generated product pages for pesticides, farm inputs, phones, computers, TVs/audio, appliances and sprayers. Guidance is explicit about confirming missing specifications and does not invent technical claims.
+- [x] Removed duplicated M-Pesa / 47-counties boilerplate from generated category intros and separated a concise ordering/delivery note.
+- [x] Added a new Kenya knapsack sprayer buying guide with a comparison table, safe equipment-selection guidance, FAQs, Article/Breadcrumb/FAQ structured data and links to the current verified sprayer listings.
+- [x] Marked the matching blog queue topic as drafted to prevent duplicate AI generation.
+- [ ] Run the SEO pull-request quality gate: JS syntax, SEO metadata tests, full page audit; inspect the audit artifact.
+- [ ] After merge, allow the blog index/sitemap and product-page workflows to rebuild, then confirm Pages deployment and live URLs.
+- [ ] Product database descriptions remain incomplete for some SKUs (e.g. the currently listed hand sprayer and several knapsack models have no catalogue description in their generated pages). Do not invent model specs, ingredient claims, warranty, certifications, prices or stock. To fully populate those fields, obtain an owner-approved supplier catalogue / manufacturer datasheets / product photos and update the catalogue through its authorised admin import process.
+- [ ] Search Console performance/indexing and Merchant Center diagnostics still require owner-side access; no ranking position is guaranteed.
+- [x] Autosave: this handoff checkpoint is committed on the working branch; continue updating after CI and review.
+
+---
+
 ## SESSION UPDATE (2026-11-01): previous SEO PR reconciled
 - [x] Inspected PR #115 against current main file-by-file. All 21 page/content and blog-title-normalizer changes were already present on main; remaining differences in seo-check.mjs and seo-daily.yml were newer main improvements, not missing changes.
 - [x] Closed PR #115 as superseded and documented the reason in its conversation: https://github.com/stermontmall/stermontmall.github.io/pull/115
