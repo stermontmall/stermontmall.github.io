@@ -12,6 +12,9 @@ on:
       - '.github/workflows/site-audit.yml'
       - '.pa11yci.json'
       - 'seo-analyzer-run.mjs'
+      - 'index.html'
+      - 'shell-chrome.js'
+      - 'blog/**'
 
 permissions:
   contents: read
