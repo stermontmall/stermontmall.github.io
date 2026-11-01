@@ -1,3 +1,10 @@
+## SESSION CHECKPOINT (2026-11-02): SEO admin reliability investigation
+- [x] Confirmed Supabase product catalogue endpoint returns HTTP 200 and 225 active products are present; proposal queue GET also returns HTTP 200.
+- [x] Identified approval failures in Supabase logs: PATCH returned HTTP 409 because the unique constraint `(target_type, target_slug, status)` blocks a new proposal from becoming approved when an older approved proposal exists for the same target.
+- [x] Deployed `seo-review` Edge Function v2 to safely supersede an older decision before applying a new approve/reject decision, with rollback if the new update fails. Front-end wiring and verification are in progress.
+- [x] Confirmed sitemap scanner only read `/sitemap.xml`, silently swallowed sitemap errors, and missed separate product/image/service sitemaps. Scanner expansion and diagnostics are in progress.
+- [ ] Verify approval against the duplicate-status case, full sitemap discovery, Product SEO scan, Market Research dashboard, browser runtime and GitHub Pages deployment before merging.
+
 ## SESSION CHECKPOINT (2026-11-01 16:50 Africa/Nairobi): post-merge workflow check + shell tests (claude.ai chat, GitHub + Supabase connected)
 Owner: "Fix and autosave on handoff. Merged/commit directly. Check handoff for pending task."
 - [x] Actions after PR #168 (a5f1615): `Site audit` run 41310351456 on main FAILED only in "Accessibility (Pa11y, sampled safe routes)" (exit 2 = real findings, most likely on the 8 pages #168 added to `.pa11yci.json`: appliances category, 4 product pages, 4 blog posts). On-page rules, Lychee broken links, Lighthouse performance: passed. `pages build and deployment`, Uptime monitor, SEO PR gates for #170/#171: passed (one Pages run was cancelled by a newer push, normal).
