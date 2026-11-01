@@ -14,7 +14,7 @@ const files = d => {
 };
 // Cover the full public HTML surface, not only product/category/blog pages.
 // Admin and upload tools are excluded; account pages are private/noindex and not ranking targets.
-const rootPages = readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|upload-photos|builder)/.test(f));
+const rootPages = readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|upload-photos|builder|google)/.test(f));
 const pages = [...new Set([...rootPages, ...['p','c','blog','services','guides'].flatMap(files)])].filter(existsSync);
 const unesc = t => String(t).replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');   // measure what Google sees, not the escaped HTML
 const exists = path => { path = decodeURIComponent(path.split('#')[0].split('?')[0]); if (!path || path === '/') path = '/index.html'; if (path.endsWith('/')) path += 'index.html'; return existsSync('.' + path); };
@@ -22,6 +22,7 @@ let redirects = 0, checked = 0;
 
 for (const f of pages) {
   const h = readFileSync(f, 'utf8');
+  if (/<meta\s+name=["']robots["']\s+content=["'][^"']*noindex/i.test(h)) continue; // private, utility and error pages are intentionally excluded from indexing
   if (/http-equiv="refresh"/i.test(h)) { redirects++; continue; }   // size-variant redirect pages
   checked++;
   const title = unesc((h.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || '');

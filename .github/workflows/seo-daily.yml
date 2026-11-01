@@ -9,6 +9,9 @@ on:
       - 'seo-meta.mjs'
       - 'seo-meta.test.mjs'
       - 'generate-products.mjs'
+      - 'blog/**'
+      - 'guides/**'
+      - '*.html'
       - '.github/workflows/seo-daily.yml'
   schedule:
     - cron: '0 6 * * *'

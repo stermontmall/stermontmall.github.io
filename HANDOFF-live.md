@@ -1,3 +1,20 @@
+## SEO AUDIT FIX CHECKPOINT (2026-11-01): resolve daily report findings
+Status: IN PROGRESS on `fix/seo-audit-findings-nov-2026`; PR to follow.
+- [x] Reviewed the live daily audit report: 370 pages checked, 65 size redirects skipped, 39 findings.
+- [x] Shortened 15 specifically listed blog page titles and aligned their Open Graph/Twitter titles. Titles retain the topic and Stermont Arcade brand.
+- [x] Excluded intentionally noindex utility/private pages from SEO checks and excluded the Google verification file from root-page crawling.
+- [x] Changed the dynamic product preview modal heading from H1 to H2; the homepage had a hidden modal H1 falsely counted as a second page H1.
+- [x] Removed a stale product URL from the seed-price guide where no corresponding generated product page exists.
+- [x] Shortened long meta descriptions on bulk quote and Nairobi landing pages.
+- [x] Expanded daily SEO audit triggers to public blog, guide and root HTML edits.
+- [x] Added a reusable blog-title normalizer and connected it to the blog rebuild workflow; future long blog titles are automatically shortened before index/sitemap refresh.
+- [ ] Run the updated audit, inspect remaining title and link issues, and fix verified findings.
+- [ ] Check live deployment, Search Console and Merchant Center; Search Console credentials remain owner-side.
+- Product import note: admin already includes CSV bulk import with photos, prices, stock, pack sizes and descriptions. It is not connected to a supplier feed; fully automatic sourcing requires an approved supplier feed/API and matching SKU/price/stock rules. Do not auto-publish unverified catalogue claims.
+- Autosave: update this handoff after each batch.
+
+---
+
 ## SEO AUTOMATION CHECKPOINT (2026-11-01): regression tests run before product rebuilds
 Status: IMPLEMENTED on `chore/seo-regression-tests-autosave`; PR to follow.
 - [x] Confirmed the product-page workflow after PR #107: product generation, Kenya SEO enrichment, owner title overrides, mobile crawler handling, and saving generated pages all completed successfully. IndexNow notification was still running at last check; deployment/indexing is not inferred from that run.
