@@ -3,7 +3,7 @@
 // Runs automatically on GitHub (see .github/workflows/product-pages.yml). No installs needed (Node 18+).
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
+import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -393,7 +393,7 @@ for (const p of products) {
     '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.id), category: cat?.name,
     brand: { '@type': 'Brand', name: brandOf(p.name) },
-    offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(p.price) || 0)),
+    offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: String(Math.round(Number(p.price) || 0)),
       availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
       seller: { '@type': 'Organization', name: BRAND } },
     ...rLd
@@ -416,7 +416,7 @@ for (const p of products) {
   });
   const ld = (p.variants ? ldGroup : ldOne) + productFaqLd + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
-    const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${SITE}${path}`)}`;
+    const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${pdpVariantUrl(path, v.slug, p.slug)}`)}`;
     return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
   // Local-utility sections (H2s): what it is used for, price and M-Pesa ordering, delivery and Sarit Centre pickup. Facts match shipping.html and nairobi.html.
   const nameE = esc(p.name), priceTxt = `${p.variants ? 'from ' : ''}${money(p.price)}${p.unit ? ' / ' + esc(p.unit) : ''}`;
