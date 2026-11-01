@@ -89,7 +89,17 @@ const expected = [
   "popvet-total-dog-dewormer-4-tablets",
   "ranger-480ec-insecticide-1-litre",
   "rootex-6-rooting-hormone-50-g",
-  "poultry-dust-insecticide-powder-200-g"
+  "poultry-dust-insecticide-powder-200-g",
+  "jambo-clean-foliar-fertilizer-1-litre",
+  "indoking-300sc-insecticide-1-litre",
+  "k-othrine-wg-250-insecticide-20-g",
+  "icon-10cs-mosquito-insecticide-62-5-ml",
+  "jembe-star-500sl-herbicide-1-litre",
+  "kingcode-elite-50ec-insecticide-1-litre",
+  "infinito-sc-687-5-fungicide-500-ml",
+  "kerol-disinfectant-fluid-1-litre",
+  "bat-crp-bat-repellent-1-litre",
+  "maxigrow-zinc-and-boron-1-litre"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];

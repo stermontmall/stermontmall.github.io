@@ -576,3 +576,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Veterinary medicine and poultry-treatment copy requires label/veterinary confirmation and avoids dosage or treatment schedules; pesticide copy remains label-first and safety-focused.
 - [x] Extended regression coverage from 77 to 87 product IDs; validated word limits, distinct plain text, safety and unsupported-claim guardrails.
 - [ ] Run full SEO PR gate and generated-page audit; merge only if successful and verify deployment.
+
+
+## 2026-11-01 — Product content batch 18
+- [x] Added two distinct sections for Jambo Clean foliar fertilizer, Indoking 300SC, K-Othrine WG 250, Icon 10CS, Jembe Star 500SL, Kingcode Elite 50EC, Infinito SC 687.5, Kerol disinfectant, Bat CRP bat repellent and Maxigrow Zinc & Boron.
+- [x] Added label-first crop protection, nutrient-analysis checks, disinfectant handling, and humane bat-exclusion guidance; no pesticide rates or unsupported performance guarantees added.
+- [x] Extended regression coverage from 87 to 97 product IDs; checked word limits, distinct plain text, safety and unsupported-claim guardrails.
+- [ ] Run full SEO PR quality gate and generated-page audit; merge only on success and verify deployment.
