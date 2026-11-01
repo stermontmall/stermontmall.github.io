@@ -1,3 +1,10 @@
+## AUDIT COVERAGE CHECKPOINT (2026-11-01)
+- [x] Services build workflow succeeded on the service-title fix branch; it regenerated the affected service guide pages.
+- [x] Added `services/**` to daily SEO audit triggers so future service and guide edits are checked automatically.
+- [ ] Confirm the post-merge daily audit report and resolve any remaining findings.
+
+---
+
 ## SERVICE GUIDE TITLE CHECKPOINT (2026-11-01)
 Status: IN PROGRESS on `fix/service-guide-seo-titles`; PR to follow.
 - [x] After PR #110 merged, the updated daily SEO audit passed and reduced findings from 39 to 8 across 363 indexable pages (65 size redirects skipped).
