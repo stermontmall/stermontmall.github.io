@@ -109,7 +109,17 @@ const expected = [
   "navigator-100-sc-insecticide-1-litre",
   "livergen-plus-poultry-liver-tonic-500-ml",
   "milestone-extreme-390-sc-fungicide-1-litre",
-  "digester-supper-69-ew-herbicide-5-litres"
+  "digester-supper-69-ew-herbicide-5-litres",
+  "compliant-560-sc-fungicide-1-litre",
+  "biodistinction-extra-700-sc-copper-fertilizer-1-litre",
+  "commander-240-ec-herbicide-1-litre",
+  "bazooka-18-ec-insecticide-1-litre",
+  "beanpro-480-sl-herbicide-1-litre",
+  "cropgrow-super-gel-suspension-fertilizer-250-ml",
+  "albafas-10-albendazole-drench-500-ml",
+  "catapult-480-sl-herbicide-1-litre",
+  "chariot-500-sc-fungicide-1-litre",
+  "bradley-500-sc-fungicide-1-litre"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
