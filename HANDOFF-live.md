@@ -758,3 +758,15 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 
 - [x] Expanded the SEO PR gate to syntax-check kili-pages.js and trigger on its changes.
 - [x] Expanded the live Site audit trigger to rerun when kili-pages.js changes, ensuring the exact search/price accessibility fixes are tested.
+
+
+## SESSION CHECKPOINT (2026-11-01): PR #176 merged — sampled accessibility repair
+- [x] PR #176 passed SEO pull-request quality gate run 41313477999 (mobile-shell browser tests, JS syntax including kili-pages.js, SEO metadata, product content, blog/sitemap generation, product/category generation, enrichment and full on-page SEO audit).
+- [x] Squash-merged PR #176 to main: 59606c4f34924b3af4cefbb8cff8bcb6bef13685.
+- [x] Added accessible Search submit control to the dynamically injected products page search, reserved input space for the button, and darkened crossed-out old-price text from #8b86a0 to #78738d.
+- [x] SEO PR quality gate and Site audit triggers now include kili-pages.js changes.
+- [ ] Post-merge GitHub Pages deployment run 41313665222 and fresh Site audit run 41313665721 queued; inspect results before declaring deployed/accessibility pass.
+- [ ] Earlier Site audit for previous main revision had Pa11y 18/19 and performance still running; this is pre-PR #176 evidence, not current result.
+- [ ] Mobile performance optimization, Google Search Console not-indexed URL investigation, Merchant Center account diagnostics, Supabase privileged-function review, and M-Pesa callback/amount validation remain outstanding.
+- [ ] No live checkout/payment tests or live credential changes performed.
+- Autosave: this checkpoint committed directly to main.
