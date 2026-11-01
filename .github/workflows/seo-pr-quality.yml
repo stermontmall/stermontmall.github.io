@@ -6,6 +6,7 @@ on:
     paths:
       - 'seo-*.mjs'
       - 'generate-products.mjs'
+      - 'kili-pages.js'
       - 'product-content.json'
       - 'product-content.test.mjs'
       - 'data-health.mjs'
@@ -55,6 +56,7 @@ jobs:
           node --check data-health.mjs
           node --check blog-write.mjs
           node --check generate-products.mjs
+          node --check kili-pages.js
           node --check product-content.test.mjs
           node --check seo-meta.mjs
       - name: Test product and category SEO metadata

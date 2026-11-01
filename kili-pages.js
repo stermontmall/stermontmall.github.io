@@ -22,7 +22,8 @@
     st.textContent =
       'header{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}' +
       '.kp-s{position:relative;flex:1 1 100%}@media(min-width:720px){.kp-s{flex:1 1 340px;max-width:520px;margin-left:auto}}' +
-      '.kp-s input{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;border:0;border-radius:999px;padding:.55rem 1rem;color:#1f1b2e;background:#fff}' +
+      '.kp-s input{width:100%;box-sizing:border-box;font:inherit;font-size:1rem;border:0;border-radius:999px;padding:.55rem 3.6rem .55rem 1rem;color:#1f1b2e;background:#fff}' +
+      '.kp-s button{position:absolute;right:4px;top:4px;bottom:4px;min-width:48px;border:0;border-radius:999px;padding:0 .7rem;background:#5b21b6;color:#fff;font:700 .85rem system-ui,sans-serif;cursor:pointer}' +
       '.kp-dd{position:absolute;left:0;right:0;top:calc(100% + .35rem);background:#fff;color:#1f1b2e;border-radius:14px;box-shadow:0 12px 32px rgba(31,27,46,.28);max-height:65vh;overflow-y:auto;z-index:70}.kp-dd[hidden]{display:none}' +
       '.kp-dd a{display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;color:#1f1b2e;text-decoration:none;font-weight:600;font-size:.92rem;border-bottom:1px solid #f0ecfa}' +
       '.kp-dd img{width:44px;height:44px;object-fit:contain;background:#fff;border-radius:8px;flex:none}.kp-dd small{display:block;color:#5b21b6;font-weight:800}.kp-dd p{margin:0;padding:.8rem;font-size:.92rem}' +
@@ -34,7 +35,7 @@
       'ul.g li{position:relative}' +
       '.kp-b{position:absolute;top:.6rem;left:.6rem;z-index:2;background:#dc2626;color:#fff;font-weight:800;font-size:.72rem;border-radius:999px;padding:.18rem .5rem;box-shadow:0 2px 6px rgba(220,38,38,.35)}' +
       '.kp-so img{opacity:.5}.kp-so .kp-b{background:#6b6b80;box-shadow:none}' +
-      '.kp-old{color:#8b86a0;font-size:.8rem;font-weight:500;margin-left:.35rem}' +
+      '.kp-old{color:#78738d;font-size:.8rem;font-weight:500;margin-left:.35rem}' +
       '.kp-th{display:flex;gap:.5rem;overflow-x:auto;margin-top:.6rem;padding-bottom:.2rem;scrollbar-width:none}.kp-th::-webkit-scrollbar{display:none}' +
       '.kp-th button{flex:none;width:62px;height:62px;padding:0;border:2px solid transparent;border-radius:10px;background:#fff;cursor:pointer;overflow:hidden}.kp-th button.on{border-color:#7c3aed}' +
       '.kp-th img{width:100%!important;height:100%!important;max-height:none!important;border:0!important;border-radius:8px!important;object-fit:cover!important}' +
@@ -46,7 +47,8 @@
     if (hd) {
       var form = el('form', 'kp-s'); form.setAttribute('role', 'search'); form.action = '/products.html';
       inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search products'; inp.autocomplete = 'off'; inp.setAttribute('aria-label', 'Search products');
-      dd = el('div', 'kp-dd'); dd.hidden = true; form.appendChild(inp); form.appendChild(dd); hd.appendChild(form);
+      var submit = el('button', '', 'Search'); submit.type = 'submit'; submit.setAttribute('aria-label', 'Submit product search');
+      dd = el('div', 'kp-dd'); dd.hidden = true; form.appendChild(inp); form.appendChild(submit); form.appendChild(dd); hd.appendChild(form);
       var tm = null, last = '';
       var render = function (rows, q) {
         dd.textContent = ''; var seen = {}, n = 0;
