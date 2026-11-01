@@ -1,3 +1,17 @@
+## SESSION CHECKPOINT (2026-11-01): handoff review and mobile tab reload fix
+
+- [x] Recovered the current project handoff and checked the open pull requests, recent merged content batches, the mobile shell implementation, and the recorded outstanding tasks.
+- [x] Confirmed product-content PRs #119, #121 and #124 are merged. PR #124's latest recorded quality gate passed (run 41290555091); the earlier "still open" notes for #119/#124 are stale.
+- [x] Confirmed the current daily SEO report #122 reports 365 pages checked, 65 size-redirect pages skipped and no findings. Separate Google indexing report #123 still lists 14 URLs not indexed; Google Search Console request-indexing and editorial review remain owner-side.
+- [x] Found the recorded mobile-shell defect: reload on Categories can lose the selected tab when the browser does not preserve history.state.
+- [x] Created branch `fix/mobile-shell-tab-reload-2026-11` and PR #149: https://github.com/stermontmall/stermontmall.github.io/pull/149. It persists the selected tab in sessionStorage as a fallback, preserves explicit deep-link precedence, bumps the app script URL to v=14 and service-worker cache to v5, and strengthens the regression test by clearing history.state before reload.
+- [ ] PR #149 requires its mobile-shell test suite and review before merge; no production deployment has been made.
+- [ ] PR #57 (SEO title/H1 modifiers) and PR #6 (admin catalog session renewal/timeout) remain open and have no review threads. Do not merge blindly: #57 was authored against older SEO code and needs reconciliation with current main; #6 has only fixture testing and explicitly lacks live-browser verification.
+- [ ] Remaining owner-only tasks: real-phone checkout and tab checks; owner review of batch 07/08 blogs; supply missing manufacturer/label data; Search Console indexing requests; confirm wording and safety-box decisions. Do not fabricate product specifications or perform live customer checkout.
+- Autosave: mobile-tab fix is committed on its feature branch; this checkpoint is committed directly to main.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-01): product content batch 02
 
 - [x] PR #121 merged: model-specific buying guidance for Hisense 55A6QKEN TV, REF205DR fridge and HMC6MBK pressure cooker.
