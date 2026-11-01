@@ -34,7 +34,10 @@ const expected = [
   "hisense-7-5kg-twin-tub-washing-machine-wsqb753w-7-5-kg",
   "glamstar-20l-manual-microwave-oven-black-20-litres",
   "ailyons-5l-electric-pressure-cooker-900w-10-preset-menus",
-  "ailyons-2-2l-electric-kettle-luxury-dark-purple"
+  "ailyons-2-2l-electric-kettle-luxury-dark-purple",
+  "von-138l-direct-cool-double-door-fridge-silver-138-litres",
+  "ipcone-16-inch-wall-mounted-fan-black-3-speed-control",
+  "ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
