@@ -144,4 +144,14 @@ for (const [id, sections] of Object.entries(content)) {
   allText.push(text.toLowerCase());
 }
 assert.equal(new Set(allText).size, allText.length, 'Product content must be distinct for every product');
+// Paragraphs and bullets must not be recycled between different product pages.
+const reusableText = new Map();
+for (const [id, sections] of Object.entries(content)) {
+  for (const section of sections) for (const value of [...(section.paragraphs || []), ...(section.bullets || [])]) {
+    const key = value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\\s+/g, ' ');
+    const previous = reusableText.get(key);
+    assert.ok(!previous || previous === id, id + ': repeated paragraph or bullet also appears on ' + previous);
+    reusableText.set(key, id);
+  }
+}
 console.log('OK: ' + Object.keys(content).length + ' product content entries; model-specific sections validated.');

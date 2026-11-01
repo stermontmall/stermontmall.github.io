@@ -605,3 +605,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Crop insecticide copy remains label-first; appliance content covers compatibility, installation, electrical/gas safety and care; drinkware content covers cleaning and safe use.
 - [x] Extended regression coverage from 117 to 127 IDs (10 new canonical product entries; existing Ramtons entry retained); checked word limits, unique copy, plain-text safety and unsupported-claim guardrails.
 - [ ] Run full SEO PR gate and generated-page audit; merge only on success and verify deployment.
+
+
+## 2026-11-01 — Product copy uniqueness repair (in progress)
+- [x] Audited all existing supplementary product paragraphs and bullets across 127 content entries; found repeated blocks shared by multiple unrelated products.
+- [x] Replaced repeated blocks with product-specific purchase, variant-check and safe-use guidance, retaining chemical label and veterinary safeguards where relevant.
+- [x] Added a regression assertion that rejects paragraph or bullet reuse across different product pages.
+- [ ] Run regression suite, product-page generation and Kenyan SEO/on-page audit; merge only after all checks pass, then verify deployment.
