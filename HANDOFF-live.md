@@ -598,3 +598,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Veterinary drench content requires label and veterinary confirmation and avoids dosage instructions; crop-input content covers crop/animal suitability, storage, drift and resistance safeguards without inventing rates.
 - [x] Extended regression coverage from 107 to 117 IDs; checked word limits, distinct text, plain-text safety and unsupported-claim guardrails.
 - [ ] Run full SEO PR gate and generated-page audit; merge only on success and verify deployment.
+
+
+## 2026-11-01 — Product content batch 21
+- [x] Added new buyer-guidance sections for Amito 5.7WDG, Ampligo 150ZC, Skilltech 44T TV mount, LG LHD657 home theatre, Habei Bear bottle set, Euroken mixed-fuel cooker, VON twin-tub washer, VIC 20000mAh power bank, Smart Raha Life drinkware set and Haier 90L fridge; refreshed the existing Ramtons steam-iron guidance.
+- [x] Crop insecticide copy remains label-first; appliance content covers compatibility, installation, electrical/gas safety and care; drinkware content covers cleaning and safe use.
+- [x] Extended regression coverage from 117 to 127 IDs (10 new canonical product entries; existing Ramtons entry retained); checked word limits, unique copy, plain-text safety and unsupported-claim guardrails.
+- [ ] Run full SEO PR gate and generated-page audit; merge only on success and verify deployment.
