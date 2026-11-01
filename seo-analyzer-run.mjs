@@ -2,11 +2,15 @@
 // Called by .github/workflows/site-audit.yml (the workflow installs seo-analyzer first). Never fails the build: it only reports.
 import { readdirSync, existsSync, appendFileSync } from 'node:fs';
 
-const dir = d => (existsSync(d) ? readdirSync(d).filter(f => f.endsWith('.html')).map(f => `${d}/${f}`) : []);
-const files = [
-  ...readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|account|track|404|upload-photos|google|builder)/.test(f)),
-  ...dir('c'), ...dir('blog'),
-];
+const dir = d => {
+  if (!existsSync(d)) return [];
+  return readdirSync(d, { withFileTypes: true }).flatMap(entry => {
+    const path = `${d}/${entry.name}`;
+    return entry.isDirectory() ? dir(path) : (entry.isFile() && entry.name.endsWith('.html') ? [path] : []);
+  });
+};
+const rootPages = readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|account|track|404|upload-photos|google|builder)/.test(f));
+const files = [...new Set([...rootPages, ...['p','c','blog','services','guides'].flatMap(dir)])];
 
 try {
   const { default: SeoAnalyzer } = await import('seo-analyzer');
