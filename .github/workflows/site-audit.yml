@@ -82,6 +82,7 @@ jobs:
               out += '\\n### ' + u + ' (' + issues.length + ')\\n' + issues.slice(0, 8).map(i => '- ' + i.message + ' \`' + (i.selector || '').slice(0, 80) + '\`').join('\\n') + '\\n';
             }
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, out);
+            console.log(out);
           "
           exit "$status"
       - uses: actions/upload-artifact@v4
