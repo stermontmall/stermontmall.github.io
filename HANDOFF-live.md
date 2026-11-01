@@ -554,3 +554,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Extended regression coverage from 47 to 57 exact product IDs.
 - [x] Checked all entries for two sections, 140–360 words, plain-text safety, distinct copy and unsupported promotional claims.
 - [ ] Run the complete PR quality gate and generated-page audit; merge only after successful checks and verify production deployment.
+
+
+## 2026-11-01 — Product content batch 15
+- [x] Added two product-specific sections for 10 catalogue items: Kynofos 21 Elite, Gut Bio, Layer Premix, Salinomycin Coccidiostat, Lysine feed amino acid, Mastercop 60SC, Milthane Super, Pegasus 500SC, Rodent-Kill 500 g and Dudu-Stop 25EC.
+- [x] Feed copy covers specification checks and storage; salinomycin copy directs users to current authorisation and veterinary/formulator oversight without dosing or mixing instructions.
+- [x] Crop protection, rodenticide and household insecticide content remains label-first and safety-focused.
+- [x] Extended regression coverage from 57 to 67 IDs; validated word limits, distinct text, plain-text safety and claim guardrails.
+- [ ] Run full PR quality gate and generated-page audit; merge only if successful and verify deployment.
