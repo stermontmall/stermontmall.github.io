@@ -531,3 +531,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Added practical guidance on frost management and warranty terms, secure wall mounting and fan care, and room setup/input selection/cable safety for speakers.
 - [x] Extended the regression suite to 35 product IDs.
 - [ ] Run the repository's actual Node regression suite and required PR workflow; GitHub connector reports no workflow runs or status checks on the PR head.
+
+
+## 2026-11-01 — Product content batch 12
+- [x] Added model-specific buyer guidance for Abasi 5% EC and ALONZE 50EC.
+- [x] Extended the content regression test for both product IDs.
+- [x] Kept the new copy focused on label checks, safe handling, storage and responsible use; no new application rates or unverified claims.
+- [ ] Run Node regression, generated-page build and full SEO audit before considering merge.
