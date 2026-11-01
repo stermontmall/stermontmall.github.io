@@ -46,6 +46,7 @@ jobs:
           python -m playwright install --with-deps chromium
       # Exercise the mobile shell with harmless fixtures, not live catalogue data.
       # Keep this check alongside the existing product and SEO quality gates.
+      # Reset per-test tab state when asserting the default landing view.
       - name: Run mobile shell browser regression suite
         run: python3 mobile-shell/shell.test.py
       - name: Check JavaScript syntax
