@@ -1,3 +1,12 @@
+## NEW TASK (2026-11-01): improve site-wide SEO audit coverage
+Status: IMPLEMENTED on `wip-seo-audit-coverage`; PR review/merge pending.
+- [x] Expanded `seo-check.mjs` from a partial audit (products, categories, blogs, home) to recursively include public HTML pages in `services/` and `guides/`, plus root-level public pages.
+- [x] Added `services/sitemap-services.xml` to broken/missing-page checks alongside the main and product sitemaps.
+- [x] Aligned homepage Open Graph and Twitter title text with its actual canonical HTML title (both previously still said "Online Shopping Store in Kenya" while `<title>` says "Online Store Kenya").
+- [ ] After merge, run GitHub Actions > Daily SEO check and review the report; then address actual page-level errors from the report.
+- Note: live site could not be fetched from this session, and Google Search Console ranking/indexing data has not been inspected. Existing GSC workflows need `GSC_SERVICE_ACCOUNT_JSON` and `GSC_PROPERTY` secrets.
+- Google first-place rankings cannot be guaranteed; focus is technical crawlability, useful unique pages, accurate metadata, internal links and Search Console feedback.
+
 ## PROGRESS CHECKPOINT — 01 Nov 2026 (Africa/Nairobi)
 **Summary:** Added and merged the phone-friendly GitHub progress checkpoint system (PR #104).
 **Completed:** Workflow `.github/workflows/save-progress.yml`, writer script `scripts/save-progress.mjs`, usage guide `PROGRESS-SAVE.md`; PR #104 merged to main (merge commit 45b5aff). Checkpoint workflow and files are present on main.
