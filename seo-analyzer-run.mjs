@@ -20,6 +20,30 @@ if (!files.includes('index.html') || !files.includes('products.html')) {
   process.exit(1);
 }
 
+// Twitter Card tags use name=, not property=. The upstream library's
+// MetaSocialRule checks the wrong attribute for Twitter tags.
+const twitterCardRule = dom => {
+  const tag = dom.window.document.querySelector('head > meta[name="twitter:card"]');
+  return Promise.resolve(tag?.getAttribute('content') ? [] : ['Missing or empty Twitter Card meta name']);
+};
+
+// Static pages may canonically end in .html; do not incorrectly require a slash.
+// Validate the canonical's absolute HTTPS URL and expected site host instead.
+const canonicalIntegrityRule = dom => {
+  const tag = dom.window.document.querySelector('head > link[rel="canonical"]');
+  const href = tag?.getAttribute('href');
+  if (!href) return Promise.resolve(['Missing canonical link or href']);
+  try {
+    const url = new URL(href);
+    if (url.protocol !== 'https:' || url.hostname !== 'stermontarcade.co.ke' || url.search || url.hash) {
+      return Promise.resolve(['Canonical must be an absolute HTTPS URL on the primary host without query or hash']);
+    }
+  } catch {
+    return Promise.resolve(['Canonical href is not a valid absolute URL']);
+  }
+  return Promise.resolve([]);
+};
+
 try {
   const { default: SeoAnalyzer } = await import('seo-analyzer');
   let issues;
@@ -27,9 +51,10 @@ try {
     .inputFiles(files)
     .useRule('titleLengthRule', { min: 10, max: 75 })
     .useRule('metaBaseRule', { list: ['description', 'viewport'] })
-    .useRule('metaSocialRule', { properties: ['og:title', 'og:description', 'og:image', 'twitter:card'] })
-    .useRule('canonicalLinkRule')
+    .useRule('metaDescriptionRule', { min: 70, max: 180 })
     .useRule('imgTagWithAltAttributeRule')
+    .addRule(twitterCardRule)
+    .addRule(canonicalIntegrityRule)
     .outputObject(report => { issues = report; })
     .run();
 
@@ -49,6 +74,7 @@ try {
       `## On-page technical checks (scoped pages)\n\nChecked ${files.length} ordinary-retail/general pages; found **${issueCount}** issue(s).\n` +
       (details ? details + '\n' : 'No issues found.\n'));
   }
+  if (issueCount > 0) process.exitCode = 1;
 } catch (error) {
   console.error('seo-analyzer execution failed:', error?.stack || error);
   process.exitCode = 1;
