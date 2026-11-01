@@ -546,3 +546,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Extended the exact-ID regression suite from 37 to 47 entries.
 - [x] Checked every entry for two sections, 140–360 words, plain-text safety, distinct copy and unsupported promotional claims.
 - [ ] Run the full PR quality gate and generated-page audit; merge only if all checks pass, then verify deployment.
+
+
+## 2026-11-01 — Product content batch 14
+- [x] Added two distinct buyer-guidance sections for 10 more catalogue products: Bedlam 200SL, Rat-Kill Pellets, Bromarat 0.005 RB, Miratex Pellets, Darvin 50EW, Rodilon Wax Blocks, Bugnil 20EC, Actellic 25EC, Fuko-Kil and Air Chopper 7.5SC.
+- [x] Focused pesticide and rodenticide copy on current label/registration checks, safe storage, child/pet/wildlife protection and professional advice; added no pesticide application rates or bait-placement instructions.
+- [x] Extended regression coverage from 47 to 57 exact product IDs.
+- [x] Checked all entries for two sections, 140–360 words, plain-text safety, distinct copy and unsupported promotional claims.
+- [ ] Run the complete PR quality gate and generated-page audit; merge only after successful checks and verify production deployment.

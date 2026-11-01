@@ -49,7 +49,17 @@ const expected = [
   "gradometer-480ec-termiticide-1-litre",
   "metro-200sc-termiticide-25-ml",
   "syngenta-tatua-rat-and-mice-poison-blocks",
-  "actellic-50ec-insecticide-1-litre"
+  "actellic-50ec-insecticide-1-litre",
+  "bedlam-200sl-insecticide-15-ml",
+  "rat-kill-pellets-25-g",
+  "bromarat-0-005-rb-rodent-bait-25-g",
+  "miratex-pellets-rat-and-mice-killer-bait-20-g",
+  "darvin-50ew-insecticide-28-ml",
+  "rodilon-wax-blocks-10-g",
+  "bugnil-20ec-insecticide-25-ml",
+  "actellic-25ec-insecticide-1-litre",
+  "fuko-kil-rat-poison-25-g",
+  "air-chopper-7-5sc-insecticide-100-ml"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
