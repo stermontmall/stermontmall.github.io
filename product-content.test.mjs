@@ -27,7 +27,10 @@ const expected = [
   "roch-mechanical-microwave-oven",
   "vision-plus-32-inch-full-hd-smart-tv-with-free-wall-bracket",
   "ultra-smart-watch-with-bluetooth-calling-and-ocean-strap-grey",
-  "ailyons-double-burner-glass-gas-cooker-regulator-pipe"
+  "ailyons-double-burner-glass-gas-cooker-regulator-pipe",
+  "kenwood-air-fryer-hfp30-000bk-3-8-litres",
+  "hisense-43a6qken-4k-uhd-smart-tv-with-tv-guard-and-wall-mount-43-inch",
+  "harman-kardon-onyx-studio-9-portable-bluetooth-speaker-single-unit"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
