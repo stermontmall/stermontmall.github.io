@@ -605,3 +605,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Crop insecticide copy remains label-first; appliance content covers compatibility, installation, electrical/gas safety and care; drinkware content covers cleaning and safe use.
 - [x] Extended regression coverage from 117 to 127 IDs (10 new canonical product entries; existing Ramtons entry retained); checked word limits, unique copy, plain-text safety and unsupported-claim guardrails.
 - [ ] Run full SEO PR gate and generated-page audit; merge only on success and verify deployment.
+
+
+## 2026-11-01 — Product content batch 15
+- [x] Added two product-specific supplementary sections for 10 more catalogue items: Kynofos 21 Elite feed phosphate, Gut Bio supplement, Layer Premix, Salinomycin coccidiostat, Lysine feed amino acid, Mastercop 60SC, Milthane Super, Pegasus 500SC, Rodent-Kill 500 g and Dudu-Stop 25EC.
+- [x] Feed guidance focuses on species/ration matching, specification checks and dry storage; salinomycin copy directs users to current authorisation and veterinary/feed-formulator oversight without providing dose or mixing instructions.
+- [x] Crop-protection and rodenticide copy remains label-first and safety-focused; no pesticide rates or bait-placement instructions added.
+- [x] Extended regression coverage from 57 to 67 product IDs; checked word limits, plain-text safety, unique copy and unsupported claims.
+- [ ] Run full PR quality gate and generated-page audit; merge only on success and verify deployment.
