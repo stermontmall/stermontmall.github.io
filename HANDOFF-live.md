@@ -787,3 +787,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [ ] Further review remains: phone-number consistency between STK prompt and order contact, callback authentication/secret rotation, payment/order atomicity, and abuse limits. Do not claim these are fixed.
 - [ ] Mobile performance, current Pa11y/performance audit completion, owner-side Google Search Console inspection, Merchant Center diagnostics and remaining Supabase advisor findings still require separate work.
 - Autosave: checkpoint committed directly to main.
+
+
+## SESSION CHECKPOINT (2026-11-01): Purchase notification contrast follow-up
+- [x] Latest Site audit run 41313721384 confirms 18/19 sampled routes pass Pa11y; the only remaining finding is the close button in the purchase notification on `/products.html` (`#stm-buy > button`), whose grey text is 3.49:1.
+- [x] Prepared branch `fix-purchase-toast-contrast-a11y-2026-11`: changed only that close-button text from `#8b86a0` to `#78738d`, added `recent-orders.js` to Site audit push triggers, and added its JavaScript syntax check to the SEO PR gate.
+- [ ] Await PR validation and post-merge Site audit before declaring 19/19 accessibility.
+- [x] Live Supabase `mpesa-callback` Edge Function deployed as version 17: success requires matching requested/received amount and a non-empty M-Pesa receipt; mismatches are recorded as `amount_mismatch` and are not treated as paid.
+- [ ] No live M-Pesa transaction was run. Verify with a controlled low-value test before considering payment flow end-to-end validated.

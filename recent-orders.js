@@ -38,7 +38,7 @@
     '#stm-buy .bt span{display:-webkit-box;overflow:hidden;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-weight:600;color:#1b1230;margin-top:1px}' +
     '#stm-buy .bt small{display:block;color:#6b6585;font-size:11.5px;margin-top:2px}' +
     '#stm-buy .bt em{display:none;font-style:normal;font-weight:800;font-size:12px;color:#7c3aed;margin-top:2px}#stm-buy.lnk .bt em{display:block}' +
-    '#stm-buy button{flex:none;border:0;background:none;color:#8b86a0;font-size:18px;line-height:1;padding:4px;cursor:pointer;align-self:flex-start;border-radius:8px}#stm-buy button:focus-visible{outline:3px solid #7c3aed}' +
+    '#stm-buy button{flex:none;border:0;background:none;color:#78738d;font-size:18px;line-height:1;padding:4px;cursor:pointer;align-self:flex-start;border-radius:8px}#stm-buy button:focus-visible{outline:3px solid #7c3aed}' +
     '@media(prefers-reduced-motion:reduce){#stm-buy{transition:opacity .2s;transform:none}}' +
     '@media print{#stm-buy{display:none}}';
   D.head.appendChild(css);

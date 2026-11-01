@@ -15,6 +15,7 @@ on:
       - 'index.html'
       - 'shell-chrome.js'
       - 'kili-pages.js'
+      - 'recent-orders.js'
       - 'blog/**'
 
 permissions:
