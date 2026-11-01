@@ -119,7 +119,17 @@ const expected = [
   "albafas-10-albendazole-drench-500-ml",
   "catapult-480-sl-herbicide-1-litre",
   "chariot-500-sc-fungicide-1-litre",
-  "bradley-500-sc-fungicide-1-litre"
+  "bradley-500-sc-fungicide-1-litre",
+  "amito-5-7-wdg-insecticide-1-kg",
+  "ampligo-150-zc-insecticide-100-ml",
+  "skilltech-44t-tilting-tv-wall-mount-bracket-fits-32-to-60-inch",
+  "lg-lhd657-1000w-5-1-channel-home-theatre-system-1000w-5-1-ch",
+  "habei-bear-3-piece-insulated-bottle-and-tumbler-set-260ml-700ml-1200ml",
+  "euroken-50x55-standing-cooker-3-gas-1-electric-with-50l-electric-oven",
+  "von-twin-tub-semi-automatic-washing-machine-7-5kg-7-5-kg",
+  "vic-20000mah-power-bank-with-led-display-and-flashlight-20000mah",
+  "ramtons-steam-iron-with-vertical-and-variable-steam",
+  "smart-raha-life-3-piece-tumbler-and-bottle-set-purple-260ml-700ml-1200ml"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
