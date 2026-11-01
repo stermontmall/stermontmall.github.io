@@ -15,6 +15,9 @@ function resolve({ search = '', saved = null, historyState = null } = {}) {
   const context = {
     URLSearchParams,
     location: { search, pathname: '/' },
+    DEEP: new URLSearchParams(search).get('product'),
+    CAT_DEEP: new URLSearchParams(search).get('cat'),
+    Q_DEEP: (new URLSearchParams(search).get('q') || '').trim().slice(0, 80),
     sessionStorage: { getItem: key => key === 'shell.activeTab' ? saved : null },
     history: { state: historyState },
   };
