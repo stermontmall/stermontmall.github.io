@@ -674,3 +674,16 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [ ] After deployment, test the legacy URL on the live host and confirm it reaches the canonical page; then inspect both URLs in Search Console.
 - Note: static-host meta-refresh/JavaScript redirect is a compatibility fallback, not a server-side HTTP 301. Confirm the live host's behaviour before describing it as a permanent redirect.
 - Autosave: checkpoint included in PR #170 branch.
+
+
+## SESSION CHECKPOINT (2026-11-01): PR #170 merged
+- [x] PR #170 merged to `main` (squash commit `d64cfdf22d22e1d0cceb9d722029459ad7eb0ae2`).
+- [x] Confirmed GitHub reports the PR as closed and merged; the legacy compatibility file and handoff note are on the merged change.
+- [x] Manually reviewed the compatibility HTML: noindex/follow, canonical to the existing `.html` product URL, immediate meta-refresh plus JavaScript fallback, query and fragment preservation, and a visible fallback link.
+- [ ] GitHub connector returned no PR workflow runs or commit status contexts for this commit; do not describe automated CI as passed.
+- [ ] Verify the live `.htm` URL after GitHub Pages deployment and confirm the canonical page opens. This static-host fallback is not an HTTP 301.
+- [ ] Search Console owner action: inspect the legacy and canonical URLs after deployment.
+- [ ] Broader owner-side indexing issue #123 lists 14 URLs not indexed (236/250 indexed in the 2026-11-01 report). The three named product pages and 11 blog posts need live URL inspection and content/link review; do not claim indexing is fixed by sitemap presence alone.
+- [ ] Latest Lighthouse report issue #20 (2026-10-26) recorded mobile homepage performance 39/100, with TTI, main-thread work, LCP and TBT flagged. This is a dated report; rerun the current live audit before changing architecture.
+- [ ] Keep product-specific pesticide copy label-led and verify approved product-label facts before editing technical application advice.
+- Autosave: this checkpoint is committed directly to `main`.
