@@ -46,7 +46,7 @@ for (const f of pages) {
   }
 }
 // every sitemap URL must exist
-for (const sm of ['sitemap.xml', 'sitemap-products.xml']) if (existsSync(sm))
+for (const sm of ['sitemap.xml', 'sitemap-products.xml', 'services/sitemap-services.xml']) if (existsSync(sm))
   for (const m of readFileSync(sm, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) { const u = m[1].replace(SITE, ''); if (u.startsWith('/') && !exists(u)) add('Sitemap lists a page that does not exist', `${sm}: ${u}`); }
 
 const total = Object.values(issues).reduce((n, a) => n + a.length, 0);
