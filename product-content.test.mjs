@@ -137,6 +137,20 @@ const expected = [
   "samsung-galaxy-a06-4gb-ram-64gb",
   "electromate-20l-electric-oven-1500w",
   "electromate-1000w-dry-iron-box-blue-and-white",
+,
+  "euroken-50x55-standing-cooker-3-gas-plus-1-electric-with-50l-electric-oven-50x55-cm",
+  "ipcone-16-inch-stand-fan-black-adjustable-height-and-tilt",
+  "nunix-wld-560-3g1e-3-gas-plus-hot-plate-cooker-with-gas-oven-50x55-cm",
+  "ramtons-steam-iron-with-vertical-and-variable-steam-steam-iron",
+  "sonar-hot-and-normal-water-dispenser-with-storage-cabinet-84-cm",
+  "classic-men-s-black-formal-blazer-piece",
+  "men-s-casual-sports-sneaker-black",
+  "mens-checked-boxer-shorts-assorted-colours-pack-of-6",
+  "shan-yes-men-s-navy-blue-tracksuit-set-set",
+  "shan-yes-men-s-white-black-tracksuit-set-set",
+  "vision-plus-32-inch-full-hd-smart-tv-with-free-wall-bracket-32-inch",
+  "ourstart-men-s-quartz-watch-blue-dial-silver-and-gold-stainless-steel",
+  "urban-comfort-women-s-green-fleece-tracksuit-set"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
