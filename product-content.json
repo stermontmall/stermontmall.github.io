@@ -242,5 +242,41 @@
         "After use, hang the jacket on a broad hanger and store it in a clean, breathable space. Keep the lapel pin and pocket square safely stored when not in use. Follow the garment care label for cleaning; avoid harsh washing or ironing directly over the pin and textured surface."
       ]
     }
+  ],
+  "itel-smartphone": [
+    {
+      "heading": "Confirm the exact phone model and specifications",
+      "paragraphs": [
+        "The listing identifies the product as an Itel smartphone, but the exact model, memory configuration, screen size, camera resolution and battery capacity are not specified in the description. These details can vary significantly between Itel models. Before ordering, contact us to confirm the precise model name and the RAM and internal storage shown on the box. Also check whether the package includes a charger, cable, case or screen protector rather than assuming accessories are bundled.",
+        "If you plan to use the phone for mobile money, schoolwork, video calls or work applications, make a short list of the apps you need and confirm that the selected model supports them. Check the SIM configuration and network compatibility for your preferred Kenyan mobile operator before payment."
+      ],
+      "bullets": [
+        "Ask for the exact model code and available colour before checkout.",
+        "Compare the stated RAM and storage, not just the product family name."
+      ]
+    },
+    {
+      "heading": "Prepare and protect your new smartphone",
+      "paragraphs": [
+        "When you receive the phone, inspect the sealed package and check the model printed on the device and box against your order. Set a screen lock, install system updates over a trusted Wi-Fi connection and download apps from official app stores. Back up important contacts, photos and documents so they are not lost if the phone is damaged or replaced.",
+        "Use a case and a screen protector that fit the exact model, keep the charging port dry and free of lint, and use a compatible charger. Avoid leaving the phone in direct sun or near heat sources. If the battery, screen or charging port behaves abnormally, use an authorised repair service rather than opening the handset yourself."
+      ]
+    }
+  ],
+  "nunix-gas-and-electric-cooker": [
+    {
+      "heading": "Confirm the cooker configuration and installation needs",
+      "paragraphs": [
+        "The listing describes a Nunix gas and electric cooker, but it does not provide a precise model number or a full breakdown of burner and oven configuration. Before ordering, confirm the exact model, cooker dimensions, number and type of cooking zones, oven fuel type and included accessories. This is especially important if you are replacing an existing cooker, because the available kitchen space and gas or electrical connections may differ.",
+        "Measure the intended space and check the doorway and route into the kitchen before arranging delivery. Ask a qualified installer to confirm that the gas supply, regulator, hose and electrical connection are suitable for the specific appliance. Do not assume a regulator or pipe listed in a general description will match every installation."
+      ]
+    },
+    {
+      "heading": "Use and clean the cooker safely",
+      "paragraphs": [
+        "Keep the kitchen well ventilated while cooking and follow the manufacturer's instructions for lighting, operating and shutting down the burners and oven. If you smell gas, turn off the supply if it is safe to do so, avoid operating electrical switches or creating a flame, leave the area and contact your gas supplier or a qualified technician. Never use a cooker with a damaged hose, loose connection or suspected leak.",
+        "Allow hot surfaces, trays and oven racks to cool before cleaning. Use cookware that sits steadily on the supports and keep handles turned away from walkways. Clean spills with products suitable for the appliance's finish and avoid pouring water into burners or electrical components."
+      ]
+    }
   ]
 }
