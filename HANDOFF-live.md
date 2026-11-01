@@ -569,3 +569,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Covered label/registration checks, grain and food safety, glyphosate drift precautions, indoor pesticide exposure prevention, sprayer inspection and fertilizer compatibility without inventing rates or guarantees.
 - [x] Extended regression coverage from 67 to 77 product IDs; checked 140–360-word range, distinct plain text and claim guardrails.
 - [ ] Run full SEO PR gate and generated-page audit; merge only on success and verify production deployment.
+
+
+## 2026-11-01 — Product content batch 17
+- [x] Added two distinct product sections for Tatua Advion cockroach gel bait, Systema 50EC, Tecto 500SC, Tatua Demand 10CS, Promax 20EC, Rimeta Gold 300SC, Popvet Total dog dewormer, Ranger 480EC, Rootex 6 rooting hormone and Poultry Dust insecticide.
+- [x] Veterinary medicine and poultry-treatment copy requires label/veterinary confirmation and avoids dosage or treatment schedules; pesticide copy remains label-first and safety-focused.
+- [x] Extended regression coverage from 77 to 87 product IDs; validated word limits, distinct plain text, safety and unsupported-claim guardrails.
+- [ ] Run full SEO PR gate and generated-page audit; merge only if successful and verify deployment.
