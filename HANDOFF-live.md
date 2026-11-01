@@ -1,9 +1,10 @@
-## SESSION CHECKPOINT (2026-11-01 16:55 Africa/Nairobi): post-merge workflow check, IN PROGRESS (claude.ai chat, GitHub + Supabase connected)
+## SESSION CHECKPOINT (2026-11-01 16:50 Africa/Nairobi): post-merge workflow check + shell tests (claude.ai chat, GitHub + Supabase connected)
 Owner: "Fix and autosave on handoff. Merged/commit directly. Check handoff for pending task."
-- [x] Cloned `main` (bd56e79). Checked Actions: after PR #168 (a5f1615) the `Site audit` run on main (41310351456) FAILED only in "Accessibility (Pa11y, sampled safe routes)" (exit code 2 = real findings). On-page rules, Lychee broken links and Lighthouse performance passed; `pages build and deployment` runs succeeded; Uptime monitor passed.
-- [ ] IN PROGRESS: reproduce Pa11y locally (serve repo root, run `.pa11yci.json` URLs against localhost with google-chrome) to see which pages/rules fail; the workflow artifact download is blocked from this sandbox. Note: Pa11y tests the LIVE domain, so a run during a Pages deploy can read stale pages.
-- [ ] Then run `python3 mobile-shell/shell.test.py` (Playwright/Chromium) and record the result.
-- Exact re-run: `cd repo && python3 -m http.server 8000 &` then `npx pa11y-ci --config <config with http://localhost:8000 URLs>`.
+- [x] Actions after PR #168 (a5f1615): `Site audit` run 41310351456 on main FAILED only in "Accessibility (Pa11y, sampled safe routes)" (exit 2 = real findings, most likely on the 8 pages #168 added to `.pa11yci.json`: appliances category, 4 product pages, 4 blog posts). On-page rules, Lychee broken links, Lighthouse performance: passed. `pages build and deployment`, Uptime monitor, SEO PR gates for #170/#171: passed (one Pages run was cancelled by a newer push, normal).
+- [x] The Pa11y details are only in the job summary/artifact, and the sandbox cannot download artifacts (blob storage 403) or install pa11y (npm/pypi blocked). FIX: `.github/workflows/site-audit.yml` now also prints the Pa11y findings to the job log (commit ce37fe2, direct to main). Run 41312374941 (triggered by it) re-tests; read it with `gh run view <id> --job <accessibility job id> --log` once the whole run is complete.
+- [x] `python3 mobile-shell/shell.test.py` run against current main (system Chrome, Playwright): 136/137, then 137/137 after a fix. The failing check was "no console/page errors": two 404s for `/p/favicon.png` and `/p/favicon.ico`. Cause: `index.html` used relative favicon links, which resolve to `/p/` once the shell changes the address to `/p/<slug>.html`. Fixed by absolute links (`/favicon.png`, `/favicon.ico`, `/apple-touch-icon.png`) in commit bfb7173, direct to main. No `app.js`/`tailwind.css` change, so no `?v=` bump.
+- [ ] NEXT: read the Pa11y findings from run 41312374941, fix them in the generators (not in generated `p/`, `blog/` pages), commit to main, confirm Site audit goes green.
+- [ ] Still owner/phone side: real-phone checks, Search Console/Merchant Center (14 URLs not indexed), supplier label data.
 - Autosave: committed directly to main.
 
 ---
