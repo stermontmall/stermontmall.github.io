@@ -1,3 +1,20 @@
+## CURRENT SESSION CHECKPOINT (2026-11-01): resume prior SEO and automation work
+Status: REVIEWED; next action is to reconcile the older open SEO-fixes PR with current main.
+- [x] Recovered the prior handoff from HANDOFF-live.md and inspected current GitHub branches, pull requests and Actions runs.
+- [x] Confirmed PR #118, "Make SEO and blog automation safer and more useful", merged to main (commit 7e87b6f9).
+- [x] Confirmed the SEO pull-request quality gate passed on branch automation/review-first-blog-and-catalog-seo (run 41285827364).
+- [x] Confirmed GitHub Pages deployment passed on the latest main commit (run 41285924555) and the uptime monitor passed (run 41286044151).
+- [x] Confirmed the daily SEO audit passed on main before PR #118 (run 41285604671; commit f9142182; 364 pages checked, 65 redirect pages skipped, no problems reported at that time).
+- [ ] Run/inspect the daily SEO audit on the post-#118 main commit; the above daily audit predates the automation-quality merge.
+- [ ] Reconcile open PR #115 (fix/seo-audit-findings-nov-2026). It is still open and reports mergeable=false against the now-advanced main; its SEO title, description, heading, audit-trigger and blog-title-normalizer changes have not yet been confirmed on main. Do not merge blindly; rebase/reapply onto current main, then run the new SEO pull-request quality gate and inspect its artifact.
+- [ ] Review the actual audit report for remaining verified findings; fix only confirmed issues.
+- [ ] Verify Search Console service-account secrets/permissions before reporting indexing or ranking data.
+- Product import remains dependent on an approved supplier feed/API or trusted source file; never invent product facts, prices, stock or photos.
+- AI blog drafts remain review-only and require human editorial approval before publishing.
+- Autosave: this checkpoint is committed directly to HANDOFF-live.md on main. Continue adding a checkpoint after each meaningful work batch.
+
+---
+
 ## AUTOMATION SAFETY AND SEO QUALITY CHECKPOINT (2026-11-01)
 Status: IN PROGRESS on `automation/review-first-blog-and-catalog-seo`; PR pending.
 - [x] Confirmed latest post-merge daily SEO audit passed: 364 pages checked, 65 size-redirect pages skipped, no problems found.
