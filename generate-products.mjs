@@ -418,6 +418,9 @@ for (const p of products) {
   const seoBoxes = `${hd.uses ? `<div class="box"><h2 style="margin-top:0">${esc(hd.uses)}</h2><p>${usesTxt}</p></div>` : ''}
 <div class="box"><h2 style="margin-top:0">${esc(hd.price)}</h2><p>${nameE} costs <b>${priceTxt}</b> at ${BRAND}${inStock ? ' and is in stock' : ', but is currently sold out, so ask us when it is back'}. Add it to your cart, pay by M-Pesa and enter the M-Pesa code from your SMS, or <a href="${esc(inStock ? wa : ask)}" rel="noopener">order on WhatsApp</a>. Buying in bulk? Message us for a quote.</p></div>
 <div class="box"><h2 style="margin-top:0">${esc(hd.delivery)}</h2><p>Orders to Nairobi usually arrive the same day or the next day, and the other counties usually within 1 to 3 days. We confirm the delivery fee for your location before you pay. Prefer store pickup? Collect at The Sarit Centre, Karuna Road, Westlands, open daily 8 AM to 8 PM, and confirm stock on WhatsApp first. See <a href="/shipping.html">shipping</a> and <a href="/nairobi.html">Nairobi delivery and pickup</a>.</p></div>`;
+  const catalogDescription = String(p.description || '').trim();
+  const detailFallback = 'This listing is for ' + p.name + ' in the ' + (cat?.name || 'Stermont Arcade') + ' category. Check the exact model, pack size or variant and the specifications shown on this page before ordering. If a detail is not listed, contact Stermont Arcade to confirm it. Current availability and delivery charges are confirmed before payment.';
+  const productDescription = catalogDescription.length >= 100 ? catalogDescription : [catalogDescription, detailFallback].filter(Boolean).join(' ');
   const buyerNotes = productBuyingNotes(p, cat);
   const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
 <div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.name)} - buy online in Kenya" fetchpriority="high">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
@@ -427,7 +430,7 @@ for (const p of products) {
 <a class="btn" href="${esc(wa)}">Order on WhatsApp</a><a class="btn alt" href="${SITE}/">Shop all products and add to cart</a>
 <div class="box">✔ Pay by M-Pesa &nbsp; ✔ Delivery to all 47 counties &nbsp; ✔ 48-hour returns on faulty items</div></div></div>
 ${sizeBox}
-${p.description ? `<div class="box"><h2 style="margin-top:0">About ${esc(p.name)}</h2><div class="desc">${esc(p.description)}</div></div>` : ''}
+${`<div class="box"><h2 style="margin-top:0">About ${esc(p.name)}</h2><div class="desc">${esc(productDescription)}</div></div>`}
 ${seoBoxes}
 ${buyerNotes}
 ${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
