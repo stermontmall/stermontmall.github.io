@@ -22,7 +22,7 @@ function resolve({ search = '', saved = null, historyState = null } = {}) {
     sessionStorage: { getItem: key => key === 'shell.activeTab' ? saved : null },
     history: { state: historyState },
   };
-  return vm.runInNewContext(productionBlock + '\\nSTART_TAB', context);
+  return vm.runInNewContext(productionBlock + '; START_TAB', context);
 }
 
 assert.equal(resolve(), 'home', 'fresh visits start on Home');
