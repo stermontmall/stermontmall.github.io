@@ -33,7 +33,7 @@ for (const f of pages) {
   if (title.trim()) { const k = title.trim().toLowerCase(); (titlePages.get(k) || titlePages.set(k, []).get(k)).push(f); }
   if (desc.trim()) { const k = desc.trim().toLowerCase(); (descPages.get(k) || descPages.set(k, []).get(k)).push(f); }
   if (f.startsWith('blog/') && f !== 'blog/index.html') {
-    const textOnly = h.replace(/<script[\\s\\S]*?<\\/script>/gi, ' ').replace(/<style[\\s\\S]*?<\\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').replace(/\\s+/g, ' ').trim();
+    const textOnly = h.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').replace(/\s+/g, ' ').trim();
     const words = textOnly ? textOnly.split(' ').length : 0;
     if (words < 350) add(`Thin blog article (${words} words; review usefulness and completeness)`, f);
   }
