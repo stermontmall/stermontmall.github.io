@@ -697,3 +697,15 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [ ] Latest Lighthouse report issue #20 (2026-10-26) recorded mobile homepage performance 39/100, with TTI, main-thread work, LCP and TBT flagged. This is a dated report; rerun the current live audit before changing architecture.
 - [ ] Keep product-specific pesticide copy label-led and verify approved product-label facts before editing technical application advice.
 - Autosave: this checkpoint is committed directly to `main`.
+
+
+## SESSION CHECKPOINT (2026-11-01): ProductGroup variant URL repair
+- [x] Found a concrete generated-schema defect on the Premise 200 SC product page: both 50 ml and 1 litre ProductGroup offers used the base 50 ml URL.
+- [x] Added pure helper `pdpVariantUrl()` in `seo-meta.mjs`; alternate pack sizes now use the canonical page URL plus the selected variant slug as a fragment, matching the mobile shell's existing deep-link convention.
+- [x] Updated ProductGroup offer URLs and grouped-size WhatsApp enquiry links in `generate-products.mjs`.
+- [x] Added four unit assertions covering the default size, alternate size, empty slug and URL-encoded slug in `seo-meta.test.mjs`.
+- [x] Created PR #171: https://github.com/stermontmall/stermontmall.github.io/pull/171
+- [ ] Await PR #171 quality-gate run 41311927022; inspect every step and generated audit artifact before merge.
+- [ ] After merge, allow the product-pages workflow to rebuild all product pages; verify the Premise JSON-LD 1 litre offer has the correct `#premise-200-sc-termiticide-1-litre` fragment.
+- [ ] No live-host or Google rich-results validation has yet been performed.
+- Autosave: this checkpoint is committed on the PR #171 branch.

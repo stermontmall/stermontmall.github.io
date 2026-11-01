@@ -206,3 +206,15 @@ export function pdpHeadings(catSlug) {
     : null;
   return { features, guide: 'Reliable Quality & Application Guide', price: 'Price, M-Pesa Checkout & Kenya Delivery', delivery: 'Delivery to Nairobi & All 47 Counties' };
 }
+
+
+// Variant URLs must identify the selected pack size. The mobile shell reads the
+// variant slug from the fragment and opens that exact size on the canonical page.
+// Keep this helper shared so JSON-LD offers and customer enquiry links stay in sync.
+export function pdpVariantUrl(path, variantSlug, baseSlug, site = 'https://stermontarcade.co.ke') {
+  const slug = String(variantSlug || '').trim();
+  const base = String(baseSlug || '').trim();
+  const root = String(site);
+  return (root.endsWith('/') ? root.slice(0, -1) : root) + String(path || '') +
+    (slug && slug !== base ? '#' + encodeURIComponent(slug) : '');
+}

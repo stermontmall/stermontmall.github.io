@@ -1,6 +1,6 @@
 // Run: node seo-meta.test.mjs   (no dependencies)
 import assert from 'node:assert/strict';
-import { pdpBadges, pdpHeadings, pdpH1, pdpTagline, pdpTitle, pdpDescription, catTitle, catDescription, powerWord, productType, hasLeadWord, buyName, isGenuine, TITLE_MAX, DESC_MAX } from './seo-meta.mjs';
+import { pdpBadges, pdpHeadings, pdpH1, pdpTagline, pdpTitle, pdpDescription, catTitle, catDescription, powerWord, productType, hasLeadWord, buyName, isGenuine, pdpVariantUrl, TITLE_MAX, DESC_MAX } from './seo-meta.mjs';
 
 const names = [
   'Bazooka 18EC Insecticide (1L)', 'Bazooka 18EC', 'Duduthrin 1.75EC Insecticide 1 Litre', 'Roundup Turbo 500ml',
@@ -107,4 +107,16 @@ console.log('example PDP :', pdpTitle('Bazooka 18EC Insecticide (1L)', { catSlug
 console.log('example desc:', pdpDescription('Bazooka 18EC', { catSlug: 'crop-insecticides' }));
 console.log('example cat :', catTitle('Crop Insecticides'));
 console.log('example cdsc:', catDescription('Crop Insecticides', 'crop-insecticides'));
+
+
+// ProductGroup offers must point at the selected pack-size fragment, not every size at the base variant.
+assert.equal(pdpVariantUrl('/p/premise-200-sc-termiticide-50-ml.html', 'premise-200-sc-termiticide-50-ml', 'premise-200-sc-termiticide-50-ml'),
+  'https://stermontarcade.co.ke/p/premise-200-sc-termiticide-50-ml.html');
+assert.equal(pdpVariantUrl('/p/premise-200-sc-termiticide-50-ml.html', 'premise-200-sc-termiticide-1-litre', 'premise-200-sc-termiticide-50-ml'),
+  'https://stermontarcade.co.ke/p/premise-200-sc-termiticide-50-ml.html#premise-200-sc-termiticide-1-litre');
+assert.equal(pdpVariantUrl('/p/item.html', '', 'item'), 'https://stermontarcade.co.ke/p/item.html');
+assert.equal(pdpVariantUrl('/p/item.html', 'size a', 'item'), 'https://stermontarcade.co.ke/p/item.html#size%20a');
+assert.equal(pdpVariantUrl('/p/item.html', 'item-xl', 'item', 'https://shop.example/'), 'https://shop.example/p/item.html#item-xl');
+n += 4;
+
 console.log(`OK: ${n} checks, 0 violations`);
