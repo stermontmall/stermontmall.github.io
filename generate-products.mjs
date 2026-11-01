@@ -313,6 +313,53 @@ const urls = [];
 const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(u)}" alt="${esc(p.name)}" width="160" height="150" loading="lazy" decoding="async">` : ''; };
 const card = p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
+// Helpful, category-specific buying checks. Avoid inventing product specifications, certifications or warranty terms.
+function productBuyingNotes(p, cat) {
+  const slug = cat?.slug || '';
+  const name = esc(p.name);
+  let heading = 'Check the exact item before ordering';
+  let intro = `This listing is for <b>${name}</b>. Match the product name and any size, model or variant shown above to the item you need. If a specification is not listed, ask us to confirm it before payment.`;
+  let checks = [
+    'Compare the exact model or pack size shown on this page with the item you intend to buy.',
+    'Read the product description and inspect the available photos; ask us about any detail that is not shown.',
+    'Confirm current availability and the delivery fee for your location before dispatch.'
+  ];
+  if (isPcpb(slug)) {
+    heading = 'What to check before buying this crop or pest-control product';
+    intro = `Before buying <b>${name}</b>, make sure the product label matches the pest, crop, site or surface you need to treat. A product name alone is not enough to establish suitability.`;
+    checks = [
+      'Check PCPB registration details and confirm that the label lists your intended pest, crop, site or use.',
+      'Compare the formulation and pack size on the label; check the expiry date and seal when it arrives.',
+      'Read the label for protective equipment, application directions, restricted-entry instructions and any pre-harvest interval. Never guess a dose or mix products.'
+    ];
+  } else if (slug === 'phones-tablets') {
+    heading = 'Phone and tablet details to compare';
+    intro = `For <b>${name}</b>, compare the exact model and the memory, storage, network and SIM details actually listed. Similar model names can have different specifications.`;
+    checks = ['Confirm the model name and RAM and storage combination shown.', 'Check network compatibility, SIM arrangement, charging connection and accessories only where specified.', 'When the device arrives, inspect the screen, cameras, buttons, charging port and supplied items against your order.'];
+  } else if (slug === 'computing') {
+    heading = 'Computer specifications to confirm';
+    intro = `For <b>${name}</b>, compare the processor, memory, storage, screen size and condition only where those details are stated.`;
+    checks = ['Match the model number and listed processor, RAM and storage to your intended use.', 'Confirm screen size, keyboard layout, operating system and included charger or accessories where specified.', 'Ask for written confirmation of condition and warranty terms if they are not clearly stated.'];
+  } else if (['televisions','tvs-audio','home-theatre','bluetooth-speakers'].includes(slug)) {
+    heading = 'Audio and TV details to compare';
+    intro = `For <b>${name}</b>, compare the exact model and screen, sound or connectivity features stated on the listing. Similar names do not guarantee identical ports or accessories.`;
+    checks = ['Confirm the screen size or speaker configuration and exact model number.', 'Check listed resolution, smart platform, connectivity and ports against your other devices.', 'Confirm whether a stand, wall mount, cables or other accessories are included.'];
+  } else if (['appliances','washing-machines','fridges-freezers','kitchen-dining'].includes(slug)) {
+    heading = 'Appliance details to check before checkout';
+    intro = `For <b>${name}</b>, compare the capacity, dimensions and operating features stated on the page with the space and use you have in mind.`;
+    checks = ['Measure the installation space, doorways and access route before ordering a large appliance.', 'Compare capacity, dimensions, power requirements and energy information where provided.', 'Confirm installation needs, included accessories and any warranty terms explicitly stated on the listing.'];
+  } else if (slug === 'sprayers-equipment') {
+    heading = 'Sprayer and equipment checks';
+    intro = `For <b>${name}</b>, choose equipment that suits the area you need to cover and the way you will carry, operate and clean it.`;
+    checks = ['Compare the tank capacity, operating type and weight shown on the listing with the size of the job.', 'Ask about compatible nozzles, seals, spare parts and cleaning instructions if not specified.', 'Use only products approved by their label for the equipment and application method; never guess mixing rates.'];
+  } else if (['agrovet','animal-feeds','veterinary-drugs','fertilizers','seeds-seedlings','herbicides','fungicides','crop-insecticides'].includes(slug)) {
+    heading = 'Farm-input details to verify';
+    intro = `For <b>${name}</b>, check that the crop, animal, variety or purpose stated on the pack matches your need. Similar names can refer to different formulations or uses.`;
+    checks = ['Confirm the exact product name, formulation or variety, pack size and intended crop or animal from the label.', 'Check batch and expiry information, packaging condition and storage instructions when the item arrives.', 'For animal medicines or uncertain crop problems, consult a qualified veterinarian or agricultural extension officer; follow the product label.'];
+  }
+  return `<div class="box"><h2 style="margin-top:0">${esc(heading)}</h2><p>${intro}</p><ul>${checks.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p>If a specification is missing, <a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hello Stermont Arcade, please confirm the specifications for ' + p.name + ' before I order.')}">ask Stermont Arcade on WhatsApp</a> before placing your order.</p></div>`;
+}
+
 const NAMES = {};   // product id -> the heading its page shows; the shop list reads this (product-names.json) so list, view and page always carry the same wording
 for (const p of products) {
   const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
@@ -371,7 +418,7 @@ for (const p of products) {
   const seoBoxes = `${hd.uses ? `<div class="box"><h2 style="margin-top:0">${esc(hd.uses)}</h2><p>${usesTxt}</p></div>` : ''}
 <div class="box"><h2 style="margin-top:0">${esc(hd.price)}</h2><p>${nameE} costs <b>${priceTxt}</b> at ${BRAND}${inStock ? ' and is in stock' : ', but is currently sold out, so ask us when it is back'}. Add it to your cart, pay by M-Pesa and enter the M-Pesa code from your SMS, or <a href="${esc(inStock ? wa : ask)}" rel="noopener">order on WhatsApp</a>. Buying in bulk? Message us for a quote.</p></div>
 <div class="box"><h2 style="margin-top:0">${esc(hd.delivery)}</h2><p>Orders to Nairobi usually arrive the same day or the next day, and the other counties usually within 1 to 3 days. We confirm the delivery fee for your location before you pay. Prefer store pickup? Collect at The Sarit Centre, Karuna Road, Westlands, open daily 8 AM to 8 PM, and confirm stock on WhatsApp first. See <a href="/shipping.html">shipping</a> and <a href="/nairobi.html">Nairobi delivery and pickup</a>.</p></div>`;
-  const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
+  const buyerNotes = productBuyingNotes(p, cat);\n  const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
 <div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.name)} - buy online in Kenya" fetchpriority="high">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
 <div><h1>${esc(h1)}</h1><p class="tagline" style="margin:.1rem 0 .6rem;color:#5b21b6;font-weight:600">${esc(tagline)}</p><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
 <p class="${inStock ? 'ok' : 'no'}">${inStock ? 'In stock' : 'Currently sold out'}</p>
@@ -381,6 +428,7 @@ for (const p of products) {
 ${sizeBox}
 ${p.description ? `<div class="box"><h2 style="margin-top:0">About ${esc(p.name)}</h2><div class="desc">${esc(p.description)}</div></div>` : ''}
 ${seoBoxes}
+${buyerNotes}
 ${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
 ${related.length ? `<h2>More in ${esc(cat.name)}</h2><ul class="g">${related.map(card).join('')}</ul>` : ''}
 <div class="stk" role="complementary" aria-label="Order this product"><b>${p.variants ? 'From ' : ''}${money(p.price)}<small>${esc(p.name)}</small></b><a class="call" href="tel:+${WHATSAPP}" aria-label="Call ${BRAND}">Call</a><a href="${esc(inStock ? wa : ask)}">${inStock ? 'Order on WhatsApp' : 'Ask on WhatsApp'}</a></div>`;
@@ -400,7 +448,7 @@ for (const [slug, c] of Object.entries(byCat)) {
   const desc = info.desc || catDescription(c.name, slug);
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
-<p>${esc(info.intro || 'Order online and pay by M-Pesa. We deliver to all 47 counties.')} Order online, pay by M-Pesa, delivery to all 47 counties.</p><ul class="g">${c.items.map(card).join('')}</ul>
+<p>${esc(info.intro || 'Browse the products listed below and compare the exact model, pack size or variant before ordering.')}</p><p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or ask about pickup at Sarit Centre, Westlands. Delivery fees are confirmed before payment.</p><ul class="g">${c.items.map(card).join('')}</ul>
 ${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
 ${info.guide || ''}
 ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<div class="box"><b>${esc(q)}</b><p>${esc(a)}</p></div>`).join('') : ''}
