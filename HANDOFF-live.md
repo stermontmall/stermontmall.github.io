@@ -453,3 +453,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Added model-specific compatibility/setup guidance for the monitor, measurement/food-storage guidance for the refrigerator, and occasion/fit/care advice for each blazer.
 - [x] Avoided guessing the monitor's size, refresh rate, response time or cable bundle, and the refrigerator's capacity/dimensions. Added all four entries to the product-content regression test.
 - [ ] Run quality gate, merge only after audit passes, and verify production page build/deployment.
+
+
+## 2026-11-01 — Product content batch 06 (in progress)
+- [x] Reviewed two generic catalogue pages with short descriptions: Itel Smartphone (~300 words) and Nunix Gas and Electric Cooker (~301 words).
+- [x] Added verification-focused buying guidance. Itel content asks shoppers to confirm exact model, RAM/storage, SIM/network compatibility and in-box accessories; cooker content asks for exact configuration/dimensions and qualified installation.
+- [x] Added safety guidance for gas leak response and smartphone handling; avoided guessing specs or asserting compatibility.
+- [x] Extended product-content regression test to include both pages.
+- [ ] Run full quality gate and merge only if all SEO and generated-page checks pass.
