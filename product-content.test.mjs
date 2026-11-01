@@ -9,7 +9,8 @@ const expected = [
   "samsung-43u8000f-crystal-uhd-4k-smart-tv-43-inch",
   "samsung-galaxy-a55-5g-1-piece",
   "tcl-75c6k-qd-mini-led-4k-smart-tv-75-inch",
-  "vitron-htc4300qfs-qled-android-smart-tv-with-wall-mount-43-inch"
+  "vitron-htc4300qfs-qled-android-smart-tv-with-wall-mount-43-inch",
+  "32-inch-frameless-qled-smart-android-tv-free-accessories"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
@@ -23,6 +24,5 @@ for (const [id, sections] of Object.entries(content)) {
   assert.ok(!/guaranteed|#1 rated|top-rated|certified/i.test(text), id + ': remove unsupported claims');
   allText.push(text.toLowerCase());
 }
-assert.notEqual(allText[0], allText[1], 'Product content must be distinct');
-assert.notEqual(allText[1], allText[2], 'Product content must be distinct');
+assert.equal(new Set(allText).size, allText.length, 'Product content must be distinct for every product');
 console.log('OK: ' + Object.keys(content).length + ' product content entries; model-specific sections validated.');
