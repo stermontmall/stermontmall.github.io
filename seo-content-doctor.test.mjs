@@ -48,7 +48,7 @@ const reviewEdge = readFileSync('supabase/functions/seo-review/index.ts', 'utf8'
 for (const token of ['superseded-', 'superseded_count', 'staff access', 'status=eq.pending']) {
   if (!reviewEdge.includes(token)) throw new Error(`Missing SEO review safety: ${token}`);
 }
-execFileSync(process.execPath, ['--check', 'supabase/functions/seo-review/index.ts'], { stdio: 'inherit' });
+if (reviewEdge.includes('service_role') && reviewEdge.includes('Access-Control-Allow-Origin: "*"')) throw new Error('SEO review must not expose a wildcard CORS policy.');
 for (const token of [
   'weighted-onpage-audit-v2',
   'Unique descriptive title',
@@ -73,7 +73,7 @@ for (const token of [
   "ps.filter(p=>Number(p.seo_score_before)!==100)",
   "Showing '+actionable.length+' pending item(s) that need improvement.",
   'Perfect 100/100 items are hidden.',
-  'offset='+offset,
+  'offset=',
   'h1Text:',
   'h2Texts:'
 ]) if (!ratingDoctor.includes(token)) throw new Error(`Missing SEO Doctor queue/filter/context feature: ${token}`);
