@@ -1,3 +1,13 @@
+## SESSION CHECKPOINT (2026-11-01 16:55 Africa/Nairobi): post-merge workflow check, IN PROGRESS (claude.ai chat, GitHub + Supabase connected)
+Owner: "Fix and autosave on handoff. Merged/commit directly. Check handoff for pending task."
+- [x] Cloned `main` (bd56e79). Checked Actions: after PR #168 (a5f1615) the `Site audit` run on main (41310351456) FAILED only in "Accessibility (Pa11y, sampled safe routes)" (exit code 2 = real findings). On-page rules, Lychee broken links and Lighthouse performance passed; `pages build and deployment` runs succeeded; Uptime monitor passed.
+- [ ] IN PROGRESS: reproduce Pa11y locally (serve repo root, run `.pa11yci.json` URLs against localhost with google-chrome) to see which pages/rules fail; the workflow artifact download is blocked from this sandbox. Note: Pa11y tests the LIVE domain, so a run during a Pages deploy can read stale pages.
+- [ ] Then run `python3 mobile-shell/shell.test.py` (Playwright/Chromium) and record the result.
+- Exact re-run: `cd repo && python3 -m http.server 8000 &` then `npx pa11y-ci --config <config with http://localhost:8000 URLs>`.
+- Autosave: committed directly to main.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-01): SEO audit coverage restored; live SEO follow-through pending
 
 - [x] Recovered this handoff and reviewed the latest SEO work and owner-side blockers before changing the repository.
