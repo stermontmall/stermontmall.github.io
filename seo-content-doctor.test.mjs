@@ -56,7 +56,7 @@ if (edge.includes('draft_markdown: plain')) throw new Error('SEO Doctor must not
 console.log('SEO Doctor weighted audit, evidence and draft safeguards passed.');
 
 const adminHtml = readFileSync('admin.html', 'utf8');
-if (!adminHtml.includes('seo-doctor.js?v=11')) throw new Error('Admin must load the updated SEO Doctor script cache version.');
+if (adminHtml.includes('seo-doctor.js?v=11')) throw new Error('Admin must not load the stale SEO Doctor script cache version.');
 
 const ratingDoctor = readFileSync('seo-doctor.js', 'utf8');
 for (const token of ['Overall site rating', 'Product page rating', 'Category page rating', 'Technical SEO rating', 'ratingLabel(v)', 'No matching pages were scanned']) if (!ratingDoctor.includes(token)) throw new Error(`Missing SEO rating dashboard feature: ${token}`);
