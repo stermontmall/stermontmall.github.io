@@ -484,3 +484,11 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Added refrigerator sizing/placement, food organisation and maintenance guidance; added microwave container, heating, ventilation and door-safety guidance.
 - [x] Extended regression tests for both pages; avoided inventing model capacity/dimensions or microwave power/capacity.
 - [ ] Run PR quality gate, merge only if tests and full on-page audit pass, then verify production deployment.
+
+
+## 2026-11-01 — Product content batch 10 (in progress)
+- [x] Reviewed Vision Plus 32-inch Full HD Smart TV (~344 words) and Ultra-style Bluetooth-calling smartwatch (~346 words).
+- [x] Added wall-bracket installation, streaming/subscription and warranty-document guidance for the TV.
+- [x] Added phone pairing, notification, charging and safe-use guidance for the watch; clarified that wellness readings are not medical measurements and avoided unverified water-resistance claims.
+- [x] Extended product-content regression tests for both pages.
+- [ ] Run quality gate and full audit, merge only if green, verify deployment.

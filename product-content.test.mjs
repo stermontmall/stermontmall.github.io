@@ -24,7 +24,9 @@ const expected = [
   "smartphone-gift-bundle-led-watch-power-bank-earbuds",
   "urban-comfort-womens-green-fleece-tracksuit",
   "vision-plus-double-door-refrigerator",
-  "roch-mechanical-microwave-oven"
+  "roch-mechanical-microwave-oven",
+  "vision-plus-32-inch-full-hd-smart-tv-with-free-wall-bracket",
+  "ultra-smart-watch-with-bluetooth-calling-and-ocean-strap-grey"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
