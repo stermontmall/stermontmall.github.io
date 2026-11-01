@@ -38,6 +38,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Test shared SEO metadata rules
+        run: node seo-meta.test.mjs
+
       - name: Build pages and sitemap from the live catalog
         run: node generate-products.mjs
 
