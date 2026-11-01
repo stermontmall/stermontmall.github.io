@@ -54,3 +54,6 @@ for (const token of [
 if (edge.includes('completed_with_errors')) throw new Error('Research run status must match the database status constraint.');
 if (edge.includes('draft_markdown: plain')) throw new Error('SEO Doctor must not label copied page text as a generated draft.');
 console.log('SEO Doctor weighted audit, evidence and draft safeguards passed.');
+
+const adminHtml = readFileSync('admin.html', 'utf8');
+if (!adminHtml.includes('seo-doctor.js?v=11')) throw new Error('Admin must load the updated SEO Doctor script cache version.');
