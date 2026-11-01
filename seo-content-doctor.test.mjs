@@ -89,3 +89,11 @@ execFileSync(process.execPath, ['--check', 'product-seo-optimizer.js'], { stdio:
 if (!adminHtml.includes('product-seo-optimizer.js?v=4')) throw new Error('Admin must load the current product SEO optimizer.');
 if (!adminHtml.includes('seo-doctor.js?v=13')) throw new Error('Admin must load the current SEO Doctor bundle.');
 console.log('Product SEO Optimizer regression checks passed.');
+
+
+// Guard against the HTTP 400 regression: both editorial status changes must send JSON.
+const statusPatchHeaders = (admin.match(/headers:\{'Content-Type':'application\\/json',Prefer:'return=representation'\}/g) || []).length;
+if (statusPatchHeaders < 2) throw new Error('SEO Doctor approval and rejection must both send Content-Type: application/json.');
+const optimizerPatchHeaders = (optimizer.match(/headers:\{'Content-Type':'application\\/json',Prefer:'return=representation'\}/g) || []).length;
+if (optimizerPatchHeaders < 2) throw new Error('Product SEO optimizer single and bulk saves must both send Content-Type: application/json.');
+console.log('SEO Doctor and product optimizer JSON PATCH header regression checks passed.');
