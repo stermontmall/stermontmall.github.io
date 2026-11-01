@@ -278,5 +278,41 @@
         "Allow hot surfaces, trays and oven racks to cool before cleaning. Use cookware that sits steadily on the supports and keep handles turned away from walkways. Clean spills with products suitable for the appliance's finish and avoid pouring water into burners or electrical components."
       ]
     }
+  ],
+  "portable-wireless-bluetooth-speaker": [
+    {
+      "heading": "Check the speaker suits your devices and listening space",
+      "paragraphs": [
+        "This listing describes a generic portable Bluetooth speaker, so exact details such as output power, battery capacity, playback time, Bluetooth version, charging connector and supported memory-card or USB inputs are not specified. If you need a particular feature, ask us to confirm it for the exact unit before ordering. Bluetooth pairing generally requires the speaker and phone or computer to be close enough and discoverable; walls, interference and device settings can affect connection range and stability.",
+        "Think about where you will use the speaker most. A small room, desk or occasional gathering has different needs from an outdoor event or a large hall. A portable speaker should not be assumed to be waterproof or suitable for exposure to rain unless its exact model carries a verified water-resistance rating."
+      ],
+      "bullets": [
+        "Confirm the charging cable and any extra inputs included in the package.",
+        "Check your phone or laptop supports Bluetooth audio before purchase."
+      ]
+    },
+    {
+      "heading": "Pair, charge and store the speaker carefully",
+      "paragraphs": [
+        "For first use, charge the speaker using the supplied or manufacturer-recommended cable and follow its charging instructions. Turn on Bluetooth on your phone, place the speaker in pairing mode and select its device name from the available list. If it does not connect, check that it is not already paired to another device, then consult the manual for the reset or pairing procedure.",
+        "Keep the speaker away from moisture, excessive heat and dusty locations. Use a moderate volume for extended listening and avoid leaving a rechargeable battery completely discharged for long periods. Store it in a dry place and do not pull the charging cable by its wire when disconnecting it."
+      ]
+    }
+  ],
+  "ramtons-steam-iron-with-vertical-and-variable-steam": [
+    {
+      "heading": "Get better results from vertical and variable steam",
+      "paragraphs": [
+        "The vertical-steam function is useful for refreshing suitable hanging garments and some curtains, while the variable-steam control lets you adjust steam output for different ironing tasks. Always check the garment care label first: some fabrics should be ironed at low heat, without steam, or not ironed at all. When you are unsure, test a low setting on an inconspicuous area or follow the garment manufacturer's advice.",
+        "For a neat result, sort clothes by their recommended heat setting and begin with fabrics that need lower temperatures. Smooth the garment on the ironing board and move the iron steadily rather than holding it in one place. When using vertical steam, hang the garment securely and keep your hands and face away from the steam path."
+      ]
+    },
+    {
+      "heading": "Maintain the soleplate and water tank",
+      "paragraphs": [
+        "Use the water type and descaling procedure recommended in the Ramtons instruction manual. Mineral deposits can build up in steam appliances, so follow the manual's guidance for cleaning and storage rather than adding cleaning chemicals to the tank. Empty remaining water after use if the instructions recommend it, allow the iron to cool fully and store it upright in a dry place.",
+        "Check the power cord and plug before each use. Stop using the iron if the cable is damaged, water leaks near electrical parts or the soleplate becomes damaged. Unplug before filling, emptying or cleaning, and keep the hot appliance out of reach of children."
+      ]
+    }
   ]
 }

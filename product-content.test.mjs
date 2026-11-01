@@ -17,7 +17,9 @@ const expected = [
   "elite-tailoring-mustard-yellow-blazer-piece",
   "elite-tailoring-royal-blue-textured-blazer-piece",
   "itel-smartphone",
-  "nunix-gas-and-electric-cooker"
+  "nunix-gas-and-electric-cooker",
+  "portable-wireless-bluetooth-speaker",
+  "ramtons-steam-iron-with-vertical-and-variable-steam"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
