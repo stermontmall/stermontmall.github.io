@@ -66,4 +66,4 @@ if (staleQuotes.length) {
 md += '> Privacy: this report intentionally excludes customer names, phone numbers, email addresses and street addresses. Open the authorised admin to contact customers. This report does not send messages or change order/quote statuses.\n';
 writeFileSync('sales-leads-report.md', md);
 writeFileSync('sales-leads-count.txt', String(staleOrders.length + staleQuotes.length));
-console.log(md);
+// Do not print or publish this report: the repository is public. Keep report data only on the ephemeral runner.
