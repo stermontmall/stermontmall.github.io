@@ -80,8 +80,20 @@ jobs:
             echo "Nothing changed - no commit needed."
           else
             git commit -m "Update product pages and sitemap"
-            git pull --rebase || true
-            git push
+            # Another automation or maintainer may update main while this build is running.
+            # Fetch/rebase and retry a rejected push instead of losing this generated update.
+            for attempt in 1 2 3; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                echo "Generated pages and sitemap saved to main."
+                exit 0
+              fi
+              echo "Push attempt ${attempt} was rejected; retrying after fetching the latest main."
+              sleep $((attempt * 2))
+            done
+            echo "::error::Could not publish generated pages after three push attempts."
+            exit 1
           fi
 
       - name: Tell Bing and other search engines about changed pages (IndexNow)
