@@ -1,3 +1,12 @@
+## PROGRESS CHECKPOINT — 01 Nov 2026 (Africa/Nairobi)
+**Summary:** Added and merged the phone-friendly GitHub progress checkpoint system (PR #104).
+**Completed:** Workflow `.github/workflows/save-progress.yml`, writer script `scripts/save-progress.mjs`, usage guide `PROGRESS-SAVE.md`; PR #104 merged to main (merge commit 45b5aff). Checkpoint workflow and files are present on main.
+**Next:** Continue the SterMont Mall SEO and website fixes. Save a checkpoint after each meaningful batch using GitHub Actions. Verify the live Premise legacy URL redirect and deployment.
+**Blocked / owner action:** No user action needed for this checkpoint. Manual GitHub Actions workflow does not detect ChatGPT usage limits or save unsent messages/uncommitted code automatically.
+**Working branch / PR:** main; PR #104 merged.
+
+---
+
 ## NEW TASK (2026-11-01): add phone-friendly progress checkpoint tool
 Status: MERGED to `main` as PR #104 (merge commit 45b5aff); files verified on `main`.
 - [x] Added `.github/workflows/save-progress.yml`: manual GitHub Actions workflow with fields for summary, completed, next, blockers, and working branch/PR. It checks out `main`, writes the checkpoint, and commits it to `main`.
