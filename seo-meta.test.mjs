@@ -107,7 +107,6 @@ console.log('example PDP :', pdpTitle('Bazooka 18EC Insecticide (1L)', { catSlug
 console.log('example desc:', pdpDescription('Bazooka 18EC', { catSlug: 'crop-insecticides' }));
 console.log('example cat :', catTitle('Crop Insecticides'));
 console.log('example cdsc:', catDescription('Crop Insecticides', 'crop-insecticides'));
-console.log(`OK: ${n} checks, 0 violations`);
 
 
 // ProductGroup offers must point at the selected pack-size fragment, not every size at the base variant.
@@ -118,3 +117,5 @@ assert.equal(pdpVariantUrl('/p/premise-200-sc-termiticide-50-ml.html', 'premise-
 assert.equal(pdpVariantUrl('/p/item.html', '', 'item'), 'https://stermontarcade.co.ke/p/item.html');
 assert.equal(pdpVariantUrl('/p/item.html', 'size a', 'item'), 'https://stermontarcade.co.ke/p/item.html#size%20a');
 n += 4;
+
+console.log(`OK: ${n} checks, 0 violations`);
