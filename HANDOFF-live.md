@@ -499,3 +499,9 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Reviewed AILYONS Double Burner Glass Gas Cooker page (327 existing words). Added practical counter/cookware planning, qualified LPG setup, leak-response, and cool-down/cleaning guidance, without inventing burner ratings or dimensions.
 - [x] Added product to the distinct-content regression test. Supplementary section text remains plain text and within the 140–320 word guardrail.
 - [ ] Run PR checks, merge only after success, then verify generated product page and deployment.
+
+
+## 2026-11-01 — AILYONS cooker content saved
+- [x] Saved two model-specific sections in product-content.json: practical counter/cookware planning and safe LPG setup, leak response, glass-top cleaning and maintenance.
+- [x] Added the product ID to the exact expected-content regression list; test ceiling remains 360 words and safety/unsupported-claim checks remain active.
+- [ ] Validate current PR against main, run quality gate/product generation, merge only after checks pass, then confirm deployment.
