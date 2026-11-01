@@ -1,0 +1,63 @@
+name: Save progress checkpoint
+
+on:
+  workflow_dispatch:
+    inputs:
+      summary:
+        description: "What were you working on? (required)"
+        required: true
+        type: string
+      completed:
+        description: "What is completed?"
+        required: false
+        type: string
+      next:
+        description: "What should happen next?"
+        required: false
+        type: string
+      blocked:
+        description: "Blockers or things needing owner action"
+        required: false
+        type: string
+      working_branch:
+        description: "Branch or PR being worked on"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: progress-checkpoint-main
+  cancel-in-progress: false
+
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Add checkpoint to handoff
+        env:
+          CHECKPOINT_SUMMARY: ${{ inputs.summary }}
+          CHECKPOINT_COMPLETED: ${{ inputs.completed }}
+          CHECKPOINT_NEXT: ${{ inputs.next }}
+          CHECKPOINT_BLOCKED: ${{ inputs.blocked }}
+          CHECKPOINT_BRANCH: ${{ inputs.working_branch }}
+        run: node scripts/save-progress.mjs
+
+      - name: Commit checkpoint to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add HANDOFF-live.md
+          if git diff --cached --quiet; then
+            echo "No checkpoint changes to commit."
+            exit 0
+          fi
+          git commit -m "docs: save progress checkpoint"
+          git push origin HEAD:main
