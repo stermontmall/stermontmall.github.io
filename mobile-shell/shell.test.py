@@ -31,18 +31,18 @@ def row(id, cat, name, price, old, featured=False, group=None, label=None, stock
     return dict(id=id, slug=id, name=name, category_id=cat, price=str(price), old_price=str(old), stock=stock, featured=featured,
                 images=[img] if img else [], unit=None, variant_group=group, variant_label=label)
 ROWS = [row('home-0', 24, 'Hot Plate', 2500, 3000, featured=True)]
-ROWS += [row(f'garden-set-{l.replace(" ", "")}', 71, 'Garden Hose Connector SetSC Garden Tool', pr, int(pr * 1.15), featured=True, group='garden-set', label=l)
+ROWS += [row(f'garden-set-{l.replace(" ", "")}', 71, 'Garden Hose Connector Set', pr, int(pr * 1.15), featured=True, group='garden-set', label=l)
          for l, pr in [('1 Litre', 6450), ('250 ml', 1550), ('100 ml', 690), ('50 ml', 390)]]
 ROWS += [row(f'outdoor-{i}', 32, f'Garden Hose Nozzle {i}', 300 + i * 250, 300 + i * 250 + 60 * (i % 3)) for i in range(1, 6)]
 ROWS += [row('outdoor-broken', 32, 'Plant Pot Set', 450, 520, img=BROKEN)]
 ROWS += [row(f'phone-{i}', 2, f'Phone Model {i}', 9000 + i * 4000, 9000 + i * 4000 + 1500) for i in range(1, 9)]
-ROWS += [row('garden-1', 71, 'Copper Garden Tool', 1200, 1200), row('garden-2', 71, 'Garden Gloves', 800, 900)]
+ROWS += [row('garden-1', 71, 'Watering Can', 1200, 1200), row('garden-2', 71, 'Garden Gloves', 800, 900)]
 ROWS += [row('home-1', 24, 'Air Fryer 5L', 6500, 7800), row('home-2', 24, 'Kettle 1.8L', 1800, 2100), row('home-3', 24, 'Blender', 3200, 3900)]
 ROWS += [row('home-soldout', 24, 'Gone Item', 100, 120, stock=0)]
 NAMES_FIX = {'home-0': 'Heavy-Duty Hot Plate Pro'}   # product-names.json heading; every other product falls back to its database name
 FAIL = [False]
 # Products the Deals badge should count: in stock, lowest size has an old price above its price. 19 = hot plate, Garden Hose Connector Set (one folded product),
-# 4 garden hose sprays (outdoor-3 has no old price), the powder, 8 phones, Garden Gloves, 3 kitchen items; the sold-out item and Copper Garden Tool do not count.
+# 4 garden hose sprays (outdoor-3 has no old price), the powder, 8 phones, Garden Gloves, 3 kitchen items; the sold-out item and Watering Can do not count.
 DEALS_EXPECTED = 19
 
 def serve(route, body, ctype='application/json'):
@@ -137,7 +137,7 @@ with sync_playwright() as p:
     pg.wait_for_selector('#page-product.open', timeout=5000)
     pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
     check('product page opens inside the shell (same URL, shell still loaded)', pg.url == url_before and pg.locator('#bottom-nav').count() == 1, pg.url)
-    check('product page shows name, price, sizes, description, unit and trust lines', 'Garden Hose Connector SetSC Garden Tool' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
+    check('product page shows name, price, sizes, description, unit and trust lines', 'Garden Hose Connector Set' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
     pg.screenshot(path=f'{OUT}/shot-product-page.png')
     check('product page: similar products listed', pg.locator('#pp-related [data-pp-open]').count() >= 1)
     pg.locator('#pp-sizes [data-pp-size="1 Litre"]').click()
@@ -339,7 +339,7 @@ with sync_playwright() as p:
     check('address: home is the bare "/" address', p9.evaluate('location.pathname + location.search') == '/')
     p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#sheet-quickbuy.open')
     check('address: opening a product puts its own page address (/p/<slug>.html + size) in the address bar', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-50ml', p9.url)
-    check('address: tab title shows the product', 'Garden Hose Connector SetSC Garden Tool' in p9.title() and p9.title().endswith('| Stermont Arcade'), p9.title())
+    check('address: tab title shows the product', 'Garden Hose Connector Set' in p9.title() and p9.title().endswith('| Stermont Arcade'), p9.title())
     p9.locator('#qb-sizes [data-size="250 ml"]').click()
     check('address: choosing another size updates the address (no extra history entry)', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml', p9.url)
     p9.locator('#qb-page').click(); p9.wait_for_selector('#page-product.open')
@@ -349,7 +349,7 @@ with sync_playwright() as p:
     p9.go_back(); p9.wait_for_function("!document.querySelector('#sheet-quickbuy.open')")
     check('address: closing the product restores "/" and the page title', p9.evaluate('location.pathname + location.search') == '/' and p9.title() == base_title, p9.url + ' | ' + p9.title())
     p9.goto(f'{BASE}/?product=garden-set-250ml'); p9.wait_for_selector('#page-product.open', timeout=10000)
-    check('address: opening the address shows that product page with that size', 'Garden Hose Connector SetSC Garden Tool' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
+    check('address: opening the address shows that product page with that size', 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
     check('address: the address stays after load and the tab title shows the product', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml' and 'Garden Hose Connector Set' in p9.title())
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
     check('address: Back from an opened address lands on the shell home ("/")', p9.evaluate('location.pathname + location.search') == '/' and p9.locator('#view-home').is_visible(), p9.url)
@@ -374,7 +374,7 @@ with sync_playwright() as p:
     c11 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c11); serve_p(c11)
     p11 = c11.new_page(); e11 = []; p11.on('pageerror', lambda e: e11.append(str(e)))
     p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml'); p11.wait_for_selector('#page-product.open', timeout=15000)
-    check('redirect: a phone opening a product page link lands in the shell on that product and size', 'Garden Hose Connector SetSC Garden Tool' in p11.locator('#pp-name').inner_text() and p11.locator('#pp-price').inner_text() == 'KSh 1,550', p11.locator('#pp-price').inner_text())
+    check('redirect: a phone opening a product page link lands in the shell on that product and size', 'Garden Hose Connector Set' in p11.locator('#pp-name').inner_text() and p11.locator('#pp-price').inner_text() == 'KSh 1,550', p11.locator('#pp-price').inner_text())
     check('redirect: the address is the product page address again (copy/share keeps its preview)', p11.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml', p11.url)
     p11.goto(f'{BASE}/p/garden-set-1Litre.html'); p11.wait_for_selector('#page-product.open', timeout=15000)
     check('redirect: without a size in the hash the page\'s own size opens', p11.locator('#pp-price').inner_text() == 'KSh 6,450', p11.locator('#pp-price').inner_text())
