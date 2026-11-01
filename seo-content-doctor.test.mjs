@@ -71,9 +71,14 @@ for (const token of [
   'Save reviewed description',
   "Prefer:'return=representation'",
   'expected exactly one updated product',
-  'No products changed'
+  'No products changed',
+  'Prepare safe fixes',
+  'Save prepared fixes (max 20)',
+  'verified pages below 100/100',
+  'slice(0,20)',
+  'Product ID mismatch'
 ]) if (!optimizer.includes(token)) throw new Error(`Missing product SEO optimizer safeguard or feature: ${token}`);
 execFileSync(process.execPath, ['--check', 'product-seo-optimizer.js'], { stdio: 'inherit' });
-if (!adminHtml.includes('product-seo-optimizer.js?v=1')) throw new Error('Admin must load the product SEO optimizer.');
+if (!adminHtml.includes('product-seo-optimizer.js?v=2')) throw new Error('Admin must load the current product SEO optimizer.');
 if (!adminHtml.includes('seo-doctor.js?v=13')) throw new Error('Admin must load the current SEO Doctor bundle.');
 console.log('Product SEO Optimizer regression checks passed.');
