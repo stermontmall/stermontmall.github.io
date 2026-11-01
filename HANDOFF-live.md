@@ -709,3 +709,13 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [ ] After merge, allow the product-pages workflow to rebuild all product pages; verify the Premise JSON-LD 1 litre offer has the correct `#premise-200-sc-termiticide-1-litre` fragment.
 - [ ] No live-host or Google rich-results validation has yet been performed.
 - Autosave: this checkpoint is committed on the PR #171 branch.
+
+
+## SESSION CHECKPOINT (2026-11-01): ProductGroup variant URL repair merged
+- [x] PR #171 passed the full SEO pull-request quality gate (workflow run 41312026625): mobile-shell browser regression suite, JavaScript syntax, SEO metadata tests, hand-written product content tests, blog/sitemap rebuild, product/category generation, SEO enrichment and full generated-page audit all completed successfully.
+- [x] Reviewed the completed workflow job: all 15 validation steps succeeded and the SEO audit artifact was uploaded.
+- [x] Squash-merged PR #171 to main (merge commit b58cd31f3e66b1d85d2adbea8115eb86fe2f30a7).
+- [ ] Verify the post-merge product-pages deployment/rebuild and inspect the generated Premise ProductGroup JSON-LD to confirm the 1 litre offer URL contains #premise-200-sc-termiticide-1-litre.
+- [ ] Live-host redirect, canonical, sitemap and Google rich-results checks remain outstanding; repository checks do not prove live deployment or Google indexing.
+- [ ] Continue next with a current mobile performance audit, targeted review of the 14 not-indexed URLs, Merchant Center identifier diagnostics, and checkout/M-Pesa code review. Owner-side Search Console and Merchant Center account diagnostics are still required for account-level actions.
+- Autosave: this checkpoint is committed directly to main.
