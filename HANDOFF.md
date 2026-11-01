@@ -1,3 +1,23 @@
+# HANDOFF - Product-content sentence quality repair (branch `fix/product-content-sentence-quality-tests-20261101`, 2026-11-01)
+STATUS: IN PROGRESS. Do not add product entries. Do not change product titles, prices, or any file other than `product-content.json`, `product-content.test.mjs`, and this handoff.
+
+## Verified
+- [x] Confirmed `product-content.json` contains exactly 127 existing entries.
+- [x] Audited sentence reuse across product entries. Using normalized sentences of 7+ words, 79 of 127 entries have more than 30% reused sentences (1,909 eligible sentences; 677 reused). This reproduces the independent finding.
+- [x] Updated `product-content.test.mjs` to calculate cross-product sentence reuse and fail any entry above 30%. Existing paragraph-level uniqueness checks remain.
+- [ ] Rewrite reused/template sentences in `product-content.json` with genuinely product-specific guidance grounded in each product's existing catalogue description. Preserve product IDs, headings where already accurate, and all factual safety constraints. Do not pad content or invent specifications, compatibility, approvals, warranties, rates or performance claims.
+- [ ] Re-run `node product-content.test.mjs`; target 127 entries passing and no product above 30% reused sentences.
+- [ ] Run the repository's relevant product-content/SEO quality checks and verify only the three permitted files changed.
+- [ ] Update this handoff with final counts and test results before opening or merging a PR.
+
+## Current checkpoint
+- Test change committed to this branch: `c9ae4255ad45df7a8b6a308e3d93460856452755`.
+- The new sentence-reuse assertion is expected to fail until the content file is repaired; the content file has not yet been changed.
+- Source facts are available in the existing `public.products.description` records in Supabase. Read only for this task; do not write to Supabase.
+- Do not start another product batch until this repair and its tests are complete.
+
+---
+
 # HANDOFF - SEO batch 08: 8 pest-control products + 8 blogs (branch `wip-seo-batch-08`, 2026-10-31)
 STATUS: MERGED to `main`. Descriptions written to Supabase for all 13 rows with every stored text MD5-equal to `seo-pest/build.mjs` output; backup in `description_backup` batch `pest-batch-08`; `seo-pest/batch-08.json` (1047 checks) and `seo-pest/blogs-08.json` (1365 checks) pass, 0 violations. Details and the next steps are in `HANDOFF-live.md`.
 
