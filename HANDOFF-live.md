@@ -821,3 +821,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Fresh post-merge Site audit 41314403234: Pa11y passed 19/19 sampled pages; Lychee broken-link check passed; on-page technical SEO rules passed.
 - [ ] Unlighthouse performance scan in Site audit 41314403234 was still running at the last check; inspect its final report before making performance claims or optimizing.
 - [x] Supabase `mpesa-callback` version 18 additionally binds callback PhoneNumber to the stored STK request phone, alongside amount equality and receipt validation.
+
+
+## SESSION CHECKPOINT (2026-11-01): Price automation safety
+- [x] Reviewed the 2026-11-01 Price watch issue: it reports 5 above-market, 10 under-market, 41 in-line and 169 unmatched; several sources were blocked/timeouts or returned no readable listings. One existing automatic price change was reported: Portable Wireless Bluetooth Speaker KSh 899 -> KSh 820.
+- [x] User instruction is not to silently alter product prices or facts. New branch `safety/price-watch-explicit-approval-2026-11` changes `price-watch.config.json` to `autoApply: false` and changes the workflow to report-only for every scheduled run.
+- [x] A manual run now requires the explicit `Apply price changes` checkbox to opt in; no price changes are made by default.
+- [ ] Validate and merge PR after checks. Existing reported KSh 820 price is not reverted automatically; review against the actual supplier/stock price before changing it.
