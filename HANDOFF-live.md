@@ -7,6 +7,7 @@ Status: IN PROGRESS on `fix/seo-audit-findings-nov-2026`; PR to follow.
 - [x] Removed a stale product URL from the seed-price guide where no corresponding generated product page exists.
 - [x] Shortened long meta descriptions on bulk quote and Nairobi landing pages.
 - [x] Expanded daily SEO audit triggers to public blog, guide and root HTML edits.
+- [x] Added a reusable blog-title normalizer and connected it to the blog rebuild workflow; future long blog titles are automatically shortened before index/sitemap refresh.
 - [ ] Run the updated audit, inspect remaining title and link issues, and fix verified findings.
 - [ ] Check live deployment, Search Console and Merchant Center; Search Console credentials remain owner-side.
 - Product import note: admin already includes CSV bulk import with photos, prices, stock, pack sizes and descriptions. It is not connected to a supplier feed; fully automatic sourcing requires an approved supplier feed/API and matching SKU/price/stock rules. Do not auto-publish unverified catalogue claims.
