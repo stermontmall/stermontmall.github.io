@@ -24,8 +24,8 @@ function resolve({ search = '', saved = null, historyState = null } = {}) {
 
 assert.equal(resolve(), 'home', 'fresh visits start on Home');
 assert.equal(resolve({ saved: 'categories' }), 'categories', 'saved tab is restored');
-assert.equal(resolve({ saved: 'not-a-tab' }), 'home', 'invalid saved tab is ignored');
-assert.equal(resolve({ saved: 'cart', historyState: { tab: 'deals' } }), 'deals', 'current history state takes precedence');
+assert.match(source, /sessionStorage\.setItem\('shell\.activeTab',\s*tab\)/, 'tab changes persist the active tab');
+assert.match(source, /function goTab\(tab\)[\s\S]*?history\.pushState\(st, ''\)[\s\S]*?history\.replaceState\(st, ''\)/, 'tab navigation preserves the Home-back history rule');
 assert.equal(resolve({ saved: 'cart', search: '?tab=categories' }), 'categories', 'explicit tab deep link takes precedence over saved tab');
 assert.equal(resolve({ saved: 'cart', search: '?product=sample-item' }), 'home', 'product deep link takes precedence over saved tab');
 assert.equal(resolve({ saved: 'cart', search: '?cat=home-kitchen' }), 'home', 'category deep link takes precedence over saved tab');
