@@ -10,7 +10,8 @@ const expected = [
   "samsung-galaxy-a55-5g-1-piece",
   "tcl-75c6k-qd-mini-led-4k-smart-tv-75-inch",
   "vitron-htc4300qfs-qled-android-smart-tv-with-wall-mount-43-inch",
-  "32-inch-frameless-qled-smart-android-tv-free-accessories"
+  "32-inch-frameless-qled-smart-android-tv-free-accessories",
+  "classic-mens-black-formal-blazer"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
