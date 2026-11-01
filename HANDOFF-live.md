@@ -612,3 +612,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Replaced repeated blocks with product-specific purchase, variant-check and safe-use guidance, retaining chemical label and veterinary safeguards where relevant.
 - [x] Added a regression assertion that rejects paragraph or bullet reuse across different product pages.
 - [ ] Run regression suite, product-page generation and Kenyan SEO/on-page audit; merge only after all checks pass, then verify deployment.
+
+
+## 2026-11-01 — Product content batch 22
+- [x] Added two individually written sections for 10 further catalogue listings: Xiaomi Poco C71, Tecno Spark Go 3, Xiaomi Redmi 15C, Samsung Galaxy A06, Familly aerosol insect killer, Green Killer sticky fly traps, 2-litre hand pressure sprayer, ElectroMate 20L oven, ElectroMate 1000W dry iron and AILYONS two-burner table-top cooker.
+- [x] Copy addresses the exact listed memory configurations, Kenyan SIM/mobile-money setup, pest-label and aerosol precautions, sprayer compatibility, appliance electrical loads, LPG installation and product care without inventing unlisted specifications.
+- [x] Extended regression coverage from 127 to 137 product IDs; existing exact paragraph/bullet reuse checks remain active.
+- [ ] Run the full SEO PR quality gate and generated-page audit; merge only after all checks pass, then verify Pages deployment.
