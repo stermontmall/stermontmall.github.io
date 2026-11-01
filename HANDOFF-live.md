@@ -719,3 +719,15 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [ ] Live-host redirect, canonical, sitemap and Google rich-results checks remain outstanding; repository checks do not prove live deployment or Google indexing.
 - [ ] Continue next with a current mobile performance audit, targeted review of the 14 not-indexed URLs, Merchant Center identifier diagnostics, and checkout/M-Pesa code review. Owner-side Search Console and Merchant Center account diagnostics are still required for account-level actions.
 - Autosave: this checkpoint is committed directly to main.
+
+
+## SESSION CHECKPOINT (2026-11-01): accessibility and build-publish reliability repair
+- [x] Investigated the latest live-site audit: broken-link scan and on-page technical-rule scan passed; Pa11y exposed repeated search-form accessibility defects and low-contrast blog CTA links.
+- [x] Identified root shop search input missing an accessible name and submit control; added an explicit accessible label, query name and screen-reader-accessible submit button.
+- [x] Identified mobile static-page chrome search form missing a submit button; added a keyboard-operable submit control and adjusted input spacing.
+- [x] Darkened blog CTA green from #16a34a to #008933 to address the reported white-text contrast ratio of 3.3:1.
+- [x] Fixed product-page publishing race: generated-page workflow now fetches/rebases and retries rejected pushes up to three times instead of one unprotected push.
+- [x] Expanded site-audit triggers so changes to the home search, mobile chrome or blog stylesheet rerun accessibility/performance/link checks.
+- [ ] Run JavaScript syntax checks and inspect the branch diff; open PR and wait for validation.
+- [ ] After merge, rerun Site audit and Build product pages; verify Pa11y findings and generated output. No live-host verification beyond the GitHub Pages deployment status is claimed.
+- Autosave: all changes and this checkpoint are committed on branch fix/site-accessibility-and-build-retry-2026-11.
