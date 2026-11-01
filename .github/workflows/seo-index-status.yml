@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '30 7 * * *'
+  workflow_run:
+    workflows: ['Build product pages']
+    types: [completed]
 
 permissions:
   contents: read
@@ -14,6 +17,7 @@ permissions:
 
 jobs:
   report:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +25,8 @@ jobs:
         with:
           node-version: 20
       - name: Check every page with Google
+        id: inspect
+        continue-on-error: true
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           GSC_PROPERTY: ${{ secrets.GSC_PROPERTY }}
@@ -33,3 +39,6 @@ jobs:
             gh issue close "$n" --comment "Superseded by the newer report." || true
           done
           gh issue create --title "Google indexing status $(date +%F)" --body-file index-status.md
+      - name: Mark incomplete inspection as failed
+        if: steps.inspect.outcome == 'failure'
+        run: exit 1
