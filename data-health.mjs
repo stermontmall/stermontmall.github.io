@@ -33,6 +33,8 @@ const checks = [
   ['Duplicate products (same name and pack size)', dupes],
   ['No product photo (hurts Google Merchant and sales)', rows.filter((p) => !hasImg(p)).map(label)],
   ['No description (weak SEO)', rows.filter((p) => !String(p.description || '').trim()).map(label)],
+  ['Description under 100 characters (too little product context for useful search snippets)', rows.filter((p) => String(p.description || '').trim().length > 0 && String(p.description).trim().length < 100).map((p) => `${label(p)} (${String(p.description).trim().length} chars)`)],
+  ['Missing product name', rows.filter((p) => !String(p.name || '').trim()).map((p) => `Product ID ${p.id}`)],
   [`Suspicious stock (${STOCK_SUSPICIOUS}+ pieces, check for a typo)`, rows.filter((p) => Number(p.stock) >= STOCK_SUSPICIOUS).map((p) => `${label(p)}: ${p.stock}`)],
 ];
 
