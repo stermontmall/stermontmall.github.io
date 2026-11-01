@@ -17,6 +17,7 @@ on:
       - 'c/**'
       - 'guides/**'
       - 'services/**'
+      - 'mobile-shell/**'
       - '*.html'
       - '.github/workflows/**'
   workflow_dispatch:
@@ -36,6 +37,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Test mobile shell tab persistence and deep-link precedence
+        run: node mobile-shell/navigation.test.mjs
       - name: Check JavaScript syntax
         run: |
           node --check seo-check.mjs
