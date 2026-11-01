@@ -1,9 +1,9 @@
 ## NEW TASK (2026-11-01): add phone-friendly progress checkpoint tool
-Status: IMPLEMENTED on `wip-progress-checkpoint-tool`; awaiting PR review/merge.
+Status: MERGED to `main` as PR #104 (merge commit 45b5aff); files verified on `main`.
 - [x] Added `.github/workflows/save-progress.yml`: manual GitHub Actions workflow with fields for summary, completed, next, blockers, and working branch/PR. It checks out `main`, writes the checkpoint, and commits it to `main`.
 - [x] Added `scripts/save-progress.mjs`: prepends a timestamped Africa/Nairobi checkpoint to this file; refuses to create a replacement if `HANDOFF-live.md` is missing.
 - [x] Added `PROGRESS-SAVE.md`: phone instructions and limitations.
-- [ ] Open and merge the PR. After merge, use GitHub > Actions > Save progress checkpoint > Run workflow.
+- [x] PR #104 merged to `main`. Ready to use: GitHub > Actions > Save progress checkpoint > Run workflow.
 - Limitation: manual save only; GitHub Actions cannot detect an approaching ChatGPT usage limit or capture unsaved chat/code automatically. Code must still be committed to its working branch.
 - Related previous task: Premise legacy URL redirect was merged in PR #103 (merge commit 425f445); live deployment and redirect still need browser verification.
 
