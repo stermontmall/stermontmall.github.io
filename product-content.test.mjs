@@ -37,7 +37,9 @@ const expected = [
   "ailyons-2-2l-electric-kettle-luxury-dark-purple",
   "von-138l-direct-cool-double-door-fridge-silver-138-litres",
   "ipcone-16-inch-wall-mounted-fan-black-3-speed-control",
-  "ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd"
+  "ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd",
+  "abasi-5-ec",
+  "alonze-50ec-abamectin-insecticide-1-litre"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
