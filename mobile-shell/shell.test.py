@@ -293,7 +293,7 @@ with sync_playwright() as p:
     check('checkout mode: the old home page is not shown behind the checkout', p4.evaluate("document.documentElement.classList.contains('stm-co') && !document.documentElement.classList.contains('stm-co-wait') && [...document.querySelectorAll('.pcard, #featured, header, .hd-r')].every(e => e.getBoundingClientRect().width === 0 || getComputedStyle(e).visibility === 'hidden' || e.offsetParent === null)"))
     p4.locator('#dr-x').click(); p4.wait_for_function("location.pathname === '/'", timeout=8000)
     check('closing the checkout goes back to the shell, not the old home page', p4.url == BASE + '/', p4.url)
-    p4.wait_for_selector('#grid .card[data-id]')
+    p4.wait_for_selector('#view-cart', state='visible')
     check('cancelled checkout: the shell cart still has its items', json.loads(p4.evaluate("localStorage.getItem('shell.cart')") or '[]') != [])
     c4.close()
 
