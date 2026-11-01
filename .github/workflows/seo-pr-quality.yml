@@ -8,6 +8,7 @@ on:
       - 'generate-products.mjs'
       - 'data-health.mjs'
       - 'blog-write.mjs'
+      - 'blog-build.mjs'
       - 'blog-topics.json'
       - 'blog/**'
       - 'p/**'
@@ -42,7 +43,13 @@ jobs:
           node --check seo-meta.mjs
       - name: Test product and category SEO metadata
         run: node seo-meta.test.mjs
-      - name: Run full on-page SEO audit
+      - name: Normalize blog titles and rebuild blog index and sitemap
+        run: |
+          node seo-blog-titles.mjs
+          node blog-build.mjs
+      - name: Build product and category pages from the live public catalogue
+        run: node generate-products.mjs
+      - name: Run full on-page SEO audit against generated pages
         run: node seo-check.mjs > seo-pr-report.md
       - name: Add audit summary
         if: always()
