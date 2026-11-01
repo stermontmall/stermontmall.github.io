@@ -1,17 +1,24 @@
-## SESSION CHECKPOINT (2026-11-01): continued handoff review and PR cleanup
+## SESSION CHECKPOINT (2026-11-01): handoff review, merged fixes and remaining owner checks
 
-- [x] PR #149 merged to `main` (merge commit `1eacad007aaf98fe14764a6c083c3524768989d2`). It stores the selected mobile-shell tab in `sessionStorage` as a fallback, keeps explicit deep links higher priority, bumps `app.js?v=14` and the service-worker cache to v5, and adds a regression case that clears `history.state` before refreshing Categories.
-- [x] PR #149 SEO quality gate run 41298903713 passed all 12 workflow steps, including JavaScript syntax, metadata/content tests, generated product/category pages and full on-page audit. Important: that workflow does NOT execute `python3 mobile-shell/shell.test.py`; the new history-loss regression case still needs the headless Chromium test run and a real-phone check.
-- [x] Closed stale PR #57. Its title/H1 changes were based on an older SEO implementation and conflict with current `main` rules (notably the no-auto-`Best Price in Kenya` title policy and current `Buy` H1 handling). Do not revive that branch without a fresh gap analysis.
-- [x] Closed superseded PR #6; its old branch would overwrite newer catalogue/pricing code.
-- [x] Ported the intended admin catalog session-renewal and loading-timeout fix to current-main branch PR #152. Quality-gate run 41299179272 passed all 12 steps, including JavaScript syntax, metadata/content tests, live-catalogue generation, SEO enrichment and full on-page audit.
-- [x] Closed duplicate PR #151; PR #152 is the single active replacement for #6.
-- [ ] PR #152 still needs a live signed-in admin-browser test with an expired or near-expiry session before merge. Do not ask anyone to share admin credentials in chat.
-- [ ] Run `python3 mobile-shell/shell.test.py` with Playwright/Chromium against the merged PR #149 tree; the test now specifically clears `history.state` before the Categories refresh.
-- [x] Confirmed the old doubled-`Buy` issue has no remaining literal `Buy Buy` matches in the repository search; no additional code change was necessary.
-- [ ] Owner-side checks remain: phone/service-worker checks, opening two service pages and one guide in a browser, real checkout using a test order (not a real customer purchase), editorial review, Search Console review, and decisions on approved marketing wording/safety content.
-- [ ] Product catalogue/SEO work that depends on verified manufacturer or label information remains blocked until those facts are supplied and checked. No unverified product claims were added in this session.
-- Autosave: this checkpoint is committed directly to `main`; active code review is PR #152 only.
+- [x] PR #149 merged to `main` (merge commit `1eacad007aaf98fe14764a6c083c3524768989d2`). The mobile shell now saves the selected tab in `sessionStorage` as a fallback, preserves explicit deep-link precedence, uses `app.js?v=14` and service-worker cache v5, and has a regression case that clears `history.state` before refreshing Categories.
+- [x] PR #149 quality gate run 41298903713 passed all 12 workflow steps, including JavaScript syntax, metadata/content tests, generated product/category pages and the full on-page SEO audit. This workflow does not run `python3 mobile-shell/shell.test.py`; the updated Playwright/Chromium regression test and a real-phone check remain outstanding.
+- [x] PR #152 merged to `main` (merge commit `a464dd30cceccf0bb82ee36ff66e820af6905381`). The current catalogue module now shares the admin page's session refresh, coalesces fallback token refreshes, times out Catalog and Stock loading after 30 seconds with the existing retry UI, and loads as `catalog-v10.js?v=11`.
+- [x] PR #152 quality gate run 41299179272 passed all 12 workflow steps, including JavaScript syntax, metadata/content tests, generated pages, SEO enrichment and the full on-page audit. The workflow does not simulate an expired admin login in a live browser; that verification remains outstanding.
+- [x] Closed stale PR #6 because its old catalogue snapshot would overwrite newer pricing and ledger changes; the safe port is now merged in PR #152.
+- [x] Closed duplicate PR #151; PR #152 was the single replacement and is now merged.
+- [x] Closed stale PR #57. Its branch was based on an older title/H1 implementation and was not merged; do not revive without a fresh gap analysis against current `seo-meta.mjs`.
+- [x] Confirmed all 8 batch-07 and all 8 batch-08 blog slugs are present in both `blog/index.html` and `sitemap.xml`.
+- [x] Confirmed generated product pages `p/mchwatox-350-sc-termiticide-1-litre.html` and `p/actellic-50ec-insecticide-1-litre.html` contain their new descriptions and retain their existing page titles.
+- [x] Confirmed the latest daily SEO report (#150) checked 365 pages (65 size-redirect pages skipped) and reported no findings.
+- [x] Confirmed PR #115 is closed and there are no currently open pull requests. Its branch was not merged; do not revive it unless a new audit report identifies an issue that is still present on current main.
+- [ ] Run `python3 mobile-shell/shell.test.py` with Playwright/Chromium against current main; specifically verify the new Categories refresh case after clearing history state.
+- [ ] Real-phone checks: open the shop twice (service worker), refresh Categories, test a product link/share/Back flow, and check the mobile checkout and service quote drawer. Do not place a real customer order; use an owner-approved test procedure.
+- [ ] Live admin-browser check: verify Catalog and Stock recover correctly with an expired or near-expiry session and that the retry state appears after a slow/failing request. Do not share admin credentials in chat.
+- [ ] Owner/editorial checks: read the batch-07/08 blogs; confirm actual service coverage, price ranges and claims; supply missing manufacturer/label specifications before adding product facts.
+- [ ] Search Console/Merchant Center checks remain owner-side: 14 URLs were not indexed in the 2026-11-01 report (#123); submit/request indexing and inspect current diagnostics with the authorised account. Google decides indexing.
+- [ ] Service pages and quote workflow still need the documented real-phone test before any further merge; owner must confirm the service claims and prices. Do not merge service branches without that check.
+- [ ] Product content still depends on approved supplier/manufacturer data for blank or incomplete catalogue fields. Do not invent specifications, ingredients, registration, warranties, stock or pricing.
+- Autosave: this checkpoint is committed directly to `main`; no open pull requests remain at the time of this check.
 
 
 ---
