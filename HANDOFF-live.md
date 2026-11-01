@@ -505,3 +505,36 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Saved two model-specific sections in product-content.json: practical counter/cookware planning and safe LPG setup, leak response, glass-top cleaning and maintenance.
 - [x] Added the product ID to the exact expected-content regression list; test ceiling remains 360 words and safety/unsupported-claim checks remain active.
 - [ ] Validate current PR against main, run quality gate/product generation, merge only after checks pass, then confirm deployment.
+
+
+## 2026-11-01 — Product content batch 11 (in progress)
+- [x] Recovered the current main-branch handoff and confirmed the product-content regression suite covers 25 reviewed product IDs.
+- [x] Reviewed the generated catalogue pages and original descriptions for Kenwood Air Fryer HFP30.000BK (~383 words), Hisense 43A6QKEN TV bundle (~389 words), and Harman Kardon Onyx Studio 9 speaker (~406 words).
+- [x] Added two model-specific sections per product covering portion planning and non-stick care; 4K viewing, source compatibility and safe bundle installation; and Bluetooth pairing, single-unit expectations and safe speaker care.
+- [x] Kept all advice within facts shown on the catalogue pages and avoided inventing unlisted ports, accessories, wireless pairing features, water-resistance ratings or warranty terms.
+- [x] Extended the distinct-content regression test to cover all three reviewed products; the existing 140–360-word supplementary-content guardrail remains in force.
+- [ ] Run the SEO pull-request quality gate and inspect its full audit artifact; merge only if every required check passes.
+- [ ] After merge, verify product-page regeneration, GitHub Pages deployment and the daily SEO audit.
+- Autosave: changes are committed on `seo/product-content-batch-11-2026-11`; nothing is published to the live site until review and merge.
+
+
+## 2026-11-01 — Continued product content batch 11
+- [x] Extended the open PR branch with four additional model-specific product sections: Hisense WSQB753W twin-tub washer, Glamstar 20L manual microwave, AILYONS 5L pressure cooker, and AILYONS 2.2L electric kettle.
+- [x] Added practical buyer guidance on load handling and installation, cookware and manual controls, pressure-release safety, and kettle filling/descaling.
+- [x] Avoided unsupported claims and added no new specifications beyond the existing catalogue listings.
+- [x] Extended regression coverage from 28 to 32 product IDs.
+- [ ] Verify PR quality workflow and inspect audit artifact before merge; commit workflow lookup currently reports no PR runs/status checks.
+
+
+## 2026-11-01 — Continued product content expansion
+- [x] Added model-specific sections for VON 138L direct-cool double-door fridge, IPCONE 16-inch wall fan, and ECOMAX 2.1CH speaker system.
+- [x] Added practical guidance on frost management and warranty terms, secure wall mounting and fan care, and room setup/input selection/cable safety for speakers.
+- [x] Extended the regression suite to 35 product IDs.
+- [ ] Run the repository's actual Node regression suite and required PR workflow; GitHub connector reports no workflow runs or status checks on the PR head.
+
+
+## 2026-11-01 — Product content batch 12
+- [x] Added model-specific buyer guidance for Abasi 5% EC and ALONZE 50EC.
+- [x] Extended the content regression test for both product IDs.
+- [x] Kept the new copy focused on label checks, safe handling, storage and responsible use; no new application rates or unverified claims.
+- [ ] Run Node regression, generated-page build and full SEO audit before considering merge.

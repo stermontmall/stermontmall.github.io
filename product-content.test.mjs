@@ -27,7 +27,19 @@ const expected = [
   "roch-mechanical-microwave-oven",
   "vision-plus-32-inch-full-hd-smart-tv-with-free-wall-bracket",
   "ultra-smart-watch-with-bluetooth-calling-and-ocean-strap-grey",
-  "ailyons-double-burner-glass-gas-cooker-regulator-pipe"
+  "ailyons-double-burner-glass-gas-cooker-regulator-pipe",
+  "kenwood-air-fryer-hfp30-000bk-3-8-litres",
+  "hisense-43a6qken-4k-uhd-smart-tv-with-tv-guard-and-wall-mount-43-inch",
+  "harman-kardon-onyx-studio-9-portable-bluetooth-speaker-single-unit",
+  "hisense-7-5kg-twin-tub-washing-machine-wsqb753w-7-5-kg",
+  "glamstar-20l-manual-microwave-oven-black-20-litres",
+  "ailyons-5l-electric-pressure-cooker-900w-10-preset-menus",
+  "ailyons-2-2l-electric-kettle-luxury-dark-purple",
+  "von-138l-direct-cool-double-door-fridge-silver-138-litres",
+  "ipcone-16-inch-wall-mounted-fan-black-3-speed-control",
+  "ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd",
+  "abasi-5-ec",
+  "alonze-50ec-abamectin-insecticide-1-litre"
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
