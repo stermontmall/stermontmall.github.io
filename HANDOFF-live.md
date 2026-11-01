@@ -1,3 +1,8 @@
+## SESSION CHECKPOINT (2026-11-02): CI test repair
+- [x] Read the prior Daily SEO check job log: the SEO Doctor test failed before reaching later checks because the test itself evaluated `'offset='+offset` with an undefined variable. Changed the assertion to the literal `offset=` token.
+- [x] Removed the inappropriate Node `--check` invocation for a Deno TypeScript Edge Function; retained static safety assertions for the tracked source instead.
+- [ ] Re-run the PR quality gate and review any further failures before merging.
+
 ## SESSION CHECKPOINT (2026-11-02): SEO admin reliability update
 - [x] Production logs confirmed the product catalogue query succeeds (HTTP 200; 225 active products) and the SEO proposal queue GET succeeds (HTTP 200).
 - [x] Production logs pinpointed approval failures: HTTP 409 from the unique `(target_type, target_slug, status)` constraint when an approved proposal already exists for the same page.
