@@ -524,3 +524,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] Avoided unsupported claims and added no new specifications beyond the existing catalogue listings.
 - [x] Extended regression coverage from 28 to 32 product IDs.
 - [ ] Verify PR quality workflow and inspect audit artifact before merge; commit workflow lookup currently reports no PR runs/status checks.
+
+
+## 2026-11-01 — Continued product content expansion
+- [x] Added model-specific sections for VON 138L direct-cool double-door fridge, IPCONE 16-inch wall fan, and ECOMAX 2.1CH speaker system.
+- [x] Added practical guidance on frost management and warranty terms, secure wall mounting and fan care, and room setup/input selection/cable safety for speakers.
+- [x] Extended the regression suite to 35 product IDs.
+- [ ] Run the repository's actual Node regression suite and required PR workflow; GitHub connector reports no workflow runs or status checks on the PR head.
