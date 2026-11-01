@@ -74,7 +74,10 @@ for (const token of [
   'No products changed',
   'Prepare safe fixes',
   'Save prepared fixes (max 20)',
-  'verified pages below 100/100',
+  'description is too short to safely expand',
+  'description is near the 4,000-character editor limit',
+  'Technical issues such as canonical tags, schema and image alt text need separate fixes',
+  'Shop '+
   'slice(0,20)',
   'Product ID mismatch'
 ]) if (!optimizer.includes(token)) throw new Error(`Missing product SEO optimizer safeguard or feature: ${token}`);
