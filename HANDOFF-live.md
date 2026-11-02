@@ -1,3 +1,14 @@
+## SESSION CHECKPOINT (2026-11-02 16:40 Africa/Nairobi): audit of last 20 uploaded products, no changes made yet (claude.ai chat, GitHub + Supabase connected)
+Owner: "Check how Claude uploaded some of the last 20 items. Use the rule and apply it as a permanent fix. Connect github and supabase."
+- [x] GitHub (stermontmall/stermontmall.github.io, push access) and Supabase (`oewvtbnmyombbtggamor`) connected and cloned.
+- [x] Pattern in the last 20 rows (all active, featured, stock 1000, low_at 20, id = slug = kebab name, seo_title = "<seo_name> | SterMont Arcade", one image at `https://stermontmall.github.io/product-photos/<file>`, unit "1 <noun>"): 12 electronics rows (2026-11-02 12:50 UTC) have cost = price/1.15; 7 agro rows 1.16; Mos-Kill kit 1.353 (older rule).
+- [ ] PROBLEM A: 5 live rows point to photo files NOT on `main`: apple-iphone-16-128gb-green, apple-iphone-17-pro-max-256gb-orange, asus-zenbook-14-oled-laptop, asus-rog-zephyrus-g16-gaming-laptop-platinum-white, apple-macbook-pro-14-m3-pro-space-black (only a .svg on `wip-electronics-posting-20261102`). Their photos are in the owner chat only. Same 5 were listed "NOT added (owner to confirm)" in the 15:43 entry below (price/spec unconfirmed; "green iPhone 16" does not exist).
+- [ ] PROBLEM B: 7 rows have image filename != product id (canon-pixma-g2410 -> g2411 file, asus charger -> gzydr-... file, e-pos, canon g3430, hp m141w, epson l3250, fogger -1.jpg, irrigation filter .png). Files exist; only the PUBLISHING.md naming rule is broken.
+- [ ] PROBLEM C: markup differs per batch (1.15 / 1.16 / 1.353); PUBLISHING.md only documents 85% COGS.
+- [ ] NEXT: owner to choose what "permanent fix" means (see chat), then work on a `wip-` branch.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 15:43 Africa/Nairobi): adding 7 electronics products LIVE (branch `wip-products-electronics-1102`)
 Owner: "Find on the internet" (prices); rule = average of Kenyan sources x1.16, cost = average.
 - [ ] IN PROGRESS: photos committed first, then Supabase inserts (images = https://stermontmall.github.io/product-photos/<file>).
