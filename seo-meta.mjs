@@ -83,7 +83,7 @@ export function pdpH1(name, ctx = {}) {
 // One visible line under the H1 on the product page. Only facts that are true for every product (no price or quality superlatives):
 //   "M-Pesa checkout · Delivery to all 47 counties · Pickup at Sarit Centre, Westlands"
 export function pdpTagline(ctx = {}) {
-  return 'M-Pesa checkout \u00b7 Delivery to all 47 counties \u00b7 Pickup at Sarit Centre, Westlands';
+  return 'M-Pesa checkout · Delivery to all 47 counties · Pickup at Sarit Centre, Westlands';
 }
 
 // PDP meta title, max 60 characters.
@@ -96,17 +96,15 @@ export function pdpTitle(name, ctx = {}) {
   const base = String(name || '').replace(/\s+/g, ' ').trim();
   const lead = hasLeadWord(base) ? '' : (isGenuine(ctx) ? 'Original' : powerWord(base, ctx));
   const led = lead ? `${lead} ${base}` : base;
-  // Ordinary retail products: lead with the action shoppers use when ready to buy.
-  // Keep the high-intent phrase "Price in Kenya"; add "Online" when the full name fits.
+  // Ordinary retail products: keep the high-intent phrase "Price in Kenya"; add "Online" when the full name fits.
+  // No "Buy" in the title: owner rule 2026-10-30 (the visible H1 carries "Buy"; see buy-name.test.mjs).
   if (productType(ctx.catSlug) === 'general') {
     const tiers = [
-      `Buy ${led} Online – Price in Kenya`,
-      `Buy ${led} – Price in Kenya`
+      `${led} Online – Price in Kenya`,
+      `${led} – Price in Kenya`
     ];
     const hit = tiers.find(t => t.length <= TITLE_MAX);
-    const prefix = 'Buy ';
-    const suffix = ' – Price in Kenya';
-    return hit || prefix + clip(led, TITLE_MAX - prefix.length - suffix.length) + suffix;
+    return hit || `${clip(led, TITLE_MAX - ' – Price in Kenya'.length)} – Price in Kenya`;
   }
   const tiers = [
     `${led} – Best Price in Kenya | ${STORE}`,

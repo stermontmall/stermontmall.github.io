@@ -23,9 +23,7 @@ for (const name of names) for (const ctx of ctxs) {
   assert.ok(t.length <= TITLE_MAX, `title ${t.length}: ${t}`);
   assert.ok(d.length <= DESC_MAX, `desc ${d.length}: ${d}`);
   assert.ok(/Price in Kenya/.test(t), `title lacks Price in Kenya: ${t}`);
-  if (productType(ctx.catSlug) === 'general') {
-    assert.ok(t.startsWith('Buy '), `ordinary retail title must lead with Buy: ${t}`);
-  }
+  assert.ok(!/^Buy /i.test(t), `title must not start with Buy (owner rule 2026-10-30): ${t}`);
   assert.ok(/M-Pesa/.test(d) && /Kenya/.test(d), `desc lacks M-Pesa/Kenya: ${d}`);
   assert.ok(!/PCPB/i.test(t + d), `PDP must not claim PCPB: ${t} | ${d}`);
   assert.ok(!/(#1|top-rated|guaranteed|certified)/i.test(t + d), `unverifiable claim: ${t} | ${d}`);
@@ -63,7 +61,7 @@ assert.ok(leads.size >= 3, `expected variety of power words, got ${[...leads]}`)
 // Trust badges and H2 headings
 for (const ctx of ctxs) {
   const b = pdpBadges(ctx).join(' | '); n += 3;
-  assert.ok(pdpBadges(ctx).every(x => x.startsWith('\u2713 ')), `badge needs a tick: ${b}`);
+  assert.ok(pdpBadges(ctx).every(x => x.startsWith('✓ ')), `badge needs a tick: ${b}`);
   assert.ok(/Fast M-Pesa Checkout/.test(b) && /Sarit Centre Pickup \| Delivery to 47 Counties/.test(b), `missing M-Pesa/pickup badge: ${b}`);
   assert.ok(!/(#1|top-rated|guaranteed|certified)/i.test(b), `unverifiable badge: ${b}`);
 }
