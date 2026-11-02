@@ -1,3 +1,59 @@
+# HANDOFF — Five product posting check (2026-11-02)
+
+## User request / scope
+Owner asked to finish automatically, then hand off progress so Claude can finish. Work is limited to these five products; do not alter product names/titles, prices, or unrelated products/files.
+
+## Supabase status checked
+Project ref: `oewvtbnmyombbtggamor`; table: `public.products`.
+All five exact records exist, are `active=true` and `featured=true`. SEO titles and product descriptions already exist. Their `images` arrays are currently empty. The schema has no `seo_description` field (a query using that column failed; do not add one for this task).
+
+| Catalog record name | Slug | Price (KES) | Description chars | SEO title |
+|---|---|---:|---:|---|
+| KMAX Italy 20 L Manual Knapsack Sprayer | kmax-italy-20l-manual-knapsack-sprayer | 2345 | 1939 | KMAX Italy 20 L Manual Knapsack Sprayer \| Kenya |
+| Mos-Kill Electric Liquid Vaporizer Kit with 35 ml Refill | mos-kill-electric-liquid-vaporizer-35ml-kit | 1999 | 1842 | Mos-Kill Electric Liquid Vaporizer Kit 35 ml \| Kenya |
+| Mos-Kill Green Mosquito Coils 10 Pieces with Stand 125 g | mos-kill-green-mosquito-coils-10pcs-125g | 500 | 1722 | Mos-Kill Mosquito Coils 10 Pieces 125 g \| Kenya |
+| Shenke Cockroach Killer Powder Sachet 1 g | shenke-cockroach-killer-powder-sachet-1g | 219 | 1848 | Shenke Cockroach Killer Powder Sachet 1 g \| Kenya |
+| Solar-Powered Outdoor Wasp Traps 3-Piece Set | solar-powered-wasp-traps-3-piece-set | 1576 | 1848 | 3-Piece Solar-Powered Wasp Traps for Outdoor Use \| Kenya |
+
+## Product photos
+Owner uploaded `stermont-product-photos-optimized.zip` containing these five 1200×1200 JPGs:
+- `kmax-20l-knapsack-sprayer.jpg`
+- `mos-kill-electric-vaporizer.jpg`
+- `mos-kill-green-coils.jpg`
+- `shenke-cockroach-killer.jpg`
+- `solar-insect-traps-3pc.jpg`
+
+A conversion package was created and delivered to the owner as:
+`sandbox:/mnt/data/stermont-five-product-webp.zip`
+It contains matching WebP files (quality 82), named:
+- `kmax-20l-knapsack-sprayer.webp`
+- `mos-kill-electric-vaporizer.webp`
+- `mos-kill-green-coils.webp`
+- `shenke-cockroach-killer.webp`
+- `solar-insect-traps-3pc.webp`
+
+Owner was asked to upload the files to the existing public Supabase Storage bucket `product-images`, keeping names unchanged, via:
+`https://supabase.com/dashboard/project/oewvtbnmyombbtggamor/storage/buckets`
+**Do not mark uploaded until owner confirms.** Current connected Supabase tools expose SQL/schema but no Storage file upload action.
+
+## Claude: remaining steps
+1. Ask/check whether the owner has uploaded all five WebP files into public bucket `product-images`. If not, use the ZIP link above (owner's downloadable attachment) and finish upload with a supported method.
+2. Obtain each public object URL using the bucket's actual public URL convention; do not guess bucket path if upload structure differs. Typically Supabase public URL pattern is `https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/<filename>`.
+3. Update only the `images` array of the five rows in `public.products` to the corresponding URL (preserve existing fields). Do not change product name, price, description, SEO title, slug, active/featured.
+4. Query the five rows again and verify images array nonempty and correct mapping.
+5. Trigger/await repository workflow `.github/workflows/product-pages.yml` (“Build product pages”; scheduled every 3 hours and supports manual dispatch). Inspect workflow latest run and status. If no dispatch action available, note schedule and use existing supported GitHub UI/API route rather than claim build triggered.
+6. Verify generated product pages and sitemap on live site, including images and page SEO. Use these page URLs:
+   - https://stermontarcade.co.ke/p/kmax-italy-20l-manual-knapsack-sprayer.html
+   - https://stermontarcade.co.ke/p/mos-kill-electric-liquid-vaporizer-35ml-kit.html
+   - https://stermontarcade.co.ke/p/mos-kill-green-mosquito-coils-10pcs-125g.html
+   - https://stermontarcade.co.ke/p/shenke-cockroach-killer-powder-sachet-1g.html
+   - https://stermontarcade.co.ke/p/solar-powered-wasp-traps-3-piece-set.html
+   Confirm each URL exists before saying live.
+7. Report to owner with verifiable status; do not state “published” until the page rebuild and live check succeed.
+
+## Important correction
+A previously shared URL ending in `/editor` is the Supabase database editor, not a dedicated product publishing portal. Use the Storage dashboard link above for uploading photos.
+
 # HANDOFF - SEO batch 08: 8 pest-control products + 8 blogs (branch `wip-seo-batch-08`, 2026-10-31)
 STATUS: MERGED to `main`. Descriptions written to Supabase for all 13 rows with every stored text MD5-equal to `seo-pest/build.mjs` output; backup in `description_backup` batch `pest-batch-08`; `seo-pest/batch-08.json` (1047 checks) and `seo-pest/blogs-08.json` (1365 checks) pass, 0 violations. Details and the next steps are in `HANDOFF-live.md`.
 
