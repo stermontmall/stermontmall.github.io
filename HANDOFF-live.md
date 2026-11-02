@@ -1,3 +1,11 @@
+## SESSION CHECKPOINT (2026-11-02 14:45 Africa/Nairobi): photo for the Mos-Kill vaporizer kit (branch `wip-photos-five-items`)
+- [x] Of the five 2026-11-02 products, FOUR already have photos in Supabase storage (`product-images` bucket; added after the earlier handoff). Only `mos-kill-electric-liquid-vaporizer-35ml-kit` had `images = []`.
+- [x] Owner sent the vaporizer photo in chat: saved as `product-photos/mos-kill-electric-liquid-vaporizer-35ml-kit.jpg` (680x680 JPEG, 43 KB), served by GitHub Pages like the other repo-hosted photos (`https://stermontmall.github.io/product-photos/<file>`).
+- [ ] NEXT: after Pages deploys, set `products.images` for that id to that URL (done in this session right after the merge) and confirm the URL opens. Product page `p/` refreshes on the next "Build product pages" run.
+- Note: the Shenke product is now named "... Sachet 8 g" (the photo says N.W. 8 grams); the old handoff still says 1 g.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 14:10 Africa/Nairobi): MERGED +15% work to main
 - [x] `wip-price-plus-15` merged to `main` (86de36f): admin Catalog, bulk import and photo listing add 15% to NEW item prices (`catalog-v10.js?v=12`, `admin-bulk.js?v=3`, `list-products.html`). DB prices were already raised 15% (backup `products_price_backup_20261102`).
 - [ ] NEXT: after GitHub Pages deploys, open admin -> Catalog -> Add new item with price 1000 / previous 1200 and confirm the preview shows KSh 1,150 / 1,380; delete the test item. Not browser-tested from the sandbox.
