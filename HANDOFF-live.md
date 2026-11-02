@@ -1,3 +1,12 @@
+## SESSION CHECKPOINT (2026-11-02 13:55 Africa/Nairobi): +15% on all prices (claude.ai chat, GitHub + Supabase connected)
+Owner: "On all the prices add 15%. Add this percentage also on admin".
+- [x] FOUND: selling prices live only in Supabase `products.price` / `products.old_price` (261 rows, 1 with price 0). Storefront, shell, admin catalog and generated pages (`p/`, `c/`, merchant-feed) all read that column, so one data change covers storefront AND admin. `price-watch.config.json` has autoApply=false (it will not undo it).
+- [ ] IN PROGRESS: back up prices to `public.products_price_backup_20261102`, then `price = ceil(price*1.15)`, `old_price = ceil(old_price*1.15)` for price > 0. Branch `wip-price-plus-15`.
+- [ ] RESTORE if needed: `update products p set price = b.price, old_price = b.old_price from products_price_backup_20261102 b where b.id = p.id;`
+- [ ] NEXT: verify counts, rebuild generated pages via the "Build product pages" workflow, then merge.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-01 16:50 Africa/Nairobi): post-merge workflow check + shell tests (claude.ai chat, GitHub + Supabase connected)
 Owner: "Fix and autosave on handoff. Merged/commit directly. Check handoff for pending task."
 - [x] Actions after PR #168 (a5f1615): `Site audit` run 41310351456 on main FAILED only in "Accessibility (Pa11y, sampled safe routes)" (exit 2 = real findings, most likely on the 8 pages #168 added to `.pa11yci.json`: appliances category, 4 product pages, 4 blog posts). On-page rules, Lychee broken links, Lighthouse performance: passed. `pages build and deployment`, Uptime monitor, SEO PR gates for #170/#171: passed (one Pages run was cancelled by a newer push, normal).
