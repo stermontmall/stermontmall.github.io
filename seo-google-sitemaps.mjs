@@ -1,4 +1,4 @@
-// Stermont Arcade - tells Google Search Console to re-read both sitemaps (automatic Google recrawl nudge).
+// Stermont Arcade - tells Google Search Console to re-read all site sitemaps (automatic Google recrawl nudge).
 // Uses the official Search Console API (sitemaps.submit). No installs needed (Node 18+).
 // Secrets (GitHub > Settings > Secrets and variables > Actions):
 //   GSC_SERVICE_ACCOUNT_JSON  the full JSON key of a Google service account that is an Owner in Search Console
@@ -7,7 +7,7 @@
 import { createSign } from 'node:crypto';
 
 const SITE = 'https://stermontarcade.co.ke';
-const SITEMAPS = [`${SITE}/sitemap.xml`, `${SITE}/sitemap-products.xml`, `${SITE}/sitemap-images.xml`];
+const SITEMAPS = [`${SITE}/sitemap.xml`, `${SITE}/sitemap-products.xml`, `${SITE}/sitemap-images.xml`, `${SITE}/services/sitemap-services.xml`];
 const raw = process.env.GSC_SERVICE_ACCOUNT_JSON, property = process.env.GSC_PROPERTY;
 if (!raw || !property) { console.log('Skipped: add the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets to turn this on.'); process.exit(0); }
 
