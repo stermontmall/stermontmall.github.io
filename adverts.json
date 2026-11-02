@@ -1,1 +1,54 @@
-{"adverts":[]}
+{
+  "adverts": [
+    {
+      "id": "ad-moskill-vaporizer-20261102",
+      "headline": "Mos-Kill Electric Vaporizer Kit with 35 ml Refill",
+      "text": "Indoor mosquito control for bedrooms and living rooms",
+      "price": 1999,
+      "badge": "New",
+      "cta": "Order on WhatsApp",
+      "image": "",
+      "active": true
+    },
+    {
+      "id": "ad-moskill-coils-20261102",
+      "headline": "Mos-Kill Green Mosquito Coils, 10 pieces with stand",
+      "text": "For patios, verandas and open outdoor areas",
+      "price": 500,
+      "badge": "New",
+      "cta": "Order on WhatsApp",
+      "image": "",
+      "active": true
+    },
+    {
+      "id": "ad-kmax-sprayer-20261102",
+      "headline": "KMAX Italy 20 L Manual Knapsack Sprayer",
+      "text": "Backpack sprayer for gardens, farms and outdoor jobs",
+      "price": 2345,
+      "badge": "New",
+      "cta": "Order on WhatsApp",
+      "image": "",
+      "active": true
+    },
+    {
+      "id": "ad-solar-traps-20261102",
+      "headline": "Solar-Powered Outdoor Insect Traps, 3-piece set",
+      "text": "Three solar traps for gardens and outdoor spaces",
+      "price": 1576,
+      "badge": "New",
+      "cta": "Order on WhatsApp",
+      "image": "",
+      "active": true
+    },
+    {
+      "id": "ad-shenke-cockroach-20261102",
+      "headline": "Shenke Cockroach Killer Powder",
+      "text": "Household cockroach control, used as the label directs",
+      "price": 219,
+      "badge": "New",
+      "cta": "Order on WhatsApp",
+      "image": "",
+      "active": true
+    }
+  ]
+}
