@@ -77,7 +77,7 @@ const ratingDoctor = readFileSync('seo-doctor.js', 'utf8');
 for (const token of [
   "ps.filter(p=>Number(p.seo_score_before)!==100)",
   "Showing '+actionable.length+' pending item(s) that need improvement.",
-  'Perfect 100/100 items are hidden.',
+  'Perfect 100/100 items are hidden (',
   'offset=',
   'h1Text:',
   'h2Texts:'
