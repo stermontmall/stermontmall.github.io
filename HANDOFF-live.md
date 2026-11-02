@@ -1,3 +1,13 @@
+
+
+## 2026-11-02 17:52 Africa/Nairobi — product photo workflow command merged
+- [x] PR #262 merged to `main`: https://github.com/stermontmall/stermontmall.github.io/pull/262 (merge commit `3f7ba083bfb50efe0829f80fb0195584302f959d`).
+- [x] Added project command `/post-product` at `.claude/commands/post-product.md`; `CLAUDE.md` now requires it for every product/photo task.
+- [x] Replaced conflicting publishing guidance with one mandatory route: authenticated `/admin.html` AI product photo uploader → `ai-add-product` → Storage `product-images` → `products.images` → read-only verification.
+- [x] Documented mobile-shell blocker: chat attachments are not automatically local shell files; never create a product without the actual image transfer or claim upload success.
+- [x] Supabase `site_playbook` already agrees with this uploader route; no DB schema, secrets, payment code or existing product data changed.
+- [ ] END-TO-END ACCEPTANCE TEST remains pending: requires the owner's next exact product URL and uploaded photo, plus authenticated admin upload session. Verify resulting draft, public image URL, product row, and later live product page.
+- Next command in a Claude Code session opened at the repository root: `/post-product`.
 ## SESSION CHECKPOINT (2026-11-02 17:44 Africa/Nairobi): permanent product-photo workflow investigation
 Owner requested a permanent cross-session fix for Claude/mobile-shell product photo uploads, with supplier URL + owner attachment, factual product research, 15% markup, stock 1000, low-stock alert 20, and saved handoff.
 - [x] Reconnected/reused existing GitHub access: `stermontmall/stermontmall.github.io`; Supabase project `oewvtbnmyombbtggamor`.
