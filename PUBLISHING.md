@@ -58,3 +58,11 @@ where active and coalesce(array_length(images, 1), 0) = 0;
 - Never silently use a different markup percentage.
 - Never apply the new-advert rules retroactively to unrelated existing products.
 - Never change payments, orders, staff, secrets, or unrelated settings while posting products.
+
+
+## Permanent mobile-shell / Claude session instruction (current implementation)
+- For Claude Code sessions, invoke `/post-product` (the repo command at `.claude/commands/post-product.md`). It explicitly requires the source URL plus owner-uploaded image, 15% markup, stock 1000, alert 20, image storage and post-upload verification.
+- The repo's authenticated Admin → AI product photo uploader sends the actual uploaded image bytes to the `ai-add-product` Edge Function. That function uploads the photo into `product-images`, stores the resulting public URL in `products.images`, and creates the product record. Use this combined path instead of separately inserting the product and forgetting its photo.
+- Current Edge Function version 9 applies `cost = verified source KES price`, `price = round(cost * 1.15, 2)`, `stock = 1000`, `low_at = 20`. It starts as a draft; only activate after image + row verification. The function response now includes both source and selling prices plus inventory values.
+- Supabase `public.add_draft_product` was also aligned to the same source-cost/15%-markup and inventory rules as a SQL fallback. It does not upload image bytes; a photo must still be attached and verified before the listing is considered complete.
+- At the beginning of each connected Claude session, also read `public.site_playbook` topics `READ_ME_FIRST`, `add_product`, `add_photo`, and `rules`. If the active session has no binary upload ability, state the actual limitation and switch to the authenticated admin uploader or an environment that can upload the supplied file. Never invent a public URL.
