@@ -60,9 +60,8 @@ if (adminHtml.includes('seo-doctor.js?v=11')) throw new Error('Admin must not lo
 
 const ratingDoctor = readFileSync('seo-doctor.js', 'utf8');
 for (const token of [
-  "ps.filter(p=>Number(p.seo_score_before)!==100)",
-  "Showing '+actionable.length+' pending item(s) that need improvement.",
-  'Perfect 100/100 items are hidden.',
+  'var actionable=ps;',
+  "Showing all '+actionable.length+' pending proposal(s). Scores are automated estimates and do not replace editorial review.",
   'offset='+offset,
   'h1Text:',
   'h2Texts:'
@@ -70,7 +69,7 @@ for (const token of [
 if (ratingDoctor.includes('&limit=30')) throw new Error('SEO Doctor must not truncate the pending proposal queue at 30.');
 
 for (const token of ['Overall site rating', 'Product page rating', 'Category page rating', 'Technical SEO rating', 'ratingLabel(v)', 'No matching pages were scanned']) if (!ratingDoctor.includes(token)) throw new Error(`Missing SEO rating dashboard feature: ${token}`);
-if (!adminHtml.includes('seo-doctor.js?v=14')) throw new Error('Admin must load the current SEO Doctor cache version including the product optimizer.');
+if (!adminHtml.includes('seo-doctor.js?v=15')) throw new Error('Admin must load the current SEO Doctor cache version including the product optimizer.');
 console.log('SEO Doctor rating dashboard regression checks passed.');
 
 const optimizer = readFileSync('product-seo-optimizer.js', 'utf8');
