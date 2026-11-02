@@ -94,7 +94,7 @@
               saved++;
               var card = el('div', 'card done');
               card.appendChild(el('h4', null, '✓ Draft saved: ' + data.product.name));
-              card.appendChild(el('p', null, 'Exact source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Not published'));
+              card.appendChild(el('p', null, 'Source cost: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Selling price (+15%): KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' · Stock: ' + data.stock + ' · Low-stock alert: ' + data.low_stock_alert + ' · Draft pending verification'));\n              card.appendChild(el('p', 'meta', '✓ Photo uploaded to product-images and linked to this draft.'));
               card.appendChild(el('p', 'meta', 'SEO title: ' + data.seo_title));
               card.appendChild(el('p', 'meta', 'Meta description preview: ' + data.meta_description_preview));
               card.appendChild(el('p', 'meta', data.price_note || data.page_note || 'Source price verified.'));
