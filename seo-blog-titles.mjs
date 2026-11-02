@@ -1,9 +1,13 @@
 // Stermont Arcade - keep blog search titles concise without changing article headings or content.
 // Runs before the blog index/sitemap rebuild. It only edits <title>, og:title and twitter:title.
+// MAX_TITLE must match the SEO Doctor title check (25-65 characters, see seo-doctor.js).
+// If "Title | Stermont Arcade" is too long, the brand is dropped rather than cutting the title mid-sentence.
+// A title cut short by an older run (ends with "…") is restored from the page's own <h1>.
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 const BRAND = ' | Stermont Arcade';
-const MAX_TITLE = 70;
+const MAX_TITLE = 65;
+const MIN_TITLE = 25;
 const clip = (value, max) => {
   const s = String(value || '').replace(/\s+/g, ' ').trim();
   if (s.length <= max) return s;
@@ -20,9 +24,15 @@ for (const file of readdirSync('blog').filter(x => x.endsWith('.html') && x !== 
   const m = before.match(/<title>([\s\S]*?)<\/title>/i);
   if (!m) continue;
   const current = decode(m[1]);
-  const base = current.endsWith(BRAND) ? current.slice(0, -BRAND.length).trim() : current;
-  const title = clip(base, MAX_TITLE - BRAND.length) + BRAND;
-  if (title.length <= MAX_TITLE && title !== current) {
+  let base = current.endsWith(BRAND) ? current.slice(0, -BRAND.length).trim() : current;
+  if (base.endsWith('…')) {
+    const h = before.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+    const h1 = h ? decode(h[1].replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim() : '';
+    if (h1.length >= MIN_TITLE) base = h1;
+  }
+  let title = base + BRAND;
+  if (title.length > MAX_TITLE) title = base.length <= MAX_TITLE ? base : clip(base, MAX_TITLE);
+  if (title.length >= MIN_TITLE && title.length <= MAX_TITLE && title !== current) {
     const safe = encode(title);
     let next = before.replace(m[0], '<title>' + safe + '</title>');
     next = next.replace(/(<meta\s+property=["']og:title["']\s+content=["'])[^"']*(["'])/i, '$1' + safe + '$2');
