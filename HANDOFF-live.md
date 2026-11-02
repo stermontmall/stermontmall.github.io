@@ -1,3 +1,10 @@
+## SESSION CHECKPOINT (2026-11-02 15:16 Africa/Nairobi): DONE: 5 photo products inserted LIVE in Supabase
+- [x] Photos merged to main (980e5e07) and deployed; 5 rows inserted with active=true, stock 1000, low_at 20, featured (ids listed in the entry below).
+- [ ] NEXT: product-watch (every 5 min) should start "Build product pages"; then open `p/covermax-organosilicone-super-spreader-adjuvant-1-litre.html` to confirm. Not checked in a browser from here (sandbox cannot open the site).
+- [ ] Still open: Integra 1 L, Pindstrup substrate 300 L, Hongwei cutter, Nia California Wonder 100 g have no price; photos are in the owner chat only.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 15:15 Africa/Nairobi): adding 5 photo products LIVE (branch `wip-products-agroduka-1102`)
 Owner: "Continue with those you have prices and add my percentage. And make them live. Skip those with price 0". Rule: +16% on the reference price (cost = reference).
 - [ ] IN PROGRESS: photos committed to product-photos/ first; then insert rows in Supabase with images = https://stermontmall.github.io/product-photos/<file>.
