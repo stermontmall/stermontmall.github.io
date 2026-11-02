@@ -1,3 +1,12 @@
+## SESSION CHECKPOINT (2026-11-02 15:15 Africa/Nairobi): adding 5 photo products LIVE (branch `wip-products-agroduka-1102`)
+Owner: "Continue with those you have prices and add my percentage. And make them live. Skip those with price 0". Rule: +16% on the reference price (cost = reference).
+- [ ] IN PROGRESS: photos committed to product-photos/ first; then insert rows in Supabase with images = https://stermontmall.github.io/product-photos/<file>.
+- Products (id: cost -> price, category): covermax-organosilicone-super-spreader-adjuvant-1-litre 3693.27 -> 4285 (73); respirator-mask-with-goggles-safety-set 553.41 -> 642 (48); yellow-chemical-spray-coverall-hood-boot-covers 2506.82 -> 2908 (48); stainless-steel-pruning-shears-secateurs 1074.5 -> 1247 (28); irrigation-screen-filter-2-inch-mesh-element 2800 -> 3248 (45). stock 1000, low_at 20, featured, active.
+- SKIPPED: Aquawet 1 L (already listed: aquawet-15sl-wetter-spreader-sticker-1-litre at 1,922); no price found: Integra 1 L, Pindstrup substrate 300 L, Hongwei cutter, Nia California Wonder 100 g. Photos for those are in the chat only (not saved).
+- Re-run: rows can be removed with `delete from products where id in (...)`.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 15:11 Africa/Nairobi): second price search, other Kenyan sites (no products added yet)
 - [x] Found: 2 inch disc filter KSh 2,800 (Jiji, Irrigation Guru, Athi River); Tolsen 8 inch ratchet pruning shears KSh 1,500 (Jiji; not the same shears); Greenlife Integra page has no price (packs 50 ml-1 L).
 - [x] Not readable/found: Aquawet 1 L (Jiji listing exists, page failed), coverall in KSh, Pindstrup 300 L, Hongwei cutter, Nia California Wonder 100 g.
