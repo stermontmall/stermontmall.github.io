@@ -66,12 +66,15 @@ jobs:
         run: node seo-content-doctor.test.mjs
       - name: Test product and category SEO metadata
         run: node seo-meta.test.mjs
+      - name: Test safe consumer-guide meta descriptions
+        run: node seo-safe-blog-meta.test.mjs
       - name: Test hand-written product content
         run: node product-content.test.mjs
       - name: Normalize blog titles and rebuild blog index and sitemap
         run: |
           node seo-blog-titles.mjs
           node blog-build.mjs
+          node seo-safe-blog-meta.mjs
       - name: Build product and category pages from the live public catalogue
         run: node generate-products.mjs
       - name: Apply the same SEO enrichment passes used by production
