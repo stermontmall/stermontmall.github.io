@@ -62,6 +62,7 @@
 - [Shop Top Veterinary Drugs & Vaccines Online in Kenya](https://stermontarcade.co.ke/c/veterinary-drugs.html): Order top-quality Veterinary Drugs & Vaccines online in Kenya. Pay by M-Pesa, Westlands pickup or fast delivery to all 47 counties.
 - [Washing Machines in Kenya](https://stermontarcade.co.ke/c/washing-machines.html): Buy washing machines online in Kenya, including twin tub models. Pay by M-Pesa, delivery to all 47 counties.
 - [Shop Top Watches & Jewellery Online in Kenya](https://stermontarcade.co.ke/c/watches-jewellery.html): Order top-quality Watches & Jewellery online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
+- [Shop Top Water Tanks & Irrigation Online in Kenya](https://stermontarcade.co.ke/c/water-tanks-irrigation.html): Order top-quality Water Tanks & Irrigation online in Kenya. Pay by M-Pesa, Westlands pickup or fast delivery to all 47 counties.
 - [Shop Top Women's Fashion Online in Kenya – M-Pesa & Delivery](https://stermontarcade.co.ke/c/womens-fashion.html): Order top-quality Women's Fashion online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
 
 ## Guides
@@ -130,6 +131,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 188 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 193 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
