@@ -1,3 +1,9 @@
+## SESSION CHECKPOINT (2026-11-02 14:54 Africa/Nairobi): product-watch verified on main
+- [x] `wip-auto-rebuild` was already merged to main (f6f010a). Manual run `gh workflow run product-watch.yml --ref main` succeeded (run 41440411838); fingerprint cache hit, products unchanged, so no rebuild was started.
+- [ ] NEXT: scheduled 5-minute runs have not shown yet (GitHub may delay); check `gh run list --workflow product-watch.yml`. After the next product upload, expect a "Build product pages" run within about 5-10 min.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 14:53 Africa/Nairobi): GitHub + Supabase connected (claude.ai chat)
 Owner: "Connect github and supabase".
 - [x] GitHub: repo stermontmall/stermontmall.github.io attached with push access and cloned (shallow) to /home/claude/stermontmall.github.io.
