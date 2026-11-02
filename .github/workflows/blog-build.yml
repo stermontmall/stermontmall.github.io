@@ -9,6 +9,8 @@ on:
       - 'blog/*.html'
       - 'blog-build.mjs'
       - 'seo-blog-titles.mjs'
+      - 'seo-safe-blog-meta.mjs'
+      - 'seo-safe-blog-meta.test.mjs'
   workflow_dispatch:
 
 permissions:
@@ -32,6 +34,10 @@ jobs:
 
       - name: Normalize blog SEO title lengths
         run: node seo-blog-titles.mjs
+      - name: Test safe consumer-guide meta descriptions
+        run: node seo-safe-blog-meta.test.mjs
+      - name: Apply allowlisted safe consumer-guide meta descriptions
+        run: node seo-safe-blog-meta.mjs
       - name: Rebuild blog index and sitemap entries
         run: node blog-build.mjs
 
