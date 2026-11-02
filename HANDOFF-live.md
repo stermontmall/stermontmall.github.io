@@ -1,3 +1,12 @@
+## SESSION CHECKPOINT (2026-11-02 15:08 Africa/Nairobi): BLOCKED on agroduka prices for 10 new photo products (no branch yet)
+Owner sent 11 photos (10 products; two Pindstrup photos are one item) and said "Prices from agroduka.com".
+- Products: Aquawet 15SL 1 L, CoverMax 1 L (Arysta), Integra adjuvant 1 L (Greenlife), respirator+goggles set JY5012, yellow chemical coverall, pruning shears (cream handle), 2-inch screen filter, Pindstrup substrate 300 L, Hongwei red-handle cutter, Nia California Wonder capsicum 100 g.
+- [x] agroduka.com (WebFetch) shows prices in US dollars with no KSh rate; agroduka.ke is not reachable from the sandbox (not on allowlist). Several agroduka.com pages failed to load (client_error).
+- USD seen: Aquawet 0.78 (pack not stated), Cover Max 1 L 28.63, Integra 1.21 (pack not stated), Respirator+Goggles set 4.29, Chemical Spray Suit 17.16-32.76. Not found: screen filter, Hongwei cutter, Pindstrup, shears, seed price.
+- [ ] WAITING for owner: how to turn these into KSh (rate, or owner types the KSh prices). Then: wip-products-agroduka-1102 branch, photos to product-photos/, insert into Supabase products (price = cost x 1.16, cost = agroduka price, stock 1000, low_at 20, featured).
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 14:54 Africa/Nairobi): product-watch verified on main
 - [x] `wip-auto-rebuild` was already merged to main (f6f010a). Manual run `gh workflow run product-watch.yml --ref main` succeeded (run 41440411838); fingerprint cache hit, products unchanged, so no rebuild was started.
 - [ ] NEXT: scheduled 5-minute runs have not shown yet (GitHub may delay); check `gh run list --workflow product-watch.yml`. After the next product upload, expect a "Build product pages" run within about 5-10 min.
