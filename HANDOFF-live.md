@@ -1,3 +1,11 @@
+## SESSION CHECKPOINT (2026-11-02 15:05 Africa/Nairobi): Nano Blue Light spray gun added; fogger photos pending an owner answer (branch `wip-nano-spray-gun`)
+Owner: sent 5 photos, "Confirm prices on jumia.co.ke and add 16%".
+- [x] Jumia (product pages, read 2026-11-02): Nano Blue Light Atomizer KSh 3,700 (old 4,999; 280 ml bottle, 1200 mAh, about 25 min per bottle, about 270 g). Selling price = 3,700 x 1.16 = 4,292; cost = 3,700; crossed-out 4,720 (about 9% off). Product id `nano-blue-light-spray-gun-atomizer-280ml`, category 38 Sprayers & Equipment, stock 1000, low-stock alert 20, featured. Photo `product-photos/nano-blue-light-spray-gun-atomizer-280ml.jpg`.
+- [ ] PENDING OWNER ANSWER: 4 thermal-fogger photos (gold body x3 incl. one duplicate view, chrome/blue x1). The existing product `thermal-fogging-machine-pulsed-power-sprayer-1-unit` (KSh 25,875) already has 4 photos of a dual-tank fogger, so these may be the same product. Jumia generic thermal fogger is KSh 34,999 (x1.16 = 40,599) if the owner wants it as a separate listing. Jumia catalog/search pages are blocked in the sandbox; only product pages found via search can be read.
+- Rule used: +16% (owner's words today) instead of the admin's +15%.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 14:45 Africa/Nairobi): photo for the Mos-Kill vaporizer kit (branch `wip-photos-five-items`)
 - [x] Of the five 2026-11-02 products, FOUR already have photos in Supabase storage (`product-images` bucket; added after the earlier handoff). Only `mos-kill-electric-liquid-vaporizer-35ml-kit` had `images = []`.
 - [x] Owner sent the vaporizer photo in chat: saved as `product-photos/mos-kill-electric-liquid-vaporizer-35ml-kit.jpg` (680x680 JPEG, 43 KB), served by GitHub Pages like the other repo-hosted photos (`https://stermontmall.github.io/product-photos/<file>`).
