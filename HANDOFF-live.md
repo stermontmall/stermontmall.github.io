@@ -1,3 +1,23 @@
+## SESSION CHECKPOINT (2026-11-02 14:20 Africa/Nairobi): admin now adds +15% to NEW item prices (branch `wip-price-plus-15`)
+Owner: "Yes add it" (automatic +15% in the admin for prices typed from now on).
+- [x] Rule: NEW items only. Saved price = ceil(typed price x 1.15); previous (crossed-out) price likewise, and always kept above the price. EDITING an existing item saves exactly what is typed (its stored price already includes the 15%), so edits never compound.
+- [x] `catalog-v10.js` (Add item / Pack size copy; preview and a bold note show the final price; cache `?v=12` in `admin.html`), `admin-bulk.js` (CSV import, new rows only; table shows the final price; `?v=3`), `list-products.html` (photo-listing tool, note added). Syntax checked with `node --check`; rounding/order logic run in node (6 cases OK). NOT run in a browser from here.
+- [ ] NEXT: open admin -> Catalog -> Add new item, type 1000 with previous 1200: preview should show KSh 1,150 / 1,380; after publishing the card shows 1,150. Then merge `wip-price-plus-15` to `main` (GitHub Pages deploys it).
+- [ ] Undo: revert the code commit; DB prices restore from `products_price_backup_20261102` (see the entry below).
+
+---
+
+## SESSION CHECKPOINT (2026-11-02 13:55 Africa/Nairobi): +15% on all prices (claude.ai chat, GitHub + Supabase connected)
+Owner: "On all the prices add 15%. Add this percentage also on admin".
+- [x] FOUND: selling prices live only in Supabase `products.price` / `products.old_price` (261 rows, 1 with price 0). Storefront, shell, admin catalog and generated pages (`p/`, `c/`, merchant-feed) all read that column, so one data change covers storefront AND admin. `price-watch.config.json` has autoApply=false (it will not undo it).
+- [x] DONE 2026-11-02 ~14:00: back up prices to `public.products_price_backup_20261102`, then `price = ceil(price*1.15)`, `old_price = ceil(old_price*1.15)` for price > 0. Branch `wip-price-plus-15`.
+- [ ] RESTORE if needed: `update products p set price = b.price, old_price = b.old_price from products_price_backup_20261102 b where b.id = p.id;`
+- [x] VERIFIED in SQL: 260 prices raised, 1 left at 0, 261 backed up; total 1,448,157.84 -> 1,665,446 (x1.150); crossed-out old prices all still above the new price.
+- [ ] NEXT: generated pages (`p/`, `c/`, merchant-feed) pick up the new prices on the next "Build product pages" run (every 3 hours, `.github/workflows/product-pages.yml`); then spot-check one product page and admin Catalog. No site code changed on this branch (handoff note only).
+- [ ] OPEN: prices typed in the admin from now on are stored exactly as typed (no automatic +15%); `price-watch` (autoApply=false) could suggest cuts back toward market prices.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-01 16:50 Africa/Nairobi): post-merge workflow check + shell tests (claude.ai chat, GitHub + Supabase connected)
 Owner: "Fix and autosave on handoff. Merged/commit directly. Check handoff for pending task."
 - [x] Actions after PR #168 (a5f1615): `Site audit` run 41310351456 on main FAILED only in "Accessibility (Pa11y, sampled safe routes)" (exit 2 = real findings, most likely on the 8 pages #168 added to `.pa11yci.json`: appliances category, 4 product pages, 4 blog posts). On-page rules, Lychee broken links, Lighthouse performance: passed. `pages build and deployment`, Uptime monitor, SEO PR gates for #170/#171: passed (one Pages run was cancelled by a newer push, normal).

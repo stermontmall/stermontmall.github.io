@@ -155,6 +155,8 @@
   /* special admin "categories": items that are out of stock, and items hidden from the shop, each get their own list */
   var CAT_OUT = '__out', CAT_HID = '__hid';
   function inCat(p, c) { return c === 'all' || (c === CAT_OUT ? p.stock <= 0 : c === CAT_HID ? !p.active : String(p.category_id) === c); }
+  /* Owner rule 2026-11-02: every NEW item gets +15% on the price (and previous price) typed in the admin; editing an existing item saves exactly what is typed, because its stored price already includes the 15% */
+  var MARKUP = 1.15; function up(n) { return Math.ceil(n * MARKUP); }
   function discPct(p) { var o = Number(p.old_price), n = Number(p.price); return o > n && n >= 0 ? Math.max(1, Math.round((o - n) / o * 100)) : 0; }
   function priceHtml(p) {
     var d = discPct(p);
@@ -221,7 +223,7 @@
       '<div><label>Previous price</label><input class="cx-f" id="cx-old" type="number" min="0" inputmode="decimal" placeholder="optional" value="' + (edit && p.old_price ? p.old_price : '') + '"></div>' +
       '<div><label>Selling price *</label><input class="cx-f" id="cx-price" type="number" min="0" inputmode="decimal" placeholder="Type the price" value="' + (edit ? p.price : '') + '"></div>' +
       '<div><label>Discount %</label><input class="cx-f" id="cx-pct" type="number" min="0" max="95" step="any" inputmode="decimal" placeholder="auto"></div></div>' +
-      '<div class="meta" style="margin:.4rem 0 0">Type the selling price yourself. Price Watch may update it later to follow market prices. Fill any two boxes and the third is worked out for you. Customers see the old price crossed out, the new price and the % off.</div>' +
+      '<div class="meta" style="margin:.4rem 0 0">' + (edit ? '' : '<b>15% is added to the price and previous price you type when you publish, so customers pay 15% more than typed.</b> ') + 'Type the selling price yourself. Price Watch may update it later to follow market prices. Fill any two boxes and the third is worked out for you. Customers see the old price crossed out, the new price and the % off.</div>' +
       '<div class="cx-quick" id="cx-quick"></div><div class="cx-pvc" id="cx-pvc"></div></div>' +
       '<div class="cx-r">' +
       '<div><label>' + (edit ? 'Pieces in stock' : 'Initial pieces') + '</label><input class="cx-f" id="cx-stock" type="number" min="0" inputmode="numeric" value="' + (edit ? p.stock : '') + '"></div>' +
@@ -241,8 +243,9 @@
         return call('/rest/v1/categories?on_conflict=slug', { m: 'POST', h: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: { name: cn, slug: slug(cn) } }).then(function (r) { return r[0].id; });
       })() : Promise.resolve(parseInt(v('cx-cat'), 10));
       return catP.then(function (cid) {
-        var row = { category_id: cid, name: name, price: price, low_at: parseInt(v('cx-low') || 5, 10), featured: $('cx-feat').checked, images: imgs };
+        var row = { category_id: cid, name: name, price: edit ? price : up(price), low_at: parseInt(v('cx-low') || 5, 10), featured: $('cx-feat').checked, images: imgs };
         if (oldP != null || (edit && p.old_price != null)) row.old_price = oldP;
+        if (!edit && row.old_price != null) { row.old_price = up(row.old_price); if (!(row.old_price > row.price)) row.old_price = row.price + 1; }
         if (unit || (edit && p.unit)) row.unit = unit || null;
         var grp = tpl ? (tpl.variant_group || slug(tpl.base || tpl.name)) : (edit && p.variant_group) || slug(name);
         if (vl || (edit && (p.variant_label || p.variant_group))) { row.variant_label = vl || null; row.variant_group = vl ? grp : null; }
@@ -269,7 +272,7 @@
       function fv(e) { var x = parseFloat(e.value); return x > 0 ? x : 0; }
       function pctOf(o, n) { return Math.round((o - n) / o * 1000) / 10; }
       function paint() {
-        var o = fv(eo), n = fv(ep), h = '';
+        var o = edit ? fv(eo) : up(fv(eo)), n = edit ? fv(ep) : up(fv(ep)), h = '';
         if (!n && !o) h = '<span class="meta">Enter the selling price to preview how customers will see it.</span>';
         else if (o && n && o <= n) h = '<span class="bad">Previous price must be higher than the current price.</span>';
         else if (o && n) h = '<span class="cx-bd">-' + Math.max(1, Math.round((o - n) / o * 100)) + '%</span> <s>' + money(o) + '</s> <b>' + money(n) + '</b><div class="meta">Customers save ' + money(o - n) + '</div>';
