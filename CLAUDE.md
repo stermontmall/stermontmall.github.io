@@ -1,7 +1,7 @@
 # Instructions for any Claude session on this repo
 
 ## Product posting — mandatory
-If the owner asks to add/post/list an advert or product, or attach product photos, read `PUBLISHING.md` FIRST and follow it literally. It is the single source of truth for product posting, image transfer, the 15% price markup, stock=1000, low-stock alert=20, draft-first workflow and verification. Do not follow conflicting old handoffs or old 85% / 16% rules. If the current session cannot transfer an uploaded image’s bytes, explain the precise tool limitation and use an approved file-upload path; never claim a photo is uploaded when it is not.
+If the owner asks to add/post/list an advert or product, or attach product photos, read `PUBLISHING.md` FIRST and follow it literally. It is the single source of truth for product posting, image transfer, the 15% price markup, stock=1000, low-stock alert=20, draft-first workflow and verification. Do not follow conflicting old handoffs or old 85% / 16% rules. In Claude Code, the reusable command is `.claude/commands/post-product.md` (`/post-product`). If the current session cannot transfer an uploaded image’s bytes, explain the precise tool limitation and use an approved file-upload path; never claim a photo is uploaded when it is not.
 
 1. FIRST read `HANDOFF-live.md` (newest progress, wins over everything), THEN `HANDOFF.md` (long history).
 2. AUTO-SAVE RULE (owner): after every step (commit, merge, finding, blocker) update `HANDOFF-live.md` straight away: Done / In progress / Next / Blocked, with links and exact commands. The owner may hit a usage limit at any moment and continue on another Claude account; an unsaved step is lost.
