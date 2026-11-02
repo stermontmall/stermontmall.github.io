@@ -1,3 +1,12 @@
+## SESSION CHECKPOINT (2026-11-02 15:10 Africa/Nairobi): price search for the 10 photo products, other vendors (no products added yet)
+Owner: "Confirm other prices from other vendors. Masterpiece fumigation and etc"; earlier chose USD x 129 then +16% for agroduka.com prices.
+- [x] Masterpiece (masterpiecefumigationservices.co.ke) sells none of these items except respirators: NP 305/306 double respirator KSh 1,200, Vaultex/Wokin 6000 half mask 4,500 (no goggles set). No match for the JY5012 respirator+goggles set.
+- [x] Jiji: only a 25 mm / 120 mesh filter at KSh 699 (not the 2 inch filter). Jiji pruning-shears page failed to load.
+- [x] No Kenyan price found for Aquawet 1 L, Integra 1 L, yellow coverall, Pindstrup 300 L, Hongwei cutter, Nia California Wonder 100 g.
+- [ ] WAITING for owner decision (add the 3 priced items now, or owner supplies prices for the rest).
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 15:08 Africa/Nairobi): BLOCKED on agroduka prices for 10 new photo products (no branch yet)
 Owner sent 11 photos (10 products; two Pindstrup photos are one item) and said "Prices from agroduka.com".
 - Products: Aquawet 15SL 1 L, CoverMax 1 L (Arysta), Integra adjuvant 1 L (Greenlife), respirator+goggles set JY5012, yellow chemical coverall, pruning shears (cream handle), 2-inch screen filter, Pindstrup substrate 300 L, Hongwei red-handle cutter, Nia California Wonder capsicum 100 g.
