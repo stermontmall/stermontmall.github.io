@@ -1040,3 +1040,10 @@ Owner: "Fix [doubled Buy], and continue with items description and seo and autos
 - [x] GALUIN intake: owner photo is available in this chat as `10999.jpg` (black low-cut lace-up GALUIN shoes, white sole). Supplied URL `https://www.jumia.co.ke/catalog/productimagezoom/sku/FA113FS41OTUZNAFAMZ/image/1` is an image-zoom endpoint, not the product listing page. Exact listing page and exact KES price remain unverified.
 - [ ] No product or Storage object created for this attempt; do not guess price or use similar-model prices. Next action: owner supplies the exact Jumia product listing URL for SKU `FA113FS41OTUZNAFAMZ`; then process via the authenticated admin uploader and verify DB row + public image URL.
 - [ ] Potential future enhancement (not deployed): add a dedicated authenticated photo-staging flow so an image selected in admin can be uploaded and retained before product-page analysis, with safe cleanup/expiry for abandoned staged files. Do not weaken staff auth, source-price verification, or photo-match checks.
+
+
+## 2026-11-02 — exact GALUIN source listing located
+- [x] Found the exact Jumia listing by SKU `FA113FS41OTUZNAFAMZ`: https://www.jumia.co.ke/galuin-mens-casual-board-shoes-running-sneakers-black-236720744.html (also indexed under the 2024 model title).
+- [x] Listing confirms GALUIN 2024 Mens Casual Board Shoes Running Sneakers - Black; size options EU 40–46; current displayed variation price range KSh 1,072–1,150. The supplied photo corresponds to the black low-top shoe style.
+- [ ] Exact selected size/variation price is not determined from the range. Before inserting a draft, confirm whether owner wants one listing covering EU 40–46 or separate size listings; exact source cost must be tied to the chosen variation.
+- [ ] Photo still needs to be selected from the phone in authenticated admin uploader at https://stermontarcade.co.ke/admin.html; the chat attachment does not auto-transfer to the browser shell. No Storage object or product row created yet.
