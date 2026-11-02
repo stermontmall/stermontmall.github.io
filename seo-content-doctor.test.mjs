@@ -91,13 +91,13 @@ console.log('SEO Doctor rating dashboard regression checks passed.');
 const optimizer = readFileSync('product-seo-optimizer.js', 'utf8');
 for (const token of [
   'Product SEO Optimizer',
-  '/rest/v1/products?select=id,slug,name,description,images,categories(name,slug),created_at&active=eq.true&order=created_at.asc&limit=1000',
+  '/rest/v1/products?select=id,slug,name,description,seo_name,seo_title,images,categories(name,slug),created_at&active=eq.true&order=created_at.asc&limit=1000',
   'meta[name="stm-id"]',
   'Save reviewed description',
   "Prefer:'return=representation'",
   'expected exactly one updated product',
   'No products changed',
-  'Prepare safe fixes',
+  'Prepare SEO title fixes',
   'Save prepared SEO fixes (max 20)',
   'Reviewed SEO title (max 60 characters)',
   'titleCandidate(name)',
