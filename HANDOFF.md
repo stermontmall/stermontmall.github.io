@@ -1,3 +1,5 @@
+- 2026-11-02: `wip-price-plus-15` merged to main (86de36f): all product prices +15% in Supabase (backup `products_price_backup_20261102`) and the admin adds 15% to new item prices. See HANDOFF-live.md.
+
 # HANDOFF — Five product posting check (2026-11-02)
 
 ## User request / scope

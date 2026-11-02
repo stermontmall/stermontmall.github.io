@@ -1,3 +1,9 @@
+## SESSION CHECKPOINT (2026-11-02 14:10 Africa/Nairobi): MERGED +15% work to main
+- [x] `wip-price-plus-15` merged to `main` (86de36f): admin Catalog, bulk import and photo listing add 15% to NEW item prices (`catalog-v10.js?v=12`, `admin-bulk.js?v=3`, `list-products.html`). DB prices were already raised 15% (backup `products_price_backup_20261102`).
+- [ ] NEXT: after GitHub Pages deploys, open admin -> Catalog -> Add new item with price 1000 / previous 1200 and confirm the preview shows KSh 1,150 / 1,380; delete the test item. Not browser-tested from the sandbox.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 14:20 Africa/Nairobi): admin now adds +15% to NEW item prices (branch `wip-price-plus-15`)
 Owner: "Yes add it" (automatic +15% in the admin for prices typed from now on).
 - [x] Rule: NEW items only. Saved price = ceil(typed price x 1.15); previous (crossed-out) price likewise, and always kept above the price. EDITING an existing item saves exactly what is typed (its stored price already includes the 15%), so edits never compound.
