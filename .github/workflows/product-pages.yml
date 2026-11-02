@@ -1,6 +1,6 @@
 # Stermont Arcade - rebuilds every product page, category page and the product sitemap automatically.
 # Runs: every 3 hours, when generate-products.mjs changes, and whenever you tap "Run workflow" in the Actions tab.
-# Price refresh requested 2026-10-28.
+# Rebuild requested 2026-11-02: five new products (Mos-Kill vaporizer and coils, Shenke, KMAX 20 L, solar traps).
 name: Build product pages
 
 on:
