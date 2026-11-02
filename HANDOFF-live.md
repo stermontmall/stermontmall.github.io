@@ -1,3 +1,11 @@
+## SESSION CHECKPOINT (2026-11-02 15:30 Africa/Nairobi): new fogger listing at KSh 35,520 (branch `wip-fogger-listing`)
+Owner: "Confirm rates on other reliable platforms in Kenya", then "Put those prices".
+- [x] Market check (2026-11-02): Imagine Care 24,870, Tilemac 32,000, Jumia 34,999 for the same 16 L pulse-jet fogger (6.5 kg, 1100x280x380 mm); Masterpiece range 23,000-30,000 mid-range, 30,000+ for 16 L+. Reference = average of the three direct prices = 30,620; selling price = x1.16 = 35,520; cost recorded 30,620; crossed-out 38,610 (about 8% off). Jiji, Kilimall and a few shops blocked the sandbox. Nano gun (4,292) rests on Jumia alone.
+- [x] Added product `petrol-thermal-fogger-machine-fumigation` (category 38, stock 1000, alert 20, featured) with 3 photos in `product-photos/petrol-thermal-fogger-machine-fumigation-{1,2,3}.jpg` (one repeated photo skipped). Chosen as option 3 (new listing); the existing `thermal-fogging-machine-pulsed-power-sprayer-1-unit` (25,875) is untouched and may show the same machine: if the owner wants one listing only, hide this one (`update products set active=false where id='petrol-thermal-fogger-machine-fumigation'`).
+- [ ] NEXT: after the next "Build product pages" run open `p/petrol-thermal-fogger-machine-fumigation.html`.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 15:05 Africa/Nairobi): Nano Blue Light spray gun added; fogger photos pending an owner answer (branch `wip-nano-spray-gun`)
 Owner: sent 5 photos, "Confirm prices on jumia.co.ke and add 16%".
 - [x] Jumia (product pages, read 2026-11-02): Nano Blue Light Atomizer KSh 3,700 (old 4,999; 280 ml bottle, 1200 mAh, about 25 min per bottle, about 270 g). Selling price = 3,700 x 1.16 = 4,292; cost = 3,700; crossed-out 4,720 (about 9% off). Product id `nano-blue-light-spray-gun-atomizer-280ml`, category 38 Sprayers & Equipment, stock 1000, low-stock alert 20, featured. Photo `product-photos/nano-blue-light-spray-gun-atomizer-280ml.jpg`.
