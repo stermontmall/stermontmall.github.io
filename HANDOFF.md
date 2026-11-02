@@ -542,3 +542,6 @@ Tested in headless Chromium against the repo served locally, Supabase products m
 
 ## Fix: product-names.json was built but never committed (branch `wip-names-file-commit`, 2026-10-29 ~22:05 EAT)
 - Check after PR #65's rebuild: product pages had the prefixed H1s (Alonze "#1 Top", Actellic "#1 Original", Agita "#1 Best", Amito "Reliable"), but `product-names.json` was missing from the repo: `product-pages.yml` only `git add`s a fixed file list. Added `product-names.json` to it. Until the next run the shop list shows database names; after it, list and view use the page headings.
+
+
+- 2026-11-02: PR #262 merged — standardized the Claude product-photo uploader workflow and added the reusable `/post-product` project command. End-to-end upload test awaits the next owner-supplied product URL/photo.
