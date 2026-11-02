@@ -98,6 +98,7 @@ for (const token of [
   'expected exactly one updated product',
   'No products changed',
   'Prepare SEO title fixes',
+  'x.a.score<100||(!clean(x.p.seo_title||\'\')&&!!titleCandidate(x.p.seo_name||x.p.name))',
   'Save prepared SEO fixes (max 20)',
   'Reviewed SEO title (max 60 characters)',
   'titleCandidate(name)',
