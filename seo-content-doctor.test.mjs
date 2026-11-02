@@ -98,7 +98,12 @@ for (const token of [
   'expected exactly one updated product',
   'No products changed',
   'Prepare safe fixes',
-  'Save prepared fixes (max 20)',
+  'Save prepared SEO fixes (max 20)',
+  'Reviewed SEO title (max 60 characters)',
+  'titleCandidate(name)',
+  'seo_title:t',
+  'seo_name:name',
+  'seo_title,seo_name',
   'description is too short to safely expand',
   'description is near the 4,000-character editor limit',
   'Technical issues such as canonical tags, schema and image alt text need separate fixes',
@@ -115,6 +120,6 @@ for (const token of [
   'Do not add unverified M-Pesa'
 ]) if (!optimizer.includes(token)) throw new Error(`Missing product SEO optimizer safeguard or feature: ${token}`);
 execFileSync(process.execPath, ['--check', 'product-seo-optimizer.js'], { stdio: 'inherit' });
-if (!adminHtml.includes('product-seo-optimizer.js?v=6')) throw new Error('Admin must load the current product SEO optimizer.');
+if (!adminHtml.includes('product-seo-optimizer.js?v=7')) throw new Error('Admin must load the current product SEO optimizer.');
 if (!adminHtml.includes('seo-doctor.js?v=19')) throw new Error('Admin must load the current SEO Doctor bundle.');
 console.log('Product SEO Optimizer regression checks passed.');
