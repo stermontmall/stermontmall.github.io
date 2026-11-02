@@ -52,7 +52,7 @@ const ld = o => `<script type="application/ld+json">${JSON.stringify(o)}</script
 const words = html => html.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<a class="btn[^>]*>[\s\S]*?<\/a>/g, ' ').replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').split(/\s+/).filter(Boolean).length;
 const counts = { services: {}, guides: {} };
 
-// Same theme as the shop: violet #7c3aed (theme-color), dark violet #5b21b6 for headings, tint #f1ebff, line #e6e1f5.
+// Same theme as the shop: violet #7c3aed (theme-color), dark violet #5b21b6 for headings, tint #f1ebff, line #e6e2f2.
 const CSS = `:root{--bg:#fff;--fg:#1e1b2e;--mut:#5f5a73;--card:#f1ebff;--brand:#7c3aed;--brand-fg:#fff;--link:#5b21b6;--line:#e6e1f5}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14111f;--fg:#ece8f7;--mut:#a79fbd;--card:#1d1830;--brand:#a78bfa;--brand-fg:#1b1033;--link:#c4b5fd;--line:#322a4a}}
 *{box-sizing:border-box}html{scroll-padding-top:calc(60px + env(safe-area-inset-top,0px))}
@@ -262,11 +262,31 @@ ${g.sections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).jo
 }
 
 {
+  // Guides index. SEO Doctor scores this page on 2+ H2 headings, structured data and 350+ words of useful text,
+  // so it carries CollectionPage + BreadcrumbList schema and short sections on how to use the guides, what the prices mean,
+  // which services are covered and where we work. Only facts already stated elsewhere on the site are used here.
   const url = `${SITE}/services/guides/`;
-  let h = head({ title: 'Home Services Guides for Nairobi and Kenya | Stermont Arcade', desc: 'Plain-language guides on pest control, solar, CCTV, appliance repair, cleaning and more, with typical Kenyan prices.', url });
+  const title = 'Home Services Guides for Nairobi and Kenya | Stermont Arcade';
+  const desc = 'Plain-language guides on pest control, solar, CCTV, appliance repair, cleaning and more, with typical Kenyan prices.';
+  const ask = wa('Hello Stermont Arcade, I read your guides and would like a service quote. My location is: ');
+  const jsonld = [
+    { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Home services guides for Nairobi and Kenya', description: desc, url, inLanguage: 'en-KE',
+      mainEntity: { '@type': 'ItemList', itemListElement: data.guides.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/services/guides/${g.slug}.html`, name: g.title })) } },
+    { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: 'Services', item: SITE + '/services/' },
+      { '@type': 'ListItem', position: 3, name: 'Guides', item: url }] }
+  ];
+  let h = head({ title, desc, url, extra: jsonld.map(ld).join('') });
   h += `<nav class="crumbs"><a href="/">Home</a> / <a href="/services/">Services</a> / Guides</nav>
 ${hero({ eyebrow: 'Guides', h1: 'Service guides for Nairobi and Kenya', lead: 'Straight answers and typical prices before you book.' })}
-<h2>All guides</h2><div class="grid">${data.guides.map(g => `<a href="/services/guides/${g.slug}.html">${esc(g.title)}<small>${esc(g.desc)}</small></a>`).join('')}</div>` + foot;
+<h2>How to use these guides</h2><p>Each guide answers the questions people ask before they book a home or farm service: what the job usually costs in Nairobi and across Kenya, what changes the price, how to prepare and what to ask before you agree. Start with the quick answer at the top of the guide, then read the sections that match your job. When you are ready, send your location and a short description of the job on WhatsApp and we reply with the next step.</p>
+<h2>All guides</h2><div class="grid">${data.guides.map(g => `<a href="/services/guides/${g.slug}.html">${esc(g.title)}<small>${esc(g.desc)}</small></a>`).join('')}</div>
+<h2>What the prices in our guides mean</h2><p>The price ranges in the guides are typical figures for Nairobi and Kenya, not fixed quotes. The final price depends on the size of the property, the materials or equipment needed, how easy the site is to reach and how many visits the job takes. We confirm the scope, availability and final quote with you before work begins, and you pay by M-Pesa.</p>
+<h2>Services these guides cover</h2><ul class="checks">${data.services.map(s => `<li><a href="/services/${s.slug}.html">${esc(s.name)}</a>: ${kes(s.priceMin)} to ${kes(s.priceMax)}${s.priceOpen ? '+' : ''}</li>`).join('')}</ul>
+${coverageBlock('Home services')}
+<p><a class="btn" href="${ask}">Get a quote on WhatsApp</a> <a class="btn alt" href="/services/">See all services</a></p>
+<a class="btn fab" href="${ask}">Get a quote</a>` + foot;
   write('guides/index.html', h);
 }
 
