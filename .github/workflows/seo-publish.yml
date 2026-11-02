@@ -9,6 +9,9 @@
 name: Publish approved SEO proposals
 
 on:
+  push:   # TEMPORARY (branch test): always a dry run, removed before merge
+    branches: [wip-seo-auto-publish]
+    paths: ['seo-publish.mjs', '.github/workflows/seo-publish.yml']
   schedule:
     - cron: '*/30 * * * *'
   workflow_dispatch:
@@ -72,7 +75,7 @@ jobs:
 
       - name: Commit and push to main
         id: push
-        if: steps.plan.outputs.changed != '0' && steps.gate.outputs.reverted != 'true' && inputs.dry_run != true
+        if: steps.plan.outputs.changed != '0' && steps.gate.outputs.reverted != 'true' && (inputs.dry_run != true && github.event_name != 'push')
         run: |
           git config user.name "bot"
           git config user.email "bot@users.noreply.github.com"
@@ -91,7 +94,7 @@ jobs:
         run: node seo-publish.mjs verify
 
       - name: Save published / failed in Supabase
-        if: steps.plan.outputs.waiting != '0' && inputs.dry_run != true
+        if: steps.plan.outputs.waiting != '0' && (inputs.dry_run != true && github.event_name != 'push')
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
