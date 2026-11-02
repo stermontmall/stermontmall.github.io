@@ -1,3 +1,11 @@
+## SESSION CHECKPOINT (2026-11-02 15:43 Africa/Nairobi): adding 7 electronics products LIVE (branch `wip-products-electronics-1102`)
+Owner: "Find on the internet" (prices); rule = average of Kenyan sources x1.16, cost = average.
+- [ ] IN PROGRESS: photos committed first, then Supabase inserts (images = https://stermontmall.github.io/product-photos/<file>).
+- ids: cost -> price: e-pos-thermal-receipt-printer 16699.67 -> 19372 (cat 19); hp-laserjet-mfp-m141w-wireless-mono-printer 25333 -> 29387 (19); canon-pixma-g3430-wireless-ink-tank-printer 31833 -> 36927 (19); epson-ecotank-l3250-wifi-all-in-one-printer 27249.25 -> 31610 (19); canon-pixma-g2411-ink-tank-all-in-one-printer 23665 -> 27452 (19); gzydr-asus-150w-laptop-charger 4500 -> 5220 (7); apple-iphone-16-128gb-white 101950 -> 118262 (2).
+- NOT added (owner to confirm): ASUS Zenbook 14 OLED (one source, UX3405M Ultra 7/16GB/1TB 198,500), ROG Zephyrus G16 white (one source 415,000, config unclear), MacBook Pro 14 space black (M3 Pro 18/512: 315,000 vs 220-286k), green iPhone (iPhone 16 has no green), orange iPhone (17 Pro Max 256GB: Jumia 172,960 vs 235,000).
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 15:41 Africa/Nairobi): BLOCKED: 12 electronics photos, no prices yet
 Owner sent 12 photos and confirmed the models: E-POS thermal receipt printer, HP LaserJet M141w, Canon PIXMA G3430, Epson EcoTank L3250, Canon PIXMA G2411, ASUS 150W charger (A17-150P1A), ASUS Zenbook 14, ASUS ROG Zephyrus G16 (white), iPhone 16 white, MacBook Pro 14 space black, iPhone 16 green, orange iPhone (model unconfirmed). None are in the shop yet (checked by name).
 - Plan: price from Jumia Kenya x1.16 (owner has not objected). Jiji listing pages failed to load this session; searches found listings only, no readable prices.
