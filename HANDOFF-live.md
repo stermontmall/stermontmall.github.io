@@ -1,3 +1,16 @@
+## SESSION CHECKPOINT (2026-11-02 08:05 Africa/Nairobi): auto-publish approved SEO drafts (claude.ai chat, GitHub + Supabase connected)
+Owner: "Make approved SEO drafts publish to the live website automatically, then verify the articles, sitemap, and SEO metadata. No more asking you to test broken workflows."
+- [x] FINDINGS. Approving in admin > SEO Doctor only sets `seo_content_proposals.status='approved'` (edge function `seo-review`); nothing publishes it. 30 proposals are approved and unpublished (26 `blog`, 4 `service`). Table already has `published` / `failed` statuses plus `published_at` / `publish_error`, so the publish step was designed but never built.
+- [x] The drafts are NOT article text. They are rule-based briefs (generation_model free-live-audit-v1 / weighted-onpage-audit-v2 / local-seo-audit-v1). The only publishable fields are `title` (SEO title) and `meta_description`. The markdown body is a brief and must never be published.
+- [x] Compared all 30 with the repo: 16 are identical to the live page already; 14 would CHANGE the live page and most are worse (titles cut mid-word e.g. "...in Keny | Stermont Arcade", good live titles replaced by shorter generic ones, boilerplate descriptions "Explore the details, check what applies to your location and request a clear quotation" on a privacy policy). Fallback title in `seo-autopilot` is `h1.slice(0,42)`, which causes the cut words.
+- [x] DESIGN: scheduled workflow `.github/workflows/seo-publish.yml` + `seo-publish.mjs`. Reads approved proposals (secrets SUPABASE_URL + SUPABASE_SERVICE_KEY already exist), validates, edits only <title>/og/twitter title + meta/og/twitter description (+ blog `dateModified` so blog-build moves the sitemap lastmod), runs blog-build + before/after seo-check, commits to main, marks rows `published` or `failed` (+ reason). Invalid proposals are NOT published: they become `failed` with `publish_error`.
+- [x] Generated pages (`guides/`, `services/guides/`, `p/`, `c/`) are never edited directly (CLAUDE.md rule): such proposals become `failed` with "generated page, change the generator".
+- [ ] IN PROGRESS on branch `wip-seo-auto-publish`: write `seo-publish.mjs`, `seo-publish.test.mjs`, workflow, admin wording (approval now DOES publish) + update `seo-content-doctor.test.mjs` which currently forbids that claim.
+- [ ] NEXT: dry run via `gh workflow run seo-publish.yml --ref wip-seo-auto-publish -f dry_run=true`, then merge to main only when green, then real run and live verification (articles, sitemap.xml lastmod, title/meta on stermontarcade.co.ke).
+- Autosave: committed on branch `wip-seo-auto-publish`.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-01 16:50 Africa/Nairobi): post-merge workflow check + shell tests (claude.ai chat, GitHub + Supabase connected)
 Owner: "Fix and autosave on handoff. Merged/commit directly. Check handoff for pending task."
 - [x] Actions after PR #168 (a5f1615): `Site audit` run 41310351456 on main FAILED only in "Accessibility (Pa11y, sampled safe routes)" (exit 2 = real findings, most likely on the 8 pages #168 added to `.pa11yci.json`: appliances category, 4 product pages, 4 blog posts). On-page rules, Lychee broken links, Lighthouse performance: passed. `pages build and deployment`, Uptime monitor, SEO PR gates for #170/#171: passed (one Pages run was cancelled by a newer push, normal).
