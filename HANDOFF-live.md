@@ -1,3 +1,11 @@
+## SESSION CHECKPOINT (2026-11-02 14:53 Africa/Nairobi): GitHub + Supabase connected (claude.ai chat)
+Owner: "Connect github and supabase".
+- [x] GitHub: repo stermontmall/stermontmall.github.io attached with push access and cloned (shallow) to /home/claude/stermontmall.github.io.
+- [x] Supabase: connector works; one project visible, ref `oewvtbnmyombbtggamor` (eu-west-1, ACTIVE_HEALTHY).
+- [ ] NEXT: owner to say the task; read the entries below, work on a `wip-` branch.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 15:50 Africa/Nairobi): automatic product-page rebuild (branch `wip-auto-rebuild`)
 Owner: "Set system to rebuild immediately new items are uploaded".
 - [x] New `.github/workflows/product-watch.yml` (every 5 min) + `product-watch.mjs`: fingerprints the ACTIVE products (id, slug, names, seo title, price, old price, unit, variant, in-stock yes/no, images, description, featured, category). A new fingerprint runs `gh workflow run product-pages.yml`; the last fingerprint is kept in the Actions cache (nothing is committed). Stock counts only as in/out of stock, so ordinary sales do not trigger builds. Safety: it refuses to act on fewer than 5 products.
