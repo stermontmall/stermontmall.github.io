@@ -6,3 +6,4 @@ Sitemap: https://stermontarcade.co.ke/sitemap.xml
 Sitemap: https://stermontarcade.co.ke/sitemap-products.xml
 Sitemap: https://stermontarcade.co.ke/sitemap-images.xml
 Sitemap: https://stermontarcade.co.ke/services/sitemap-services.xml
+Sitemap: https://stermontarcade.co.ke/pest-control/sitemap.xml
