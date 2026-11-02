@@ -8,6 +8,8 @@
   function norm(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
   function baseName(f) { return String(f).replace(/\.[^.]+$/, ''); }
   function A() { return window.STMAdmin; }
+  /* Owner rule 2026-11-02: +15% on the price and old price of every NEW item (existing items are never repriced here) */
+  function up(n) { return Math.ceil(n * 1.15); }
 
   /* ---------- CSV ---------- */
   function parseCSV(t) {
@@ -79,7 +81,7 @@
     /* =============== 1. spreadsheet import =============== */
     var c1 = h('div', 'card'); c.appendChild(c1);
     c1.appendChild(h('h3', null, '1 · Add many products from a spreadsheet')); c1.firstChild.style.margin = '0 0 .3rem';
-    c1.appendChild(h('p', 'meta', 'Fill the template in Excel or Google Sheets, save as CSV, then choose it below together with the product photos. Every row needs a selling_price. Rows with the same name and different pack_size become sizes of one product.'));
+    c1.appendChild(h('p', 'meta', 'Fill the template in Excel or Google Sheets, save as CSV, then choose it below together with the product photos. Every row needs a selling_price. 15% is added to the price and old_price of every NEW item when it is imported. Rows with the same name and different pack_size become sizes of one product.'));
     var a1 = h('div', 'acts'); a1.appendChild(btn('⬇ Download template', 'alt sm', function () { download('stermont-products-template.csv', TEMPLATE.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n')); })); c1.appendChild(a1);
     var csvIn = fileInput(false, '.csv,text/csv,text/plain'), phIn = fileInput(true, 'image/*');
     var lb1 = h('label', null, 'Spreadsheet (.csv)'), lb2 = h('label', null, 'Photos (select all of them together)');
@@ -140,7 +142,7 @@
       if (Object.keys(newCats).length) out1.appendChild(h('p', 'meta', 'New categories to create: ' + Object.keys(newCats).map(function (k) { return newCats[k]; }).join(', ')));
       out1.appendChild(table(['Row', 'Item', 'Price', 'Stock', 'Photos', 'Result'], plan.map(function (o) {
         var res = o.errs.length ? { t: '✖ ' + o.errs.join('; '), cls: 'neg' } : { t: (o.action === 'update' ? '↻ Update existing' : '＋ Add') + (o.warns.length ? ' · ⚠ ' + o.warns.join('; ') : '') };
-        return [{ t: String(o.line) }, { t: (o.name || '—') + (o.pack ? ' · ' + o.pack : '') }, { t: o.price != null ? A().money(o.price) : '—' }, { t: String(o.stock || 0) }, { t: String(o.photos.length) }, res];
+        return [{ t: String(o.line) }, { t: (o.name || '—') + (o.pack ? ' · ' + o.pack : '') }, { t: o.price != null ? A().money(o.action === 'create' ? up(o.price) : o.price) : '—' }, { t: String(o.stock || 0) }, { t: String(o.photos.length) }, res];
       })));
       if (ok.length) { var go = btn('Import ' + ok.length + ' item' + (ok.length === 1 ? '' : 's'), 'ok', function () { run(ok, go); }); go.style.cssText = 'width:100%;margin-top:.8rem'; out1.appendChild(go); }
       var note = h('p', 'meta', 'Existing items only get new photos, description, old price and unit; their stock and price are never changed here.'); out1.appendChild(note);
@@ -161,8 +163,8 @@
             if (!Object.keys(patch).length) return null; return req('/rest/v1/products?id=eq.' + encodeURIComponent(o.id), 'PATCH', patch, 'return=minimal');
           }
           return catId(o).then(function (cid) {
-            var row = { id: o.id, category_id: cid, name: o.name, price: o.price, cost: 0, stock: o.stock, low_at: 5, featured: o.featured, active: true, images: imgs };
-            if (o.desc) row.description = o.desc; if (o.old != null) row.old_price = o.old; if (o.unit) row.unit = o.unit; if (o.pack) { row.variant_label = o.pack; row.variant_group = o.group; }
+            var row = { id: o.id, category_id: cid, name: o.name, price: up(o.price), cost: 0, stock: o.stock, low_at: 5, featured: o.featured, active: true, images: imgs };
+            if (o.desc) row.description = o.desc; if (o.old != null) row.old_price = Math.max(up(o.old), row.price + 1); if (o.unit) row.unit = o.unit; if (o.pack) { row.variant_label = o.pack; row.variant_group = o.group; }
             return req('/rest/v1/products', 'POST', row, 'return=minimal');
           });
         });

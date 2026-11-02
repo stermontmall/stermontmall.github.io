@@ -1,3 +1,12 @@
+## SESSION CHECKPOINT (2026-11-02 14:20 Africa/Nairobi): admin now adds +15% to NEW item prices (branch `wip-price-plus-15`)
+Owner: "Yes add it" (automatic +15% in the admin for prices typed from now on).
+- [x] Rule: NEW items only. Saved price = ceil(typed price x 1.15); previous (crossed-out) price likewise, and always kept above the price. EDITING an existing item saves exactly what is typed (its stored price already includes the 15%), so edits never compound.
+- [x] `catalog-v10.js` (Add item / Pack size copy; preview and a bold note show the final price; cache `?v=12` in `admin.html`), `admin-bulk.js` (CSV import, new rows only; table shows the final price; `?v=3`), `list-products.html` (photo-listing tool, note added). Syntax checked with `node --check`; rounding/order logic run in node (6 cases OK). NOT run in a browser from here.
+- [ ] NEXT: open admin -> Catalog -> Add new item, type 1000 with previous 1200: preview should show KSh 1,150 / 1,380; after publishing the card shows 1,150. Then merge `wip-price-plus-15` to `main` (GitHub Pages deploys it).
+- [ ] Undo: revert the code commit; DB prices restore from `products_price_backup_20261102` (see the entry below).
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 13:55 Africa/Nairobi): +15% on all prices (claude.ai chat, GitHub + Supabase connected)
 Owner: "On all the prices add 15%. Add this percentage also on admin".
 - [x] FOUND: selling prices live only in Supabase `products.price` / `products.old_price` (261 rows, 1 with price 0). Storefront, shell, admin catalog and generated pages (`p/`, `c/`, merchant-feed) all read that column, so one data change covers storefront AND admin. `price-watch.config.json` has autoApply=false (it will not undo it).
