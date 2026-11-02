@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'seo-*.mjs'
+      - 'seo-publish.test.mjs'
       - 'generate-products.mjs'
       - 'kili-pages.js'
       - 'recent-orders.js'
@@ -62,8 +63,12 @@ jobs:
           node --check product-content.test.mjs
           node --check seo-meta.mjs
           node --check seo-doctor.js
+          node --check seo-publish.mjs
+          node --check seo-publish.test.mjs
       - name: Test SEO Doctor editorial approval safeguards
         run: node seo-content-doctor.test.mjs
+      - name: Test publishing of approved SEO proposals
+        run: node seo-publish.test.mjs
       - name: Test product and category SEO metadata
         run: node seo-meta.test.mjs
       - name: Test hand-written product content

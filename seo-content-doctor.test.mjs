@@ -19,12 +19,29 @@ for (const token of [
 const admin = readFileSync('seo-doctor.js', 'utf8');
 for (const token of [
   'Technical Audit & Editorial Review',
-  "Prefer:'return=representation'",
-  'no proposal row was updated',
-  'publish content, or change live pages',
-  'pending editorial review'
-]) if (!admin.includes(token)) throw new Error(`Missing admin approval safeguard: ${token}`);
-if (admin.includes('queued for the site publishing pipeline')) throw new Error('Do not claim an approval publishes content.');
+  "/functions/v1/seo-review",
+  "action:'approve'",
+  'pending editorial review',
+  // Approval now publishes the SEO title + meta description automatically (seo-publish.yml); the admin must say so and show them.
+  'automatically within about 30 minutes',
+  'is never published',
+  'Will publish. SEO title (',
+  'Approved: publishing status',
+  'Not published: '
+]) if (!admin.includes(token)) throw new Error(`Missing admin approval wording or feature: ${token}`);
+for (const stale of ['does not publish live page content', 'approval does not publish', 'queued for the site publishing pipeline'])
+  if (admin.includes(stale)) throw new Error(`Admin must not make an outdated or false publishing claim: ${stale}`);
+// The approval function must stay staff-only and only act on pending rows (it is deployed in Supabase; this is its source).
+const review = readFileSync('supabase/functions/seo-review/index.ts', 'utf8');
+for (const token of ['/auth/v1/user', 'staff?select=email', 'status=eq.pending', '"approve" && action !== "reject"', 'reviewed_by: email'])
+  if (!review.includes(token)) throw new Error(`Missing seo-review safeguard: ${token}`);
+// Publishing of approved proposals: automatic, but never of the brief text and never on generated pages.
+const pub = readFileSync('seo-publish.mjs', 'utf8'), pubFlow = readFileSync('.github/workflows/seo-publish.yml', 'utf8');
+for (const token of ['never written to a page', 'generated page', 'TRUSTED_MODELS', 'verifyLive'])
+  if (!pub.includes(token) && !pub.toLowerCase().includes(token.toLowerCase())) throw new Error(`Missing publisher safeguard: ${token}`);
+for (const token of ["cron: '*/30 * * * *'", 'seo-publish.mjs gate', 'seo-publish.mjs verify', 'seo-publish.mjs finalize', 'dry_run'])
+  if (!pubFlow.includes(token)) throw new Error(`Missing publish workflow step: ${token}`);
+if (pub.includes('draft_markdown')) throw new Error('The publisher must never read or publish the draft_markdown brief.');
 execFileSync(process.execPath, ['--check', 'seo-doctor.js'], { stdio: 'inherit' });
 console.log('SEO Content Doctor + Admin SEO Doctor syntax tests passed.');
 
@@ -62,14 +79,14 @@ const ratingDoctor = readFileSync('seo-doctor.js', 'utf8');
 for (const token of [
   'var actionable=ps;',
   "Showing all '+actionable.length+' pending proposal(s). Scores are automated estimates and do not replace editorial review.",
-  'offset='+offset,
+  "&offset='+offset",
   'h1Text:',
   'h2Texts:'
 ]) if (!ratingDoctor.includes(token)) throw new Error(`Missing SEO Doctor queue/filter/context feature: ${token}`);
 if (ratingDoctor.includes('&limit=30')) throw new Error('SEO Doctor must not truncate the pending proposal queue at 30.');
 
 for (const token of ['Overall site rating', 'Product page rating', 'Category page rating', 'Technical SEO rating', 'ratingLabel(v)', 'No matching pages were scanned']) if (!ratingDoctor.includes(token)) throw new Error(`Missing SEO rating dashboard feature: ${token}`);
-if (!adminHtml.includes('seo-doctor.js?v=15')) throw new Error('Admin must load the current SEO Doctor cache version including the product optimizer.');
+if (!adminHtml.includes('seo-doctor.js?v=17')) throw new Error('Admin must load the current SEO Doctor cache version including the publishing status panel.');
 console.log('SEO Doctor rating dashboard regression checks passed.');
 
 const optimizer = readFileSync('product-seo-optimizer.js', 'utf8');
@@ -95,6 +112,5 @@ for (const token of [
   'Do not add unverified M-Pesa'
 ]) if (!optimizer.includes(token)) throw new Error(`Missing product SEO optimizer safeguard or feature: ${token}`);
 execFileSync(process.execPath, ['--check', 'product-seo-optimizer.js'], { stdio: 'inherit' });
-if (!adminHtml.includes('product-seo-optimizer.js?v=4')) throw new Error('Admin must load the current product SEO optimizer.');
-if (!adminHtml.includes('seo-doctor.js?v=14')) throw new Error('Admin must load the current SEO Doctor bundle.');
+if (!adminHtml.includes('product-seo-optimizer.js?v=5')) throw new Error('Admin must load the current product SEO optimizer.');
 console.log('Product SEO Optimizer regression checks passed.');
