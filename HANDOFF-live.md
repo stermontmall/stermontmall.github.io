@@ -1,3 +1,17 @@
+## SESSION CHECKPOINT (2026-11-02 17:44 Africa/Nairobi): permanent product-photo workflow investigation
+Owner requested a permanent cross-session fix for Claude/mobile-shell product photo uploads, with supplier URL + owner attachment, factual product research, 15% markup, stock 1000, low-stock alert 20, and saved handoff.
+- [x] Reconnected/reused existing GitHub access: `stermontmall/stermontmall.github.io`; Supabase project `oewvtbnmyombbtggamor`.
+- [x] Inspected `admin-photo-ai.js`, `ai-add-product`, `upload-photos`, `public.products`, `public.site_playbook`, storage bucket and current product records.
+- [x] Confirmed intended AI route: authenticated `/admin.html` AI product photo uploader sends actual image bytes to `ai-add-product`; the Edge Function uploads to `product-images`, creates a draft row, writes `images[]`, applies source KES cost + 15%, stock 1000 and low_at 20.
+- [x] Confirmed image bucket `product-images` is public and has 105 objects. Current products: 282 total; 280 have images; the two without images are inactive legacy AILYONS kettle rows, not active listings.
+- [x] The five products in the earlier posting handoff now all have non-empty image URLs, stock 1000 and low_at 20. Their exact rows were checked; do not re-upload them.
+- [x] Ruled out suspected JPEG mismatch: `admin-photo-ai.js` explicitly encodes JPEG (`canvas.toBlob(..., 'image/jpeg', 0.86)`) and sends `media_type: image/jpeg`.
+- [ ] IN PROGRESS: make repository instructions consistent. Existing `PUBLISHING.md` did not clearly identify the authenticated AI uploader as the mandatory route, while Supabase `site_playbook` correctly directs Claude to it. Add project command `/post-product`, clarify mobile-shell attachment-byte/session limitations, and require verified Storage + DB evidence.
+- [ ] NEXT: verify changed files on branch `wip-permanent-product-photo-20261102`; commit SHA; do not merge until docs and command are checked.
+- [ ] BLOCKED: no owner-supplied new product URL + photo in this request, so a new live upload cannot be end-to-end tested yet.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 16:40 Africa/Nairobi): audit of last 20 uploaded products, no changes made yet (claude.ai chat, GitHub + Supabase connected)
 Owner: "Check how Claude uploaded some of the last 20 items. Use the rule and apply it as a permanent fix. Connect github and supabase."
 - [x] GitHub (stermontmall/stermontmall.github.io, push access) and Supabase (`oewvtbnmyombbtggamor`) connected and cloned.
