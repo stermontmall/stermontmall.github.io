@@ -219,7 +219,8 @@
         "/products.html",
         "/blog/how-to-order-and-pay-by-mpesa-online-kenya.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "drafted": "2026-11-02"
     },
     {
       "slug": "how-to-stop-bed-bugs-coming-back-kenya",
