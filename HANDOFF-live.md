@@ -1,3 +1,10 @@
+## SESSION CHECKPOINT (2026-11-02 15:11 Africa/Nairobi): second price search, other Kenyan sites (no products added yet)
+- [x] Found: 2 inch disc filter KSh 2,800 (Jiji, Irrigation Guru, Athi River); Tolsen 8 inch ratchet pruning shears KSh 1,500 (Jiji; not the same shears); Greenlife Integra page has no price (packs 50 ml-1 L).
+- [x] Not readable/found: Aquawet 1 L (Jiji listing exists, page failed), coverall in KSh, Pindstrup 300 L, Hongwei cutter, Nia California Wonder 100 g.
+- [ ] WAITING for owner: add all 10 as hidden drafts (active=false) with known prices, or wait for owner prices.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 15:10 Africa/Nairobi): price search for the 10 photo products, other vendors (no products added yet)
 Owner: "Confirm other prices from other vendors. Masterpiece fumigation and etc"; earlier chose USD x 129 then +16% for agroduka.com prices.
 - [x] Masterpiece (masterpiecefumigationservices.co.ke) sells none of these items except respirators: NP 305/306 double respirator KSh 1,200, Vaultex/Wokin 6000 half mask 4,500 (no goggles set). No match for the JY5012 respirator+goggles set.
