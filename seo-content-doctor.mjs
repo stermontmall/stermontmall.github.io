@@ -14,7 +14,9 @@ const files = d => !existsSync(d) ? [] : readdirSync(d, { withFileTypes: true })
 const pages = [
   ...files('services').filter(f => f !== 'services/index.html' && !/\/index\.html$/.test(f)),
   ...files('blog').filter(f => f !== 'blog/index.html')
-].filter(existsSync);
+].filter(existsSync)
+  // Moved-page stubs (meta refresh to another URL) are redirects, not content: do not score them.
+  .filter(f => !/<meta[^>]+http-equiv=["']refresh["']/i.test(readFileSync(f, 'utf8')));
 
 function analyse(file) {
   const html = readFileSync(file, 'utf8');
