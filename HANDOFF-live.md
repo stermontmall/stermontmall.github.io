@@ -1,3 +1,10 @@
+## SESSION CHECKPOINT (2026-11-02 15:41 Africa/Nairobi): BLOCKED: 12 electronics photos, no prices yet
+Owner sent 12 photos and confirmed the models: E-POS thermal receipt printer, HP LaserJet M141w, Canon PIXMA G3430, Epson EcoTank L3250, Canon PIXMA G2411, ASUS 150W charger (A17-150P1A), ASUS Zenbook 14, ASUS ROG Zephyrus G16 (white), iPhone 16 white, MacBook Pro 14 space black, iPhone 16 green, orange iPhone (model unconfirmed). None are in the shop yet (checked by name).
+- Plan: price from Jumia Kenya x1.16 (owner has not objected). Jiji listing pages failed to load this session; searches found listings only, no readable prices.
+- [ ] WAITING for owner: prices (or Jumia links), plus storage/RAM/SSD/processor for the phones and laptops, and the model of the orange iPhone. Photos are in the chat only.
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 15:16 Africa/Nairobi): DONE: 5 photo products inserted LIVE in Supabase
 - [x] Photos merged to main (980e5e07) and deployed; 5 rows inserted with active=true, stock 1000, low_at 20, featured (ids listed in the entry below).
 - [ ] NEXT: product-watch (every 5 min) should start "Build product pages"; then open `p/covermax-organosilicone-super-spreader-adjuvant-1-litre.html` to confirm. Not checked in a browser from here (sandbox cannot open the site).
