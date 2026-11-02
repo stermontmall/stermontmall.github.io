@@ -1,0 +1,46 @@
+# Stermont Arcade - rebuilds the product pages soon after a product is added or changed (new item, price, photo, description, hidden/shown).
+# Every 5 minutes it fingerprints the live products (product-watch.mjs). A new fingerprint starts "Build product pages" (about 3 minutes);
+# an unchanged one does nothing. The last fingerprint is kept in the Actions cache, so nothing is committed by this workflow.
+# GitHub may delay scheduled runs by a few minutes. Run it by hand from the Actions tab to rebuild right away.
+name: Watch products
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: product-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - id: fp
+        run: node product-watch.mjs >> "$GITHUB_OUTPUT"
+      - id: seen
+        uses: actions/cache/restore@v4
+        with:
+          path: .product-fingerprint
+          key: product-fingerprint-${{ steps.fp.outputs.hash }}
+          lookup-only: true
+      - name: Products changed - rebuild the pages
+        if: steps.seen.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run product-pages.yml --ref main
+          echo "${{ steps.fp.outputs.hash }}" > .product-fingerprint
+      - name: Remember this fingerprint
+        if: steps.seen.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .product-fingerprint
+          key: product-fingerprint-${{ steps.fp.outputs.hash }}

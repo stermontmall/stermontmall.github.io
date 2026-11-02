@@ -1,3 +1,12 @@
+## SESSION CHECKPOINT (2026-11-02 15:50 Africa/Nairobi): automatic product-page rebuild (branch `wip-auto-rebuild`)
+Owner: "Set system to rebuild immediately new items are uploaded".
+- [x] New `.github/workflows/product-watch.yml` (every 5 min) + `product-watch.mjs`: fingerprints the ACTIVE products (id, slug, names, seo title, price, old price, unit, variant, in-stock yes/no, images, description, featured, category). A new fingerprint runs `gh workflow run product-pages.yml`; the last fingerprint is kept in the Actions cache (nothing is committed). Stock counts only as in/out of stock, so ordinary sales do not trigger builds. Safety: it refuses to act on fewer than 5 products.
+- [x] Tested locally with fixture JSON: same data -> same hash; sale (5->4 stock) -> same; price change -> new; restock 0->3 -> new.
+- [ ] NEXT: merge to main, run once by hand (`gh workflow run product-watch.yml --ref main`), then check `gh run list --workflow product-watch.yml`. The first run always starts one rebuild (no stored fingerprint yet). GitHub can delay scheduled runs by several minutes, so expect about 5-10 min + 3 min build after an upload, not instant.
+- Stop it: delete `.github/workflows/product-watch.yml` (the 3-hourly schedule stays).
+
+---
+
 ## SESSION CHECKPOINT (2026-11-02 15:30 Africa/Nairobi): new fogger listing at KSh 35,520 (branch `wip-fogger-listing`)
 Owner: "Confirm rates on other reliable platforms in Kenya", then "Put those prices".
 - [x] Market check (2026-11-02): Imagine Care 24,870, Tilemac 32,000, Jumia 34,999 for the same 16 L pulse-jet fogger (6.5 kg, 1100x280x380 mm); Masterpiece range 23,000-30,000 mid-range, 30,000+ for 16 L+. Reference = average of the three direct prices = 30,620; selling price = x1.16 = 35,520; cost recorded 30,620; crossed-out 38,610 (about 8% off). Jiji, Kilimall and a few shops blocked the sandbox. Nano gun (4,292) rests on Jumia alone.
