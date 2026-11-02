@@ -43,6 +43,12 @@ for (const token of [
   'weighted',
   'canonicalValid',
   'imagesWithAlt',
+  'imagesMissingAlt',
+  'imagesWithDescriptiveAlt',
+  'coverageComplete',
+  'Audit coverage:',
+  'slice(0,2000)',
+  "['One H1',h1===1,13]",
   'internalLinks',
   'jsonLdCount',
   'grid.append(k)'
