@@ -1,6 +1,6 @@
 // Run: node seo-safe-blog-meta.test.mjs (no dependencies)
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { SAFE_BLOG_META, applySafeBlogMeta, runSafeBlogMeta } from './seo-safe-blog-meta.mjs';
@@ -25,7 +25,7 @@ assert.ok(out.includes('<title>Keep title</title>')); n++;
 assert.equal(applySafeBlogMeta(page, 'https://stermontarcade.co.ke/blog/wrong.html', item.description), page); n++;
 assert.equal(applySafeBlogMeta(page, item.canonical, 'short'), page); n++;
 assert.equal(applySafeBlogMeta(page, item.canonical, 'x'.repeat(156)), page); n++;
-const dir = mkdtempSync(join(tmpdir(), 'stm-safe-blog-meta-')); mkdirSync(dir);
+const dir = mkdtempSync(join(tmpdir(), 'stm-safe-blog-meta-'));
 writeFileSync(join(dir, file), page);
 runSafeBlogMeta({ dir });
 const saved = readFileSync(join(dir, file), 'utf8');
