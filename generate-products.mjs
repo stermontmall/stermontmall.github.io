@@ -3,7 +3,7 @@
 // Runs automatically on GitHub (see .github/workflows/product-pages.yml). No installs needed (Node 18+).
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
+import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -32,7 +32,7 @@ const fixProducts = list => list.map(p => (Array.isArray(p.images) ? { ...p, ima
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
-  const cols = ['id,slug,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
+  const cols = ['id,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
                 'id,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
                 'id,name,price,old_price,unit,stock,images,description,categories(name,slug)',
                 'id,name,price,stock,images,description,categories(name,slug)'];
@@ -399,7 +399,8 @@ for (const p of products) {
   // Meta title (max 60 chars) and description (max 155 chars) come from seo-meta.mjs: "[Original] <name> \u2013 Price in Kenya | Stermont Arcade".
   // "Original / genuine" is only claimed for known brands and farm inputs; the price stays in the Product schema and on the page.
   const ctx = { brand: brandOf(p.name), catSlug: cat?.slug };
-  const title = pdpTitle(p.name, ctx), desc = pdpDescription(p.name, ctx, p.description), h1 = pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
+  const approvedName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
+  const title = pdpTitle(p.name, ctx), desc = pdpDescription(p.name, ctx, p.description), h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
   NAMES[p.id] = h1; (p.variants || []).forEach(v => { NAMES[v.id] = h1; });
   // Related products rotate through the category (the 6 that follow this one, wrapping round), so EVERY product, including the newest, gets links from other product pages.
   const related = (() => {
