@@ -2,8 +2,8 @@
       var D = document;
       /* ---- Settings: put your M-Pesa Till or Paybill here ---- */
       var CFG = { paybill: '714777', payAcct: '0748888230', wa: '254748888230',
-        /* Card payments (Paystack). Keep false until Paystack approves the live account and PAYSTACK_SECRET_KEY in Supabase holds the sk_live_ key; while false the card box is not shown, so buyers never see Paystack's test screen. Set true to turn it back on. */
-        card: false,
+        /* Card payments (Paystack). The card option is visible; paystack-init rejects test keys and requires PAYSTACK_SECRET_KEY to start with sk_live_. */
+        card: true,
         sbUrl: 'https://oewvtbnmyombbtggamor.supabase.co', sbKey: 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', sbRef: 'oewvtbnmyombbtggamor',
         /* M-Pesa STK Push (Daraja). Keep false while on sandbox; set true when production keys are live. Test any time with ?stk=1 in the page URL. */
         stk: true,
