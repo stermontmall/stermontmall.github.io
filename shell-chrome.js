@@ -1,12 +1,14 @@
 /* Stermont Arcade - mobile shell look for the static pages (account, track, shipping, returns, contact, faq, about, privacy, terms).
-   On a phone it adds the shell's top bar (back, search, cart) and the bottom nav (Home, Categories, Deals, Cart, Account) around the page, and hides the
-   page's own desktop header. The page text is not changed (crawlers and desktop screens see the page as before). The nav links open the shell
+   It adds the shell's top bar (back, search, cart) and the bottom nav (Home, Categories, Deals, Cart, Account) around the page, and hides the
+   page's own desktop header. The page text is not changed (crawlers see the page as before). The nav links open the shell
    (/?tab=...), and the search opens the shell's search (/?q=...). The cart badge reads the shell cart (localStorage "shell.cart").
+   CHANGE 2026-11-03 (branch wip-shell-everywhere): runs on EVERY screen size now (owner request: mobile shell everywhere). On wide screens the page
+   sits in a centred 480px column like the shell. To bring the old desktop pages back, re-add at the top of the function:
+   if (window.matchMedia && matchMedia('(min-width:900px) and (pointer:fine)').matches) return;
    Load with: <script src="/shell-chrome.js?v=1" defer></script>. To undo: remove that line from the page. */
 (function () {
   try {
     if (window.__stmChrome) return; window.__stmChrome = 1;
-    if (window.matchMedia && matchMedia('(min-width:900px) and (pointer:fine)').matches) return;   // desktop keeps the full page
     var P = '#7c3aed', LINE = '#e5e7eb';
     var css = 'body.stm-chrome{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}' +
       'body.stm-chrome>header{display:none}' +
@@ -22,7 +24,10 @@
       '#stm-nav a{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:56px;color:#6b7280;font-size:11px;text-decoration:none;-webkit-tap-highlight-color:transparent}' +
       '#stm-nav a[aria-current="page"]{color:' + P + ';font-weight:600}' +
       '#stm-nav .stm-badge{top:5px;right:auto;left:55%}' +
-      'body.stm-chrome #wa-float{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}';
+      'body.stm-chrome #wa-float{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}' +
+      /* wide screens: same centred 480px column as the shell home page */
+      '@media (min-width:600px){html:has(body.stm-chrome){background:#e5e7eb}body.stm-chrome{max-width:480px;margin:0 auto;background:#fff;box-shadow:0 0 24px rgba(0,0,0,.12);min-height:100vh}' +
+      '#stm-nav{left:calc(50% - 240px);right:calc(50% - 240px)}body.stm-chrome #wa-float{right:calc(50% - 226px)!important}}';
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
     var ic = function (d) { return '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; };
     var I = {
