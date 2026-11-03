@@ -1,4 +1,11 @@
 
+## 2026-11-03 21:20 Africa/Nairobi - Mercedes-Benz CLA 200 listing ACTIVATED
+Owner: "Mercedes CLA 2019 2000CC DIESEL 2019 2WD KSH 4.8M" then "Make it live directly".
+- [x] Row `mercedes-benz-cla-200-for-sale-kenya` set active=true, price 4,800,000 (owner's asking price; cost left 0 because no source cost exists), 10 photos in `product-photos/` live on main (pages deploy succeeded).
+- [x] Description now has year 2019, 2000cc, diesel, 2WD, price. Transmission, mileage, location and contact were not supplied and are not in the text.
+- [ ] Triggered `product-pages.yml` (workflow_dispatch) to build the product page/sitemap entry; confirm https://stermontarcade.co.ke/p/mercedes-benz-cla-200-for-sale-kenya.html opens.
+- [ ] OWNER: add mileage, transmission, location, contact; meta description and alt text have no DB column.
+
 ## 2026-11-03 21:10 Africa/Nairobi - Mercedes-Benz CLA 200 listing (branch `wip-mercedes-cla-200-listing`)
 Owner: "Do it directly" (sent 13 photos + full SEO copy; no price/year/mileage/contact supplied).
 - [x] 10 unique photos (3 duplicate pairs dropped) resized to 1400px wide JPEG and added as `product-photos/mercedes-benz-cla-200-for-sale-kenya-1..10.jpg`.
