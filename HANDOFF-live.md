@@ -1,4 +1,12 @@
 
+## 2026-11-03 15:20 Africa/Nairobi - card checkout shows Paystack TEST mode (finding, no code change)
+Owner: "my buyers want to transact so remove the tests" (screenshot: stermontarcade.co.ke card popup, TEST badge, "Transaction declined. Please use the test card.").
+- [x] Cause: NOT in the repo (grep for test card / sk_test / pk_test finds nothing). Edge functions `paystack-init` and `paystack-status` use the secret `PAYSTACK_SECRET_KEY` from Supabase function secrets; it is currently an `sk_test_` key, so Paystack serves its test popup.
+- [x] Test data found in Supabase: `card_payments` has 2 test "success" rows (STM-KPS46N 1203, STM-RGHPX4 43178) and 3 pending; `orders` STM-KPS46N is status `paid` (handled 2026-11-03 12:02 by staff) and STM-RGHPX4 is `pending`, both `pay_verified = true` from test cards. Not changed yet; owner to confirm before cancelling or deleting them.
+- [ ] OWNER: Paystack dashboard, switch to Live mode (business must be activated), Settings > API Keys & Webhooks: copy the live secret key `sk_live_...`, set the live webhook URL to `https://oewvtbnmyombbtggamor.supabase.co/functions/v1/paystack-webhook`.
+- [ ] OWNER or Claude: Supabase > Edge Functions > Secrets: replace `PAYSTACK_SECRET_KEY` with the `sk_live_` value (no redeploy needed). Do not paste the key into files.
+- [ ] Then: one small real card payment (e.g. KES 100 product), check `select order_ref, status, paid_amount from card_payments order by created_at desc limit 3;` shows `success` and the order shows `pay_verified = true`; refund it in Paystack.
+
 
 ## 2026-11-02 17:52 Africa/Nairobi — product photo workflow command merged
 - [x] PR #262 merged to `main`: https://github.com/stermontmall/stermontmall.github.io/pull/262 (merge commit `3f7ba083bfb50efe0829f80fb0195584302f959d`).
