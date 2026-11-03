@@ -1,4 +1,12 @@
 
+## 2026-11-03 16:40 Africa/Nairobi - START: mobile shell becomes the ONLY view on every screen and section (branch `wip-shell-only`, cut from `main` 74d85c6)
+Owner: "I only need mobile shell to take over the whole website. I don't want this traditional view. Make mobile shell 100% the only website in all sections. Connect GitHub and Supabase."
+- [x] Repo cloned (shallow) to `/home/claude/stermontmall.github.io`, branch `wip-shell-only` created. GitHub push access attached for this session.
+- [x] Map of the "traditional view" gates (all must go): `index.html` inline script (wide screen `min-width:900px` + `pointer:fine` -> `/classic.html`, `/#p-...` -> classic, desktop `?product=` -> `/p/<slug>.html`); `shell-chrome.js` line 9 and `admin-shell.js` line 10 (desktop skip); `seo-shell-redirect.mjs` (desktop skip on `/p/` and `/c/` pages, run by `.github/workflows/product-pages.yml`); `mobile-shell/app.js` links to `/classic.html` (grid error line ~267, checkout hand-off lines ~508-514); `index.html` Account tab "Open the full shop" link.
+- [x] Findings: the shell has NO desktop layout yet (fluid, no max-width) so removing the gate needs a centred app column; checkout (M-Pesa, delivery fees, order e-mails) still lives in `classic.html` + `checkout-deferred.js`; `blog/`, `guides/`, `pest-control/`, `p/`, `c/` pages do not load `shell-chrome.js` (services pages do).
+- [ ] Next: (1) remove the desktop gates, (2) centred shell column on wide screens, (3) route `/classic.html` visitors into the shell except the checkout hand-off, (4) give blog/guides/pest pages the shell chrome via their generators, (5) bump `?v=` for `app.js` and `tailwind.css`, (6) tests: `node mobile-shell/navigation.test.mjs; python3 mobile-shell/shell.test.py; node seo-meta.test.mjs; node seo-titles.test.mjs`.
+- Resume command: `cd /home/claude/stermontmall.github.io && git checkout wip-shell-only && git log --oneline -3`
+
 ## 2026-11-03 16:40 Africa/Nairobi - reload kept sending customers from a category to Home (branch `wip-keep-category-on-reload`)
 Owner: "When I refresh a category then pages brings me to home screen. Fix"
 - [x] Cause: the shell is one page; picking a category (chip, Categories tab, `/?cat=` or `/c/<slug>.html` link) only changed in-memory state and the address stayed `/`, so a reload started on "For you" (the active tab was already saved, the category was not).
