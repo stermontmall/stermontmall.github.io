@@ -1,4 +1,4 @@
-    (function () {
+(function () {
       var D = document;
       /* ---- Settings: put your M-Pesa Till or Paybill here ---- */
       var CFG = { paybill: '714777', payAcct: '0748888230', wa: '254748888230',
@@ -230,7 +230,32 @@
         b.appendChild(x);
       }
       /* ---- Card payments (Paystack). Card details are typed in Paystack's own window; this page only gets a payment reference back. ---- */
-      var cardBusy = false, cardMsg = '', cardRefLast = '';
+      var cardBusy = false, cardMsg = '', cardRefLast = '', keepObs = null;
+      /* FIX (2026-11-03): in checkout mode classic.html hides every <body> child except the drawer
+         (html.stm-co body>*:not(#dr):not(#toast):not([role=alert]){display:none!important}).
+         Paystack adds its card window straight to <body>, so it was hidden and the page waited forever on
+         "Processing card payment...". While the card window is open we tag whatever Paystack adds to <body>
+         with .stm-keep and show it; the tag is removed again when the card step ends. */
+      (function () {
+        var st = D.createElement('style');
+        st.textContent = 'html.stm-co body>.stm-keep:not(#a):not(#b):not(#c){display:block!important}';
+        D.head.appendChild(st);
+      })();
+      function keepCardWindow(on) {
+        if (keepObs) { keepObs.disconnect(); keepObs = null; }
+        [].forEach.call(D.querySelectorAll('body>.stm-keep'), function (n) { n.classList.remove('stm-keep'); });
+        if (!on) return;
+        [].forEach.call(D.querySelectorAll('body>*'), function (n) { if (/paystack/i.test((n.outerHTML || '').slice(0, 400))) n.classList.add('stm-keep'); });
+        if (!window.MutationObserver) return;
+        keepObs = new MutationObserver(function (ms) {
+          ms.forEach(function (m) {
+            [].forEach.call(m.addedNodes, function (n) {
+              if (n.nodeType === 1 && !/^(SCRIPT|STYLE|LINK|NOSCRIPT)$/.test(n.tagName) && n.id !== 'dr' && n.id !== 'toast') n.classList.add('stm-keep');
+            });
+          });
+        });
+        keepObs.observe(D.body, { childList: true });
+      }
       function loadPaystack() {
         return new Promise(function (res, rej) {
           if (window.PaystackPop) { res(); return; }
@@ -266,20 +291,26 @@
         var amt = due(T), email = (form.email || '').trim().toLowerCase();
         if (!ref) ref = newRef();
         cardBusy = true; cardMsg = 'Starting secure card payment...'; cardRefLast = ''; render();
+        keepCardWindow(true);
         stkFn('paystack-init', { email: email, amount: amt, ref: ref }).then(function (j) {
           cardRefLast = j.reference;
           return loadPaystack().then(function () {
             return new Promise(function (res, rej) {
+              var loaded = false, hint;
               cardMsg = 'Complete the payment in the card window.'; render();
+              hint = setTimeout(function () {
+                if (!loaded && cardBusy) { cardMsg = 'The card window is taking long to open. If nothing appears, check your connection and reload this page, or pay with M-Pesa below.'; render(); }
+              }, 15000);
               new window.PaystackPop().resumeTransaction(j.accessCode, {
-                onSuccess: function () { res(); },
-                onCancel: function () { cardRefLast = ''; rej(new Error('Card payment cancelled. You can try again.')); },
-                onError: function (e) { rej(new Error((e && e.message) || 'The card payment failed. Try again.')); }
+                onLoad: function () { loaded = true; clearTimeout(hint); },
+                onSuccess: function () { clearTimeout(hint); res(); },
+                onCancel: function () { clearTimeout(hint); cardRefLast = ''; rej(new Error('Card payment cancelled. You can try again.')); },
+                onError: function (e) { clearTimeout(hint); rej(new Error((e && e.message) || 'The card payment failed. Try again.')); }
               });
             });
           });
-        }).then(function () { return cardFinish(T, cardRefLast); })
-          .catch(function (e) { cardBusy = false; cardMsg = (e && e.message) || 'Could not start the card payment. Try again or pay with M-Pesa.'; render(); });
+        }).then(function () { keepCardWindow(false); return cardFinish(T, cardRefLast); })
+          .catch(function (e) { keepCardWindow(false); cardBusy = false; cardMsg = (e && e.message) || 'Could not start the card payment. Try again or pay with M-Pesa.'; render(); });
       }
       function rCard(b, T) {
         if (due(T) < 1 || due(T) > 150000) return;
