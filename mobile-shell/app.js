@@ -264,7 +264,7 @@ const SKELETON = `<li class="card pointer-events-none" aria-hidden="true"><div c
 const skeletons = n => SKELETON.repeat(n);
 
 const grid = $('#grid'), sentinel = $('#sentinel'), EMPTY_TEXT = $('#grid-empty').textContent;
-function showGridError() { const el = $('#grid-empty'); el.innerHTML = 'Could not load products. <button class="underline text-brand" data-retry>Try again</button><br><a class="underline text-brand" href="/classic.html">Open the full shop</a>'; el.hidden = false; }
+function showGridError() { const el = $('#grid-empty'); el.innerHTML = 'Could not load products. <button class="underline text-brand" data-retry>Try again</button><br><a class="underline text-brand" href="/">Reload the shell</a>'; el.hidden = false; }
 const feed = { page: 1, hasMore: true, loading: false, token: 0, items: new Map() };
 
 function query() {
