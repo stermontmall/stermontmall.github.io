@@ -1,9 +1,9 @@
-// Stermont Arcade - sends PEOPLE on a phone from a product page (/p/<slug>.html) into the mobile shell (/?product=<slug>), while crawlers keep the page.
+// Stermont Arcade - sends ALL customer browsers (phone, tablet and desktop) from product/category SEO pages into the mobile shell, while crawlers keep SEO HTML.
 // Why: the shell is one page, so a /?product= link can only preview as the home page. The shell now shows /p/<slug>.html in its address bar
 // (so a copied or shared link previews as THIS product, from the head of this page) and the page hands phones back to the shell.
-// Also handles the category pages (see below). Runs in .github/workflows/product-pages.yml after the page build (idempotent: the marker below is added once, a rebuilt page gets it again).
-// What the script skips (the page stays as it is): crawlers and link-preview bots (Googlebot, Facebook, WhatsApp, ...), desktop screens
-// (min-width 900px with a mouse, they use the full page), and an address with ?classic=1. A size can ride in the hash: /p/abasi-5-ec.html#abasi-5-ec-50-ml.
+// Also handles category pages. The product-pages workflow rebuilds and reinjects this rule across generated pages (idempotent).
+// Only crawlers/link-preview bots retain the SEO HTML. EVERY human visitor, including desktop users, uses the mobile shell. Pack-size
+// selection remains in the hash: /p/abasi-5-ec.html#abasi-5-ec-50-ml.
 // Redirect stubs (pages with a meta refresh, one per extra pack size) are left alone. To undo: delete this step from the workflow and rebuild.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
@@ -11,8 +11,6 @@ const DIR = process.env.P_DIR || 'p';
 export const MARK = '<!--stm-shell-->';
 export const SCRIPT = MARK + `<script>(function(){try{var ua=navigator.userAgent||'';` +
   `if(/bot|crawl|spider|slurp|facebookexternalhit|facebot|whatsapp|telegram|twitter|linkedin|pinterest|slack|discord|embedly|preview|lighthouse|pagespeed|inspectiontool|adsbot|mediapartners/i.test(ua))return;` +
-  `if(window.matchMedia&&matchMedia('(min-width:900px) and (pointer:fine)').matches)return;` +
-  `if(/[?&]classic=1/.test(location.search))return;` +
   `var h=decodeURIComponent((location.hash||'').slice(1)),s=location.pathname.replace(/^\\/p\\//,'').replace(/\\.html$/,'');` +
   `if(!/^[a-z0-9-]+$/i.test(s))return;if(!/^[a-z0-9-]+$/i.test(h))h='';` +
   `location.replace('/?product='+encodeURIComponent(h||s));}catch(e){}})();</script>`;
@@ -28,8 +26,6 @@ export function inject(html) {
 export const CAT_MARK = '<!--stm-shell-cat-->';
 export const CAT_SCRIPT = CAT_MARK + `<script>(function(){try{var ua=navigator.userAgent||'';` +
   `if(/bot|crawl|spider|slurp|facebookexternalhit|facebot|whatsapp|telegram|twitter|linkedin|pinterest|slack|discord|embedly|preview|lighthouse|pagespeed|inspectiontool|adsbot|mediapartners/i.test(ua))return;` +
-  `if(window.matchMedia&&matchMedia('(min-width:900px) and (pointer:fine)').matches)return;` +
-  `if(/[?&]classic=1/.test(location.search))return;` +
   `var s=location.pathname.replace(/^\\/c\\//,'').replace(/\\.html$/,'');` +
   `if(!/^[a-z0-9-]+$/i.test(s)||s==='index')return;` +
   `location.replace('/?cat='+encodeURIComponent(s));}catch(e){}})();</script>`;
