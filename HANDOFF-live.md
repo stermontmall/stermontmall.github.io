@@ -1,4 +1,10 @@
 
+## 2026-11-03 16:05 Africa/Nairobi - card box hidden until Paystack is live + desktop Share button (branch `wip-card-off-desktop-share`)
+- [x] `checkout-deferred.js`: new flag `CFG.card: false` and `rCard` returns early, so buyers only see M-Pesa and never Paystack's TEST popup. TO TURN CARDS BACK ON: after Paystack approves the live account, put the `sk_live_` key in Supabase secret `PAYSTACK_SECRET_KEY`, set the live webhook, do one real small payment test, then set `card: true` (note: the card box is gated by this flag only, the edge functions stay deployed).
+- [x] Desktop cart drawer got a "Share cart link" button inside the cart list (not the footer: the WhatsApp bubble floats over the drawer footer on desktop and covered it).
+- [x] Tests: `python3 mobile-shell/shell.test.py` 149/149 (new: desktop share button, card box switched off).
+- [ ] Still open: test orders STM-KPS46N (status paid) and STM-RGHPX4 from Paystack test cards are still in `orders`/`card_payments`; owner to say whether to cancel them.
+
 ## 2026-11-03 15:45 Africa/Nairobi - shareable cart link (branch `wip-share-cart-link`)
 Owner: "If I add items to cart, and share link, the link doesn't directly go to the cart but to the home screen."
 - [x] Cause: the cart lives only in each phone's storage (`shell.cart`), and the address bar stays on the bare domain, so a copied link could only open Home (and an empty cart on another phone).

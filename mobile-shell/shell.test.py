@@ -501,9 +501,15 @@ with sync_playwright() as p:
     p14 = c14.new_page(); e14 = []; p14.on('pageerror', lambda e: e14.append(str(e)))
     p14.goto(f'{BASE}/?cart=home-0:2'); p14.wait_for_function("location.pathname === '/classic.html'", timeout=15000); p14.wait_for_selector('#dr.on', timeout=15000)
     check('shared cart: a desktop screen opens the full shop with the cart drawer open', p14.locator('#dr.on').count() == 1 and '?cart=' not in p14.url, p14.url)
+    p14.evaluate("window.__shared = null; navigator.share = u => { window.__shared = u; return Promise.resolve(); }")
+    p14.get_by_text('Share cart link').click(); p14.wait_for_timeout(200)
+    sh14 = p14.evaluate('window.__shared') or {}
+    check('shared cart: desktop cart drawer has a Share cart link button that builds the address', sh14.get('url') == 'https://stermontarcade.co.ke/?cart=home-0:2', sh14)
     check('shared cart: desktop no page errors', not e14, e14[:3])
     c14.close()
 
+    co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
+    check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
     check('no console/page errors', not errors, errors[:3])
     b.close()
 

@@ -2,6 +2,8 @@
       var D = document;
       /* ---- Settings: put your M-Pesa Till or Paybill here ---- */
       var CFG = { paybill: '714777', payAcct: '0748888230', wa: '254748888230',
+        /* Card payments (Paystack). Keep false until Paystack approves the live account and PAYSTACK_SECRET_KEY in Supabase holds the sk_live_ key; while false the card box is not shown, so buyers never see Paystack's test screen. Set true to turn it back on. */
+        card: false,
         sbUrl: 'https://oewvtbnmyombbtggamor.supabase.co', sbKey: 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', sbRef: 'oewvtbnmyombbtggamor',
         /* M-Pesa STK Push (Daraja). Keep false while on sandbox; set true when production keys are live. Test any time with ?stk=1 in the page URL. */
         stk: true,
@@ -92,6 +94,18 @@
       function normPhone(p) { var d = (p || '').replace(/[\s\-().]/g, ''), m = d.match(/^(?:\+?254|0)([17]\d{8})$/); return m ? '254' + m[1] : null; }
       function go(s) { step = s; render(); }
 
+      /* Share cart link: the address carries the cart lines (product id : quantity), so whoever opens it lands on a cart with the same items. */
+      function copyLink(url) {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(function () { toast('Cart link copied'); }, function () { window.prompt('Copy your cart link:', url); });
+        else window.prompt('Copy your cart link:', url);
+      }
+      function shareCart() {
+        var lines = Object.keys(cart).filter(function (id) { return cart[id] > 0; }).map(function (id) { return encodeURIComponent(id.replace(/^p-/, '')) + ':' + cart[id]; });
+        if (!lines.length) return;
+        var url = 'https://stermontarcade.co.ke/?cart=' + lines.join(',');
+        if (navigator.share) { navigator.share({ title: 'My Stermont Arcade cart', text: 'My cart on Stermont Arcade:', url: url }).catch(function (e) { if (!e || e.name !== 'AbortError') copyLink(url); }); return; }
+        copyLink(url);
+      }
       function rCart(b, f, T) {
         if (!T.n) {
           var e = h('div', 'empty'); e.appendChild(h('div', 'em', '\uD83D\uDED2')); e.appendChild(h('h3', null, 'Your cart is empty')); e.appendChild(h('p', 'note', 'Add products and check out in under a minute.'));
@@ -112,6 +126,7 @@
           var rt = h('div', 'cr'); rt.appendChild(h('div', 'ct', money(i.total)));
           var x = h('button', 'rm', '\u2715 Remove'); x.type = 'button'; x.setAttribute('aria-label', 'Remove ' + i.name); x.onclick = function () { setQ(i.id, 0); }; rt.appendChild(x); r.appendChild(rt); b.appendChild(r);
         });
+        btn(b, 'Share cart link', shareCart, 'btn-alt');   /* in the list, not the footer: the WhatsApp bubble floats over the footer on desktop */
         row(f, 'Subtotal (' + T.n + (T.n === 1 ? ' item)' : ' items)'), money(T.s), 'big');
         f.appendChild(h('p', 'note', 'Delivery fee is added at checkout based on your county.'));
         btn(f, 'Checkout', function () { go('details'); });
@@ -313,6 +328,7 @@
           .catch(function (e) { keepCardWindow(false); cardBusy = false; cardMsg = (e && e.message) || 'Could not start the card payment. Try again or pay with M-Pesa.'; render(); });
       }
       function rCard(b, T) {
+        if (CFG.card !== true) return;
         if (due(T) < 1 || due(T) > 150000) return;
         var x = h('div', 'pay'); x.appendChild(h('h4', null, 'Pay by card (Visa or Mastercard)'));
         x.appendChild(h('p', 'note', 'Secure card payment by Paystack. Your card details are entered in Paystack\u2019s window and never reach this website.'));
