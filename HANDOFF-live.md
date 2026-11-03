@@ -1,4 +1,11 @@
 
+## 2026-11-03 16:40 Africa/Nairobi - reload kept sending customers from a category to Home (branch `wip-keep-category-on-reload`)
+Owner: "When I refresh a category then pages brings me to home screen. Fix"
+- [x] Cause: the shell is one page; picking a category (chip, Categories tab, `/?cat=` or `/c/<slug>.html` link) only changed in-memory state and the address stayed `/`, so a reload started on "For you" (the active tab was already saved, the category was not).
+- [x] Fix (`mobile-shell/app.js`): the chosen chip + sub-category are saved for the tab in sessionStorage `shell.activeCat` (written on every store change, read before the store saves its default) and restored on load when the address asks for nothing deeper (product / cat / search / cart link). After the catalog loads the saved category is checked against the live categories; an unknown one falls back to For you. `index.html` loads `app.js?v=16`.
+- [x] Tests: `python3 mobile-shell/shell.test.py` 155/155 (new: reload keeps chip/title/products, keeps a sub-category from `/?cat=`, stays on For you after choosing it, unknown saved category falls back, fresh visit unchanged); `node mobile-shell/navigation.test.mjs` OK.
+- [ ] Not changed: the address bar still shows `/` while a category is open (sharing a category still uses `/c/<slug>.html`).
+
 ## 2026-11-03 16:20 Africa/Nairobi - 5 missing electronics photos added (branch `wip-photos-5-electronics-1103`)
 - [x] Owner sent the 5 photos in chat; copied byte-for-byte (JPEG, 680x680) to `product-photos/` under the exact names the live rows already use: apple-iphone-17-pro-max-256gb-orange.jpg, apple-iphone-16-128gb-green.jpg, asus-zenbook-14-oled-laptop.jpg, apple-macbook-pro-14-m3-pro-space-black.jpg, asus-rog-zephyrus-g16-gaming-laptop-platinum-white.jpg. This fixes PROBLEM A (404 photos on 5 live rows) and the failing "Broken links (Lychee)" job of Site audit run #20 (it flagged these 5 URLs in index.html/products.html).
 - [x] No Supabase rows changed. Still open from the 16:40 audit: prices/specs for these 5 were never confirmed by the owner ("green iPhone 16" is not a real colour; orange image is a render).

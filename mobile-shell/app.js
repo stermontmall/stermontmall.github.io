@@ -83,6 +83,10 @@ async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min 
   return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size };
 }
 
+/* The category the customer picked (and its sub-category) survives a reload: it is kept for this tab in sessionStorage, like the active tab. Read here, before
+   the store below saves its default state, and applied in section 11 once nothing deeper (product / category / search / cart link) was asked for in the address. */
+const SAVED_CAT = (() => { try { const c = JSON.parse(sessionStorage.getItem('shell.activeCat') || 'null'); return c && typeof c.chip === 'string' && c.chip !== 'all' ? { chip: c.chip, sub: typeof c.sub === 'string' ? c.sub : '' } : null; } catch { return null; } })();
+
 /* ---------- 2. Store + live badges ---------- */
 const store = (() => {
   let s = { tab: 'home', cart: ls.get('cart', []).filter(i => i.rowId), dealsNew: 0, chip: 'all', sub: '', q: '', filters: { sort: 'rec', min: 0, max: 0, disc: false } };   // dealsNew stays 0 (badge hidden) until the catalog is loaded, see syncDealsBadge
@@ -117,6 +121,7 @@ store.subscribe((s, prev) => {
   setBadge('cart', cartCount(s), cartCount(prev));
   setBadge('deals', s.dealsNew, prev.dealsNew);
   ls.set('cart', s.cart);
+  if (s !== prev) { try { sessionStorage.setItem('shell.activeCat', JSON.stringify({ chip: s.chip, sub: s.sub })); } catch {} }   // keeps the chosen category across a reload
 });
 
 /* ---------- 3. Overlays wired to browser history ----------
@@ -562,8 +567,10 @@ $('#search-form').addEventListener('submit', e => {
 });
 
 if (Q_DEEP && !DEEP && !CAT_DEEP) { store.set({ q: Q_DEEP }); $('#search').value = Q_DEEP; }   // a search typed on a static page
+const RESTORE_CAT = !DEEP && !CAT_DEEP && !Q_DEEP && !CART_DEEP.length && SAVED_CAT;   // a reload keeps the chosen category (checked against the live categories once they load)
+if (RESTORE_CAT) store.set({ chip: SAVED_CAT.chip, sub: SAVED_CAT.sub });
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
 if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
 if (CART_DEEP.length) toast('Loading shared cart...');
-loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) openDeepLink(DEEP); else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
+loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) { store.set({ sub: '' }); refreshGrid(); } else $('#grid-title').textContent = store.get().sub || t.name; } } renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) openDeepLink(DEEP); else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
 })();
