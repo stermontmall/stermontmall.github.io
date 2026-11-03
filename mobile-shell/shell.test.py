@@ -426,7 +426,7 @@ with sync_playwright() as p:
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_c(cx)
         px = cx.new_page(); px.goto(f'{BASE}/c/garden-outdoors.html'); px.wait_for_timeout(1500)
-        check(f'category redirect: {label} keeps the category page (no redirect)', px.evaluate('location.pathname') == '/c/garden-outdoors.html', px.url)
+        check(f'category redirect: {label} lands in shell for category', px.evaluate('location.pathname') == '/' and px.locator('#grid .card[data-id]').count() > 0, px.url)
         cx.close()
     cc2 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc2); serve_c(cc2)
     pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1'); pc2.wait_for_timeout(1500)
@@ -464,19 +464,19 @@ with sync_playwright() as p:
     for label, kw in [('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx)
         px = cx.new_page(); px.goto(f'{BASE}/shipping.html'); px.wait_for_timeout(800)
-        check(f'static pages: {label} gets the page without the shell bar', px.locator('#stm-bar').count() == 0 and px.locator('body > header').first.is_visible(), px.url)
+        check(f'static pages: {label} shows shell bar and bottom nav', px.locator('#stm-bar').is_visible() and px.locator('#stm-nav a').count() == 5, px.url)
         cx.close()
 
     # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
     c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)
     p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_function("location.pathname !== '/'", timeout=15000); p6.wait_for_timeout(1500)
-    check('old /#p-... product link opens the full shop and that product (it then shows the straight /p/ URL)', p6.url.endswith('/classic.html#p-home-0') or '/p/' in p6.url, p6.url)
+    check('old /#p-... product link opens product overlay in shell', p6.evaluate('location.pathname') == '/' and p6.locator('#page-product.open').count() == 1, p6.url)
     p6.goto(f'{BASE}/mobile-shell/'); p6.wait_for_function("location.pathname === '/'", timeout=15000)
     check('/mobile-shell/ forwards to the home page', p6.url == BASE + '/', p6.url)
     c6.close()
     c7 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c7)
-    p7 = c7.new_page(); p7.goto(URL); p7.wait_for_function("location.pathname === '/classic.html'", timeout=15000)
-    check('desktop screens keep the full classic shop', '/classic.html' in p7.url, p7.url)
+    p7 = c7.new_page(); p7.goto(URL); p7.wait_for_selector('#grid .card[data-id]', timeout=15000)
+    check('desktop homepage stays in shell', p7.evaluate('location.pathname') == '/' and p7.locator('#bottom-nav').is_visible(), p7.url)
     c7.close()
     check('no page errors during the handoff flow', not e4, e4[:3])
 
@@ -499,8 +499,8 @@ with sync_playwright() as p:
     c13.close()
     c14 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c14)
     p14 = c14.new_page(); e14 = []; p14.on('pageerror', lambda e: e14.append(str(e)))
-    p14.goto(f'{BASE}/?cart=home-0:2'); p14.wait_for_function("location.pathname === '/classic.html'", timeout=15000); p14.wait_for_selector('#dr.on', timeout=15000)
-    check('shared cart: a desktop screen opens the full shop with the cart drawer open', p14.locator('#dr.on').count() == 1 and '?cart=' not in p14.url, p14.url)
+    p14.goto(f'{BASE}/?cart=home-0:2'); p14.wait_for_selector('#cart-list li', timeout=15000)
+    check('shared cart: desktop opens shell cart tab with items', p14.locator('#view-cart').is_visible() and p14.locator('#cart-list li').count() == 1, p14.url)
     p14.evaluate("window.__shared = null; navigator.share = u => { window.__shared = u; return Promise.resolve(); }")
     p14.get_by_text('Share cart link').click(); p14.wait_for_timeout(200)
     sh14 = p14.evaluate('window.__shared') or {}
