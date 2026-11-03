@@ -1,14 +1,16 @@
 /* Stermont Arcade - mobile shell look for the static pages (account, track, shipping, returns, contact, faq, about, privacy, terms).
-   On a phone it adds the shell's top bar (back, search, cart) and the bottom nav (Home, Categories, Deals, Cart, Account) around the page, and hides the
-   page's own desktop header. The page text is not changed (crawlers and desktop screens see the page as before). The nav links open the shell
+   On every screen size (phone, tablet, desktop) it adds the shell's top bar (back, search, cart) and the bottom nav (Home, Categories, Deals, Cart, Account) around the page, and hides the
+   page's own desktop header. The page text is not changed (crawlers see the page as before). The nav links open the shell
    (/?tab=...), and the search opens the shell's search (/?q=...). The cart badge reads the shell cart (localStorage "shell.cart").
    Load with: <script src="/shell-chrome.js?v=1" defer></script>. To undo: remove that line from the page. */
 (function () {
   try {
     if (window.__stmChrome) return; window.__stmChrome = 1;
-    if (window.matchMedia && matchMedia('(min-width:900px) and (pointer:fine)').matches) return;   // desktop keeps the full page
     var P = '#7c3aed', LINE = '#e5e7eb';
-    var css = 'body.stm-chrome{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}' +
+    var GAP = 'max(0px,calc((100% - 480px) / 2))';   // wide screens: the pages stay one phone-width column, like the shell
+    var css = 'html{background:#e5e7eb}@media (prefers-color-scheme:dark){html{background:#0b0a10}}' +
+      'body.stm-chrome{max-width:480px;margin-left:auto;margin-right:auto;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 8px 40px rgba(0,0,0,.14)}' +
+      'body.stm-chrome{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}' +
       'body.stm-chrome>header{display:none}' +
       '#stm-bar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:4px;height:52px;padding:env(safe-area-inset-top,0px) 8px 0;box-sizing:content-box;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.08);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
       '#stm-bar a,#stm-bar button{position:relative;display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:none;color:#1f2937;cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent}' +
@@ -18,11 +20,11 @@
       '#stm-bar form button{position:absolute;right:3px;top:3px;width:30px;height:30px;border:0;border-radius:50%;background:' + P + ';color:#fff;display:grid;place-items:center;font:600 12px system-ui,sans-serif;cursor:pointer}' +
       '#stm-bar form svg{position:absolute;left:11px;top:50%;margin-top:-8px;width:16px;height:16px;color:#6b7280;pointer-events:none}' +
       '.stm-badge{position:absolute;top:1px;right:1px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:999px;background:#e11d48;color:#fff;font:600 10px/16px system-ui,sans-serif;text-align:center}' +
-      '#stm-nav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;background:#fff;border-top:1px solid ' + LINE + ';padding-bottom:env(safe-area-inset-bottom,0px);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
+      '#stm-nav{position:fixed;left:' + GAP + ';right:' + GAP + ';bottom:0;z-index:50;display:flex;background:#fff;border-top:1px solid ' + LINE + ';padding-bottom:env(safe-area-inset-bottom,0px);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
       '#stm-nav a{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:56px;color:#6b7280;font-size:11px;text-decoration:none;-webkit-tap-highlight-color:transparent}' +
       '#stm-nav a[aria-current="page"]{color:' + P + ';font-weight:600}' +
       '#stm-nav .stm-badge{top:5px;right:auto;left:55%}' +
-      'body.stm-chrome #wa-float{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}';
+      'body.stm-chrome #wa-float{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important;right:calc(' + GAP + ' + 16px)!important}';
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
     var ic = function (d) { return '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; };
     var I = {
