@@ -66,17 +66,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="stylesheet" href="/mobile-shell/tailwind.css?v=2">
 <style>/* WhatsApp button: sit above the bottom nav, and get out of the way while a sheet or page is open (it covered Buy now) */#wa-float{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}body.no-scroll #wa-float{display:none!important}</style>
+<style>/* Mobile shell on EVERY screen size (owner request 2026-11-03). On wide screens the shell stays a centred 480px phone column and every fixed layer (bottom nav, sheets, product page, scrim, drawer) is clamped to that column. Phones (<600px) are untouched. */
+@media (min-width:600px){
+  html{background:#e5e7eb}
+  body{max-width:480px;margin-left:auto;margin-right:auto;box-shadow:0 0 24px rgba(0,0,0,.12)}
+  #bottom-nav,#scrim,.sheet-bottom,#page-product{left:calc(50% - 240px)!important;right:calc(50% - 240px)!important}
+  .sheet-left{left:calc(50% - 240px)!important}
+  #wa-float{right:calc(50% - 226px)!important}
+}</style>
   <style>/* the build bot rewrites the crawler links between the seo-links markers (generate-products.mjs); these variables style them */
   :root{--panel:#f3f4f6;--line:#e5e7eb;--ink:#1f2937}.seo-links .wrap{padding:0 12px 8px}.seo-links h2{color:var(--ink)}</style>
   <script>
-  /* Desktop screens keep the full classic shop; old shared /#p-... product links open it too. The shell is the phone home page.
-     Crawlers and link-preview bots are never redirected: they must read this page (its site name, title and links), not the classic copy. */
+  /* The mobile shell is the home page on EVERY screen size now (desktop used to be sent to /classic.html; that redirect was removed on 2026-11-03).
+     Only old shared /#p-... product links still open the classic page. To bring the desktop redirect back, see HANDOFF-shell-everywhere.md.
+     Crawlers and link-preview bots are never redirected: they must read this page (its site name, title and links). */
   (function () {
     if (/bot|crawl|spider|slurp|googlebot|bingbot|inspectiontool|lighthouse|pagespeed|facebookexternalhit|whatsapp/i.test(navigator.userAgent || '')) return;
-    var wide = window.matchMedia && matchMedia('(min-width:900px) and (pointer:fine)').matches;
-    var prod = /[?&]product=([^&#]+)/.exec(location.search);   // shell product address: desktop opens the full product page of that product
-    if (wide && prod) location.replace('/p/' + prod[1] + '.html');
-    else if (wide || /^#p-/.test(location.hash)) location.replace('/classic.html' + location.search + location.hash);
+    if (/^#p-/.test(location.hash)) location.replace('/classic.html' + location.search + location.hash);
   })();
   </script>
 </head>
