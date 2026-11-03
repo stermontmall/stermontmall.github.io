@@ -1,4 +1,9 @@
 
+## 2026-11-03 16:20 Africa/Nairobi - 5 missing electronics photos added (branch `wip-photos-5-electronics-1103`)
+- [x] Owner sent the 5 photos in chat; copied byte-for-byte (JPEG, 680x680) to `product-photos/` under the exact names the live rows already use: apple-iphone-17-pro-max-256gb-orange.jpg, apple-iphone-16-128gb-green.jpg, asus-zenbook-14-oled-laptop.jpg, apple-macbook-pro-14-m3-pro-space-black.jpg, asus-rog-zephyrus-g16-gaming-laptop-platinum-white.jpg. This fixes PROBLEM A (404 photos on 5 live rows) and the failing "Broken links (Lychee)" job of Site audit run #20 (it flagged these 5 URLs in index.html/products.html).
+- [x] No Supabase rows changed. Still open from the 16:40 audit: prices/specs for these 5 were never confirmed by the owner ("green iPhone 16" is not a real colour; orange image is a render).
+- [ ] NEXT: after Pages deploys, open https://stermontarcade.co.ke/product-photos/apple-iphone-16-128gb-green.jpg to confirm; re-run Site audit (workflow_dispatch) to confirm Lychee passes.
+
 ## 2026-11-03 16:05 Africa/Nairobi - card box hidden until Paystack is live + desktop Share button (branch `wip-card-off-desktop-share`)
 - [x] `checkout-deferred.js`: new flag `CFG.card: false` and `rCard` returns early, so buyers only see M-Pesa and never Paystack's TEST popup. TO TURN CARDS BACK ON: after Paystack approves the live account, put the `sk_live_` key in Supabase secret `PAYSTACK_SECRET_KEY`, set the live webhook, do one real small payment test, then set `card: true` (note: the card box is gated by this flag only, the edge functions stay deployed).
 - [x] Desktop cart drawer got a "Share cart link" button inside the cart list (not the footer: the WhatsApp bubble floats over the drawer footer on desktop and covered it).
