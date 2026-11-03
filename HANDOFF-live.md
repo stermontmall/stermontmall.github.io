@@ -1,4 +1,10 @@
 
+## 2026-11-03 21:10 Africa/Nairobi - Mercedes-Benz CLA 200 listing (branch `wip-mercedes-cla-200-listing`)
+Owner: "Do it directly" (sent 13 photos + full SEO copy; no price/year/mileage/contact supplied).
+- [x] 10 unique photos (3 duplicate pairs dropped) resized to 1400px wide JPEG and added as `product-photos/mercedes-benz-cla-200-for-sale-kenya-1..10.jpg`.
+- [ ] Draft row `mercedes-benz-cla-200-for-sale-kenya` (category 15 Automotive, active=false, stock 1000, low_at 20) created in Supabase with images pointing at the files above.
+- [ ] OWNER: price is a placeholder (0.00, draft only); year, mileage, transmission, location and contact are NOT in the description because they were never supplied. Set the real price, add those details, then activate.
+
 ## 2026-11-03 16:40 Africa/Nairobi - reload kept sending customers from a category to Home (branch `wip-keep-category-on-reload`)
 Owner: "When I refresh a category then pages brings me to home screen. Fix"
 - [x] Cause: the shell is one page; picking a category (chip, Categories tab, `/?cat=` or `/c/<slug>.html` link) only changed in-memory state and the address stayed `/`, so a reload started on "For you" (the active tab was already saved, the category was not).
