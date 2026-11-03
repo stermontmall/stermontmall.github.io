@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-<!--stm-classic-shell--><script>(function(){try{var ua=navigator.userAgent||'';if(/bot|crawl|spider|slurp|googlebot|bingbot|facebookexternalhit|whatsapp|telegram|preview|lighthouse|pagespeed|inspectiontool/i.test(ua))return;var q=new URLSearchParams(location.search);var h=/^#p-([a-z0-9-]+)$/i.exec(location.hash||'');if(h&&!q.has('product'))q.set('product',h[1]);location.replace('/'+(q.toString()?'?'+q.toString():'')+(h?'':location.hash));}catch(e){location.replace('/');}})();</script>
+<!--stm-classic-shell--><script>(function(){try{var ua=navigator.userAgent||'';if(/bot|crawl|spider|slurp|googlebot|bingbot|facebookexternalhit|whatsapp|telegram|preview|lighthouse|pagespeed|inspectiontool/i.test(ua))return;var q=new URLSearchParams(location.search);if(q.get('checkout')==='1')return;/* Keep the existing verified M-Pesa/order checkout surface; all browsing routes go to shell. */var h=/^#p-([a-z0-9-]+)$/i.exec(location.hash||'');if(h&&!q.has('product'))q.set('product',h[1]);location.replace('/'+(q.toString()?'?'+q.toString():'')+(h?'':location.hash));}catch(e){location.replace('/');}})();</script>
   <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#7c3aed">
