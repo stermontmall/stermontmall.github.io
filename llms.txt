@@ -29,6 +29,7 @@
 - [Shop Top Agrovet Online in Kenya – M-Pesa & Delivery](https://stermontarcade.co.ke/c/agrovet.html): Order top-quality Agrovet online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
 - [Shop Top Animal Feeds Online in Kenya – M-Pesa & Delivery](https://stermontarcade.co.ke/c/animal-feeds.html): Order top-quality Animal Feeds online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
 - [Shop Top Appliances Online in Kenya – M-Pesa & Delivery](https://stermontarcade.co.ke/c/appliances.html): Order top-quality Appliances online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
+- [Shop Top Automotive Online in Kenya – M-Pesa & Delivery](https://stermontarcade.co.ke/c/automotive.html): Order top-quality Automotive online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
 - [Shop Top Bed Bug Killers Online in Kenya – M-Pesa & Delivery](https://stermontarcade.co.ke/c/bed-bug-killers.html): Order PCPB-approved, top-quality Bed Bug Killers at wholesale prices in Nairobi. Fast delivery across 47 counties with secure M-Pesa checkout.
 - [Shop Top Bluetooth Speakers Online in Kenya](https://stermontarcade.co.ke/c/bluetooth-speakers.html): Order top-quality Bluetooth Speakers online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
 - [Shop Top Cockroach & Ant Killers Online in Kenya](https://stermontarcade.co.ke/c/cockroach-ant-killers.html): Order PCPB-approved, top-quality Cockroach & Ant Killers at wholesale prices in Nairobi. Fast delivery across 47 counties with secure M-Pesa checkout.
@@ -132,6 +133,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 205 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 206 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
