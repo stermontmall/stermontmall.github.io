@@ -230,7 +230,7 @@
         b.appendChild(x);
       }
       /* ---- Card payments (Paystack). Card details are typed in Paystack's own window; this page only gets a payment reference back. ---- */
-      var cardBusy = false, cardMsg = '', cardRefLast = '';
+      var cardBusy = false, cardMsg = '', cardRefLast = '', cardUrl = '';
       function loadPaystack() {
         return new Promise(function (res, rej) {
           if (window.PaystackPop) { res(); return; }
@@ -257,7 +257,7 @@
       function cardFinish(T, reference) {
         cardBusy = true; cardMsg = 'Confirming your card payment...'; render();
         return cardPoll(reference).then(function (p) {
-          cardBusy = false; cardMsg = ''; cardRefLast = '';
+          cardBusy = false; cardMsg = ''; cardRefLast = ''; cardUrl = '';
           form.payVia = 'card'; form.payCode = p.receipt; form.payAmt = String(p.amount); form.payTouched = true; place(T);
         }).catch(function (e) { cardBusy = false; cardMsg = (e && e.message) || 'Card payment failed. Try again.'; render(); });
       }
@@ -265,17 +265,24 @@
         if (cardBusy || sending) return;
         var amt = due(T), email = (form.email || '').trim().toLowerCase();
         if (!ref) ref = newRef();
-        cardBusy = true; cardMsg = 'Starting secure card payment...'; cardRefLast = ''; render();
+        cardBusy = true; cardMsg = 'Starting secure card payment...'; cardRefLast = ''; cardUrl = ''; render();
         stkFn('paystack-init', { email: email, amount: amt, ref: ref }).then(function (j) {
-          cardRefLast = j.reference;
+          cardRefLast = j.reference; cardUrl = j.authorizationUrl || '';
           return loadPaystack().then(function () {
             return new Promise(function (res, rej) {
+              var shown = false;
               cardMsg = 'Complete the payment in the card window.'; render();
               new window.PaystackPop().resumeTransaction(j.accessCode, {
+                onLoad: function () { shown = true; },
                 onSuccess: function () { res(); },
-                onCancel: function () { cardRefLast = ''; rej(new Error('Card payment cancelled. You can try again.')); },
+                onCancel: function () { cardRefLast = ''; cardUrl = ''; rej(new Error('Card payment cancelled. You can try again.')); },
                 onError: function (e) { rej(new Error((e && e.message) || 'The card payment failed. Try again.')); }
               });
+              /* Some phones never show Paystack's window. If nothing appeared after a few seconds, offer Paystack's own page in a new tab. */
+              setTimeout(function () {
+                if (shown || !cardBusy || !cardUrl || D.querySelector('iframe[src*="paystack"]')) return;
+                cardBusy = false; cardMsg = 'The card window did not open. Tap "Open card page", pay there, then come back here and tap "Check my card payment".'; render();
+              }, 5000);
             });
           });
         }).then(function () { return cardFinish(T, cardRefLast); })
@@ -287,6 +294,7 @@
         x.appendChild(h('p', 'note', 'Secure card payment by Paystack. Your card details are entered in Paystack\u2019s window and never reach this website.'));
         if (cardMsg) x.appendChild(h('p', 'note', cardMsg));
         var bt = h('button', 'btn btn-main', cardBusy ? 'Processing card payment...' : 'Pay ' + money(due(T)) + ' by card'); bt.type = 'button'; bt.disabled = cardBusy || sending; bt.onclick = function () { cardPay(T); }; x.appendChild(bt);
+        if (cardRefLast && cardUrl && !cardBusy) { var op = h('a', 'btn btn-main', 'Open card page'); op.href = cardUrl; op.target = '_blank'; op.rel = 'noopener'; x.appendChild(op); }
         if (cardRefLast && !cardBusy) { var ck = h('button', 'btn btn-alt', 'Check my card payment'); ck.type = 'button'; ck.onclick = function () { cardFinish(T, cardRefLast); }; x.appendChild(ck); }
         b.appendChild(x);
       }
@@ -535,7 +543,7 @@
             lastMsg = message(T); lastUrl = 'https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(lastMsg);
             notify(T, s);
             ls('stm_cust', { uid: myUid(), name: form.name.trim(), phone: form.phone, email: (form.email || '').trim(), county: form.county, addr: form.addr, method: form.method });
-            doneRef = ref; doneTotal = due(T); form.vc = null; form.vcode = ''; ref = ''; cart = {}; store(); sending = false; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.payVia = ''; cardRefLast = ''; cardMsg = ''; step = 'done'; sync(); if (!isOpen) render();
+            doneRef = ref; doneTotal = due(T); form.vc = null; form.vcode = ''; ref = ''; cart = {}; store(); sending = false; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.payVia = ''; cardRefLast = ''; cardUrl = ''; cardMsg = ''; step = 'done'; sync(); if (!isOpen) render();
           })
           .catch(function (err) {
             clearTimeout(to); sending = false;
