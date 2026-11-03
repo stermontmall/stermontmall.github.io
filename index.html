@@ -69,17 +69,19 @@
   <style>/* the build bot rewrites the crawler links between the seo-links markers (generate-products.mjs); these variables style them */
   :root{--panel:#f3f4f6;--line:#e5e7eb;--ink:#1f2937}.seo-links .wrap{padding:0 12px 8px}.seo-links h2{color:var(--ink)}</style>
   <script>
-  /* Desktop screens keep the full classic shop; old shared /#p-... product links open it too. The shell is the phone home page.
-     Crawlers and link-preview bots are never redirected: they must read this page (its site name, title and links), not the classic copy. */
+  /* Mobile shell is the sole customer storefront on phones, tablets and desktop.
+     Preserve old shared product links (#p-...) by translating them into the shell's product deep link.
+     SEO crawlers still read this canonical homepage normally. */
   (function () {
-    if (/bot|crawl|spider|slurp|googlebot|bingbot|inspectiontool|lighthouse|pagespeed|facebookexternalhit|whatsapp/i.test(navigator.userAgent || '')) return;
-    var wide = window.matchMedia && matchMedia('(min-width:900px) and (pointer:fine)').matches;
-    var prod = /[?&]product=([^&#]+)/.exec(location.search);   // shell product address: desktop opens the full product page of that product
-    if (wide && prod) location.replace('/p/' + prod[1] + '.html');
-    else if (wide || /^#p-/.test(location.hash)) location.replace('/classic.html' + location.search + location.hash);
+    try {
+      var m = /^#p-([a-z0-9-]+)$/i.exec(location.hash || '');
+      if (!m) return;
+      var q = new URLSearchParams(location.search);
+      if (!q.has('product')) q.set('product', m[1]);
+      location.replace('/?' + q.toString());
+    } catch (e) {}
   })();
-  </script>
-</head>
+  </script></head>
 <body class="min-h-dvh">
 <h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">Stermont Arcade</h1><!-- the brand name on the page itself: one of the signals Google uses for the site name -->
 
