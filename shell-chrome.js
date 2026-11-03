@@ -1,12 +1,10 @@
-/* Stermont Arcade - mobile shell look for the static pages (account, track, shipping, returns, contact, faq, about, privacy, terms).
-   On a phone it adds the shell's top bar (back, search, cart) and the bottom nav (Home, Categories, Deals, Cart, Account) around the page, and hides the
-   page's own desktop header. The page text is not changed (crawlers and desktop screens see the page as before). The nav links open the shell
-   (/?tab=...), and the search opens the shell's search (/?q=...). The cart badge reads the shell cart (localStorage "shell.cart").
+/* Stermont Arcade - shell navigation for static sections (account, tracking, shipping, returns, contact, FAQ, about, privacy, terms and services).
+   Adds the same shell top bar and bottom nav at EVERY viewport, hiding the old section header so users do not fall back to the traditional desktop navigation.
+   Content and payment/order functionality remain intact. Nav/search/cart links return to the main shell.
    Load with: <script src="/shell-chrome.js?v=1" defer></script>. To undo: remove that line from the page. */
 (function () {
   try {
     if (window.__stmChrome) return; window.__stmChrome = 1;
-    if (window.matchMedia && matchMedia('(min-width:900px) and (pointer:fine)').matches) return;   // desktop keeps the full page
     var P = '#7c3aed', LINE = '#e5e7eb';
     var css = 'body.stm-chrome{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}' +
       'body.stm-chrome>header{display:none}' +
