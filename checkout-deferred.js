@@ -18,12 +18,12 @@
       function ls(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} return null; }
       function h(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
       function money(n) { return 'KSh ' + n.toLocaleString('en-KE'); }
-      var cart = ls('stm_cart') || {}, cust = ls('stm_cust') || {}, step = 'cart', isOpen = false, opener = null, ref = '', lastMsg = '', lastUrl = '', sending = false, sendErr = '', doneRef = '', doneTotal = 0, doneCode = '', doneAmt = 0;
+      var cart = ls('stm_cart') || {}, cust = ls('stm_cust') || {}, step = 'cart', isOpen = false, opener = null, ref = '', lastMsg = '', lastUrl = '', sending = false, sendErr = '', doneRef = '', doneTotal = 0, doneCode = '', doneAmt = 0, doneVia = '';
       /* Saved checkout details belong to one person. If a different account (or a guest) is now using this phone, drop them so nobody sees the previous customer's details. */
       function myUid() { try { var x = JSON.parse(localStorage.getItem('sb-' + CFG.sbRef + '-auth-token')); return x && x.user && x.user.id ? x.user.id : null; } catch (e) { return null; } }
       var lastUid = myUid();
       if (!cust || cust.uid === undefined || cust.uid !== lastUid) { cust = {}; ls('stm_cust', null); }
-      var form = { method: 'delivery', name: cust.name || '', phone: cust.phone || '', email: cust.email || '', county: cust.county || '', addr: cust.addr || '', notes: '', payCode: '', payAmt: '', payTouched: false }, errs = {};
+      var form = { method: 'delivery', name: cust.name || '', phone: cust.phone || '', email: cust.email || '', county: cust.county || '', addr: cust.addr || '', notes: '', payCode: '', payAmt: '', payTouched: false, payVia: '' }, errs = {};
       function session() {
         try {
           var x = JSON.parse(localStorage.getItem('sb-' + CFG.sbRef + '-auth-token'));
@@ -36,7 +36,7 @@
       function checkWho() {
         var u = myUid(); if (u === lastUid) return; lastUid = u;
         cust = {}; ls('stm_cust', null); ref = ''; stkPhone = ''; stkMsg = ''; errs = {}; if (step === 'done') step = 'cart';
-        form.name = ''; form.phone = ''; form.email = ''; form.county = ''; form.addr = ''; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.vc = null; form.vcode = '';
+        form.name = ''; form.phone = ''; form.email = ''; form.county = ''; form.addr = ''; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.payVia = ''; form.vc = null; form.vcode = '';
         var us = (session() || {}).user; if (us) { var m2 = us.user_metadata || {}; form.name = m2.full_name || ''; form.phone = m2.phone || ''; form.email = us.email || ''; }
       }
       window.addEventListener('storage', function (e) { if (e.key && e.key.indexOf('-auth-token') > -1) { checkWho(); if (isOpen) render(); } });
@@ -52,7 +52,7 @@
       function info(id) {
         var el = D.getElementById(id); if (!el) return null;
         var im = el.querySelector('img'), p = parseInt(el.querySelector('.price').textContent.replace(/\D/g, ''), 10);
-        return { id: id, name: el.querySelector('h3').textContent.replace(/^Buy\s+/i, ''), price: p || 0, img: im ? im.src : '' };   /* the shop shows "Buy <name>"; cart, orders, e-mails and WhatsApp keep the plain name */
+        return { id: id, name: el.querySelector('h3').textContent.replace(/^Buy\s+/i, ''), price: p || 0, img: im ? im.src : '' };   /* the shop shows "Buy <n>"; cart, orders, e-mails and WhatsApp keep the plain name */
       }
       function totals() {
         var L = [], n = 0, s = 0;
@@ -216,7 +216,7 @@
           return stkPoll(j.checkoutRequestId);
         }).then(function (p) {
           stkBusy = false; stkMsg = '';
-          form.payCode = p.receipt; form.payAmt = String(p.amount); form.payTouched = true; place(T);
+          form.payVia = ''; form.payCode = p.receipt; form.payAmt = String(p.amount); form.payTouched = true; place(T);
         }).catch(function (e) { stkBusy = false; stkMsg = (e && e.message) || 'Payment failed. Try again.'; render(); });
       }
       function rStk(b, T) {
@@ -227,6 +227,67 @@
         if (stkMsg) x.appendChild(h('p', 'note', stkMsg));
         var bt = h('button', 'btn btn-main', stkBusy ? 'Waiting for payment...' : 'Pay ' + money(due(T)) + ' with M-Pesa'); bt.type = 'button'; bt.disabled = stkBusy; bt.onclick = function () { stkPay(T); }; x.appendChild(bt);
         x.appendChild(h('p', 'note', 'Or pay manually with the Paybill details below and enter your code.'));
+        b.appendChild(x);
+      }
+      /* ---- Card payments (Paystack). Card details are typed in Paystack's own window; this page only gets a payment reference back. ---- */
+      var cardBusy = false, cardMsg = '', cardRefLast = '';
+      function loadPaystack() {
+        return new Promise(function (res, rej) {
+          if (window.PaystackPop) { res(); return; }
+          var s = D.createElement('script'); s.src = 'https://js.paystack.co/v2/inline.js'; s.async = true;
+          s.onload = function () { if (window.PaystackPop) res(); else rej(new Error('Card checkout could not load. Try again or pay with M-Pesa.')); };
+          s.onerror = function () { rej(new Error('Card checkout could not load. Check your connection or pay with M-Pesa.')); };
+          D.head.appendChild(s);
+        });
+      }
+      function cardPoll(reference) {
+        return new Promise(function (res, rej) {
+          (function tick(k) {
+            if (k > 20) { rej(new Error('We could not confirm your card payment yet. If you were charged, tap "Check my card payment" in a minute, or message us on WhatsApp.')); return; }
+            setTimeout(function () {
+              stkFn('paystack-status', { reference: reference }).then(function (j) {
+                if (j.status === 'success') res({ receipt: j.receipt || reference, amount: j.amount });
+                else if (j.status === 'pending') tick(k + 1);
+                else rej(new Error(j.message || 'The card payment was not completed. You can try again.'));
+              }).catch(function () { tick(k + 1); });
+            }, k === 0 ? 1000 : 3000);
+          })(0);
+        });
+      }
+      function cardFinish(T, reference) {
+        cardBusy = true; cardMsg = 'Confirming your card payment...'; render();
+        return cardPoll(reference).then(function (p) {
+          cardBusy = false; cardMsg = ''; cardRefLast = '';
+          form.payVia = 'card'; form.payCode = p.receipt; form.payAmt = String(p.amount); form.payTouched = true; place(T);
+        }).catch(function (e) { cardBusy = false; cardMsg = (e && e.message) || 'Card payment failed. Try again.'; render(); });
+      }
+      function cardPay(T) {
+        if (cardBusy || sending) return;
+        var amt = due(T), email = (form.email || '').trim().toLowerCase();
+        if (!ref) ref = newRef();
+        cardBusy = true; cardMsg = 'Starting secure card payment...'; cardRefLast = ''; render();
+        stkFn('paystack-init', { email: email, amount: amt, ref: ref }).then(function (j) {
+          cardRefLast = j.reference;
+          return loadPaystack().then(function () {
+            return new Promise(function (res, rej) {
+              cardMsg = 'Complete the payment in the card window.'; render();
+              new window.PaystackPop().resumeTransaction(j.accessCode, {
+                onSuccess: function () { res(); },
+                onCancel: function () { cardRefLast = ''; rej(new Error('Card payment cancelled. You can try again.')); },
+                onError: function (e) { rej(new Error((e && e.message) || 'The card payment failed. Try again.')); }
+              });
+            });
+          });
+        }).then(function () { return cardFinish(T, cardRefLast); })
+          .catch(function (e) { cardBusy = false; cardMsg = (e && e.message) || 'Could not start the card payment. Try again or pay with M-Pesa.'; render(); });
+      }
+      function rCard(b, T) {
+        if (due(T) < 1 || due(T) > 150000) return;
+        var x = h('div', 'pay'); x.appendChild(h('h4', null, 'Pay by card (Visa or Mastercard)'));
+        x.appendChild(h('p', 'note', 'Secure card payment by Paystack. Your card details are entered in Paystack\u2019s window and never reach this website.'));
+        if (cardMsg) x.appendChild(h('p', 'note', cardMsg));
+        var bt = h('button', 'btn btn-main', cardBusy ? 'Processing card payment...' : 'Pay ' + money(due(T)) + ' by card'); bt.type = 'button'; bt.disabled = cardBusy || sending; bt.onclick = function () { cardPay(T); }; x.appendChild(bt);
+        if (cardRefLast && !cardBusy) { var ck = h('button', 'btn btn-alt', 'Check my card payment'); ck.type = 'button'; ck.onclick = function () { cardFinish(T, cardRefLast); }; x.appendChild(ck); }
         b.appendChild(x);
       }
       function cleanCode() { return String(form.payCode || '').replace(/\s+/g, '').toUpperCase(); }
@@ -240,11 +301,12 @@
         b.appendChild(x);
       }
       function message(T) {
+        var vc = form.payVia === 'card';
         var L = ['Hello Stermont Arcade, I would like to place an order.', '', '*Order ' + (ref || doneRef) + '*'];
         T.L.forEach(function (i, k) { L.push((k + 1) + '. ' + i.name + ' x' + i.qty + ' = ' + money(i.total)); });
         L.push('', '*Subtotal:* ' + money(T.s), vOff(T) ? '*Voucher ' + form.vc.code + ':* -' + money(vOff(T)) : '', feeOf() ? '*Delivery fee:* ' + money(feeOf()) : '', (feeOf() || vOff(T)) ? '*Total to pay:* ' + money(due(T)) : '', '*Delivery:* ' + (form.method === 'pickup' ? where() : 'Deliver to ' + where() + (feeOf() ? '' : ' (fee to be confirmed)')), '', '*Name:* ' + form.name.trim(), '*Phone:* +' + normPhone(form.phone));
         if (form.notes && form.notes.trim()) L.push('*Notes:* ' + form.notes.trim());
-        L.push('*Payment:* M-Pesa Paybill ' + CFG.paybill + ', account ' + CFG.payAcct, '*M-Pesa code:* ' + (doneCode || cleanCode()) + ' (paid KSh ' + (doneAmt || Number(form.payAmt)) + ')', '', 'Please confirm availability and the delivery fee. Thank you!');
+        L.push(vc ? '*Payment:* Card (Paystack)' : '*Payment:* M-Pesa Paybill ' + CFG.paybill + ', account ' + CFG.payAcct, (vc ? '*Card reference:* ' : '*M-Pesa code:* ') + (doneCode || cleanCode()) + ' (paid KSh ' + (doneAmt || Number(form.payAmt)) + ')', '', 'Please confirm availability and the delivery fee. Thank you!');
         return L.join('\n');
       }
       function copyBtn(v) { var c = h('button', 'cp', 'Copy'); c.type = 'button'; c.onclick = function () { try { navigator.clipboard.writeText(v).then(function () { toast('Copied'); }); } catch (e) {} }; return c; }
@@ -264,6 +326,7 @@
         box(b, 'Contact', [[form.name.trim()], ['+' + normPhone(form.phone)], [(form.email || '').trim()]], 'details');
         vBox(b, T);
         var amt = due(T); if (!form.payTouched) form.payAmt = String(amt);
+        rCard(b, T);
         var mb = b;
         if (stkOn()) { rStk(b, T); mb = h('details', 'man'); if (stkMsg && !stkBusy) mb.open = true; mb.appendChild(h('summary', null, 'Paid manually instead? Enter your M-Pesa code')); b.appendChild(mb); }
         mb.appendChild(h('p', 'note', 'Step 1: pay with M-Pesa using the details below. Step 2: enter the code from your M-Pesa SMS. Your order is only placed after you enter it.'));
@@ -275,7 +338,7 @@
         var ac = h('div', 'fld'), al = h('label', null, 'Amount you paid (KSh)'); al.htmlFor = 'payamt'; ac.appendChild(al);
         var ai = h('input'); ai.id = 'payamt'; ai.type = 'number'; ai.inputMode = 'numeric'; ai.min = '1'; ai.value = form.payAmt || ''; ac.appendChild(ai);
         var ae = h('div', 'err', ''); ac.appendChild(ae); mb.appendChild(ac);
-        if (feeOf() || vOff(T)) { row(f, 'Items total', money(T.s)); if (vOff(T)) row(f, 'Voucher ' + form.vc.code, '-' + money(vOff(T))); if (feeOf()) row(f, 'Delivery to ' + form.county, money(feeOf())); row(f, 'Total to pay', money(due(T)), 'big'); } else row(f, 'Items total', money(T.s), 'big'); f.appendChild(h('p', 'note', form.method === 'delivery' && !CFG.fees[form.county] ? 'The delivery fee to your county is confirmed on WhatsApp and paid separately.' : 'Delivery is included in the total above. Pay it in one M-Pesa payment.'));
+        if (feeOf() || vOff(T)) { row(f, 'Items total', money(T.s)); if (vOff(T)) row(f, 'Voucher ' + form.vc.code, '-' + money(vOff(T))); if (feeOf()) row(f, 'Delivery to ' + form.county, money(feeOf())); row(f, 'Total to pay', money(due(T)), 'big'); } else row(f, 'Items total', money(T.s), 'big'); f.appendChild(h('p', 'note', form.method === 'delivery' && !CFG.fees[form.county] ? 'The delivery fee to your county is confirmed on WhatsApp and paid separately.' : 'Delivery is included in the total above. Pay it in one payment.'));
         if (sendErr) f.appendChild(h('div', 'oerr', sendErr));
         var pb = btn(f, sending ? 'Placing your order...' : 'I have paid, place order', function () { place(T); });
         function check(show) {
@@ -283,21 +346,22 @@
           ae.textContent = show && form.payAmt && !amtOk(T) ? 'The amount must be at least ' + money(amt) + '.' : '';
           pb.disabled = sending || !(codeOk() && amtOk(T));
         }
-        pi.addEventListener('input', function () { form.payCode = pi.value; check(true); });
+        pi.addEventListener('input', function () { form.payCode = pi.value; form.payVia = ''; check(true); });
         ai.addEventListener('input', function () { form.payAmt = ai.value; form.payTouched = true; check(true); });
         check(false);
         if (sendErr) btn(f, 'Send on WhatsApp instead', function () { window.open('https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(message(T)), '_blank', 'noopener'); }, 'btn-alt');
       }
       function notify(T, s) {
         if (!CFG.mailKey) return;
+        var viaCard = form.payVia === 'card', PCODE = viaCard ? 'Card reference' : 'M-Pesa code', PLINE = viaCard ? 'Card (Paystack), verified by Paystack' : 'M-Pesa Paybill ' + CFG.paybill + ', account ' + CFG.payAcct;
         var adm = new URL('admin.html', location.href).href;
         var lines = T.L.map(function (i, k) { return (k + 1) + '. ' + i.name + ' x' + i.qty + ' = ' + money(i.total); });
         if (feeOf()) lines.push('Delivery to ' + form.county + ' = ' + money(feeOf()));
         var msg = ['Order ' + ref, '', lines.join('\n'), '', 'Subtotal: ' + money(T.s) + (vOff(T) ? ' - voucher ' + form.vc.code + ' ' + money(vOff(T)) : '') + (feeOf() ? ' + delivery ' + money(feeOf()) : '') + ((feeOf() || vOff(T)) ? ' = TOTAL ' + money(due(T)) : ''), form.method === 'pickup' ? 'Collection: ' + where() : 'Deliver to: ' + where(),
           '', 'Customer: ' + form.name.trim(), 'Phone: +' + normPhone(form.phone), s && s.user && s.user.email ? 'Account email: ' + s.user.email : '',
-          form.notes && form.notes.trim() ? 'Notes: ' + form.notes.trim() : '', '', 'Payment: M-Pesa Paybill ' + CFG.paybill + ', account ' + CFG.payAcct, 'M-Pesa CODE entered by customer: ' + (doneCode || cleanCode()) + ' (says paid KSh ' + (doneAmt || Number(form.payAmt)) + ')',
+          form.notes && form.notes.trim() ? 'Notes: ' + form.notes.trim() : '', '', 'Payment: ' + PLINE, (viaCard ? 'Card reference: ' : 'M-Pesa CODE entered by customer: ') + (doneCode || cleanCode()) + ' (says paid KSh ' + (doneAmt || Number(form.payAmt)) + ')',
           'WhatsApp the customer: https://wa.me/' + normPhone(form.phone),
-          '', 'STATUS: PENDING VERIFICATION. Check the M-Pesa SMS for the code above, then (customer care sign-in required):',
+          '', viaCard ? 'STATUS: PAID BY CARD and verified by Paystack. Confirm stock, then (customer care sign-in required):' : 'STATUS: PENDING VERIFICATION. Check the M-Pesa SMS for the code above, then (customer care sign-in required):',
           'APPROVE (paid): ' + adm + '?ref=' + encodeURIComponent(ref) + '&action=approve',
           'DECLINE (not paid): ' + adm + '?ref=' + encodeURIComponent(ref) + '&action=decline'].filter(function (l, i, a) { return l !== '' || a[i - 1] !== ''; }).join('\n');
         /* Backup staff alert: Web3Forms plain text (only used if the styled EmailJS alert fails) */
@@ -327,7 +391,7 @@
             delivery: form.method === 'pickup' ? 'Collection: ' + where() : 'Deliver to: ' + where(), mpesa_code: (doneCode || cleanCode()), order_message: msg };
           /* Customer confirmation: also send the same field names the (working) staff template uses, so the styled template is filled in */
           var custBtn = '<a href="https://wa.me/' + CFG.wa + '" style="display:inline-block;background:#7c3aed;color:#ffffff;font-weight:800;font-size:15px;text-decoration:none;padding:14px 22px;border-radius:14px;margin:4px;">Message us on WhatsApp</a>';
-          var custMsg = 'Hello ' + form.name.trim() + ', thank you for your order. We have received your M-Pesa code ' + (doneCode || cleanCode()) + ' (KSh ' + (doneAmt || Number(form.payAmt)) + '). We will verify the payment and contact you on WhatsApp to confirm your order and delivery.';
+          var custMsg = 'Hello ' + form.name.trim() + ', thank you for your order. We have received your ' + (viaCard ? 'card payment (reference ' + (doneCode || cleanCode()) + ')' : 'M-Pesa code ' + (doneCode || cleanCode())) + ' (KSh ' + (doneAmt || Number(form.payAmt)) + '). We will verify the payment and contact you on WhatsApp to confirm your order and delivery.';
           /* Full styled customer email. The EmailJS template body is just {{{html_body}}}, so everything is built here. */
           function hx(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]; }); }
           var itemRows = T.L.map(function (i) {
@@ -357,7 +421,7 @@
             '</td></tr>' +
             '<tr><td bgcolor="#2a0e5c" style="background:#2a0e5c;padding:22px 14px 20px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>' + cStep(0) + cStep(1) + cStep(2) + cStep(3) + '</tr></table></td></tr>' +
             '<tr><td style="padding:28px 26px 8px;"><div style="' + CF + 'font-size:18px;font-weight:800;color:#1b1230;">Hi ' + hx(form.name.trim()) + ',</div>' +
-              '<p style="' + CF + 'font-size:15px;line-height:1.65;color:#4a4163;margin:10px 0 0;">Thank you for shopping with us. We have your M-Pesa code and are now verifying the payment. We will contact you on WhatsApp to confirm your order and ' + (isPick ? 'collection' : 'delivery') + '. Your order is confirmed only after the payment is verified.</p></td></tr>' +
+              '<p style="' + CF + 'font-size:15px;line-height:1.65;color:#4a4163;margin:10px 0 0;">Thank you for shopping with us. We have your ' + (viaCard ? 'card payment' : 'M-Pesa code') + ' and are now verifying the payment. We will contact you on WhatsApp to confirm your order and ' + (isPick ? 'collection' : 'delivery') + '. Your order is confirmed only after the payment is verified.</p></td></tr>' +
             '<tr><td style="padding:18px 26px 6px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5ff;border:1px solid #e6dcfb;border-radius:18px;">' +
               '<tr><td colspan="2" style="padding:16px 18px 2px;' + CF + 'font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7c3aed;">Your order</td></tr>' +
               '<tr><td colspan="2" style="padding:0 18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + cRows + '</table></td></tr>' +
@@ -365,7 +429,7 @@
             '</table></td></tr>' +
             '<tr><td style="padding:12px 20px 6px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>' +
               '<td width="50%" valign="top" style="padding:6px;"><div style="background:#f1fbd0;border-radius:16px;padding:14px 16px;"><div style="' + CF + 'font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#4d6b00;">' + (isPick ? 'Collect at' : 'Delivering to') + '</div><div style="' + CF + 'font-size:14px;font-weight:600;line-height:1.45;color:#1b1230;padding-top:6px;">' + hx(where()) + '</div></div></td>' +
-              '<td width="50%" valign="top" style="padding:6px;"><div style="background:#efe7ff;border-radius:16px;padding:14px 16px;"><div style="' + CF + 'font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#5b21b6;">M-Pesa code</div><div style="font-family:Courier New,monospace;font-size:16px;font-weight:900;letter-spacing:.06em;color:#1b1230;padding-top:6px;">' + hx(paidCode) + '</div><div style="' + CF + 'font-size:12px;color:#6b5f8a;padding-top:2px;">' + hx(money(paidAmt)) + ' &middot; Awaiting check</div></div></td>' +
+              '<td width="50%" valign="top" style="padding:6px;"><div style="background:#efe7ff;border-radius:16px;padding:14px 16px;"><div style="' + CF + 'font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#5b21b6;">' + PCODE + '</div><div style="font-family:Courier New,monospace;font-size:16px;font-weight:900;letter-spacing:.06em;color:#1b1230;padding-top:6px;">' + hx(paidCode) + '</div><div style="' + CF + 'font-size:12px;color:#6b5f8a;padding-top:2px;">' + hx(money(paidAmt)) + ' &middot; Awaiting check</div></div></td>' +
             '</tr></table></td></tr>' +
             '<tr><td style="padding:0 26px;"><p style="' + CF + 'font-size:13px;line-height:1.55;color:#6b5f8a;margin:6px 0 0;">The delivery fee, if any, is confirmed with you on WhatsApp.</p></td></tr>' +
             '<tr><td align="center" style="padding:18px 26px 24px;">' + custBtn + '</td></tr>' +
@@ -381,8 +445,8 @@
           function mkBtn(href, label, bg, fg) { return '<a href="' + href + '" style="display:inline-block;background:' + bg + ';color:' + fg + ';font-weight:bold;font-size:15px;text-decoration:none;padding:13px 20px;border-radius:12px;margin:4px;">' + label + '</a>'; }
           var buttons = mkBtn(adm + '?ref=' + enc + '&action=approve', 'Approve (paid)', '#c8f31d', '#2a0e5c') + mkBtn(adm + '?ref=' + enc + '&action=decline', 'Decline', '#d92d20', '#ffffff') + mkBtn('https://wa.me/' + normPhone(form.phone), 'WhatsApp customer', '#7c3aed', '#ffffff');
           var staffMsg = 'Customer: ' + form.name.trim() + '\nPhone: +' + normPhone(form.phone) + (custEmail ? '\nEmail: ' + custEmail : '') + (form.notes && form.notes.trim() ? '\nNotes: ' + form.notes.trim() : '') +
-            '\n\nPayment: M-Pesa Paybill ' + CFG.paybill + ', account ' + CFG.payAcct + '\nM-Pesa code entered: ' + (doneCode || cleanCode()) + ' (says paid KSh ' + (doneAmt || Number(form.payAmt)) + ')' +
-            '\n\nSTATUS: PENDING VERIFICATION. Check the M-Pesa SMS for the code above, then approve or decline (customer care sign-in required).';
+            '\n\nPayment: ' + PLINE + '\n' + (viaCard ? 'Card reference: ' : 'M-Pesa code entered: ') + (doneCode || cleanCode()) + ' (says paid KSh ' + (doneAmt || Number(form.payAmt)) + ')' +
+            (viaCard ? '\n\nSTATUS: PAID BY CARD and verified by Paystack. Confirm stock, then approve or decline (customer care sign-in required).' : '\n\nSTATUS: PENDING VERIFICATION. Check the M-Pesa SMS for the code above, then approve or decline (customer care sign-in required).');
           /* Designed staff alert: uses the same working EmailJS template as the customer email (body is just {{{html_body}}}). */
           var pcode = doneCode || cleanCode(), pamt = doneAmt || Number(form.payAmt), amtMatch = pamt === due(T);
           var FF = "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;";
@@ -400,7 +464,7 @@
               '<div style="' + FF + 'font-size:28px;font-weight:900;line-height:1.15;color:#ffffff;">New order!</div>' +
               '<div style="' + FF + 'font-size:34px;font-weight:900;color:#c8f31d;padding-top:8px;">' + hx(money(due(T))) + '</div>' +
               '<div style="' + FF + 'font-size:14px;color:#e9ddff;padding-top:6px;">Order <b>' + hx(ref) + '</b></div>' +
-              '<div style="padding-top:14px;"><span style="display:inline-block;background:#f59e0b;color:#2a0e5c;' + FF + 'font-size:12px;font-weight:900;letter-spacing:.1em;padding:6px 14px;border-radius:20px;">&#9203; PENDING VERIFICATION</span></div>' +
+              '<div style="padding-top:14px;"><span style="display:inline-block;background:#f59e0b;color:#2a0e5c;' + FF + 'font-size:12px;font-weight:900;letter-spacing:.1em;padding:6px 14px;border-radius:20px;">' + (viaCard ? '&#128179; PAID BY CARD' : '&#9203; PENDING VERIFICATION') + '</span></div>' +
             '</td></tr>' +
             '<tr><td style="padding:22px 26px 4px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5ff;border:1px solid #e6dcfb;border-radius:18px;">' +
               '<tr><td colspan="2" style="padding:16px 18px 2px;' + FF + 'font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7c3aed;">Items ordered</td></tr>' +
@@ -413,12 +477,12 @@
             '</tr></table></td></tr>' +
             (form.notes && form.notes.trim() ? '<tr><td style="padding:6px 26px 0;"><div style="background:#f8f5ff;border-radius:14px;padding:12px 16px;' + FF + 'font-size:13px;color:#4a4163;"><b>Customer notes:</b> ' + hx(form.notes.trim()) + '</div></td></tr>' : '') +
             '<tr><td style="padding:6px 26px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#2a0e5c" style="background:#2a0e5c;border-radius:18px;"><tr>' +
-              '<td style="padding:16px 18px;"><div style="' + FF + 'font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#c8f31d;">M-Pesa code entered</div>' +
+              '<td style="padding:16px 18px;"><div style="' + FF + 'font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#c8f31d;">' + (viaCard ? 'Card reference' : 'M-Pesa code entered') + '</div>' +
               '<div style="font-family:Courier New,monospace;font-size:24px;font-weight:900;letter-spacing:.12em;color:#ffffff;padding-top:6px;">' + hx(pcode) + '</div>' +
-              '<div style="' + FF + 'font-size:12px;color:#cdbdf3;padding-top:4px;">Customer says paid ' + hx(money(pamt)) + ' &middot; Paybill ' + hx(CFG.paybill) + ' / ' + hx(CFG.payAcct) + '</div></td>' +
+              '<div style="' + FF + 'font-size:12px;color:#cdbdf3;padding-top:4px;">' + (viaCard ? 'Paid by card ' + hx(money(pamt)) + ' &middot; verified by Paystack' : 'Customer says paid ' + hx(money(pamt)) + ' &middot; Paybill ' + hx(CFG.paybill) + ' / ' + hx(CFG.payAcct)) + '</div></td>' +
               '<td align="right" valign="middle" style="padding:16px 18px;"><span style="display:inline-block;background:' + (amtMatch ? '#c8f31d' : '#f59e0b') + ';color:#2a0e5c;' + FF + 'font-size:12px;font-weight:900;padding:7px 12px;border-radius:12px;">' + (amtMatch ? '&#10003; Amount matches' : '&#9888; Check amount') + '</span></td>' +
             '</tr></table></td></tr>' +
-            '<tr><td style="padding:16px 26px 4px;"><div style="background:#fff8e6;border:1px solid #fde4a3;border-radius:14px;padding:12px 16px;' + FF + 'font-size:13px;line-height:1.55;color:#6b4a00;"><b>Before you approve:</b> open your M-Pesa SMS and confirm the code and amount above are real. Sign-in is required on the next page.</div></td></tr>' +
+            '<tr><td style="padding:16px 26px 4px;"><div style="background:#fff8e6;border:1px solid #fde4a3;border-radius:14px;padding:12px 16px;' + FF + 'font-size:13px;line-height:1.55;color:#6b4a00;"><b>Before you approve:</b> ' + (viaCard ? 'this card payment was verified with Paystack. Confirm stock, then approve.' : 'open your M-Pesa SMS and confirm the code and amount above are real.') + ' Sign-in is required on the next page.</div></td></tr>' +
             '<tr><td align="center" style="padding:16px 20px 6px;">' + bigBtn(adm + '?ref=' + enc + '&action=approve', '&#10003; Approve (paid)', '#c8f31d', '#2a0e5c') + bigBtn(adm + '?ref=' + enc + '&action=decline', '&#10005; Decline', '#ffffff', '#dc2626', 'border:2px solid #dc2626;') + '</td></tr>' +
             '<tr><td align="center" style="padding:6px 20px 24px;">' + bigBtn('https://wa.me/' + normPhone(form.phone), '&#128172; WhatsApp customer', '#25d366', '#ffffff') + '</td></tr>' +
             '<tr><td align="center" bgcolor="#2a0e5c" style="background:#2a0e5c;padding:16px 24px;"><div style="' + FF + 'font-size:12px;color:#cdbdf3;">Stermont Arcade &middot; order alert for staff &middot; ' + hx(ref) + '</div></td></tr>' +
@@ -443,7 +507,7 @@
         sending = true; sendErr = ''; render();
         doneCode = ''; doneAmt = 0;
         var s = session(), method = form.method, code = cleanCode(), paid = Number(form.payAmt);
-        if (!codeOk() || !amtOk(T)) { sending = false; sendErr = 'Enter your M-Pesa code and the amount you paid before placing the order.'; render(); return; }
+        if (!codeOk() || !amtOk(T)) { sending = false; sendErr = 'Enter your payment code and the amount you paid before placing the order.'; render(); return; }
         var row = {
           ref: ref, user_id: s ? s.user.id : null, customer_name: form.name.trim().slice(0, 120), phone: '+' + normPhone(form.phone),
           email: (form.email || '').trim().toLowerCase().slice(0, 150) || (s && s.user.email) || null, method: method, county: method === 'delivery' ? form.county : null,
@@ -462,27 +526,27 @@
           .catch(function (err) {   /* payment columns not set up yet: keep the code in the order notes instead */
             if (err && err.status === 400 && /pay_code|pay_amount/.test(err.body || '')) {
               var r2 = Object.assign({}, row); delete r2.pay_code; delete r2.pay_amount;
-              r2.notes = ('M-Pesa code ' + code + ', paid KSh ' + paid + (row.notes ? ' | ' + row.notes : '')).slice(0, 500); return post(r2);
+              r2.notes = ((form.payVia === 'card' ? 'Card reference ' : 'M-Pesa code ') + code + ', paid KSh ' + paid + (row.notes ? ' | ' + row.notes : '')).slice(0, 500); return post(r2);
             }
             throw err;
           })
           .then(function () {
-            clearTimeout(to); doneCode = code; doneAmt = paid;
+            clearTimeout(to); doneCode = code; doneAmt = paid; doneVia = form.payVia || '';
             lastMsg = message(T); lastUrl = 'https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(lastMsg);
             notify(T, s);
             ls('stm_cust', { uid: myUid(), name: form.name.trim(), phone: form.phone, email: (form.email || '').trim(), county: form.county, addr: form.addr, method: form.method });
-            doneRef = ref; doneTotal = due(T); form.vc = null; form.vcode = ''; ref = ''; cart = {}; store(); sending = false; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; step = 'done'; sync(); if (!isOpen) render();
+            doneRef = ref; doneTotal = due(T); form.vc = null; form.vcode = ''; ref = ''; cart = {}; store(); sending = false; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.payVia = ''; cardRefLast = ''; cardMsg = ''; step = 'done'; sync(); if (!isOpen) render();
           })
           .catch(function (err) {
             clearTimeout(to); sending = false;
             try { console.error('Order failed:', err && err.message); } catch (e) {}
-            sendErr = err && err.status === 409 ? 'This M-Pesa code has already been used on another order. Check the code in your SMS, or message us on WhatsApp.' : 'We could not place your order. Check your connection and try again, or send it on WhatsApp instead.' + (err && err.status ? ' (Error ' + err.status + ')' : ' (Network)'); render();
+            sendErr = err && err.status === 409 ? 'This payment code has already been used on another order. Check the code in your SMS or receipt, or message us on WhatsApp.' : 'We could not place your order. Check your connection and try again, or send it on WhatsApp instead.' + (err && err.status ? ' (Error ' + err.status + ')' : ' (Network)'); render();
           });
       }
       function rDone(b, f) {
         var c = h('div', 'center'); c.appendChild(h('div', 'done-ic', '✓')); c.appendChild(h('h3', null, 'Order received')); c.appendChild(h('p', 'note', 'Reference ' + doneRef));
-        c.appendChild(h('p', null, 'Thank you! We have your M-Pesa code. We will verify the payment and contact you on WhatsApp to confirm your order and delivery.')); b.appendChild(c);
-        box(b, 'Payment submitted', [['M-Pesa code', doneCode], ['Amount', money(doneAmt)]]);
+        c.appendChild(h('p', null, 'Thank you! We have your ' + (doneVia === 'card' ? 'card payment' : 'M-Pesa code') + '. We will verify the payment and contact you on WhatsApp to confirm your order and delivery.')); b.appendChild(c);
+        box(b, 'Payment submitted', [[doneVia === 'card' ? 'Card reference' : 'M-Pesa code', doneCode], ['Amount', money(doneAmt)]]);
         var a = h('a', 'btn btn-main', 'Message us on WhatsApp'); a.href = lastUrl; a.target = '_blank'; a.rel = 'noopener'; f.appendChild(a);
         btn(f, 'Copy order details', function () { try { navigator.clipboard.writeText(lastMsg).then(function () { toast('Copied'); }); } catch (e) {} }, 'btn-alt');
         if (session()) { var mo = h('a', 'btn btn-alt', 'View my orders'); mo.href = 'account.html'; f.appendChild(mo); }
