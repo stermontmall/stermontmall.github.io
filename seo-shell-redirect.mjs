@@ -1,51 +1,42 @@
-// Stermont Arcade - sends ALL customer browsers (phone, tablet and desktop) from product/category SEO pages into the mobile shell, while crawlers keep SEO HTML.
-// Why: the shell is one page, so a /?product= link can only preview as the home page. The shell now shows /p/<slug>.html in its address bar
-// (so a copied or shared link previews as THIS product, from the head of this page) and the page hands phones back to the shell.
-// Also handles category pages. The product-pages workflow rebuilds and reinjects this rule across generated pages (idempotent).
-// Only crawlers/link-preview bots retain the SEO HTML. EVERY human visitor, including desktop users, uses the mobile shell. Pack-size
-// selection remains in the hash: /p/abasi-5-ec.html#abasi-5-ec-50-ml.
-// Redirect stubs (pages with a meta refresh, one per extra pack size) are left alone. To undo: delete this step from the workflow and rebuild.
+// Stermont Arcade - REMOVES the visitor redirect from product (/p/) and category (/c/) SEO pages.
+// History: until 2026-11-03 this step injected a script that sent every non-crawler browser from /p/<slug>.html to /?product=<slug>
+// (and /c/<slug>.html to /?cat=<slug>), i.e. into the JavaScript mobile shell, while crawlers kept the static page.
+// Why it was removed: showing crawlers one page and visitors another can look like a "sneaky redirect" to Google, and visitors from
+// Google landed on the heavy shell instead of the fast static page. The owner asked for it to stop (2026-11-03).
+// Now: the product-pages workflow still runs this file after every rebuild, but it only STRIPS the old scripts (idempotent), so any
+// page the generator leaves untouched or rewrites loses the redirect. Visitors stay on /p/ and /c/ pages; the shell is for browsing.
+// The shell still shows /p/<slug>.html in its address bar when a product is open (mobile-shell/app.js), so shared links keep working.
+// Redirect stubs (pages with a meta refresh, one per extra pack size) are left alone.
+// To bring the redirect back: see git history of this file (the commit before this one).
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const DIR = process.env.P_DIR || 'p';
 export const MARK = '<!--stm-shell-->';
-export const SCRIPT = MARK + `<script>(function(){try{var ua=navigator.userAgent||'';` +
-  `if(/bot|crawl|spider|slurp|facebookexternalhit|facebot|whatsapp|telegram|twitter|linkedin|pinterest|slack|discord|embedly|preview|lighthouse|pagespeed|inspectiontool|adsbot|mediapartners/i.test(ua))return;` +
-  `var h=decodeURIComponent((location.hash||'').slice(1)),s=location.pathname.replace(/^\\/p\\//,'').replace(/\\.html$/,'');` +
-  `if(!/^[a-z0-9-]+$/i.test(s))return;if(!/^[a-z0-9-]+$/i.test(h))h='';` +
-  `location.replace('/?product='+encodeURIComponent(h||s));}catch(e){}})();</script>`;
+export const CAT_MARK = '<!--stm-shell-cat-->';
+
+// Matches the marker followed by the injected <script>...</script> block (the old SCRIPT / CAT_SCRIPT text, whatever its exact wording).
+const PRODUCT_RE = new RegExp(MARK.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '<script>[\\s\\S]*?</script>', 'g');
+const CAT_RE = new RegExp(CAT_MARK.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '<script>[\\s\\S]*?</script>', 'g');
 
 export function inject(html) {
-  if (/http-equiv=["']refresh["']/i.test(html)) return html;               // redirect stub of an extra pack size
-  html = html.split(SCRIPT).join('');                                       // idempotent: take our script out, put it back in the same place
-  const m = /<meta charset=[^>]*>/i.exec(html) || /<head[^>]*>/i.exec(html); if (!m) return html;   // after the charset tag, which must stay in the first 1024 bytes
-  return html.slice(0, m.index + m[0].length) + SCRIPT + html.slice(m.index + m[0].length);
+  if (/http-equiv=["']refresh["']/i.test(html)) return html;   // redirect stub of an extra pack size: untouched
+  return html.replace(PRODUCT_RE, '');
 }
-
-// Category pages (/c/<slug>.html, top-level and sub-category): same rules, target /?cat=<slug>. /c/index.html (all categories) and redirect stubs are left alone.
-export const CAT_MARK = '<!--stm-shell-cat-->';
-export const CAT_SCRIPT = CAT_MARK + `<script>(function(){try{var ua=navigator.userAgent||'';` +
-  `if(/bot|crawl|spider|slurp|facebookexternalhit|facebot|whatsapp|telegram|twitter|linkedin|pinterest|slack|discord|embedly|preview|lighthouse|pagespeed|inspectiontool|adsbot|mediapartners/i.test(ua))return;` +
-  `var s=location.pathname.replace(/^\\/c\\//,'').replace(/\\.html$/,'');` +
-  `if(!/^[a-z0-9-]+$/i.test(s)||s==='index')return;` +
-  `location.replace('/?cat='+encodeURIComponent(s));}catch(e){}})();</script>`;
 
 export function injectCat(html) {
   if (/http-equiv=["']refresh["']/i.test(html)) return html;
-  html = html.split(CAT_SCRIPT).join('');
-  const m = /<meta charset=[^>]*>/i.exec(html) || /<head[^>]*>/i.exec(html); if (!m) return html;
-  return html.slice(0, m.index + m[0].length) + CAT_SCRIPT + html.slice(m.index + m[0].length);
+  return html.replace(CAT_RE, '');
 }
 
 function run(dir, fn, label) {
   let n = 0, total = 0;
-  let files = []; try { files = readdirSync(dir).filter(f => f.endsWith('.html') && !(label === 'category' && f === 'index.html')); } catch (e) { console.log(`seo-shell-redirect: no ${dir}/ folder, skipped`); return; }
+  let files = []; try { files = readdirSync(dir).filter(f => f.endsWith('.html')); } catch (e) { console.log(`seo-shell-redirect: no ${dir}/ folder, skipped`); return; }
   for (const f of files) {
     total++;
     try { const s = readFileSync(`${dir}/${f}`, 'utf8'), o = fn(s); if (o !== s) { writeFileSync(`${dir}/${f}`, o); n++; } }
     catch (e) { console.log('skipped', f, e.message); }
   }
-  console.log(`seo-shell-redirect: ${n} of ${total} ${label} pages got the phone redirect`);
+  console.log(`seo-shell-redirect: removed the visitor redirect from ${n} of ${total} ${label} pages`);
 }
 
 if (process.argv[1] && process.argv[1].endsWith('seo-shell-redirect.mjs')) {
