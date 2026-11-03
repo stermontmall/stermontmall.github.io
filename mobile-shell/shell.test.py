@@ -56,7 +56,7 @@ def on_rest(route):
         r = next((x for x in ROWS if x['id'] == rid), None)
         return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK])])
     serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
-# The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page, so the redirect script that runs is the shipped one.
+# The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
 REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
 def mock_network(ctx):
     ctx.route('**/p/*.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=REAL))
@@ -368,69 +368,85 @@ with sync_playwright() as p:
     check('address: an unknown product shows a notice and the normal home', p9.locator('#page-product.open').count() == 0 and 'no longer available' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
     check('address: no page errors', not e9, e9[:3])
     c9.close()
-    # /p/<slug>.html -> shell on phones (seo-shell-redirect.mjs). The served page is the REAL generated product page, so the injected script is what runs.
-    check('redirect: the generated product pages carry the phone redirect script', 'stm-shell' in REAL)
+
+    # /p/<slug>.html no longer redirects anyone (2026-11-03, owner request: Google may read "crawlers get the page, visitors get the shell" as a sneaky redirect).
+    # seo-shell-redirect.mjs now only STRIPS the old script. The served page is the REAL generated product page.
+    import subprocess, re as _re
+    check('redirect removed: the generated product pages no longer carry the phone redirect script', 'stm-shell' not in REAL)
+    OLD_SCRIPT = '<!--stm-shell--><script>(function(){location.replace("/?product=x")})();</script>'
+    OLD_CAT_SCRIPT = '<!--stm-shell-cat--><script>(function(){location.replace("/?cat=x")})();</script>'
+    def run_node(fn, html):
+        js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1])))" % fn
+        return subprocess.run(['node', '-e', js, html], cwd=ROOT, capture_output=True, text=True, check=True).stdout
+    old_page = '<!doctype html><html><head><meta charset="utf-8">' + OLD_SCRIPT + '<title>t</title></head><body>x</body></html>'
+    new_page = run_node('inject', old_page)
+    check('redirect removed: inject() strips the old product script and keeps the rest of the page', 'stm-shell' not in new_page and '<title>t</title>' in new_page and '<body>x</body>' in new_page, new_page)
+    check('redirect removed: inject() twice gives the same page', run_node('inject', new_page) == new_page)
+    stub = '<html><head><meta http-equiv="refresh" content="0;url=/p/x.html">' + OLD_SCRIPT + '</head></html>'
+    check('redirect removed: redirect stubs (meta refresh) are left alone', run_node('inject', stub) == stub)
+    old_cat = '<!doctype html><html><head><meta charset="utf-8">' + OLD_CAT_SCRIPT + '<title>c</title></head><body>y</body></html>'
+    new_cat = run_node('injectCat', old_cat)
+    check('redirect removed: injectCat() strips the old category script and keeps the rest', 'stm-shell-cat' not in new_cat and '<title>c</title>' in new_cat and '<body>y</body>' in new_cat, new_cat)
+    check('redirect removed: injectCat() twice gives the same page', run_node('injectCat', new_cat) == new_cat)
     def serve_p(ctx): pass   # mock_network already serves the real generated product page for every /p/*.html address
     c11 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c11); serve_p(c11)
     p11 = c11.new_page(); e11 = []; p11.on('pageerror', lambda e: e11.append(str(e)))
-    p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml'); p11.wait_for_selector('#page-product.open', timeout=15000)
-    check('redirect: a phone opening a product page link lands in the shell on that product and size', 'Garden Hose Connector Set' in p11.locator('#pp-name').inner_text() and p11.locator('#pp-price').inner_text() == 'KSh 1,550', p11.locator('#pp-price').inner_text())
-    check('redirect: the address is the product page address again (copy/share keeps its preview)', p11.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml', p11.url)
-    p11.goto(f'{BASE}/p/garden-set-1Litre.html'); p11.wait_for_selector('#page-product.open', timeout=15000)
-    check('redirect: without a size in the hash the page\'s own size opens', p11.locator('#pp-price').inner_text() == 'KSh 6,450', p11.locator('#pp-price').inner_text())
-    check('redirect: no page errors', not e11, e11[:3])
+    p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml'); p11.wait_for_timeout(1500)
+    check('redirect removed: a phone opening a product page link stays on that page (no jump into the shell)', p11.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and p11.locator('#page-product').count() == 0, p11.url)
+    p11.goto(f'{BASE}/p/garden-set-1Litre.html'); p11.wait_for_timeout(1500)
+    check('redirect removed: a phone opening a product page without a size stays on that page too', p11.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and p11.locator('#bottom-nav').count() == 0, p11.url)
+    check('redirect removed: no page errors', not e11, e11[:3])
     c11.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
                       ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_p(cx)
         px = cx.new_page(); px.goto(f'{BASE}/p/garden-set-1Litre.html'); px.wait_for_timeout(1500)
-        check(f'redirect: {label} keeps the product page (no redirect)', px.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and px.locator('#page-product').count() == 0, px.url)
+        check(f'redirect removed: {label} keeps the product page (no redirect)', px.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and px.locator('#page-product').count() == 0, px.url)
         cx.close()
     cc = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc); serve_p(cc)
     pc = cc.new_page(); pc.goto(f'{BASE}/p/garden-set-1Litre.html?classic=1'); pc.wait_for_timeout(1500)
-    check('redirect: ?classic=1 keeps the old page on a phone', pc.evaluate('location.pathname') == '/p/garden-set-1Litre.html', pc.url)
+    check('redirect removed: ?classic=1 keeps the old page on a phone', pc.evaluate('location.pathname') == '/p/garden-set-1Litre.html', pc.url)
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_function("location.pathname !== '/'", timeout=15000)
     check('address: on a desktop screen it opens that product\'s full page (/p/<slug>.html)', p10.evaluate('location.pathname') == '/p/garden-set-250ml.html', p10.url)
     c10.close()
 
-    # category pages -> shell on phones (seo-shell-redirect.mjs, injectCat). The served /c/ page is the REAL generated page with the shipped script injected.
-    import subprocess, re as _re
+    # category pages (/c/<slug>.html) no longer redirect either. The shell still understands /?cat=<slug> (links, reloads), so that part stays tested.
     def cat_page(slug):
-        js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.injectCat(require('fs').readFileSync('c/%s.html','utf8'))))" % slug
-        return subprocess.run(['node', '-e', js], cwd=ROOT, capture_output=True, text=True, check=True).stdout
+        return open(os.path.join(ROOT, 'c', slug + '.html'), encoding='utf-8').read()
     def serve_c(ctx):
         def h(rt):
             m = _re.search(r'/c/([a-z0-9-]+)\.html', rt.request.url)
             rt.fulfill(status=200, content_type='text/html', body=cat_page(m.group(1)))
         ctx.route('**/c/*.html*', h)
-    check('category redirect: the injected category page carries the script and the page is otherwise unchanged', 'stm-shell-cat' in cat_page('garden-outdoors') and 'Garden' in cat_page('garden-outdoors'))
-    check('category redirect: injecting twice gives the same page', cat_page('garden-outdoors').count('stm-shell-cat') == 1)
+    check('category redirect removed: the generated category pages carry no redirect script', 'stm-shell-cat' not in cat_page('garden-outdoors') and 'Garden' in cat_page('garden-outdoors'))
     c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12); serve_c(c12)
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
-    p12.goto(f'{BASE}/c/garden-outdoors.html'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
+    p12.goto(f'{BASE}/c/garden-outdoors.html'); p12.wait_for_timeout(1500)
+    check('category redirect removed: a phone on a category page stays on that page', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('#grid .card[data-id]').count() == 0, p12.url)
+    p12.goto(f'{BASE}/?cat=garden-outdoors'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('category redirect: a phone on a category page lands in the shell on that category (only its products)', ids and all(i.startswith('outdoor-') for i in ids), ids)
-    check('category redirect: the address becomes / (no leftover ?cat=)', p12.evaluate('location.pathname + location.search') == '/', p12.url)
-    p12.goto(f'{BASE}/c/kitchen-dining.html'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
+    check('shell address /?cat=<slug> still opens that category (only its products)', ids and all(i.startswith('outdoor-') for i in ids), ids)
+    check('shell address /?cat=<slug>: the address becomes / (no leftover ?cat=)', p12.evaluate('location.pathname + location.search') == '/', p12.url)
+    p12.goto(f'{BASE}/?cat=kitchen-dining'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('category redirect: a sub-category page opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname') == '/', ids)
+    check('shell address /?cat=<sub-category> opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname') == '/', ids)
     p12.goto(f'{BASE}/?cat=no-such-category'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
-    check('category redirect: an unknown category shows a notice and the normal home', 'no longer available' in p12.locator('#toast').inner_text(), p12.locator('#toast').inner_text())
-    check('category redirect: no page errors', not e12, e12[:3])
+    check('shell address /?cat=<unknown> shows a notice and the normal home', 'no longer available' in p12.locator('#toast').inner_text(), p12.locator('#toast').inner_text())
+    check('category pages: no page errors', not e12, e12[:3])
     c12.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
                       ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_c(cx)
         px = cx.new_page(); px.goto(f'{BASE}/c/garden-outdoors.html'); px.wait_for_timeout(1500)
-        check(f'category redirect: {label} lands in shell for category', px.evaluate('location.pathname') == '/' and px.locator('#grid .card[data-id]').count() > 0, px.url)
+        check(f'category redirect removed: {label} keeps the category page', px.evaluate('location.pathname') == '/c/garden-outdoors.html', px.url)
         cx.close()
     cc2 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc2); serve_c(cc2)
     pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1'); pc2.wait_for_timeout(1500)
-    check('category redirect: ?classic=1 keeps the category page on a phone', pc2.evaluate('location.pathname') == '/c/garden-outdoors.html', pc2.url)
+    check('category redirect removed: ?classic=1 keeps the category page on a phone', pc2.evaluate('location.pathname') == '/c/garden-outdoors.html', pc2.url)
     cc2.close()
 
     # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell
