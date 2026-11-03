@@ -172,7 +172,18 @@ window.addEventListener('popstate', e => {
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
 const DEEP = new URLSearchParams(location.search).get('product');   // /?product=<slug>: a shared or reloaded product address, opened after the catalog loads
-const TAB_DEEP = new URLSearchParams(location.search).get('tab');   // /?tab=cart|categories|deals|account: the bottom nav of the static pages (shell-chrome.js)
+/* /?cart=<product id>:<qty>,<product id>:<qty>: a shared cart link (the Share cart link button). The cart itself lives in each phone's own storage, so the link
+   carries the lines. They are kept in sessionStorage until the catalog has added them, so a reload before that does not lose them. */
+const CART_DEEP = (() => {
+  const parse = raw => String(raw || '').split(',').slice(0, 40).map(x => { const [id, q] = x.split(':'); return { rowId: (id || '').trim(), qty: Math.max(1, Math.min(99, parseInt(q, 10) || 1)) }; })
+    .filter(l => /^[a-z0-9][a-z0-9-]{0,120}$/i.test(l.rowId));
+  const fromUrl = parse(new URLSearchParams(location.search).get('cart'));
+  try {
+    if (fromUrl.length) { sessionStorage.setItem('shell.pendingCart', JSON.stringify(fromUrl)); return fromUrl; }
+    return parse((JSON.parse(sessionStorage.getItem('shell.pendingCart') || '[]') || []).map(l => l.rowId + ':' + l.qty).join(','));
+  } catch { return fromUrl; }
+})();
+const TAB_DEEP = CART_DEEP.length ? 'cart' : new URLSearchParams(location.search).get('tab');   // /?tab=cart|categories|deals|account: the bottom nav of the static pages (shell-chrome.js); a shared cart link opens the cart
 const Q_DEEP = (new URLSearchParams(location.search).get('q') || '').trim().slice(0, 80);   // /?q=<words>: the search box of the static pages
 const CAT_DEEP = new URLSearchParams(location.search).get('cat');   // /?cat=<slug>: a category (or sub-category) page address; /c/<slug>.html sends phones here
 /* A reload keeps the tab the customer was on: the browser hands back the state of the current history entry, and every tab hop stores its tab in it
@@ -471,7 +482,7 @@ $('#qb-buy').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty);
 store.subscribe(s => {
   const n = cartCount(s);
   $('#cart-title-count').textContent = n ? `(${n})` : '';
-  $('#cart-empty').hidden = n > 0; $('#cart-total-bar').hidden = n === 0;
+  $('#cart-empty').hidden = n > 0; $('#cart-total-bar').hidden = n === 0; $('#share-cart').hidden = n === 0;
   $('#cart-total').textContent = 'KSh ' + fmt(cartTotal(s));
   $('#cart-list').innerHTML = s.cart.map(i => `<li class="flex gap-3 bg-white rounded-lg p-2 shadow-card">
     <div class="w-20 h-20 rounded-lg shrink-0 grid place-items-center text-4xl" style="background:${i.bg};overflow:hidden">${thumb(i)}</div>
@@ -497,6 +508,28 @@ $('#checkout').addEventListener('click', () => {
   catch { toast('Could not start checkout. Please allow site storage and try again.'); return; }
   location.href = '/classic.html?checkout=1';   // the shell cart stays until the order is finished (classic.html clears it) so a cancelled checkout loses nothing
 });
+
+/* Share cart link: the address carries the cart lines, so whoever opens it lands on the Cart tab with the same items. */
+$('#share-cart').addEventListener('click', async () => {
+  const cart = store.get().cart; if (!cart.length) return;
+  const url = 'https://stermontarcade.co.ke/?cart=' + cart.map(i => encodeURIComponent(i.rowId) + ':' + i.qty).join(',');
+  try { if (navigator.share) { await navigator.share({ title: 'My Stermont Arcade cart', text: 'My cart on Stermont Arcade:', url }); return; } }
+  catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(url); toast('Cart link copied'); } catch { window.prompt('Copy your cart link:', url); }
+});
+function applySharedCart(lines) {   // idempotent: a line already in the cart gets the shared quantity instead of adding to it, so opening the link twice does not double anything
+  const cart = store.get().cart.map(i => ({ ...i })); let added = 0, missing = 0;
+  lines.forEach(l => {
+    const p = PRODUCTS.find(x => x.sizes.some(z => z.rowId === l.rowId));
+    if (!p) { missing++; return; }   // sold out or removed since the link was made
+    const sz = p.sizes.find(z => z.rowId === l.rowId), key = p.id + '|' + sz.label, hit = cart.find(i => i.key === key);
+    if (hit) hit.qty = l.qty; else cart.push({ key, id: p.id, rowId: sz.rowId, name: p.name, size: sz.label, qty: l.qty, price: sz.price, img: p.img, emoji: p.emoji, bg: p.bg });
+    added++;
+  });
+  store.set({ cart });
+  try { sessionStorage.removeItem('shell.pendingCart'); } catch {}
+  toast(missing ? (added ? 'Some items are no longer available' : 'Those items are no longer available') : 'Cart opened from shared link');
+}
 
 /* ---------- 11. Wiring ---------- */
 let toastTimer;
@@ -531,5 +564,6 @@ $('#search-form').addEventListener('submit', e => {
 if (Q_DEEP && !DEEP && !CAT_DEEP) { store.set({ q: Q_DEEP }); $('#search').value = Q_DEEP; }   // a search typed on a static page
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
 if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
-loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (DEEP) openDeepLink(DEEP); else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
+if (CART_DEEP.length) toast('Loading shared cart...');
+loadCatalog().then(() => { renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) openDeepLink(DEEP); else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
 })();

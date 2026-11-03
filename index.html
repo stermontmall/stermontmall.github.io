@@ -179,6 +179,7 @@
       <div><p class="text-xs text-mute">Total</p><p id="cart-total" class="font-bold text-sale text-base"></p></div>
       <button id="checkout" class="tap h-10 px-6 rounded-full bg-brand text-white font-semibold text-sm">Checkout</button>
     </div>
+    <button id="share-cart" class="tap" style="width:calc(100% - 16px);margin:8px 8px 0;height:40px;border-radius:9999px;border:1.5px solid #7c3aed;color:#7c3aed;background:#fff;font-weight:600;font-size:14px" hidden>Share cart link</button>
   </section>
 
   <section id="view-account" data-view="account" hidden>
@@ -332,7 +333,7 @@
 
 <div id="toast" class="fixed left-1/2 -translate-x-1/2 top-[64px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
 
-<script src="/mobile-shell/app.js?v=14"></script>
+<script src="/mobile-shell/app.js?v=15"></script>
 <script src="/analytics.js"></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
 </body>

@@ -1,4 +1,11 @@
 
+## 2026-11-03 15:45 Africa/Nairobi - shareable cart link (branch `wip-share-cart-link`)
+Owner: "If I add items to cart, and share link, the link doesn't directly go to the cart but to the home screen."
+- [x] Cause: the cart lives only in each phone's storage (`shell.cart`), and the address bar stays on the bare domain, so a copied link could only open Home (and an empty cart on another phone).
+- [x] Fix: "Share cart link" button on the shell Cart tab builds `https://stermontarcade.co.ke/?cart=<product id>:<qty>,...` (native share sheet, else copies). Opening it lands on the Cart tab with those lines (`CART_DEEP` + `applySharedCart` in `mobile-shell/app.js`; idempotent, unknown/sold-out ids skipped with a toast, max 40 lines, qty 1-99). Desktop: `index.html` already forwards the query to `classic.html`, which got a small `?cart=` receiver script that adds the lines through `STM.add` and opens the cart drawer. `index.html` now loads `app.js?v=15`.
+- [x] Tests: `node mobile-shell/navigation.test.mjs` OK; `python3 mobile-shell/shell.test.py` 147/147 (10 new shared-cart checks, phone + desktop).
+- [ ] Not done: no share button on the desktop classic cart drawer (links made on a phone work on desktop and the reverse only for phone-made links).
+
 ## 2026-11-03 15:20 Africa/Nairobi - card checkout shows Paystack TEST mode (finding, no code change)
 Owner: "my buyers want to transact so remove the tests" (screenshot: stermontarcade.co.ke card popup, TEST badge, "Transaction declined. Please use the test card.").
 - [x] Cause: NOT in the repo (grep for test card / sk_test / pk_test finds nothing). Edge functions `paystack-init` and `paystack-status` use the secret `PAYSTACK_SECRET_KEY` from Supabase function secrets; it is currently an `sk_test_` key, so Paystack serves its test popup.

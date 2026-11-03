@@ -37,4 +37,20 @@ assert.equal(resolve({ saved: 'cart', search: '?tab=unknown' }), 'cart', 'unknow
 
 assert.match(source, /sessionStorage\.setItem\('shell\.activeTab',\s*tab\)/, 'tab changes persist the active tab');
 assert.match(source, /function goTab\(tab\)[\s\S]*?history\.pushState\(st, ''\)[\s\S]*?history\.replaceState\(st, ''\)/, 'tab navigation preserves the Home-back history rule');
+// Shared cart link (/?cart=id:qty,...): parsed by the production CART_DEEP block, opens the Cart tab, bad lines are dropped.
+const cStart = source.indexOf('const CART_DEEP = (() => {'), cEnd = source.indexOf('const TAB_DEEP = CART_DEEP.length');
+assert.ok(cStart !== -1 && cEnd > cStart, 'production shared-cart parser must exist');
+function cartLines(search, pending = null) {
+  const store = new Map(); if (pending) store.set('shell.pendingCart', pending);
+  const context = { URLSearchParams, location: { search }, sessionStorage: { getItem: k => store.get(k) ?? null, setItem: (k, v) => store.set(k, v), removeItem: k => store.delete(k) } };
+  return JSON.parse(JSON.stringify(vm.runInNewContext(source.slice(cStart, cEnd) + '; CART_DEEP', context)));
+}
+assert.deepEqual(cartLines('?cart=abc-1:2,xyz:1'), [{ rowId: 'abc-1', qty: 2 }, { rowId: 'xyz', qty: 1 }], 'shared cart lines are parsed');
+assert.deepEqual(cartLines('?cart=abc:500,def:0,ghi'), [{ rowId: 'abc', qty: 99 }, { rowId: 'def', qty: 1 }, { rowId: 'ghi', qty: 1 }], 'quantities are clamped to 1-99');
+assert.deepEqual(cartLines('?cart=%3Cscript%3E:1,ok:1'), [{ rowId: 'ok', qty: 1 }], 'ids with unexpected characters are dropped');
+assert.equal(cartLines('?cart=' + Array.from({ length: 80 }, (_, i) => 'p' + i + ':1').join(',')).length, 40, 'at most 40 lines');
+assert.deepEqual(cartLines('', JSON.stringify([{ rowId: 'kept', qty: 3 }])), [{ rowId: 'kept', qty: 3 }], 'a reload before the catalog loaded keeps the pending lines');
+assert.deepEqual(cartLines(''), [], 'no cart parameter means no shared lines');
+assert.match(source, /const TAB_DEEP = CART_DEEP\.length \? 'cart'/, 'a shared cart link opens the Cart tab');
+assert.match(source, /loadCatalog\(\)\.then\([^\n]*applySharedCart\(CART_DEEP\)/, 'shared lines are added once the catalog is loaded');
 console.log('OK: mobile shell tab persistence, reload restoration and deep-link precedence');

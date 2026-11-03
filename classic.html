@@ -1640,5 +1640,37 @@ try { if (localStorage.getItem('stm_handoff')) { document.documentElement.classN
   }, 150);
 })();
 </script>
+<script>
+/* Shared cart link: /classic.html?cart=<product id>:<qty>,... (the phone shell's "Share cart link" button; desktop screens are sent here with the query kept).
+   Each line is added through the shop's own STM.add once its card exists, so prices and checkout stay the one proven flow; then the cart opens. */
+(function () {
+  var m = /[?&]cart=([^&#]*)/.exec(location.search); if (!m) return;
+  var raw; try { raw = decodeURIComponent(m[1]); } catch (e) { return; }
+  var lines = raw.split(',').slice(0, 40).map(function (x) { var a = x.split(':'); return { id: (a[0] || '').trim(), qty: Math.max(1, Math.min(99, parseInt(a[1], 10) || 1)) }; })
+    .filter(function (l) { return /^[a-z0-9][a-z0-9-]{0,120}$/i.test(l.id); });
+  try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
+  if (!lines.length) return;
+  function note(text) {
+    var d = document.createElement('div'); d.setAttribute('role', 'alert');
+    d.style.cssText = 'position:fixed;left:8px;right:8px;top:8px;z-index:99999;background:#7c2d12;color:#fff;padding:12px 14px;border-radius:10px;font:600 14px/1.4 system-ui,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3)';
+    d.textContent = text + ' (tap to close)'; d.onclick = function () { d.remove(); }; document.body.appendChild(d);
+  }
+  var tries = 0, timer = setInterval(function () {
+    tries++;
+    var all = window.STM && lines.every(function (l) { return document.getElementById('p-' + l.id); });
+    if (!all && tries < 80) return;                        /* wait up to ~12 s for the catalog to build the cards */
+    clearInterval(timer);
+    if (!window.STM) { note('The shop is still loading. Reload this page to open the shared cart.'); return; }
+    var missing = 0, added = 0;
+    lines.forEach(function (l) {
+      var card = document.getElementById('p-' + l.id);
+      if (!card) { missing++; return; }                    /* sold out or removed since the link was made */
+      window.STM.add(card, null, l.qty); added++;
+    });
+    if (missing) note(added ? 'Some items in that cart are no longer available.' : 'Those items are no longer available.');
+    if (added) window.STM.open();
+  }, 150);
+})();
+</script>
 </body>
 </html>
