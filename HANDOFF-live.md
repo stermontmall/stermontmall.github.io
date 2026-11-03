@@ -1,3 +1,11 @@
+## 2026-11-03 17:00 Africa/Nairobi - mobile shell becomes the ONLY view, all screen sizes (branch `wip-mobile-shell-only`) - STARTED
+Owner: "I only need mobile shell to take over the whole website. I don't want this traditional view. Make mobile shell 100% only website in all sections. Connect GitHub and Supabase. Confirm the handoff and keep saving progress."
+- [x] Connected: GitHub repo `stermontmall/stermontmall.github.io` (push access, cloned) and Supabase project `oewvtbnmyombbtggamor` (eu-west-1, ACTIVE_HEALTHY).
+- [x] Found where the traditional view still shows: `index.html` (~line 72-79) sends desktop screens (min-width 900px + mouse) to `classic.html`; `seo-shell-redirect.mjs` skips desktop for `/p/` and `/c/` pages; shell menu has an "Open the full shop" link to `classic.html`.
+- [ ] IN PROGRESS: remove the desktop redirect and make the shell render well on wide screens; stop `/p/` and `/c/` skipping desktop (edit the generator, never the generated pages); drop the "Open the full shop" link; bump `?v=` in `index.html`.
+- [ ] NEXT: `python3 mobile-shell/shell.test.py` and `node mobile-shell/navigation.test.mjs`, then merge to `main` only when finished AND tested.
+- Crawlers/link-preview bots must still read the real pages (do not break SEO); `classic.html` file stays in the repo for now, nothing should send people to it.
+
 
 ## 2026-11-03 16:40 Africa/Nairobi - reload kept sending customers from a category to Home (branch `wip-keep-category-on-reload`)
 Owner: "When I refresh a category then pages brings me to home screen. Fix"
