@@ -7,7 +7,8 @@
 // so this tool shows you exactly what is blocking each page instead of guessing.
 // Uses the same secrets as seo-google-sitemaps.mjs (GitHub > Settings > Secrets and variables > Actions):
 //   GSC_SERVICE_ACCOUNT_JSON, GSC_PROPERTY. The service account must be added as a user on the property in Search Console.
-// Optional: MAX_URLS (default 250; Google allows about 2000 inspections per day per property).
+// Optional: MAX_URLS (default 250; Google allows about 2000 inspections per day per property),
+//           MAX_MINUTES (default 20; the run stops and reports what it has instead of hanging for hours).
 import { createSign } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 
@@ -19,6 +20,7 @@ if (!raw || !property) {
 }
 
 const MAX = Number(process.env.MAX_URLS) || 250;
+const deadline = Date.now() + (Number(process.env.MAX_MINUTES) || 20) * 60000;
 
 // ---- Sign in to Google with the service account ----
 const key = JSON.parse(raw);
@@ -51,17 +53,34 @@ const inspect = async url => {
     return { url, verdict: s.verdict || 'UNKNOWN', state: s.coverageState || 'Unknown', crawled: (s.lastCrawlTime || '').slice(0, 10),
       canonical: s.googleCanonical && s.googleCanonical !== url ? s.googleCanonical : '', robots: s.robotsTxtState, fetch: s.pageFetchState, indexing: s.indexingState };
   }
-  return { url, error: 'rate limited, try again later' };
+  return { url, error: 'rate limited, try again later', rateLimited: true };
 };
 
+// Stop early instead of hanging: 3 rate-limited pages in a row means Google's quota is used up for now,
+// and a run time limit keeps the job from ever sitting for hours (the old version could take over an hour and then fail).
 const results = [];
-for (const u of urls) { results.push(await inspect(u)); await sleep(250); }
+let limitedInRow = 0, notChecked = 0, stopReason = '';
+for (const u of urls) {
+  if (Date.now() > deadline) { stopReason = 'the run time limit was reached'; break; }
+  const r = await inspect(u);
+  results.push(r);
+  limitedInRow = r.rateLimited ? limitedInRow + 1 : 0;
+  if (limitedInRow >= 3) { stopReason = "Google's inspection quota is used up for now (it resets daily)"; break; }
+  await sleep(250);
+}
+notChecked = urls.length - results.length;
+
+const limited = results.filter(r => r.rateLimited);
+const errs = results.filter(r => r.error && !r.rateLimited);
 
 // A permission problem affects every URL, so say it once and clearly.
-const firstError = results.find(r => r.error);
-if (results.length && results.every(r => r.error)) {
-  console.log('# Google indexing status\n\nGoogle refused every check: `' + firstError.error + '`\n\nUsually the service account is not added as a user on this property. In Search Console open Settings > Users and permissions > Add user, paste the service account email (`' + key.client_email + '`) and give it **Full** or **Restricted** access. Also check that `GSC_PROPERTY` matches the property exactly (for example `sc-domain:stermontarcade.co.ke`).');
+if (results.length && errs.length === results.length) {
+  console.log('# Google indexing status\n\nGoogle refused every check: `' + errs[0].error + '`\n\nUsually the service account is not added as a user on this property. In Search Console open Settings > Users and permissions > Add user, paste the service account email (`' + key.client_email + '`) and give it **Full** or **Restricted** access. Also check that `GSC_PROPERTY` matches the property exactly (for example `sc-domain:stermontarcade.co.ke`).');
   process.exit(1);
+}
+if (results.length && limited.length === results.length) {
+  console.log('# Google indexing status ' + new Date().toISOString().slice(0, 10) + '\n\nGoogle\'s URL Inspection quota is used up right now, so no pages could be checked. This is not a setup problem. Run it again tomorrow, or lower `MAX_URLS` if other tools also use this quota.');
+  process.exit(0);
 }
 
 const ok = results.filter(r => !r.error);
@@ -79,10 +98,12 @@ const advice = {
   'Alternate page with proper canonical tag': 'Google treats it as a copy of the canonical page shown. Usually fine for size or colour variants.',
 };
 
+const unchecked = results.length - ok.length + notChecked;
 const out = [];
 out.push(`# Google indexing status ${new Date().toISOString().slice(0, 10)}`);
 out.push('');
-out.push(`Checked **${ok.length}** pages with Google (products first). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${results.length - ok.length ? `, ${results.length - ok.length} could not be checked` : ''}.`);
+out.push(`Checked **${ok.length}** pages with Google (products first). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${unchecked ? `, ${unchecked} not checked` : ''}.`);
+if (stopReason) out.push('', `> Stopped early because ${stopReason}. The pages not checked are the last ones in the list; they will be checked on a later run.`);
 out.push('');
 if (notIndexed.length) {
   out.push('## Why pages are not indexed');
@@ -101,12 +122,13 @@ if (notIndexed.length) {
   for (const r of notIndexed) out.push(`| ${short(r.url)} | ${r.state} | ${r.crawled || 'never'} | ${r.canonical ? short(r.canonical) : ''} |`);
   out.push('');
 }
-if (firstError) {
+if (errs.length) {
   out.push('## Pages that could not be checked');
   out.push('| Page | Error |', '|---|---|');
-  for (const r of results.filter(x => x.error)) out.push(`| ${short(r.url)} | ${r.error} |`);
+  for (const r of errs) out.push(`| ${short(r.url)} | ${r.error} |`);
   out.push('');
 }
 out.push('_Google decides what to index. This report shows what is blocking each page; it cannot force indexing._');
 console.log(out.join('\n'));
-if (results.some(r => r.error)) process.exitCode = 1;
+// Only fail the job for real problems (more than 1 in 10 checks erroring), not for quota or time limits.
+if (errs.length > Math.max(2, results.length / 10)) process.exitCode = 1;
