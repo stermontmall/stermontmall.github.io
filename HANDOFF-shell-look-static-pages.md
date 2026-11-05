@@ -1,31 +1,20 @@
-# HANDOFF - Shell look on /p/ and /c/ pages (2026-11-05, branch `wip-shell-look-static-pages`, NOT merged)
+# HANDOFF - Mobile shell look on every static page (updated 2026-11-05, pushed straight to `main` at the owner's request)
 
 ## Why
-Since 2026-11-03 (commit 4d808f6, see HANDOFF-stop-shell-redirect.md) phone visitors are no longer redirected from `/p/` and `/c/` pages into the JS shell, so they see the old static page. Owner (2026-11-05): "I need mobile shell to dominate everything". Chosen approach: restyle the static pages themselves (same page, same URL for everyone, no redirect, no cloaking).
+Since 2026-11-03 (commit 4d808f6, see HANDOFF-stop-shell-redirect.md) visitors are NOT redirected from `/p/` and `/c/` pages into the JS shell (Google could read that as a sneaky redirect). Owner (2026-11-05): "I need mobile shell to dominate everything". Chosen approach: the static pages themselves get the shell top bar (back, search, cart) and bottom nav (Home, Categories, Deals, Cart, Account). Same page, same URL for everyone, no redirect, no cloaking. Do not bring the redirect back.
 
-## Done (on the branch)
-- [x] `seo-shell-chrome.mjs` (new): after every rebuild, adds the shell top bar + bottom nav to every `p/*.html` and `c/*.html` (adds `<script src="/shell-chrome.js?v=2" defer>` and a small `<style>` that reserves the 52px bar height and lifts the sticky buy bar above the bottom nav). Idempotent (marker `<!--stm-chrome-->`), meta-refresh stubs untouched.
-- [x] `seo-shell-chrome.test.mjs` (new): ran locally with node, passes.
-- [x] `shell-chrome.js`: no tab is marked current on `/p/` and `/c/` pages.
+## Done (on `main`)
+- [x] Homepage `index.html` is the shell for everyone (commit 8e60a35, "Keep storefront navigation inside the mobile shell by default").
+- [x] `seo-shell-chrome.mjs` + `seo-shell-chrome.test.mjs`: adds the bars to `p/`, `c/`, `guides/` and `products.html`. It is run at the end of `seo-shell-redirect.mjs` (a step `product-pages.yml` already runs after every build), so no workflow edit was needed.
+- [x] `shell-chrome.js` draws the bars. Info pages (about, contact, FAQ, terms, returns, track, shipping, privacy, account) and `/services/` already load it.
+- [x] 2026-11-05, commit 6414c26: `wa-float.js` now also loads `/shell-chrome.js?v=2` on any page that loads `wa-float.js` (loaded by `analytics.js` and `img-protect.js`), which should cover `nairobi.html`, `bulk-quote.html`, blog pages and guides. Skipped on `/`, `index.html`, admin, classic, upload-photos, advert-poster, list-products. Idempotent (`window.__stmChrome`). Undo: delete the added block at the top of `wa-float.js`.
 
-## Blocked
-- [ ] Workflow file could not be edited from here (GitHub connector returned "Forbidden" for `.github/workflows/product-pages.yml`). Owner must make these 3 edits to `.github/workflows/product-pages.yml` (on this branch or on `main` after merge):
-  1. Under `on.push.paths` add: `- 'seo-shell-chrome.mjs'` and `- 'shell-chrome.js'`
-  2. After the step "Test hand-written product content" add:
-     ```yaml
-           - name: Test the shell top bar and bottom nav injector
-             run: node seo-shell-chrome.test.mjs
-     ```
-  3. After the step that runs `node seo-shell-redirect.mjs` add:
-     ```yaml
-           - name: Give product and category pages the shell top bar and bottom nav, same page for everyone (seo-shell-chrome.mjs)
-             continue-on-error: true
-             run: node seo-shell-chrome.mjs
-     ```
+## NOT done
+- [ ] `/pest-control/` (about 35 pages plus `locations/` and `blog/`), and probably `seo-agro/` and `seo-pest/` output: these pages load no scripts, so the `wa-float.js` loader does not reach them. Fix = add `<script src="/shell-chrome.js?v=2" defer></script>` before `</body>` in whatever generates them (look in `seo-pest/`), then rebuild; or push the tag into each file.
+- [ ] `seo-shell-chrome.mjs` cannot cover other folders by itself: the "Save changes" step of `.github/workflows/product-pages.yml` only does `git add -A p c guides sitemap-products.xml sitemap-state.json sitemap.xml products.html merchant-feed.xml product-names.json index.html`. Adding `pest-control` there (and a recursive run in `seo-shell-chrome.mjs`) needs an owner edit: the GitHub connector gets "Forbidden" on `.github/workflows/*`.
+- [ ] Not run: `python3 mobile-shell/shell.test.py`, `node seo-shell-chrome.test.mjs`, and a full build. Nothing here was loaded in a browser.
+- [ ] Phone check in a private tab (old cached copies may not show the bars yet): `/nairobi.html`, `/bulk-quote.html`, one `/blog/` page, one `/p/` page, one `/c/` page should show the white top bar and the bottom nav; the green sticky buy bar on `/p/` sits above the nav.
+- [ ] Search Console (owner): watch Performance and Pages for `/p/` URLs over the next 1-2 weeks, as in HANDOFF-stop-shell-redirect.md.
 
-## Next
-- [ ] Apply the 3 workflow edits, merge the branch to `main`, then run the "Build product pages" workflow (Actions tab, Run workflow). The bot commit will add the bar to all `p/` and `c/` pages.
-- [ ] Phone check in a private tab: `/p/` and `/c/` pages show the purple-free white top bar (back, search, cart) and the bottom nav (Home, Categories, Deals, Cart, Account); the green sticky buy bar sits above the nav.
-- [ ] Not run here: `python3 mobile-shell/shell.test.py` (no clone), and the full build.
-- [ ] Not covered yet: `/guides/` pages, `/blog/` and `products.html` (not in `p/` or `c/`).
-- [ ] To undo: remove the workflow step; pages lose the bar on the next rebuild.
+## Supabase
+Connected (one project, active). Nothing was changed there for this work.
