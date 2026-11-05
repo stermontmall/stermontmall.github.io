@@ -3106,5 +3106,38 @@
         "Inspect the shell, suspension and adjustment parts before each use. Follow the manufacturer's guidance for cleaning, storage and service life, and replace the helmet when the instructions require it or if it has been involved in an impact or shows damage. Store it away from direct sunlight, excessive heat and chemicals. A helmet is only one part of workplace protection; use the other protective equipment and safe-work procedures required for the task."
       ]
     }
+  ],
+  "e-pos-80mm-thermal-receipt-printer": [
+    {
+      "heading": "A practical printer for busy checkout counters",
+      "paragraphs": [
+        "The E-POS 80mm Thermal Receipt Printer is a point-of-sale printing device for businesses that need to produce clear transaction receipts at a checkout or service counter. It is intended for use with a compatible POS system and suitable 80mm thermal paper. Thermal receipt printing uses heat-sensitive paper, so the printer can produce text without a conventional ink cartridge or toner. This makes it a practical option for shops and service businesses that print customer receipts throughout the working day.",
+        "A receipt printer is an important part of a point-of-sale workflow. After a sale is recorded in compatible POS software, the system can send the transaction details to the printer so the customer receives a printed record. Depending on the software and configuration, receipts may show items purchased, quantities, prices, totals, taxes, payment details and the business information configured in the POS system. The exact receipt layout is controlled by the software, not by the printer alone.",
+        "The 80mm paper format provides a wider receipt area than smaller receipt formats. This can be useful where a business needs room for longer item descriptions, several line items or additional transaction information. Confirm the supported paper width and roll dimensions against the actual unit and the paper you intend to buy before ordering."
+      ]
+    },
+    {
+      "heading": "How thermal receipt printing works and how to care for it",
+      "paragraphs": [
+        "Direct thermal printers create an image by applying heat to specially coated thermal paper. Because the printing process does not use ink cartridges, businesses do not need to purchase ink or toner for ordinary receipt printing. The paper itself is the consumable. Store thermal rolls in a cool, dry place away from direct sunlight, excess heat and friction, which can affect print quality or cause receipts to darken.",
+        "For consistent results, load the roll in the direction indicated by the printer's paper guide, keep the paper path clear and use rolls that meet the printer's stated width and diameter limits. If a receipt prints blank, check that the thermal paper is loaded with its coated side facing the print head. Follow the manufacturer's instructions when opening the cover or clearing a paper jam.",
+        "Keep the printer on a stable, dry counter with enough space for the paper cover to open. Avoid placing liquids, dust or loose objects near the paper feed. Switch off the unit before cleaning or inspecting internal parts, and use only the cleaning method recommended by the manufacturer. Do not scrape the thermal print head with sharp objects."
+      ]
+    },
+    {
+      "heading": "Suitable business uses and POS compatibility",
+      "paragraphs": [
+        "An 80mm thermal receipt printer may suit retail shops, supermarkets, mini-markets, pharmacies, restaurants, cafés, salons, repair counters, ticket desks and other businesses that use compatible point-of-sale software. It can support routine checkout operations by giving customers a printed record and helping staff maintain a consistent transaction process. The printer is a peripheral device; it does not independently manage stock, calculate sales or process card and mobile-money payments. Those functions depend on the connected POS software and payment equipment.",
+        "Before buying, confirm the connection type supported by the exact E-POS model, such as USB, Ethernet, serial or wireless connectivity. Do not assume that every connection option is included. Check operating-system support, driver availability and compatibility with your POS application. If the printer is intended for a cash drawer, confirm that the unit has the required cash-drawer port and that the drawer and software use a compatible interface."
+      ]
+    },
+    {
+      "heading": "Setup, paper selection and buying guidance in Kenya",
+      "paragraphs": [
+        "Also verify the power adapter, plug type, paper-roll dimensions and any cables or accessories included in the package. Install the correct driver or select the printer through the POS software according to the supplier's instructions. Print a test receipt before using the device for live transactions. If you are replacing an older receipt printer, compare its connection and driver requirements with your current system to avoid compatibility problems.",
+        "Order the E-POS 80mm Thermal Receipt Printer from Stermont Arcade for a compatible checkout and point-of-sale setup. It is a useful consideration for Kenyan businesses looking for an 80mm thermal receipt-printing option for everyday sales documentation. Before checkout, confirm the exact model, interface, supported paper-roll size, power requirements and included accessories so that it matches your existing POS equipment.",
+        "For a retail outlet, restaurant or service counter, consider the number of receipts printed each day and keep suitable spare thermal rolls available. Train staff to load paper correctly, clear jams without forcing the cover and check print quality during routine opening procedures. If the printer stops responding, confirm power, cable connections, selected printer settings and driver compatibility before assuming the unit is faulty."
+      ]
+    }
   ]
 }
