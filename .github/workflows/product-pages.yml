@@ -12,6 +12,8 @@ on:
     paths:
       - 'generate-products.mjs'
       - 'seo-meta.mjs'
+      - 'seo-safe-meta.mjs'
+      - 'seo-safe-meta.test.mjs'
       - 'seo-overrides.mjs'
       - 'seo-overrides.json'
       - 'seo-titles.mjs'
@@ -43,6 +45,9 @@ jobs:
       - name: Test shared SEO metadata rules
         run: node seo-meta.test.mjs
 
+      - name: Test allowlisted ordinary-product meta descriptions
+        run: node seo-safe-meta.test.mjs
+
       - name: Test hand-written product content
         run: node product-content.test.mjs
 
@@ -59,6 +64,9 @@ jobs:
       - name: Apply the owner's exact Google titles (products.seo_title, from the Master Catalog SEO Mapping PDF)
         continue-on-error: true
         run: node seo-titles.mjs
+
+      - name: Apply allowlisted ordinary-product meta descriptions only
+        run: node seo-safe-meta.mjs
 
       - name: Phones on a product or category page go to the mobile shell, crawlers keep the page (seo-shell-redirect.mjs)
         continue-on-error: true
