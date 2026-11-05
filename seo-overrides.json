@@ -1386,5 +1386,27 @@
         "No. It is a monochrome printer and HP lists no automatic duplex printing for this model."
       ]
     ]
+  },
+  "asus-150w-laptop-charger-adapter-19-5v-7-7a": {
+    "title": "ASUS 150W Laptop Charger 19.5V 7.7A in Kenya | Stermont Arcade",
+    "desc": "Shop the ASUS A17-150P1A 150W laptop charger in Kenya. Stated 19.5V, 7.7A output; verify connector and exact laptop compatibility before ordering.",
+    "faq": [
+      [
+        "Which ASUS laptop does this 150W adapter fit?",
+        "The listing uses the A17-150P1A reference. Confirm your exact laptop model and connector before ordering; it is not guaranteed to fit every ASUS laptop."
+      ],
+      [
+        "What are the output specifications?",
+        "The stated output is 19.5V and 7.7A, corresponding to a nominal 150W rating. Compare these values with your original adapter label."
+      ],
+      [
+        "How do I check whether the charger is compatible?",
+        "Match the voltage, current requirement, connector dimensions, polarity and laptop model using the original adapter label or manufacturer documentation."
+      ],
+      [
+        "Can I use a 150W charger with any 19.5V laptop?",
+        "No. Voltage alone is not enough to establish compatibility. The connector, polarity, power requirement and manufacturer specifications must also match."
+      ]
+    ]
   }
 }
