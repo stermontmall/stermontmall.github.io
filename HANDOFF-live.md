@@ -1154,3 +1154,38 @@ Prices below are market-reference source costs, not confirmed wholesale invoices
 - [x] Generated output commit: `3be162b33f7e92c3199b3384a66237d2488e0b0e`.
 - [ ] GitHub Pages deployment for generated commit was queued at last check: run `https://github.com/stermontmall/stermontmall.github.io/actions/runs/41976797646`. Product-pages workflow was still completing its IndexNow submission step. Confirm both finish, then verify live HTTP pages and image rendering.
 - [ ] External image links remain hotlinked from vendors/marketplace pages, not copied to Supabase Storage; live rendering has not yet been verified.
+
+
+
+## 2026-11-05 — Next 20 missing product candidates researched (not yet created)
+Owner asked to continue adding any missing products. Rechecked live pest-control catalogue categories 34–38 and excluded existing products/variants. These are new candidate products; no Supabase rows have been created in this step.
+
+### Supplier-backed candidates and observed Kenya listing prices
+Prices below are observed vendor listing prices, NOT wholesale costs and NOT approved final selling prices. Verify current stock, exact specification, VAT and supplier price before creating a listing. Do not automatically add 15% to a retail vendor price as if it were a cost.
+1. Disposable chemical protective coverall — ARK Hygiene, from KSh 3,900/piece — https://arkhygienesolutions.com/ppe-safety-gear/
+2. Washable full-body protective coverall — ARK Hygiene, from KSh 3,900/piece — https://arkhygienesolutions.com/ppe-safety-gear/
+3. Long heavy-duty rubber gloves — ARK Hygiene, from KSh 1,000/pair — https://arkhygienesolutions.com/ppe-safety-gear/
+4. Short heavy-duty rubber gloves — ARK Hygiene, from KSh 450 — https://arkhygienesolutions.com/ppe-safety-gear/
+5. Disposable face shield — ARK Hygiene, from KSh 250/piece — https://arkhygienesolutions.com/ppe-safety-gear/
+6. Safety goggles — ARK Hygiene, from KSh 750/piece — https://arkhygienesolutions.com/ppe-safety-gear/
+7. Ocean Blue nitrile powder-free examination gloves — Safety Hub, KSh 500/listing — https://www.safetyhub.co.ke/
+8. 3M dust mask — COMAK Safety, KSh 800 — https://www.comaksafety.co.ke/our%20store/
+9. Single respirator mask NP307 — KimSafety, KSh 800 — https://www.kimsafety.co.ke/category/ppe
+10. Steel-toe safety boots — COMAK Safety, KSh 3,500 — https://www.comaksafety.co.ke/our%20store/
+11. Dust coat — ARK Hygiene, from KSh 1,790 — https://arkhygienesolutions.com/ppe-safety-gear/
+12. Laboratory coat — ARK Hygiene, from KSh 1,800 — https://arkhygienesolutions.com/ppe-safety-gear/
+13. Disposable waterproof shoe covers, 100-piece pack — ARK Hygiene, from KSh 1,100/pack — https://arkhygienesolutions.com/ppe-safety-gear/
+14. Disposable head net covers — ARK Hygiene, from KSh 1,600/pack — https://arkhygienesolutions.com/ppe-safety-gear/
+15. Disposable face masks — ARK Hygiene, from KSh 400/pair — https://arkhygienesolutions.com/ppe-safety-gear/
+16. Disposable PVC waterproof gown — ARK Hygiene, from KSh 1,800/piece — https://arkhygienesolutions.com/ppe-safety-gear/
+17. Disposable Tyvek protective gown — ARK Hygiene, from KSh 950/piece — https://arkhygienesolutions.com/ppe-safety-gear/
+18. Shatter-proof UV insect-killer replacement tubes — IPM Store, KSh 3,007 listing — https://www.ipmstore.co.ke/product-category/accesories/
+19. Universal fly-light glue monitor/refill — IPM Store, KSh 468 listing — https://www.ipmstore.co.ke/product-category/accesories/
+20. Pest-exclusion door sweep — IPM Store, KSh 1,705 listing — https://www.ipmstore.co.ke/product-category/accesories/
+
+### Evidence and next actions
+- Kenya supplier listings support a wider pest-operator PPE and consumables range: Safety Hub, COMAK, KimSafety, ARK Hygiene, Hezsey Safety and IPM Store. See https://www.safetyhub.co.ke/, https://www.comaksafety.co.ke/our%20store/, https://www.kimsafety.co.ke/category/ppe, https://arkhygienesolutions.com/ppe-safety-gear/, https://www.hezseysafety.co.ke/ and https://www.ipmstore.co.ke/product-category/accesories/.
+- Candidate names were checked against current catalogue names in categories 34–38; none of the 20 exact candidate names appeared as an existing product in that category audit. Similar generic PPE items may exist outside those categories; perform a whole-catalogue duplicate check before each insert.
+- No product rows, image links, prices, or stock values were changed in this research step.
+- Before saving each listing, verify the exact item/pack and current KES supplier price; obtain a direct matching product image URL or use the authenticated photo uploader for actual image bytes. External image URLs must be reported as hotlinks, not Supabase Storage uploads.
+- Preserve the established inventory defaults only after source verification: stock=1000, low_at=20, featured=false, active=false pending owner review. Use cost=verified supplier cost and price=round(cost*1.15,2) only where the source price is genuinely the acquisition cost; do not treat public retail asking prices as wholesale costs.
