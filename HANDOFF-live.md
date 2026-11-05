@@ -1140,3 +1140,8 @@ Prices below are market-reference source costs, not confirmed wholesale invoices
 - [ ] Public pages are not generated yet because the products remain inactive drafts. Do not activate until owner approves after reviewing model/pack/image match and market-reference prices. Then activate the approved rows and run `.github/workflows/product-pages.yml`; verify product pages, canonical, JSON-LD, image rendering and sitemap.
 - [ ] External image links were selected from image-search previews. Supabase row references were verified, but external image HTTP rendering from the live website has not yet been end-to-end checked. If any broken image is reported, replace only that row's image URL after checking a matching source.
 - Next: owner review/approval; activate only approved products, then build and verify live product pages.
+
+
+### Pricing precision correction — 2026-11-05
+- [x] Re-applied the exact configured formula `price = round(cost * 1.15, 2)` and updated matching description price text. Verification query confirms all 10 rows now pass `round(cost*1.15,2)=price`.
+- Final retail prices: racket KSh 765.90; Rebune 20W UV lamp KSh 6,342.25; window net kit KSh 788.90; yellow sticky cards 30-pack KSh 2,056.20; rat snap traps 2-pack KSh 849.85; live mouse trap KSh 755.55; multi-catch rat trap KSh 7,959.15; multi-catch mouse trap KSh 3,720.25; Vaultex half-mask KSh 2,988.85; knapsack repair kit KSh 1,322.50.
