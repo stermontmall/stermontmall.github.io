@@ -490,8 +490,8 @@ with sync_playwright() as p:
 
     # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
     c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)
-    p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_function("location.pathname !== '/'", timeout=15000); p6.wait_for_timeout(1500)
-    check('legacy /#p-... link resolves to the canonical full product page', p6.evaluate('location.pathname') == '/p/home-0.html' and p6.locator('#bottom-nav').count() == 0, p6.url)
+    p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_selector('#page-product.open', timeout=15000); p6.wait_for_timeout(500)
+    check('legacy /#p-... link opens the product in the mobile shell at its canonical address', p6.evaluate('location.pathname') == '/p/home-0.html' and p6.locator('#bottom-nav').is_visible() and 'Hot Plate' in p6.locator('#pp-name').inner_text(), p6.url)
     p6.goto(f'{BASE}/mobile-shell/'); p6.wait_for_function("location.pathname === '/'", timeout=15000)
     check('/mobile-shell/ forwards to the home page', p6.url == BASE + '/', p6.url)
     c6.close()
