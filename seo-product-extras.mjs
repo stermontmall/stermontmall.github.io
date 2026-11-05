@@ -111,7 +111,7 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
   try {
     const file = `p/${f}`; let h = readFileSync(file, 'utf8');
     if (h.includes(MARK) || !/<h1>/.test(h)) continue;   // already done, or a redirect stub
-    const nm = h.match(/<h1>([\s\S]*?)<\/h1>/), cm = h.match(/<nav class="bc">[\s\S]*?<a href="\/c\/([^"]+)\.html">([^<]*)<\/a>/), canon = (h.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
+    const nm = h.match(/<h1>([\s\S]*?)<\/h1>/), cm = h.match(/<nav class="bc">[\s\S]*<a href="\/c\/([^"]+)\.html">([^<]*)<\/a>/), canon = (h.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
     // The H1 starts with the "Buy" prefix (seo-meta.mjs buyName). Headings and sentences built around the name add their own "Buy", so drop it here (no "Buy Buy Original ...").
     const name = unesc(nm[1].replace(/<[^>]+>/g, '').trim()).replace(/^Buy\s+/i, '');
     const slug = cm ? decodeURIComponent(cm[1]) : '', cname = cm ? cm[2] : '';
@@ -137,7 +137,7 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
       h = h.includes('<div class="box"><h2 style="margin-top:0">About ') ? h.replace('<div class="box"><h2 style="margin-top:0">About ', () => facts + '<div class="box"><h2 style="margin-top:0">About ') : h.replace('<div class="stk"', () => facts + '<div class="stk"');
     }
     // 3) safe use
-    if (CROP.has(slug) || PEST.has(slug)) {
+    if (CROP.has(slug) || (PEST.has(slug) && slug !== 'rodent-control')) {
       const plant = PLANT_INPUT.has(slug);
       const li = plant ? [
         'Read the whole label before you use the product. The label is the instruction for rates, crops and safety.',
