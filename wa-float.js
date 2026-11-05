@@ -1,6 +1,22 @@
 /* Floating WhatsApp button, shown on every public page so customers can ask about stock and delivery fees in one tap.
    Loaded directly by the info pages, and from /img-protect.js and /analytics.js (storefront, product, category and blog pages).
    Loading it twice is harmless: the second run sees the button and stops. */
+/* 2026-11-05: also loads the shell top bar and bottom nav (/shell-chrome.js) on every public static page that loads this file
+   (nairobi, bulk-quote, blog, guides, ...), so the mobile shell look is the default everywhere without editing each generator.
+   Skipped on the storefront shell itself, admin, classic and tool pages. shell-chrome.js is idempotent (window.__stmChrome).
+   To undo: delete this block. */
+(function () {
+  try {
+    var p = location.pathname;
+    if (window.__stmChrome) return;
+    if (/^\/(index\.html)?$/.test(p) || /admin|upload-photos|classic|advert-poster|list-products/.test(p)) return;
+    if (document.getElementById('appbar') || document.getElementById('stm-bar')) return;
+    var sc = document.createElement('script');
+    sc.src = '/shell-chrome.js?v=2';
+    sc.defer = true;
+    document.head.appendChild(sc);
+  } catch (e) {}
+})();
 (function () {
   if (document.getElementById('wa-float')) return;
   if (/admin|upload-photos/.test(location.pathname)) return;
