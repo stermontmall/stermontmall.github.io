@@ -1256,3 +1256,11 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 - [x] GitHub rebuild trigger commits: workflow note 8d51ff07da0e23532f898b9365ccee47e8bc7040; generator trigger 6e099c837c3316018df226b49f2c84bcf8c27db8.
 - [ ] Verify Actions rebuild completes, generated product pages and sitemap include all ten, and public image loading. Do not report live page publication as confirmed until generated files and public URLs are checked.
 - [ ] Prices above are supplier public listing prices used as the base cost for continuity with the prior product upload process; they are not independently confirmed wholesale acquisition invoices. Confirm margin against actual procurement cost before treating it as realized profit.
+
+
+### Verification completed for 2026-11-05 ten-product batch
+- [x] GitHub Actions generated all ten product HTML pages; latest generator output commit: f317770212ca6387df96ff4701c4c7b935af2758.
+- [x] Each generated page contains canonical URL, Product structured data, OG image, mobile sticky order bar and stm-chrome navigation styling.
+- [x] All ten product URLs are present in sitemap-products.xml.
+- [ ] Public-domain page and image HTTP rendering could not be independently confirmed in this session; user should open the links to confirm browser delivery.
+- [ ] These generated static product pages use the existing mobile chrome/sticky order bar template; they do not mount the full mobile-shell/app.js app. Do not describe this as full mobile-shell takeover.
