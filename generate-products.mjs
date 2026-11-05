@@ -603,3 +603,5 @@ writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<
 console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages.`);
 
 // Catalog rebuild trigger: publish the owner-approved Ocean Blue nitrile gloves listing (2026-11-05).
+
+// Catalog rebuild trigger: publish the remaining owner-approved PPE and pest-exclusion listings (2026-11-05).
