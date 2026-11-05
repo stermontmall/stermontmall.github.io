@@ -137,7 +137,7 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
       h = h.includes('<div class="box"><h2 style="margin-top:0">About ') ? h.replace('<div class="box"><h2 style="margin-top:0">About ', () => facts + '<div class="box"><h2 style="margin-top:0">About ') : h.replace('<div class="stk"', () => facts + '<div class="stk"');
     }
     // 3) safe use
-    if (CROP.has(slug) || PEST.has(slug)) {
+    if (CROP.has(slug) || (PEST.has(slug) && slug !== 'rodent-control')) {
       const plant = PLANT_INPUT.has(slug);
       const li = plant ? [
         'Read the whole label before you use the product. The label is the instruction for rates, crops and safety.',
