@@ -228,7 +228,11 @@ with sync_playwright() as p:
     # reload with a sheet open does not reopen it; clear the search first so the fixture has a visible product to open
     pg.fill('#search', ''); pg.keyboard.press('Enter'); pg.wait_for_selector('#grid .card[data-id]')
     pg.locator('#grid .card[data-id]').first.locator('p').first.click()
-    pg.reload(); pg.wait_for_selector('#grid .card[data-id]')
+    # Opening a product changes the address to its canonical /p/<slug>.html URL.
+    # To test shell reload state (rather than the separate full product page), return
+    # the address to the shell root while preserving the current history state.
+    pg.evaluate("history.replaceState(history.state, '', '/')")
+    pg.reload(); pg.wait_for_selector('#grid .card[data-id]', timeout=15000)
     check('reload while sheet open lands clean', pg.locator('#sheet-quickbuy.open').count() == 0)
     check('deals badge stays cleared after reload (nothing new since the visit to Deals)', pg.locator('#bottom-nav [data-badge="deals"]').is_hidden())
 
