@@ -1275,3 +1275,11 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 - [ ] Run SEO PR quality gate, review the generated product pages for the latest 50 non-Mercedes items, and merge only after checks pass.
 - [ ] After merge, trigger/re-run Build product pages and verify the live Econo Rat Bait Station page, representative rodent traps, chemical products, PPE and other product types on mobile.
 - Important: this branch fixes enrichment classification, not the short product descriptions themselves. The separate editorial rewrite/review batch remains outstanding; do not claim 50 descriptions have been rewritten or published yet.
+
+
+## 2026-11-05 — Editorial content batch started
+- [x] Confirmed public.seo_content_proposals schema and site_playbook approval workflow before writing.
+- [x] Created pending, owner-review proposal for RodiRid Rodenticide Wax Blocks (proposal ID 0f97cc6e-37e8-4c3e-8569-e9946fc38554). Draft is 1,152 words; it uses catalogue facts plus Kenya PCPB and supplier references, and deliberately avoids unsupported application rates and pack-size claims.
+- [x] Bumped admin.html Product SEO Optimizer asset cache key from v8 to v9 so the updated editorial word/section checks can load after deployment.
+- [ ] Continue 500+ word unique product descriptions for the remaining 49 products in the audited batch as pending proposals; do not publish until owner approval.
+- [ ] Verify PR #341 quality checks, merge, deployment and live admin asset after checks pass. The new description is a pending proposal, not a live product-page change.
