@@ -605,3 +605,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // Catalog rebuild trigger: publish the owner-approved Ocean Blue nitrile gloves listing (2026-11-05).
 
 // Catalog rebuild trigger: publish the remaining owner-approved PPE and pest-exclusion listings (2026-11-05).
+
+// Rebuild trigger 2026-11-05: self-hosted product image assets replace unreliable supplier hotlinks.
