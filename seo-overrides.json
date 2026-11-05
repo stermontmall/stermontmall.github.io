@@ -872,5 +872,115 @@
         "Check the supplier's size guide and choose a fit that allows movement over normal work clothing."
       ]
     ]
+  },
+  "3m-8210-n95-dust-respirator": {
+    "title": "3M 8210 N95 Dust Respirator Price in Kenya | Stermont",
+    "desc": "3M 8210 N95 disposable particulate respirator for certain non-oil particles. Check fit and task suitability before use.",
+    "faq": [
+      [
+        "What does N95 mean on the 3M 8210?",
+        "3M states that the 8210 is NIOSH-approved for at least 95% filtration efficiency against certain non-oil-based particles."
+      ],
+      [
+        "Does it protect against chemical vapours?",
+        "No. It is a particulate respirator and does not protect against gases, vapours or oxygen-deficient atmospheres."
+      ],
+      [
+        "Can it be used for every fumigation task?",
+        "No. Select respiratory protection from the chemical label, safety data sheet and workplace risk assessment."
+      ],
+      [
+        "How should the fit be checked?",
+        "Follow the official 3M donning instructions and perform the user seal check each time it is worn."
+      ]
+    ]
+  },
+  "disposable-surgical-gown": {
+    "title": "Disposable Surgical Gown Price in Kenya | Stermont Arcade",
+    "desc": "Disposable protective gown for suitable clinical and hygiene procedures. Confirm sterility, material and barrier rating before use.",
+    "faq": [
+      [
+        "Is this gown sterile?",
+        "The current product record does not confirm sterility. Check the supplier packaging and documentation."
+      ],
+      [
+        "What barrier level does it provide?",
+        "No AAMI barrier level is stated. Confirm the required level and tested specification before use."
+      ],
+      [
+        "Can it be reused?",
+        "This listing describes a disposable gown. Do not wash or reuse it unless the manufacturer explicitly permits it."
+      ],
+      [
+        "How do I choose a gown?",
+        "Match the gown's verified barrier performance and coverage to the procedure risk assessment."
+      ]
+    ]
+  },
+  "white-laboratory-coat": {
+    "title": "White Laboratory Coat Price in Kenya | Stermont Arcade",
+    "desc": "White laboratory coat for general laboratory and workplace use. Confirm fabric, size and task-specific protection requirements.",
+    "faq": [
+      [
+        "What is a white lab coat used for?",
+        "It is a removable outer layer for suitable laboratory, education and clinical-support tasks."
+      ],
+      [
+        "Does it protect against chemical splashes?",
+        "No specific chemical-protection rating is stated. Select specialist clothing according to the hazard assessment."
+      ],
+      [
+        "How should I choose a size?",
+        "Check the supplier size guide and choose a coat that covers the required areas without restricting movement."
+      ],
+      [
+        "Can it be worn outside the laboratory?",
+        "Follow workplace hygiene rules; potentially contaminated lab coats should not be worn into public or eating areas."
+      ]
+    ]
+  },
+  "clear-anti-fog-safety-goggles": {
+    "title": "Clear Anti-Fog Safety Goggles Price in Kenya | Stermont",
+    "desc": "Clear anti-fog safety goggles with adjustable strap for suitable workplace eye protection. Confirm impact and splash ratings.",
+    "faq": [
+      [
+        "What are anti-fog safety goggles used for?",
+        "They provide eye coverage for suitable workplace tasks where the verified lens and frame protection match the hazard."
+      ],
+      [
+        "Are these goggles certified to EN166?",
+        "The current product record does not confirm a certification. Check the product markings and supplier documentation."
+      ],
+      [
+        "Do they protect against chemical splashes?",
+        "Only if the exact model is rated for the relevant splash hazard. Confirm ventilation and protection class before use."
+      ],
+      [
+        "How should I maintain them?",
+        "Inspect lenses and straps, clean using the manufacturer's method and replace damaged or badly scratched goggles."
+      ]
+    ]
+  },
+  "steel-toe-safety-boots": {
+    "title": "Steel Toe Safety Boots Price in Kenya | Stermont Arcade",
+    "desc": "Steel-toe safety boots for suitable warehouse, workshop and construction tasks. Confirm size and certification before purchase.",
+    "faq": [
+      [
+        "What is the purpose of a steel toe cap?",
+        "It is designed to reduce injury risk from certain impacts and compression when the boot meets the relevant tested standard."
+      ],
+      [
+        "Are these boots EN ISO 20345 certified?",
+        "The current product record does not confirm certification. Check the markings and manufacturer documents."
+      ],
+      [
+        "Do they have puncture-resistant soles?",
+        "That feature is not confirmed in the listing. Verify the sole specification for your workplace hazard."
+      ],
+      [
+        "How do I choose a size?",
+        "Select a secure fit with adequate toe room and try the boots with the socks used at work."
+      ]
+    ]
   }
 }
