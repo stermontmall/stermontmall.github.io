@@ -180,6 +180,8 @@ const expected = [
   "xuanku-unisex-white-gold-fashion-sport-sneakers",
   "kekkila-peatmoss",
   "light-duty-safety-helmet-standard",
+  "e-pos-80mm-thermal-receipt-printer",
+  "hp-laserjet-mfp-m141w-wireless-mono-laser-printer",
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
