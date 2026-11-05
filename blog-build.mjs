@@ -2,6 +2,7 @@
 // Runs from .github/workflows/blog-build.yml whenever a blog post is added or edited (no installs needed, Node 18+).
 // Safe by design: it only rewrites the post list between the markers in blog/index.html and the /blog/ entries in sitemap.xml,
 // it never touches product pages, and it writes nothing when nothing changed.
+import './seo-blog-chrome.mjs';   // 2026-11-05: shell top bar + bottom nav on every blog page (same page for everyone). Remove this line to stop.
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const SITE = 'https://stermontarcade.co.ke';
