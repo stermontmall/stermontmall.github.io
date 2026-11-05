@@ -1334,5 +1334,31 @@
         "This item remains an inactive catalogue draft and is not currently published for sale."
       ]
     ]
+  },
+  "e-pos-80mm-thermal-receipt-printer": {
+    "title": "E-POS 80mm Thermal Receipt Printer Price in Kenya | Stermont Arcade",
+    "desc": "Buy an E-POS 80mm thermal receipt printer in Kenya for compatible POS checkout systems. Confirm interface, paper size, drivers and included accessories.",
+    "faq": [
+      [
+        "What is an 80mm thermal receipt printer used for?",
+        "It prints customer receipts from compatible point-of-sale software at retail, hospitality and service counters."
+      ],
+      [
+        "Does this printer need ink or toner?",
+        "Direct thermal receipt printers use heat-sensitive paper and do not normally require ink cartridges or toner."
+      ],
+      [
+        "Will it work with my POS system?",
+        "Compatibility depends on the exact printer interface, driver, operating system and POS application. Confirm these details before purchase."
+      ],
+      [
+        "Does it connect by USB or Wi-Fi?",
+        "The connection options for this exact listing are not confirmed here. Check the model label or supplier specification before ordering."
+      ],
+      [
+        "What paper does it use?",
+        "The listing identifies an 80mm thermal receipt printer. Confirm the supported roll width, diameter and paper specification for the exact unit."
+      ]
+    ]
   }
 }
