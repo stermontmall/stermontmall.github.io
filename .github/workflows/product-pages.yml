@@ -112,3 +112,5 @@ jobs:
           except Exception as e:
               print("IndexNow submit failed (not critical):", e)
           PY
+
+# Catalog rebuild trigger: publish the ten owner-approved pest-control products (2026-11-05).
