@@ -225,7 +225,8 @@ with sync_playwright() as p:
     t = pg.locator('#grid-title').inner_text()
     check('search filters grid', 'air fryer' in t.lower() and pg.locator('#grid .card[data-id]').count() >= 1, t)
 
-    # reload with a sheet open does not reopen it
+    # reload with a sheet open does not reopen it; clear the search first so the fixture has a visible product to open
+    pg.fill('#search', ''); pg.keyboard.press('Enter'); pg.wait_for_selector('#grid .card[data-id]')
     pg.locator('#grid .card[data-id]').first.locator('p').first.click()
     pg.reload(); pg.wait_for_selector('#grid .card[data-id]')
     check('reload while sheet open lands clean', pg.locator('#sheet-quickbuy.open').count() == 0)
