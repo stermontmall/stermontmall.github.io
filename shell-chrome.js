@@ -1,7 +1,8 @@
-/* Stermont Arcade - shell navigation for static sections (account, tracking, shipping, returns, contact, FAQ, about, privacy, terms and services).
+/* Stermont Arcade - shell navigation for static sections (account, tracking, shipping, returns, contact, FAQ, about, privacy, terms, services, and product /p/ and category /c/ pages).
    Adds the same shell top bar and bottom nav at EVERY viewport, hiding the old section header so users do not fall back to the traditional desktop navigation.
    Content and payment/order functionality remain intact. Nav/search/cart links return to the main shell.
-   Load with: <script src="/shell-chrome.js?v=1" defer></script>. To undo: remove that line from the page. */
+   Load with: <script src="/shell-chrome.js?v=1" defer></script>. To undo: remove that line from the page.
+   /p/ and /c/ pages get it from seo-shell-chrome.mjs (run by product-pages.yml); no tab is marked current there. */
 (function () {
   try {
     if (window.__stmChrome) return; window.__stmChrome = 1;
@@ -39,9 +40,11 @@
       '<form action="/" method="get" role="search"><input name="q" type="search" enterkeyhint="search" autocomplete="off" placeholder="Search pest control, agrovet, phones..." aria-label="Search the shop">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><button type="submit" aria-label="Submit search">Go</button></form>' +
       '<a href="/?tab=cart" aria-label="Cart">' + I.cart + badge + '</a>';
+    // Account pages are reached from the shell's Account tab; product (/p/) and category (/c/) pages are browsing pages, so no tab is current there.
+    var browsing = /^\/(p|c)\//.test(location.pathname);
     var nav = document.createElement('nav'); nav.id = 'stm-nav'; nav.setAttribute('aria-label', 'Main');
     nav.innerHTML = '<a href="/">' + I.home + 'Home</a><a href="/?tab=categories">' + I.grid + 'Categories</a><a href="/?tab=deals">' + I.bolt + 'Deals</a>' +
-      '<a href="/?tab=cart">' + I.cart + 'Cart' + badge + '</a><a href="/account.html" aria-current="page">' + I.user + 'Account</a>';   // these pages are reached from the shell's Account tab
+      '<a href="/?tab=cart">' + I.cart + 'Cart' + badge + '</a><a href="/account.html"' + (browsing ? '' : ' aria-current="page"') + '>' + I.user + 'Account</a>';
     var go = function () {
       document.body.classList.add('stm-chrome');
       document.body.insertBefore(bar, document.body.firstChild); document.body.appendChild(nav);
