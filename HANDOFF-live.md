@@ -1123,3 +1123,10 @@ Prices below are market-reference source costs, not confirmed wholesale invoices
 
 ### Next
 - Resume with the authenticated admin uploader response for the ten products. Confirm exact model/pack size and image match before saving each draft. Keep stock=1000, low_at=20, active=false; use the verified supplier cost and the 15% pricing rule unless the owner explicitly changes that rule.
+
+
+## 2026-11-05 — Owner-authorized external image URLs for 10 pest-control drafts
+- Owner explicitly authorized using externally hosted product image URLs, matching the pattern of four existing product records, instead of Supabase Storage uploads for this batch only. Do not call these Storage uploads; canonical uploader rule remains for future batches.
+- Keep each item as a draft pending owner review: stock=1000, low_at=20, featured=false, active=false. Use candidate IDs/slugs and categories already researched; do not overwrite existing rows.
+- Use matching product imagery from vendor/manufacturer/listing sources. Where an image is illustrative rather than the exact local vendor stock image, keep copy generic and avoid claiming exact brand/model or pack contents.
+- Batch in progress: create rows, verify every row and external image URL, then report draft URLs. Product-pages generator builds active products only, so no public product pages are expected until owner activates them.
