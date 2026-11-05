@@ -95,6 +95,7 @@
 - [How to get rid of ants at home in Kenya: a practical guide](https://stermontarcade.co.ke/blog/how-to-get-rid-of-ants-at-home-kenya.html): Find the ant trail, remove food and water, then choose bait or spray. A practical guide for Kenyan kitchens and homes, with a table of common problems.
 - [How to Get Rid of Bed Bugs in Kenya: Step-by-Step](https://stermontarcade.co.ke/blog/how-to-get-rid-of-bed-bugs-kenya.html): Bed bugs at home in Kenya? Learn the signs, how to clean and treat your bed and room, why you must repeat treatment, and when to call a professional.
 - [How to Get Rid of Cockroaches in Kenya: Home Guide](https://stermontarcade.co.ke/blog/how-to-get-rid-of-cockroaches-kenya.html): Cockroaches in your kitchen or restaurant? Learn where they hide, how to clean up, which treatments to use as directed on the label, and how to keep them away.
+- [How to Keep Rats Out of a Shop or Store in Kenya](https://stermontarcade.co.ke/blog/how-to-keep-rats-out-of-a-shop-or-store-kenya.html): Learn how rodent proofing, off-floor storage, waste management, and safe rat control shop Kenya techniques protect stock from rats in store.
 - [How to Order and Pay by M-Pesa Online in Kenya](https://stermontarcade.co.ke/blog/how-to-order-and-pay-by-mpesa-online-kenya.html): Learn how to order online in Kenya and pay by M-Pesa Paybill: add to cart, pay, enter your M-Pesa code, and get delivery to all 47 counties.
 - [How to read an insecticide label: PCPB, ingredients and warnings](https://stermontarcade.co.ke/blog/how-to-read-an-insecticide-label-kenya.html): A plain guide to reading an insecticide label in Kenya: the PCPB registration, active ingredient, target pests, directions, warnings, first aid and storage.
 - [Icon 10CS: how a long-lasting residual spray works at home](https://stermontarcade.co.ke/blog/icon-10cs-residual-mosquito-spray-how-it-works-kenya.html): How Syngenta Icon 10CS keeps working after it dries, where to spray it against mosquitoes, flies and cockroaches in Kenya, and what to do first.
@@ -134,6 +135,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 256 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 255 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
