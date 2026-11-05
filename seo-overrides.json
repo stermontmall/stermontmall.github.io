@@ -542,5 +542,27 @@
         "Inspect regularly, record location and date, and compare catches alongside crop scouting rather than making treatment decisions from one count."
       ]
     ]
+  },
+  "funnel-bucket-insect-trap": {
+    "title": "Funnel Bucket Insect Monitoring Trap in Kenya | Stermont",
+    "desc": "Reusable funnel bucket insect trap for orchard, farm and greenhouse monitoring. Confirm target pest and compatible lure before use.",
+    "faq": [
+      [
+        "What is this trap for?",
+        "A reusable trap body for monitoring selected flying insects when paired with a suitable attractant."
+      ],
+      [
+        "Is a lure included?",
+        "The listing does not specify a lure. Confirm the target species and compatible lure separately."
+      ],
+      [
+        "Can one lure attract every insect?",
+        "No. Lures are target-specific. Follow the supplier instructions and avoid mixing lure types."
+      ],
+      [
+        "How do I use the results?",
+        "Inspect and record catches regularly, then compare results with crop scouting and local agronomic advice."
+      ]
+    ]
   }
 }
