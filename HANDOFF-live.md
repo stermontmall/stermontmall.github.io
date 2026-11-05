@@ -1275,3 +1275,11 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 - [ ] Run SEO PR quality gate, review the generated product pages for the latest 50 non-Mercedes items, and merge only after checks pass.
 - [ ] After merge, trigger/re-run Build product pages and verify the live Econo Rat Bait Station page, representative rodent traps, chemical products, PPE and other product types on mobile.
 - Important: this branch fixes enrichment classification, not the short product descriptions themselves. The separate editorial rewrite/review batch remains outstanding; do not claim 50 descriptions have been rewritten or published yet.
+
+
+## 2026-11-05 — Pest-control service authority and internal-link improvements
+- [x] Confirmed the existing site already contains dedicated pest-control service pages, a pest-control advice centre and a Kenya service-area hub; avoided creating thin duplicate city pages.
+- [x] Added a crawlable pest-control service directory to the main storefront homepage, linking to core service pages, the location hub and the advice centre without replacing the ecommerce homepage or changing checkout/catalogue behavior.
+- [x] Added direct links from the Kenya service-area hub to six high-intent service pathways (bed bugs, termites, cockroaches, rodents, hospitality and warehouse/container work).
+- [x] Updated the pest-control sitemap lastmod for the revised location hub; no new URLs were created.
+- [ ] Pending: run HTML/link checks, inspect the PR diff, merge to main, then verify the deployed homepage and location hub on mobile. Search Console indexing and ranking changes must be measured after crawl; they cannot be guaranteed immediately.
