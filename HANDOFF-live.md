@@ -1246,3 +1246,13 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 
 ### Correction to 2026-11-05 candidate photo audit
 - The IPM Store category confirms the Snake Tongs listing and KSh 10,858 price, but the image found in image search was a generic third-party snake tong, not verified as the IPM Store product photo. Keep Snake Tongs out of the eligible batch until its exact matching photo is confirmed. There are currently 9 candidate source pages with product photos, not 10 fully verified products.
+
+
+## 2026-11-05 — 10 additional products added to Supabase; page rebuild triggered
+- [x] Whole-catalogue duplicate-name check returned no matches for the ten selected product names.
+- [x] Added 10 active product rows in Supabase with descriptions, SEO name/title, source photo hotlinks, source-listing prices stored as cost basis, 15% markup, stock=1000, low_at=5, featured=false.
+- [x] Matching product image links were taken from the corresponding supplier product pages (Rafiki Pest Control, Clearance Warehouse, GM Cleaning Services). These are external image hotlinks, following the previous ten-product method; they are not uploaded Supabase Storage assets.
+- [x] Products: Protecta Micro Bait Station (25,000 → 28,750); Pantry Moth Trap (900 → 1,035); Moths Trap (2,700 → 3,105); Bird/Pigeon Spikes 50cm (810 → 931.50); GMLuminos Pro Glue Board Fly Catcher (18,000 → 20,700); Combat Rodent Bait Station (3,850 → 4,427.50); RodiRid Wax Blocks (250 → 287.50); Econo Rat Bait Station 1pc (3,499 → 4,023.85); Guardian Bait Station Translucent Cover 1pc (2,996 → 3,445.40); Rafiki Rat & Mouse Glue Board (450 → 517.50).
+- [x] GitHub rebuild trigger commits: workflow note 8d51ff07da0e23532f898b9365ccee47e8bc7040; generator trigger 6e099c837c3316018df226b49f2c84bcf8c27db8.
+- [ ] Verify Actions rebuild completes, generated product pages and sitemap include all ten, and public image loading. Do not report live page publication as confirmed until generated files and public URLs are checked.
+- [ ] Prices above are supplier public listing prices used as the base cost for continuity with the prior product upload process; they are not independently confirmed wholesale acquisition invoices. Confirm margin against actual procurement cost before treating it as realized profit.
