@@ -1224,3 +1224,21 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 - [x] Current supplier results show ARK PPE page/catalogue prices vary across crawls/pages: face shield KSh 120 vs KSh 250; safety goggles KSh 750 vs KSh 950; disposable face masks KSh 400 per pair vs KSh 3,950 per pair in one page result. Do not use these ambiguous prices until item-level confirmation.
 - [x] Additional current Kenya sources: TrueShield Safety Gear shop lists disposable coveralls around KSh 750–850, several workwear variants, FFP2/FFP3 masks, nitrile gloves and boots; KimSafety lists FFP2 disposable dust masks (box of 20) KSh 1,550, shoe covers KSh 700, welding gloves KSh 1,400, and MSA full-face shield KSh 1,900; Kijani Medical lists N95 mask KSh 1,200, nitrile gloves KSh 750, shoe covers KSh 530, face shield KSh 350; COMAK lists 3M dust mask KSh 800, steel-toe boots KSh 3,500, chemical suit KSh 6,000, coveralls KSh 3,500, Diamond Grip Gloves KSh 500 (VAT exclusive). These are listed retail prices, not verified acquisition costs.
 - [ ] Next: use exact item-level pages and matching image assets, remove duplicates against current catalogue, and verify acquisition cost basis before calculating selling price. No product row or image changed during this research.
+
+
+## 2026-11-05 — next 10-product research batch (not posted)
+- [x] Checked active Supabase product names/slugs for duplicates against these candidates; no exact-name matches were returned.
+- [x] Researched candidate items and current Kenya seller listing prices; supplier/product pages show product photos for the candidates below:
+  1. Protecta Micro Bait Station — KES 25,000 — https://shop.rafikipestcontrol.com/products/protecta-micro-bait-station
+  2. Protecta Mouse Bait Station — KES 25,000 — https://shop.rafikipestcontrol.com/products/protecta-mouse-bait-station
+  3. Sticky Mouse Box — KES 2,700 — https://shop.rafikipestcontrol.com/products/sticky-mouse-box
+  4. Pantry Moth Trap — KES 900 — https://shop.rafikipestcontrol.com/products/pantry-moth-trap/
+  5. Black Moth Trap — KES 2,700 — https://shop.rafikipestcontrol.com/products/black-moth-trap
+  6. Moths Trap — KES 2,700 — https://shop.rafikipestcontrol.com/products/moths-trap/
+  7. Bird Pigeon Spikes (50 cm strip) — KES 810 — https://clearancewarehouse.co.ke/product/stainless-steel-bird-spikes
+  8. Glue Board Fly Catcher / GMLuminos Pro — KES 18,000 — https://gmcleaning.co.ke/product/glue-board-fly-catcher/
+  9. Combat Rodent Bait Station — KES 3,850 — https://shop.rafikipestcontrol.com/products/combat-rodent-bait-station/
+  10. Snake Tongs — KES 10,858 — https://www.ipmstore.co.ke/product-category/accesories/
+- [ ] No product rows were created and no product images were uploaded. Canonical instructions require an exact source product page URL plus the actual matching image file through the authenticated admin AI photo uploader; this session has no authenticated uploader/image-byte transfer action. Do not use external image hotlinks or direct SQL as a workaround.
+- [ ] These displayed amounts are seller retail/list prices, not verified Stermont acquisition costs. Do not set cost equal to these prices or calculate the 15% selling price until actual source acquisition cost is confirmed.
+- [ ] Next exact step: owner supplies/approves the exact product source pages and corresponding image files through https://stermontarcade.co.ke/admin.html → staff sign-in → AI product photo uploader. On successful response, verify each draft row and Storage image, then owner review/approval before activation.
