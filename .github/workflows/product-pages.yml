@@ -18,6 +18,7 @@ on:
       - 'seo-overrides.json'
       - 'seo-titles.mjs'
       - 'seo-shell-redirect.mjs'
+      - 'seo-related-fill.mjs'
       - 'product-content.json'
       - 'product-content.test.mjs'
       - 'seo-kenya.mjs'
@@ -67,6 +68,10 @@ jobs:
 
       - name: Apply allowlisted ordinary-product meta descriptions only
         run: node seo-safe-meta.mjs
+
+      - name: Top up related-product links on pages in small categories (seo-related-fill.mjs)
+        continue-on-error: true
+        run: node seo-related-fill.mjs
 
       - name: Phones on a product or category page go to the mobile shell, crawlers keep the page (seo-shell-redirect.mjs)
         continue-on-error: true

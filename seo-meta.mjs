@@ -128,12 +128,15 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
     .replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&quot;/gi, '"')
     .replace(/&#39;|&apos;/gi, "'").replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
     .replace(/[•▪●]/g, ' ').replace(/\s+/g, ' ').trim();
-  const first = (source.match(/^.*?[.!?](?=\s|$)/) || [source])[0].trim();
-  const fact = first.length >= 28 && first.length <= 260 ? first : source;
+  // Skip catalogue sentences that start with "Buy": the description already opens with "Buy <name> in Kenya: ", so using one
+  // produced "Buy X in Kenya: Buy X…" cut off mid-phrase (seen on the NIVEA Sun page). Use the first real product sentence instead.
+  const sentences = (source.match(/[^.!?]+[.!?](?=\s|$)/g) || []).map(s => s.trim());
+  const fact = sentences.find(s => s.length >= 28 && s.length <= 260 && !/^buy\b/i.test(s)) || '';
   const prefix = `Buy ${n} in Kenya: `;
   const suffix = '. Pay by M-Pesa; delivery to 47 counties.';
   const room = DESC_MAX - prefix.length - suffix.length;
-  if (fact.length >= 28 && room >= 24) {
+  // Use the sentence only when it fits whole or has real room (60+ characters); a 20-character stub is worse than the standard wording below.
+  if (fact && room >= 24 && (fact.length <= room || room >= 60)) {
     const candidate = prefix + clip(fact, room) + suffix;
     if (candidate.length <= DESC_MAX) return candidate;
   }
