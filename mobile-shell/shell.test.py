@@ -228,7 +228,11 @@ with sync_playwright() as p:
     # reload with a sheet open does not reopen it; clear the search first so the fixture has a visible product to open
     pg.fill('#search', ''); pg.keyboard.press('Enter'); pg.wait_for_selector('#grid .card[data-id]')
     pg.locator('#grid .card[data-id]').first.locator('p').first.click()
-    pg.reload(); pg.wait_for_selector('#grid .card[data-id]')
+    # Opening a product changes the address to its canonical /p/<slug>.html URL.
+    # To test shell reload state (rather than the separate full product page), return
+    # the address to the shell root while preserving the current history state.
+    pg.evaluate("history.replaceState(history.state, '', '/')")
+    pg.reload(); pg.wait_for_selector('#grid .card[data-id]', timeout=15000)
     check('reload while sheet open lands clean', pg.locator('#sheet-quickbuy.open').count() == 0)
     check('deals badge stays cleared after reload (nothing new since the visit to Deals)', pg.locator('#bottom-nav [data-badge="deals"]').is_hidden())
 
@@ -236,7 +240,7 @@ with sync_playwright() as p:
     FAIL[0] = True
     p2 = ctx.new_page(); p2.goto(URL)
     p2.wait_for_selector('#grid-empty:not([hidden])', timeout=8000)
-    check('network failure shows a retry link, no stuck skeletons', 'Could not load products' in p2.locator('#grid-empty').inner_text() and p2.locator('#grid-empty a[href="/classic.html"]').count() == 1 and p2.locator('#grid .card[aria-hidden="true"]').count() == 0)
+    check('network failure shows a retry link, no stuck skeletons', 'Could not load products' in p2.locator('#grid-empty').inner_text() and p2.locator('#grid-empty a[href="/"]').count() == 1 and p2.locator('#grid .card[aria-hidden="true"]').count() == 0)
     FAIL[0] = False
     p2.locator('[data-retry]').click(); p2.wait_for_selector('#grid .card[data-id]')
     check('retry loads the products', p2.locator('#grid .card[data-id]').count() >= 12 and p2.locator('#grid-empty').is_hidden())
@@ -411,7 +415,7 @@ with sync_playwright() as p:
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_function("location.pathname !== '/'", timeout=15000)
-    check('address: on a desktop screen it opens that product\'s full page (/p/<slug>.html)', p10.evaluate('location.pathname') == '/p/garden-set-250ml.html', p10.url)
+    check('address: on a desktop screen it opens that product\'s full page (/p/<slug>.html)', p10.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml', p10.url)
     c10.close()
 
     # category pages (/c/<slug>.html) no longer redirect either. The shell still understands /?cat=<slug> (links, reloads), so that part stays tested.
@@ -486,8 +490,8 @@ with sync_playwright() as p:
 
     # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
     c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)
-    p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_function("location.pathname !== '/'", timeout=15000); p6.wait_for_timeout(1500)
-    check('old /#p-... product link opens product overlay in shell', p6.evaluate('location.pathname') == '/' and p6.locator('#page-product.open').count() == 1, p6.url)
+    p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_selector('#page-product.open', timeout=15000); p6.wait_for_timeout(500)
+    check('legacy /#p-... link opens the product in the mobile shell at its canonical address', p6.evaluate('location.pathname') == '/p/home-0.html' and p6.locator('#bottom-nav').is_visible() and 'Hot Plate' in p6.locator('#pp-name').inner_text(), p6.url)
     p6.goto(f'{BASE}/mobile-shell/'); p6.wait_for_function("location.pathname === '/'", timeout=15000)
     check('/mobile-shell/ forwards to the home page', p6.url == BASE + '/', p6.url)
     c6.close()
