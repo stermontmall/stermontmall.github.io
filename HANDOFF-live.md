@@ -1264,3 +1264,14 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 - [x] All ten product URLs are present in sitemap-products.xml.
 - [ ] Public-domain page and image HTTP rendering could not be independently confirmed in this session; user should open the links to confirm browser delivery.
 - [ ] These generated static product pages use the existing mobile chrome/sticky order bar template; they do not mount the full mobile-shell/app.js app. Do not describe this as full mobile-shell takeover.
+
+## 2026-11-05 — Product SEO batch audit: category targeting and misleading safety copy
+- Scope: latest 50 non-Mercedes product records; Mercedes-Benz explicitly excluded.
+- Finding: generated product pages use a breadcrumb regex that captures the first category link (the parent hub) instead of the final leaf category. This misclassifies some rodent-control products and causes irrelevant related-guide/safety enrichment.
+- Finding: the generic Safe use box is currently applied to rodent-control category pages, including physical bait stations and traps; it can show pesticide mixing/spraying and PCPB instructions that do not fit those hardware products.
+- [x] Branch `fix/product-safety-seo-content-50-batch` created from current main.
+- [x] `seo-product-extras.mjs` now selects the final category link in a product breadcrumb and excludes `rodent-control` hardware pages from the generic chemical-use box.
+- [x] Added `seo-product-extras.test.mjs` regression check and wired it into `.github/workflows/seo-pr-quality.yml`.
+- [ ] Run SEO PR quality gate, review the generated product pages for the latest 50 non-Mercedes items, and merge only after checks pass.
+- [ ] After merge, trigger/re-run Build product pages and verify the live Econo Rat Bait Station page, representative rodent traps, chemical products, PPE and other product types on mobile.
+- Important: this branch fixes enrichment classification, not the short product descriptions themselves. The separate editorial rewrite/review batch remains outstanding; do not claim 50 descriptions have been rewritten or published yet.
