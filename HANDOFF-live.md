@@ -1242,3 +1242,7 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 - [ ] No product rows were created and no product images were uploaded. Canonical instructions require an exact source product page URL plus the actual matching image file through the authenticated admin AI photo uploader; this session has no authenticated uploader/image-byte transfer action. Do not use external image hotlinks or direct SQL as a workaround.
 - [ ] These displayed amounts are seller retail/list prices, not verified Stermont acquisition costs. Do not set cost equal to these prices or calculate the 15% selling price until actual source acquisition cost is confirmed.
 - [ ] Next exact step: owner supplies/approves the exact product source pages and corresponding image files through https://stermontarcade.co.ke/admin.html → staff sign-in → AI product photo uploader. On successful response, verify each draft row and Storage image, then owner review/approval before activation.
+
+
+### Correction to 2026-11-05 candidate photo audit
+- The IPM Store category confirms the Snake Tongs listing and KSh 10,858 price, but the image found in image search was a generic third-party snake tong, not verified as the IPM Store product photo. Keep Snake Tongs out of the eligible batch until its exact matching photo is confirmed. There are currently 9 candidate source pages with product photos, not 10 fully verified products.
