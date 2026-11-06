@@ -1722,6 +1722,70 @@
       ],
       "status": "drafted",
       "drafted": "2026-10-30"
+    },
+    {
+      "slug": "ulv-fogger-maintenance-cleaning-battery-care-kenya",
+      "title": "ULV Fogger Maintenance in Kenya: Cleaning, Battery Care and Storage",
+      "angle": "Model-neutral maintenance guide: inspect parts, clean only as the manual directs, battery care, storage and service logs. No improvised flushing or repairs.",
+      "keywords": [
+        "ULV fogger maintenance Kenya",
+        "fogging machine cleaning",
+        "cordless fogger battery care"
+      ],
+      "facts": [
+        "The VectorFog DC20 supplier listing states up to 40 minutes runtime and about three hours charging; figures are model-specific and indicative.",
+        "Stermont Arcade lists the VectorFog DC20 and a Generic 7L electric ULV fogger."
+      ],
+      "links": [
+        "/p/vectorfog-dc20-cordless-ulv-fogger.html",
+        "/p/generic-7l-electric-ulv-portable-fogger-sprayer-machine-1-unit.html",
+        "/c/pest-control-fumigation.html"
+      ],
+      "status": "published",
+      "published": "2026-11-06"
+    },
+    {
+      "slug": "pest-control-equipment-checklist-businesses-kenya",
+      "title": "Pest Control Equipment Checklist for Businesses in Kenya",
+      "angle": "Commercial buyer guide on matching equipment to service jobs, manuals, compatibility, spares, safety, recordkeeping and supplier support. No unsupported regulatory claims.",
+      "keywords": [
+        "pest control equipment Kenya",
+        "fumigation equipment Nairobi",
+        "pest control machines for business"
+      ],
+      "facts": [
+        "Stermont Arcade lists a VectorFog DC20, Generic 7L electric ULV fogger and pulse thermal fogger.",
+        "Stermont Arcade accepts M-Pesa and arranges delivery across Kenya; confirm charges and availability."
+      ],
+      "links": [
+        "/c/pest-control-fumigation.html",
+        "/p/vectorfog-dc20-cordless-ulv-fogger.html",
+        "/p/generic-7l-electric-ulv-portable-fogger-sprayer-machine-1-unit.html",
+        "/p/thermal-fogging-machine-pulsed-power-sprayer-1-unit.html"
+      ],
+      "status": "published",
+      "published": "2026-11-06"
+    },
+    {
+      "slug": "ulv-fogger-vs-knapsack-sprayer-kenya",
+      "title": "ULV Fogger vs Knapsack Sprayer: Which Should You Choose?",
+      "angle": "Comparison of aerosol fogging and directed knapsack spraying, model specifications, suitable application methods, safety and selection questions.",
+      "keywords": [
+        "ULV fogger vs knapsack sprayer",
+        "fogger or sprayer Kenya",
+        "pest control sprayer machine"
+      ],
+      "facts": [
+        "The VectorFog DC20 listing states 2-litre tank and 12V operation.",
+        "Stermont Arcade lists Jacto HD 550 20-litre knapsack sprayer and several fogging machines."
+      ],
+      "links": [
+        "/p/vectorfog-dc20-cordless-ulv-fogger.html",
+        "/p/jacto-hd-550-knapsack-sprayer-20-litres.html",
+        "/c/sprayers-equipment.html"
+      ],
+      "status": "published",
+      "published": "2026-11-06"
     }
   ]
 }
