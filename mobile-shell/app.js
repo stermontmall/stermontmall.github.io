@@ -323,6 +323,7 @@ function selectCategory(chip, sub = '') {
 }
 let sideCat = '__top';
 /* Photo for a tile: the first product photo in that category (and sub-category); the emoji shows if there is none or it fails to load. */
+const SERVICE_TILE_PHOTO = 'https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/service-media/pest-control-fumigation-nairobi/2026-11/mvzjhdh3-7c9e80602774.jpg';
 const photoOf = (cat, sub) => (PRODUCTS.find(p => p.cat === cat && (!sub || p.sub === sub) && p.img) || {}).img || '';
 const tile = (attrs, label, img, emoji, bg) => `<li><button class="tap w-full flex flex-col items-center gap-1.5" ${attrs}>
       <span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:64px;height:64px;background:${bg}">${thumb({ img, emoji })}</span>
@@ -334,11 +335,11 @@ function renderCategoriesView() {
   /* Rail icon: a real product photo of that category (emoji if none or it fails to load); Top Categories keeps its star. */
   const railIcon = (icon, img) => img ? `<span class="grid place-items-center overflow-hidden rounded-lg shrink-0" style="width:44px;height:44px;font-size:24px;line-height:1;background:#fff;border:1px solid #eee">${thumb({ img, emoji: icon })}</span>` : `<span style="font-size:26px;line-height:1">${icon}</span>`;
   const rail = (id, icon, name, img) => `<button class="cat-side" role="tab" data-side="${esc(id)}" aria-selected="${id === sideCat}" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 4px">${railIcon(icon, img)}<span>${esc(name)}</span></button>`;
-  const svcRail = `<a class="cat-side" href="/services/" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 4px;text-decoration:none;color:inherit"><span style="font-size:26px;line-height:1">\u{1F6E0}\uFE0F</span><span>Services</span></a>`;
+  const svcRail = `<a class="cat-side" href="/services/" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 4px;text-decoration:none;color:inherit"><span class="grid place-items-center overflow-hidden rounded-lg shrink-0" style="width:44px;height:44px;font-size:24px;line-height:1;background:#fff;border:1px solid #eee">${thumb({ img: SERVICE_TILE_PHOTO, emoji: '\u{1F6E0}\uFE0F' })}</span><span>Services</span></a>`;
   $('#cat-side').innerHTML = rail('__top', '⭐', 'Top Categories') + svcRail + CATS.map(x => rail(x.id, x.icon, x.name, photoOf(x.id))).join('');
   if (!c) {
     $('#cat-main').innerHTML = `<div class="mb-3 font-semibold">Top Categories</div>
-      <ul class="grid grid-cols-3 gap-y-4 gap-x-2"><li><a class="tap w-full flex flex-col items-center gap-1.5" href="/services/" style="text-decoration:none;color:inherit"><span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:64px;height:64px;background:#f3ecff">\u{1F6E0}\uFE0F</span><span class="text-xs text-center leading-4">Services</span></a></li>${CATS.map(x => tile(`data-cat-all="${esc(x.id)}"`, x.name, photoOf(x.id), x.icon, '#fff')).join('')}</ul>`;
+      <ul class="grid grid-cols-3 gap-y-4 gap-x-2"><li><a class="tap w-full flex flex-col items-center gap-1.5" href="/services/" style="text-decoration:none;color:inherit"><span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:64px;height:64px;background:#f3ecff">${thumb({ img: SERVICE_TILE_PHOTO, emoji: '\u{1F6E0}\uFE0F' })}</span><span class="text-xs text-center leading-4">Services</span></a></li>${CATS.map(x => tile(`data-cat-all="${esc(x.id)}"`, x.name, photoOf(x.id), x.icon, '#fff')).join('')}</ul>`;
     return;
   }
   $('#cat-main').innerHTML = `<button class="tap w-full text-left mb-3 flex items-center justify-between font-semibold" data-cat-all="${esc(c.id)}">${esc(c.name)}<span class="text-xs text-brand font-normal">View all &rsaquo;</span></button>
