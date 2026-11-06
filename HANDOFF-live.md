@@ -1,4 +1,11 @@
 
+## 2026-11-06 15:30 Africa/Nairobi - Mercedes-Benz CLA 200 details added (DB only, no code change)
+Owner supplied: "47k kms, Automatic, Nairobi and all 47 counties".
+- [x] `products` row `mercedes-benz-cla-200-for-sale-kenya`: "Vehicle details" list now has Transmission: Automatic, Mileage: 47,000 km, Location: Nairobi (available to buyers in all 47 counties). Only that list changed; title and price untouched. Verified by query.
+- [x] No `description_backup` column exists in `products`, so the old vehicle-details list was saved in the session scratchpad only (it was just the list without the 3 new lines).
+- [ ] The public product page is generated: re-run `product-pages.yml` (workflow_dispatch) so https://stermontarcade.co.ke/p/mercedes-benz-cla-200-for-sale-kenya.html shows the new lines.
+- [ ] OWNER: contact number still not supplied; the text says "Contact our sales team".
+
 ## 2026-11-06 15:20 Africa/Nairobi - missing "Add to cart" investigation + sold-out item restocked (DB only, no code change)
 Owner: "Why are some items missing the add to cart or checkout" then "Fix all directly".
 - [x] Cause 1: `storefront-live.js` shows a disabled "Sold out" button when `stock <= 0`; the mobile shell hides sold-out products entirely. Only one active row was at 0: `v-tac-t8-20w-g13-uv-fly-killer-tubes-2-pack` (price 5499, low_at 1, no restock history).
