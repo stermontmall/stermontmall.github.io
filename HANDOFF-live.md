@@ -1,4 +1,13 @@
 
+## 2026-11-06 08:37 Africa/Nairobi - content authority improvements (branch `wip-content-authority-20261106`)
+Owner approved work on content gaps 2-7; owner will supply real project proof, photos and testimonials separately (gap 1).
+- [x] Removed the misleading “new website” wording from the shared service-page generator; service pages now state three years of hands-on service experience and explain the assessment/quotation process without inventing credentials.
+- [x] Added relevant cross-links from the pest-control service landing page to the Kenya pest-control directory and advice centre.
+- [x] Improved blog-index taxonomy so more pest-control topics (rodents, bed bugs, fleas, ticks, wasps, stored-grain pests, etc.) group under Pest control; added a featured route to the service directory and advice centre.
+- [x] Added professional-service/advice-centre links to generated pest-control product guides to connect informational and commercial intent.
+- [ ] NEXT: open PR, run GitHub Actions tests/builds, fix any failures, merge only after successful validation; then verify live pages and sitemap.
+- [ ] OWNER: add genuine project photographs, case studies and customer testimonials when ready. Do not fabricate them.
+
 ## 2026-11-03 21:20 Africa/Nairobi - Mercedes-Benz CLA 200 listing ACTIVATED
 Owner: "Mercedes CLA 2019 2000CC DIESEL 2019 2WD KSH 4.8M" then "Make it live directly".
 - [x] Row `mercedes-benz-cla-200-for-sale-kenya` set active=true, price 4,800,000 (owner's asking price; cost left 0 because no source cost exists), 10 photos in `product-photos/` live on main (pages deploy succeeded).

@@ -11,7 +11,7 @@ const START = '<!--BLOG-POSTS-START-->', END = '<!--BLOG-POSTS-END-->';
 const GROUPS = [
   ['Shopping online', ['mpesa', 'delivery', 'order', 'shopping', 'payment', 'checkout']],
   ['Electronics and appliances', ['tv', 'fridge', 'washing', 'fryer', 'laptop', 'phone', 'solar', 'cooker', 'microwave', 'blender', 'appliance', 'appliances']],
-  ['Pest control', ['bugs', 'cockroach', 'cockroaches', 'rat', 'mouse', 'mosquito', 'mosquitoes', 'termite', 'termites', 'pest', 'fumigation', 'ants', 'flies']]
+  ['Pest control', ['bed', 'bug', 'bugs', 'roach', 'roaches', 'cockroach', 'cockroaches', 'rat', 'rats', 'mouse', 'mice', 'rodent', 'rodents', 'mosquito', 'mosquitoes', 'termite', 'termites', 'pest', 'fumigation', 'ants', 'flies', 'flea', 'fleas', 'tick', 'ticks', 'wasp', 'wasps', 'bee', 'bats', 'bat', 'snake', 'snakes', 'disinfection', 'disinfect', 'grain', 'weevil', 'weevils', 'stored', 'insecticide', 'spray']]
 ];
 const OTHER = 'More guides';
 const today = new Date().toISOString().slice(0, 10);
@@ -41,7 +41,8 @@ if (!posts.length) { console.log('No blog posts found - leaving index and sitema
 // ---- blog/index.html: rewrite only the part between the markers ----
 {
   const order = [...GROUPS.map(g => g[0]), OTHER];
-  const html = order.map(g => {
+  const hub = `<section class="box pest-control-hub"><h2>Need professional pest-control help?</h2><p>Our dedicated <a href="/pest-control/">pest-control and fumigation directory</a> explains residential, hotel, commercial, bed bug, termite and rodent services across Kenya. For practical prevention and treatment guidance, visit the <a href="/pest-control/blog/">Pest Control Advice Centre</a>. To request a quotation, share your town, property type and pest concern.</p></section>\n`;
+  const html = hub + order.map(g => {
     const list = posts.filter(p => p.group === g).sort((a, b) => (b.published || '').localeCompare(a.published || '') || a.title.localeCompare(b.title));
     return list.length ? `<h2>${esc(g)}</h2>\n` + list.map(p => `<div class="box"><a href="/blog/${p.slug}.html">${esc(p.title)}</a>${p.desc ? `<p>${esc(p.desc)}</p>` : ''}</div>`).join('\n') : '';
   }).filter(Boolean).join('\n');

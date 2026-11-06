@@ -35,6 +35,7 @@ export function renderPost(a) {
   const relTitle = r => { try { const m = fs.readFileSync(path.join(root, 'blog', r + '.html'), 'utf8').match(/<h1[^>]*>([\s\S]*?)<\/h1>/i); return m ? unesc(m[1].replace(/<[^>]+>/g, '').trim()) : r; } catch { return r; } };
   const catHtml = `<div class="box"><strong>Shop this category</strong><ul class="rel"><li><a href="/c/${a.cat}.html">${esc(catTitle)}</a></li><li><a href="/p/${a.product}.html">See the product and its sizes</a></li></ul></div>`;
   const relHtml = a.related.length ? `<h2>Related guides</h2>\n<ul class="rel">${a.related.map(r => `<li><a href="/blog/${r}.html">${esc(relTitle(r))}</a></li>`).join('')}</ul>` : '';
+  const serviceHtml = `<div class="box"><strong>Need professional help?</strong><p>Explore <a href="/pest-control/">professional pest control and fumigation services in Kenya</a> or visit the <a href="/pest-control/blog/">Pest Control Advice Centre</a>. For a quotation, share your town, property type and pest concern.</p></div>`;
   return `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(a.title)} | Stermont Arcade</title><meta name="description" content="${esc(a.description)}">
@@ -58,6 +59,7 @@ ${faqHtml}
 ${a.closing ? para(a.closing) : ''}
 ${catHtml}
 ${relHtml}
+${serviceHtml}
 <a class="btn" href="/products.html">Browse all products</a>
 <div class="box"><a href="https://wa.me/254748888230?text=Hello%20Stermont%20Arcade">Questions? Chat with us on WhatsApp</a></div>
 </main>

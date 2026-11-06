@@ -214,11 +214,11 @@ ${hero({
     chips: ['Quote after inspection', 'Pay by M-Pesa', 'Nairobi and all 47 counties']
   })}
 ${s.intro.map(p => `<p>${esc(p)}</p>`).join('')}
-<p><strong>Three years of hands-on service experience:</strong> Stermont Arcade has a new website, but our service work is not new. Our experienced team has been delivering professional services for three years. We confirm the scope, availability and final quote with you before work begins.</p>
+<section class="trust-note"><h2>Three years of service experience</h2><p>Stermont Arcade brings three years of hands-on service experience. We begin by understanding the property and the problem, explain the recommended scope, confirm availability and provide a quotation before work starts. The final method and schedule depend on site conditions and the agreed scope.</p></section>
 <h2>What is included</h2><ul class="checks">${s.included.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
 <h2>How it works</h2><ol class="steps">${s.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
 <h2>What decides the price</h2><ul class="checks">${s.priceFactors.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
-${s.extraSections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).join('')}`).join('')}${s.slug === PEST_LANDING && pests.length ? pestLinksSection() : ''}
+${s.extraSections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).join('')}`).join('')}${s.slug === PEST_LANDING && pests.length ? pestLinksSection() : ''}${s.slug === PEST_LANDING ? `<section class="related-resources"><h2>Pest-control advice and specialist services</h2><p>Explore our <a href="/pest-control/">Kenya pest-control service directory</a> for pest-specific options, or visit the <a href="/pest-control/blog/">Pest Control Advice Centre</a> for practical guidance on prevention, inspections and responsible treatment. For a quotation, tell us your town, property type and the pest you have identified.</p></section>` : ''}
 <h2>Who we serve</h2><p>${esc(s.audience)}</p>
 <h2>Where we work</h2><p>${esc(s.areas)}</p>
 ${coverageBlock(s.name)}
