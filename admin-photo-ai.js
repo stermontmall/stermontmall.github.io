@@ -8,6 +8,33 @@
     root.textContent = '';
     var wrap = el('div'), head = el('div', 'card'), rowsBox = el('div'), results = el('div'), rows = [], running = false;
     head.appendChild(el('h3', null, 'AI product photo uploader'));
+    head.appendChild(el('h3', null, 'Attach an online photo to an existing product'));
+    head.appendChild(el('p', 'meta', 'Paste the exact product ID and a direct HTTPS link to its JPG, PNG or WebP photo. This attaches the image to the existing product without changing its price, cost, description or stock. Staff sign-in is required.'));
+    var attachId = el('input'); attachId.type = 'text'; attachId.placeholder = 'Existing product ID, e.g. yago-3-in-1-soil-ph-meter'; attachId.autocomplete = 'off'; attachId.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit;margin:.35rem 0';
+    var attachUrl = el('input'); attachUrl.type = 'url'; attachUrl.placeholder = 'https://supplier.com/path/product-photo.jpg'; attachUrl.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit;margin:.35rem 0';
+    var attachStatus = el('p', 'meta');
+    var attachBtn = button('Attach photo to existing product', 'ok', function () {
+      var id = attachId.value.trim(), imageUrl = attachUrl.value.trim();
+      if (!id || !imageUrl) { alert('Enter the existing product ID and direct photo link.'); return; }
+      if (!/^https:\/\//i.test(imageUrl)) { alert('The photo link must start with https://'); return; }
+      attachBtn.disabled = true; attachStatus.textContent = 'Downloading photo and attaching it…';
+      window.STMAdmin.raw('/functions/v1/ai-add-product', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'attach_existing', product_id: id, image_url: imageUrl })
+      }).then(function (response) {
+        return response.text().then(function (raw) {
+          var data = {}; try { data = raw ? JSON.parse(raw) : {}; } catch (_e) {}
+          if (!response.ok || !data.ok) throw new Error(data.error || 'Photo attachment failed (' + response.status + ').');
+          attachStatus.textContent = '✓ Photo attached and saved in Supabase Storage for ' + data.product_id + '.';
+          attachStatus.appendChild(D.createTextNode(' '));
+          var link = el('a', null, 'Open stored image'); link.href = data.image_url; link.target = '_blank'; link.rel = 'noopener'; attachStatus.appendChild(link);
+        });
+      }).catch(function (error) { attachStatus.textContent = 'Not attached: ' + error.message; })
+        .finally(function () { attachBtn.disabled = false; });
+    });
+    head.append(attachId, attachUrl, attachBtn, attachStatus);
+    head.appendChild(el('hr'));
+
     head.appendChild(el('p', 'meta', 'Add up to 10 products in one session. For each item, upload its photo from your device OR paste a direct link to the photo, and paste the exact product page URL. AI reads the product and source price, writes the listing and SEO fields, then saves it as an unpublished draft for your review.'));
     head.appendChild(el('p', 'meta', 'Price rule: use the exact source KSh/KES price with the existing 15% markup, or enter your own selling price to override it. Owner-set prices are saved exactly with no markup.'));
     var status = el('p', 'meta', '0 of 10 product slots used.');
