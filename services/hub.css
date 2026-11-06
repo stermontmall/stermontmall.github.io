@@ -161,3 +161,19 @@ footer{max-width:1280px}
  .other-copy{grid-column:auto}
  .appliance-photo,.appliance-photo img{min-height:185px}
 }
+
+/* Cache-busted reference layout overrides */
+html body main .services-hero{display:grid!important;grid-template-columns:1fr 1fr!important;min-height:300px!important;background:linear-gradient(110deg,#10066d 0%,#2b0b91 52%,#4b17b5 53%)!important;color:#fff!important}
+html body main .services-hero-copy h1{color:#fff!important;font-size:clamp(2.5rem,5.5vw,4.5rem)!important}
+html body main .services-hero-copy h1 span{color:#ffdc21!important}
+html body main .services-hero-photo{display:block!important;min-height:300px!important}
+html body main .hero-promises{display:flex!important;list-style:none!important}
+html body main .hero-promises li:before{content:'✓';display:inline-grid;place-items:center;background:#ffdc21;color:#210b78;border-radius:50%;width:27px;height:27px;margin-right:8px}
+html body main .services-trustbar{display:grid!important}
+@media(max-width:760px){
+ html body main .services-hero{grid-template-columns:1fr!important;min-height:0!important}
+ html body main .services-hero-photo{min-height:210px!important}
+ html body main .pest-showcase{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ html body main .other-services-feature{grid-template-columns:1fr 1.15fr!important}
+ html body main .services-trustbar{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
