@@ -195,6 +195,12 @@ const expected = [
   "ridomil-gold-mz-68wg-fungicide-250g",
   "score-250ec-fungicide-1l",
   "bestox-100ec-insecticide-100ml",
+  "actara-25wg-insecticide-40g",
+  "karate-zeon-5cs-insecticide-100ml",
+  "karate-zeon-5cs-insecticide-1l",
+  "infinito-687-5sc-fungicide-500ml",
+  "nordox-75wg-red-copper-fungicide-500g",
+  "nordox-75wg-red-copper-fungicide-1kg",
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
