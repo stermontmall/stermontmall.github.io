@@ -1,3 +1,8 @@
+## 2026-11-06 17:25 Africa/Nairobi - ROOT CAUSE found (branch `wip-broken-links-fix`)
+- [x] `agrimec-018ec-insecticide-100ml` is active in Supabase (photo exists in storage, category crop-insecticides) but has NO page file in `p/`. Six products were activated together at 2026-11-06 13:49:23 UTC (danadim-progress-400ec-insecticide-1l, mospilan-20sp-insecticide-100g, voliam-targo-063sc-insecticide-100ml, decis-2-5ec-insecticide-500ml, agrimec-018ec-insecticide-100ml, confidor-200sl-insecticide-250ml), 12 min AFTER the last "Build product pages" run (13:37 UTC). Until the next build every link to those pages is a 404.
+- [x] Systemic cause: pages only exist after `product-pages.yml` runs (every 3 h cron, or manual). Any product activated between builds, and any link to it, is broken until then.
+- [ ] NEXT: (1) trigger a rebuild now: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main` (REST; do not start two builds at once). (2) Permanent fix: make 404.html send unbuilt `/p/<slug>.html` URLs to the shell product view, and trigger the build automatically when products change.
+
 ## 2026-11-06 17:10 Africa/Nairobi - Broken links on /p/agrimec-018ec-insecticide-100ml.html (branch `wip-broken-links-fix`)
 Owner: "Fix the issue / Fix the issue of broken links permanently" for https://stermontarcade.co.ke/p/agrimec-018ec-insecticide-100ml.html
 - [x] Cloned repo, created `wip-broken-links-fix` from main (b31a033).
