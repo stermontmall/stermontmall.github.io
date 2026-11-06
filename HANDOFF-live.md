@@ -1,4 +1,9 @@
 
+## 2026-11-06 15:55 Africa/Nairobi - Mercedes CLA 200 delivery wording (DB only)
+Owner clarified "Delivery": the 47 counties are delivery coverage.
+- [x] `products` row `mercedes-benz-cla-200-for-sale-kenya`: location line now "Location: Nairobi" plus "Delivery: Available to all 47 counties" (replaces "available to buyers in all 47 counties"). Verified by query.
+- [ ] Rebuild once so the page matches: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`. Do not start two builds at once: a second run conflicts on generated `c/` pages.
+
 ## 2026-11-06 15:45 Africa/Nairobi - "Build product pages" was failing; test list fixed (branch `wip-fix-product-content-test-20261106`)
 - [x] Cause: `product-content.json` got an entry for `t8-f10w-g13-uv-fly-killer-tubes-10w-2-pack` (UV tube buying guide, commits of 2026-11-06 ~11:48 UTC) but the approved-ID list in `product-content.test.mjs` was not updated, so step "Test hand-written product content" failed (runs 42212986010, 42213017470, 42217559396). The failure blocked every product-page rebuild.
 - [x] Fix: added that ID to the `expected` list. `node product-content.test.mjs` now prints "OK: 179 product content entries". Content itself was not edited or reviewed by me beyond the test's own checks.
