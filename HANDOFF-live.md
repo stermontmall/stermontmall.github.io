@@ -1,4 +1,9 @@
 
+## 2026-11-06 15:45 Africa/Nairobi - "Build product pages" was failing; test list fixed (branch `wip-fix-product-content-test-20261106`)
+- [x] Cause: `product-content.json` got an entry for `t8-f10w-g13-uv-fly-killer-tubes-10w-2-pack` (UV tube buying guide, commits of 2026-11-06 ~11:48 UTC) but the approved-ID list in `product-content.test.mjs` was not updated, so step "Test hand-written product content" failed (runs 42212986010, 42213017470, 42217559396). The failure blocked every product-page rebuild.
+- [x] Fix: added that ID to the `expected` list. `node product-content.test.mjs` now prints "OK: 179 product content entries". Content itself was not edited or reviewed by me beyond the test's own checks.
+- [ ] NEXT: after merge, trigger the rebuild: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main` (use REST, `gh workflow run` fails with a GraphQL 403 here), then confirm https://stermontarcade.co.ke/p/mercedes-benz-cla-200-for-sale-kenya.html shows Mileage / Transmission / Location.
+
 ## 2026-11-06 15:30 Africa/Nairobi - Mercedes-Benz CLA 200 details added (DB only, no code change)
 Owner supplied: "47k kms, Automatic, Nairobi and all 47 counties".
 - [x] `products` row `mercedes-benz-cla-200-for-sale-kenya`: "Vehicle details" list now has Transmission: Automatic, Mileage: 47,000 km, Location: Nairobi (available to buyers in all 47 counties). Only that list changed; title and price untouched. Verified by query.
