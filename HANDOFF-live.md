@@ -1,3 +1,10 @@
+## 2026-11-06 23:05 Africa/Nairobi - shell check on every page (finding, no code change, main at 5fa7115)
+Owner: "Check for me is shell working in all pages". Loaded all 640 tracked .html files in a 390px mobile browser from a local server (script not committed).
+- [x] 565 real pages show the shell (home = shell itself; `/p/` 287, `/c/` 43, `/guides/` 32, `/blog/` 71, `/pest-control/` 62, `/services/` 49, 14 root pages: top bar + bottom nav) and stay on their own address.
+- [x] 76 pages redirect, all intended: 74 `/p/` size-variant stubs and 1 blog stub (meta refresh to the canonical page, for Google), `/mobile-shell/index.html` (old URL to `/`), `classic.html` (old home to `/`, checkout mode exempt).
+- [x] Skipped on purpose: admin, upload-photos, list-products, advert-poster, Google verification file.
+- [ ] Not checked: the live site (not reachable from the sandbox) and a real phone. Run the same check on the live URL if wanted.
+
 ## 2026-11-06 22:50 Africa/Nairobi - checkout stays inside the mobile shell, no page redirect (branch `wip-shell-no-redirects-20261106`)
 Owner: "I need all pages on mobile shell without page redirects. Fix everything".
 - [x] Audit: every public page already carries the shell bars (`node seo-shell-chrome-all.mjs` = 0 changes of 65; only admin, upload-photos and the Google verification file have none, on purpose). The only customer-facing page jump left was Checkout: shell -> `/classic.html?checkout=1` -> `location.replace('/')` back.
