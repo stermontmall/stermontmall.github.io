@@ -1422,3 +1422,15 @@ Owner explicitly said last chance, work properly, connect GitHub/Supabase and pu
 - [x] Verified Storage object rows for all 20 product image files (one object per product) and confirmed all 20 database rows are active with a Storage URL.
 
 - [x] Opened PR #424 for the 20 SEO entries and handoff updates: https://github.com/stermontmall/stermontmall.github.io/pull/424. SEO pull-request quality workflow run 42283859650 was queued/running at checkpoint; wait for success before merge, then verify product-pages build and Pages deployment.
+
+
+
+## 2026-11-06 — 20 additional crop-nutrition and spray-adjuvant products prepared for publication
+- [x] Screened beyond the earlier fertilizer-only list and selected 20 non-duplicate foliar nutrition and adjuvant products from Kenyan supplier listings, including Algreen, YaraVita, Amiran, Greenlife and spray-adjuvant lines.
+- [x] Added 20 product rows through `public.add_draft_product` in Supabase project `oewvtbnmyombbtggamor`, using the existing 15% markup path and stock defaults.
+- [x] Attached a matching product image to every row through `public.add_product_photo`; one Bonzin image was replaced with a direct product photo after the initial supplier thumbnail did not persist.
+- [x] Final Supabase verification: 20/20 rows exist, active=true, and have at least one image in public Storage.
+- [x] Added two product-specific SEO sections for each new product to `product-content.json`; section word counts are 277–294 words per product. Updated the content allowlist in `product-content.test.mjs`.
+- [ ] NEXT: review PR quality checks, merge the SEO content and allowlist, then verify product-page generation, canonical URLs, Product JSON-LD, sitemap entries and Pages deployment before claiming all pages are live.
+- Products: Algreen Bonzin 1L; Algreen Supa-K 1L; Goldchance Super Flowers & Fruits; Growcal MGB; Multi NPK 13-2-44 1kg; Plant Soul 1L; Polyfeed 1kg; Super Boron Extra 1L; Super Nitro Humix 1L; Vitabor Gold 1L; YaraVita Crop Boost 1L; YaraVita Powerboost 1L; Zinc Gold; Zincabor; Integra 1L; Golden Leaf 1L; Agral 90 1L; Super Gro 5L; Booster Foliar 500ml; Algreen Hynitro 42 1L.
+- Supplier sources are recorded in each Supabase product row. Some multi-pack supplier listings display a price range rather than a separate price for every size; verify the exact variant price against the pack label/supplier before changing price or margin.
