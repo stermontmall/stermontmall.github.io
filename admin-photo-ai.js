@@ -9,7 +9,7 @@
     var wrap = el('div'), head = el('div', 'card'), rowsBox = el('div'), results = el('div'), rows = [], running = false;
     head.appendChild(el('h3', null, 'AI product photo uploader'));
     head.appendChild(el('p', 'meta', 'Add up to 10 products in one session. For each item, upload its photo and paste the exact product page URL. AI reads the product and source price, writes the listing and SEO fields, then saves it as an unpublished draft for your review.'));
-    head.appendChild(el('p', 'meta', 'Price rule: the draft is created only when the source page contains a verifiable KSh/KES price and the photo matches the product. No markup, currency conversion or guessed prices.'));
+    head.appendChild(el('p', 'meta', 'Price rule: use the exact source KSh/KES price with the existing 15% markup, or enter your own selling price to override it. Owner-set prices are saved exactly with no markup.'));
     var status = el('p', 'meta', '0 of 10 product slots used.');
     var actions = el('div', 'acts');
     var add = button('+ Add product', 'alt', addRow);
@@ -22,7 +22,7 @@
       status.textContent = rows.length + ' of ' + MAX + ' product slots used.';
       add.disabled = running || rows.length >= MAX;
       run.disabled = running || !rows.some(function (r) { return r.file && r.url.value.trim(); });
-      rows.forEach(function (r) { r.fileInput.disabled = running; r.url.disabled = running; r.remove.disabled = running; });
+      rows.forEach(function (r) { r.fileInput.disabled = running; r.url.disabled = running; r.price.disabled = running; r.remove.disabled = running; });
     }
     function addRow() {
       if (rows.length >= MAX || running) return;
@@ -31,11 +31,13 @@
       file.type = 'file'; file.accept = 'image/*'; file.style.cssText = 'display:block;width:100%;padding:.55rem;border:1px dashed var(--ln);border-radius:10px;background:#fff';
       var urlLabel = el('label', null, 'Source product website URL'), url = el('input');
       url.type = 'url'; url.placeholder = 'https://example.com/product-page'; url.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
+      var priceLabel = el('label', null, 'Your selling price in KSh (optional override)'), price = el('input');
+      price.type = 'number'; price.min = '1'; price.step = '0.01'; price.placeholder = 'Leave blank to use source price + 15%'; price.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
       var preview = el('img'); preview.alt = 'Selected product preview'; preview.hidden = true; preview.style.cssText = 'display:block;max-width:140px;max-height:120px;object-fit:contain;margin-top:.6rem;border-radius:8px';
       var remove = button('Remove', 'alt sm', function () { rows = rows.filter(function (r) { return r.card !== card; }); card.remove(); renumber(); update(); });
       var line = el('div', 'acts'); line.append(remove);
-      card.append(label, photoLabel, file, urlLabel, url, preview, line); rowsBox.appendChild(card);
-      var row = { card: card, fileInput: file, url: url, preview: preview, remove: remove, file: null, done: false };
+      card.append(label, photoLabel, file, urlLabel, url, priceLabel, price, preview, line); rowsBox.appendChild(card);
+      var row = { card: card, fileInput: file, url: url, price: price, preview: preview, remove: remove, file: null, done: false };
       rows.push(row);
       file.addEventListener('change', function () {
         row.file = file.files && file.files[0] || null;
@@ -44,6 +46,7 @@
         update();
       });
       url.addEventListener('input', update);
+      price.addEventListener('input', update);
       update();
     }
     function renumber() { rows.forEach(function (r, i) { r.card.querySelector('h4').textContent = 'Product ' + (i + 1); }); }
@@ -85,7 +88,7 @@
             return window.STMAdmin.raw('/functions/v1/ai-add-product', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ image: image, media_type: 'image/jpeg', url: r.url.value.trim() })
+              body: JSON.stringify({ image: image, media_type: 'image/jpeg', url: r.url.value.trim(), selling_price_kes: r.price.value.trim() || undefined })
             });
           }).then(function (response) {
             return response.text().then(function (raw) {
@@ -94,7 +97,7 @@
               saved++;
               var card = el('div', 'card done');
               card.appendChild(el('h4', null, '✓ Draft saved: ' + data.product.name));
-              card.appendChild(el('p', null, 'Exact source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Not published'));
+              card.appendChild(el('p', null, data.source_price_kes == null ? 'Owner-set selling price: KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' · No markup · Not published' : 'Source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Selling price includes 15% markup · Not published'));
               card.appendChild(el('p', 'meta', 'SEO title: ' + data.seo_title));
               card.appendChild(el('p', 'meta', 'Meta description preview: ' + data.meta_description_preview));
               card.appendChild(el('p', 'meta', data.price_note || data.page_note || 'Source price verified.'));
