@@ -187,6 +187,7 @@ const expected = [
   "moskill-aerosol-750ml-jumbo-pack",
   "mos-kill-mat-vapouriser-electric-mosquito-heater",
   "resolve-6-dust-insecticide-12-x-10g-sachets",
+  "vectorfog-dc20-cordless-ulv-fogger",
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
