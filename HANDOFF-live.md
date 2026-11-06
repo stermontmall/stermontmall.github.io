@@ -1300,3 +1300,15 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 - [x] Verified page source on branch: 1,425 words; canonical, Article and FAQ schema present; internal links point to existing service/blog pages.
 - [ ] Run blog build and SEO checks; open PR and review generated blog index/sitemap updates before merge.
 - [ ] After merge, verify GitHub Pages deployment and live page; ranking improvement is not yet measured.
+
+
+## 2026-11-06 - Masterpiece-style institutional pest-control content (PR #362)
+- [x] Studied the live competitor site structure: institution pages for hotels, schools, warehouse/factories, hospitals, offices, restaurants, churches and bars/butchers; separate pest pages; buyer-focused articles and location posts.
+- [x] Added eight original institutional service pages using `services/services-data.json` + `services/build-services.mjs`: hotel, school, warehouse/factory, hospital/healthcare, restaurant/commercial kitchen, office, church/worship facility and bar/butchery/food premises.
+- [x] Added the eight new pages to the main Services hub and generated `services/sitemap-services.xml`. Verified all eight pages have 779-827 words, unique H1/title, canonical URL and FAQ schema. Sitemap now contains 49 URLs and `robots.txt` already references it.
+- [x] Added `blog/pest-control-contracts-property-managers-kenya.html` (1,425 words) with Article/Breadcrumb/FAQ schema, internal links and commercial quotation CTA.
+- [x] Added PR #362, merged to main. Merge commit: `535b64051c0871ecda344bbab8e3e3a80a50cb97`.
+- [x] Main workflows: Build services pages success; Build blog index and sitemap success; Daily SEO check success. Full PR quality gate did not complete successfully (latest run reported failure/action_required before a job started); do not report it as passed.
+- [ ] GitHub Pages deployment for merge is running: `42173980901`. Verify completion and then inspect live URLs for the eight service pages, article and sitemap.
+- [ ] Site audit `42173949532` is running. Review its accessibility/performance/broken-link results and fix any issues attributable to the new pages.
+- [ ] After deployment, use Search Console performance/indexing data to compare Stermont against Masterpiece. No ranking improvement is claimed yet.
