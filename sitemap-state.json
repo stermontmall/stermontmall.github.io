@@ -1,6 +1,6 @@
 {
  "/p/hisense-hmc6mbk-7-in-1-pressure-cooker.html": {
-  "hash": "314e453ba699f939ead7181b2e4ed40d69b4f381",
+  "hash": "ba8c9dfa133ebeaa4747949fdc8625ddda1f740a",
   "lastmod": "2026-11-06"
  },
  "/p/abasi-5-ec.html": {
@@ -28,11 +28,15 @@
   "lastmod": "2026-11-06"
  },
  "/p/premise-200-sc-termiticide-50-ml.html": {
-  "hash": "18c0daa4cfea8fdbfc6590cafa12a2630d3445bd",
+  "hash": "6cc55f317a14d695ab4177c5c03c4272d1267637",
   "lastmod": "2026-11-06"
  },
  "/p/syngenta-tatua-rat-and-mice-poison-blocks.html": {
   "hash": "9953ba23401e88a239599664b8282d476e4becb0",
+  "lastmod": "2026-11-06"
+ },
+ "/p/gradometer-480ec-termiticide-1-litre.html": {
+  "hash": "7ee632dab79fd99c427630633527a27818e79dde",
   "lastmod": "2026-11-06"
  },
  "/p/bayer-baraki-pellets-rat-and-mice-poison-10-g.html": {
@@ -40,11 +44,7 @@
   "lastmod": "2026-11-06"
  },
  "/p/metro-200sc-termiticide-25-ml.html": {
-  "hash": "7e7802c5eba0c39986f9f5913879b785578a5bc3",
-  "lastmod": "2026-11-06"
- },
- "/p/gradometer-480ec-termiticide-1-litre.html": {
-  "hash": "e6da8115b0f319114895920ef21d3766bc0216fe",
+  "hash": "1a1f04e4e907c3600f0588cf4b0cefce83ac3b7a",
   "lastmod": "2026-11-06"
  },
  "/p/fuko-kil-rat-poison-25-g.html": {
@@ -60,7 +60,7 @@
   "lastmod": "2026-11-06"
  },
  "/p/rodilon-wax-blocks-10-g.html": {
-  "hash": "33e9538b99fefcc9d860f814ddee0d48cbe058f3",
+  "hash": "5b155d4edb22549a94f990f4f61d7b47d05a4625",
   "lastmod": "2026-11-06"
  },
  "/p/bedlam-200sl-insecticide-100-ml.html": {
@@ -76,11 +76,11 @@
   "lastmod": "2026-11-06"
  },
  "/p/rat-kill-pellets-25-g.html": {
-  "hash": "6e0467fb7cf4ba813c491172f5b498d45c68a182",
+  "hash": "791203a1539ed25ad2c170c4687d5125b9931c13",
   "lastmod": "2026-11-06"
  },
  "/p/bromarat-0-005-rb-rodent-bait-25-g.html": {
-  "hash": "4c30e168b125dd3feae7abce8213b0107cb2dc9e",
+  "hash": "800ad54ac4562fd39c57d71b939823090b67c893",
   "lastmod": "2026-11-06"
  },
  "/p/darvin-50ew-insecticide-28-ml.html": {
@@ -91,28 +91,28 @@
   "hash": "7b2e76fbc0c0bee2d3e701ac99adc050232e11e0",
   "lastmod": "2026-11-06"
  },
- "/p/kynofos-21-elite-feed-phosphate-25-kg.html": {
-  "hash": "3d8b2f7df4d95760c55820f7ddd42306a8cd3c78",
-  "lastmod": "2026-11-06"
- },
- "/p/lysine-feed-amino-acid-25-kg.html": {
-  "hash": "7f30afab718127403d6608c71cc2413bcf369cfb",
-  "lastmod": "2026-11-06"
- },
- "/p/layer-premix-for-poultry-feed-25-kg.html": {
-  "hash": "083708d5db4b404af7d47b7abff13dee90cb0207",
-  "lastmod": "2026-11-06"
- },
- "/p/kenwood-air-fryer-hfp30-000bk-3-8-litres.html": {
-  "hash": "047ddc327f479eee4bd8b8f65434101e27f5cb4c",
-  "lastmod": "2026-11-06"
- },
  "/p/salinomycin-coccidiostat-feed-additive-25-kg.html": {
-  "hash": "940711889a2023bbe7972999b8ed9139d8e41248",
+  "hash": "7f6587fec985772aa39a62110c6d65c934a6d40d",
   "lastmod": "2026-11-06"
  },
  "/p/gut-bio-animal-feed-supplement-100-g.html": {
-  "hash": "464ff3fbe6b0214174cc9e05ffba08c902c87cc9",
+  "hash": "818d574814d9bba8a6905aa62e2aa8c33e628ffe",
+  "lastmod": "2026-11-06"
+ },
+ "/p/lysine-feed-amino-acid-25-kg.html": {
+  "hash": "50aa5fe49d65430498bdb94c719f3702f47e3e3d",
+  "lastmod": "2026-11-06"
+ },
+ "/p/kenwood-air-fryer-hfp30-000bk-3-8-litres.html": {
+  "hash": "287b535f7cb17d80d1b05db5212f6b00b61f74c7",
+  "lastmod": "2026-11-06"
+ },
+ "/p/layer-premix-for-poultry-feed-25-kg.html": {
+  "hash": "e4a05f18dabecaa5033050b7d8f8b452f0454411",
+  "lastmod": "2026-11-06"
+ },
+ "/p/kynofos-21-elite-feed-phosphate-25-kg.html": {
+  "hash": "342167145b52e86e549b4fa493c74f7ca3e963c4",
   "lastmod": "2026-11-06"
  },
  "/p/pegasus-500sc-insecticide-1-litre.html": {
@@ -144,19 +144,7 @@
   "lastmod": "2026-11-06"
  },
  "/p/rodent-kill-rat-pellets-500-g.html": {
-  "hash": "1e8e7311bf0916f2c8cf6ff9bf710b6fa28ff427",
-  "lastmod": "2026-11-06"
- },
- "/p/jacto-hd-550-knapsack-sprayer-20-litres.html": {
-  "hash": "1765fdab0987b06d380eefb6cb051ec593360431",
-  "lastmod": "2026-11-05"
- },
- "/p/kelvin-dudu-dust-100-g.html": {
-  "hash": "7f30a1aa43fa490f8d69ca191638523995a8f3d2",
-  "lastmod": "2026-11-06"
- },
- "/p/lava-100ec-insecticide-100-ml.html": {
-  "hash": "4bc2e15e40af1512cc146b87e139653913111d6b",
+  "hash": "1c523826d6e6fdf8fc1919c19616551693a7db19",
   "lastmod": "2026-11-06"
  },
  "/p/actellic-gold-dust-1-kg.html": {
@@ -167,32 +155,44 @@
   "hash": "294815c1a3ec35bf8ecb5585c586054950e25ae3",
   "lastmod": "2026-11-02"
  },
- "/p/tecto-500sc-fungicide-1-litre.html": {
-  "hash": "a0aea52e5c837d511e3f5f699b460efc089e9c2e",
+ "/p/lava-100ec-insecticide-100-ml.html": {
+  "hash": "4bc2e15e40af1512cc146b87e139653913111d6b",
+  "lastmod": "2026-11-06"
+ },
+ "/p/jacto-hd-550-knapsack-sprayer-20-litres.html": {
+  "hash": "1765fdab0987b06d380eefb6cb051ec593360431",
+  "lastmod": "2026-11-05"
+ },
+ "/p/kelvin-dudu-dust-100-g.html": {
+  "hash": "7f30a1aa43fa490f8d69ca191638523995a8f3d2",
   "lastmod": "2026-11-06"
  },
  "/p/thunder-od-145-foliar-insecticide-1-litre.html": {
   "hash": "0159926c6ebc1f9f4eb3b8898a2e481e6f507234",
   "lastmod": "2026-11-06"
  },
- "/p/tatua-demand-10cs-insecticide-25-ml.html": {
-  "hash": "fb1622eb5df6174ccbc6728dbc29955bc0fa855b",
-  "lastmod": "2026-11-05"
- },
  "/p/systema-50ec-insecticide-1-litre.html": {
   "hash": "fb641602169c2cefd14e9be2d02f7af5b6c9bdde",
   "lastmod": "2026-11-06"
  },
+ "/p/tatua-demand-10cs-insecticide-25-ml.html": {
+  "hash": "fb1622eb5df6174ccbc6728dbc29955bc0fa855b",
+  "lastmod": "2026-11-05"
+ },
  "/p/tecamin-max-foliar-fertilizer-1-litre.html": {
-  "hash": "275200acd763fe938e66fa476b4a2980556064c3",
+  "hash": "0788c6c31b5010bbe8bcd273dd9b81c6986f4467",
   "lastmod": "2026-11-06"
  },
  "/p/tatua-advion-cockroach-gel-bait-30-g.html": {
   "hash": "2f85406fd71ca8edfbf3471839d0d77d6b585d5a",
   "lastmod": "2026-11-06"
  },
+ "/p/tecto-500sc-fungicide-1-litre.html": {
+  "hash": "a0aea52e5c837d511e3f5f699b460efc089e9c2e",
+  "lastmod": "2026-11-06"
+ },
  "/p/popvet-total-dog-dewormer-4-tablets.html": {
-  "hash": "a8f2dee56a098da3f07fdc47e63cc214f2f6f880",
+  "hash": "32b6e7daef6eecc0971ff7ea410d0d0d95689968",
   "lastmod": "2026-11-06"
  },
  "/p/ranger-480ec-insecticide-1-litre.html": {
@@ -219,28 +219,28 @@
   "hash": "f44b714a2652570eef568c9d6eb51652bb9e0959",
   "lastmod": "2026-11-02"
  },
- "/p/jembe-star-500sl-herbicide-1-litre.html": {
-  "hash": "8ba2325f5953d15a34aad842f46cd2e7ef7e0fe7",
-  "lastmod": "2026-11-06"
- },
  "/p/kingcode-elite-50ec-insecticide-1-litre.html": {
   "hash": "97d4c4947d62fc78914ffc753f109ac54f452778",
   "lastmod": "2026-11-06"
  },
+ "/p/jembe-star-500sl-herbicide-1-litre.html": {
+  "hash": "8ba2325f5953d15a34aad842f46cd2e7ef7e0fe7",
+  "lastmod": "2026-11-06"
+ },
  "/p/jambo-clean-foliar-fertilizer-1-litre.html": {
-  "hash": "334cf342c97af453baa391aa4970e34671fbb6cb",
-  "lastmod": "2026-11-06"
- },
- "/p/k-othrine-wg-250-insecticide-20-g.html": {
-  "hash": "8d2fb1da8f07c12d672f70edbf9538ff9e1a5ef5",
-  "lastmod": "2026-11-06"
- },
- "/p/icon-10cs-mosquito-insecticide-62-5-ml.html": {
-  "hash": "bceb13c992deabd528139cd40c8c5fb6d83fb3f2",
+  "hash": "7e2ac5bf6589121fc8f0246e35c528b2ba5564df",
   "lastmod": "2026-11-06"
  },
  "/p/infinito-sc-687-5-fungicide-500-ml.html": {
   "hash": "66230c412f07cc4a10354c356e372976648e8336",
+  "lastmod": "2026-11-06"
+ },
+ "/p/k-othrine-wg-250-insecticide-20-g.html": {
+  "hash": "8d792fbaf330999d33f4d01d85213b9322873202",
+  "lastmod": "2026-11-06"
+ },
+ "/p/icon-10cs-mosquito-insecticide-62-5-ml.html": {
+  "hash": "7dd45716218030e32973dc714fa05277a5938186",
   "lastmod": "2026-11-06"
  },
  "/p/indoking-300sc-insecticide-1-litre.html": {
@@ -248,47 +248,47 @@
   "lastmod": "2026-11-06"
  },
  "/p/bat-crp-bat-repellent-1-litre.html": {
-  "hash": "19e7311796531d709a4c28e0cb8501e9682686d6",
+  "hash": "ab1f35d72f0834bf433577bc0b6c3c1294e862b0",
   "lastmod": "2026-11-06"
  },
  "/p/mchwatox-350-sc-termiticide-1-litre.html": {
-  "hash": "66169f95a77828140096a3158072b6da303bdd2f",
+  "hash": "9d1ca3193564558940778ba015a215520525922c",
   "lastmod": "2026-11-06"
  },
  "/p/maxigrow-zinc-and-boron-1-litre.html": {
-  "hash": "63d14872a35464fcb0194a1ff9c818c8a7af1c69",
+  "hash": "b39867eeeba677fb0c72cf29a01710be0541b229",
   "lastmod": "2026-11-06"
  },
  "/p/nilzan-plus-drench-1-litre.html": {
-  "hash": "e848e26f8c887b4408a9522ac2e7bb49ed49f42f",
+  "hash": "bd6c4194fcede0bd829eb34c29e355b9a0492dd6",
   "lastmod": "2026-11-06"
  },
  "/p/maguguma-top-500-sc-herbicide-1-litre.html": {
   "hash": "8bdd2996a9d2ad0f2144be7ba7052bbbba92c76f",
   "lastmod": "2026-11-06"
  },
+ "/p/olvet-drench-albendazole-2-5-percent-500-ml.html": {
+  "hash": "a1578fc534c2f5dfae48cb4260c2df8408dea64c",
+  "lastmod": "2026-11-06"
+ },
+ "/p/levafas-diamond-fluke-and-worm-drench-1-litre.html": {
+  "hash": "d2c26422f70cd301230efb1e998234dc95cd6e55",
+  "lastmod": "2026-11-06"
+ },
  "/p/navigator-100-sc-insecticide-1-litre.html": {
-  "hash": "a5feeb178ec91d93341ce50ab8be70640e28f66f",
+  "hash": "dab648e4b7a951e993676b6da300262cac620e4b",
   "lastmod": "2026-11-06"
  },
  "/p/milestone-extreme-390-sc-fungicide-1-litre.html": {
   "hash": "b95e5b89b1e3db4ba1f87989023fc2d38bab46b1",
   "lastmod": "2026-11-06"
  },
- "/p/olvet-drench-albendazole-2-5-percent-500-ml.html": {
-  "hash": "306056bd5c00fc2dfeac42e678443042e09133f6",
-  "lastmod": "2026-11-06"
- },
  "/p/norbrook-milking-salve-100-g.html": {
-  "hash": "0060e7d3ee9aca9814aa256d36dbd1daad40eedd",
-  "lastmod": "2026-11-06"
- },
- "/p/levafas-diamond-fluke-and-worm-drench-1-litre.html": {
-  "hash": "5d763597692ebd8e0c7b9accaaa3f8ee80315074",
+  "hash": "aa2cd71ce6eb289413f9488d1b19588c375bff44",
   "lastmod": "2026-11-06"
  },
  "/p/livergen-plus-poultry-liver-tonic-500-ml.html": {
-  "hash": "f001ad47cb091d9d4cdad5c728a9aafc15a6ef57",
+  "hash": "1d01f8cf8aea6f6e0478a80290fd8a50515fd5fb",
   "lastmod": "2026-11-06"
  },
  "/p/digester-supper-69-ew-herbicide-5-litres.html": {
@@ -307,16 +307,12 @@
   "hash": "b100bb4140d9f4745568fabe88e3879802d6f27f",
   "lastmod": "2026-11-06"
  },
- "/p/biodistinction-extra-700-sc-copper-fertilizer-1-litre.html": {
-  "hash": "b6c46ef99db7f1799ca1001770b67f5ea7c14ef9",
-  "lastmod": "2026-11-06"
- },
  "/p/albafas-10-albendazole-drench-500-ml.html": {
-  "hash": "534407344aecc36309121909565fd1a01d98ae35",
+  "hash": "6d7d0663f0f4d4ef911a95a21315f5b35b14e886",
   "lastmod": "2026-11-06"
  },
  "/p/cropgrow-super-gel-suspension-fertilizer-250-ml.html": {
-  "hash": "e08e72d54bf166ab6f95ea8aba0cb446dbeb5f35",
+  "hash": "ac85ece842f56bb0ff74db4a0dc1256add02553f",
   "lastmod": "2026-11-06"
  },
  "/p/ampligo-150-zc-insecticide-100-ml.html": {
@@ -324,7 +320,7 @@
   "lastmod": "2026-11-06"
  },
  "/p/amito-5-7-wdg-insecticide-1-kg.html": {
-  "hash": "a2dfd54082c49798415fcf45811fbe62d21b807b",
+  "hash": "803339adfb04c66f56191cdbf7139cbbfc59a98f",
   "lastmod": "2026-11-06"
  },
  "/p/catapult-480-sl-herbicide-1-litre.html": {
@@ -337,6 +333,10 @@
  },
  "/p/beanpro-480-sl-herbicide-1-litre.html": {
   "hash": "cef241055d680a1096ebb6cad1391c2f68c1211a",
+  "lastmod": "2026-11-06"
+ },
+ "/p/biodistinction-extra-700-sc-copper-fertilizer-1-litre.html": {
+  "hash": "0d27eeaf5ed1696345b4fefab7d0f5671924f380",
   "lastmod": "2026-11-06"
  },
  "/p/bradley-500-sc-fungicide-1-litre.html": {
@@ -384,15 +384,15 @@
   "lastmod": "2026-11-06"
  },
  "/p/euroken-50x55-standing-cooker-3-gas-1-electric-with-50l-electric-oven.html": {
-  "hash": "1040a77e988ac00ec091c4b2e49de901a2f801bc",
+  "hash": "a28e12d01e9d4c2341aacc74f76b62af201322dd",
   "lastmod": "2026-11-06"
  },
  "/p/xiaomi-redmi-15c-8gb-ram-256gb.html": {
-  "hash": "8116cac29977e5e61e5d8677d7943a5bdf49753f",
+  "hash": "c47253edc08949be62c82a7f2f4fccb1d8177e5d",
   "lastmod": "2026-11-06"
  },
  "/p/ramtons-steam-iron-with-vertical-and-variable-steam.html": {
-  "hash": "4f13bfedd36d969e13d072a6ad71b9ba8834945f",
+  "hash": "c157118da872571f0d2f09be2848e47eac33bdfc",
   "lastmod": "2026-11-06"
  },
  "/p/ultra-smart-watch-with-bluetooth-calling-and-ocean-strap-grey.html": {
@@ -400,7 +400,7 @@
   "lastmod": "2026-11-05"
  },
  "/p/tecno-spark-go-3-4gb-ram-64gb.html": {
-  "hash": "ffb7bb81bf6782389aca250e6c2f2000a84527da",
+  "hash": "26690138d6e6f0912e83661f96eea48d3f96b919",
   "lastmod": "2026-11-06"
  },
  "/p/familly-insect-killer-super-strength-aerosol-spray.html": {
@@ -408,7 +408,7 @@
   "lastmod": "2026-11-06"
  },
  "/p/nunix-wld-560-3g1e-3-gas-hot-plate-cooker-with-gas-oven.html": {
-  "hash": "180743a30f79c2af0377ecc00c907f883e055fa8",
+  "hash": "355d247543943919855b9f6fa3d388269033cc06",
   "lastmod": "2026-11-06"
  },
  "/p/von-twin-tub-semi-automatic-washing-machine-7-5kg-7-5-kg.html": {
@@ -416,23 +416,31 @@
   "lastmod": "2026-11-05"
  },
  "/p/glamstar-20l-manual-microwave-oven-black-20-litres.html": {
-  "hash": "f72fe90b8489c16298c3fceadc906d56208db374",
+  "hash": "3984a20175cca339bee882e3b439a69b9f4e46cf",
   "lastmod": "2026-11-06"
  },
- "/p/smart-raha-life-3-piece-tumbler-and-bottle-set-purple-260ml-700ml-1200ml.html": {
-  "hash": "8649311681ac13be77c97ce24ca58d74afa8fcb7",
+ "/p/green-killer-fly-catch-trap-sticky-rolls-5-packs-20-rolls.html": {
+  "hash": "7a1020cc9d301df0ab7b7e96c928bb8929e824bf",
+  "lastmod": "2026-11-06"
+ },
+ "/p/habei-bear-3-piece-insulated-bottle-and-tumbler-set-260ml-700ml-1200ml.html": {
+  "hash": "87ad4ee5404b54deeee678babf4c182ce7484d95",
   "lastmod": "2026-11-06"
  },
  "/p/vision-plus-32-inch-full-hd-smart-tv-with-free-wall-bracket.html": {
   "hash": "0af8011c89dcaaab3d73b7c3b50dae695542035f",
   "lastmod": "2026-11-06"
  },
- "/p/skyworth-32-inch-eye-care-google-tv-32-inch.html": {
-  "hash": "db52d1a771fb5cd7f9df0de2c7581b6768b86cda",
+ "/p/xiaomi-poco-c71-3gb-ram-64gb.html": {
+  "hash": "e87a64043ba7309aff62616421b7e3bbfdc70505",
   "lastmod": "2026-11-06"
  },
- "/p/habei-bear-3-piece-insulated-bottle-and-tumbler-set-260ml-700ml-1200ml.html": {
-  "hash": "485d1537a32a45ba75b118fa85366cb8a5384cd6",
+ "/p/smart-raha-life-3-piece-tumbler-and-bottle-set-purple-260ml-700ml-1200ml.html": {
+  "hash": "130f842efabf0fcae8a75c14995753ee2ba46d27",
+  "lastmod": "2026-11-06"
+ },
+ "/p/skyworth-32-inch-eye-care-google-tv-32-inch.html": {
+  "hash": "db52d1a771fb5cd7f9df0de2c7581b6768b86cda",
   "lastmod": "2026-11-06"
  },
  "/p/haier-90l-single-door-direct-cool-fridge-black-90-litres.html": {
@@ -443,80 +451,72 @@
   "hash": "cd805397b27c81c9f9773caadade86f4c2737da8",
   "lastmod": "2026-11-06"
  },
- "/p/xiaomi-poco-c71-3gb-ram-64gb.html": {
-  "hash": "d3dbea6e57c595198efbac7f1ec8a146b3e6590a",
+ "/p/samsung-galaxy-a06-4gb-ram-64gb.html": {
+  "hash": "f13605de970a3e775d444919a8cd71b780865509",
   "lastmod": "2026-11-06"
  },
  "/p/2-litre-hand-pressure-sprayer-2-litres.html": {
   "hash": "648bd785daaf3242942ebbc29fd7408f4f5864b2",
   "lastmod": "2026-11-05"
  },
- "/p/samsung-galaxy-a06-4gb-ram-64gb.html": {
-  "hash": "c1e15acea11a6b1ac63602d66f400ae88907bb76",
-  "lastmod": "2026-11-06"
- },
- "/p/green-killer-fly-catch-trap-sticky-rolls-5-packs-20-rolls.html": {
-  "hash": "589adf003ac33e7bf8f2829e1ee458f198a91283",
-  "lastmod": "2026-11-06"
- },
  "/p/vic-20000mah-power-bank-with-led-display-and-flashlight-20000mah.html": {
   "hash": "832bdbaae25abde0d939d2fbaf669079bd049549",
   "lastmod": "2026-11-05"
  },
  "/p/ailyons-5l-electric-pressure-cooker-900w-10-preset-menus.html": {
-  "hash": "05b044ebf1de716b972a65833027c9b1aa7a7b0d",
-  "lastmod": "2026-11-06"
- },
- "/p/ailyons-2-0l-electric-kettle-glossy-black-with-red-accents.html": {
-  "hash": "5cd60904c5677deac15881a180e7d105cca0c757",
-  "lastmod": "2026-11-06"
- },
- "/p/ailyons-2-2l-electric-kettle-luxury-dark-purple.html": {
-  "hash": "f6c349fc578bcc80d6ad00e5e96c1738a79bc99e",
-  "lastmod": "2026-11-06"
- },
- "/p/ailyons-2-burner-table-top-gas-cooker-with-6kg-regulator-1-5m-pipe-and-clips.html": {
-  "hash": "6aee450c102f99ea59dad17a500d6f2a314a0115",
-  "lastmod": "2026-11-06"
- },
- "/p/electromate-6l-single-tank-electric-deep-fryer-stainless-steel.html": {
-  "hash": "0c9f4d041cc3b73fa4f9eb7ca55ab2cedef42e26",
-  "lastmod": "2026-11-06"
- },
- "/p/electric-hot-plate-1000w-single-coil-cooker-with-5-level-temperature-control.html": {
-  "hash": "57a65f2138a0aa23a11623c67bf8a29e644d2159",
+  "hash": "b049aa75d601c40119d621c74eb6412cd37dce04",
   "lastmod": "2026-11-06"
  },
  "/p/electromate-20l-electric-oven-1500w.html": {
-  "hash": "7a39f85735aa1f116f5f3cd786e5d3917c12ca6b",
+  "hash": "a0e1f4189b194ae42354c0d99f14f79d4b6de5cb",
+  "lastmod": "2026-11-06"
+ },
+ "/p/ailyons-2-2l-electric-kettle-luxury-dark-purple.html": {
+  "hash": "a2c3e847b03fccfc19ea4463c7eaca1f67426375",
+  "lastmod": "2026-11-06"
+ },
+ "/p/ailyons-2-burner-table-top-gas-cooker-with-6kg-regulator-1-5m-pipe-and-clips.html": {
+  "hash": "2220c5dd8b26b2774cd6f554f810a104440cf30d",
+  "lastmod": "2026-11-06"
+ },
+ "/p/ailyons-2-0l-electric-kettle-glossy-black-with-red-accents.html": {
+  "hash": "933c09d4caed00c76c2c49c8cb344e651e0bf7c3",
+  "lastmod": "2026-11-06"
+ },
+ "/p/electric-hot-plate-1000w-single-coil-cooker-with-5-level-temperature-control.html": {
+  "hash": "596ddf8ccee88ba778336c00dd4236bf7f8bac49",
+  "lastmod": "2026-11-06"
+ },
+ "/p/sonar-hot-and-normal-water-dispenser-with-storage-cabinet-84-cm.html": {
+  "hash": "8d8085e83e0705d876d64bbd14dcddde99cad64a",
   "lastmod": "2026-11-06"
  },
  "/p/ipcone-16-inch-wall-mounted-fan-black-3-speed-control.html": {
-  "hash": "0b0c50ada447510e1b13e5bb593fed5e7084ecdc",
+  "hash": "f2a4cec0de667193fac8e4c917b1e0499fc97cb0",
   "lastmod": "2026-11-06"
  },
  "/p/ipcone-16-inch-stand-fan-black-adjustable-height-and-tilt.html": {
-  "hash": "fa04af7da44baa940a2bc3d881920cc5f2c7925a",
+  "hash": "ed7f7adfbf84f995ac37bab79495b2f97de87f43",
+  "lastmod": "2026-11-06"
+ },
+ "/p/electromate-1000w-dry-iron-box-blue-and-white.html": {
+  "hash": "0e3167b8e1a2d012ae292d5d58856a9f123ef20c",
+  "lastmod": "2026-11-06"
+ },
+ "/p/lyons-1-8l-cordless-stainless-steel-electric-kettle-silver-and-black.html": {
+  "hash": "baa38bd62490ba8506cec43db3738ce82ed8e6b8",
   "lastmod": "2026-11-06"
  },
  "/p/lumagogo-210cm-adjustable-phone-tripod-stand-with-bluetooth-remote.html": {
   "hash": "ea444c54dddcebadd0f770d04b6f402c56bc4ea5",
   "lastmod": "2026-11-02"
  },
- "/p/electromate-1000w-dry-iron-box-blue-and-white.html": {
-  "hash": "0593eff91ae62fd1bc8609dd84a5919597af448a",
-  "lastmod": "2026-11-06"
- },
- "/p/lyons-1-8l-cordless-stainless-steel-electric-kettle-silver-and-black.html": {
-  "hash": "69709fdc84d5f1f4006c59080c5e84625ba0cab0",
-  "lastmod": "2026-11-06"
- },
  "/p/ourstart-mens-quartz-watch-blue-dial-silver-and-gold-stainless-steel.html": {
   "hash": "2a2550147b64e3d393baa8215b46213a7cf31c81",
   "lastmod": "2026-11-02"
  },
- "/p/sonar-hot-and-normal-water-dispenser-with-storage-cabinet-84-cm.html": {
-  "hash": "88d4d371e82c2c8d91e6407ab7ca858485acf757",
+ "/p/electromate-6l-single-tank-electric-deep-fryer-stainless-steel.html": {
+  "hash": "926400d40e218954231b351ac6d80425c4934e57",
   "lastmod": "2026-11-06"
  },
  "/p/sonar-2l-electric-kettle-black-with-red-base.html": {
@@ -555,49 +555,49 @@
   "hash": "964863f7274e4c214800974a851fe765d215d206",
   "lastmod": "2026-11-05"
  },
- "/p/samsung-galaxy-a16-8gb-256gb-earbuds-watch-25w-adapter.html": {
-  "hash": "cd54475994b56b6aa2c6af7f3391f66048b081be",
+ "/p/smartphone-gift-bundle-led-watch-power-bank-earbuds.html": {
+  "hash": "7cc49f02fd74a40c89bc9304853121bfd2055306",
   "lastmod": "2026-11-06"
  },
  "/p/womens-white-tassel-charm-sneakers-black-heel.html": {
-  "hash": "68ef611ab9ffede7f673b7058cc22a3e8413eb94",
+  "hash": "083b834a94a1876f50e71361a6c94b13a4219ea0",
+  "lastmod": "2026-11-06"
+ },
+ "/p/samsung-galaxy-a16-8gb-256gb-earbuds-watch-25w-adapter.html": {
+  "hash": "b44a69ab347066b065fcf24f62467839d162a047",
+  "lastmod": "2026-11-06"
+ },
+ "/p/ailyons-double-burner-glass-gas-cooker-regulator-pipe.html": {
+  "hash": "2acf326374ba7777719c7fab34f8b9486586b37f",
+  "lastmod": "2026-11-06"
+ },
+ "/p/ailyons-6l-electric-pressure-cooker-digital.html": {
+  "hash": "a62c420f212389a2c895b000c50eabcdf1eefd28",
+  "lastmod": "2026-11-06"
+ },
+ "/p/xuanku-unisex-white-gold-fashion-sport-sneakers.html": {
+  "hash": "6a567e5a8c1fa4dcb0764e41732c6edb44dc690a",
   "lastmod": "2026-11-06"
  },
  "/p/waanzilish-mens-black-feather-casual-sneakers.html": {
-  "hash": "4194cab98c55162592ca7a5a95b8c4d2515663dc",
+  "hash": "b5651119cb6951a2bd543e7636c89b7711ac8ce4",
   "lastmod": "2026-11-06"
  },
  "/p/32-inch-frameless-qled-smart-android-tv-free-accessories.html": {
   "hash": "ac71601763d684fbab44c9d926851935344c5dbb",
   "lastmod": "2026-11-06"
  },
- "/p/amaze-fridge-freezer-guard-with-6-way-extension.html": {
-  "hash": "e1c49acf4e232029694d1c279db8ef5c423f5fa5",
-  "lastmod": "2026-11-05"
- },
- "/p/ailyons-double-burner-glass-gas-cooker-regulator-pipe.html": {
-  "hash": "8484db260a119425cf94565bf0efb688a70aaad4",
-  "lastmod": "2026-11-06"
- },
- "/p/smartphone-gift-bundle-led-watch-power-bank-earbuds.html": {
-  "hash": "fb50ed8100e6a1ccf04ad4eb98b5f368befe2f0e",
-  "lastmod": "2026-11-06"
- },
- "/p/ailyons-6l-electric-pressure-cooker-digital.html": {
-  "hash": "37e67559a6d9d476d0bfe1be9983cfe5668451ed",
-  "lastmod": "2026-11-06"
- },
- "/p/xuanku-unisex-white-gold-fashion-sport-sneakers.html": {
-  "hash": "46107f820cb58f308961dc489690cf474d92e84d",
-  "lastmod": "2026-11-06"
- },
  "/p/hisense-1-5l-2-in-1-blender-with-grinder-500w.html": {
-  "hash": "8861a630896622aa3427ba11986a21b8d77a82ff",
+  "hash": "b60ff3257fc7d5ebff23fe7d1c6306a38f0cdc07",
   "lastmod": "2026-11-06"
  },
  "/p/samsung-galaxy-a16-4gb-128gb-25w-adapter-watch-cover.html": {
-  "hash": "7557e7998715469b69387a892087925cff32424f",
+  "hash": "af6896b1429b40780be73f59188657c88d9b97c2",
   "lastmod": "2026-11-06"
+ },
+ "/p/amaze-fridge-freezer-guard-with-6-way-extension.html": {
+  "hash": "e1c49acf4e232029694d1c279db8ef5c423f5fa5",
+  "lastmod": "2026-11-05"
  },
  "/p/mens-casual-sports-sneaker-black.html": {
   "hash": "abd4ba45fd7d288c4e43fe4ca37dc1ef0e48a876",
@@ -628,7 +628,7 @@
   "lastmod": "2026-11-05"
  },
  "/p/roch-mechanical-microwave-oven.html": {
-  "hash": "6da3d092ad02435b141caf44c8fcdc9baa2e8821",
+  "hash": "fd86fe7726e1cd3e49b173ea5e5034c881662f6d",
   "lastmod": "2026-11-06"
  },
  "/p/glamstar-double-door-refrigerator.html": {
@@ -636,7 +636,7 @@
   "lastmod": "2026-11-06"
  },
  "/p/itel-smartphone.html": {
-  "hash": "67454a5b39f99431379509962bb03d5e3585e0aa",
+  "hash": "0234630d84940a2606c979888ac20670bcc38bfe",
   "lastmod": "2026-11-06"
  },
  "/p/portable-wireless-bluetooth-speaker.html": {
@@ -648,7 +648,7 @@
   "lastmod": "2026-11-06"
  },
  "/p/dahua-full-hd-gaming-monitor.html": {
-  "hash": "54d203827521e32b8f1434130748bbf437962303",
+  "hash": "6bf5770905c42f73ec4146092e96987916432226",
   "lastmod": "2026-11-06"
  },
  "/p/vision-plus-double-door-refrigerator.html": {
@@ -656,7 +656,7 @@
   "lastmod": "2026-11-06"
  },
  "/p/samsung-galaxy-a55-5g-1-piece.html": {
-  "hash": "7ae6f90b77bd08510bc3f00a0ce72dd83d1bd80a",
+  "hash": "a775d1d043e3f4cacbbf2fed78a4ed5fdb38c876",
   "lastmod": "2026-11-06"
  },
  "/p/easygro-calcium-water-soluble-fertilizer-14-0-2-te.html": {
@@ -672,11 +672,11 @@
   "lastmod": "2026-11-02"
  },
  "/p/greenberg-bronze-knapsack-sprayer.html": {
-  "hash": "dfa24aefaad43cb71eaa7cce10acefa40a727a76",
+  "hash": "2fde3ea18172e63c81bec5054ab62ff1622a5fa0",
   "lastmod": "2026-11-06"
  },
  "/p/tihan.html": {
-  "hash": "dc6deb787689483e3e1b445404c5f93767403b3b",
+  "hash": "13195fc5baadb8da6bc72b2c9c36f039b5df9fc1",
   "lastmod": "2026-11-06"
  },
  "/p/optimizer.html": {
@@ -696,11 +696,11 @@
   "lastmod": "2026-11-06"
  },
  "/p/engeo-247sc.html": {
-  "hash": "8072135da1aeecb8dc2c2fb64cef02dbece88f2c",
+  "hash": "d596440dfb5650ab1682c793edc9741f03a1b067",
   "lastmod": "2026-11-06"
  },
  "/p/agita-1gb-fly-bait-20g.html": {
-  "hash": "bac56ae46fbd6e894c2178aa01bb9c79174e634d",
+  "hash": "e48f4a67f221a114f26b66160e05a3b0e37b9b2b",
   "lastmod": "2026-11-06"
  },
  "/p/revus-250sc.html": {
@@ -708,35 +708,35 @@
   "lastmod": "2026-11-06"
  },
  "/p/light-duty-safety-helmet-standard.html": {
-  "hash": "ab36dc1a0621bd7e83d65b225492b3db37edf741",
+  "hash": "e553fcf21fa051b67bd9b7eb5a60e9f5c4bed716",
   "lastmod": "2026-11-06"
  },
  "/p/generic-7l-electric-ulv-portable-fogger-sprayer-machine-1-unit.html": {
-  "hash": "8ca1fa7123a6e0779e2f0e917aa540f4ab9ff04c",
+  "hash": "943eb9b78a676a8e408ec9174ac580e79ebbaf2f",
   "lastmod": "2026-11-06"
  },
  "/p/total-20l-knapsack-sprayer.html": {
-  "hash": "c6892800bd1a6612354e332147f3f1680cd25c58",
+  "hash": "7073cd1845148144d11ffd10ed69aaedc3d78ab6",
   "lastmod": "2026-11-06"
  },
  "/p/thermal-fogging-machine-pulsed-power-sprayer-1-unit.html": {
   "hash": "6798f9309998e540bc39570e6e3eb28bfd95e47c",
   "lastmod": "2026-11-06"
  },
+ "/p/solar-powered-wasp-traps-3-piece-set.html": {
+  "hash": "7739e0cd7ff8ccf4c9c74a9e539617c77fb5c294",
+  "lastmod": "2026-11-06"
+ },
  "/p/kmax-italy-20l-manual-knapsack-sprayer.html": {
-  "hash": "3e186e7ef174f743dc5ad9be6db6c0006482a88d",
+  "hash": "076552c8a00ff4ce3d1b18180dd7d973e260f02a",
   "lastmod": "2026-11-06"
  },
  "/p/mos-kill-green-mosquito-coils-10pcs-125g.html": {
-  "hash": "796045a83b84a0fda889655e411f0c267cb60be6",
-  "lastmod": "2026-11-06"
- },
- "/p/solar-powered-wasp-traps-3-piece-set.html": {
-  "hash": "8eb01d47ae9ec9135109c4bed0a9e6e6894eaf61",
+  "hash": "f51631b24ccb5157912b7dadd5f053dcdd193a14",
   "lastmod": "2026-11-06"
  },
  "/p/mos-kill-electric-liquid-vaporizer-35ml-kit.html": {
-  "hash": "825c1a78edf468e63a04afa25fbf9e5f3f516012",
+  "hash": "048168d1688d6bf164c75575c7b986c93c43dd7f",
   "lastmod": "2026-11-06"
  },
  "/p/shenke-cockroach-killer-powder-sachet-8g.html": {
@@ -744,279 +744,279 @@
   "lastmod": "2026-11-06"
  },
  "/p/nano-blue-light-spray-gun-atomizer-280ml.html": {
-  "hash": "e6fcd60690fdd5d4c5ee0f019ffb4c137d48dbdd",
+  "hash": "e10247dc6294b0a2891c3d768223bc1cc957d18e",
   "lastmod": "2026-11-06"
  },
  "/p/petrol-thermal-fogger-machine-fumigation.html": {
-  "hash": "efd6dc4f29736fa3e4a08223ad829529c48cf5ff",
-  "lastmod": "2026-11-06"
- },
- "/p/covermax-organosilicone-super-spreader-adjuvant-1-litre.html": {
-  "hash": "d008ab3b3330f4b81f6753d4c86f2f6613c58335",
-  "lastmod": "2026-11-05"
- },
- "/p/stainless-steel-pruning-shears-secateurs.html": {
-  "hash": "537f3ff74ca5418fba251e5f07dd7879269a6902",
-  "lastmod": "2026-11-05"
- },
- "/p/respirator-mask-with-goggles-safety-set.html": {
-  "hash": "cf85ac5bc4912f4c331d319f5b674a3d2e938d0f",
+  "hash": "f68e5bea20b12afec357b7547626b1a0098deddc",
   "lastmod": "2026-11-06"
  },
  "/p/yellow-chemical-spray-coverall-hood-boot-covers.html": {
-  "hash": "3551d9878fd9b229a61b86a42e3dc53ffb00c0cc",
+  "hash": "4ed8126576f410e6236b701635350da67f018437",
   "lastmod": "2026-11-06"
  },
  "/p/irrigation-screen-filter-2-inch-mesh-element.html": {
   "hash": "649d7882645c8ec156ece1ac2c8a103b9ccce962",
   "lastmod": "2026-11-05"
  },
- "/p/e-pos-80mm-thermal-receipt-printer.html": {
-  "hash": "e0c276ab4b61532321f8b3963ea256b5f0c40ea8",
+ "/p/respirator-mask-with-goggles-safety-set.html": {
+  "hash": "9fcd7e3a7426a4df22eb369ab1f20acd3ef3ce4e",
   "lastmod": "2026-11-06"
  },
- "/p/canon-pixma-g3430-all-in-one-wifi-ink-tank-printer.html": {
-  "hash": "1ee025871592ea9c566e5f29c6c06c20a43b6707",
-  "lastmod": "2026-11-06"
+ "/p/stainless-steel-pruning-shears-secateurs.html": {
+  "hash": "537f3ff74ca5418fba251e5f07dd7879269a6902",
+  "lastmod": "2026-11-05"
  },
- "/p/apple-iphone-17-pro-max-256gb-orange.html": {
-  "hash": "79e497b7856d041f0f9b8627b80002ff8eb3223c",
-  "lastmod": "2026-11-06"
- },
- "/p/asus-zenbook-14-oled-laptop.html": {
-  "hash": "79f58540830d555f6e7f1d4af1db4eb0ed31f462",
-  "lastmod": "2026-11-06"
- },
- "/p/asus-rog-zephyrus-g16-gaming-laptop-platinum-white.html": {
-  "hash": "5972604ab58498af95875a48097fea7e604a0566",
-  "lastmod": "2026-11-06"
- },
- "/p/epson-ecotank-l3250-wifi-all-in-one-ink-tank-printer.html": {
-  "hash": "f0ff7ce068a5eeb4ad89cc5cf8640e135ab2eb1d",
-  "lastmod": "2026-11-06"
- },
- "/p/apple-iphone-16-128gb-green.html": {
-  "hash": "033ce75729ccf432d59f3e95e95bbbb21d55d691",
-  "lastmod": "2026-11-06"
- },
- "/p/apple-macbook-pro-14-m3-pro-space-black.html": {
-  "hash": "e2f351e3cfb28f9e0a16d4ba80c1b88791a5e540",
-  "lastmod": "2026-11-06"
+ "/p/covermax-organosilicone-super-spreader-adjuvant-1-litre.html": {
+  "hash": "d008ab3b3330f4b81f6753d4c86f2f6613c58335",
+  "lastmod": "2026-11-05"
  },
  "/p/asus-150w-laptop-charger-adapter-19-5v-7-7a.html": {
-  "hash": "2bcbf674eca703a54f950e6409167b33a6f8dfe9",
+  "hash": "8c00378725be07b3d03ee2cabf3f42a6af73d70f",
   "lastmod": "2026-11-06"
  },
  "/p/apple-iphone-16-128gb-white.html": {
-  "hash": "865f144f8fd38310f9dea298ae50576dec7f6c87",
+  "hash": "f3013303c45a1fecf281b9c232ae0dc145b0d14b",
+  "lastmod": "2026-11-06"
+ },
+ "/p/apple-iphone-17-pro-max-256gb-orange.html": {
+  "hash": "177dcbd96dfc087e3e714b902118ccefd26bba79",
+  "lastmod": "2026-11-06"
+ },
+ "/p/asus-zenbook-14-oled-laptop.html": {
+  "hash": "5f1d0ae444d7ac3135f7b473784646405ec7ec14",
+  "lastmod": "2026-11-06"
+ },
+ "/p/asus-rog-zephyrus-g16-gaming-laptop-platinum-white.html": {
+  "hash": "d255339f5df58b64c4e0f81b410225fdb3ef001e",
+  "lastmod": "2026-11-06"
+ },
+ "/p/apple-iphone-16-128gb-green.html": {
+  "hash": "ff401b0437b28294b230754ce4665e9ec0e35bf6",
+  "lastmod": "2026-11-06"
+ },
+ "/p/e-pos-80mm-thermal-receipt-printer.html": {
+  "hash": "51e2c26519ebef588b16d78301d36af97ab4613d",
   "lastmod": "2026-11-06"
  },
  "/p/canon-pixma-g2410-all-in-one-refillable-ink-tank-printer.html": {
-  "hash": "2a538a4908f2795dffb879c41a182d4d79456ea6",
+  "hash": "c542f25c854bd632e66dec584878765ddb151f1c",
+  "lastmod": "2026-11-06"
+ },
+ "/p/epson-ecotank-l3250-wifi-all-in-one-ink-tank-printer.html": {
+  "hash": "c70f922961dafaf985b273a0216a6d7ed4e0eefb",
+  "lastmod": "2026-11-06"
+ },
+ "/p/canon-pixma-g3430-all-in-one-wifi-ink-tank-printer.html": {
+  "hash": "2d754be54f07eeb831adddec97d0d4a3ca8449b6",
+  "lastmod": "2026-11-06"
+ },
+ "/p/apple-macbook-pro-14-m3-pro-space-black.html": {
+  "hash": "6c76b781503c6829c9326a0b2153e4dc9d9f0bac",
   "lastmod": "2026-11-06"
  },
  "/p/hp-laserjet-mfp-m141w-wireless-mono-laser-printer.html": {
-  "hash": "11f752b8e1cf037b17d9b41a4a6ad67ac7f7d542",
+  "hash": "e12c88b51f1ffc9eb56f9e38ebfdf5643dd14fd1",
   "lastmod": "2026-11-06"
  },
  "/p/mercedes-benz-cla-200-for-sale-kenya.html": {
   "hash": "5027dc0fcd14facbc91b4716860237434e60944e",
   "lastmod": "2026-11-06"
  },
- "/p/pyramid-trek-citriodiol-insect-repellent-60ml.html": {
-  "hash": "34eb00e0ca415f5b1def852293628998f679f22e",
-  "lastmod": "2026-11-06"
- },
  "/p/lockable-rodent-bait-station.html": {
-  "hash": "02b9605e1ef4d892867322aefa35efe1c8b4b802",
+  "hash": "2e9c5a7c95a7eaa51a105af278331a1cfb58e318",
   "lastmod": "2026-11-06"
  },
  "/p/blue-touch-jumbo-rat-glue-traps-2-pack.html": {
-  "hash": "e4eb2f103dee9d1f3a482e374721180f74462848",
+  "hash": "8bddb2b7f24faadffea633a696180687847e2240",
   "lastmod": "2026-11-06"
  },
  "/p/shenke-electric-mosquito-mats-30-pack.html": {
-  "hash": "09714be27e81c6e1b33239c5b2f8939ec99daf83",
+  "hash": "889b65c673a5a3ae0401e444cdaa37686ff420d9",
   "lastmod": "2026-11-06"
  },
- "/p/vaultex-half-face-respirator.html": {
-  "hash": "79b2ff1752558cd355251a9fa70218dac4e088e3",
-  "lastmod": "2026-11-06"
- },
- "/p/knapsack-sprayer-spare-parts-kit.html": {
-  "hash": "d5ad0b722f11994846a198d4eea4b89e94d7cdb5",
-  "lastmod": "2026-11-06"
- },
- "/p/humane-live-mouse-trap.html": {
-  "hash": "1586cc016bf317a4b7a2e380f8ae38911a5863ff",
-  "lastmod": "2026-11-06"
- },
- "/p/mechanical-rat-snap-trap.html": {
-  "hash": "4ef08241d94cc8af739719edb1c882a64009ba20",
-  "lastmod": "2026-11-06"
- },
- "/p/multiple-catch-mouse-trap.html": {
-  "hash": "9fa9d805d1181d332acb5cd2933e26e427318c66",
+ "/p/pyramid-trek-citriodiol-insect-repellent-60ml.html": {
+  "hash": "f6d9372a8ab0848f136391c5137bcc05279a72a7",
   "lastmod": "2026-11-06"
  },
  "/p/20w-uv-electric-insect-killer.html": {
-  "hash": "1c338e00a8dc92cfd14c859d32d20deb6f7a9e3c",
+  "hash": "5ad05cef597e40f599c594f63b0b1c47ab368152",
   "lastmod": "2026-11-06"
  },
- "/p/rechargeable-electric-mosquito-racket-led.html": {
-  "hash": "c6bcc0d52d23e846112b990a2999f1f25315a3b4",
-  "lastmod": "2026-11-06"
- },
- "/p/yellow-sticky-traps-30-pack.html": {
-  "hash": "0050d713c31c4a196077ad4538c8cd4b23f009d6",
+ "/p/multiple-catch-mouse-trap.html": {
+  "hash": "186ac09358ebcbcb6c42370800ad06c22d539746",
   "lastmod": "2026-11-06"
  },
  "/p/mosquito-window-net-screen.html": {
-  "hash": "c77d529044c5639e4791fca8a7c8852ed2690b6b",
+  "hash": "6314581e90db84dc2dec538a01aedee75753c4fd",
+  "lastmod": "2026-11-06"
+ },
+ "/p/rechargeable-electric-mosquito-racket-led.html": {
+  "hash": "f58916b2529ff97c47d2ddb1ecffc71a83295881",
+  "lastmod": "2026-11-06"
+ },
+ "/p/humane-live-mouse-trap.html": {
+  "hash": "dd4d699c178575b4692a80a3d252a2e7270bbab2",
+  "lastmod": "2026-11-06"
+ },
+ "/p/knapsack-sprayer-spare-parts-kit.html": {
+  "hash": "e085b54e4716820b1234fb87e669cf44bb618cc3",
+  "lastmod": "2026-11-06"
+ },
+ "/p/vaultex-half-face-respirator.html": {
+  "hash": "3c24db105adcbe0d1aa53b37f8ff0cbca5245837",
+  "lastmod": "2026-11-06"
+ },
+ "/p/yellow-sticky-traps-30-pack.html": {
+  "hash": "b76b49a206744b42a22e36f2793da0eec3b0bc96",
+  "lastmod": "2026-11-06"
+ },
+ "/p/mechanical-rat-snap-trap.html": {
+  "hash": "ba8f588d1c6f9c6c87035aab1ca545ce1040e062",
   "lastmod": "2026-11-06"
  },
  "/p/multiple-catch-rat-trap.html": {
-  "hash": "95b3ab8df232c018f6ceddd881e83e98a6be21ca",
+  "hash": "f75f010baea179a1c0a44e16d2fe34c04e2311dc",
   "lastmod": "2026-11-06"
  },
  "/p/ocean-blue-nitrile-powder-free-examination-gloves-100-pack.html": {
-  "hash": "981847cca913c658bde975b6756d3f545bfbb655",
+  "hash": "f3508ecbe1d0fe7df57e32b1aba7b705de40ea49",
   "lastmod": "2026-11-06"
  },
  "/p/long-heavy-duty-chemical-rubber-gloves.html": {
-  "hash": "ebea6a00b5ddb0c14bb92f3419cb0a5b9a7def09",
-  "lastmod": "2026-11-06"
- },
- "/p/white-laboratory-coat.html": {
-  "hash": "42e0d6ea56304ed44cf8d1a341d5d696f1445ecf",
-  "lastmod": "2026-11-06"
- },
- "/p/clear-anti-fog-safety-goggles.html": {
-  "hash": "2ba6092e6f3dd6be1eb41f35676256c499a3da16",
-  "lastmod": "2026-11-06"
- },
- "/p/steel-toe-safety-boots.html": {
-  "hash": "b8dcba6d52d80fc7e376658d9a2d2c16bb58df1b",
+  "hash": "fa36bae6a01a5e564bc96bf714900ec1060c7368",
   "lastmod": "2026-11-06"
  },
  "/p/disposable-cpe-shoe-covers-100-pack.html": {
-  "hash": "0a36b584987675b36a4a66f692122b41cf04ae8d",
+  "hash": "3e44295a041f9e4a0842e1bf3f6e33834b49424e",
+  "lastmod": "2026-11-06"
+ },
+ "/p/clear-anti-fog-safety-goggles.html": {
+  "hash": "b5e73e6dcfb1f99f0a7a8b128df835fe2ed9c39c",
   "lastmod": "2026-11-06"
  },
  "/p/disposable-clear-face-shield.html": {
-  "hash": "552c7eba087e1002fad384128541161ed2ab2ace",
+  "hash": "01748e5272f3a8815b0a9d577584b05c6db09b12",
   "lastmod": "2026-11-06"
  },
- "/p/disposable-surgical-gown.html": {
-  "hash": "aad92c92d1d7f1ac755ad295d1b0b8b4828e52e5",
+ "/p/white-laboratory-coat.html": {
+  "hash": "1ed66d84ec4de03b1709917bde4bec38ff9b1154",
   "lastmod": "2026-11-06"
  },
- "/p/industrial-polycotton-dust-coat.html": {
-  "hash": "68274a989939ed75dbd54bfb37e3f728dd1d55a4",
-  "lastmod": "2026-11-06"
- },
- "/p/aluminium-brush-door-sweep-pest-exclusion.html": {
-  "hash": "98355fb9ca81b44ba14ac7e1d38711a1ab9d8fd3",
+ "/p/steel-toe-safety-boots.html": {
+  "hash": "b514deb65665381ab2c1889157372c5a73a051ab",
   "lastmod": "2026-11-06"
  },
  "/p/3m-8210-n95-dust-respirator.html": {
-  "hash": "957c9b033cbce3d8a034a7f26c0469caaaa08658",
+  "hash": "c0399e64cccfebf2ab3515372b678d60dfb5c2d5",
   "lastmod": "2026-11-06"
  },
  "/p/uv-insect-killer-replacement-tubes-pair.html": {
-  "hash": "ed888f0e2d8334a424447cdfff66839d2814aa64",
+  "hash": "f82a946db94b783814521033dc838d2de00b2064",
+  "lastmod": "2026-11-06"
+ },
+ "/p/industrial-polycotton-dust-coat.html": {
+  "hash": "8b9d028ecb3edce7707fa5267cf3785c63186265",
+  "lastmod": "2026-11-06"
+ },
+ "/p/disposable-surgical-gown.html": {
+  "hash": "43777c40a3930801ef8180fc0682f9c9cb46b779",
+  "lastmod": "2026-11-06"
+ },
+ "/p/aluminium-brush-door-sweep-pest-exclusion.html": {
+  "hash": "678963260b13b502e06543c895d014c1a7f928e2",
   "lastmod": "2026-11-06"
  },
  "/p/horiver-insect-traps-10-pack.html": {
-  "hash": "05b52c79a72232de64c84ac462e96244f2dca2d2",
+  "hash": "b2d2c830261ad9f8209334eeaa87372a724cc1ff",
   "lastmod": "2026-11-06"
  },
  "/p/horiver-yellow-rollertrap-100m.html": {
-  "hash": "c2f4d0203c074bccade9eb22ec23021a3a425b1c",
+  "hash": "f116a80460c49ebc2eaaca682655ad45afa8f74e",
   "lastmod": "2026-11-06"
  },
  "/p/bata-heavy-duty-gumboots.html": {
-  "hash": "4ef3d1e152fb757ad5dcdf7fc387e8eb4f53525f",
+  "hash": "4a635101d5f7d4c559a561d681fb2cf6f1b99834",
   "lastmod": "2026-11-06"
  },
  "/p/amiran-knapsack-sprayer-16l.html": {
   "hash": "da9b788a053366e501de44a1f7dfcfc391b3259d",
   "lastmod": "2026-11-06"
  },
- "/p/yellow-glue-roll-optiroll-30cm-100m.html": {
-  "hash": "aa750f97d3984af604caed49f3981fe592137a75",
-  "lastmod": "2026-11-06"
- },
  "/p/fly-glue-boards-15pcs.html": {
-  "hash": "a5bcdeb76cea896e2ef1e1b742c3a16ceb87560c",
-  "lastmod": "2026-11-06"
- },
- "/p/red-top-fly-bag-trap.html": {
-  "hash": "9ffdbbc61b9e796e5ef1de1d5ee0f3e780ac208f",
-  "lastmod": "2026-11-06"
- },
- "/p/blue-glue-roll-optiroll-15cm-100m.html": {
-  "hash": "2862deb0907fb8d0382c0e98371fbf3caab70ba0",
-  "lastmod": "2026-11-06"
- },
- "/p/yellow-glue-roll-dermi-15cm-100m.html": {
-  "hash": "84e365fd5da8084240027e06e8e9ab87a5829e16",
+  "hash": "ee9bce354ef30443d1574edae8b5381fcb53f76e",
   "lastmod": "2026-11-06"
  },
  "/p/ed21-30w-fly-catcher.html": {
-  "hash": "77e8f3495a5a5224d078c16645bedd74cefebd49",
+  "hash": "926c0b19b0a461d08bff343f1c533c3a26f5421e",
   "lastmod": "2026-11-06"
  },
- "/p/rafiki-fly-catcher-8-piece.html": {
-  "hash": "8338f816e3a0cd4cb5fcaaae9a2e6998f77008aa",
+ "/p/red-top-fly-bag-trap.html": {
+  "hash": "7349f0d57b4ee8ad58aa6a8ec3416bc0dd7e94e9",
   "lastmod": "2026-11-06"
  },
- "/p/delta-trap-monitoring-device.html": {
-  "hash": "1b386521d59798c7a6e313aa5c8d330efa2f8e6e",
+ "/p/blue-glue-roll-optiroll-15cm-100m.html": {
+  "hash": "d5fa88e2c57e5179640b09549a91e0fbfea9cbec",
   "lastmod": "2026-11-06"
  },
  "/p/cross-vane-trap-black.html": {
-  "hash": "6ed09c7c65e418021b14fdce32d634ccc00cd491",
+  "hash": "9f41d21d90d0eba22b86f3b11c300320156c1ef4",
+  "lastmod": "2026-11-06"
+ },
+ "/p/delta-trap-monitoring-device.html": {
+  "hash": "d819e6b151de35a3c6ec51bd0e9af4d9e08d006f",
+  "lastmod": "2026-11-06"
+ },
+ "/p/yellow-glue-roll-optiroll-30cm-100m.html": {
+  "hash": "a1b45f52bc08543fae5afd324d01368c703bdac6",
   "lastmod": "2026-11-06"
  },
  "/p/funnel-bucket-insect-trap.html": {
-  "hash": "2c98d43771b44f52d071d4d53d9c84f65e780f0c",
+  "hash": "31d56936de1bbdebcceb9e64b4d3a342be2ac81c",
+  "lastmod": "2026-11-06"
+ },
+ "/p/yellow-glue-roll-dermi-15cm-100m.html": {
+  "hash": "6934f3c47186d97a2cfad9ec4ab2251e810acdd9",
+  "lastmod": "2026-11-06"
+ },
+ "/p/rafiki-fly-catcher-8-piece.html": {
+  "hash": "37988e4d185a824e21a5825c7afb466b8ccc997c",
+  "lastmod": "2026-11-06"
+ },
+ "/p/guardian-bait-station-translucent-cover.html": {
+  "hash": "0556971f71245ba075ed09ff08c30551d6431c4f",
   "lastmod": "2026-11-06"
  },
  "/p/stainless-steel-bird-pigeon-spikes-50cm.html": {
   "hash": "3f10d2553872678ed91c77643fadac48d42d910e",
   "lastmod": "2026-11-06"
  },
- "/p/econo-rat-bait-station.html": {
-  "hash": "c00fda895eb4a6924bf12751d821b5f6d3fe02f9",
-  "lastmod": "2026-11-06"
- },
- "/p/protecta-micro-bait-station.html": {
-  "hash": "ed974a00befef90541869a178e71212e1f75712c",
-  "lastmod": "2026-11-06"
- },
- "/p/rafiki-rat-mouse-glue-board.html": {
-  "hash": "e8f80595c7bbd664fefd390b35ec94ab93eadab3",
+ "/p/household-clothes-moth-trap.html": {
+  "hash": "3d97424f6b3f172fa6107ca646a27aa6f0826506",
   "lastmod": "2026-11-06"
  },
  "/p/combat-rodent-bait-station.html": {
-  "hash": "f1f478940e91c651ab31a3a989a349fd571f6866",
+  "hash": "78c0067095f38805d3dd25b8243e837c7cfd8686",
   "lastmod": "2026-11-06"
  },
- "/p/pantry-moth-pheromone-trap.html": {
-  "hash": "308e209cf8d9daccf222c233a432212875b6a07b",
+ "/p/rafiki-rat-mouse-glue-board.html": {
+  "hash": "c1c22b1f836c39c8c87b65af0c66d05fae3855ca",
   "lastmod": "2026-11-06"
  },
- "/p/household-clothes-moth-trap.html": {
-  "hash": "a607be7fc2ada13f933e3cd8c68666f838b1f6d7",
+ "/p/econo-rat-bait-station.html": {
+  "hash": "d531015b98a640912c5ac8ae1064ee419d8e4825",
   "lastmod": "2026-11-06"
  },
  "/p/rodirid-rodenticide-wax-blocks.html": {
-  "hash": "69c01d5a115fc3fbf1cd62e3cef21334868edcdf",
+  "hash": "f4d7efb5daa725e12ce3e54473d1a5333155c9b4",
   "lastmod": "2026-11-06"
  },
- "/p/guardian-bait-station-translucent-cover.html": {
-  "hash": "be4bb88076ed40bc3de4ab2250147366d527d5dd",
+ "/p/pantry-moth-pheromone-trap.html": {
+  "hash": "cfa403e109a356df6e9cfacb3b86d461eac2ae8d",
+  "lastmod": "2026-11-06"
+ },
+ "/p/protecta-micro-bait-station.html": {
+  "hash": "0b1e934848fc8c34c2286b8f8def66a97d9571d2",
   "lastmod": "2026-11-06"
  },
  "/p/t8-f10w-g13-uv-fly-killer-tubes-10w-2-pack.html": {
@@ -1032,7 +1032,7 @@
   "lastmod": "2026-11-06"
  },
  "/p/mos-kill-mat-vapouriser-electric-mosquito-heater.html": {
-  "hash": "56f5df792d8889df7d51152d730fe24221a54c48",
+  "hash": "11ccd20a403d12f00335e1cf269153af0bba4f62",
   "lastmod": "2026-11-06"
  },
  "/p/resolve-6-dust-insecticide-12-x-10g-sachets.html": {
@@ -1040,63 +1040,67 @@
   "lastmod": "2026-11-06"
  },
  "/p/thunder-145od-insecticide-100-ml.html": {
-  "hash": "89efef9b2937150ab6cb6bdffe7a5162fa014be2",
+  "hash": "39eef74c2bffd11f6662af1140aafaa810b2cfb0",
   "lastmod": "2026-11-06"
  },
  "/p/radiant-120sc-insecticide-100ml.html": {
-  "hash": "616433f8231fd2b8f572956abe19983d02326e17",
+  "hash": "fa1b183ca77a95a08c57fe32d12a960e287f04b6",
   "lastmod": "2026-11-06"
  },
  "/p/agrimec-018ec-insecticide-100ml.html": {
-  "hash": "4c2b02fe973391da83991836e3a55fde6ab4fdc0",
-  "lastmod": "2026-11-06"
- },
- "/p/confidor-200sl-insecticide-250ml.html": {
-  "hash": "0b2687d78c6b47bb58186559a369b5f8f2e68a5f",
-  "lastmod": "2026-11-06"
- },
- "/p/danadim-progress-400ec-insecticide-1l.html": {
-  "hash": "e74dc4ce65f73a2a57e125c3e1d77fe5b7a96cc7",
-  "lastmod": "2026-11-06"
- },
- "/p/mospilan-20sp-insecticide-100g.html": {
-  "hash": "afbff74e6e815268351055cb40575e6964bd6f36",
+  "hash": "41181aed4f0ba8e2d00407a4c669ce174aa07091",
   "lastmod": "2026-11-06"
  },
  "/p/decis-2-5ec-insecticide-500ml.html": {
-  "hash": "a6fb0e99159ff3198123cd89df71e926a8a13114",
+  "hash": "4d2a6d49cc390753881e5c61bf10be65a3edd92a",
+  "lastmod": "2026-11-06"
+ },
+ "/p/danadim-progress-400ec-insecticide-1l.html": {
+  "hash": "7f5fc89053f9616a0d38426a479032fbf7f0a6ac",
   "lastmod": "2026-11-06"
  },
  "/p/voliam-targo-063sc-insecticide-100ml.html": {
-  "hash": "7a3cba39decebf574891d88c1dfdb50284a6876d",
+  "hash": "9825a750d3ed710b30118691c7ccd0a853719bd5",
+  "lastmod": "2026-11-06"
+ },
+ "/p/confidor-200sl-insecticide-250ml.html": {
+  "hash": "7fca2ac9fe00faf5afd56a5e7937936e83953c38",
+  "lastmod": "2026-11-06"
+ },
+ "/p/mospilan-20sp-insecticide-100g.html": {
+  "hash": "c87063a99f4ee88d5d098481c389a964a229a115",
   "lastmod": "2026-11-06"
  },
  "/p/vectorfog-dc20-cordless-ulv-fogger.html": {
   "hash": "f8ac46dcf016dd764d50331aa108a5ad69059ade",
   "lastmod": "2026-11-06"
  },
- "/p/belt-480sc-insecticide-50ml.html": {
-  "hash": "db608a187afe588e2ea50c7b0e5be9bb2ec94d20",
+ "/p/coragen-20sc-insecticide-200ml.html": {
+  "hash": "545254c85ebb28f505421ee7a23764eeb1d43826",
   "lastmod": "2026-11-06"
  },
- "/p/dynamec-18ec-insecticide-1l.html": {
-  "hash": "684f95691d116163666178dbf6242203e12ae31a",
+ "/p/dynamec-18ec-insecticide-10ml.html": {
+  "hash": "87bb5318ed274d0cdd6711899e05aa857daae9fb",
   "lastmod": "2026-11-06"
  },
- "/p/coragen-20sc-insecticide-30ml.html": {
-  "hash": "013862f32a6dbdab170bed5c02010cb9632b3a33",
+ "/p/belt-480sc-insecticide-1l.html": {
+  "hash": "55f2733d742ad4818031283a12a1b4870b548877",
   "lastmod": "2026-11-06"
  },
  "/p/match-050ec-insecticide-1l.html": {
-  "hash": "d0b533ae621be30d17cddd3a120d51e5ce11579a",
+  "hash": "77f81cbce571e33f7d205167ecf0e25ec04042e5",
+  "lastmod": "2026-11-06"
+ },
+ "/p/escort-19ec-insecticide-1l.html": {
+  "hash": "9748ee65a8f650bfa86cb49eb01948017a63afeb",
   "lastmod": "2026-11-06"
  },
  "/c/kitchen-dining.html": {
-  "hash": "65dd12883dff1c042a9138d52980b7886590899a",
+  "hash": "f1638fc3fdb24689f13345a149eb98cc347b7803",
   "lastmod": "2026-11-06"
  },
  "/c/crop-insecticides.html": {
-  "hash": "4a253570fec6090b013db63a704ab38939e5b77f",
+  "hash": "7e819320f9da8f7d79f73a44512a66424de1d09c",
   "lastmod": "2026-11-06"
  },
  "/c/disinfectants-hygiene.html": {
@@ -1112,15 +1116,15 @@
   "lastmod": "2026-11-06"
  },
  "/c/termite-control.html": {
-  "hash": "e01fe8644aae491a73b381c4feec71da95e8b694",
+  "hash": "48a7c6cf7871cbdecefbf594310e206bb5fdd0ee",
   "lastmod": "2026-11-06"
  },
  "/c/rodent-control.html": {
-  "hash": "85d147da8e6235ca301c6bd028e94cf98ff27985",
+  "hash": "f388ea8892ee8671f17544ef870783070ba6215c",
   "lastmod": "2026-11-06"
  },
  "/c/pest-control-fumigation.html": {
-  "hash": "92850f2bb39890ddc7434ab55f01e782e846b3b8",
+  "hash": "91d7321445d0b3a28fb2d135831fdafdf8a73f91",
   "lastmod": "2026-11-06"
  },
  "/c/fumigation-chemicals.html": {
@@ -1128,7 +1132,7 @@
   "lastmod": "2026-11-06"
  },
  "/c/animal-feeds.html": {
-  "hash": "b9db40069900ed65c6c3052de25c5c2e0ae67367",
+  "hash": "2aa758edaae6f48bcbf9ae7184a8780849cc926a",
   "lastmod": "2026-11-06"
  },
  "/c/herbicides.html": {
@@ -1136,7 +1140,7 @@
   "lastmod": "2026-11-06"
  },
  "/c/sprayers-equipment.html": {
-  "hash": "633f84949f7e066cf6cb04a41e6aa7e363ede41a",
+  "hash": "0f123145f1c5e5a94a87195b4c296655e5f8a7df",
   "lastmod": "2026-11-06"
  },
  "/c/cockroach-ant-killers.html": {
@@ -1144,15 +1148,15 @@
   "lastmod": "2026-11-06"
  },
  "/c/fertilizers.html": {
-  "hash": "f3ace212b9f3716fce48ac2a369e94570a45d4a8",
+  "hash": "9d46a2428007067c14f83c84ece88e12288fbe79",
   "lastmod": "2026-11-06"
  },
  "/c/veterinary-drugs.html": {
-  "hash": "7ca41133259ee443e47bb855936421139d216741",
+  "hash": "82228bb110102cbf9d95c1d1e7889b1659fb58b9",
   "lastmod": "2026-11-06"
  },
  "/c/agrovet.html": {
-  "hash": "6b8a32fae5a1236e3da0d13baaf12c5a60c8f324",
+  "hash": "cce935d712748063388d9c8be26bd3d745e17406",
   "lastmod": "2026-11-06"
  },
  "/c/adjuvants-growth-regulators.html": {
@@ -1160,7 +1164,7 @@
   "lastmod": "2026-11-05"
  },
  "/c/mosquito-fly-control.html": {
-  "hash": "f470d2bf6c700b90ed268a61b332c0d5351d40ef",
+  "hash": "d7ffa61efd9ad9280f6a26a901da1eff78e1e52a",
   "lastmod": "2026-11-06"
  },
  "/c/washing-machines.html": {
@@ -1188,11 +1192,11 @@
   "lastmod": "2026-11-06"
  },
  "/c/appliances.html": {
-  "hash": "2de6f63e9b959031c3b0a77cc86c1f39c00d1a6c",
+  "hash": "092998c4032e20f51e313f7234abbb8065f81c53",
   "lastmod": "2026-11-06"
  },
  "/c/phones-tablets.html": {
-  "hash": "98cb83f71bc78a006bf0935251767d9170387ec9",
+  "hash": "81a1b03dc018c3285ec3b3d5d7dcd38efd346b3f",
   "lastmod": "2026-11-06"
  },
  "/c/watches-jewellery.html": {
@@ -1212,7 +1216,7 @@
   "lastmod": "2026-11-02"
  },
  "/c/shoes.html": {
-  "hash": "4515215acc0dda08af67c4de1254b8730d2e18b4",
+  "hash": "43fdff84589ca9beb5c5c2e8271efc60b1369ee5",
   "lastmod": "2026-11-06"
  },
  "/c/electrical-lighting.html": {
@@ -1224,7 +1228,7 @@
   "lastmod": "2026-11-02"
  },
  "/c/computing.html": {
-  "hash": "a703cd4d0afb71f891f707bae7f00e9eda2d95f5",
+  "hash": "6b6ab6c3c06ca44918510d1ba5fb058aad6bf7ea",
   "lastmod": "2026-11-06"
  },
  "/c/seeds-seedlings.html": {
@@ -1236,7 +1240,7 @@
   "lastmod": "2026-11-05"
  },
  "/c/protective-wear-safety.html": {
-  "hash": "8ccff29830da99e6f0bef1200540833192d28595",
+  "hash": "0314d4b708ba133a1af0347b8bd8a1b201e9a4d3",
   "lastmod": "2026-11-06"
  },
  "/c/water-tanks-irrigation.html": {
@@ -1244,7 +1248,7 @@
   "lastmod": "2026-11-02"
  },
  "/c/printers-office-machines.html": {
-  "hash": "a819b28ab09ad0897f738de32c92863c4845cbbd",
+  "hash": "13449341db821dfcb1ad85cc30acdb7225b7355c",
   "lastmod": "2026-11-06"
  },
  "/c/automotive.html": {
@@ -1252,7 +1256,7 @@
   "lastmod": "2026-11-03"
  },
  "/c/agrochemicals.html": {
-  "hash": "452c99cec64f9efc968a2babc6fb9d9cf0d15c25",
+  "hash": "20dc00b0fba46c50a0733cf3309fe1a5397d81a0",
   "lastmod": "2026-11-06"
  },
  "/c/tvs-audio.html": {
@@ -1260,11 +1264,11 @@
   "lastmod": "2026-11-06"
  },
  "/c/": {
-  "hash": "681eadd13d67cfd2e3c9b8062af0f0284ffdf474",
+  "hash": "c4ee11e0562e9b5eacc1118b708a41891e1aa9fe",
   "lastmod": "2026-11-06"
  },
  "/products.html": {
-  "hash": "1611bdff42d6d7b176f4bb2d6be86d7df1c1c4f5",
+  "hash": "aa59c30448ad0b420bcb68c8a93393d03631f1f2",
   "lastmod": "2026-11-06"
  }
 }
