@@ -1453,3 +1453,11 @@ Owner explicitly said last chance, work properly, connect GitHub/Supabase and pu
 
 - Final Supabase check: all 20 products now resolve to an image object in `product-images`; all current primary files are at least 11,294 bytes. Fourteen primary image URLs were switched to new supplier originals and Super Gro's existing WebP was refreshed (2.3KB → 29.7KB). The five remaining images were already larger source files.
 - Triggered the product-page rebuild by committing a harmless workflow-file comment; workflow run/deployment completion still needs checking in Actions.
+
+
+## 2026-11-06 — Further photo repair attempt (latest 20-product batch)
+- Replaced and activated three additional supplier images in Supabase Storage: Algreen Supa-K, YaraVita Crop Boost (1030×1030 supplier original), and Golden Leaf Organosilicone. Each upload returned HTTP 200 and the product records now point to the new Storage objects.
+- Algreen Bonzin replacement was not applied: the indexed Truvets image URL now returns HTTP 404. Existing primary image remains 23,504 bytes; needs a working high-resolution product image source.
+- Super Nitro Humix replacement was not applied: Agroduka's product-page image is only 319×319 (and the detailed image is 158×319), below the uploader's 450×450 minimum. Existing 331,252-byte image remains in place pending a higher-resolution authentic source.
+- Rebuild trigger commit: d03beeda24ccedcb8b6f58cd5680e3ef8e9fa938. Build product pages run #390 was observed in progress at last check; do not claim deployment complete until Actions reports success and live pages are checked.
+- Important: file byte size is not a substitute for pixel dimensions or visual sharpness. Three refreshed images are uploaded; two products still need suitable verified originals. The other 15 had already been refreshed in the earlier repair work.
