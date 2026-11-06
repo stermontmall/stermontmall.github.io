@@ -34,7 +34,7 @@
       'body.kp-nav{padding-bottom:64px}body.kp-nav #wa-float{bottom:calc(76px + env(safe-area-inset-bottom,0px))}}' +
       'ul.g li{position:relative}' +
       '.kp-b{position:absolute;top:.6rem;left:.6rem;z-index:2;background:#dc2626;color:#fff;font-weight:800;font-size:.72rem;border-radius:999px;padding:.18rem .5rem;box-shadow:0 2px 6px rgba(220,38,38,.35)}' +
-      '.kp-so img{opacity:.5}.kp-so .kp-b{background:#6b6b80;box-shadow:none}' +
+      '.kp-so img{opacity:1!important;filter:none!important}.kp-so .kp-b{background:#6b6b80;box-shadow:none}' +
       '.kp-old{color:#78738d;font-size:.8rem;font-weight:500;margin-left:.35rem}' +
       '.kp-th{display:flex;gap:.5rem;overflow-x:auto;margin-top:.6rem;padding-bottom:.2rem;scrollbar-width:none}.kp-th::-webkit-scrollbar{display:none}' +
       '.kp-th button{flex:none;width:62px;height:62px;padding:0;border:2px solid transparent;border-radius:10px;background:#fff;cursor:pointer;overflow:hidden}.kp-th button.on{border-color:#7c3aed}' +
@@ -99,7 +99,7 @@
             var s = el('s', 'kp-old', money(was)); pr.appendChild(s);
             li.insertBefore(el('span', 'kp-b', '-' + Math.max(1, Math.round((was - now) / was * 100)) + '%'), li.firstChild);
           }
-          if (Number(r.stock) <= 0) { li.classList.add('kp-so'); if (!li.querySelector('.kp-b')) li.insertBefore(el('span', 'kp-b', 'Sold out'), li.firstChild); }
+          if (r.stock != null && r.stock !== '' && Number(r.stock) <= 0) { li.classList.add('kp-so'); if (!li.querySelector('.kp-b')) li.insertBefore(el('span', 'kp-b', 'Sold out'), li.firstChild); }
         });
       });
     }
