@@ -1434,3 +1434,11 @@ Owner explicitly said last chance, work properly, connect GitHub/Supabase and pu
 - [ ] NEXT: review PR quality checks, merge the SEO content and allowlist, then verify product-page generation, canonical URLs, Product JSON-LD, sitemap entries and Pages deployment before claiming all pages are live.
 - Products: Algreen Bonzin 1L; Algreen Supa-K 1L; Goldchance Super Flowers & Fruits; Growcal MGB; Multi NPK 13-2-44 1kg; Plant Soul 1L; Polyfeed 1kg; Super Boron Extra 1L; Super Nitro Humix 1L; Vitabor Gold 1L; YaraVita Crop Boost 1L; YaraVita Powerboost 1L; Zinc Gold; Zincabor; Integra 1L; Golden Leaf 1L; Agral 90 1L; Super Gro 5L; Booster Foliar 500ml; Algreen Hynitro 42 1L.
 - Supplier sources are recorded in each Supabase product row. Some multi-pack supplier listings display a price range rather than a separate price for every size; verify the exact variant price against the pack label/supplier before changing price or margin.
+
+
+## 2026-11-06 — Product photo quality correction
+- Audited the latest 20 crop-nutrition/adjuvant products against Supabase Storage object metadata.
+- Confirmed 12 of 20 current images are extremely small (1,346–3,228 bytes); these must be replaced with genuine, high-resolution product photographs. The remaining 8 are larger files, but file size alone does not prove resolution or clarity.
+- Updated and deployed Supabase Edge Function `upload-photos` version 9. It now reads JPG/PNG/WebP dimensions and rejects images below 800×800 pixels. It also places a verified replacement first in `products.images` and removes older same-product image URLs from the gallery list.
+- Saved the deployed Edge Function source in the repository at `supabase/functions/upload-photos/index.ts` (commit `1041ab0c9a4409ba38a69f2df814e8c0cfdf094b`).
+- IMPORTANT: the upload guard is live, but the 12 low-resolution product photos have NOT yet been replaced. Do not mark the photo task complete until each of the 20 product images has been visually checked and the 12 poor sources have been replaced by genuine images that pass the 800×800 gate. Preserve all product data, pricing and SEO.
