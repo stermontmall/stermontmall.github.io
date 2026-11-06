@@ -1,3 +1,11 @@
+## 2026-11-06 22:50 Africa/Nairobi - checkout stays inside the mobile shell, no page redirect (branch `wip-shell-no-redirects-20261106`)
+Owner: "I need all pages on mobile shell without page redirects. Fix everything".
+- [x] Audit: every public page already carries the shell bars (`node seo-shell-chrome-all.mjs` = 0 changes of 65; only admin, upload-photos and the Google verification file have none, on purpose). The only customer-facing page jump left was Checkout: shell -> `/classic.html?checkout=1` -> `location.replace('/')` back.
+- [x] Fix: `mobile-shell/app.js` opens the checkout in a full-screen same-origin frame (`#checkout-frame`) inside the shell, with a history entry (Back closes it); `classic.html` tells the shell it was closed via postMessage instead of redirecting when it runs inside the frame (opened on its own it still goes to `/`). `index.html` loads `app.js?v=17`.
+- [x] Tests: `shell.test.py` checkout checks now use the frame (address stays `/`). Result 157/159, identical to `main` before the change; the 2 failures are old: "home page keeps the SEO head" and a sandbox network error (ERR_TUNNEL_CONNECTION_FAILED).
+- [ ] Left as is on purpose: the `<meta refresh>` stubs under `/p/` (size variants), `/mobile-shell/index.html` and one blog stub exist so old and duplicate URLs keep one canonical page for Google. Removing them would 404 old links.
+- [ ] NEXT: phone check in a private tab (add to cart, Checkout, pay or close, Back button), then merge. Not tested with a real M-Pesa payment.
+
 ## 2026-11-06 17:09 Africa/Nairobi - broken links: 10 "undefined" buttons fixed + permanent guard (branch `wip-fix-undefined-links-20261106`)
 Owner: sent /p/agrimec-018ec-insecticide-100ml.html, "Fix the issue / fix broken links permanently / connect GitHub and Supabase / confirm handoff and pickup".
 - [x] GitHub (stermontmall/stermontmall.github.io) and Supabase (project oewvtbnmyombbtggamor) connected and read. Pickup: last entries above (Mercedes CLA wording, product-content test fix 15:45) are DB-only/merged; their one open step is still the rebuild: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.

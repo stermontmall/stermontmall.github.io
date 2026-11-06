@@ -169,6 +169,7 @@ function closeAllThen(fn) { // close every overlay, then run fn once history has
   afterClose = fn; history.go(-stack.length);
 }
 window.addEventListener('popstate', e => {
+  if (typeof coFrame !== 'undefined' && coFrame && !(e.state && e.state.checkout)) closeCheckout(true);   // Back while the checkout layer is open
   const st = e.state || { tab: 'home', stack: [] };
   stack = (st.stack || []).filter(id => OVERLAYS.includes(id) && !((id === 'sheet-quickbuy' || id === 'page-product') && !qb.p));
   if (st.tab && st.tab !== store.get().tab) showTab(st.tab);
@@ -512,7 +513,31 @@ $('#checkout').addEventListener('click', () => {
   const cart = store.get().cart; if (!cart.length) return;
   try { localStorage.setItem('stm_handoff', JSON.stringify(cart.map(i => ({ rowId: i.rowId, qty: i.qty, price: i.price, name: i.name, size: i.size })))); }
   catch { toast('Could not start checkout. Please allow site storage and try again.'); return; }
-  location.href = '/classic.html?checkout=1';   // the shell cart stays until the order is finished (classic.html clears it) so a cancelled checkout loses nothing
+  openCheckout();   // the shell cart stays until the order is finished (classic.html clears it) so a cancelled checkout loses nothing
+});
+/* The checkout opens in a full-screen layer INSIDE the shell (same-origin frame), so the customer never leaves the shell and no page redirect happens.
+   classic.html tells us it was closed with postMessage({ stmCheckout: 'closed' }); the device Back button closes it too (history entry below). */
+let coFrame = null;
+function openCheckout() {
+  if (coFrame) return;
+  const f = document.createElement('iframe');
+  f.id = 'checkout-frame'; f.title = 'Checkout'; f.src = '/classic.html?checkout=1';
+  f.setAttribute('allow', 'payment');
+  f.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:0;z-index:90;background:#fff';
+  document.body.appendChild(f); coFrame = f;
+  document.body.classList.add('no-scroll');
+  history.pushState({ tab: store.get().tab, stack: [...stack], checkout: 1 }, '');
+}
+function closeCheckout(fromHistory) {
+  if (!coFrame) return;
+  coFrame.remove(); coFrame = null;
+  document.body.classList.toggle('no-scroll', stack.length > 0);
+  store.set({ cart: ls.get('cart', []).filter(i => i.rowId) });   // the checkout clears shell.cart once the order is finished; show what is left
+  if (!fromHistory && history.state && history.state.checkout) history.back();
+}
+window.addEventListener('message', e => {
+  if (e.origin !== location.origin || !coFrame || e.source !== coFrame.contentWindow) return;
+  if (e.data && e.data.stmCheckout === 'closed') closeCheckout(false);
 });
 
 /* Share cart link: the address carries the cart lines, so whoever opens it lands on the Cart tab with the same items. */
