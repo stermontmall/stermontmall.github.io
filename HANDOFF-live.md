@@ -1370,3 +1370,15 @@ Owner explicitly said last chance, work properly, connect GitHub/Supabase and pu
 - [x] Added Escort 19 EC 50ml and 1L after PCPB current crop registry confirmed PCPB(CR)1116; costs KSh 385 and 5,800; selling prices KSh 442.75 and 6,670. Product image uses supplier's 1L bottle photo; size note is included.
 - [x] Final Supabase verification: 13 product rows (5 distinct formulations) active=true, stock 1000, low_at 20, prices/costs and pack labels persisted.
 - [x] Second product-pages workflow watched-file commit on main: d6e1ee808fdac694a02761e358b18ae21a7c5d06. Workflow execution itself is not readable through current connector; static HTML page deployment remains unverified.
+
+
+## 2026-11-06 — PDF first-60 product batch continued (three verified products)
+- [x] Re-read pages 1–3 of the owner's Agrovet & Pest Control Market Price List; checked the live catalogue for exact-name duplicates. Existing items and pack variants were excluded.
+- [x] Added and verified three new active Supabase products using the canonical `add_draft_product` + `add_product_photo` path; the photo uploader downloaded each direct image into Storage and activated the row only after upload.
+  - Pegasus 500SC Insecticide 100ml — source cost KSh 730; selling KSh 839.50; supplier listing: https://agropests.com/products/pegasus-500-sc-100ml; product photo from https://www.farmrescue.co.ke/product/pegasus-500-sc.
+  - Ridomil Gold MZ 68WG Fungicide 1kg — source cost KSh 2,950; selling KSh 3,392.50; supplier: https://agropests.com/products/ridomil-gold-mz-68wg-1kg.
+  - COPCHEM 50%WP Copper Oxychloride Fungicide 1kg — source cost KSh 1,470; selling KSh 1,690.50; supplier: https://mtolori.com/product/details/copchem-50-wp-1kg-copper-oxychloride-50-wp-5591.
+- [x] All three rows verified active=true, images[] populated with public Storage URLs, stock=1000, low_at=20; 15% markup verified.
+- [x] Added distinct supplementary SEO content (354–356 words each) and allowlist tests in PR #419; local equivalent of the product-content.test.mjs assertions passed (187 IDs, key set matches, word bounds and uniqueness checks passed). PR merged to main: 8b9a956cf686a3d828cc5c04d16b4f7f9beaaddc.
+- [ ] NEXT: trigger/re-run product-pages.yml after merge, then verify generated p/ pages, canonical/Product JSON-LD and sitemap entries. Initial fetch immediately after merge returned 404 for the three generated pages, so they are NOT yet confirmed live.
+- [ ] Continue screening the remaining first-60 PDF candidates. Do not add items with pack-size mismatch, uncertain formulation, unclear source price, or restricted/unclear registration. Score 250EC and the earlier 100ml draft do not match the PDF's 250ml pack; keep it inactive pending correction.
