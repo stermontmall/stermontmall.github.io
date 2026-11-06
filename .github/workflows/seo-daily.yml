@@ -10,9 +10,6 @@ on:
       - 'seo-meta.mjs'
       - 'seo-meta.test.mjs'
       - 'seo-check.mjs'
-      - 'seo-doctor.js'
-      - 'seo-content-doctor.mjs'
-      - 'seo-content-doctor.test.mjs'
       - 'generate-products.mjs'
       - 'blog/**'
       - 'guides/**'
@@ -37,19 +34,8 @@ jobs:
           node-version: 20
       - name: Test shared SEO metadata rules
         run: node seo-meta.test.mjs
-      - name: Test Content Doctor rules and Admin SEO Doctor syntax
-        run: node seo-content-doctor.test.mjs
       - name: Run technical SEO check
         run: node seo-check.mjs > seo-report.md
-      - name: Run content-quality Doctor
-        run: node seo-content-doctor.mjs > seo-content-report.md
-      - name: Combine reports
-        run: |
-          {
-            cat seo-report.md
-            printf '\n\n---\n\n'
-            cat seo-content-report.md
-          } > seo-report-combined.md
       - name: Publish the report as an issue
         env:
           GH_TOKEN: ${{ github.token }}
@@ -57,4 +43,4 @@ jobs:
           for n in $(gh issue list --state open --search "SEO check in:title" --json number --jq '.[].number'); do
             gh issue close "$n" --comment "Superseded by today's report." || true
           done
-          gh issue create --title "Daily SEO check $(date +%F)" --body-file seo-report-combined.md
+          gh issue create --title "Daily technical SEO check $(date +%F)" --body-file seo-report.md
