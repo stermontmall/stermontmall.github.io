@@ -3276,5 +3276,40 @@
         "Store securely in the original packaging."
       ]
     }
+  ],
+  "vectorfog-dc20-cordless-ulv-fogger": [
+    {
+      "heading": "Cordless ULV fogging for mobile treatment work",
+      "paragraphs": [
+        "The VectorFog DC20 is a cordless ultra-low-volume (ULV) fogger intended for professional operators who need to move around a treatment area without trailing a mains power cable. Its 12V battery-powered design and 2-litre tank make it a portable option for suitable pest-management and disinfection jobs. Before selecting a fogger, identify the treatment area, the product label's approved application method and the operator training required.",
+        "The published DC20 specifications state a spray distance of approximately 2–7 metres and droplet sizes of 5–50 microns. These figures describe the machine's stated operating range; actual coverage depends on the liquid formulation, nozzle condition, airflow, room layout and environmental conditions. ULV fogging is not a substitute for inspection, sanitation, exclusion or targeted residual treatment where those methods are required."
+      ],
+      "bullets": [
+        "Cordless 12V operation for greater mobility around suitable treatment sites.",
+        "2-litre tank capacity.",
+        "Published droplet-size range of 5–50 microns.",
+        "Published spray-distance range of approximately 2–7 metres."
+      ]
+    },
+    {
+      "heading": "Check battery runtime, charging and handling",
+      "paragraphs": [
+        "The supplier's published information indicates up to 40 minutes of continuous operation and an approximate charging time of 3 hours. Treat these as indicative figures rather than guaranteed job times: battery age, charging condition, liquid viscosity and operating technique can affect runtime. The listed machine weight is approximately 3.2 kg, with dimensions around 480 × 250 × 200 mm. Confirm the exact package contents, battery and charger before purchase.",
+        "For Kenyan pest-control businesses, hotels, institutions and facilities teams, portability can help when moving between rooms or work zones. Plan the work so the operator can control access, ventilation and re-entry. Use only formulations whose labels explicitly approve ULV application in the intended setting, and follow the label and safety data sheet for dilution, PPE, ventilation, exposure controls and re-entry intervals. Never assume that every insecticide or disinfectant can be fogged."
+      ],
+      "bullets": [
+        "Confirm the supplied battery, charger, warranty and spare-parts availability.",
+        "Use the chemical manufacturer's approved ULV dilution and application directions.",
+        "Keep people, animals, food and unprotected surfaces away as required by the product label.",
+        "Do not apply in occupied spaces unless the product label and applicable rules explicitly allow it."
+      ]
+    },
+    {
+      "heading": "Is a cordless ULV fogger the right machine?",
+      "paragraphs": [
+        "A cordless ULV fogger is most useful when the operator values mobility and the treatment protocol calls for a fine aerosol. It is different from a thermal fogger, which uses heat to produce a visible fog, and from a conventional pressure sprayer, which generally applies larger droplets to selected surfaces. Choose equipment according to the pest, target site, approved chemical, required deposition and operator controls rather than choosing by machine type alone.",
+        "The DC20 listing is an international-reference-priced item. Stermont Arcade's displayed price is based on a US$730 reference price plus a 50% markup, converted at the working exchange rate used for this listing. This is a pricing benchmark, not a confirmed Kenyan supplier quotation or landed import cost. Confirm stock, delivery lead time, taxes, warranty and the final payable amount before ordering."
+      ]
+    }
   ]
 }
