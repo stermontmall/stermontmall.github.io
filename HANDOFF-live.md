@@ -1,3 +1,10 @@
+## 2026-11-06 17:55 Africa/Nairobi - permanent fix written and tested locally (branch `wip-broken-links-fix`)
+- [x] `404.html`: head script sends unbuilt `/p/<slug>.html` -> `/?product=<slug>` and `/c/<slug>.html` -> `/?cat=<slug>` (same for every visitor, still a real HTTP 404 + noindex). Test: `node not-found-fallback.test.mjs` -> OK 12 cases.
+- [x] `check-product-pages.mjs` (+ `check-product-pages.test.mjs`, OK 5 cases): fails the build if any ACTIVE product has no `p/` page. Against the pre-rebuild repo it names exactly the 6 unbuilt products.
+- [x] `.github/workflows/product-pages.yml`: cron every 30 min (was 3 h), new `repository_dispatch` type `catalog-changed`, both new tests before the build, guard step right after "Save changes" (pages still publish if the guard fails). YAML parses; existing tests still pass (`product-content` 183 entries, `seo-meta` 0 violations).
+- [ ] NEXT: push branch, merge to main (schedule/dispatch only run from main), then confirm the guard step is green and the 6 pages are live: `gh api repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/runs?per_page=2 -q '.workflow_runs[] | "\(.id) \(.status) \(.conclusion)"'`
+- [ ] OPTIONAL (owner decision): fully instant builds need a Supabase DB trigger calling GitHub `repository_dispatch` with a GitHub token stored as a secret. Not set up; needs a token from the owner.
+
 ## 2026-11-06 17:35 Africa/Nairobi - rebuild started (branch `wip-broken-links-fix`)
 - [x] Triggered product-pages.yml via REST: run 42230585134 (workflow_dispatch, started 14:03 UTC). Check: `gh api repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/runs?per_page=1 -q '.workflow_runs[0] | .status, .conclusion'` then confirm https://stermontarcade.co.ke/p/agrimec-018ec-insecticide-100ml.html opens (6 pages should appear: agrimec, confidor, decis, mospilan, voliam-targo, danadim-progress).
 - [x] Scanned all 405 built pages (p/ c/ guides/ products.html index.html) for broken internal href/src: 0 broken. So the only fault is the build gap, not bad links inside pages.
