@@ -1450,3 +1450,6 @@ Owner explicitly said last chance, work properly, connect GitHub/Supabase and pu
 - Confirmed newly stored object sizes include 100KB Growcal, 101KB Plant Soul, 364KB Polyfeed, 134KB Vitabor, 33KB Agral, 192KB Hynitro, 155KB Zincabor, 190KB Integra, 232KB Super Boron, 144KB Multi NPK, 41KB Booster, 11KB Powerboost, 40KB Zinc Gold, and 202KB Goldchance. Super Gro's stored WebP has increased from 2.3KB to 29.7KB.
 - All product names, prices, descriptions and SEO fields were preserved.
 - Remaining review: confirm all 20 images visually on the public product pages and check the Bonzin/Supa-K/Crop Boost originals for visual sharpness. Image bytes are a quality indicator, not a substitute for visual verification.
+
+- Final Supabase check: all 20 products now resolve to an image object in `product-images`; all current primary files are at least 11,294 bytes. Fourteen primary image URLs were switched to new supplier originals and Super Gro's existing WebP was refreshed (2.3KB → 29.7KB). The five remaining images were already larger source files.
+- Triggered the product-page rebuild by committing a harmless workflow-file comment; workflow run/deployment completion still needs checking in Actions.
