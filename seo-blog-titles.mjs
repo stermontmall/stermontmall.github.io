@@ -1,6 +1,6 @@
 // Stermont Arcade - keep blog search titles concise without changing article headings or content.
 // Runs before the blog index/sitemap rebuild. It only edits <title>, og:title and twitter:title.
-// MAX_TITLE must match the SEO Doctor title check (25-65 characters, see seo-doctor.js).
+// Keep generated blog titles concise and readable for search-result snippets.
 // If "Title | Stermont Arcade" is too long, the brand is dropped rather than cutting the title mid-sentence.
 // A title cut short by an older run (ends with "…") is restored from the page's own <h1>.
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
