@@ -1352,3 +1352,17 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 - [ ] NEXT: sign in at /admin.html -> Catalog -> Add new item -> paste a direct .jpg link -> Add link; confirm the thumbnail appears and, after saving, `products.images` holds the Storage URL. Then merge `wip-photo-links` to `main`.
 - [ ] NOT DONE: `admin-bulk.js` file inputs (bulk importer) still device-only.
 - Not browser-tested from the sandbox (needs a staff login).
+
+
+## 2026-11-06 21:50 Africa/Nairobi — owner-authorized PDF product additions (Supabase active rows)
+Owner explicitly said last chance, work properly, connect GitHub/Supabase and publish products; earlier instructions authorize live publication. Proceeded with 11 pack-specific records after duplicate check.
+- [x] Supabase project oewvtbnmyombbtggamor checked; exact-name duplicate query returned none for selected candidate names.
+- [x] Added and verified 11 active rows with stock=1000, low_at=20, category_id=72 (Crop Insecticides), selling price = verified supplier cost × 1.15.
+- [x] Match 050 EC: 25ml, 100ml, 1L. Costs KSh 205, 480, 4,950; selling prices KSh 235.75, 552, 5,682.50.
+- [x] Belt 480 SC: 50ml, 250ml, 1L. Costs KSh 1,345, 6,705, 26,815; selling prices KSh 1,546.75, 7,710.75, 30,837.25.
+- [x] Coragen 20 SC: 30ml, 200ml. Costs KSh 850, 4,670; selling prices KSh 977.50, 5,370.
+- [x] Dynamec 1.8 EC: 10ml, 100ml, 1L. Costs KSh 210, 730, 6,150; selling prices KSh 241.50, 839.50, 7,072.50. PCPB restriction note added (not for open-field use).
+- [x] Rows use variant_group / variant_label. Images are supplier/manufacturer hotlinks, not copied into the product-images bucket. Descriptions disclose image pack-size mismatch where applicable.
+- [x] GitHub product-pages workflow file received a comment-only update on main (commit bd959d9b48ba38e59ca06b2f4dd17f80836dec0) to trigger the watched-path rebuild.
+- [ ] Verify workflow completion and public generated product pages after build. Live website fetch unavailable in this session; do not claim static page deployment until verified.
+- [ ] No separate blog pages created; records contain SEO titles and original product descriptions. Separate blog posts need the approved blog-content schema.
