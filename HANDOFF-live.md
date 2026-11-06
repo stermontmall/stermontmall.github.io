@@ -1,3 +1,13 @@
+## 2026-11-06 23:10 Africa/Nairobi - owner-authorized pest product batch (20 rows; 3 photo-backed active)
+Owner explicitly authorized direct product and photo posting. Connected to Supabase project oewvtbnmyombbtggamor and repo stermontmall/stermontmall.github.io.
+- [x] Checked the pest-control catalogue and exact product-name duplicates before inserting 20 supplier-listed products from Kejani Cleaning Services.
+- [x] Inserted 20 rows through public.add_draft_product using supplier-listed KES costs; the helper applied the existing 15% margin. Rows without accepted photos remain inactive drafts.
+- [x] Successfully uploaded and activated 3 matching photos: Green Leaf Powder Cockroach Killing Bait, Mortein Doom Aiko Odourless Aerosol 400+200ml, Raid LED Liquid Electric Mosquito Killer 33ml. Supabase image URLs stored; all 3 active=true.
+- [ ] Remaining 17 rows are still drafts. Photo validation rejected source images below 450x450 or URLs that returned HTML instead of image bytes. Do not activate them until a sharp, direct product image passes upload validation.
+- [x] Added model-specific product SEO sections for the 3 active products to product-content.json and updated product-content.test.mjs allowlist. Commits: ab9981af4b2811eec94d135df6a3505eb9d30dae; 5116e671696cd72ec3917b3703db1e383eeb1908.
+- [ ] Generated pages are not yet verified. The expected /p/ HTML files were not present when checked after the content commit; wait for product-pages.yml build and verify deployment before claiming the pages are live.
+- Photo job results: successful jobs 459 (Mortein), 463 (Raid LED), 464 (Green Leaf); rejected jobs 455-458, 460-462, 465-474 (minimum image size / non-image URL checks).
+
 ## 2026-11-06 23:05 Africa/Nairobi - shell check on every page (finding, no code change, main at 5fa7115)
 Owner: "Check for me is shell working in all pages". Loaded all 640 tracked .html files in a 390px mobile browser from a local server (script not committed).
 - [x] 565 real pages show the shell (home = shell itself; `/p/` 287, `/c/` 43, `/guides/` 32, `/blog/` 71, `/pest-control/` 62, `/services/` 49, 14 root pages: top bar + bottom nav) and stay on their own address.
