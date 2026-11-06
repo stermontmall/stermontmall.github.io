@@ -185,6 +185,7 @@ const expected = [
   "t8-f10w-g13-uv-fly-killer-tubes-10w-2-pack",
   "fumakilla-vape-mat-e-30-piece-refill-pack",
   "moskill-aerosol-750ml-jumbo-pack",
+  "mos-kill-mat-vapouriser-electric-mosquito-heater",
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
