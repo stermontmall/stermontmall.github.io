@@ -611,3 +611,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // Rebuild trigger 2026-11-05: refresh catalog pages to render product-specific photo URLs from Supabase.
 
 // Rebuild trigger 2026-11-05: publish ten additional researched pest-control products with matching supplier photos.
+
+// Rebuild trigger 2026-11-06: publish the T8 F10W G13 UV fly-killer replacement tube product page and sitemap entry.
