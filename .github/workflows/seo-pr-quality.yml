@@ -19,6 +19,8 @@ on:
       - 'c/**'
       - 'guides/**'
       - 'services/**'
+      - 'pest-control/**'
+      - 'link-check.mjs'
       - 'mobile-shell/**'
       - '*.html'
       - '.github/workflows/**'
@@ -51,6 +53,8 @@ jobs:
       # Reset per-test tab state when asserting the default landing view.
       - name: Run mobile shell browser regression suite
         run: python3 mobile-shell/shell.test.py
+      - name: Broken and placeholder links (link-check.mjs)
+        run: node link-check.mjs
       - name: Check JavaScript syntax
         run: |
           node --check seo-check.mjs
