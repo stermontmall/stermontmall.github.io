@@ -1292,3 +1292,11 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 - [x] Added direct links from the Kenya service-area hub to six high-intent service pathways (bed bugs, termites, cockroaches, rodents, hospitality and warehouse/container work).
 - [x] Updated the pest-control sitemap lastmod for the revised location hub; no new URLs were created.
 - [x] Merged PR #350 to `main` (commit `941e09753b49a7296c85eee9f97959621ba100fc`). SEO auto-index workflow completed successfully; GitHub Pages artifact build succeeded and deploy job was still running at the last check. All 12 internal-link destinations were verified in the repository. Public/mobile verification remains pending deployment completion; Search Console indexing and ranking changes must be measured after crawl and cannot be guaranteed immediately.
+
+
+## 2026-11-06 - commercial pest-control content (branch `wip-b2b-pest-control-content-20261106`)
+- [x] Studied the competitor's publicly indexed LinkedIn content: it targets property managers, landlords, hotels, schools, warehouses, procurement and facility managers, and frames pest control around operational risks rather than only listing household services.
+- [x] Added `blog/pest-control-contracts-property-managers-kenya.html`: a 1,425-word Kenyan buyer guide covering inspection scope, quotation comparisons, service reports, safety/re-entry planning, landlord prevention and procurement checks. Includes canonical URL, Article/Breadcrumb/FAQ structured data, related service links and a commercial WhatsApp enquiry CTA.
+- [x] Verified page source on branch: 1,425 words; canonical, Article and FAQ schema present; internal links point to existing service/blog pages.
+- [ ] Run blog build and SEO checks; open PR and review generated blog index/sitemap updates before merge.
+- [ ] After merge, verify GitHub Pages deployment and live page; ranking improvement is not yet measured.
