@@ -1635,6 +1635,8 @@ try { if (localStorage.getItem('stm_handoff')) { document.documentElement.classN
     function leave() {
       if (leaving || dr.classList.contains('on')) return; leaving = true;
       try { if (!Object.keys(JSON.parse(localStorage.getItem('stm_cart') || '{}') || {}).length) localStorage.setItem('shell.cart', '[]'); } catch (e) {}
+      /* Inside the shell's checkout layer: tell the shell to close it (no page change). Opened on its own: go to the shell. */
+      if (window.parent !== window) { try { window.parent.postMessage({ stmCheckout: 'closed' }, location.origin); return; } catch (e) {} }
       location.replace('/');
     }
     new MutationObserver(leave).observe(dr, { attributes: true, attributeFilter: ['class'] });
