@@ -149,7 +149,10 @@ const expected = [
   "shan-yes-men-s-white-black-tracksuit-set-set",
   "vision-plus-32-inch-full-hd-smart-tv-with-free-wall-bracket-32-inch",
   "ourstart-men-s-quartz-watch-blue-dial-silver-and-gold-stainless-steel",
-  "urban-comfort-women-s-green-fleece-tracksuit-set"
+  "urban-comfort-women-s-green-fleece-tracksuit-set",
+  "green-leaf-powder-cockroach-killing-bait",
+  "mortein-doom-aiko-odourless-aerosol-400-200ml",
+  "raid-led-liquid-electric-mosquito-killer-33ml"
 ,
   "tymx-portable-bluetooth-speaker-rgb-led-light-ring-1200mah",
   "amaze-fridge-freezer-guard-with-6-way-extension",
