@@ -61,7 +61,7 @@ function dimensions(b: Uint8Array, mime: string): { width: number; height: numbe
 function enforcePhotoQuality(b: Uint8Array, mime: string): string | null {
   const d = dimensions(b, mime);
   if (!d) return "could not read image dimensions; upload a standard JPG, PNG or WebP";
-  if (d.width < 800 || d.height < 800) return "photo is too small (" + d.width + "×" + d.height + "); minimum is 800×800 pixels";
+  if (d.width < 450 || d.height < 450) return "photo is too small (" + d.width + "×" + d.height + "); minimum is 450×450 pixels";
   return null;
 }
 
