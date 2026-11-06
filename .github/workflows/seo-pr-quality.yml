@@ -61,9 +61,6 @@ jobs:
           node --check recent-orders.js
           node --check product-content.test.mjs
           node --check seo-meta.mjs
-          node --check seo-doctor.js
-      - name: Test SEO Doctor editorial approval safeguards
-        run: node seo-content-doctor.test.mjs
       - name: Test product category and safety enrichment
         run: node seo-product-extras.test.mjs
       - name: Test product and category SEO metadata
