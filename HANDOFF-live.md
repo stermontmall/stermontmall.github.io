@@ -1344,3 +1344,11 @@ Prices below are observed vendor listing prices, NOT wholesale costs and NOT app
 - [ ] GitHub Pages deployment for merge is running: `42173980901`. Verify completion and then inspect live URLs for the eight service pages, article and sitemap.
 - [ ] Site audit `42173949532` is running. Review its accessibility/performance/broken-link results and fix any issues attributable to the new pages.
 - [ ] After deployment, use Search Console performance/indexing data to compare Stermont against Masterpiece. No ranking improvement is claimed yet.
+
+## SESSION CHECKPOINT (2026-11-06 19:40 Africa/Nairobi): photo links in admin Catalog (branch `wip-photo-links`)
+- [x] AI photo uploader already accepted a direct photo link (main, 0bd1f6f, `ai-add-product` v12).
+- [x] NEW Supabase Edge Function `fetch-photo` v1 deployed (verify_jwt on, staff-only via `is_staff`): downloads a public https jpg/png/webp link (<=5 MB) into Storage `product-images`, returns `{ok, url}`. Source: `supabase/functions/fetch-photo/index.ts`.
+- [x] `catalog-v10.js` (now `?v=13` in `admin.html`): Add/Edit item modal has "OR paste a direct photo link" + Add link button; pushes the returned URL into the item's images.
+- [ ] NEXT: sign in at /admin.html -> Catalog -> Add new item -> paste a direct .jpg link -> Add link; confirm the thumbnail appears and, after saving, `products.images` holds the Storage URL. Then merge `wip-photo-links` to `main`.
+- [ ] NOT DONE: `admin-bulk.js` file inputs (bulk importer) still device-only.
+- Not browser-tested from the sandbox (needs a staff login).

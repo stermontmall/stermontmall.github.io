@@ -229,7 +229,9 @@
       '<div><label>' + (edit ? 'Pieces in stock' : 'Initial pieces') + '</label><input class="cx-f" id="cx-stock" type="number" min="0" inputmode="numeric" value="' + (edit ? p.stock : '') + '"></div>' +
       '<div><label>Low-stock alert below</label><input class="cx-f" id="cx-low" type="number" min="0" value="' + (edit ? p.low_at : 5) + '"></div></div>' +
       '<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" id="cx-feat"' + (edit && p.featured ? ' checked' : '') + '> Feature as advert / top banner</label>' +
-      '<label>Photos</label><input type="file" id="cx-file" accept="image/*" multiple><div class="cx-th" id="cx-th"></div><div class="meta" id="cx-up"></div>';
+      '<label>Photos</label><input type="file" id="cx-file" accept="image/*" multiple>' +
+      '<label>OR paste a direct photo link (jpg, png or webp)</label><div style="display:flex;gap:.4rem"><input class="cx-f" id="cx-plink" type="url" placeholder="https://example.com/photo.jpg" style="flex:1"><button type="button" class="btn alt sm" id="cx-padd">Add link</button></div>' +
+      '<div class="cx-th" id="cx-th"></div><div class="meta" id="cx-up"></div>';
     modal(edit ? 'Edit item' : 'Add new item', body, edit ? 'Save changes' : 'Publish to website', function () {
       if ($('cx-up').textContent) throw new Error('Wait for photos to finish uploading');
       var name = v('cx-name').trim(), price = num('cx-price'), stock = edit ? (v('cx-stock') === '' ? NaN : parseInt(v('cx-stock'), 10)) : parseInt(v('cx-stock') || 0, 10);
@@ -308,6 +310,20 @@
         Promise.all(fs.map(function (f) { return upload(f, base); })).then(function (us) { imgs.push.apply(imgs, us); up.textContent = ''; thumbs(); })
           .catch(function (er) { up.textContent = ''; var x = c.querySelector('#cx-me'); x.textContent = 'Upload failed: ' + er.message; x.hidden = false; });
         e.target.value = '';
+      };
+      /* Photo link: the server downloads it (browsers cannot, because of CORS) and stores it in Storage. */
+      var padd = c.querySelector('#cx-padd');
+      padd.onclick = function () {
+        var link = v('cx-plink').trim(), up = c.querySelector('#cx-up'), x = c.querySelector('#cx-me');
+        if (!link) return;
+        padd.disabled = true; up.textContent = 'Fetching photo from link…'; x.hidden = true;
+        call('/functions/v1/fetch-photo', { m: 'POST', body: { image_url: link, name: v('cx-name') } })
+          .then(function (r) {
+            if (!r || !r.ok) throw new Error((r && r.error) || 'Could not add that photo link');
+            imgs.push(r.url); c.querySelector('#cx-plink').value = ''; thumbs();
+          })
+          .catch(function (er) { x.textContent = 'Photo link failed: ' + er.message; x.hidden = false; })
+          .then(function () { up.textContent = ''; padd.disabled = false; });
       };
     });
   }
