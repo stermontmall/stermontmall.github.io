@@ -1,3 +1,11 @@
+## 2026-11-06 17:09 Africa/Nairobi - broken links: 10 "undefined" buttons fixed + permanent guard (branch `wip-fix-undefined-links-20261106`)
+Owner: sent /p/agrimec-018ec-insecticide-100ml.html, "Fix the issue / fix broken links permanently / connect GitHub and Supabase / confirm handoff and pickup".
+- [x] GitHub (stermontmall/stermontmall.github.io) and Supabase (project oewvtbnmyombbtggamor) connected and read. Pickup: last entries above (Mercedes CLA wording, product-content test fix 15:45) are DB-only/merged; their one open step is still the rebuild: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+- [x] Agrimec page: all 23 internal links resolve and every linked product is active in Supabase. The live site is not reachable from the sandbox, so what the owner saw live could not be reproduced here; owner to say which link looked broken.
+- [x] Scan of all 14,213 internal links in every page found ONE broken target: `href="undefined"` on 10 pages in `pest-control/blog/` (the "Explore /pest-control/... " button, added by PR #265 with no generator in the repo). Each now points to the page named in its own text.
+- [x] Guard: `link-check.mjs` (no dependencies) fails on placeholder hrefs (undefined, null, NaN, [object Object], ${...}) and on internal links with no file. Run in the PR gate (`seo-pr-quality.yml`, hard fail) and in `product-pages.yml` before saving (warning only, so one bad link never blocks a price rebuild). Run by hand: `node link-check.mjs`.
+- [ ] NEXT: merge, then re-run the rebuild command above. External links (e.g. pcpb.go.ke) are only checked weekly by Site audit (Lychee), which covers root pages, not /p/.
+
 
 ## 2026-11-06 15:55 Africa/Nairobi - Mercedes CLA 200 delivery wording (DB only)
 Owner clarified "Delivery": the 47 counties are delivery coverage.

@@ -84,6 +84,10 @@ jobs:
             sed -i '0,/<meta charset="UTF-8">/s##&\n  <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>#' index.html
           fi
 
+      - name: Warn about broken or placeholder links before saving (link-check.mjs)
+        continue-on-error: true
+        run: node link-check.mjs --warn
+
       - name: Save changes (only if something changed)
         run: |
           git config user.name "bot"
