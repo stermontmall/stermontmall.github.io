@@ -3281,34 +3281,31 @@
     {
       "heading": "Cordless ULV fogging for mobile treatment work",
       "paragraphs": [
-        "The VectorFog DC20 is a cordless ultra-low-volume (ULV) fogger intended for professional operators who need to move around a treatment area without trailing a mains power cable. Its 12V battery-powered design and 2-litre tank make it a portable option for suitable pest-management and disinfection jobs. Before selecting a fogger, identify the treatment area, the product label's approved application method and the operator training required.",
-        "The published DC20 specifications state a spray distance of approximately 2–7 metres and droplet sizes of 5–50 microns. These figures describe the machine's stated operating range; actual coverage depends on the liquid formulation, nozzle condition, airflow, room layout and environmental conditions. ULV fogging is not a substitute for inspection, sanitation, exclusion or targeted residual treatment where those methods are required."
+        "The VectorFog DC20 is a battery-powered ultra-low-volume (ULV) fogger for professional operators who need to move around a treatment area without a mains power cable. Its 12V operation and 2-litre tank make it a portable option for suitable pest-management and disinfection work. Choose a fogger only after checking the target site, treatment objective and application method approved on the product label.",
+        "Published DC20 specifications state a spray distance of about 2–7 metres and droplet sizes of 5–50 microns. Actual coverage depends on the liquid formulation, nozzle condition, airflow and site conditions. ULV fogging does not replace inspection, sanitation, exclusion or targeted residual treatment when those methods are required."
       ],
       "bullets": [
-        "Cordless 12V operation for greater mobility around suitable treatment sites.",
-        "2-litre tank capacity.",
-        "Published droplet-size range of 5–50 microns.",
-        "Published spray-distance range of approximately 2–7 metres."
+        "Cordless 12V operation and 2-litre tank.",
+        "Published droplet-size range: 5–50 microns.",
+        "Published spray-distance range: approximately 2–7 metres."
       ]
     },
     {
-      "heading": "Check battery runtime, charging and handling",
+      "heading": "Battery, handling and safe application",
       "paragraphs": [
-        "The supplier's published information indicates up to 40 minutes of continuous operation and an approximate charging time of 3 hours. Treat these as indicative figures rather than guaranteed job times: battery age, charging condition, liquid viscosity and operating technique can affect runtime. The listed machine weight is approximately 3.2 kg, with dimensions around 480 × 250 × 200 mm. Confirm the exact package contents, battery and charger before purchase.",
-        "For Kenyan pest-control businesses, hotels, institutions and facilities teams, portability can help when moving between rooms or work zones. Plan the work so the operator can control access, ventilation and re-entry. Use only formulations whose labels explicitly approve ULV application in the intended setting, and follow the label and safety data sheet for dilution, PPE, ventilation, exposure controls and re-entry intervals. Never assume that every insecticide or disinfectant can be fogged."
+        "The supplier lists up to 40 minutes of continuous operation and approximately 3 hours for charging. These are indicative figures; battery condition and operating conditions affect runtime. The listed weight is about 3.2 kg and dimensions are approximately 480 × 250 × 200 mm. Confirm the exact model, battery, charger, warranty and package contents before ordering.",
+        "Use only formulations whose labels explicitly approve ULV application. Follow the label and safety data sheet for dilution, personal protective equipment, ventilation, exposure controls and re-entry intervals. Keep people, animals, food and unprotected surfaces clear as directed; never assume every insecticide or disinfectant can be fogged."
       ],
       "bullets": [
-        "Confirm the supplied battery, charger, warranty and spare-parts availability.",
-        "Use the chemical manufacturer's approved ULV dilution and application directions.",
-        "Keep people, animals, food and unprotected surfaces away as required by the product label.",
-        "Do not apply in occupied spaces unless the product label and applicable rules explicitly allow it."
+        "Confirm battery, charger, warranty and spare-parts availability.",
+        "Follow the chemical label and safety data sheet for every application."
       ]
     },
     {
-      "heading": "Is a cordless ULV fogger the right machine?",
+      "heading": "Choosing a cordless ULV fogger",
       "paragraphs": [
-        "A cordless ULV fogger is most useful when the operator values mobility and the treatment protocol calls for a fine aerosol. It is different from a thermal fogger, which uses heat to produce a visible fog, and from a conventional pressure sprayer, which generally applies larger droplets to selected surfaces. Choose equipment according to the pest, target site, approved chemical, required deposition and operator controls rather than choosing by machine type alone.",
-        "The DC20 listing is an international-reference-priced item. Stermont Arcade's displayed price is based on a US$730 reference price plus a 50% markup, converted at the working exchange rate used for this listing. This is a pricing benchmark, not a confirmed Kenyan supplier quotation or landed import cost. Confirm stock, delivery lead time, taxes, warranty and the final payable amount before ordering."
+        "A cordless ULV fogger is suited to work where mobility is important and the treatment protocol calls for a fine aerosol. It differs from a thermal fogger, which uses heat, and a conventional pressure sprayer, which generally applies larger droplets to selected surfaces. Match the machine to the pest, target site, approved chemical and operator controls.",
+        "The displayed Stermont Arcade price uses a US$730 international reference plus a 50% markup, converted using the working exchange rate. This is a pricing benchmark, not a confirmed Kenyan landed cost or confirmation of local stock. Check availability, delivery, taxes and warranty before ordering."
       ]
     }
   ]
