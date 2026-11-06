@@ -1,4 +1,11 @@
 
+## 2026-11-06 15:20 Africa/Nairobi - missing "Add to cart" investigation + sold-out item restocked (DB only, no code change)
+Owner: "Why are some items missing the add to cart or checkout" then "Fix all directly".
+- [x] Cause 1: `storefront-live.js` shows a disabled "Sold out" button when `stock <= 0`; the mobile shell hides sold-out products entirely. Only one active row was at 0: `v-tac-t8-20w-g13-uv-fly-killer-tubes-2-pack` (price 5499, low_at 1, no restock history).
+- [x] Fix: Supabase `products` row set to stock 1000, low_at 20 (owner's standard rule). Check afterwards: 0 active rows with stock <= 0, 0 below low_at.
+- [x] Cause 2 (by design, unchanged): 139 variant groups (181 rows) show "Select size" on the card; "Add to cart" appears after a size is picked in the product view. Checkout is one shared page (`/classic.html?checkout=1`), no per-product gating found.
+- [ ] OWNER: if a specific item still shows no button or no checkout, send its name/link. Draft rows (35, active=false) are hidden from the shop on purpose.
+
 ## 2026-11-06 08:37 Africa/Nairobi - content authority improvements (branch `wip-content-authority-20261106`)
 Owner approved work on content gaps 2-7; owner will supply real project proof, photos and testimonials separately (gap 1).
 - [x] Removed the misleading “new website” wording from the shared service-page generator; service pages now state three years of hands-on service experience and explain the assessment/quotation process without inventing credentials.
