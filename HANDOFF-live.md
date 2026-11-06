@@ -1366,3 +1366,7 @@ Owner explicitly said last chance, work properly, connect GitHub/Supabase and pu
 - [x] GitHub product-pages workflow file received a comment-only update on main (commit bd959d9b48ba38e59ca06b2f4dd17f80836dec0) to trigger the watched-path rebuild.
 - [ ] Verify workflow completion and public generated product pages after build. Live website fetch unavailable in this session; do not claim static page deployment until verified.
 - [ ] No separate blog pages created; records contain SEO titles and original product descriptions. Separate blog posts need the approved blog-content schema.
+
+- [x] Added Escort 19 EC 50ml and 1L after PCPB current crop registry confirmed PCPB(CR)1116; costs KSh 385 and 5,800; selling prices KSh 442.75 and 6,670. Product image uses supplier's 1L bottle photo; size note is included.
+- [x] Final Supabase verification: 13 product rows (5 distinct formulations) active=true, stock 1000, low_at 20, prices/costs and pack labels persisted.
+- [x] Second product-pages workflow watched-file commit on main: d6e1ee808fdac694a02761e358b18ae21a7c5d06. Workflow execution itself is not readable through current connector; static HTML page deployment remains unverified.
