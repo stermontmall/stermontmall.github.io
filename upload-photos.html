@@ -10,13 +10,13 @@ label.chk{display:flex;gap:.6rem;align-items:flex-start;margin:.6rem 0}label.chk
 .row .col{flex:1;min-width:0}.row select{margin:0;padding:.5rem}.st{font-size:.85rem;margin-top:.25rem}
 .ok{color:#15803d}.no{color:#b91c1c}.hint{font-size:.85rem;color:#5b5675}</style></head><body>
 <h1>Stermont product photo upload</h1>
-<p>1. Enter the passcode. 2. Choose the photos (any file name). 3. Pick the product for each photo. 4. Tap Upload.</p>
+<p>1. Enter the passcode. 2. Choose the photos (any file name, any size). 3. Pick the product for each photo. 4. Tap Upload.</p>
 <input id="pass" type="password" placeholder="Passcode" autocomplete="off">
 <input id="files" type="file" accept="image/*" multiple>
 <label class="chk"><input id="act" type="checkbox"><span>Publish the product as soon as its photo uploads (leave unticked to keep it a draft)</span></label>
 <div id="rows"></div>
 <button id="go" disabled>Upload photos</button>
-<p class="hint">Photos are shrunk on your phone to fit (longest side 1600 px). Each photo must be at least 450 x 450 px. If a photo name matches a product ID it is selected for you.</p>
+<p class="hint">Photos are uploaded exactly as they are (JPG, PNG, WebP, GIF up to 24 MB; other types such as HEIC are converted at full size). If a photo name matches a product ID it is selected for you.</p>
 <script>
 const FN = 'https://oewvtbnmyombbtggamor.supabase.co/functions/v1/upload-photos';
 // Draft products still waiting for a photo (checked 2026-11-07). Add new ones here, or type nothing: the function rejects unknown IDs.
@@ -70,18 +70,20 @@ $('files').onchange = () => {
   $('go').disabled = !items.length;
 };
 
-// Shrink on the phone: longest side 1600 px, JPEG. Returns null if the browser cannot read the image.
-async function shrink(file) {
+// Original photo is sent untouched when it is a JPG, PNG, WebP or GIF up to 24 MB.
+// Anything else (HEIC, AVIF, BMP, huge files) is converted by the browser to a full-size JPEG.
+const OK_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' };
+async function prepare(file) {
+  if (OK_TYPES[file.type] && file.size <= 24 * 1024 * 1024) return { blob: file, ext: OK_TYPES[file.type] };
   try {
     const bmp = await createImageBitmap(file);
-    const w = bmp.width, h = bmp.height;
-    if (Math.min(w, h) < 450) return { tooSmall: w + 'x' + h };
-    const k = Math.min(1, 1600 / Math.max(w, h));
-    const c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+    const k = Math.min(1, 4000 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
     const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
-    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.88));
-    return blob ? { blob } : null;
-  } catch (e) { return null; }
+    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
+    if (blob) return { blob, ext: 'jpg' };
+  } catch (e) {}
+  return { blob: file, ext: (file.name.split('.').pop() || 'jpg').toLowerCase() };
 }
 
 $('go').onclick = async () => {
@@ -95,12 +97,9 @@ $('go').onclick = async () => {
     const id = it.sel.value;
     if (!id) { stat(it, 'Skipped: choose a product', 'no'); continue; }
     stat(it, 'Preparing photo...');
-    const s = await shrink(it.file);
-    if (s && s.tooSmall) { stat(it, 'Not uploaded: photo is too small (' + s.tooSmall + '); minimum 450x450', 'no'); continue; }
-    const up = s ? s.blob : it.file; // fall back to the original if the browser cannot decode it
-    const ext = s ? 'jpg' : (it.file.name.split('.').pop() || 'jpg').toLowerCase();
+    const pr = await prepare(it.file);
     const fd = new FormData(); fd.append('pass', pass); if ($('act').checked) fd.append('activate', '1');
-    fd.append('files', new File([up], id + '.' + ext, { type: up.type || it.file.type }));
+    fd.append('files', new File([pr.blob], id + '.' + pr.ext, { type: pr.blob.type || it.file.type }));
     stat(it, 'Uploading...');
     try {
       const r = await fetch(FN, { method: 'POST', body: fd });
