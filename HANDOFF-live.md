@@ -1,3 +1,12 @@
+## 2026-11-08 00:50 Africa/Nairobi - owner rules applied: research photo + SEO, publish LIVE (docs and playbook only)
+Owner: "I want chatgpt to research photos online and post them and find product SEO and publish them live without any issue".
+- [x] Supabase `site_playbook` (4 topics: READ_ME_FIRST, add_product, add_photo, rules) rewritten: research photo + SEO yourself, publish `active=true` after the row and photo are verified, no owner-review wait. Old text saved in `site_playbook_backup_20261108`.
+- [x] `PUBLISHING.md` and `CLAUDE.md` updated to match. Kept: price = source KES cost x 1.15, stock 1000, low_at 20, duplicate check, never overwrite existing products, never invent a photo URL, no secrets in chat.
+- [x] DB already allows publishing without a photo (`products_posting_rules` migration of 2026-11-07); `add_draft_product` still inserts `active=false` as the starting state, then the poster sets `active=true` (or `add_product_photo(id, url, true)`).
+- [ ] The only remaining stop: a missing/unverified source KES price (never guessed).
+- [ ] OWNER (ChatGPT): import https://stermontarcade.co.ke/chatgpt-photo-upload-openapi.json in the GPT's Actions (API key, Bearer, passcode). ChatGPT also needs a way to create product rows (the SQL helper `add_draft_product`, or the admin AI uploader); not tested here.
+- [ ] NEXT: after new products go live, rebuild pages: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+
 ## 2026-11-07 23:30 Africa/Nairobi - photo upload page fixed (branch `wip-photo-upload-page-20261107`)
 - [x] `upload-photos.html` rebuilt: pick photos with any file name, choose the product per photo from a dropdown (24 current drafts; matching file names are pre-selected), photos are shrunk on the phone to 1600px JPEG (avoids the 5 MB limit), optional tick-box "publish as soon as it uploads" (off = stays draft). The Edge Function and secrets were NOT changed; passcode is still typed by the owner.
 - [x] Tested with a mocked endpoint (Playwright): preselect by file name, too-small photo (<450px) blocked, duplicate product blocked, activate flag sent only when ticked. NOT tested against the live function (no network route here).

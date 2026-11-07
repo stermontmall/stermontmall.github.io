@@ -17,10 +17,10 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 ## Posting route
 1. Read `CLAUDE.md`, this file, and Supabase `public.site_playbook` topics `READ_ME_FIRST`, `add_product`, `add_photo`.
 2. Check the live catalogue for duplicates and confirm a valid category.
-3. Create the draft product row (`active=false`). Photos are OPTIONAL and never block or delay posting.
-4. If the owner supplied a photo, attach it with `upload-photos` or the admin AI photo uploader. If the session cannot reach the image bytes, post the draft without a photo and tell the owner the one remaining step.
+3. Create the product row (the `add_draft_product` helper inserts it with `active=false`; that is only the starting state). Write an original factual description (60-120 words) and an `seo_title` of at most 60 characters with brand, model, pack size and Kenya.
+4. PHOTO (owner rule 2026-11-08: ChatGPT/Claude researches it online). If the owner gave no photo, find a sharp direct image of the EXACT product on the manufacturer, supplier or an official retailer page (at least 450x450, correct brand, model and pack size, no other shop's watermark or logo). Attach it with `upload-photos` (`image_url`, `images`, `image_base64` or `openaiFileIdRefs`) or `public.add_product_photo(product_id, image_url, true)`. If a photo is rejected, try another source image.
 5. Never invent a photo URL. Report a photo as attached only after the Storage object and the `products.images` reference are checked.
-6. Keep the product `active=false` until the owner approves publication. After activation, verify the generated product page, canonical, Product JSON-LD and sitemap entry once the product-pages workflow completes.
+6. PUBLISH LIVE (owner rule 2026-11-08): once the row and photo are verified, set `active=true` (or send `activate: true` with the photo). No owner-review wait. If no suitable photo exists, publish without one and say so. If the source price is not verified, stop and ask: that is the only blocker. After activation, verify the generated product page, canonical, Product JSON-LD and sitemap entry once the product-pages workflow completes.
 
 ## Price and inventory rules for NEW products
 - Let `C` be the verified source price in KES.
@@ -29,7 +29,7 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 - Do not apply 16%, the old 85%-of-selling-price calculation, or any other formula unless the owner explicitly changes the rule for that batch.
 - Do not convert foreign currency without an owner-approved exchange rate.
 - Set `stock = 1000`, `low_at = 20`, and `featured = false` unless the owner explicitly requests featured placement.
-- New products are drafts (`active=false`) pending owner review. Do not silently publish them.
+- New products are published live (`active=true`) after verification (owner rule 2026-11-08). The earlier draft-first / owner-review rule no longer applies.
 - Use a unique lowercase-hyphen product ID/slug and a category ID read from the live categories table.
 - Do not overwrite an existing product or silently change an existing name, price, cost, description, stock or photo.
 
@@ -42,7 +42,7 @@ from public.products
 where id = '<product-id>';
 ```
 
-Confirm exactly one intended row exists; cost equals the verified source KES price; price equals round(cost * 1.15, 2); stock=1000; low_at=20; active=false pending owner review. If a photo was attached, `images` contains the returned public Storage URL and it opens.
+Confirm exactly one intended row exists; cost equals the verified source KES price; price equals round(cost * 1.15, 2); stock=1000; low_at=20; active=true once verified (owner rule 2026-11-08). If a photo was attached, `images` contains the returned public Storage URL and it opens.
 
 Report the product ID, source cost, selling price, stock, alert threshold, draft status, photo status and blockers. Do not say "posted", "published" or "photo attached" beyond the evidence actually checked.
 
