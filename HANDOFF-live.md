@@ -3,7 +3,8 @@ Owner: "I want chatgpt to research photos online and post them and find product 
 - [x] Supabase `site_playbook` (4 topics: READ_ME_FIRST, add_product, add_photo, rules) rewritten: research photo + SEO yourself, publish `active=true` after the row and photo are verified, no owner-review wait. Old text saved in `site_playbook_backup_20261108`.
 - [x] `PUBLISHING.md` and `CLAUDE.md` updated to match. Kept: price = source KES cost x 1.15, stock 1000, low_at 20, duplicate check, never overwrite existing products, never invent a photo URL, no secrets in chat.
 - [x] DB already allows publishing without a photo (`products_posting_rules` migration of 2026-11-07); `add_draft_product` still inserts `active=false` as the starting state, then the poster sets `active=true` (or `add_product_photo(id, url, true)`).
-- [ ] The only remaining stop: a missing/unverified source KES price (never guessed).
+- [x] 00:55 Owner: "Also find prices online". Rules now say: find the source KES price yourself (lowest current in-stock KES listing of the exact product on a reputable Kenyan seller page, URL recorded as source). Playbook backup: `site_playbook_backup_20261108b`. `PUBLISHING.md`, `CLAUDE.md` updated.
+- [ ] The only remaining stop: no KES listing of the exact product can be found (price is never invented).
 - [ ] OWNER (ChatGPT): import https://stermontarcade.co.ke/chatgpt-photo-upload-openapi.json in the GPT's Actions (API key, Bearer, passcode). ChatGPT also needs a way to create product rows (the SQL helper `add_draft_product`, or the admin AI uploader); not tested here.
 - [ ] NEXT: after new products go live, rebuild pages: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
 

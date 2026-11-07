@@ -23,7 +23,8 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 6. PUBLISH LIVE (owner rule 2026-11-08): once the row and photo are verified, set `active=true` (or send `activate: true` with the photo). No owner-review wait. If no suitable photo exists, publish without one and say so. If the source price is not verified, stop and ask: that is the only blocker. After activation, verify the generated product page, canonical, Product JSON-LD and sitemap entry once the product-pages workflow completes.
 
 ## Price and inventory rules for NEW products
-- Let `C` be the verified source price in KES.
+- Find the source price online yourself (owner rule 2026-11-08): the lowest current in-stock KES listing of the EXACT product (same brand, model, pack size) on a reputable Kenyan seller or supplier page. Record that page URL as the source. Never invent or estimate a price. If no KES listing of the exact product exists, stop and ask the owner.
+- Let `C` be that source price in KES.
 - Save `cost = round(C, 2)`.
 - Save `price = round(C * 1.15, 2)` (15% markup on source cost).
 - Do not apply 16%, the old 85%-of-selling-price calculation, or any other formula unless the owner explicitly changes the rule for that batch.
