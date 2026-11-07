@@ -1,28 +1,116 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow"><title>Photo upload</title>
-<style>body{font:16px/1.5 system-ui,sans-serif;max-width:480px;margin:0 auto;padding:1rem;background:#faf9fd;color:#1f1b2e}
-h1{font-size:1.3rem}input,button{font:inherit;width:100%;padding:.8rem;margin:.4rem 0;border-radius:10px;border:1px solid #c9c2e6;box-sizing:border-box}
-button{background:#7c3aed;color:#fff;border:0;font-weight:700}ul{padding-left:1.1rem}.ok{color:#15803d}.no{color:#b91c1c}</style></head><body>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:520px;margin:0 auto;padding:1rem;background:#faf9fd;color:#1f1b2e}
+h1{font-size:1.3rem}input,select,button{font:inherit;width:100%;padding:.8rem;margin:.4rem 0;border-radius:10px;border:1px solid #c9c2e6;box-sizing:border-box;background:#fff}
+button{background:#7c3aed;color:#fff;border:0;font-weight:700}button:disabled{opacity:.5}
+label.chk{display:flex;gap:.6rem;align-items:flex-start;margin:.6rem 0}label.chk input{width:auto;margin:.25rem 0 0}
+.row{display:flex;gap:.7rem;align-items:center;border:1px solid #e3def5;border-radius:12px;padding:.5rem;margin:.5rem 0;background:#fff}
+.row img{width:64px;height:64px;object-fit:cover;border-radius:8px;flex:none;background:#eee}
+.row .col{flex:1;min-width:0}.row select{margin:0;padding:.5rem}.st{font-size:.85rem;margin-top:.25rem}
+.ok{color:#15803d}.no{color:#b91c1c}.hint{font-size:.85rem;color:#5b5675}</style></head><body>
 <h1>Stermont product photo upload</h1>
-<p>Enter the passcode, choose the 8 product photos, then tap Upload.</p>
+<p>1. Enter the passcode. 2. Choose the photos (any file name). 3. Pick the product for each photo. 4. Tap Upload.</p>
 <input id="pass" type="password" placeholder="Passcode" autocomplete="off">
 <input id="files" type="file" accept="image/*" multiple>
-<button id="go">Upload photos</button>
-<ul id="out"></ul>
+<label class="chk"><input id="act" type="checkbox"><span>Publish the product as soon as its photo uploads (leave unticked to keep it a draft)</span></label>
+<div id="rows"></div>
+<button id="go" disabled>Upload photos</button>
+<p class="hint">Photos are shrunk on your phone to fit (longest side 1600 px). Each photo must be at least 450 x 450 px. If a photo name matches a product ID it is selected for you.</p>
 <script>
-document.getElementById('go').onclick = async () => {
-  const out = document.getElementById('out'), files = document.getElementById('files').files;
-  out.innerHTML = '';
-  if (!files.length) { out.innerHTML = '<li class="no">Choose the photos first.</li>'; return; }
-  const fd = new FormData(); fd.append('pass', document.getElementById('pass').value);
-  for (const f of files) fd.append('files', f, f.name);
-  out.innerHTML = '<li>Uploading...</li>';
+const FN = 'https://oewvtbnmyombbtggamor.supabase.co/functions/v1/upload-photos';
+// Draft products still waiting for a photo (checked 2026-11-07). Add new ones here, or type nothing: the function rejects unknown IDs.
+const DRAFTS = [
+["kids-letter-jigsaw-puzzle","Letter Jigsaw Puzzle for Children"],
+["kids-pastel-blocks-windmill","Large Pastel Building Blocks Set with Windmill"],
+["kids-wooden-blackboard","Kids Wooden Blackboard"],
+["kids-sank-magic-copybook","SANK Magic Practice Copybook for Kids"],
+["kids-7in1-montessori-puzzle","7-in-1 Montessori Puzzle Block"],
+["kids-wooden-calculation-shelf","Wooden 3-in-1 Educational Calculation Shelf"],
+["kids-stem-weather-station","STEM Weather Station Science Kit"],
+["kids-magnetic-ludo","Magnetic Ludo Set Board Game"],
+["kids-stem-planetarium","STEM Planetarium"],
+["kids-intellect-500-building-blocks","Intellect Building Blocks 500 Pieces"],
+["kids-match-it-spelling-game","Match-It Spelling Puzzle Game"],
+["kids-46pc-art-set","46-Piece Kids Art Set"],
+["kids-150pc-art-set","150-Piece Kids Art Set"],
+["kids-12in-lcd-writing-board","12-Inch LCD Writing Board for Kids"],
+["kids-wooden-xylophone","Kids Wooden Xylophone"],
+["kids-100pcs-number-building-blocks","100PCS Kids Educational Building Blocks with Number Cubes"],
+["kids-38pcs-police-building-blocks","38PCS Kids Educational Building Blocks with Police Figures"],
+["kids-50pcs-city-building-blocks-truck","50-Piece City Building Blocks with Truck"],
+["kids-magnetic-sticks-balls-64pcs","64PCS Magnetic Building Sticks and Balls STEM Set"],
+["kids-character-building-blocks","Character Building Blocks Set"],
+["mortein-doom-aik-lemon-aerosol-400-200ml","Mortein Doom Aik Lemon Aerosol 400+200ml"],
+["grinbelt-vermin-powder-100g","Grinbelt Vermin Powder 100g"],
+["fumakilla-vape-liquid-cordless-destroyer-set","Fumakilla Vape Liquid Cordless Destroyer Set"],
+["mos-kill-dudu-powder-insecticide-200g","Mos-Kill Dudu Powder Insecticide 200g"]
+];
+const $ = id => document.getElementById(id);
+let items = []; // {file, url, sel, st}
+
+function stat(it, msg, cls) { it.st.textContent = msg; it.st.className = 'st ' + (cls || ''); }
+
+$('files').onchange = () => {
+  items.forEach(it => URL.revokeObjectURL(it.url));
+  items = []; $('rows').textContent = '';
+  for (const file of $('files').files) {
+    const row = document.createElement('div'); row.className = 'row';
+    const img = document.createElement('img'); const url = URL.createObjectURL(file); img.src = url;
+    const col = document.createElement('div'); col.className = 'col';
+    const sel = document.createElement('select');
+    const o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Choose product...'; sel.appendChild(o0);
+    for (const [id, name] of DRAFTS) { const o = document.createElement('option'); o.value = id; o.textContent = name; sel.appendChild(o); }
+    const base = file.name.toLowerCase().replace(/\.[a-z0-9]+$/, '');
+    if (DRAFTS.some(d => d[0] === base)) sel.value = base;
+    const st = document.createElement('div'); st.className = 'st'; st.textContent = file.name;
+    col.append(sel, st); row.append(img, col); $('rows').appendChild(row);
+    items.push({ file, url, sel, st, done: false });
+  }
+  $('go').disabled = !items.length;
+};
+
+// Shrink on the phone: longest side 1600 px, JPEG. Returns null if the browser cannot read the image.
+async function shrink(file) {
   try {
-    const r = await fetch('https://oewvtbnmyombbtggamor.supabase.co/functions/v1/upload-photos', { method: 'POST', body: fd });
-    const j = await r.json();
-    if (j.error) { out.innerHTML = '<li class="no">' + j.error + '</li>'; return; }
-    out.innerHTML = j.results.map(x => '<li class="' + (x.ok ? 'ok' : 'no') + '">' + x.file + (x.ok ? ' uploaded' : ' skipped: ' + x.reason) + '</li>').join('');
-  } catch (e) { out.innerHTML = '<li class="no">Upload failed. Check your connection and try again.</li>'; }
+    const bmp = await createImageBitmap(file);
+    const w = bmp.width, h = bmp.height;
+    if (Math.min(w, h) < 450) return { tooSmall: w + 'x' + h };
+    const k = Math.min(1, 1600 / Math.max(w, h));
+    const c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.88));
+    return blob ? { blob } : null;
+  } catch (e) { return null; }
+}
+
+$('go').onclick = async () => {
+  const pass = $('pass').value;
+  if (!pass) { alert('Enter the passcode first.'); return; }
+  const chosen = items.filter(it => !it.done).map(it => it.sel.value).filter(Boolean);
+  if (new Set(chosen).size !== chosen.length) { alert('Two photos are set to the same product. Pick a different product for each photo.'); return; }
+  $('go').disabled = true;
+  for (const it of items) {
+    if (it.done) continue;
+    const id = it.sel.value;
+    if (!id) { stat(it, 'Skipped: choose a product', 'no'); continue; }
+    stat(it, 'Preparing photo...');
+    const s = await shrink(it.file);
+    if (s && s.tooSmall) { stat(it, 'Not uploaded: photo is too small (' + s.tooSmall + '); minimum 450x450', 'no'); continue; }
+    const up = s ? s.blob : it.file; // fall back to the original if the browser cannot decode it
+    const ext = s ? 'jpg' : (it.file.name.split('.').pop() || 'jpg').toLowerCase();
+    const fd = new FormData(); fd.append('pass', pass); if ($('act').checked) fd.append('activate', '1');
+    fd.append('files', new File([up], id + '.' + ext, { type: up.type || it.file.type }));
+    stat(it, 'Uploading...');
+    try {
+      const r = await fetch(FN, { method: 'POST', body: fd });
+      const j = await r.json();
+      if (j.error) { stat(it, 'Failed: ' + j.error, 'no'); if (r.status === 401) break; continue; }
+      const x = (j.results || [])[0] || {};
+      if (x.ok) { it.done = true; it.sel.disabled = true; stat(it, 'Uploaded' + (x.live ? ' and published' : ' (still a draft)'), 'ok'); }
+      else stat(it, 'Failed: ' + (x.reason || 'unknown reason'), 'no');
+    } catch (e) { stat(it, 'Upload failed. Check your connection and tap Upload again.', 'no'); }
+  }
+  $('go').disabled = items.every(it => it.done);
 };
 </script></body></html>
