@@ -1,3 +1,11 @@
+## 2026-11-07 23:00 Africa/Nairobi - kids' products batch: 20 drafts, 0 photos, 0 live (verified by query, BLOCKED on photos)
+- [x] GitHub repo and Supabase project oewvtbnmyombbtggamor connected in this session; verified read-only.
+- [x] 20 rows `kids-*` (category 54 Toys & Games) exist, created 2026-11-07 19:03 UTC: all `active=false`, `images` empty, stock 1000, low_at 20, price = cost x 1.15 (checked). Nothing was changed in this step.
+- [x] Why they cannot go live: trigger `products_posting_rules_trg` silently sets `active=false` on any row with no images. This is the real block, and it overrides the "photos are optional" line in CLAUDE.md for activation.
+- [ ] BLOCKED: actual product photos not supplied and this session has no route for image bytes (SQL connector only). Never write a made-up image URL.
+- [ ] NEXT: owner sends a photo per product (or direct public https image URLs, JPG/PNG/WebP, at least 450x450, under 2 MB), then upload via `upload-photos` Edge Function or `/admin.html`, check the Storage object and `products.images`, then set `active=true` and rebuild `product-pages.yml`.
+- [ ] Still open from the pest batch below: 4 pest drafts without photos remain (Mortein Doom Aik Lemon, Grinbelt Vermin Powder, Fumakilla Vape Cordless Set, Mos-Kill Dudu Powder).
+
 ## 2026-11-06 23:10 Africa/Nairobi - owner-authorized pest product batch (20 rows; 3 photo-backed active)
 Owner explicitly authorized direct product and photo posting. Connected to Supabase project oewvtbnmyombbtggamor and repo stermontmall/stermontmall.github.io.
 - [x] Checked the pest-control catalogue and exact product-name duplicates before inserting 20 supplier-listed products from Kejani Cleaning Services.
