@@ -1,0 +1,58 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Stermont product photo upload",
+    "version": "2.0.0",
+    "description": "Attach photos to an existing product. Send the passcode as the API key (Bearer). The product must already exist (draft is fine)."
+  },
+  "servers": [{ "url": "https://oewvtbnmyombbtggamor.supabase.co/functions/v1" }],
+  "paths": {
+    "/upload-photos": {
+      "post": {
+        "operationId": "uploadProductPhotos",
+        "summary": "Attach one or more photos to a product",
+        "description": "Pass attached chat images in openaiFileIdRefs, or direct https links / base64 in images. First photo becomes the main photo unless append is true; extra photos go to the gallery. Set activate to true only when the owner approves publishing.",
+        "x-openai-isConsequential": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["product_id"],
+                "properties": {
+                  "product_id": { "type": "string", "description": "Existing product id, lowercase-hyphen, e.g. kids-wooden-xylophone" },
+                  "openaiFileIdRefs": {
+                    "type": "array",
+                    "description": "Images attached in the chat",
+                    "items": { "type": "object", "properties": { "name": { "type": "string" }, "id": { "type": "string" }, "mime_type": { "type": "string" }, "download_link": { "type": "string" } } }
+                  },
+                  "images": {
+                    "type": "array",
+                    "description": "Direct https image links, data: URLs, or base64 strings",
+                    "items": { "type": "string" }
+                  },
+                  "image_url": { "type": "string", "description": "Single direct https link to a jpg/png/webp/gif" },
+                  "image_base64": { "type": "string", "description": "Single photo as base64 or a data: URL" },
+                  "append": { "type": "boolean", "description": "Add to the gallery instead of replacing the main photo" },
+                  "activate": { "type": "boolean", "description": "Publish the product once the photo is saved" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "All photos saved" },
+          "207": { "description": "Some photos saved, some failed; see results" },
+          "401": { "description": "Wrong passcode" },
+          "404": { "description": "No product with this id" },
+          "422": { "description": "Photo rejected; see reason" }
+        },
+        "security": [{ "passcode": [] }]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": { "passcode": { "type": "http", "scheme": "bearer" } }
+  }
+}
