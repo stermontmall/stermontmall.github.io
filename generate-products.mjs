@@ -456,11 +456,11 @@ function productBuyingNotes(p, cat) {
 
 // Content audit: warn on short descriptions and exact repeated 200-word openings; do not block the whole catalogue build.
 {
-  const clean = value => String(value || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/\\s+/g, ' ').trim();
+  const clean = value => String(value || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/\s+/g, ' ').trim();
   const seen = new Map();
   let short = 0;
   for (const p of products) {
-    const words = clean(p.description).split(/\\s+/).filter(Boolean);
+    const words = clean(p.description).split(/\s+/).filter(Boolean);
     if (words.length < 600) { short++; console.warn(`[content-audit] ${p.id}: only ${words.length} words`); }
     const opening = words.slice(0, 200).join(' ').toLowerCase();
     if (opening) {
