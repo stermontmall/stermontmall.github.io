@@ -11,6 +11,8 @@
 // 2026-11-05: at the end this also runs seo-shell-chrome.mjs, which gives the same static pages the shell top bar and bottom nav
 // (same page for everyone, no redirect). It lives here because this step already runs after every build and the workflow file
 // could not be edited. To turn it off, remove the runAll() call in the block at the bottom.
+// 2026-11-08: the owner brought the phone redirect back (HANDOFF-shell-dominant.md). It is NOT done by the old <!--stm-shell--> script this file strips:
+// it is the inline <!--stm-early--> script and shell-chrome.js, both added by seo-shell-chrome.mjs (runAll below). Edit of this comment only, to trigger a rebuild.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const DIR = process.env.P_DIR || 'p';
@@ -45,6 +47,6 @@ function run(dir, fn, label) {
 if (process.argv[1] && process.argv[1].endsWith('seo-shell-redirect.mjs')) {
   run(DIR, inject, 'product');
   run(process.env.C_DIR || 'c', injectCat, 'category');
-  try { (await import('./seo-shell-chrome.mjs')).runAll(); }   // shell top bar + bottom nav on p, c, guides, products.html
+  try { (await import('./seo-shell-chrome.mjs')).runAll(); }   // shell top bar + bottom nav + early phone redirect on p, c; chrome on guides, products.html
   catch (e) { console.log('seo-shell-chrome skipped:', e.message); }
 }
