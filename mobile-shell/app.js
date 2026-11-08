@@ -469,10 +469,11 @@ function openQuickBuy(id) {
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
 }
 function openDeepLink(slug) {   // the full product page for a /?product=<slug> address (any pack size's slug works)
-  const p = PRODUCTS.find(x => x.slug === slug || x.sizes.some(z => z.slug === slug));
+  const hit = x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug);   // /p/<id>.html pages are named by the row id, which differs from the slug on some products
+  const p = PRODUCTS.find(hit);
   if (!p) { toast('That product is no longer available'); return; }
   deepOpen = true;
-  qb.p = p; qb.size = (p.sizes.find(z => z.slug === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
+  qb.p = p; qb.size = (p.sizes.find(z => z.slug === slug || z.rowId === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
   renderQB(); openProductPage();
 }
 /* FAST PATH for /?product=<slug> (owner 2026-11-08: the link must go straight to the product, not wait for the whole catalog).
@@ -486,13 +487,13 @@ async function quickDeepLink(slug) {
     const [cats, names, rows0] = await Promise.all([
       api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
       fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({})),
-      api('products?active=eq.true&slug=eq.' + encodeURIComponent(slug) + '&select=' + PRODUCT_COLS)
+      api('products?active=eq.true&or=(slug.eq.' + encodeURIComponent(slug) + ',id.eq.' + encodeURIComponent(slug) + ')&select=' + PRODUCT_COLS)
     ]);
     if (deepOpen || fullCatalog || !rows0.length) return;
     let rows = rows0; const g = rows0[0].variant_group;
     if (g) { rows = await api('products?active=eq.true&variant_group=eq.' + encodeURIComponent(g) + '&select=' + PRODUCT_COLS); if (deepOpen || fullCatalog || !rows.length) return; }
     buildCatalog(rows, cats, names);   // PRODUCTS = just this product; the full catalog replaces it when it arrives
-    if (!PRODUCTS.some(x => x.slug === slug || x.sizes.some(z => z.slug === slug))) { PRODUCTS = []; CATS = []; return; }
+    if (!PRODUCTS.some(x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug))) { PRODUCTS = []; CATS = []; return; }
     openDeepLink(slug);
   } catch (e) { if (!deepOpen && !fullCatalog) { PRODUCTS = []; CATS = []; } }
 }

@@ -1,3 +1,9 @@
+## 2026-11-08 20:45 Africa/Nairobi - links to products whose slug differs from their id (branch `wip-link-id-fallback`, NOT merged)
+- [x] FOUND: `/p/<id>.html` pages (and `?shell=1` / phone redirects to `/?product=<id>`) failed in the shell with "That product is no longer available" for the 19 active products where `products.slug` != `products.id` (e.g. samsung-galaxy-a06-..., pentagon-50ec-insecticide-1-litre-stermont-arcade-kenya-1-litre). The shell only matched slug. Rootex 6 (slug = id) was fine.
+- [x] FIX: `mobile-shell/app.js` openDeepLink + quickDeepLink also match catalog id / row id (REST `or=(slug.eq.X,id.eq.X)`); `index.html` `app.js?v=19`. `shell.test.py` 167/168 (same sandbox network failure as before).
+- [ ] NEXT: push branch, merge to main after phone check: open `/p/samsung-galaxy-a06-4gb-ram-plus-64gb-4gb-plus-64gb.html?shell=1` -> must land on the product.
+- [ ] Other findings (not changed): Rootex page breadcrumb says Agrochemicals > Crop Insecticides (generator picks the wrong sub-category; its real one is Adjuvants & Growth Regulators); `/c/` index lists only 4 of 38 categories; `products.html` is a stub linking to `/index.html`.
+
 ## 2026-11-08 22:05 Africa/Nairobi - broken-links fix MERGED + stale tests fixed (main 4381c7e, 4e60d2a)
 - [x] `shell.test.py`: 3 stale checks updated (new SEO title, `?shell=1` share links). Suite now 167/168; the 1 failure is the sandbox's blocked network (ERR_TUNNEL), not code.
 - [x] Broken-links work from `wip-broken-links-fix` re-applied on the restored workflow and merged: `404.html` opens an unbuilt `/p/<slug>.html` or `/c/<slug>.html` in the shell; product pages rebuild every 30 min (was 3 h) and on `repository_dispatch` type `catalog-changed`; `check-product-pages.mjs` fails the run if any ACTIVE product has no page. First build with these (run 42503072460) succeeded, guard step green against the live catalog.
