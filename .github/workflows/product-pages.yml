@@ -1,12 +1,15 @@
 # Stermont Arcade - rebuilds every product page, category page and the product sitemap automatically.
-# Runs: every 3 hours, when generate-products.mjs changes, and whenever you tap "Run workflow" in the Actions tab.
+# Runs: every 30 minutes, when generate-products.mjs changes, on a repository_dispatch event of type catalog-changed (instant rebuild), and whenever you tap "Run workflow" in the Actions tab.
+# Why every 30 minutes: a product only has a /p/ page after a build, so a product activated between builds had a dead link until the next one (2026-11-06, Agrimec 018EC). 404.html now opens such links in the shop meanwhile, and check-product-pages.mjs fails the run if an active product is still missing a page.
 # Rebuild requested 2026-11-02: five new products (Mos-Kill vaporizer and coils, Shenke, KMAX 20 L, solar traps).
 name: Build product pages
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
+  repository_dispatch:
+    types: [catalog-changed]
   push:
     branches: [main]
     paths:
@@ -27,6 +30,10 @@ on:
       - 'product-content.json'
       - 'product-content.test.mjs'
       - 'seo-kenya.mjs'
+      - '404.html'
+      - 'check-product-pages.mjs'
+      - 'check-product-pages.test.mjs'
+      - 'not-found-fallback.test.mjs'
       - '.github/workflows/product-pages.yml'
 
 permissions:
@@ -65,6 +72,12 @@ jobs:
 
       - name: Test hand-written product content
         run: node product-content.test.mjs
+
+      - name: Test the 404 page fallback (unbuilt product and category links open in the shop)
+        run: node not-found-fallback.test.mjs
+
+      - name: Test the product page guard
+        run: node check-product-pages.test.mjs
 
       - name: Build pages and sitemap from the live catalog
         run: node generate-products.mjs
@@ -126,6 +139,9 @@ jobs:
             echo "::error::Could not publish generated pages after three push attempts."
             exit 1
           fi
+
+      - name: Guard - every active product must have a built page (no dead product links)
+        run: node check-product-pages.mjs
 
       - name: Tell Bing and other search engines about changed pages (IndexNow)
         run: |
