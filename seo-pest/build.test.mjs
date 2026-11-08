@@ -6,7 +6,9 @@ import { renderText, words } from './build.mjs';
 const dir = path.dirname(fileURLToPath(import.meta.url));
 let checks = 0; const bad = []; const thin = [];
 const ok = (cond, msg) => { checks++; if (!cond) bad.push(msg); };
-const BANNED = [/\bguarantee/i, /100\s?%/, /\bcure[sd]?\b/i, /\bcertified\b/i, /\bbest\b/i, /#1/, /top-rated/i, /pcpb[- ]approved/i, /\bsafe for (babies|children|kids|pets)\b/i, /\bnon-?toxic\b/i, /\bKSh\s?\d/i];
+// Owner decision 2026-11-08: the owner knows what Kenyan shoppers search, so search words such as "best" and "best price" are allowed.
+// Still banned: claims that need proof (guarantee, certified, #1, top-rated, PCPB-approved) and health/safety promises.
+const BANNED = [/\bguarantee/i, /100\s?%/, /\bcure[sd]?\b/i, /\bcertified\b/i, /#1/, /top-rated/i, /pcpb[- ]approved/i, /\bsafe for (babies|children|kids|pets)\b/i, /\bnon-?toxic\b/i, /\bKSh\s?\d/i];
 const DOSE = /\b\d+(?:\.\d+)?\s?(?:ml|g|kg|l|litres?)\s?(?:per|\/)\s?(?:litre|liter|l|kg|acre|hectare|tank|knapsack|bird|animal|water|m2|m²)\b/i;
 for (const f of fs.readdirSync(dir).filter(f => /^batch-\d+\.json$/.test(f))) {
   const items = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
