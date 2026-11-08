@@ -18,6 +18,7 @@ on:
       - 'seo-overrides.mjs'
       - 'seo-overrides.json'
       - 'seo-titles.mjs'
+      - 'seo-titles.test.mjs'
       - 'seo-shell-redirect.mjs'
       - 'seo-related-fill.mjs'
       - 'product-content.json'
@@ -46,6 +47,9 @@ jobs:
 
       - name: Test shared SEO metadata rules
         run: node seo-meta.test.mjs
+
+      - name: Test owner-supplied product title length limits
+        run: node seo-titles.test.mjs
 
       - name: Test allowlisted ordinary-product meta descriptions
         run: node seo-safe-meta.test.mjs
