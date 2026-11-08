@@ -89,14 +89,17 @@ Before considering an SEO release complete, verify:
 - Active products with no category_id: 0.
 - Active products with an empty images array: 0.
 - Seven active agrochemical listings still reference legacy github.io photo paths previously identified as missing from both repository and Storage. A non-empty image array is not proof that an image loads or matches the product; those seven remain blocked for photo replacement and visual verification.
-- Prior description audit: 0 active products below 600 words; 272 were in the 600–800 word band at the last check. Word count alone is not a quality or ranking score.
+- Product description audit (whitespace word count): 0 active products below 600 words; 272 are in the 600–800 band; 457 exceed 800 words. The overlength group contains a repeated generic “PRODUCT BUYING GUIDE” block appended to older original copy. This is not acceptable as final product SEO: those 457 descriptions need product-specific compression/rewrite to 600–800 words, not blind truncation.
+- Category taxonomy: 54 generated category landing pages plus `/c/index.html`. Eight parent hubs are now generated and linked: Clothing & Fashion, Phones & Accessories, TV/Audio/Video, Computers & Accessories, Home & Kitchen, Kids & Baby, Shoes, and Health & Beauty.
+- Image sitemap: 668 entries; zero double-escaped query strings. The seven confirmed missing legacy photo URLs are excluded from the image sitemap, but their product pages still need real replacement photos uploaded and verified.
 
 ## 8. Ordered implementation queue
 
-1. **P0 — Technical release verification:** current product-page workflow is rebuilding; confirm it finishes green, then verify live HTTP responses and the generated sitemap files.
+1. **P0 — Product description quality:** rewrite the 457 over-800-word descriptions into unique, product-specific 600–800-word content and remove the repeated generic buying-guide boilerplate.
 2. **P1 — Image integrity:** replace and visually verify the seven known dead legacy product-photo references; then sample the remaining catalogue for exact product/pack match.
-3. **P1 — Category taxonomy:** audit parent/child coverage, category index completeness, breadcrumbs, empty leaf categories and links from home/category/product pages.
+3. **P1 — Category taxonomy:** check empty leaf categories, breadcrumbs and internal links after the eight parent hubs were generated.
 4. **P1 — Product-page structured data:** compare rendered H1, price, availability, image and JSON-LD for representative products and multi-size groups.
+5. **P2 — Live validation:** test product/category/service/blog URLs, canonical tags, meta descriptions and all sitemap endpoints from a public network; the browser checker could not reach the custom domain in this session.
 5. **P2 — Services:** ensure each core service has one complete, indexable, distinct landing page and accurate local coverage.
 6. **P2 — Blog clusters:** map each existing article to one intent and cluster; merge or redirect only after URL and traffic review.
 7. **P3 — Measurement:** use Google Search Console query/page data to prioritize pages by impressions, clicks, CTR and position; track enquiries and product sales separately.
