@@ -14,9 +14,10 @@ This is the single source of truth for every Claude session that adds products t
 ## CONTENT STANDARD (owner rule 2026-11-08) — applies to ALL SEO, product, category and blog content
 - Every product page, category page, blog post and guide must carry MORE THAN 600 words of original, useful, Kenya-focused text. Quality first: no padding, no recycled paragraphs, no invented facts or statistics, no fake reviews.
 - Product page = `products.description` (150-250 words: value hook, features, specs, what is in the box) PLUS a `product-content.json` entry (at least 450 words: buying guide, who it suits, Kenyan use cases, comparison with 1-2 alternatives, care/safety, 5+ FAQs). Combined unique text must exceed 600 words. Note: the admin description box stops at 4000 characters, so put the long-form part in `product-content.json`.
-- Write for high-intent Kenyan searches: "[exact model] price in Kenya", "[product] vs [product]", "buy [product] M-Pesa". Include the KES price, M-Pesa and WhatsApp ordering, nationwide delivery (47 counties), and Nairobi (Sarit Centre, Westlands) context where true.
+- Write for high-intent Kenyan searches. The OWNER decides the keywords (he is Kenyan and knows what shoppers search): "[exact model] price in Kenya", "[product] vs [product]", "buy [product] M-Pesa". Include the KES price, M-Pesa and WhatsApp ordering, nationwide delivery (47 counties), and Nairobi (Sarit Centre, Westlands) context where true.
+- OWNER'S SEO POWER WORDS ARE ALLOWED (decision 2026-11-08): Best, Top-Rated, Original, Genuine, PCPB-Approved, Price in Kenya, M-Pesa, Sarit Centre Westlands, 47 counties. Title formulas: PDP "[Power word] [Product] [Volume] – Best Price in Kenya"; category "Shop Top & Reliable [Category] Online in Kenya – M-Pesa & Delivery". Use PCPB-Approved only for products that are PCPB-registered.
+- Still blocked by the tests: guarantee/guaranteed, certified, #1, cure, 100%, and safety promises on pesticides (safe for children/pets, non-toxic), and prices written inside descriptions (prices change).
 - Add something competitors do not: a plain-language buying checklist, a comparison table, honest limits ("who should NOT buy this"), a care/safety note, and related guides links.
-- Keep the claim guards in the tests (no "guaranteed", "certified", "top-rated", "best", "PCPB-approved" unless proven for that product).
 - Progress must be saved after every step (see `CLAUDE.md`).
 
 ## Owner's inputs

@@ -255,7 +255,8 @@ for (const [id, sections] of Object.entries(content)) {
   }
   assert.ok(sections.every(s => s.heading && Array.isArray(s.paragraphs) && s.paragraphs.length), id + ': every section needs a heading and paragraphs');
   assert.ok(!/<[^>]+>/.test(text), id + ': store plain text and escape at render time');
-  assert.ok(!/guaranteed|#1 rated|top-rated|certified/i.test(text), id + ': remove unsupported claims');
+  // Owner decision 2026-11-08: "top-rated" is allowed again (owner's SEO words). Still blocked: unproven #1 and guarantee/certified claims.
+  assert.ok(!/guaranteed|#1 rated|certified/i.test(text), id + ': remove unsupported claims');
   allText.push(text.toLowerCase());
 }
 assert.equal(new Set(allText).size, allText.length, 'Product content must be distinct for every product');
