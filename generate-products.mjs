@@ -708,3 +708,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-08: rebuild product pages after matching additional TVS Apache and HLX supplier photos.
 
 // 2026-11-08: regenerate motorcycle catalogue after the next verified Boxer and TVS spare-part photo batch.
+
+// 2026-11-08: final refresh after additional Boxer axle, chain-guide and ignition-coil image matches.
