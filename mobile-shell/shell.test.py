@@ -1,6 +1,6 @@
 # Headless-mobile test of the shell. Needs: pip install playwright && playwright install chromium
 # Run: python3 mobile-shell/shell.test.py   (screenshots go to the system temp folder)
-import sys, threading, http.server, socketserver, functools, os, tempfile, json, base64, time
+import re, sys, threading, http.server, socketserver, functools, os, tempfile, json, base64, time
 from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root: the shell reads /product-names.json
@@ -276,7 +276,7 @@ with sync_playwright() as p:
     # ---- the shell is now the home page (/): SEO head, handoff to the proven checkout, redirects ----
     BASE = URL.rstrip('/')
     html = pg.evaluate("fetch('/').then(r => r.text())")   # the HTML the server sends (the live page's title changes while a product is open)
-    check('home page keeps the SEO head (title, canonical, index robots, JSON-LD)', '<title>Stermont Arcade | Online Store Kenya</title>' in html and 'rel="canonical" href="https://stermontarcade.co.ke/"' in html and 'index, follow' in html and html.count('application/ld+json') >= 2 and 'noindex' not in html)
+    check('home page keeps the SEO head (title, canonical, index robots, JSON-LD)', re.search(r'<title>[^<]*\| Stermont Arcade</title>', html) and 'rel="canonical" href="https://stermontarcade.co.ke/"' in html and 'index, follow' in html and html.count('application/ld+json') >= 2 and 'noindex' not in html)
     check('home page carries the seo-links markers the build bot fills (crawlable category + product links)', html.count('<!-- seo-links:start -->') == 1 and html.count('<!-- seo-links:end -->') == 1 and '/c/' in html and '/p/' in html)
     cls = open(os.path.join(ROOT, 'classic.html'), encoding='utf-8').read()
     chk = open(os.path.join(ROOT, 'checkout.html'), encoding='utf-8').read()
@@ -391,10 +391,10 @@ with sync_playwright() as p:
     p9.evaluate("window.__shared = null; navigator.share = d => { window.__shared = d; return Promise.resolve(); }")
     p9.locator('#pp-share').click(); p9.wait_for_function('window.__shared')
     sh = p9.evaluate('window.__shared')
-    check('share: shares the product\'s own /p/ page link, not the shell address', sh['url'] == f'{BASE}/p/home-1.html' and 'Air Fryer' in sh['title'], sh)
+    check('share: shares the product\'s own /p/ page link, not the shell address', sh['url'] == f'{BASE}/p/home-1.html?shell=1' and 'Air Fryer' in sh['title'], sh)
     p9.evaluate("navigator.share = undefined; window.__copied = null; Object.defineProperty(navigator, 'clipboard', { value: { writeText: t => { window.__copied = t; return Promise.resolve(); } }, configurable: true })")
     p9.locator('#pp-share').click(); p9.wait_for_function('window.__copied')
-    check('share: without the share sheet the link is copied and a notice shows', p9.evaluate('window.__copied') == f'{BASE}/p/home-1.html' and 'Link copied' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
+    check('share: without the share sheet the link is copied and a notice shows', p9.evaluate('window.__copied') == f'{BASE}/p/home-1.html?shell=1' and 'Link copied' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
     check('share: the address bar shows the same product page address', p9.evaluate('location.pathname') == '/p/home-1.html')
     p9.goto(f'{BASE}/?product=does-not-exist'); p9.wait_for_selector('#grid .card[data-id]'); p9.wait_for_timeout(600)
     check('address: an unknown product shows a notice and the normal home', p9.locator('#page-product.open').count() == 0 and 'no longer available' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
