@@ -135,9 +135,11 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
   const prefix = `Buy ${n} in Kenya: `;
   const suffix = '. Pay by M-Pesa; delivery to 47 counties.';
   const room = DESC_MAX - prefix.length - suffix.length;
-  // Use the sentence only when it fits whole or has real room (60+ characters); a 20-character stub is worse than the standard wording below.
-  if (fact && room >= 24 && (fact.length <= room || room >= 60)) {
-    const candidate = prefix + clip(fact, room) + suffix;
+  // Never cut a factual sentence in the middle. A clipped fragment can produce broken snippets
+  // (for example, ending a storage specification with an ellipsis). Use the Kenya-specific fallback
+  // unless the complete first product sentence fits within the meta-description budget.
+  if (fact && room >= 24 && fact.length <= room) {
+    const candidate = prefix + fact + suffix;
     if (candidate.length <= DESC_MAX) return candidate;
   }
 
