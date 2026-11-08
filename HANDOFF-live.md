@@ -1830,3 +1830,18 @@ Owner requested 20 additional fast-moving sneaker styles, avoiding existing cata
 - [x] Reebok Court Advance image retry completed: request 992 returned HTTP 200, live=true, photos=1. Final catalogue verification: 20/20 new sneaker products active, each with exactly one image, stock 1000, low_at 20, featured true and cost=85% of price.
 - [x] Set category thumbnail images and featured labels for Men's Sneakers (82) and Women's Sneakers (87).
 - [ ] Re-run/verify the product-page workflow after the Reebok activation so its static SEO page and sitemap entry are generated; 19 of the 20 pages were already present and passed title/meta/canonical/Product JSON-LD/image-alt checks at last check.
+
+
+## 2026-11-08 - 20 new photo-verified pest-control products published
+- [x] Catalog audit: checked active pest-control categories and existing products before adding new, distinct equipment, monitoring and exclusion items. Kept the new active batch to 20; an extra draft PPE listing was deactivated and excluded from SEO.
+- [x] Supabase: 20 new products active across Pest Control & Fumigation, Termite Control, Bed Bug Killers, Cockroach & Ant Killers, Mosquito & Fly Control, Rodent Control, Sprayers & Equipment and Protective Wear & Safety.
+- [x] Photo ingestion: each of the 20 active products has one real product-matched image uploaded to the `product-images` Storage bucket; image ingest HTTP responses verified successful (requests 1012-1035, including retries for the moisture meter and glue-board refill). No emoji or placeholder images.
+- [x] Commercial defaults: stock 1000, low-stock threshold 20, featured=true, cost=85% of selling price (15% below retail).
+- [x] SEO: added unique Kenya-focused title/meta description and FAQ schema in `seo-overrides.json`, plus buyer/use guidance sections in `product-content.json`; set per-product `seo_title` values in Supabase. Product descriptions avoid unsupported efficacy guarantees and distinguish tools/monitors from pesticides.
+- [ ] VERIFY after GitHub Actions rebuild: every active product has a generated `p/<id>.html` page, unique title/meta description, canonical, Product JSON-LD and image alt; all 20 appear in `sitemap-products.xml`; IndexNow step completes or reports its non-critical result.
+- [ ] Owner review: prices are provisional catalogue estimates, not supplier-confirmed quotes; confirm landed costs, availability, warranty and exact accessory contents before accepting customer orders. Third-party image reuse rights should be confirmed with suppliers/rights holders.
+- Active IDs:
+  - `bellows-duster-jt-eaton-20261108`, `bg-1150-bulb-dust-r-duster-20261108`, `bg-hand-dust-r-1152a-20261108`, `vectorgel-dh1-gel-bait-gun-20261108`, `sa1600-lockable-automatic-aerosol-dispenser-20261108`
+  - `bg-versatool-415-termite-injection-tool-20261108`, `advance-termite-monitoring-bait-station-20261108`, `bg-robco-soil-rodding-tool-20261108`, `fnirsi-wmt10-wood-moisture-meter-20261108`, `ullman-telescoping-inspection-mirror-20261108`
+  - `uv365-blacklight-inspection-flashlight-20261108`, `queen-bedbug-proof-mattress-encasement-20261108`, `guardmax-bedbug-pillow-encasement-2pack-20261108`, `duotrap-bedbug-interceptor-4pack-20261108`, `atrix-ergo-bedbug-hepa-backpack-vacuum-20261108`
+  - `polti-cimex-eradicator-bedbug-steamer-20261108`, `stufit-copper-mesh-rodent-exclusion-roll-20261108`, `catchmaster-vector-uv-fly-light-trap-20261108`, `catchmaster-909-fly-light-glue-boards-12pack-20261108`, `catchmaster-100i-cockroach-monitor-traps-9pack-20261108`
