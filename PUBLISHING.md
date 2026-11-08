@@ -21,6 +21,13 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 4. PHOTO (owner rule 2026-11-08: ChatGPT/Claude researches it online). If the owner gave no photo, find a sharp direct image of the EXACT product on the manufacturer, supplier or an official retailer page (at least 450x450, correct brand, model and pack size, no other shop's watermark or logo). Attach it with `upload-photos` (`image_url`, `images`, `image_base64` or `openaiFileIdRefs`) or `public.add_product_photo(product_id, image_url, true)`. If a photo is rejected, try another source image.
 5. Never invent a photo URL. Report a photo as attached only after the Storage object and the `products.images` reference are checked.
 6. PUBLISH LIVE (owner rule 2026-11-08): once the row and photo are verified, set `active=true` (or send `activate: true` with the photo). No owner-review wait. If no suitable photo exists, publish without one and say so. If the source price is not verified, stop and ask: that is the only blocker. After activation, verify the generated product page, canonical, Product JSON-LD and sitemap entry once the product-pages workflow completes.
+7. GIVE THE MOBILE-SHELL LINK (owner rule 2026-11-08, permanent): see "Product links" below.
+
+## Product links (owner rule 2026-11-08, permanent)
+- Every product link given to the owner (chat reply, report, handoff) MUST open the mobile shell: `https://stermontarcade.co.ke/?product=<products.slug>`. Read `slug` from the product row (it usually equals `id`; 19 older rows differ).
+- NEVER give `https://stermontarcade.co.ke/p/<id>.html`, `/classic.html` or any other address as "the link". Those open the static/old page.
+- The static `/p/<id>.html` pages are kept only for Google and link previews. They are deliberately NOT redirected for visitors (see `HANDOFF-stop-shell-redirect.md`: the 2026-11-03 redirect was removed over a suspected ranking drop). Do not re-add a redirect without an explicit owner decision.
+- Check before reporting: the row is `active=true`, then give the shell link. Opening it on a phone should show the shell product view (photo, price, Add to cart).
 
 ## Price and inventory rules for NEW products
 - Find the source price online yourself (owner rule 2026-11-08): the lowest current in-stock KES listing of the EXACT product (same brand, model, pack size) on a reputable Kenyan seller or supplier page. Record that page URL as the source. Never invent or estimate a price. If no KES listing of the exact product exists, stop and ask the owner.
@@ -38,14 +45,14 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 After posting, run a read-only query using the exact product ID:
 
 ```sql
-select id, name, price, cost, stock, low_at, active, images
+select id, slug, name, price, cost, stock, low_at, active, images
 from public.products
 where id = '<product-id>';
 ```
 
 Confirm exactly one intended row exists; cost equals the verified source KES price; price equals round(cost * 1.15, 2); stock=1000; low_at=20; active=true once verified (owner rule 2026-11-08). If a photo was attached, `images` contains the returned public Storage URL and it opens.
 
-Report the product ID, source cost, selling price, stock, alert threshold, draft status, photo status and blockers. Do not say "posted", "published" or "photo attached" beyond the evidence actually checked.
+Report the product ID, source cost, selling price, stock, alert threshold, draft status, photo status, the mobile-shell link (`https://stermontarcade.co.ke/?product=<slug>`) and blockers. Do not say "posted", "published" or "photo attached" beyond the evidence actually checked.
 
 ## Security and boundaries
 - Never expose the photo passcode, Supabase service-role key, staff JWT, or any other secret in chat, commits, SQL output or instructions.
