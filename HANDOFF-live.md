@@ -1896,5 +1896,5 @@ Owner instruction: “Continue with the next 30.”
 - [!] Existing image URLs were retained, not visually checked for exact model/variant match. The throttle cable listing uses an external-hosted image URL; verify image rights and availability. No photos were uploaded or replaced in this batch.
 - [!] Some part fitments and technical details remain conditional on exact part number, model year, connector/dimensions and physical sample. The copy explicitly avoids claiming OEM authenticity or unverified interchangeability. Brake, steering and throttle parts require mechanic fitment checks.
 - [!] Static product HTML, canonical tags, Product JSON-LD, sitemap inclusion, IndexNow notification and GitHub Pages deployment have not been verified for this batch. Google indexing and rankings are not claimed.
-- [ ] Next catalogue scan: expected 60 active products remain below 600 words; verify with a fresh SQL count before selecting the next batch.
+- [ ] Next catalogue scan: fresh SQL count after this batch confirms 60 active products remain below 600 words.
 - Customer-facing product links must use the mobile-shell format `https://stermontarcade.co.ke/?product=<slug>` after confirming the item is active.
