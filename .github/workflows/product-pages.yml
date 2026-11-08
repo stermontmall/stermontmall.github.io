@@ -15,6 +15,8 @@ on:
     paths:
       - 'generate-products.mjs'
       - 'seo-indexing-guard.test.mjs'
+      - 'seo-catalog-guard.mjs'
+      - 'seo-catalog-guard.test.mjs'
       - 'seo-product-identifiers.mjs'
       - 'seo-product-identifiers.test.mjs'
       - 'seo-product-extras.mjs'
@@ -66,6 +68,12 @@ jobs:
 
       - name: Test owner-supplied product title length limits
         run: node seo-titles.test.mjs
+
+      - name: Test active catalogue SEO metadata quality guard
+        run: node seo-catalog-guard.test.mjs
+
+      - name: Audit active catalogue before page generation
+        run: node seo-catalog-guard.mjs
 
       - name: Test allowlisted ordinary-product meta descriptions
         run: node seo-safe-meta.test.mjs
