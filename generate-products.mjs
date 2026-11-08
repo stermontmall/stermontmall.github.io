@@ -18,6 +18,32 @@ const brandOf = name => { const n = ` ${String(name).toLowerCase()} `; const hit
 const RETURNS = { '@type': 'MerchantReturnPolicy', applicableCountry: 'KE', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 2, url: 'https://stermontarcade.co.ke/returns.html' };
 // Delivery facts from shipping.html: all of Kenya, usually 1 to 3 days. The fee depends on location and is confirmed before payment, so no fixed rate is claimed here.
 const SHIPPING = { '@type': 'OfferShippingDetails', shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'KE' }, deliveryTime: { '@type': 'ShippingDeliveryTime', transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' } } };
+// Store facts match the live Nairobi pickup page and returns/shipping policies.
+const STORE_LD = {
+  '@context': 'https://schema.org',
+  '@type': ['Store', 'OnlineStore'],
+  '@id': `${SITE}/#store`,
+  name: BRAND,
+  url: SITE + '/',
+  telephone: '+254748888230',
+  email: 'support@stermontarcade.co.ke',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'The Sarit Centre, Karuna Road',
+    addressLocality: 'Westlands, Nairobi',
+    postalCode: '00800',
+    addressCountry: 'KE'
+  },
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+    opens: '08:00',
+    closes: '20:00'
+  },
+  areaServed: [{ '@type': 'City', name: 'Nairobi' }, { '@type': 'Country', name: 'Kenya' }],
+  paymentAccepted: 'M-Pesa',
+  currenciesAccepted: 'KES'
+};
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
@@ -59,6 +85,7 @@ h1{font-size:1.5rem;line-height:1.25;margin:.2rem 0 .6rem}.pr{font-size:1.7rem;f
 .btn.alt{background:#fff;color:#6d28d9;border:2px solid #7c3aed}.btn.ask{margin:.2rem 0 .8rem;font-size:1.02rem;box-shadow:0 2px 8px rgba(22,163,74,.3)}.box{background:#fff;border:1px solid #e6e1f5;border-radius:14px;padding:.9rem 1rem;margin:1rem 0}
 .desc{white-space:pre-line}ul.g{list-style:none;padding:0;display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
 ul.g img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:.5rem}ul.g li{background:#fff;border:1px solid #e6e1f5;border-radius:12px;padding:.7rem}ul.g a{text-decoration:none;font-weight:600;color:#1f1b2e}ul.g span{display:block;color:#5b21b6;font-weight:800}
+.product-silo{margin:2rem 0;padding:1.2rem;background:#f7f9fc;border:1px solid #e3e8ef;border-radius:14px}.product-silo h2{margin:.1rem 0 .6rem;font-size:1.25rem}.product-silo h3{margin:1rem 0 .45rem;font-size:1rem}.product-silo p{color:#596579;margin:.35rem 0 .7rem}.silo-links{display:flex;flex-wrap:wrap;gap:.55rem}.silo-links a{display:inline-block;padding:.5rem .75rem;background:#fff;border:1px solid #dce3ec;border-radius:8px;text-decoration:none}.silo-products{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.65rem}.silo-products a{display:block;padding:.7rem;background:#fff;border:1px solid #e1e6ed;border-radius:8px;text-decoration:none;font-weight:600}.silo-products small{display:block;color:#5b21b6;margin-top:.25rem}.silo-guides{padding-left:1.2rem;line-height:1.9}.silo-guides a{font-weight:600} 
 footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85rem;border-top:1px solid #e6e1f5}
 .stk{display:none}
 @media(max-width:700px){main{padding-bottom:5.5rem}.stk{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;align-items:center;gap:.6rem;padding:.6rem .8rem calc(.6rem + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e6e1f5;box-shadow:0 -2px 10px rgba(31,27,46,.12)}
@@ -69,6 +96,7 @@ const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = ''
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${SITE}${path}"><meta name="robots" content="index, follow, max-image-preview:large">
+<script>(function(){var q=new URLSearchParams(location.search);if(["search","sort","filter"].some(function(k){return q.has(k)})){var m=document.querySelector('meta[name="robots"]');if(m)m.setAttribute("content","noindex,follow");}})();</script>
 <meta property="og:type" content="${ogType}"><meta property="og:site_name" content="${BRAND}"><meta property="og:locale" content="en_KE">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${SITE}${path}">
 <meta property="og:image" content="${esc(og || SITE + '/logo.png')}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(og || SITE + '/logo.png')}">${extra}
@@ -345,6 +373,41 @@ const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `
 const card = p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 // Helpful, category-specific buying checks. Avoid inventing product specifications, certifications or warranty terms.
+function productSiloHtml(p, cat, related) {
+  if (!cat) return related.length ? `<section class="product-silo"><h2>Related products</h2><div class="silo-products">${related.map(x => `<a href="/p/${encodeURIComponent(sl(x.id))}.html">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div></section>` : '';
+  const parent = Object.entries(HUBS).find(([hubSlug, hub]) => hubSlug !== cat.slug && hub.kids.includes(cat.slug));
+  const hubSlug = parent ? parent[0] : cat.slug;
+  const hub = byCat[hubSlug] || byCat[cat.slug] || cat;
+  const hubUrl = `/c/${encodeURIComponent(hubSlug)}.html`;
+  const children = (HUBS[hubSlug]?.kids || [])
+    .filter(slug => slug !== cat.slug && byCat[slug]?.items?.length)
+    .slice(0, 6);
+  const guideMap = {
+    'pest-control-fumigation': [['/blog/pest-control-products-for-hotels-and-restaurants-kenya.html','Pest control products for hotels and restaurants in Kenya'],['/blog/pest-control-equipment-checklist-businesses-kenya.html','Pest-control equipment checklist for businesses']],
+    'bed-bug-killers': [['/blog/how-to-get-rid-of-bed-bugs-kenya.html','How to get rid of bed bugs in Kenya'],['/blog/bed-bugs-in-hostels-and-rentals-kenya.html','Bed bugs in hostels and rental properties']],
+    'termite-control': [['/blog/termite-control-at-home-kenya.html','Termite control at home in Kenya'],['/blog/termites-in-timber-and-gardens-gradometer-480ec-kenya.html','Termites in timber and gardens']],
+    'cockroach-ant-killers': [['/blog/how-to-get-rid-of-cockroaches-kenya.html','How to get rid of cockroaches in Kenya'],['/blog/cockroach-gel-spray-or-powder-kenya.html','Cockroach gel, spray or powder: choosing a format']],
+    'rodent-control': [['/blog/rat-control-in-warehouses-and-stores-rodent-kill-500g-kenya.html','Rat control in warehouses and stores'],['/blog/rat-control-in-a-poultry-house-tatua-bait-blocks-kenya.html','Rat control in poultry houses']],
+    'sprayers-equipment': [['/blog/how-to-choose-a-knapsack-sprayer-kenya.html','How to choose a knapsack sprayer'],['/blog/ulv-fogger-vs-knapsack-sprayer-kenya.html','ULV fogger vs knapsack sprayer']],
+    'mosquito-fly-control': [['/blog/mosquito-control-at-home-kenya.html','Mosquito control at home in Kenya'],['/blog/sticky-fly-rolls-for-kitchens-dairies-and-shops-kenya.html','Sticky fly rolls for kitchens, dairies and shops']],
+    'agrochemicals': [['/blog/actellic-50ec-store-bagged-grain-and-livestock-houses-kenya.html','Stored-grain and livestock-house pest control'],['/blog/grain-save-dust-permethrin-for-maize-and-beans-kenya.html','Protecting stored maize and beans']],
+    'agrovet': [['/blog/how-to-disinfect-a-poultry-house-kenya.html','How to disinfect a poultry house'],['/blog/poultry-feed-premix-lysine-phosphate-kenya.html','Poultry feed premix buying guide']],
+    'animal-feeds': [['/blog/poultry-feed-premix-lysine-phosphate-kenya.html','Poultry feed premix buying guide']],
+    'herbicides': [['/blog/actellic-25ec-preparing-an-empty-store-before-harvest-kenya.html','Preparing a store before harvest']],
+    'fungicides': [['/blog/pest-control-products-for-hotels-and-restaurants-kenya.html','Product selection and safe storage guidance']]
+  };
+  const guides = guideMap[cat.slug] || guideMap[hubSlug] || [];
+  return `<section class="product-silo" aria-label="Category links, related products and buying guides">
+    <h2>Explore ${esc(cat.name)} and related buying guides</h2>
+    <p>Browse the main category, compare related products and read practical guides before choosing.</p>
+    <h3>Shop the main category</h3>
+    <div class="silo-links"><a href="${hubUrl}">${esc(hub.name || cat.name)} in Kenya</a></div>
+    ${children.length ? `<h3>Related categories</h3><div class="silo-links">${children.map(slug => `<a href="/c/${encodeURIComponent(slug)}.html">${esc(byCat[slug].name)}</a>`).join('')}</div>` : ''}
+    ${related.length ? `<h3>Related products</h3><div class="silo-products">${related.slice(0,6).map(x => `<a href="/p/${encodeURIComponent(sl(x.id))}.html">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div>` : ''}
+    ${guides.length ? `<h3>Helpful guides</h3><ul class="silo-guides">${guides.map(([url,label]) => `<li><a href="${url}">${esc(label)}</a></li>`).join('')}</ul>` : ''}
+  </section>`;
+}
+
 function productBuyingNotes(p, cat) {
   const slug = cat?.slug || '';
   const name = esc(p.name);
@@ -391,6 +454,26 @@ function productBuyingNotes(p, cat) {
   return `<div class="box"><h2 style="margin-top:0">${esc(heading)}</h2><p>${intro}</p><ul>${checks.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p>If a specification is missing, <a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hello Stermont Arcade, please confirm the specifications for ' + p.name + ' before I order.')}">ask Stermont Arcade on WhatsApp</a> before placing your order.</p></div>`;
 }
 
+// Content audit: warn on short descriptions and exact repeated 200-word openings; do not block the whole catalogue build.
+{
+  const clean = value => String(value || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/\\s+/g, ' ').trim();
+  const seen = new Map();
+  let short = 0;
+  for (const p of products) {
+    const words = clean(p.description).split(/\\s+/).filter(Boolean);
+    if (words.length < 600) { short++; console.warn(`[content-audit] ${p.id}: only ${words.length} words`); }
+    const opening = words.slice(0, 200).join(' ').toLowerCase();
+    if (opening) {
+      const key = createHash('sha256').update(opening).digest('hex');
+      if (!seen.has(key)) seen.set(key, []);
+      seen.get(key).push(p.id);
+    }
+  }
+  const duplicates = [...seen.values()].filter(ids => ids.length > 1);
+  console.log(`[content-audit] ${products.length} products; ${short} below 600 words; ${duplicates.length} exact repeated 200-word opening groups.`);
+  duplicates.slice(0, 20).forEach(ids => console.warn('[content-audit] repeated opening:', ids.join(', ')));
+}
+
 const NAMES = {};   // product id -> the heading its page shows; the shop list reads this (product-names.json) so list, view and page always carry the same wording
 for (const p of products) {
   const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
@@ -419,7 +502,7 @@ for (const p of products) {
     brand: { '@type': 'Brand', name: brandOf(p.name) },
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(p.price) || 0)),
       availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
-      seller: { '@type': 'Organization', name: BRAND } },
+      seller: { '@id': `${SITE}/#store` } },
     ...rLd
   });
   const ldGroup = p.variants ? jsonLd({
@@ -429,16 +512,9 @@ for (const p of products) {
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
       offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: String(Math.round(Number(v.price) || 0)),
         availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
-        seller: { '@type': 'Organization', name: BRAND } } }))
+        seller: { '@id': `${SITE}/#store` } } }))
   }) : '';
-  const productFaqLd = jsonLd({
-    '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [
-      { '@type': 'Question', name: `How can I buy ${p.name} in Kenya?`, acceptedAnswer: { '@type': 'Answer', text: `You can order ${p.name} online at Stermont Arcade, pay securely by M-Pesa, and get delivery to all 47 counties in Kenya.` } },
-      { '@type': 'Question', name: `Do you deliver ${p.name} outside Nairobi?`, acceptedAnswer: { '@type': 'Answer', text: `Yes, we deliver ${p.name} to all 47 counties across Kenya, typically within 1 to 3 days.` } },
-      { '@type': 'Question', name: `What is the price of ${p.name}?`, acceptedAnswer: { '@type': 'Answer', text: `The price of ${p.name} is ${money(p.price)}${p.unit ? ' / ' + p.unit : ''}. You can order directly on our website or via WhatsApp.` } }
-    ]
-  });
-  const ld = (p.variants ? ldGroup : ldOne) + productFaqLd + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
+  const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
     const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${pdpVariantUrl(path, v.slug, p.slug)}`)}`;
     return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
@@ -467,7 +543,7 @@ ${productContentHtml(p)}
 ${seoBoxes}
 ${buyerNotes}
 ${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
-${related.length ? `<h2>More in ${esc(cat.name)}</h2><ul class="g">${related.map(card).join('')}</ul>` : ''}
+${productSiloHtml(p, cat, related)}
 <div class="stk" role="complementary" aria-label="Order this product"><b>${p.variants ? 'From ' : ''}${money(p.price)}<small>${esc(p.name)}</small></b><a class="call" href="tel:+${WHATSAPP}" aria-label="Call ${BRAND}">Call</a><a href="${esc(inStock ? wa : ask)}">${inStock ? 'Order on WhatsApp' : 'Ask on WhatsApp'}</a></div>`;
   writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld, ogType: 'product', extra: `<meta name="stm-id" content="${esc(p.id)}"><meta name="stm-seo" content="v2"><meta property="product:price:amount" content="${Math.round(Number(p.price) || 0)}"><meta property="product:price:currency" content="KES"><meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` }));
   urls.push(path);
