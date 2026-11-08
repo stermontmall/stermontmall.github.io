@@ -40,7 +40,19 @@ for (const f of pages) {
   if (!/<link rel=["']canonical["']/i.test(h)) add('Missing canonical link', f);
   const h1 = (h.match(/<h1[\s>]/gi) || []).length;
   if (h1 !== 1) add(h1 ? 'More than one H1 heading' : 'Missing H1 heading', f);
-  (h.match(/<img\b[^>]*>/gi) || []).forEach(t => { if (!/\balt=/i.test(t)) add('Image without alt text', f); });
+  (h.match(/<img\b[^>]*>/gi) || []).forEach(t => {
+    if (!/\balt=/i.test(t)) add('Image without alt text', f);
+    const sm = t.match(/\bsrc=["']([^"']+)["']/i);
+    if (sm) {
+      let src = sm[1].split(/[?#]/)[0];
+      if (src.startsWith(SITE)) src = src.slice(SITE.length) || '/';
+      if (/^https:\/\/stermontmall\.github\.io\/product-photos\//i.test(sm[1])) add('Legacy GitHub Pages product image URL', f);
+      if (!/^[a-z][a-z0-9+.-]*:/i.test(src) && !src.startsWith('//')) {
+        if (!src.startsWith('/')) src = '/' + src;
+        if (!exists(src)) add(`Missing local image file ${src}`, f);
+      }
+    }
+  });
   for (const m of h.matchAll(/<script type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)) { try { JSON.parse(m[1]); } catch { add('Broken structured data (JSON-LD)', f); } }
   if (f.startsWith('p/')) {
     if (!/<img\b(?![^>]*placeholder\.svg)/i.test(h)) add('Product page has no photo (also left out of the Google Shopping feed)', f);
@@ -55,8 +67,11 @@ for (const f of pages) {
   }
 }
 // every sitemap URL must exist
-for (const sm of ['sitemap.xml', 'sitemap-products.xml', 'services/sitemap-services.xml', 'pest-control/sitemap.xml']) if (existsSync(sm))
-  for (const m of readFileSync(sm, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) { const u = m[1].replace(SITE, ''); if (u.startsWith('/') && !exists(u)) add('Sitemap lists a page that does not exist', `${sm}: ${u}`); }
+for (const sm of ['sitemap.xml', 'sitemap-products.xml', 'services/sitemap-services.xml', 'pest-control/sitemap.xml', 'sitemap-images.xml']) if (existsSync(sm)) {
+  const xml = readFileSync(sm, 'utf8');
+  for (const m of xml.matchAll(/<loc>([^<]+)<\/loc>/g)) { const u = m[1].replace(SITE, ''); if (u.startsWith('/') && !exists(u)) add('Sitemap lists a page that does not exist', `${sm}: ${u}`); }
+  for (const m of xml.matchAll(/<image:loc>([^<]+)<\/image:loc>/g)) { const u = m[1].replace(SITE, ''); if (u.startsWith('/') && !exists(u)) add('Image sitemap lists a missing local image', `${sm}: ${u}`); }
+}
 
 for (const [value, list] of titlePages) if (list.length > 1) for (const f of list) add('Duplicate page title', f);
 for (const [value, list] of descPages) if (list.length > 1) for (const f of list) add('Duplicate meta description', f);
