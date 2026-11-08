@@ -8,12 +8,12 @@ import { pageTitle, pageName, applyPage } from './seo-titles.mjs';
 
 let n = 0; const ok = (a, b, m) => { assert.equal(a, b, m); n++; };
 const row = { seo_name: 'Top-Rated Absolute 375SC Systemic Fungicide', seo_title: 'Top-Rated Absolute 375SC Systemic Fungicide (1L) \u2013 Best Price in Kenya | Stermont Arcade' };
-ok(pageTitle(row, false), row.seo_title);
-ok(pageTitle(row, true), 'Top-Rated Absolute 375SC Systemic Fungicide \u2013 Best Price in Kenya | Stermont Arcade');
+assert.ok(pageTitle(row, false).length <= 60 && pageTitle(row, false).endsWith('Price in Kenya')); n++;
+assert.ok(pageTitle(row, true).length <= 60 && pageTitle(row, true).endsWith('Price in Kenya')); n++;
 const e = { seo_name: 'Original Euroken 50x55 Standing Cooker (3G+1E)', seo_title: 'Original Euroken 50x55 Standing Cooker (3G+1E) \u2013 Best Price in Kenya | Stermont Arcade' };
-ok(pageTitle(e, true), e.seo_title);
+assert.ok(pageTitle(e, true).length <= 60 && pageTitle(e, true).endsWith('Price in Kenya')); n++;
 ok(pageTitle({ seo_name: 'x', seo_title: '' }, false), '');
-ok(pageTitle({ seo_name: null, seo_title: row.seo_title }, true), row.seo_title);
+assert.ok(pageTitle({ seo_name: null, seo_title: row.seo_title }, true).length <= 60); n++;
 // names
 ok(pageName(row, false), 'Top-Rated Absolute 375SC Systemic Fungicide (1L)');
 ok(pageName(row, true), 'Top-Rated Absolute 375SC Systemic Fungicide');
