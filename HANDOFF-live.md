@@ -1607,3 +1607,13 @@ Owner: "Post 15 spare parts products on my website".
 - [x] GitHub Pages deployment run 42492233503 completed successfully after the generated pages were pushed. Product pages are therefore deployed from the generated catalogue commit.
 - [ ] Product-pages workflow's final IndexNow notification step was still running at last check; page generation, save and deployment succeeded independently.
 - [ ] Ten products remain without a verified matching image; keep as live no-photo listings until exact photos are found.
+
+
+## 2026-11-08 - 20 additional Bajaj Boxer motorcycle spare parts published
+- [x] Audited the existing category-61 catalogue and created 20 new unique Boxer BM100/BM125/BM150 product records with supplier source URLs.
+- [x] All 20 are active in Supabase. Each has a Kenya-focused SEO title and a 745-767 word description; source prices are recorded as cost and store selling price is calculated at cost + 15%.
+- [x] Stock quantity 1,000 and low-stock alert 20 on all 20; no featured/advert flag changed.
+- [x] Ten product photos were uploaded from matching FDR Auto Garage product-page image links and confirmed in the products.images field: BM100 6200 bearing, BM125/150 6202 bearing, oil drain plug, throttle grip, BM150 cylinder block, PF521205 piston kit, STD piston kit, STD++ piston kit, BM150 headlamp cowling, BM150 4-gear speedometer dashboard.
+- [ ] Ten other products have no confirmed product-specific image yet. Keep blank rather than use unrelated photos.
+- [ ] Product-page rebuild and sitemap generation triggered by the workflow file update below; verify all 20 product HTML pages, sitemap entries, and Pages deployment after the run completes.
+- Source pricing used: FDR Auto Garage product pages, including exact prices and part references; where the supplier product detail page was not indexed, its Motorcycle Spare Parts category listing was used. See each product's source_url.
