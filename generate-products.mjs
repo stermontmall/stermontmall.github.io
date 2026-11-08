@@ -714,3 +714,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-08: refresh catalogue after verified Boxer transmission and BM100 suspension photo matches.
 
 // 2026-11-08: regenerate Boxer and TVS product pages after final verified photo-matching batch.
+
+// 2026-11-08: refresh BM100 capacitor photo after confirming its DU201063 part reference.
