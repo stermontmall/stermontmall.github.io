@@ -1858,3 +1858,16 @@ Owner requested 20 additional fast-moving sneaker styles, avoiding existing cata
 
 - [x] Product sitemap check: all 30 phone product IDs appear in sitemap-products.xml.
 - [ ] Final public-domain spot check after GitHub Pages deployment completes; Google indexing and rankings are not guaranteed.
+
+
+## 2026-11-09 - 18 pest-control catalogue descriptions expanded to 600–800 words
+Owner instruction: “Fix the 18 items.”
+- [x] Updated 18 active pest-control product records in Supabase with unique product-specific 600–800-word descriptions, Kenya-focused SEO names and titles. Backup batch: `catalogue-seo-600-800-pest-batch-02`.
+- [x] Verified 18/18 descriptions within 600–800 words; 18/18 have exactly one pre-change description backup; 18/18 remain active with stock=1000, low_at=20 and featured=true; all 18 retain an image URL reference.
+- [x] Updated: Catchmaster 909 glue boards; queen bed bug mattress encasement; Stuf-It copper mesh; FNIRSI WMT-10 meter; B&G Robco rodding tool; SA-1600 aerosol dispenser; Ullman HTA2-T mirror; VectorGel DH1 bait gun; B&G 1150 Bulb Dust-R; Polti Cimex Eradicator; Catchmaster Vector UV trap; Atrix Ergo HEPA backpack vacuum; 365nm UV flashlight; Catchmaster 100i 9-pack; DuoTrap 4-pack; Guardmax pillow encasements; B&G Hand Dust-R 1152A; B&G Versatool 415.
+- [x] Preserved existing prices and inventory settings; no product rows created/deleted and no image references replaced.
+- [!] Image references exist, but exact visual image-to-product matching was not checked in this pass.
+- [!] Static HTML regeneration, canonical/JSON-LD, sitemap, IndexNow and GitHub Pages deployment are not verified for this batch. Verify the next product-pages workflow run before claiming pages published. Public-domain browser check was inaccessible.
+- [ ] The Advance in-ground termite monitoring station from the earlier batch remains below 600 words and was outside this 18-item scope; JT Eaton Bellows Duster was already updated. The separate 3M 6700 respirator was also outside scope.
+- Current active catalogue scan: 110 active products still have descriptions below 600 words.
+- Customer links should use `https://stermontarcade.co.ke/?product=<slug>`; do not send static `/p/` URLs as customer-facing links.
