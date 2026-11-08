@@ -1,3 +1,10 @@
+## 2026-11-08 13:01 Africa/Nairobi - quotation without client details (branch `wip-quotation-no-client-20261108`)
+Owner: "add an option of only the quotation without indicating details of clients if they don't disclose... just selection of items and their prices".
+- [x] Supabase migration `client_quotations_anonymous`: column `anonymous boolean` (also in `setup-client-quotations.sql`). Anonymous rows store client_name 'Not disclosed' and null contact fields.
+- [x] Form: tick "Client not disclosed: print only the items and prices" (hides the client fields). PDF drops the "Prepared for" card, the client name in the footer and QR, and the printed name in the signature box; WhatsApp text drops the client line; WhatsApp button opens the contact chooser (no phone needed); email is blocked. Saved list shows "Client not disclosed". `receipt.js?v=13`, `admin-quotations.js?v=4`, `drawCards` now fits any number of cards (receipt still 3).
+- [x] Tested: mock-PDF run (no client card or name, receipt unchanged) and Playwright (tick, save, list label, WhatsApp link, edit keeps tick). Real PDF layout still not viewed.
+- [ ] NEXT: owner makes one "not disclosed" quotation and checks the PDF.
+
 ## 2026-11-08 12:50 Africa/Nairobi - quotation VAT-included option (branch `wip-quotation-vat-included-20261108`)
 Owner: "The 16% is included on my prices so make that option be visible on the quotation".
 - [x] Supabase migration `client_quotations_vat_inclusive`: new column `vat_inclusive boolean` (also in `setup-client-quotations.sql`).

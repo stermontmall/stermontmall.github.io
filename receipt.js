@@ -257,7 +257,7 @@
     return drawCards(d, cols, y);
   }
   function drawCards(d, cols, y) {   // three info cards (shared by the receipt and the quotation)
-    var gap = 5, colW = (CW - 2 * gap) / 3, ew = colW - 9;
+    var gap = 5, colW = (CW - (cols.length - 1) * gap) / cols.length, ew = colW - 9;
     var maxH = 0;
     cols.forEach(function (col) {   // measure first so all three cards are the same height
       var h = 11.5;
@@ -620,6 +620,7 @@
   function qdate(d) { try { return new Date(d).toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' }); } catch (e) { return ''; } }
   function qnum(v) { var n = Number(v); return isFinite(n) && n > 0 ? n : 0; }
   function qno(q) { return q.ref || 'QT-DRAFT'; }
+  function qanon(q) { return !!q.anonymous; }   // client details not disclosed: print only items and prices
   function qcalc(q) {
     var items = (q.items || []).map(function (it) {
       var qty = qnum(it.qty) || 1, price = qnum(it.price), disc = Math.min(100, qnum(it.disc));
@@ -676,7 +677,7 @@
     if (!QR) return null;
     try {
       var o = QR(0, 'M');
-      o.addData(['STERMONT ARCADE - QUOTATION', 'Quote: ' + qno(q), 'Client: ' + (q.client_name || ''), 'Total: ' + money(c.total), 'Valid until: ' + qdate(qvalid(q)), BIZ.web].join('\n'));
+      o.addData(['STERMONT ARCADE - QUOTATION', 'Quote: ' + qno(q)].concat(qanon(q) ? [] : ['Client: ' + (q.client_name || '')]).concat(['Total: ' + money(c.total), 'Valid until: ' + qdate(qvalid(q)), BIZ.web]).join('\n'));
       o.make(); return o;
     } catch (e) { return null; }
   }
@@ -725,11 +726,12 @@
   function qCols(q, c) {
     function keep(list) { return list.filter(function (e, i) { return i === 0 || String(e[1] || '').trim(); }); }
     var dep = c.deposit_amount ? [['Deposit to confirm', money(c.deposit_amount) + ' (' + qnum(q.deposit_percent) + '%)']] : [];
-    return [
+    var cols = [
       { t: 'PREPARED FOR', e: keep([['Client', q.client_name], ['Company', q.client_company], ['Phone', q.client_phone], ['Email', q.client_email], ['KRA PIN', q.client_pin], ['Address', q.client_address]]) },
       { t: 'QUOTATION', e: [['Quote reference', qno(q)], ['Issued', qdate(q.created_at || new Date())], ['Valid until', qdate(qvalid(q))]].concat(qnum(q.vat_rate) ? [['VAT', qnum(q.vat_rate) + '% ' + (c.vat_inclusive ? 'included in all prices' : 'added on top of prices')]] : [['Prepared by', BIZ.name]]) },
       { t: 'PAYMENT & DELIVERY', e: [['Pay to (M-Pesa Paybill)', BIZ.paybill + '  |  Acc. ' + BIZ.account], ['Payment terms', q.payment_terms || 'As agreed'], ['Delivery / collection', q.delivery_terms || 'Confirmed when you accept']].concat(dep) }
     ];
+    return qanon(q) ? cols.slice(1) : cols;
   }
   function qSteps(q) {
     return [['Quotation issued', when(q.created_at || new Date()), 'left'], ['Client accepts', 'before ' + qdate(qvalid(q)), 'center'], ['Order & delivery', 'after payment', 'right']];
@@ -792,7 +794,7 @@
     for (var p = 1; p <= n; p++) {
       d.setPage(p);
       stroke(d, C.line); d.setLineWidth(0.25); d.line(M, H - 17.2, W - M, H - 17.2);
-      var lead = 'Quotation ' + qno(q) + '   |   Valid until ' + qdate(qvalid(q)) + '   |   Prepared for ' + (q.client_name || '');
+      var lead = 'Quotation ' + qno(q) + '   |   Valid until ' + qdate(qvalid(q)) + (qanon(q) ? '' : '   |   Prepared for ' + (q.client_name || ''));
       font(d, 'normal', 6.6, C.mute); d.text(d.splitTextToSize(lead, 118)[0], M, H - 14.2);
       font(d, 'normal', 6.4, C.mute); d.text('Computer-generated quotation. Prices valid until the date shown.', W - M, H - 14.2, { align: 'right' });
       fill(d, C.purple); d.rect(0, H - 11, W, 11, 'F'); fill(d, C.lime); d.rect(0, H - 11, W, 0.9, 'F');
@@ -804,7 +806,7 @@
   function qBuild(q, c, logo, sig, stamp, QR) {
     return loadLib().then(function (JsPDF) {
       var d = new JsPDF({ unit: 'mm', format: 'a4' });
-      d.setProperties({ title: 'Quotation ' + qno(q), subject: q.client_name || '', author: BIZ.name });
+      d.setProperties({ title: 'Quotation ' + qno(q), subject: qanon(q) ? '' : (q.client_name || ''), author: BIZ.name });
       watermark(d);
       qHeader(d, logo, q);
       var y = qHero(d, q, c, qQr(QR, q, c), 51) + 3;
@@ -816,7 +818,7 @@
       y = qTotals(d, q, c, y) + 4;
       y = qNotes(d, q, y);
       if (y + 33 > FOOT) { newPage(d); y = 18; }
-      signatures(d, y, sig, stamp, { customer_name: q.client_name, sigTitle: 'ACCEPTED BY (CLIENT)' });
+      signatures(d, y, sig, stamp, { customer_name: qanon(q) ? '' : q.client_name, sigTitle: 'ACCEPTED BY (CLIENT)' });
       qFooters(d, q);
       return d;
     });
@@ -824,7 +826,7 @@
 
   function qcheck(q) {
     var c = qcalc(q);
-    if (!String(q.client_name || '').trim()) throw new Error('Add the client name first.');
+    if (!qanon(q) && !String(q.client_name || '').trim()) throw new Error('Add the client name first.');
     if (!c.items.length) throw new Error('Add at least one item first.');
     return c;
   }
@@ -842,8 +844,8 @@
     var c = qcalc(q);
     var out = ['*' + BIZ.name.toUpperCase() + ' | QUOTATION*', '',
       '📋 Quote no: ' + qno(q), '📅 Date: ' + qdate(q.created_at || new Date()), '⏳ Valid until: ' + qdate(qvalid(q)), '',
-      '👤 ' + (q.client_name || '') + (q.client_company ? ' (' + q.client_company + ')' : ''), '',
-      '*Items*', qlines(c).join('\n'), '', 'Subtotal: ' + money(c.subtotal)];
+    ].concat(qanon(q) ? [] : ['👤 ' + (q.client_name || '') + (q.client_company ? ' (' + q.client_company + ')' : ''), '']).concat([
+      '*Items*', qlines(c).join('\n'), '', 'Subtotal: ' + money(c.subtotal)]);
     if (c.discount_amount) out.push('Discount: - ' + money(c.discount_amount));
     if (qnum(q.vat_rate) && !c.vat_inclusive) out.push('VAT (' + qnum(q.vat_rate) + '%): ' + money(c.vat_amount));
     if (c.delivery_fee) out.push('Delivery: ' + money(c.delivery_fee));
@@ -898,6 +900,7 @@
   function qemail(q) {
     var c; try { c = qcheck(q); } catch (e) { return Promise.reject(e); }
     if (!EMAILJS.serviceId || !EMAILJS.statusTemplateId || !EMAILJS.publicKey) return Promise.reject(new Error('Email is not set up yet'));
+    if (qanon(q)) return Promise.reject(new Error('This quotation has no client details, so it cannot be emailed.'));
     if (!q.client_email) return Promise.reject(new Error('This quotation has no client email.'));
     var params = {
       to_email: q.client_email, reply_to: BIZ.email, from_email: BIZ.email, support_email: BIZ.email, to_name: q.client_name, name: q.client_name, customer_name: q.client_name, user_name: q.client_name, email: q.client_email,

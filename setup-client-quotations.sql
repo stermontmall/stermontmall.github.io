@@ -49,3 +49,6 @@ revoke all on sequence public.client_quotation_seq from anon;
 
 -- added 2026-11-08 (migration "client_quotations_vat_inclusive"): for tables created before this column existed
 alter table public.client_quotations add column if not exists vat_inclusive boolean not null default false;
+
+-- added 2026-11-08 (migration "client_quotations_anonymous"): quotation without client details (items and prices only)
+alter table public.client_quotations add column if not exists anonymous boolean not null default false;

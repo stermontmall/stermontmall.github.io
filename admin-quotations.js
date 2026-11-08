@@ -26,7 +26,7 @@
   var DEL_PRESETS = ['Store pickup (Sarit Centre, Westlands)', 'Delivered within Nairobi in 1-2 working days', 'Delivered countrywide in 3-5 working days'];
 
   function blank() {
-    return { id: null, ref: null, created_at: null, status: 'draft', client_name: '', client_company: '', client_phone: '', client_email: '', client_pin: '', client_address: '',
+    return { id: null, ref: null, created_at: null, status: 'draft', anonymous: false, client_name: '', client_company: '', client_phone: '', client_email: '', client_pin: '', client_address: '',
       items: [{ name: '', qty: 1, price: '', disc: '' }], discount_type: 'none', discount_value: '', vat_rate: 16, vat_inclusive: true, delivery_fee: '', deposit_percent: '', valid_days: 14,
       payment_terms: '', delivery_terms: '', notes: '', terms: DEF_TERMS, accepted_at: null, sent_at: null };
   }
@@ -34,6 +34,7 @@
     var s = blank(); Object.keys(s).forEach(function (k) { if (r[k] != null) s[k] = r[k]; });
     s.items = (r.items || []).map(function (i) { return { name: i.name, qty: i.qty, price: i.price, disc: i.disc || '' }; });
     if (!s.items.length) s.items = blank().items;
+    if (s.anonymous) s.client_name = '';
     return s;
   }
   function validUntil(S) { var d = S.created_at ? new Date(S.created_at) : new Date(); d.setDate(d.getDate() + (Math.round(num(S.valid_days)) || 14)); return ymd(d); }
@@ -41,7 +42,7 @@
   function nz(v) { v = String(v == null ? '' : v).trim(); return v ? v : null; }
   function payload(S) {
     var c = Q().calc(S), p = {
-      status: S.status, client_name: String(S.client_name).trim(), client_company: nz(S.client_company), client_phone: nz(S.client_phone), client_email: nz(S.client_email), client_pin: nz(S.client_pin), client_address: nz(S.client_address),
+      status: S.status, anonymous: !!S.anonymous, client_name: S.anonymous ? 'Not disclosed' : String(S.client_name).trim(), client_company: S.anonymous ? null : nz(S.client_company), client_phone: S.anonymous ? null : nz(S.client_phone), client_email: S.anonymous ? null : nz(S.client_email), client_pin: S.anonymous ? null : nz(S.client_pin), client_address: S.anonymous ? null : nz(S.client_address),
       items: c.items, discount_type: S.discount_type || 'none', discount_value: S.discount_type === 'none' ? 0 : num(S.discount_value), vat_rate: Math.min(100, num(S.vat_rate)), vat_inclusive: !!S.vat_inclusive, delivery_fee: num(S.delivery_fee),
       deposit_percent: Math.min(100, num(S.deposit_percent)), valid_days: Math.min(365, Math.max(1, Math.round(num(S.valid_days)) || 14)), valid_until: validUntil(S),
       payment_terms: nz(S.payment_terms), delivery_terms: nz(S.delivery_terms), notes: nz(S.notes), terms: nz(S.terms),
@@ -150,7 +151,7 @@
     function save(after) {
       if (busy) return Promise.resolve(null);
       var k = Q().calc(S);
-      if (String(S.client_name).trim().length < 2) { msg('Add the client name first.'); return Promise.resolve(null); }
+      if (!S.anonymous && String(S.client_name).trim().length < 2) { msg('Add the client name first, or tick "Client not disclosed".'); return Promise.resolve(null); }
       if (!k.items.length) { msg('Add at least one item with a name first.'); return Promise.resolve(null); }
       busy = true; msg('');
       var p = payload(S), call = S.id ? req('/rest/v1/client_quotations?id=eq.' + S.id, 'PATCH', p, 'return=representation') : req('/rest/v1/client_quotations', 'POST', p, 'return=representation');
@@ -176,6 +177,9 @@
       f.appendChild(h('div', 'qt-h', S.id ? 'Edit quotation ' + S.ref : 'New quotation'));
       f.appendChild(h('div', 'qt-h', 'Client'));
       var g = h('div', 'qt-grid'); f.appendChild(g);
+      var anRow = h('label'); anRow.style.cssText = 'display:flex;gap:.5rem;align-items:center;margin:.2rem 0 .7rem;font-weight:600;cursor:pointer';
+      var an = h('input'); an.type = 'checkbox'; an.checked = !!S.anonymous; anRow.appendChild(an); anRow.appendChild(D.createTextNode('Client not disclosed: print only the items and prices'));
+      an.onchange = function () { S.anonymous = an.checked; g.style.display = an.checked ? 'none' : ''; }; g.style.display = S.anonymous ? 'none' : ''; f.insertBefore(anRow, g);
       var nm = inp('text', S.client_name, { list: 'qt-clients', maxlength: 120, placeholder: 'Client name (type to pick a past client)' }, function (v) { S.client_name = v; });
       var co = inp('text', S.client_company, { maxlength: 160 }, function (v) { S.client_company = v; }), ph = inp('tel', S.client_phone, { maxlength: 30, placeholder: '+2547...' }, function (v) { S.client_phone = v; }),
         em = inp('email', S.client_email, { maxlength: 150 }, function (v) { S.client_email = v; }), pin = inp('text', S.client_pin, { maxlength: 30 }, function (v) { S.client_pin = v; }),
@@ -241,9 +245,9 @@
       b('Save quotation', '', function () { return save().then(function (r) { if (r) drawForm(); }); });
       b('Save & download PDF', 'alt', function () { return afterSave(doPdf); });
       b('PDF only', 'alt', function () { return doPdf(view(S)); });
-      b('Save & email client', 'alt', function () { if (!String(S.client_email).trim()) { msg('Add the client email first.'); return null; } return afterSave(function (row) { return doEmail(row); }); });
+      b('Save & email client', 'alt', function () { if (S.anonymous) { msg('No client details, so there is no email address to send to.'); return null; } if (!String(S.client_email).trim()) { msg('Add the client email first.'); return null; } return afterSave(function (row) { return doEmail(row); }); });
       var wa = h('button', 'btn alt', 'WhatsApp client'); wa.type = 'button';
-      wa.onclick = function () { if (!waPhone(S.client_phone)) { msg('Add the client phone first.'); return; } if (!Q().calc(S).items.length) { msg('Add at least one item first.'); return; } window.open(waLink(view(S)), '_blank', 'noopener'); };
+      wa.onclick = function () { if (!S.anonymous && !waPhone(S.client_phone)) { msg('Add the client phone first.'); return; } if (!Q().calc(S).items.length) { msg('Add at least one item first.'); return; } window.open(waLink(view(S)), '_blank', 'noopener'); };
       acts.appendChild(wa);
       var cn = h('button', 'btn alt', 'Close form'); cn.type = 'button'; cn.onclick = function () { formHost.textContent = ''; totBox = null; itemsBox = null; msg(''); }; acts.appendChild(cn);
       f.addEventListener('submit', function (e) { e.preventDefault(); });
@@ -269,7 +273,7 @@
     }
     function card(r) {
       var k = h('div', 'card'), top = h('div'); top.style.cssText = 'display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap;align-items:center';
-      var l = h('b', null, r.ref + ' · ' + r.client_name); top.appendChild(l); var sh = shown(r); top.appendChild(h('span', 'qt-b ' + sh, (STATUSES.filter(function (x) { return x[0] === sh; })[0] || [0, sh])[1])); k.appendChild(top);
+      var l = h('b', null, r.ref + ' · ' + (r.anonymous ? 'Client not disclosed' : r.client_name)); top.appendChild(l); var sh = shown(r); top.appendChild(h('span', 'qt-b ' + sh, (STATUSES.filter(function (x) { return x[0] === sh; })[0] || [0, sh])[1])); k.appendChild(top);
       k.appendChild(h('div', 'meta', [r.client_company, r.client_phone, r.client_email].filter(Boolean).join(' · ')));
       var d = h('div', 'meta'); d.appendChild(h('b', null, money(r.total))); d.appendChild(D.createTextNode(' · ' + (r.items || []).length + ' item(s) · issued ' + A().fmt(r.created_at) + ' · valid until ' + (r.valid_until || '-'))); k.appendChild(d);
       var a = h('div', 'qt-f'); k.appendChild(a);
@@ -277,7 +281,7 @@
       b('Edit', 'alt', function () { S = fromRow(r); S.id = r.id; S.ref = r.ref; S.created_at = r.created_at; S.sent_at = r.sent_at; S.accepted_at = r.accepted_at; msg(''); drawForm(); });
       b('PDF', 'alt', function () { return doPdf(r); });
       if (r.client_email) b('Email', 'alt', function () { return doEmail(r); });
-      if (waPhone(r.client_phone)) { var w = h('a', 'btn alt sm', 'WhatsApp'); w.href = waLink(r); w.target = '_blank'; w.rel = 'noopener'; a.appendChild(w); }
+      if (r.anonymous || waPhone(r.client_phone)) { var w = h('a', 'btn alt sm', 'WhatsApp'); w.href = waLink(r); w.target = '_blank'; w.rel = 'noopener'; a.appendChild(w); }
       b('Duplicate', 'alt', function () { S = fromRow(r); S.id = null; S.ref = null; S.created_at = null; S.status = 'draft'; S.sent_at = null; S.accepted_at = null; msg('Copy ready: change the client or items, then save.', true); drawForm(); });
       if (r.status !== 'sent' && r.status !== 'accepted') b('Mark sent', 'alt', function () { return patch(r, { status: 'sent', sent_at: r.sent_at || new Date().toISOString() }, r.ref + ' marked as sent.'); });
       if (r.status !== 'accepted') b('Mark accepted', 'ok', function () { return patch(r, { status: 'accepted', accepted_at: new Date().toISOString() }, r.ref + ' marked as accepted.'); });
@@ -296,7 +300,7 @@
     }
     function loadList() {
       return req('/rest/v1/client_quotations?select=*&order=created_at.desc&limit=300').then(function (r) {
-        rows = r || []; rows.forEach(function (x) { addClient(x.client_name, x.client_company, x.client_phone, x.client_email, x.client_pin, x.client_address); }); drawClients(); drawHead(); drawList();
+        rows = r || []; rows.forEach(function (x) { if (!x.anonymous) addClient(x.client_name, x.client_company, x.client_phone, x.client_email, x.client_pin, x.client_address); }); drawClients(); drawHead(); drawList();
       }).catch(function (e) { msg(e.message); });
     }
     drawHead(); loadSuggest(); loadList();
