@@ -3,6 +3,11 @@
 name: Google sitemap ping
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'seo-google-sitemaps.mjs'
+      - '.github/workflows/google-sitemap-ping.yml'
   workflow_dispatch:
   schedule:
     - cron: '30 4 * * *'
