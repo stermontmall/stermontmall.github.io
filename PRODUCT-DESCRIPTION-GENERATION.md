@@ -63,7 +63,7 @@ Do not include sitewide delivery, returns, address or M-Pesa copy in every secti
 
 ### Output contract
 
-Return valid HTML for the description and a separate machine-readable fact record containing:
+Return the product description as plain text with clear section headings and line breaks (not HTML or Markdown syntax), because the current storefront renders the database description as text. Return a separate machine-readable fact record containing:
 - verifiedSpecifications
 - activeIngredients (name, concentration, evidence/source)
 - pcpbRegistrationNumber and evidence/source, or null
