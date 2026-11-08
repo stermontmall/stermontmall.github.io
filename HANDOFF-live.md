@@ -1617,3 +1617,12 @@ Owner: "Post 15 spare parts products on my website".
 - [ ] Ten other products have no confirmed product-specific image yet. Keep blank rather than use unrelated photos.
 - [ ] Product-page rebuild and sitemap generation triggered by the workflow file update below; verify all 20 product HTML pages, sitemap entries, and Pages deployment after the run completes.
 - Source pricing used: FDR Auto Garage product pages, including exact prices and part references; where the supplier product detail page was not indexed, its Motorcycle Spare Parts category listing was used. See each product's source_url.
+
+
+## 2026-11-08 - 20 Bajaj Boxer pages deployed and sitemap verified
+- [x] Product-pages workflow #456 passed all content, metadata, indexing and link-safety tests; page generation and save steps succeeded.
+- [x] Confirmed all 20 new product URLs appear in `sitemap-products.xml`.
+- [x] Confirmed sample generated product HTML files contain page titles, canonical URLs and Product JSON-LD.
+- [x] GitHub Pages deployment run 42493278138 completed successfully.
+- [ ] IndexNow notification step was still running at last status check; deployment itself succeeded.
+- [ ] Ten products still await exact product-specific photos; current no-photo listings remain blank to avoid image mismatch.
