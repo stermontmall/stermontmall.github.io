@@ -1,3 +1,8 @@
+## 2026-11-08 08:50 Africa/Nairobi - photo search attempt: 0 photos attached (no file changes besides this note)
+Owner: "Find photos online and attach them". 29 ACTIVE products have no photo (20 kids-*, 4 pest, 5 sprayer/protective items: aico-ac-8l, aico-japan-ac16l, chemical-spray-protective-suit, greenberg-gold-motorised-sprayer-15l, high-pressure-sprayer-hose-50-metres).
+- [x] Image search finds pictures but does not return direct image file URLs; web search for the exact pest items (Mortein Doom Aik Lemon, Grinbelt Vermin 100g, Mos-Kill Dudu 200g) returned other brands/pages. Attaching needs a direct https image URL of the EXACT product (`public.add_product_photo(id, url)` or upload-photos), so nothing was attached rather than risk a wrong photo.
+- [ ] NEXT: ChatGPT (has browsing + the upload-photos Action) or owner supplies photos; verify each with: select id, images from products where active and cardinality(images)=0;
+
 ## 2026-11-08 00:50 Africa/Nairobi - owner rules applied: research photo + SEO, publish LIVE (docs and playbook only)
 Owner: "I want chatgpt to research photos online and post them and find product SEO and publish them live without any issue".
 - [x] Supabase `site_playbook` (4 topics: READ_ME_FIRST, add_product, add_photo, rules) rewritten: research photo + SEO yourself, publish `active=true` after the row and photo are verified, no owner-review wait. Old text saved in `site_playbook_backup_20261108`.
