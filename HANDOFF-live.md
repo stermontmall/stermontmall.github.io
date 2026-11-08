@@ -1,3 +1,10 @@
+## 2026-11-08 09:25 Africa/Nairobi - "Build product pages" was failing 8 runs in a row; fixed (content trimmed)
+Owner: "They are supposed to run every three hours" (schedule `0 */3 * * *` is correct, but GitHub delivered runs 3-9 h apart and every run since 2026-11-07 00:34 UTC failed).
+- [x] Cause: `product-content.test.mjs` word limit (140-360) and banned words (`guaranteed|#1 rated|top-rated|certified`) on 3 hand-written entries from the 2026-11-06 pest batch: green-leaf (377 words + the word "guaranteed" in a disclaimer), mortein-doom-aiko (379), raid-led (361). Fix: cut 7 low-value sentences / reworded the disclaimer in `product-content.json`; test now `OK: 234 product content entries`. Test limits were NOT loosened.
+- [x] GitHub cron is best-effort: scheduled runs drift (watch-products every 5 min only fires ~every 3 h). If exact 3-hour spacing matters, trigger via an external caller or an hourly cron plus a cheap "anything changed?" check.
+- [ ] Confirm the next run is green: `gh api repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/runs?per_page=3 --jq '.workflow_runs[]|[.created_at,.event,.conclusion]|@tsv'`
+- [ ] Still open: Blog writer fails when its draft branch already exists (push rejected, non-fast-forward); Site audit has 1 link timeout.
+
 ## 2026-11-08 09:10 Africa/Nairobi - admin "Find photos online" added (admin.html > AI photo upload tab)
 Owner: "Add that feature on admin app".
 - [x] New Edge Function `find-photo` (v1, verify_jwt true + staff check; source `supabase/functions/find-photo/index.ts`). Searches Bing images by product name (no API key), `suggest` mode returns up to 8 options; `auto` mode downloads candidates, keeps real jpg/png/webp >= 450x450, asks Gemini whether it is the SAME product (brand/model/pack size, no other shop's branding) and attaches the first that passes. Never replaces an existing photo; never changes price/stock/active.
