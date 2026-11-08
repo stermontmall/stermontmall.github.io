@@ -1634,3 +1634,13 @@ Owner: "Post 15 spare parts products on my website".
 - [ ] BM150 left side cover 52PF1829 remains without a photo. Search results found a white BM150 cover but not the listed cocktail white/red variant; do not substitute a visibly different colour/decoration.
 - [ ] No image was attached to any item using a generic unrelated motorcycle photo. Existing catalogue image records for the other recent products remain unchanged.
 - Note: source photos were matched by product type/model/code where available. The 6004 and 6301 images are bearing-type illustrations rather than branded FDR product shots; verify final visual appearance in the live product cards before any further bulk photo work.
+
+
+## 2026-11-08 19:10 Africa/Nairobi - mandatory product-photo publication guard
+- [x] Audited the 50 newest product rows in Supabase: 39 have at least one image URL; 11 have empty images arrays.
+- [x] Updated public.products posting trigger function: a new product cannot be inserted active, and a draft cannot transition to active, while images is empty. Existing active listings are not mass-deactivated; ordinary edits to already-active legacy rows remain possible. Photo upload followed by activation is supported.
+- [x] Updated CLAUDE.md and PUBLISHING.md: exact product photo, Storage object and URL verification are mandatory before publishing; no generic/mismatched photos; leave as draft if exact photo cannot be found.
+- [ ] Repair photos for the 11 recent listings and verify mobile-shell cards. Exact supplier search found FDR listings for TVS chain/sprocket N6321170, rear mudguard N5220460, front shock seals 2094T721 and red front mudguard N62216606G, plus catalogue references for TVS gearshift/kick starter parts. Direct image files still need to be extracted and uploaded; do not infer a photo from a listing title alone.
+- [ ] Missing-photo IDs: bajaj-boxer-bm150-left-side-cover-white-red-52pf1829; tvs-hlx-150cc-5-gear-chain-and-sprocket-kit-n6321170; tvs-hlx-100cc-carburettor-adaptor-n2041400; tvs-hlx-125cc-150cc-carburettor-adaptor-n3040980; tvs-hlx-100cc-125cc-150cc-front-shock-seals-ocelot-2094t721; tvs-hlx-150cc-4-gear-speedometer-assembly-class-one; tvs-hlx-100cc-125cc-150cc-kick-starter-shaft; tvs-hlx-100cc-125cc-150cc-gearshift-shaft-ocelot; tvs-hlx-100cc-125cc-150cc-gearshift-shaft-assembly; tvs-hlx-150cc-front-mudguard-red-n62216606g; tvs-hlx-150cc-rear-fender-mudguard-n5220460.
+- [ ] Verification: re-run SQL count on newest 50; test activation guard on a disposable draft inside a rollback transaction; rebuild product pages after images are uploaded.
+- Database guard is a direct SQL function update (not yet represented by a committed migration file). Add a migration to repository before next schema deployment.
