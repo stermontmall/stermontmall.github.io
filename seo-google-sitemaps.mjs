@@ -7,7 +7,7 @@
 import { createSign } from 'node:crypto';
 
 const SITE = 'https://stermontarcade.co.ke';
-const SITEMAPS = [`${SITE}/sitemap.xml`, `${SITE}/sitemap-products.xml`, `${SITE}/sitemap-images.xml`, `${SITE}/services/sitemap-services.xml`];
+const SITEMAPS = [`${SITE}/sitemap.xml`, `${SITE}/sitemap-products.xml`, `${SITE}/sitemap-images.xml`, `${SITE}/services/sitemap-services.xml`, `${SITE}/pest-control/sitemap.xml`];
 const raw = process.env.GSC_SERVICE_ACCOUNT_JSON, property = process.env.GSC_PROPERTY;
 if (!raw || !property) { console.log('Skipped: add the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets to turn this on.'); process.exit(0); }
 
