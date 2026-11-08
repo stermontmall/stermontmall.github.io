@@ -1,3 +1,9 @@
+## 2026-11-08 22:05 Africa/Nairobi - broken-links fix MERGED + stale tests fixed (main 4381c7e, 4e60d2a)
+- [x] `shell.test.py`: 3 stale checks updated (new SEO title, `?shell=1` share links). Suite now 167/168; the 1 failure is the sandbox's blocked network (ERR_TUNNEL), not code.
+- [x] Broken-links work from `wip-broken-links-fix` re-applied on the restored workflow and merged: `404.html` opens an unbuilt `/p/<slug>.html` or `/c/<slug>.html` in the shell; product pages rebuild every 30 min (was 3 h) and on `repository_dispatch` type `catalog-changed`; `check-product-pages.mjs` fails the run if any ACTIVE product has no page. First build with these (run 42503072460) succeeded, guard step green against the live catalog.
+- [ ] OPTIONAL, owner decision: fully instant rebuilds need a Supabase trigger calling GitHub `repository_dispatch` with a token stored as a secret. Not set up (needs a GitHub token from the owner).
+- [ ] If the guard step ever turns red: it names the products without a page; a product activated mid-build fixes itself on the next 30-min run. Branch `wip-broken-links-fix` is now obsolete and can be deleted.
+
 ## 2026-11-08 21:15 Africa/Nairobi - product rebuild restored + workflow guard (on main: c91710c, 36c1735)
 - [x] FOUND: commit 3d378d6b (19:38, "Trigger product page rebuild for fresh BM150 listings") replaced `.github/workflows/product-pages.yml` (9.5 KB) with comments only. Every push then failed to start the workflow and NO product pages were rebuilt for ~2 h; new products had no page (dead links).
 - [x] FIXED: restored the file from 122934a5 (YAML parses, 19 steps). The push re-ran the build: success, 19 "fresh" product pages now exist and are in `sitemap-products.xml`; `agrimec-018ec-insecticide-100ml` page exists.
