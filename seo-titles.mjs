@@ -26,13 +26,13 @@ const NAMES_FILE = process.env.NAMES_FILE || 'product-names.json';
 const SEP = ' \u2013 ';
 const TITLE_LIMIT = 60;
 const clipTitle = value => {
-  const s = String(value || '').replace(/\\s+/g, ' ').trim();
+  const s = String(value || '').replace(/\s+/g, ' ').trim();
   if (s.length <= TITLE_LIMIT) return s;
   const suffix = ' – Price in Kenya';
-  const name = s.split(/\\s+[–-]\\s+/)[0].trim();
+  const name = s.split(/\s+[–-]\s+/)[0].trim();
   const room = TITLE_LIMIT - suffix.length;
   const clipped = name.length > room
-    ? name.slice(0, room + 1).replace(/\\s+\\S*$/, '').trim()
+    ? name.slice(0, room + 1).replace(/\s+\S*$/, '').trim()
     : name;
   return (clipped || name.slice(0, room)).trim() + suffix;
 };
