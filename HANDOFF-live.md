@@ -1587,3 +1587,15 @@ Owner said continue and save time. Rechecked supplier pages and current catalogu
 - PCPB public-health register independently lists Goodknight Multi Insect Killer Aerosol (PCPB(CR)1404), Raid Multi Insect Killer Aerosol (PCPB(CR)0683), Baygon Crawling Insect Killer (PCPB(CR)1800), and other products. Do not infer registration for similarly named variants or unregistered supplier listings.
 - Supabase duplicate query shows existing exact/related stock includes Fumakilla Vape Mat E refill, Moskill Aerosol 750ml, Promax 20 EC bedbug insecticide, and existing live mouse traps; exclude duplicates and check each exact name before adding.
 - [ ] No product rows or images were inserted in this follow-up. Prices on supplier retail sites cannot automatically be treated as acquisition cost for the 15% markup rule; and the selected product photos have not all been validated. Continue with the strongest non-duplicate candidates, verify PCPB labels for pesticide products, then create drafts and request review per the active product-posting playbook. No live publication claimed.
+
+
+## 2026-11-08 17:40 Africa/Nairobi - 15 TVS HLX spare parts published to Supabase (pages rebuild pending)
+Owner: "Post 15 spare parts products on my website".
+- [x] Checked live category 61 (Motorcycle Accessories) and current catalogue to avoid exact duplicate names.
+- [x] Researched 15 TVS HLX spare parts and KES source prices from FDR Auto Garage listings. Recorded supplier page URLs in each product row via `add_draft_product`.
+- [x] Created 15 unique products with 788-807 word descriptions and Kenya-focused SEO titles. Applied the established price rule: source cost + 15%; stock 1000; low-stock alert 20; featured=false.
+- [x] Attached five matching supplier photos and confirmed their five JPEG objects exist in the public `product-images` Storage bucket and their URLs are present in `products.images`: front mudguard black, primary driven gear, 4-gear countershaft, cylinder block Ocelot, and Ocelot oil drain plug.
+- [x] Published all 15 rows (`active=true`) and verified cost, selling price, stock, alert threshold, SEO title and image arrays in Supabase.
+- [ ] Ten of the fifteen listings currently have no suitable verified photo. Photo is optional under the owner's latest rule; they are live without a photo rather than using a mismatched image.
+- [ ] Product pages and sitemap have not yet been rebuilt/verified. `.github/workflows/product-pages.yml` is scheduled every 3 hours and supports workflow_dispatch; this connector exposes no workflow-dispatch action. Trigger via GitHub Actions UI or API command: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`. Then verify the 15 `/p/<id>.html` pages, Product JSON-LD, canonical URLs and sitemap entries.
+- Source pricing: FDR Auto Garage product listings/category pages (see each row's source URL); no source prices were guessed.
