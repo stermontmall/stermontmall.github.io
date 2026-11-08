@@ -5,6 +5,7 @@ import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node
 import { createHash } from 'node:crypto';
 import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
+import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -190,26 +191,36 @@ products.forEach(p => { if (sl(p.id) !== p.id) aliases.push({ id: p.id, to: p.id
   });
 }
 const fileOf = path => `.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m));
-const byCat = {};
-products.forEach(p => { const s = p.categories?.slug; if (s) (byCat[s] = byCat[s] || { name: p.categories.name, items: [] }).items.push(p); });
+const rawByCat = {};
+products.forEach(p => { const s = p.categories?.slug; if (s) (rawByCat[s] = rawByCat[s] || { name: p.categories.name, items: [] }).items.push(p); });
+const byCat = applyCategoryHubs(rawByCat);
 
-// "Hub" categories gather the products of their child categories, so one strong page (e.g. Pest Control & Fumigation) ranks for the broad search.
-// Order matters: a hub that lists another hub as a kid (agrovet -> agrochemicals) must come after it.
-const HUBS = {
-  'pest-control-fumigation': { name: 'Pest Control & Fumigation', label: 'Pest control by type', kids: ['bed-bug-killers', 'cockroach-ant-killers', 'mosquito-fly-control', 'rodent-control', 'termite-control', 'fumigation-chemicals', 'sprayers-equipment'] },
-  'agrochemicals': { name: 'Agrochemicals', label: 'Agrochemicals by type', kids: ['herbicides', 'fungicides', 'crop-insecticides', 'adjuvants-growth-regulators'] },
-  'agrovet': { name: 'Agrovet', label: 'Agrovet by type', kids: ['agrochemicals', 'fertilizers', 'veterinary-drugs', 'animal-feeds', 'disinfectants-hygiene'] },
-  'tvs-audio': { name: 'TVs & Audio', label: 'TVs and audio by type', kids: ['televisions', 'home-theatre', 'bluetooth-speakers', 'tv-mounts-accessories'] },
-  'appliances': { name: 'Appliances', label: 'Appliances by type', kids: ['washing-machines', 'fridges-freezers', 'kitchen-dining'] },
-  'automotive': { name: 'Automotive', label: 'Automotive by type', kids: ['cars-for-sale', 'car-accessories-parts', 'motorcycle-accessories'] }
-};
-for (const [slug, h] of Object.entries(HUBS)) {
-  const items = [...(byCat[slug]?.items || [])];
-  h.kids.forEach(k => (byCat[k]?.items || []).forEach(x => { if (!items.includes(x)) items.push(x); }));
-  if (items.length) byCat[slug] = { name: h.name, items };
-}
 // Extra search-friendly text for category pages. Categories not listed here still get a normal page.
 const INFO = {
+  'fashion': { h1: 'Clothing & Fashion in Kenya', title: 'Clothing & Fashion Online in Kenya | Stermont Arcade',
+    desc: 'Shop men\'s, women\'s and children\'s clothing online in Kenya. Compare available styles and sizes, then order with M-Pesa and nationwide delivery.',
+    intro: 'Browse clothing for men, women and children. Check the listed size, colour, material and fit details for each item before ordering.' },
+  'phones-accessories': { h1: 'Phones & Accessories in Kenya', title: 'Phones & Accessories in Kenya | Stermont Arcade',
+    desc: 'Shop smartphones, phone accessories, refurbished phones and headsets in Kenya. Check model, storage, condition and price before ordering by M-Pesa.',
+    intro: 'Compare smartphones, phone accessories, refurbished devices and headsets. Confirm the exact model, storage, network compatibility, condition and included accessories before payment.' },
+  'tv-audio-video': { h1: 'TV, Audio & Video in Kenya', title: 'TV, Audio & Video in Kenya | Stermont Arcade',
+    desc: 'Shop televisions, speakers, home theatre systems, cameras and TV accessories in Kenya. Compare models and listed prices, then order by M-Pesa.',
+    intro: 'Browse televisions, audio equipment, cameras and accessories. Check screen size, connectivity, supported formats and the exact model details shown on each listing.' },
+  'computers-accessories': { h1: 'Computers & Accessories in Kenya', title: 'Computers & Accessories in Kenya | Stermont Arcade',
+    desc: 'Shop laptops, computing accessories, printers, networking and security equipment in Kenya. Compare specifications and confirm availability before payment.',
+    intro: 'Find computing devices and accessories, printers, networking products and security equipment. Compare the exact model, processor, memory, storage and connectivity where those details are listed.' },
+  'home-kitchen': { h1: 'Home & Kitchen Products in Kenya', title: 'Home & Kitchen Products in Kenya | Stermont Arcade',
+    desc: 'Shop home, kitchen, lighting, cleaning, furniture and storage products in Kenya. Compare item details and delivery before paying by M-Pesa.',
+    intro: 'Browse practical home and kitchen products, including lighting, cleaning, furniture, storage and kitchen essentials. Check dimensions, capacity, materials and included accessories before ordering.' },
+  'baby-products': { h1: 'Kids & Baby Products in Kenya', title: 'Kids & Baby Products in Kenya | Stermont Arcade',
+    desc: 'Shop children\'s toys, learning sets and baby products in Kenya. Check age suitability, included pieces and product details before ordering.',
+    intro: 'Browse toys, learning sets and children\'s products. Review age guidance, small-parts warnings, included pieces and care instructions before purchase.' },
+  'shoes': { h1: 'Shoes Online in Kenya', title: 'Shoes Online in Kenya | Stermont Arcade',
+    desc: 'Browse men\'s and women\'s shoes, sneakers and sandals in Kenya. Check size, colour, fit and availability before ordering.',
+    intro: 'Compare available shoes, sneakers and sandals. Check the size guide, colour, fit notes and product photos carefully before ordering.' },
+  'health-beauty': { h1: 'Health & Beauty Products in Kenya', title: 'Health & Beauty Products in Kenya | Stermont Arcade',
+    desc: 'Browse health, beauty and wellness products in Kenya. Check ingredients, pack size, intended use and product instructions before ordering.',
+    intro: 'Browse health, beauty and wellness listings. Review the ingredients, pack size, intended use, warnings and instructions shown on the product label.' },
   'cars-for-sale': { h1: 'Cars for Sale in Kenya', title: 'Cars for Sale in Kenya | Mercedes-Benz and More | Stermont Arcade',
     desc: 'Browse cars for sale in Kenya at Stermont Arcade, starting with the Mercedes-Benz CLA 200. See photos and the price in KSh, then enquire on WhatsApp.',
     intro: 'Cars for sale from Stermont Arcade, with photos and the price in Kenya shillings. Message us on WhatsApp to ask about a car, arrange a viewing and confirm the details before you pay.' },
