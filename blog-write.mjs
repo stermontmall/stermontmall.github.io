@@ -47,7 +47,10 @@ for (const t of data.topics) {
 
 // Pick the next topic, rotating between shop categories so consecutive posts are not all about one product group.
 const catOf = t => (t.links || []).find(l => /^\/c\//.test(l)) || '';
-const pool = data.topics.filter(t => t.status === 'pending' && (!ONLY || t.slug === ONLY));
+// Topics that already have an unmerged draft branch (draft/<slug>, passed in by the workflow) are skipped, so a draft waiting
+// for review is not rewritten every day and the push is not rejected.
+const HAS_DRAFT = new Set((process.env.DRAFT_SLUGS || '').split(/[\s,]+/).filter(Boolean));
+const pool = data.topics.filter(t => t.status === 'pending' && !HAS_DRAFT.has(t.slug) && (!ONLY || t.slug === ONLY));
 const last = data.topics.filter(t => t.status === 'drafted' && t.drafted).sort((a, b) => String(b.drafted).localeCompare(String(a.drafted)))[0];
 const topic = ONLY ? pool[0] : (pool.find(t => !last || catOf(t) !== catOf(last)) || pool[0]);
 if (!topic) stop(ONLY ? `Topic "${ONLY}" is not pending.` : 'No pending topics left in blog-topics.json.');

@@ -1,3 +1,9 @@
+## 2026-11-08 09:35 Africa/Nairobi - fixed blog writer + site audit causes (owner: "Fix all errors that you have")
+- [x] Blog writer: it re-drafted topic `how-to-stop-bed-bugs-coming-back-kenya` every day because that draft (PR #406) is still open and the topic stays `pending` on main; the push to the existing `draft/...` branch was rejected. Fix: workflow lists `draft/*` branches and passes them as `DRAFT_SLUGS`; `blog-write.mjs` skips those topics. PR #406 still needs the owner's review/merge.
+- [x] Site audit (Lychee): 3 live products hotlinked images from other sites that are dead (delta-trap-monitoring-device and knapsack-sprayer-spare-parts-kit = 404; rechargeable-electric-mosquito-racket-led = host times out, also from Supabase). Old values saved in `products_images_backup_20261108`; `images` set to empty so the shop shows the placeholder. They now appear in admin > AI photo upload > Find photos online.
+- [ ] Still open: 32 active products without a photo (29 earlier + these 3); photos need a direct image link or the admin finder.
+- [ ] Verify: next Blog writer run and the next Site audit (Tue 07:00 UTC) are green.
+
 ## 2026-11-08 09:25 Africa/Nairobi - "Build product pages" was failing 8 runs in a row; fixed (content trimmed)
 Owner: "They are supposed to run every three hours" (schedule `0 */3 * * *` is correct, but GitHub delivered runs 3-9 h apart and every run since 2026-11-07 00:34 UTC failed).
 - [x] Cause: `product-content.test.mjs` word limit (140-360) and banned words (`guaranteed|#1 rated|top-rated|certified`) on 3 hand-written entries from the 2026-11-06 pest batch: green-leaf (377 words + the word "guaranteed" in a disclaimer), mortein-doom-aiko (379), raid-led (361). Fix: cut 7 low-value sentences / reworded the disclaimer in `product-content.json`; test now `OK: 234 product content entries`. Test limits were NOT loosened.

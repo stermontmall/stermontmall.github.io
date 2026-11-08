@@ -35,9 +35,18 @@ jobs:
         with:
           node-version: 20
 
+      - name: List topics that already have a draft waiting for review
+        id: waiting
+        run: |
+          git fetch --prune origin '+refs/heads/draft/*:refs/remotes/origin/draft/*' || true
+          slugs=$(git for-each-ref --format='%(refname:strip=4)' refs/remotes/origin/draft/ | tr '\n' ' ')
+          echo "Drafts already waiting: ${slugs:-none}"
+          echo "slugs=$slugs" >> "$GITHUB_OUTPUT"
+
       - name: Draft the next post
         id: draft
         env:
+          DRAFT_SLUGS: ${{ steps.waiting.outputs.slugs }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TOPIC_SLUG: ${{ github.event.inputs.topic_slug }}
