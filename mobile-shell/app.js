@@ -541,21 +541,21 @@ $('#cart-list').addEventListener('click', e => {
   const cart = store.get().cart.map(i => i.key === b.dataset.qty ? { ...i, qty: i.qty + +b.dataset.d } : i).filter(i => i.qty > 0);
   store.set({ cart });
 });
-/* Checkout: the shop's own checkout (M-Pesa, delivery fees, order e-mails) lives on /classic.html. The cart lines are handed over
+/* Checkout: the shop's own checkout (M-Pesa, delivery fees, order e-mails) lives on /checkout.html. The cart lines are handed over
    under `stm_handoff`; that page adds them through its STM.add once its product cards exist, then opens its cart. */
 $('#checkout').addEventListener('click', () => {
   const cart = store.get().cart; if (!cart.length) return;
   try { localStorage.setItem('stm_handoff', JSON.stringify(cart.map(i => ({ rowId: i.rowId, qty: i.qty, price: i.price, name: i.name, size: i.size })))); }
   catch { toast('Could not start checkout. Please allow site storage and try again.'); return; }
-  openCheckout();   // the shell cart stays until the order is finished (classic.html clears it) so a cancelled checkout loses nothing
+  openCheckout();   // the shell cart stays until the order is finished (checkout.html clears it) so a cancelled checkout loses nothing
 });
 /* The checkout opens in a full-screen layer INSIDE the shell (same-origin frame), so the customer never leaves the shell and no page redirect happens.
-   classic.html tells us it was closed with postMessage({ stmCheckout: 'closed' }); the device Back button closes it too (history entry below). */
+   checkout.html tells us it was closed with postMessage({ stmCheckout: 'closed' }); the device Back button closes it too (history entry below). */
 let coFrame = null;
 function openCheckout() {
   if (coFrame) return;
   const f = document.createElement('iframe');
-  f.id = 'checkout-frame'; f.title = 'Checkout'; f.src = '/classic.html?checkout=1';
+  f.id = 'checkout-frame'; f.title = 'Checkout'; f.src = '/checkout.html?checkout=1';
   f.setAttribute('allow', 'payment');
   f.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:0;z-index:90;background:#fff';
   document.body.appendChild(f); coFrame = f;

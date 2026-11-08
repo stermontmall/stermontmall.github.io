@@ -22,7 +22,7 @@
   try {
     var p = location.pathname;
     if (window.__stmChrome) return;
-    if (/^\/(index\.html)?$/.test(p) || /admin|upload-photos|classic|advert-poster|list-products/.test(p)) return;
+    if (/^\/(index\.html)?$/.test(p) || /admin|upload-photos|classic|checkout|advert-poster|list-products/.test(p)) return;
     if (document.getElementById('appbar') || document.getElementById('stm-bar')) return;
     var sc = document.createElement('script');
     sc.src = '/shell-chrome.js?v=2';

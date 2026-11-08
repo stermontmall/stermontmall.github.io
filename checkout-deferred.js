@@ -246,7 +246,7 @@
       }
       /* ---- Card payments (Paystack). Card details are typed in Paystack's own window; this page only gets a payment reference back. ---- */
       var cardBusy = false, cardMsg = '', cardRefLast = '', keepObs = null;
-      /* FIX (2026-11-03): in checkout mode classic.html hides every <body> child except the drawer
+      /* FIX (2026-11-03): in checkout mode checkout.html hides every <body> child except the drawer
          (html.stm-co body>*:not(#dr):not(#toast):not([role=alert]){display:none!important}).
          Paystack adds its card window straight to <body>, so it was hidden and the page waited forever on
          "Processing card payment...". While the card window is open we tag whatever Paystack adds to <body>

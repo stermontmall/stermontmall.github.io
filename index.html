@@ -75,9 +75,11 @@
   (function () {
     try {
       var m = /^#p-([a-z0-9-]+)$/i.exec(location.hash || '');
-      if (!m) return;
       var q = new URLSearchParams(location.search);
-      if (!q.has('product')) q.set('product', m[1]);
+      var it = q.get('item');   /* /?item=<id>: the share link the old home page gave out before the shell (2026-10-30) */
+      if (!m && !(it && /^[a-z0-9][a-z0-9-]*$/i.test(it) && !q.has('product'))) return;
+      if (it) q.delete('item');
+      if (!q.has('product')) q.set('product', m ? m[1] : it);
       location.replace('/?' + q.toString());
     } catch (e) {}
   })();
@@ -378,7 +380,7 @@
 
 <div id="toast" class="fixed left-1/2 -translate-x-1/2 top-[64px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
 
-<script src="/mobile-shell/app.js?v=17"></script>
+<script src="/mobile-shell/app.js?v=18"></script>
 <script src="/analytics.js"></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
 </body>

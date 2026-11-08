@@ -1,2 +1,4 @@
 seo-agro/out/
 seo-pest/out/
+__pycache__/
+*.pyc

@@ -1,3 +1,14 @@
+## 2026-11-08 20:25 Africa/Nairobi - classic.html removed from every path (branch `wip-no-classic-hop`)
+Owner answered "Fix the issue permanently. Make everything work efficiently" (no single symptom named), so every route through classic.html was removed.
+- [x] `git mv classic.html checkout.html`: the checkout surface (M-Pesa, delivery fees, order e-mails) keeps all its code under an honest name. Still `noindex`; opened ONLY inside the shell's checkout frame. A direct visit without a cart handoff still bounces to `/`.
+- [x] New `classic.html` = 1.4 KB forwarder (was the 128 KB old home page): `#p-<id>` and `?item=<id>` -> `/?product=<id>`, `?cart=` kept, `?checkout=1` -> `/checkout.html` (for a phone still running an older cached shell), anything else -> `/`. noindex, canonical `/`, noscript meta refresh.
+- [x] `mobile-shell/app.js` checkout frame -> `/checkout.html?checkout=1`; `index.html` `app.js?v=18` (cache-bust rule); `wa-float.js` skips checkout.html like it skipped classic.
+- [x] Bonus: old home-page share links `/?item=<id>` opened the Home screen (the shell ignored `item`). `index.html` head script now opens that product.
+- [x] Guard `no-classic-hop.test.mjs` (OK) added to `seo-pr-quality.yml`: fails if any page/script mentions classic.html, if the forwarder grows past 3 KB, or if the shell stops using checkout.html.
+- [x] `shell.test.py` updated (+9 checks for forwarder chains, checkout frame URL, direct checkout.html visit).
+- [ ] RUNNING: `python3 mobile-shell/shell.test.py 2>&1 | tee /tmp/claude-0/-home-claude/d2b94179-6a00-5a5e-9df4-8083dc198e76/scratchpad/shell-after.txt | tail -15` (~2 min). Baseline on main before the change: 155/159, the 4 failures are sandbox network errors (ERR_TUNNEL_CONNECTION_FAILED), not code.
+- [ ] NEXT: commit, rebase on main, merge to main only if no NEW failures; then phone check (open site twice): Checkout opens, an old classic.html link forwards, `/?item=<id>` opens a product. Desktop `/p/<slug>.html` is still the static page by the 2026-11-08 owner decision (phones only).
+
 ## 2026-11-08 19:55 Africa/Nairobi - "links go to classic.html before the mobile shell" investigation (branch `wip-no-classic-hop`, from main f9fc911)
 Owner: "Now my links go to classic html before going to mobile shell. Fix the issue permanently". Symptom not yet pinned down.
 - [x] Traced real redirect chains in headless Chromium (phone 390px + desktop 1280px) against current main. NO ordinary link goes through classic.html: `/?product=`, `/p/<slug>.html` (phone: head script -> `/?product=`), `/c/<slug>.html`, `/#p-<slug>`, `/index.html`, `/mobile-shell/`, `/`, `/account.html` -> 0 requests to classic.html.

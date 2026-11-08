@@ -51,6 +51,8 @@ jobs:
       # Exercise the mobile shell with harmless fixtures, not live catalogue data.
       # Keep this check alongside the existing product and SEO quality gates.
       # Reset per-test tab state when asserting the default landing view.
+      - name: Nothing may go through /classic.html (guard)
+        run: node no-classic-hop.test.mjs
       - name: Run mobile shell browser regression suite
         run: python3 mobile-shell/shell.test.py
       - name: Broken and placeholder links (link-check.mjs)
