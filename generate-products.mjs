@@ -712,3 +712,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-08: final refresh after additional Boxer axle, chain-guide and ignition-coil image matches.
 
 // 2026-11-08: refresh catalogue after verified Boxer transmission and BM100 suspension photo matches.
+
+// 2026-11-08: regenerate Boxer and TVS product pages after final verified photo-matching batch.
