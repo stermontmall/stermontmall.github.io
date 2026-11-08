@@ -25,7 +25,7 @@ for (const f of list('p')) {
   const img = og(h);
   if (!img || /placeholder\.svg/.test(img) || /logo\.png$/.test(img)) continue; // no real product photo yet
   const name = title(h).split('|')[0].trim();
-  xml += `<url><loc>${SITE}/p/${f}</loc><image:image><image:loc>${esc(img)}</image:loc><image:title>${esc(name)}</image:title></image:image></url>\n`;
+  xml += `<url><loc>${SITE}/p/${f}</loc><image:image><image:loc>${esc(unesc(img))}</image:loc><image:title>${esc(name)}</image:title></image:image></url>\n`;
   imgCount++; pageCount++;
 }
 xml += `</urlset>\n`;
