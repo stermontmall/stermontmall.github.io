@@ -1845,3 +1845,13 @@ Owner requested 20 additional fast-moving sneaker styles, avoiding existing cata
   - `bg-versatool-415-termite-injection-tool-20261108`, `advance-termite-monitoring-bait-station-20261108`, `bg-robco-soil-rodding-tool-20261108`, `fnirsi-wmt10-wood-moisture-meter-20261108`, `ullman-telescoping-inspection-mirror-20261108`
   - `uv365-blacklight-inspection-flashlight-20261108`, `queen-bedbug-proof-mattress-encasement-20261108`, `guardmax-bedbug-pillow-encasement-2pack-20261108`, `duotrap-bedbug-interceptor-4pack-20261108`, `atrix-ergo-bedbug-hepa-backpack-vacuum-20261108`
   - `polti-cimex-eradicator-bedbug-steamer-20261108`, `stufit-copper-mesh-rodent-exclusion-roll-20261108`, `catchmaster-vector-uv-fly-light-trap-20261108`, `catchmaster-909-fly-light-glue-boards-12pack-20261108`, `catchmaster-100i-cockroach-monitor-traps-9pack-20261108`
+
+
+## 2026-11-08 - 30 new smartphones added with model-matched photos and Kenya SEO
+- [x] Supabase: inserted 30 unique phone listings in Phones & Tablets (category_id=2); all 30 active, each has exactly one product image in the public product-images bucket.
+- [x] Inventory defaults: stock 1,000; low-stock threshold 20; featured=true; cost set to 85% of displayed price as requested.
+- [x] Product data: added unique Kenya-focused titles, meta descriptions and FAQs in seo-overrides.json, plus model-specific supplementary buying guidance in product-content.json; updated product-content.test.mjs allowlist.
+- [x] Photo retries completed for initial image-ingestion failures; final SQL check returned total=30, active=30, one_image=30, defaults_ok=30.
+- [ ] Verify the product-pages GitHub Actions run, generated /p/<id>.html pages, product sitemap entries and live customer links before calling the static SEO pages deployed.
+- [ ] Verify the blog-build run publishes the three new phone-buying guides into /blog/ and sitemap.xml.
+- Note: prices are catalogue estimates, not supplier-confirmed quotations or stock reservations. Confirm supplier price, exact regional SKU, warranty, physical RAM and included accessories before fulfilling an order. Image files were sourced from manufacturer/retailer pages; confirm image-use permissions before commercial reuse.
