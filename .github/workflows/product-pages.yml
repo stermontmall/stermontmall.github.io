@@ -48,6 +48,9 @@ jobs:
       - name: Test Google indexing safeguards (canonical, robots and sitemap)
         run: node seo-indexing-guard.test.mjs
 
+      - name: Test validated optional GTIN/MPN Product schema fields
+        run: node seo-product-identifiers.test.mjs
+
       - name: Test shared SEO metadata rules
         run: node seo-meta.test.mjs
 
