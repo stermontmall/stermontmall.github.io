@@ -1,5 +1,14 @@
 
 
+## 2026-11-08 20:xx Africa/Nairobi - emoji/placeholder product photo audit
+Owner requested finding catalogue items displaying emoji-style fallback photos and attaching real product images.
+- [x] Audited all products: 20 rows have empty images arrays (18 active, 2 inactive). The 9 empty-image rows among the latest 50 are all TVS/Bajaj motorcycle parts listed in the earlier photo audit.
+- [x] One previously empty item successfully received a real photo and Storage URL: Rechargeable Electric Mosquito Racket with LED Light. Source: https://www.antimoustic.com/6984-product_main_2x/raquette-anti-moustique-rechargeable.jpg. Verified the public product-images object and product images array.
+- [x] Researched exact product-image sources for Mortein Doom Aik Lemon 400+200ml, Mos-Kill Dudu Powder 200g, Fumakilla Vape Liquid Cordless Destroyer Set, and a reusable delta trap. Their supplier/search images were identified, but upload-photos rejected the external URLs (HTTP 422: source served as a webpage rather than a direct image file; Koppert image URL returned 404). No photos were added for those four.
+- [ ] Still need exact direct image files for 19 remaining products with empty images arrays. Do not report researched URLs as attached; do not use unrelated or visually similar photos. Prioritize the remaining nine active motorcycle parts and the older Aico sprayers, 50m hose, Grinbelt powder, fly-light glue boards and knapsack repair kit.
+- [ ] Rebuild product pages and verify mobile-shell rendering after the confirmed Storage upload.
+
+
 ## 2026-11-08 19:09 Africa/Nairobi - audit and repair latest 50 motorcycle spare-part photos
 Owner requested photos for missing items among the latest 50 products and a permanent prevention fix.
 - [x] Audited the latest 50 rows in public.products: initially 11 had empty images arrays. After repair, 9 remain without photos.
