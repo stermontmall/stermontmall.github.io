@@ -1,6 +1,6 @@
 -- Applied directly to Supabase project oewvtbnmyombbtggamor.
--- Keeps the existing 600-900 word and source-price checks and rejects exact duplicate
--- first-200-word openings across both active products and inactive drafts.
+-- Enforces 600-900 words, rejects exact duplicate first-200-word openings across all
+-- products and drafts, and preserves the "Price in Kenya" suffix within 60 characters.
 create or replace function public.add_draft_product(
   p_name text, p_price numeric, p_category_id bigint, p_unit text, p_description text, p_source_url text
 )
@@ -33,18 +33,16 @@ begin
   end if;
   if exists (select 1 from products where lower(name) = lower(v_name)) then raise exception 'a product with this name already exists'; end if;
   v_source_cost := round(p_price, 2);
+  v_selling_price := round(v_source_cost, 2);
   v_selling_price := round(v_source_cost * 1.15, 2);
   v_id := btrim(regexp_replace(lower(v_name), '[^a-z0-9]+', '-', 'g'), '-');
   v_id := left(v_id, 70);
   if v_id = '' then v_id := 'product'; end if;
   if exists (select 1 from products where id = v_id) then v_id := v_id || '-' || substr(md5(random()::text), 1, 5); end if;
-  v_title := case when char_length(v_name || ' – Price in Kenya') <= 60 then v_name || ' – Price in Kenya' else regexp_replace(left(v_name, 60 - char_length(' – Price in Kenya')), '[[:space:]]+[^[:space:]]*
-  insert into products (id, slug, name, seo_name, seo_title, description, price, cost, old_price, unit, category_id, images, active, stock, low_at, featured)
-  values (v_id, v_id, v_name, v_name, v_title, v_desc, v_selling_price, v_source_cost, null, coalesce(nullif(btrim(p_unit), ''), 'piece'), p_category_id, '{}', false, 1000, 20, false);
-  return v_id;
-end
-$function$;
-, '') || ' – Price in Kenya' end;
+  v_title := case
+    when char_length(v_name || ' – Price in Kenya') <= 60 then v_name || ' – Price in Kenya'
+    else regexp_replace(left(v_name, 60 - char_length(' – Price in Kenya')), '[[:space:]]+[^[:space:]]*$', '') || ' – Price in Kenya'
+  end;
   insert into products (id, slug, name, seo_name, seo_title, description, price, cost, old_price, unit, category_id, images, active, stock, low_at, featured)
   values (v_id, v_id, v_name, v_name, v_title, v_desc, v_selling_price, v_source_cost, null, coalesce(nullif(btrim(p_unit), ''), 'piece'), p_category_id, '{}', false, 1000, 20, false);
   return v_id;
