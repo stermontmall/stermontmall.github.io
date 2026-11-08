@@ -1,7 +1,7 @@
 /* Stermont Arcade mobile shell prototype.
    Vanilla JS, no framework. Data is live: products + categories come from Supabase (section 1).
    Sections: 1 data (Supabase)  2 store + badges  3 history-backed overlays  4 tabs  5 header scroll
-             6 grid + skeletons  7 categories  8 filters  9 quick buy  10 cart  11 wiring */
+             6 grid + skeletons + Previous/Next pages  7 categories  8 filters  9 quick buy  10 cart  11 wiring */
 (() => {
 'use strict';
 const $ = (s, r = document) => r.querySelector(s);
@@ -70,7 +70,7 @@ const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
 /* thumbnail markup: the product photo, or the category emoji when there is none (or it fails to load, see the error listener in section 11) */
 const thumb = p => p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" decoding="async" data-emoji="${esc(p.emoji)}" style="width:100%;height:100%;object-fit:contain;background:#fff">` : p.emoji;
 
-/* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
+/* Resolves {items, hasMore, total}; rejects when Supabase cannot be reached (the grid shows a retry link). `total` is the number of products that match. */
 async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 12 }) {
   await loadCatalog();
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
@@ -80,7 +80,7 @@ async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min 
   else if (sort === 'high') r.sort((a, b) => b.price - a.price);
   else if (sort === 'disc') r.sort((a, b) => discOf(b) - discOf(a));
   else r.sort((a, b) => b.featured - a.featured);               // recommended: featured first, then the catalog order (sort is stable)
-  return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size };
+  return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size, total: r.length };
 }
 
 /* The category the customer picked (and its sub-category) survives a reload: it is kept for this tab in sessionStorage, like the active tab. Read here, before
@@ -244,7 +244,7 @@ function goTab(tab) {
   }, { passive: true });
 })();
 
-/* ---------- 6. Product grid + skeletons ---------- */
+/* ---------- 6. Product grid + skeletons + Previous / Next pages ---------- */
 const stars = r => `<span class="stars" style="--fill:${(r / 5 * 100).toFixed(0)}%" role="img" aria-label="${r} out of 5"></span>`;
 function cardHTML(p) {
   const d = discOf(p);
@@ -265,41 +265,70 @@ const SKELETON = `<li class="card pointer-events-none" aria-hidden="true"><div c
 const skeletons = n => SKELETON.repeat(n);
 
 const grid = $('#grid'), sentinel = $('#sentinel'), EMPTY_TEXT = $('#grid-empty').textContent;
+const PAGE_SIZE = 24;   // products per page on Home (two columns, so 12 rows); the Previous / Next buttons below the grid move between pages
 function showGridError() { const el = $('#grid-empty'); el.innerHTML = 'Could not load products. <button class="underline text-brand" data-retry>Try again</button><br><a class="underline text-brand" href="/">Reload the shell</a>'; el.hidden = false; }
-const feed = { page: 1, hasMore: true, loading: false, token: 0, items: new Map() };
+const feed = { page: 1, total: 0, loading: false, token: 0, items: new Map() };
+
+/* A line above the grid with how many products this view has, and the page buttons below it (both are created here, so an older cached index.html still works). */
+const countEl = document.createElement('p'); countEl.id = 'grid-count'; countEl.className = 'px-3 pb-1 text-2xs text-mute'; countEl.setAttribute('aria-live', 'polite');
+grid.insertAdjacentElement('beforebegin', countEl);
+const pager = document.createElement('nav'); pager.id = 'pager'; pager.setAttribute('aria-label', 'Product pages'); pager.hidden = true;
+pager.style.cssText = 'padding:14px 12px 6px;text-align:center';
+$('#grid-empty').insertAdjacentElement('afterend', pager);
+const pgBtn = (dir, label, off) => `<button class="tap" data-page="${dir}" ${off ? 'disabled' : ''} style="height:40px;padding:0 18px;border-radius:9999px;font-weight:600;font-size:14px;border:1.5px solid ${off ? '#e5e7eb' : '#7c3aed'};background:${off ? '#f3f4f6' : '#7c3aed'};color:${off ? '#9ca3af' : '#fff'}">${label}</button>`;
+function renderPager() {
+  const total = feed.total, pages = Math.max(1, Math.ceil(total / PAGE_SIZE)), p = feed.page, s = store.get();
+  countEl.textContent = total ? fmt(total) + (total === 1 ? ' product' : ' products') + (s.q || s.chip !== 'all' || s.sub ? '' : ' in stock') : '';
+  if (feed.loading || !total) { pager.hidden = true; return; }
+  const from = (p - 1) * PAGE_SIZE + 1, to = Math.min(total, p * PAGE_SIZE);
+  pager.hidden = false;
+  pager.innerHTML = `<p class="text-xs text-mute">Showing ${fmt(from)}\u2013${fmt(to)} of ${fmt(total)} ${total === 1 ? 'product' : 'products'}</p>` +
+    (pages > 1 ? `<div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px">${pgBtn('prev', '&lsaquo; Previous', p <= 1)}<span class="text-xs font-semibold">Page ${p} of ${pages}</span>${pgBtn('next', 'Next &rsaquo;', p >= pages)}</div>` : '');
+}
+function scrollToGrid() {   // after Previous / Next: back to the top of the list (the header is sticky, so leave room for it)
+  const y = $('#grid-title').getBoundingClientRect().top + window.scrollY - 110;
+  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+}
 
 function query() {
   const s = store.get();
   return { cat: s.chip, sub: s.sub, q: s.q, ...s.filters };
 }
-async function loadPage(reset) {
-  if (feed.loading && !reset) return;
-  if (reset) { feed.page = 1; feed.hasMore = true; feed.token++; grid.innerHTML = ''; $('#grid-empty').hidden = true; }
-  if (!feed.hasMore) return;
-  const token = feed.token; feed.loading = true;
-  grid.insertAdjacentHTML('beforeend', skeletons(reset ? 6 : 4));
+/* Shows one page of the current query. A new category, search or filter calls loadPage(1); Previous / Next call it with the neighbouring page. */
+async function loadPage(page = 1, scroll = false) {
+  const token = ++feed.token; feed.loading = true; feed.page = page;
+  $('#grid-empty').hidden = true;
+  grid.innerHTML = skeletons(6);
+  renderPager();
   let res;
-  try { res = await fetchProducts({ ...query(), page: feed.page }); }
+  try { res = await fetchProducts({ ...query(), page, size: PAGE_SIZE }); }
   catch (e) {
     if (token !== feed.token) return;
-    $$('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
-    feed.loading = false; feed.hasMore = false; showGridError(); return;
+    grid.innerHTML = '';
+    feed.loading = false; feed.total = 0; renderPager(); showGridError(); return;
   }
   if (token !== feed.token) return;            // a newer query started: drop this stale answer
-  const { items, hasMore } = res;
-  $$('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
+  const { items, total } = res, pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (page > pages) return loadPage(pages, scroll);   // the list got shorter (a filter changed): show its last page instead
   items.forEach(p => feed.items.set(p.id, p));
-  grid.insertAdjacentHTML('beforeend', items.map(cardHTML).join(''));
-  feed.page++; feed.hasMore = hasMore; feed.loading = false;
-  const em = $('#grid-empty'); em.textContent = EMPTY_TEXT; em.hidden = grid.children.length > 0;
-  if (feed.hasMore && store.get().tab === 'home' && sentinel.getBoundingClientRect().top < innerHeight + 400) loadPage(false);
+  grid.innerHTML = items.map(cardHTML).join('');
+  feed.total = total; feed.loading = false;
+  const em = $('#grid-empty'); em.textContent = EMPTY_TEXT; em.hidden = items.length > 0;
+  renderPager();
+  if (scroll) scrollToGrid();
 }
-new IntersectionObserver(es => { if (es[0].isIntersecting && store.get().tab === 'home') loadPage(false); }, { rootMargin: '400px' }).observe(sentinel);
 
 function refreshGrid() {
   const s = store.get(), cat = CATS.find(c => c.id === s.chip);
   $('#grid-title').textContent = s.q ? `Results for "${s.q}"` : s.sub || (cat ? cat.name : 'Recommended for you');
-  renderChips(); loadPage(true);
+  renderChips(); loadPage(1);
+}
+/* The live store-wide count, shown as the first pill under the heading once the catalog is in (sold-out products are not counted; pack sizes of one product count once). */
+function showStoreCount() {
+  const row = $('#view-home .no-sb'); if (!row || !PRODUCTS.length) return;
+  let el = $('#count-pill');
+  if (!el) { el = document.createElement('span'); el.id = 'count-pill'; el.className = 'shrink-0 px-2.5 py-1 rounded-full bg-brand text-white'; row.prepend(el); }
+  el.textContent = fmt(PRODUCTS.length) + ' products in stock';
 }
 async function renderDeals() {
   const el = $('#deals-grid'); if (el.dataset.loaded) return;
@@ -575,6 +604,7 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-open]'))) { opener = el; if (el.dataset.open === 'sheet-filters') { draftSort = store.get().filters.sort; syncFilterUI(); } return openOverlay(el.dataset.open); }
   if ((el = t.closest('[data-close]'))) return closeTop();
   if ((el = t.closest('[data-add]'))) { const p = feed.items.get(el.dataset.add); if (p) { if (p.sizes.length > 1) openQuickBuy(p.id); else { addToCart(p, p.sizes[0].label, 1); toast('Added to cart'); } } return; }   // several pack sizes: pick the size first
+  if ((el = t.closest('[data-page]'))) { if (!feed.loading && !el.disabled) loadPage(feed.page + (el.dataset.page === 'next' ? 1 : -1), true); return; }   // Previous / Next under the grid
   if (t.closest('[data-retry]')) return refreshGrid();
   if (t.closest('[data-retry-deals]')) return renderDeals();
   if ((el = t.closest('#chips [data-chip]'))) return selectCategory(el.dataset.chip);
@@ -598,5 +628,5 @@ if (RESTORE_CAT) store.set({ chip: SAVED_CAT.chip, sub: SAVED_CAT.sub });
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
 if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
 if (CART_DEEP.length) toast('Loading shared cart...');
-loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) { store.set({ sub: '' }); refreshGrid(); } else $('#grid-title').textContent = store.get().sub || t.name; } } renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) openDeepLink(DEEP); else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
+loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) { store.set({ sub: '' }); refreshGrid(); } else $('#grid-title').textContent = store.get().sub || t.name; } } renderChips(); renderCategoriesView(); renderDrawer(); showStoreCount(); syncDealsBadge(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) openDeepLink(DEEP); else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories, the store count and the Deals badge appear once the data is in
 })();
