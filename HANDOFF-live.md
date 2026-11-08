@@ -1,3 +1,34 @@
+## 2026-11-09 — SEO catalogue cleanup and rebuild
+
+Owner request: “Fix all well” — organize and repair the site-wide SEO foundation.
+
+### Done
+- Supabase active catalogue: normalized all 40 blank `seo_name` values using actual product names and shared pack-size variant names. Existing product IDs, slugs, prices, descriptions, stock, categories and image references were not changed by this cleanup.
+- Corrected all 28 active `seo_title` values over 60 characters, preserving product identity and the Kenya price intent.
+- Verified database counts: 729 active products; 0 missing SEO names; 0 missing SEO titles; 0 titles over 60 characters; 0 missing category IDs; 0 empty image arrays.
+- Added `seo-catalog-guard.mjs` + tests and wired them into `.github/workflows/product-pages.yml`. Future builds now fail if active products have blank SEO names/titles, titles >60 chars, no category or no image reference. Legacy image URLs are warnings, not build failures.
+- Fixed product meta-description fallback ordering so the concise nationwide delivery version is preferred over the countrywide generic fallback; `seo-meta.test.mjs` exposed the issue.
+- Fixed `seo-extras.mjs` image sitemap escaping: decode existing HTML entities before XML-escaping image URLs, avoiding double-escaped `&amp;amp;` query strings.
+- Confirmed robots.txt references root, product, image, services and pest-control sitemaps. Services and pest-control sitemap files exist in the repository; the root sitemap contains blog URLs.
+- Updated `SEO-ARCHITECTURE.md` with current counts and remaining work.
+
+### Build status
+- Product-page workflow run: https://github.com/stermontmall/stermontmall.github.io/actions/runs/42526524418
+- Run was in progress at handoff. Product/category page generation step completed successfully; final save, page guard and IndexNow steps still need confirmation.
+- A prior run failed on the new guard's regex syntax; corrected in commit `d424863c18cd463cd458c27df5efbc825f08e580`. Do not treat the earlier failed run as the final result.
+- The product page build should be checked through to a green conclusion before claiming live deployment.
+
+### Still blocked / next
+1. Seven active products still use legacy missing image paths under `stermontmall.github.io/product-photos/`: acetochlor-50-ec-herbicide-1-litre, jade-premium-bio-pesticide-1-litre, one-touch-crop-protector-insecticide-250-ml, ortiva-250-sc-fungicide-1-litre, total-touch-250-sc-insecticide-1-litre, touchdown-herbicide-1-litre, tower-extreme-680-wg-fungicide-1-kg. Need exact replacement photos uploaded to Supabase Storage and visually checked; do not invent URLs or leave mismatched images.
+2. After the product-page workflow completes, check the SEO extras workflow and confirm `sitemap-images.xml` has single-escaped query strings.
+3. Check generated product/category sitemap coverage, product pages and category breadcrumbs against live pages. Verify canonical, meta title/description, Product JSON-LD and HTTP 200.
+4. Review empty leaf categories before deciding whether to add useful content, hide from navigation, or noindex; do not delete categories or change URLs without a redirect plan.
+5. Review service-page and blog intent overlap; the service and pest-control sitemaps already exist. Do not mass-create near-duplicate city pages.
+6. Google Search Console indexing/performance remains unverified. IndexNow is not Google indexing.
+
+### Exact next check
+Fetch workflow run `42526524418` and inspect all job steps through the final conclusion. If green, verify the generated pages and image sitemap before reporting deployment complete.
+
 ## 2026-11-08 21:25 Africa/Nairobi - "Cars for Sale" category, Mercedes-Benz CLA 200 first (branch `wip-cars-for-sale`)
 Owner: the Mercedes was buried at the bottom of Automotive (~130 featured motorcycle parts sort ahead of it) and asked for a category for selling cars.
 - [x] Supabase: new sub-category `categories.id=88` "Cars for Sale" (`cars-for-sale`, parent 15 Automotive, sort_order -1 so its chip comes first). `products.id='mercedes-benz-cla-200-for-sale-kenya'` moved from category_id 15 to 88. UNDO: `update products set category_id=15 where id='mercedes-benz-cla-200-for-sale-kenya'; delete from categories where id=88;`
