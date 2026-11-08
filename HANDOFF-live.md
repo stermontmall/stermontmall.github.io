@@ -1708,3 +1708,12 @@ Owner confirmed to leave deleted products deleted and create fresh listings only
 - [x] Each generated HTML file contains canonical metadata and Product JSON-LD. All three entries are present in `sitemap-products.xml`.
 - [x] GitHub Pages deployment run 42500522145 completed successfully for the generated-pages commit.
 - Product URLs: https://stermontarcade.co.ke/p/bajaj-boxer-bm150-chain-sprocket-kit-fresh-20261108.html ; https://stermontarcade.co.ke/p/bajaj-boxer-bm150-piston-ring-set-36pf0116-fresh.html ; https://stermontarcade.co.ke/p/tvs-hlx-150-4gear-chain-sprocket-kit-szn6320660-fresh.html
+
+
+## 2026-11-08 - Fresh product batch continuation
+- [x] Added fresh Bajaj Boxer BM150 Chain and Sprocket Drive Kit listing (KSh 3,199 reference; cost 85%; stock 1000; low_at 20; featured). Matching BM150 chain/sprocket image uploaded to Supabase Storage; async upload HTTP 200; activated via photo-check function; active=true verified.
+- [x] Added fresh Bajaj Boxer BM150 Piston Ring Set 36PF0116 listing (KSh 560 reference; cost 85%; stock 1000; low_at 20; featured). Matching 36PF0116/BM150 image uploaded; async upload HTTP 200; activated via photo-check function; active=true verified.
+- [x] Added fresh TVS HLX 150 4-Gear Chain and Sprocket Kit listing, reference SZN6320660 (KSh 3,480 reference; cost 85%; stock 1000; low_at 20; featured). HLX150 chain/sprocket kit photo uploaded to Supabase Storage; product row verified active=true with one image.
+- Product IDs: bajaj-boxer-bm150-chain-sprocket-kit-fresh-20261108; bajaj-boxer-bm150-piston-ring-set-36pf0116-fresh; tvs-hlx-150-4gear-chain-sprocket-kit-szn6320660-fresh.
+- [ ] Static product-page build/deployment and sitemap inclusion remain unverified; check GitHub Actions and verify generated URLs before claiming published static pages.
+- [ ] Product descriptions in this batch are substantial but still below the previously requested 600–800+ word target; expand with verified model-specific information rather than padding.
