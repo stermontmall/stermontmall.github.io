@@ -706,3 +706,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-08: refresh generated catalogue pages after the latest verified supplier-photo replacements.
 
 // 2026-11-08: rebuild product pages after matching additional TVS Apache and HLX supplier photos.
+
+// 2026-11-08: regenerate motorcycle catalogue after the next verified Boxer and TVS spare-part photo batch.
