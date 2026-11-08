@@ -92,6 +92,7 @@ Before considering an SEO release complete, verify:
 - Product description audit (whitespace word count): 0 active products below 600 words; 272 are in the 600–800 band; 457 exceed 800 words. The overlength group contains a repeated generic “PRODUCT BUYING GUIDE” block appended to older original copy. This is not acceptable as final product SEO: those 457 descriptions need product-specific compression/rewrite to 600–800 words, not blind truncation.
 - Category taxonomy: 54 generated category landing pages plus `/c/index.html`. Eight parent hubs are now generated and linked: Clothing & Fashion, Phones & Accessories, TV/Audio/Video, Computers & Accessories, Home & Kitchen, Kids & Baby, Shoes, and Health & Beauty.
 - Image sitemap: 668 entries; zero double-escaped query strings. The seven confirmed missing legacy photo URLs are excluded from the image sitemap, but their product pages still need real replacement photos uploaded and verified.
+- Release checks: product-page build `42526989268` passed; generated pages deployment `42527018892` passed; Google Search Console ping `42526976909` successfully submitted all five sitemaps (root, products, images, services and pest-control). Public HTTP response checks on the custom domain remain unverified because the browser checker could not reach it.
 
 ## 8. Ordered implementation queue
 
@@ -99,10 +100,10 @@ Before considering an SEO release complete, verify:
 2. **P1 — Image integrity:** replace and visually verify the seven known dead legacy product-photo references; then sample the remaining catalogue for exact product/pack match.
 3. **P1 — Category taxonomy:** check empty leaf categories, breadcrumbs and internal links after the eight parent hubs were generated.
 4. **P1 — Product-page structured data:** compare rendered H1, price, availability, image and JSON-LD for representative products and multi-size groups.
-5. **P2 — Live validation:** test product/category/service/blog URLs, canonical tags, meta descriptions and all sitemap endpoints from a public network; the browser checker could not reach the custom domain in this session.
-5. **P2 — Services:** ensure each core service has one complete, indexable, distinct landing page and accurate local coverage.
-6. **P2 — Blog clusters:** map each existing article to one intent and cluster; merge or redirect only after URL and traffic review.
-7. **P3 — Measurement:** use Google Search Console query/page data to prioritize pages by impressions, clicks, CTR and position; track enquiries and product sales separately.
+5. **P2 — Live validation:** test product/category/service/blog URLs, canonical tags, meta descriptions and all sitemap endpoints from a public network.
+6. **P2 — Services:** ensure each core service has one complete, indexable, distinct landing page and accurate local coverage.
+7. **P2 — Blog clusters:** map each existing article to one intent and cluster; merge or redirect only after URL and traffic review.
+8. **P3 — Measurement:** use Google Search Console query/page data to prioritize pages by impressions, clicks, CTR and position; track enquiries and product sales separately.
 
 ## 9. Safety rules
 
