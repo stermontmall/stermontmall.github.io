@@ -18,9 +18,9 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 1. Read `CLAUDE.md`, this file, and Supabase `public.site_playbook` topics `READ_ME_FIRST`, `add_product`, `add_photo`.
 2. Check the live catalogue for duplicates and confirm a valid category.
 3. Create the product row (the `add_draft_product` helper inserts it with `active=false`; that is only the starting state). Write an original factual description (60-120 words) and an `seo_title` of at most 60 characters with brand, model, pack size and Kenya.
-4. PHOTO (owner rule 2026-11-08: ChatGPT/Claude researches it online). If the owner gave no photo, find a sharp direct image of the EXACT product on the manufacturer, supplier or an official retailer page (at least 450x450, correct brand, model and pack size, no other shop's watermark or logo). Attach it with `upload-photos` (`image_url`, `images`, `image_base64` or `openaiFileIdRefs`) or `public.add_product_photo(product_id, image_url, true)`. If a photo is rejected, try another source image.
+4. PHOTO IS A PUBLICATION REQUIREMENT (owner instruction 2026-11-08): find a sharp direct image of the EXACT product on the manufacturer, supplier or an official retailer page (at least 450x450, correct brand, model, part number, colour and pack size; no other shop's watermark/logo). Attach it with `upload-photos` or `public.add_product_photo`. If rejected, try another exact source. Verify the uploaded Storage object, reachable public URL and `products.images` array.
 5. Never invent a photo URL. Report a photo as attached only after the Storage object and the `products.images` reference are checked.
-6. PUBLISH LIVE (owner rule 2026-11-08): once the row and photo are verified, set `active=true` (or send `activate: true` with the photo). No owner-review wait. If no suitable photo exists, publish without one and say so. If the source price is not verified, stop and ask: that is the only blocker. After activation, verify the generated product page, canonical, Product JSON-LD and sitemap entry once the product-pages workflow completes.
+6. PUBLISH LIVE only after both exact photo and source price are verified. Set `active=true` only when `images` contains the uploaded photo URL. The database now rejects a new product activation with an empty photo array. If no exact suitable photo can be found/uploaded, leave `active=false` and report the blocker. After activation, verify the generated product page, image, canonical, Product JSON-LD and sitemap entry once the product-pages workflow completes.
 7. GIVE THE MOBILE-SHELL LINK (owner rule 2026-11-08, permanent): see "Product links" below.
 
 ## Product links (owner rule 2026-11-08, permanent)
@@ -50,7 +50,7 @@ from public.products
 where id = '<product-id>';
 ```
 
-Confirm exactly one intended row exists; cost equals the verified source KES price; price equals round(cost * 1.15, 2); stock=1000; low_at=20; active=true once verified (owner rule 2026-11-08). If a photo was attached, `images` contains the returned public Storage URL and it opens.
+Confirm exactly one intended row exists; cost equals the verified source KES price; price equals round(cost * 1.15, 2); stock=1000; low_at=20. Before activation, require `cardinality(images) > 0`, confirm the Storage object exists and the URL opens. Only then set `active=true`.
 
 Report the product ID, source cost, selling price, stock, alert threshold, draft status, photo status, the mobile-shell link (`https://stermontarcade.co.ke/?product=<slug>`) and blockers. Do not say "posted", "published" or "photo attached" beyond the evidence actually checked.
 
