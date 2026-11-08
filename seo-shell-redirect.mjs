@@ -1,29 +1,41 @@
-// Stermont Arcade - REMOVES the visitor redirect from product (/p/) and category (/c/) SEO pages.
-// History: until 2026-11-03 this step injected a script that sent every non-crawler browser from /p/<slug>.html to /?product=<slug>
-// (and /c/<slug>.html to /?cat=<slug>), i.e. into the JavaScript mobile shell, while crawlers kept the static page.
-// Why it was removed: showing crawlers one page and visitors another can look like a "sneaky redirect" to Google, and visitors from
-// Google landed on the heavy shell instead of the fast static page. The owner asked for it to stop (2026-11-03).
-// Now: the product-pages workflow still runs this file after every rebuild, but it only STRIPS the old scripts (idempotent), so any
-// page the generator leaves untouched or rewrites loses the redirect. Visitors stay on /p/ and /c/ pages; the shell is for browsing.
-// The shell still shows /p/<slug>.html in its address bar when a product is open (mobile-shell/app.js), so shared links keep working.
-// Redirect stubs (pages with a meta refresh, one per extra pack size) are left alone.
-// To bring the redirect back: see git history of this file (the commit before this one).
-// 2026-11-05: at the end this also runs seo-shell-chrome.mjs, which gives the same static pages the shell top bar and bottom nav
-// (same page for everyone, no redirect). It lives here because this step already runs after every build and the workflow file
-// could not be edited. To turn it off, remove the runAll() call in the block at the bottom.
+// Stermont Arcade - product links (/p/<slug>.html) open the mobile shell product view on PHONES, except for search visitors and crawlers.
+// History: until 2026-11-03 every non-crawler browser was sent from /p/ and /c/ pages into the shell; it was removed because a ranking drop was
+// suspected (see HANDOFF-stop-shell-redirect.md). 2026-11-08: owner asked for shared product links to land in the shell view again.
+// To keep the SEO risk small this version is narrower than the old one:
+//   - crawlers and link-preview bots (Googlebot, WhatsApp, Facebook, ...) never redirect, so previews and indexing see the static page;
+//   - visitors who arrive FROM a search engine (Google, Bing, ...) stay on the static page, like before;
+//   - desktop screens stay on the static page; ?classic=1 always stays;
+//   - everyone else on a phone/tablet (shared WhatsApp links, direct links, ads) goes to /?product=<slug>, which opens the shell product view.
+// Pack-size selection stays in the hash: /p/abasi-5-ec.html#abasi-5-ec-50-ml.
+// Category pages (/c/) still have no redirect; their old script is stripped. Redirect stubs (meta refresh, one per extra pack size) are left alone.
+// The product-pages workflow runs this file after every rebuild (idempotent), so regenerated pages get the script back.
+// To turn it off again: make inject() return html with the script removed (see git history, commit 4d808f6), or delete the SCRIPT line below.
+// 2026-11-05: at the end this also runs seo-shell-chrome.mjs (shell top bar + bottom nav on the static pages). To turn that off, remove the runAll() call.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const DIR = process.env.P_DIR || 'p';
 export const MARK = '<!--stm-shell-->';
 export const CAT_MARK = '<!--stm-shell-cat-->';
 
-// Matches the marker followed by the injected <script>...</script> block (the old SCRIPT / CAT_SCRIPT text, whatever its exact wording).
-const PRODUCT_RE = new RegExp(MARK.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '<script>[\\s\\S]*?</script>', 'g');
-const CAT_RE = new RegExp(CAT_MARK.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '<script>[\\s\\S]*?</script>', 'g');
+export const SCRIPT = MARK + String.raw`<script>(function(){try{var ua=navigator.userAgent||'';
+if(/bot|crawl|spider|slurp|facebookexternalhit|facebot|whatsapp|telegram|twitter|linkedin|pinterest|slack|discord|embedly|preview|lighthouse|pagespeed|inspectiontool|adsbot|mediapartners/i.test(ua))return;
+if(/[?&]classic=1/.test(location.search))return;
+if(!/Android|iPhone|iPad|iPod|Mobile/i.test(ua)&&!(window.matchMedia&&matchMedia('(max-width:820px)').matches))return;
+if(/^https?:\/\/([a-z0-9-]+\.)*(google|bing|yahoo|duckduckgo|yandex|baidu|ecosia|brave)\.[a-z.]+\//i.test(document.referrer||''))return;
+var h=decodeURIComponent((location.hash||'').slice(1)),s=location.pathname.replace(/^\/p\//,'').replace(/\.html$/,'');
+if(!/^[a-z0-9-]+$/i.test(s))return;if(!/^[a-z0-9-]+$/i.test(h))h='';
+location.replace('/?product='+encodeURIComponent(h||s));}catch(e){}})();</script>`;
+
+const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// Matches a marker followed by an injected <script>...</script> block, whatever its exact wording.
+const PRODUCT_RE = new RegExp(esc(MARK) + '<script>[\\s\\S]*?</script>', 'g');
+const CAT_RE = new RegExp(esc(CAT_MARK) + '<script>[\\s\\S]*?</script>', 'g');
 
 export function inject(html) {
-  if (/http-equiv=["']refresh["']/i.test(html)) return html;   // redirect stub of an extra pack size: untouched
-  return html.replace(PRODUCT_RE, '');
+  if (/http-equiv=["']refresh["']/i.test(html)) return html;               // redirect stub of an extra pack size: untouched
+  html = html.replace(PRODUCT_RE, '');                                      // idempotent: take any old copy out, put the current one back
+  const m = /<meta charset=[^>]*>/i.exec(html) || /<head[^>]*>/i.exec(html); if (!m) return html;   // after the charset tag, which must stay in the first 1024 bytes
+  return html.slice(0, m.index + m[0].length) + SCRIPT + html.slice(m.index + m[0].length);
 }
 
 export function injectCat(html) {
@@ -31,7 +43,7 @@ export function injectCat(html) {
   return html.replace(CAT_RE, '');
 }
 
-function run(dir, fn, label) {
+function run(dir, fn, label, verb) {
   let n = 0, total = 0;
   let files = []; try { files = readdirSync(dir).filter(f => f.endsWith('.html')); } catch (e) { console.log(`seo-shell-redirect: no ${dir}/ folder, skipped`); return; }
   for (const f of files) {
@@ -39,12 +51,12 @@ function run(dir, fn, label) {
     try { const s = readFileSync(`${dir}/${f}`, 'utf8'), o = fn(s); if (o !== s) { writeFileSync(`${dir}/${f}`, o); n++; } }
     catch (e) { console.log('skipped', f, e.message); }
   }
-  console.log(`seo-shell-redirect: removed the visitor redirect from ${n} of ${total} ${label} pages`);
+  console.log(`seo-shell-redirect: ${verb} ${n} of ${total} ${label} pages`);
 }
 
 if (process.argv[1] && process.argv[1].endsWith('seo-shell-redirect.mjs')) {
-  run(DIR, inject, 'product');
-  run(process.env.C_DIR || 'c', injectCat, 'category');
+  run(DIR, inject, 'product', 'phone redirect set on');
+  run(process.env.C_DIR || 'c', injectCat, 'category', 'redirect removed from');
   try { (await import('./seo-shell-chrome.mjs')).runAll(); }   // shell top bar + bottom nav on p, c, guides, products.html
   catch (e) { console.log('seo-shell-chrome skipped:', e.message); }
 }
