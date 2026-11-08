@@ -24,12 +24,12 @@ Inspection of the first overlength product (Hisense HMC6MBK pressure cooker) sho
 1. Seven product photo references still need exact replacement images uploaded to Supabase Storage and visually checked: acetochlor-50-ec-herbicide-1-litre, jade-premium-bio-pesticide-1-litre, one-touch-crop-protector-insecticide-250-ml, ortiva-250-sc-fungicide-1-litre, total-touch-250-sc-insecticide-1-litre, touchdown-herbicide-1-litre, tower-extreme-680-wg-fungicide-1-kg. They are excluded from the image sitemap only; product pages still reference them.
 2. Product-page run `42526989268` had all build, test, save and page-guard steps green; IndexNow was still running at handoff. Confirm final conclusion.
 3. Live custom-domain HTTP checks were not possible through the browser tool in this session. GitHub Pages deployment completed successfully, but public HTTP 200/canonical/structured-data checks still need an external test.
-4. Confirm latest Google sitemap submission included all five sitemaps: root, products, images, services and pest-control. The latest ping run after adding pest-control succeeded.
+4. Google Search Console submission is verified: run `42526976909` submitted all five sitemaps successfully (root, products, images, services and pest-control).
 
 ### Exact next work
-1. Check `42526989268` final status.
-2. Begin rewriting the first 30 >800-word product descriptions; backup originals first; verify each final description is 600–800 words and product-specific.
-3. Continue in batches until all 457 overlength descriptions are resolved.
+1. Begin rewriting the first 30 >800-word product descriptions; back up originals first; verify each final description is 600–800 words and product-specific.
+2. Continue in batches until all 457 overlength descriptions are resolved.
+3. Replace and verify the seven broken product images.
 ## 2026-11-09 — SEO catalogue cleanup and rebuild
 
 Owner request: “Fix all well” — organize and repair the site-wide SEO foundation.
