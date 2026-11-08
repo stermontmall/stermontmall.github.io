@@ -1871,3 +1871,16 @@ Owner instruction: “Fix the 18 items.”
 - [ ] The Advance in-ground termite monitoring station from the earlier batch remains below 600 words and was outside this 18-item scope; JT Eaton Bellows Duster was already updated. The separate 3M 6700 respirator was also outside scope.
 - Current active catalogue scan: 110 active products still have descriptions below 600 words.
 - Customer links should use `https://stermontarcade.co.ke/?product=<slug>`; do not send static `/p/` URLs as customer-facing links.
+
+
+## 2026-11-09 - Next 20 catalogue descriptions expanded to 600–800 words
+Owner instruction: “Continue with the next 20.”
+- [x] Selected the next 20 active catalogue rows with descriptions below 600 words, ordered by created_at: four Essie Mugo Cockroach Paste sizes (200g, 300g, 500g, 600g); 14-inch leather welding gloves; AA12 two-stripe vest; 3M UltraFit earplugs; four-stripe orange vest; polycarbonate industrial safety glasses; construction rigger gloves; cotton Conti suit; Diamond Grip gloves; disposable foam earplugs; PVC hazmat spraying suit; chemical-resistant gloves; HDPE safety helmet; lab coat; PVC apron; reflective strap vest; Bajaj Boxer 100/125/150 air-filter service component.
+- [x] Supabase: updated all 20 descriptions with original product-specific content, each verified between 737 and 792 words. Updated SEO names and Kenya-focused SEO titles (titles kept within 60 characters). Existing product names, prices, image references, stock, low-stock thresholds and featured flags were preserved.
+- [x] Backups: one pre-change description backup per product in `catalogue-seo-600-800-batch-06`.
+- [x] Verification: 20/20 active; stock=1000; low_at=20; featured=true; each retains one image reference; 20/20 backups present. No rows created or deleted.
+- [!] Images were retained but not visually inspected for exact model/variant match. This is especially important for the four Essie size variants, the 3M UltraFit SKU/cord variant, PPE certification claims and the Bajaj Boxer model-year/part-number fitment.
+- [!] Product descriptions deliberately avoid unsupported claims: the Essie active ingredient and registration must be read from the physical label; PPE standards and ratings must be verified on the supplied items; Bajaj fitment requires model-year/part-number confirmation. 3M attenuation differs by UltraFit SKU; exact listing SKU remains unconfirmed.
+- [!] Explicit meta-description overrides, static product HTML, canonical tags, Product JSON-LD, sitemap inclusion, IndexNow notification and GitHub Pages deployment have not been verified for this batch. No Google indexing or ranking claim.
+- [ ] Next: audit the remaining short-description catalogue, now expected to be 90 active products below 600 words; then check the product-pages workflow and verify generated pages, canonical/JSON-LD and sitemap entries for this batch.
+- Customer links must use the mobile shell format `https://stermontarcade.co.ke/?product=<slug>` after confirming each product remains active.
