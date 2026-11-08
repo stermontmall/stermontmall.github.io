@@ -34,7 +34,10 @@ const SW = {
   'pest-control-fumigation': 'dawa za kuua wadudu', 'fumigation-chemicals': 'dawa za kufukiza', 'fertilizers': 'mbolea', 'seeds-seedlings': 'mbegu na miche',
   'herbicides': 'dawa ya kuua magugu', 'fungicides': 'dawa ya kuvu', 'crop-insecticides': 'dawa za wadudu wa mimea', 'animal-feeds': 'chakula cha mifugo',
   'veterinary-drugs': 'dawa za mifugo', 'garden-outdoors': 'vifaa vya bustani', 'health-beauty': 'bidhaa za urembo na afya',
-  'sprayers-equipment': 'pampu za kunyunyizia dawa', 'protective-wear-safety': 'vifaa vya usalama', 'disinfectants-hygiene': 'dawa za usafi'
+  'sprayers-equipment': 'pampu za kunyunyizia dawa', 'protective-wear-safety': 'vifaa vya usalama', 'disinfectants-hygiene': 'dawa za usafi',
+  'fashion': 'mavazi', 'phones-accessories': 'simu na vifaa vya simu', 'tv-audio-video': 'runinga, sauti na video',
+  'computers-accessories': 'kompyuta na vifaa', 'home-kitchen': 'bidhaa za nyumbani na jikoni', 'baby-products': 'bidhaa za watoto',
+  'shoes': 'viatu', 'health-beauty': 'afya na urembo'
 };
 
 // ---------- 1) product pages ----------
