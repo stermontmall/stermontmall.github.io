@@ -15,7 +15,7 @@ const files = d => {
 // Cover the full public HTML surface, not only product/category/blog pages.
 // Admin and upload tools are excluded; account pages are private/noindex and not ranking targets.
 const rootPages = readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|upload-photos|builder|google)/.test(f));
-const pages = [...new Set([...rootPages, ...['p','c','blog','services','guides'].flatMap(files)])].filter(existsSync);
+const pages = [...new Set([...rootPages, ...['p','c','blog','services','guides','pest-control'].flatMap(files)])].filter(existsSync);
 const unesc = t => String(t).replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');   // measure what Google sees, not the escaped HTML
 const exists = path => { path = decodeURIComponent(path.split('#')[0].split('?')[0]); if (!path || path === '/') path = '/index.html'; if (path.endsWith('/')) path += 'index.html'; return existsSync('.' + path); };
 let redirects = 0, checked = 0;
@@ -55,7 +55,7 @@ for (const f of pages) {
   }
 }
 // every sitemap URL must exist
-for (const sm of ['sitemap.xml', 'sitemap-products.xml', 'services/sitemap-services.xml']) if (existsSync(sm))
+for (const sm of ['sitemap.xml', 'sitemap-products.xml', 'services/sitemap-services.xml', 'pest-control/sitemap.xml']) if (existsSync(sm))
   for (const m of readFileSync(sm, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) { const u = m[1].replace(SITE, ''); if (u.startsWith('/') && !exists(u)) add('Sitemap lists a page that does not exist', `${sm}: ${u}`); }
 
 for (const [value, list] of titlePages) if (list.length > 1) for (const f of list) add('Duplicate page title', f);
