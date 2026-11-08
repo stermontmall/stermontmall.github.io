@@ -12,7 +12,7 @@ export function auditProducts(rows) {
     if (String(p.seo_title || '').length > 60) errors.push(`${id}: seo_title exceeds 60 characters (${p.seo_title.length})`);
     if (p.category_id == null) errors.push(`${id}: missing category_id`);
     if (!Array.isArray(p.images) || p.images.length === 0) errors.push(`${id}: no product image reference`);
-    if ((p.images || []).some(u => /stermontmall\\.github\\.io\\/product-photos\\//i.test(String(u)))) {
+    if ((p.images || []).some(u => /stermontmall\.github\.io\/product-photos\//i.test(String(u)))) {
       warnings.push(`${id}: legacy github.io product-photo URL requires availability and visual-match verification`);
     }
   }
