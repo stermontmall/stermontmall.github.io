@@ -147,9 +147,9 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
   const desc = DESCRIPTOR[productType(ctx.catSlug)];
   const gen = isGenuine(ctx) ? `100% genuine & ${desc} ` : `${desc} `;
   const tiers = [
-    `Buy ${gen}${n} in Kenya at ${STORE}. Fast M-Pesa checkout, Sarit Centre Westlands pickup, or countrywide delivery.`,
-    `Buy ${gen}${n} in Kenya at ${STORE}. M-Pesa checkout, Sarit Centre Westlands pickup, delivery to 47 counties.`,
     `Buy ${gen}${n} in Kenya at ${STORE}. M-Pesa checkout, Westlands pickup or delivery to all 47 counties.`,
+    `Buy ${gen}${n} in Kenya at ${STORE}. M-Pesa checkout, Sarit Centre Westlands pickup, delivery to 47 counties.`,
+    `Buy ${gen}${n} in Kenya at ${STORE}. Fast M-Pesa checkout, Sarit Centre Westlands pickup, or countrywide delivery.`,
     `Buy ${isGenuine(ctx) ? '100% genuine ' : ''}${n} in Kenya at ${STORE}. M-Pesa checkout, Westlands pickup or delivery to all 47 counties.`,
     `Buy ${n} in Kenya at ${STORE}. M-Pesa checkout, Westlands pickup or delivery to all 47 counties.`,
     `Buy ${n} in Kenya. M-Pesa checkout, Westlands pickup, delivery to 47 counties.`
