@@ -15,6 +15,8 @@ const read = f => readFileSync(f, 'utf8');
 const title = h => unesc(((h.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || '').trim());
 const desc = h => { const m = h.match(/<meta name=["']description["'] content=(?:"([^"]*)"|'([^']*)')/i); return m ? unesc(m[1] || m[2] || '').trim() : ''; };
 const og = h => (h.match(/<meta property=["']og:image["'] content=["']([^"']+)["']/i) || [])[1] || '';
+// These seven catalogue image references were confirmed missing from both the repo and Storage; keep them out of the image sitemap until replaced.
+const BROKEN_PRODUCT_IMAGES = /(?:acetochlor-50-ec-herbicide-1-litre|jade-premium-bio-pesticide-1-litre|one-touch-crop-protector-insecticide-250-ml|ortiva-250-sc-fungicide-1-litre|total-touch-250-sc-insecticide-1-litre|touchdown-herbicide-1-litre|tower-extreme-680-wg-fungicide-1-kg)\.(?:jpg|webp)$/i;
 
 // ---------- 1) image sitemap ----------
 let imgCount = 0, pageCount = 0;
@@ -23,7 +25,7 @@ for (const f of list('p')) {
   const h = read(`p/${f}`);
   if (/http-equiv="refresh"/i.test(h)) continue;                       // size-variant redirect pages are not indexable
   const img = og(h);
-  if (!img || /placeholder\.svg/.test(img) || /logo\.png$/.test(img)) continue; // no real product photo yet
+  if (!img || /placeholder\.svg/.test(img) || /logo\.png$/.test(img) || BROKEN_PRODUCT_IMAGES.test(img)) continue; // no verified product photo yet
   const name = title(h).split('|')[0].trim();
   xml += `<url><loc>${SITE}/p/${f}</loc><image:image><image:loc>${esc(unesc(img))}</image:loc><image:title>${esc(name)}</image:title></image:image></url>\n`;
   imgCount++; pageCount++;
