@@ -56,9 +56,9 @@ writeFileSync(join(dir, 'rows.json'), JSON.stringify([
 const log = execFileSync('node', ['seo-titles.mjs'], { env: { ...process.env, P_DIR: join(dir, 'p'), NAMES_FILE: join(dir, 'names.json'), SEO_TITLES_JSON: join(dir, 'rows.json') }, encoding: 'utf8', cwd: process.cwd() });
 const abs = readFileSync(join(dir, 'p', 'abs.html'), 'utf8'), eu = readFileSync(join(dir, 'p', 'euro.html'), 'utf8'), no = readFileSync(join(dir, 'p', 'none.html'), 'utf8');
 console.log(log.trim());
-const absTitle = abs.match(/<title>([^<]+)<\\/title>/)?.[1] || ''; assert.ok(absTitle.length <= 60 && absTitle.endsWith('Price in Kenya')); n++;
+const absTitle = abs.match(/<title>([^<]+)<\/title>/)?.[1] || ''; assert.ok(absTitle.length <= 60 && absTitle.endsWith('Price in Kenya')); n++;
 assert.match(abs, /<h1>Buy Top-Rated Absolute 375SC Systemic Fungicide<\/h1>/); n++;
-const euroTitle = eu.match(/<title>([^<]+)<\\/title>/)?.[1] || ''; assert.ok(euroTitle.length <= 60 && euroTitle.endsWith('Price in Kenya')); n++;
+const euroTitle = eu.match(/<title>([^<]+)<\/title>/)?.[1] || ''; assert.ok(euroTitle.length <= 60 && euroTitle.endsWith('Price in Kenya')); n++;
 assert.match(eu, /<h1>Buy Original Euroken 50x55 Standing Cooker \(3G\+1E\)<\/h1>/); n++;
 assert.match(no, /<title>Old title<\/title>/); n++; assert.match(no, /<h1>Untouched<\/h1>/); n++;
 const names = JSON.parse(readFileSync(join(dir, 'names.json'), 'utf8'));
