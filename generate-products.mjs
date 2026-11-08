@@ -4,6 +4,7 @@
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
+import { productIdentifiers } from './seo-product-identifiers.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -58,7 +59,9 @@ const fixProducts = list => list.map(p => (Array.isArray(p.images) ? { ...p, ima
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
-  const cols = ['id,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
+  const cols = ['id,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
+                'id,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
                 'id,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
                 'id,name,price,old_price,unit,stock,images,description,categories(name,slug)',
                 'id,name,price,stock,images,description,categories(name,slug)'];
@@ -501,7 +504,7 @@ for (const p of products) {
   const ldOne = jsonLd({
     '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.id), category: cat?.name,
-    brand: { '@type': 'Brand', name: brandOf(p.name) },
+    brand: { '@type': 'Brand', name: brandOf(p.name) }, ...productIdentifiers(p),
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(p.price) || 0)),
       availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
       seller: { '@id': `${SITE}/#store` } },
@@ -510,7 +513,7 @@ for (const p of products) {
   const ldGroup = p.variants ? jsonLd({
     '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, category: cat?.name, brand: { '@type': 'Brand', name: brandOf(p.name) }, ...rLd,
-    hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label,
+    hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label, ...productIdentifiers(v),
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
       offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: String(Math.round(Number(v.price) || 0)),
         availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
