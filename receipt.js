@@ -628,9 +628,11 @@
     var sub = items.reduce(function (a, it) { return a + it.total; }, 0);
     var dv = qnum(q.discount_value), dt = q.discount_type || 'none';
     var disc = dt === 'percent' ? Math.round(sub * Math.min(100, dv) / 100) : dt === 'fixed' ? Math.min(Math.round(dv), sub) : 0;
-    var taxable = sub - disc, vr = Math.min(100, qnum(q.vat_rate)), vat = Math.round(taxable * vr / 100), del = Math.round(qnum(q.delivery_fee));
-    var total = taxable + vat + del, dep = Math.round(total * Math.min(100, qnum(q.deposit_percent)) / 100);
-    return { items: items, subtotal: sub, discount_amount: disc, vat_amount: vat, delivery_fee: del, total: total, deposit_amount: dep, balance_after_deposit: total - dep };
+    var gross = sub - disc, vr = Math.min(100, qnum(q.vat_rate)), del = Math.round(qnum(q.delivery_fee)), incl = !!q.vat_inclusive, vat, total;
+    if (incl) { total = gross + del; vat = Math.round(total * vr / (100 + vr)); }   // prices already include VAT: show the VAT inside the total
+    else { vat = Math.round(gross * vr / 100); total = gross + vat + del; }          // VAT added on top of the prices
+    var dep = Math.round(total * Math.min(100, qnum(q.deposit_percent)) / 100);
+    return { items: items, subtotal: sub, discount_amount: disc, vat_amount: vat, vat_inclusive: incl, net: total - vat, delivery_fee: del, total: total, deposit_amount: dep, balance_after_deposit: total - dep };
   }
   function qvalid(q) {
     if (q.valid_until) { var v = new Date(String(q.valid_until).slice(0, 10) + 'T23:59:59'); if (!isNaN(v)) return v; }
@@ -725,7 +727,7 @@
     var dep = c.deposit_amount ? [['Deposit to confirm', money(c.deposit_amount) + ' (' + qnum(q.deposit_percent) + '%)']] : [];
     return [
       { t: 'PREPARED FOR', e: keep([['Client', q.client_name], ['Company', q.client_company], ['Phone', q.client_phone], ['Email', q.client_email], ['KRA PIN', q.client_pin], ['Address', q.client_address]]) },
-      { t: 'QUOTATION', e: [['Quote reference', qno(q)], ['Issued', qdate(q.created_at || new Date())], ['Valid until', qdate(qvalid(q))], ['Prepared by', BIZ.name]] },
+      { t: 'QUOTATION', e: [['Quote reference', qno(q)], ['Issued', qdate(q.created_at || new Date())], ['Valid until', qdate(qvalid(q))]].concat(qnum(q.vat_rate) ? [['VAT', qnum(q.vat_rate) + '% ' + (c.vat_inclusive ? 'included in all prices' : 'added on top of prices')]] : [['Prepared by', BIZ.name]]) },
       { t: 'PAYMENT & DELIVERY', e: [['Pay to (M-Pesa Paybill)', BIZ.paybill + '  |  Acc. ' + BIZ.account], ['Payment terms', q.payment_terms || 'As agreed'], ['Delivery / collection', q.delivery_terms || 'Confirmed when you accept']].concat(dep) }
     ];
   }
@@ -744,11 +746,14 @@
   }
 
   function qTotals(d, q, c, y) {
-    var t0 = y, pw = 86, px = W - M - pw, rh = 6.4, rows = [['Subtotal', money(c.subtotal)]];
+    var t0 = y, pw = 86, px = W - M - pw, rh = 6.4, vr = qnum(q.vat_rate), incl = c.vat_inclusive && vr > 0, rows = [[incl ? 'Subtotal (VAT included)' : 'Subtotal', money(c.subtotal)]];
     if (c.discount_amount) rows.push(['Discount' + (q.discount_type === 'percent' ? ' (' + qnum(q.discount_value) + '%)' : ''), '- ' + money(c.discount_amount)]);
-    if (qnum(q.vat_rate)) rows.push(['VAT (' + qnum(q.vat_rate) + '%)', money(c.vat_amount)]);
+    if (vr && !c.vat_inclusive) rows.push(['VAT (' + vr + '%)', money(c.vat_amount)]);
     if (c.delivery_fee) rows.push(['Delivery fee', money(c.delivery_fee)]);
-    var barTop = t0 + 4 + rows.length * rh, ph = barTop - t0 + 8.6 + (c.deposit_amount ? 14 : 3);
+    var after = [];   // lines under the total bar
+    if (incl) { after.push(['Includes VAT (' + vr + '%)', money(c.vat_amount), false]); after.push(['Amount before VAT', money(c.net), false]); }
+    if (c.deposit_amount) after.push(['Deposit to confirm (' + qnum(q.deposit_percent) + '%)', money(c.deposit_amount), true]);
+    var barTop = t0 + 4 + rows.length * rh, ph = barTop - t0 + 8.6 + 2 + after.length * 5.2 + 1.5;
     font(d, 'bold', 7.4, C.purple); d.text('NOTES', M, t0 + 4);
     font(d, 'normal', 7.6, C.mute);
     d.splitTextToSize('Prices are in Kenya shillings. This quotation is not a tax invoice or a receipt. A receipt is issued once payment is confirmed.', 76).slice(0, 3).forEach(function (l, i) { d.text(l, M, t0 + 9 + i * 3.7); });
@@ -759,12 +764,12 @@
       font(d, 'normal', 9.2, C.ink); d.text(rw[0], l, t0 + 7.4 + i * rh); d.text(rw[1], r, t0 + 7.4 + i * rh, { align: 'right' });
     });
     fill(d, C.navy); d.roundedRect(px + 3, barTop, pw - 6, 8.6, 2.2, 2.2, 'F');
-    font(d, 'bold', 8.8, C.white); d.text('TOTAL', l, barTop + 5.6);
+    font(d, 'bold', 8.8, C.white); d.text(incl ? 'TOTAL (VAT INCL.)' : 'TOTAL', l, barTop + 5.6);
     font(d, 'bold', 11, C.lime); d.text(money(c.total), r, barTop + 5.7, { align: 'right' });
-    if (c.deposit_amount) {
-      font(d, 'bold', 8.2, C.ink); d.text('Deposit to confirm (' + qnum(q.deposit_percent) + '%)', l, barTop + 13);
-      d.text(money(c.deposit_amount), r, barTop + 13, { align: 'right' });
-    }
+    after.forEach(function (a, i) {
+      var yy = barTop + 8.6 + 2 + 3.4 + i * 5.2;
+      font(d, a[2] ? 'bold' : 'normal', a[2] ? 8.2 : 8, a[2] ? C.ink : C.mute); d.text(a[0], l, yy); d.text(a[1], r, yy, { align: 'right' });
+    });
     return t0 + ph;
   }
 
@@ -840,9 +845,10 @@
       '👤 ' + (q.client_name || '') + (q.client_company ? ' (' + q.client_company + ')' : ''), '',
       '*Items*', qlines(c).join('\n'), '', 'Subtotal: ' + money(c.subtotal)];
     if (c.discount_amount) out.push('Discount: - ' + money(c.discount_amount));
-    if (qnum(q.vat_rate)) out.push('VAT (' + qnum(q.vat_rate) + '%): ' + money(c.vat_amount));
+    if (qnum(q.vat_rate) && !c.vat_inclusive) out.push('VAT (' + qnum(q.vat_rate) + '%): ' + money(c.vat_amount));
     if (c.delivery_fee) out.push('Delivery: ' + money(c.delivery_fee));
-    out.push('*TOTAL: ' + money(c.total) + '*');
+    out.push('*TOTAL' + (c.vat_inclusive && qnum(q.vat_rate) ? ' (VAT included)' : '') + ': ' + money(c.total) + '*');
+    if (c.vat_inclusive && qnum(q.vat_rate)) out.push('Includes VAT (' + qnum(q.vat_rate) + '%): ' + money(c.vat_amount) + ' | Amount before VAT: ' + money(c.net));
     if (c.deposit_amount) out.push('Deposit to confirm (' + qnum(q.deposit_percent) + '%): ' + money(c.deposit_amount));
     out.push('', 'Pay via M-Pesa Paybill ' + BIZ.paybill + ', Account ' + BIZ.account + ' once you accept.');
     if (q.payment_terms) out.push('Payment terms: ' + q.payment_terms);
@@ -860,8 +866,9 @@
     function line(label, val) { return '<tr><td style="padding:6px 18px;' + F + 'font-size:14px;color:#4a4163;">' + label + '</td><td align="right" style="padding:6px 18px;' + F + 'font-size:14px;color:#1b1230;">' + hx(val) + '</td></tr>'; }
     var extra = line('Subtotal', money(c.subtotal));
     if (c.discount_amount) extra += line('Discount', '- ' + money(c.discount_amount));
-    if (qnum(q.vat_rate)) extra += line('VAT (' + qnum(q.vat_rate) + '%)', money(c.vat_amount));
+    if (qnum(q.vat_rate) && !c.vat_inclusive) extra += line('VAT (' + qnum(q.vat_rate) + '%)', money(c.vat_amount));
     if (c.delivery_fee) extra += line('Delivery fee', money(c.delivery_fee));
+    var vatNote = c.vat_inclusive && qnum(q.vat_rate) ? '<tr><td colspan="2" style="padding:0 18px 10px;' + F + 'font-size:13px;color:#6b5f8a;">Includes VAT (' + qnum(q.vat_rate) + '%): ' + hx(money(c.vat_amount)) + ' &middot; Amount before VAT: ' + hx(money(c.net)) + '</td></tr>' : '';
     var dep = c.deposit_amount ? '<tr><td colspan="2" style="padding:0 18px 14px;' + F + 'font-size:13px;color:#5b21b6;font-weight:700;">Deposit to confirm (' + qnum(q.deposit_percent) + '%): ' + hx(money(c.deposit_amount)) + '</td></tr>' : '';
     var wa = 'https://wa.me/' + String(BIZ.phone).replace(/\D/g, '') + '?text=' + encodeURIComponent('Hello ' + BIZ.name + ', I accept quotation ' + qno(q));
     function btn(href, label, bg, fg) { return '<a href="' + href + '" style="display:inline-block;background:' + bg + ';color:' + fg + ';' + F + 'font-size:15px;font-weight:800;text-decoration:none;padding:14px 22px;border-radius:14px;margin:4px;">' + label + '</a>'; }
@@ -878,7 +885,7 @@
       '<tr><td style="padding:18px 26px 6px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5ff;border:1px solid #e6dcfb;border-radius:18px;">' +
         '<tr><td colspan="2" style="padding:16px 18px 2px;' + F + 'font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7c3aed;">Items quoted</td></tr>' +
         '<tr><td colspan="2" style="padding:0 18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + rows + '</table></td></tr>' + extra +
-        '<tr><td style="padding:14px 18px;' + F + 'font-size:16px;font-weight:700;color:#1b1230;">Total</td><td align="right" style="padding:14px 18px;' + F + 'font-size:24px;font-weight:900;color:#5b21b6;">' + hx(money(c.total)) + '</td></tr>' + dep +
+        '<tr><td style="padding:14px 18px;' + F + 'font-size:16px;font-weight:700;color:#1b1230;">Total' + (c.vat_inclusive && qnum(q.vat_rate) ? ' (VAT included)' : '') + '</td><td align="right" style="padding:14px 18px;' + F + 'font-size:24px;font-weight:900;color:#5b21b6;">' + hx(money(c.total)) + '</td></tr>' + vatNote + dep +
       '</table></td></tr>' +
       '<tr><td style="padding:12px 26px 6px;"><div style="background:#efe7ff;border-radius:16px;padding:14px 16px;"><div style="' + F + 'font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#5b21b6;">How to pay once you accept</div>' +
         '<div style="' + F + 'font-size:14px;font-weight:600;line-height:1.5;color:#1b1230;padding-top:6px;">M-Pesa Paybill <b>' + hx(BIZ.paybill) + '</b>, Account <b>' + hx(BIZ.account) + '</b></div>' +

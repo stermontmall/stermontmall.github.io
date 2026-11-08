@@ -1,3 +1,10 @@
+## 2026-11-08 12:50 Africa/Nairobi - quotation VAT-included option (branch `wip-quotation-vat-included-20261108`)
+Owner: "The 16% is included on my prices so make that option be visible on the quotation".
+- [x] Supabase migration `client_quotations_vat_inclusive`: new column `vat_inclusive boolean` (also in `setup-client-quotations.sql`).
+- [x] New quotations default to VAT 16% with "Prices already include VAT". The VAT is shown inside the total, not added: PDF totals panel says "TOTAL (VAT INCL.)" with "Includes VAT (16%)" and "Amount before VAT", the QUOTATION card says "16% included in all prices", same lines in the email and WhatsApp text. "Add VAT on top of prices" is still selectable. `receipt.js?v=12`, `admin-quotations.js?v=3`.
+- [x] Tested: mock-PDF run (incl/excl math and printed labels), Playwright on the form (13,680 total, VAT 1,887, before VAT 11,793). Real PDF layout still not viewed.
+- [ ] NEXT: owner downloads one quotation PDF and checks the VAT lines.
+
 ## 2026-11-08 12:45 Africa/Nairobi - quotation item picker (branch `wip-quotation-item-picker-20261108`)
 Owner: "Add all the items to the items section of the quotation so that I search and select".
 - [x] `admin-quotations.js?v=2`: Items section now has a search box over EVERY product (active and hidden, with stock) and every service from `service_catalog` (price_min as price, open-price services leave it blank). Tap a result to add it; tapping again adds quantity. The item name box still suggests as you type.

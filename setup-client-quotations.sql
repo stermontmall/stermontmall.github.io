@@ -20,6 +20,7 @@ create table if not exists public.client_quotations (
   discount_type text not null default 'none' check (discount_type in ('none', 'percent', 'fixed')),
   discount_value numeric not null default 0 check (discount_value >= 0),
   vat_rate numeric not null default 0 check (vat_rate >= 0 and vat_rate <= 100),
+  vat_inclusive boolean not null default false,   -- true: prices already include VAT (VAT is shown inside the total); false: VAT is added on top
   delivery_fee numeric not null default 0 check (delivery_fee >= 0),
   deposit_percent numeric not null default 0 check (deposit_percent >= 0 and deposit_percent <= 100),
   valid_days integer not null default 14 check (valid_days between 1 and 365),
@@ -45,3 +46,6 @@ create policy "staff manage client quotations" on public.client_quotations
 
 revoke all on public.client_quotations from anon;
 revoke all on sequence public.client_quotation_seq from anon;
+
+-- added 2026-11-08 (migration "client_quotations_vat_inclusive"): for tables created before this column existed
+alter table public.client_quotations add column if not exists vat_inclusive boolean not null default false;

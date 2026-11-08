@@ -27,7 +27,7 @@
 
   function blank() {
     return { id: null, ref: null, created_at: null, status: 'draft', client_name: '', client_company: '', client_phone: '', client_email: '', client_pin: '', client_address: '',
-      items: [{ name: '', qty: 1, price: '', disc: '' }], discount_type: 'none', discount_value: '', vat_rate: 0, delivery_fee: '', deposit_percent: '', valid_days: 14,
+      items: [{ name: '', qty: 1, price: '', disc: '' }], discount_type: 'none', discount_value: '', vat_rate: 16, vat_inclusive: true, delivery_fee: '', deposit_percent: '', valid_days: 14,
       payment_terms: '', delivery_terms: '', notes: '', terms: DEF_TERMS, accepted_at: null, sent_at: null };
   }
   function fromRow(r) {
@@ -42,7 +42,7 @@
   function payload(S) {
     var c = Q().calc(S), p = {
       status: S.status, client_name: String(S.client_name).trim(), client_company: nz(S.client_company), client_phone: nz(S.client_phone), client_email: nz(S.client_email), client_pin: nz(S.client_pin), client_address: nz(S.client_address),
-      items: c.items, discount_type: S.discount_type || 'none', discount_value: S.discount_type === 'none' ? 0 : num(S.discount_value), vat_rate: Math.min(100, num(S.vat_rate)), delivery_fee: num(S.delivery_fee),
+      items: c.items, discount_type: S.discount_type || 'none', discount_value: S.discount_type === 'none' ? 0 : num(S.discount_value), vat_rate: Math.min(100, num(S.vat_rate)), vat_inclusive: !!S.vat_inclusive, delivery_fee: num(S.delivery_fee),
       deposit_percent: Math.min(100, num(S.deposit_percent)), valid_days: Math.min(365, Math.max(1, Math.round(num(S.valid_days)) || 14)), valid_until: validUntil(S),
       payment_terms: nz(S.payment_terms), delivery_terms: nz(S.delivery_terms), notes: nz(S.notes), terms: nz(S.terms),
       subtotal: c.subtotal, discount_amount: c.discount_amount, vat_amount: c.vat_amount, total: c.total, updated_at: new Date().toISOString()
@@ -121,9 +121,11 @@
       function row(l, v, cls) { var d = h('div', cls); d.appendChild(h('span', null, l)); d.appendChild(h('span', null, v)); totBox.appendChild(d); }
       row('Subtotal', money(k.subtotal));
       if (k.discount_amount) row('Discount', '- ' + money(k.discount_amount));
-      if (num(S.vat_rate)) row('VAT (' + num(S.vat_rate) + '%)', money(k.vat_amount));
+      var incl = k.vat_inclusive && num(S.vat_rate);
+      if (num(S.vat_rate) && !k.vat_inclusive) row('VAT (' + num(S.vat_rate) + '%)', money(k.vat_amount));
       if (k.delivery_fee) row('Delivery fee', money(k.delivery_fee));
-      row('Total', money(k.total), 'g');
+      row(incl ? 'Total (VAT included)' : 'Total', money(k.total), 'g');
+      if (incl) { row('Includes VAT (' + num(S.vat_rate) + '%)', money(k.vat_amount)); row('Amount before VAT', money(k.net)); }
       if (k.deposit_amount) { row('Deposit to confirm (' + num(S.deposit_percent) + '%)', money(k.deposit_amount)); row('Balance after deposit', money(k.balance_after_deposit)); }
     }
     function drawItems() {
@@ -213,12 +215,13 @@
       var g2 = h('div', 'qt-grid'); f.appendChild(g2);
       var dv = inp('number', S.discount_value, { min: 0, step: 'any' }, function (v) { S.discount_value = v; recalc(); });
       var dt = sel([['none', 'No overall discount'], ['percent', 'Percent (%) off'], ['fixed', 'Fixed amount (KSh) off']], S.discount_type, function (v) { S.discount_type = v; dv.disabled = v === 'none'; recalc(); }); dv.disabled = S.discount_type === 'none';
+      var vm = sel([['1', 'Prices already include VAT'], ['0', 'Add VAT on top of prices']], S.vat_inclusive ? '1' : '0', function (v) { S.vat_inclusive = v === '1'; recalc(); });
       var vat = inp('number', S.vat_rate, { min: 0, max: 100, step: 'any', list: 'qt-vat' }, function (v) { S.vat_rate = v; recalc(); });
       var dl = h('datalist'); dl.id = 'qt-vat'; ['0', '16'].forEach(function (x) { var o = h('option'); o.value = x; dl.appendChild(o); }); g2.appendChild(dl);
       var df = inp('number', S.delivery_fee, { min: 0, step: 'any' }, function (v) { S.delivery_fee = v; recalc(); });
       var dp = inp('number', S.deposit_percent, { min: 0, max: 100, step: 'any' }, function (v) { S.deposit_percent = v; recalc(); });
       var vd = inp('number', S.valid_days, { min: 1, max: 365, step: 1 }, function (v) { S.valid_days = v; });
-      [['Overall discount', dt], ['Discount value', dv], ['VAT % (0 = none, 16 = standard)', vat], ['Delivery fee (KSh)', df], ['Deposit required (%)', dp], ['Valid for (days)', vd]].forEach(function (x) { g2.appendChild(fld(x[0], x[1])); });
+      [['Overall discount', dt], ['Discount value', dv], ['VAT treatment', vm], ['VAT % (0 = no VAT, 16 = standard)', vat], ['Delivery fee (KSh)', df], ['Deposit required (%)', dp], ['Valid for (days)', vd]].forEach(function (x) { g2.appendChild(fld(x[0], x[1])); });
 
       totBox = h('div', 'qt-tot'); f.appendChild(totBox); recalc();
 
