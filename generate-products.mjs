@@ -718,3 +718,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-08: refresh BM100 capacitor photo after confirming its DU201063 part reference.
 
 // 2026-11-08: rebuild product pages after adding 15 model-matched Bajaj Boxer spare parts with supplier photos.
+
+// 2026-11-08: rebuild motorcycle product pages after adding 15 researched Boxer and TVS spare parts with matched images.
