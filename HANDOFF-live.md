@@ -1,3 +1,35 @@
+## 2026-11-09 — SEO structure, category hubs and sitemap corrections
+
+### Done
+- Catalogue identity cleanup remains verified: 729 active products; 0 blank `seo_name`; 0 blank `seo_title`; 0 titles over 60 characters; 0 missing category IDs; 0 empty image arrays.
+- Added a build-time catalogue guard and tests. The latest product-page run passed the category-hub test, Google indexing guard, SEO metadata tests, owner title limit test, catalogue guard, page-content tests, and active-product page guard.
+- Added eight parent category hubs and aligned product breadcrumbs with category parents. The generator now creates 54 category landing pages plus `/c/index.html` (55 HTML files in `c/`). All eight new hub pages appear in the category index.
+- Verified a phone product breadcrumb and BreadcrumbList JSON-LD now agree: Home > Phones & Accessories > Phones & Tablets > product.
+- Corrected the kitchen-dining parent mapping from Appliances to Home & Kitchen.
+- Fixed product meta-description fallback ordering and the image sitemap's double-escaped ampersands.
+- Excluded the seven confirmed missing legacy product photos from `sitemap-images.xml`. Latest verified image sitemap: 668 image entries, zero `&amp;amp;` occurrences, none of the seven broken paths listed.
+- Added `pest-control/sitemap.xml` to the Google Search Console sitemap submission list and wired the sitemap workflow to run when the list changes. Google sitemap ping run `42526976909` completed successfully; run URL: https://github.com/stermontmall/stermontmall.github.io/actions/runs/42526976909.
+- SEO extras run `42527071898` completed successfully and regenerated image sitemap + `llms.txt`: https://github.com/stermontmall/stermontmall.github.io/actions/runs/42527071898.
+- Product/category generated pages were saved in commit `67f389f787e80abbdbb649c6989fbd8eca3143c4`; GitHub Pages deployment run `42527018892` completed successfully: https://github.com/stermontmall/stermontmall.github.io/actions/runs/42527018892.
+
+### Newly discovered product-copy issue — NOT DONE
+A full whitespace word-count audit of all 729 active descriptions found:
+- 0 below 600 words
+- 272 between 600 and 800 words
+- 457 above 800 words
+
+Inspection of the first overlength product (Hisense HMC6MBK pressure cooker) shows the older description has a specific original section followed by a long generic `PRODUCT BUYING GUIDE` block. Similar repeated boilerplate appears in the overlength group. These 457 descriptions must be rewritten/condensed to unique, product-specific 600–800-word copy. Do not simply truncate at 800 words or retain the generic block. Back up original text in `public.description_backup` before every batch update. The next batch is the first 30 overlength rows from the 2026-11-09 audit; exact IDs are available by querying active descriptions >800 words ordered by `created_at`.
+
+### Remaining blockers
+1. Seven product photo references still need exact replacement images uploaded to Supabase Storage and visually checked: acetochlor-50-ec-herbicide-1-litre, jade-premium-bio-pesticide-1-litre, one-touch-crop-protector-insecticide-250-ml, ortiva-250-sc-fungicide-1-litre, total-touch-250-sc-insecticide-1-litre, touchdown-herbicide-1-litre, tower-extreme-680-wg-fungicide-1-kg. They are excluded from the image sitemap only; product pages still reference them.
+2. Product-page run `42526989268` had all build, test, save and page-guard steps green; IndexNow was still running at handoff. Confirm final conclusion.
+3. Live custom-domain HTTP checks were not possible through the browser tool in this session. GitHub Pages deployment completed successfully, but public HTTP 200/canonical/structured-data checks still need an external test.
+4. Confirm latest Google sitemap submission included all five sitemaps: root, products, images, services and pest-control. The latest ping run after adding pest-control succeeded.
+
+### Exact next work
+1. Check `42526989268` final status.
+2. Begin rewriting the first 30 >800-word product descriptions; backup originals first; verify each final description is 600–800 words and product-specific.
+3. Continue in batches until all 457 overlength descriptions are resolved.
 ## 2026-11-09 — SEO catalogue cleanup and rebuild
 
 Owner request: “Fix all well” — organize and repair the site-wide SEO foundation.
