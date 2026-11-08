@@ -241,11 +241,18 @@ const expected = [
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
+const thin = [];
 for (const [id, sections] of Object.entries(content)) {
   assert.ok(Array.isArray(sections) && sections.length >= 2, id + ': add at least two useful sections');
   const text = sections.flatMap(s => [s.heading, ...(s.paragraphs || []), ...(s.bullets || [])]).join(' ');
   const count = text.trim().split(/\s+/).filter(Boolean).length;
-  assert.ok(count >= 140 && count <= 360, id + ': supplementary content should be useful, not padded (' + count + ' words)');
+  // Owner rule 2026-11-08: every page must carry over 600 words in total (description + this content).
+  // Ceiling raised from 360 to 900. Entries under 450 words are listed as thin; STRICT_600=1 makes them fail.
+  assert.ok(count >= 140 && count <= 900, id + ': supplementary content should be useful, not padded (' + count + ' words)');
+  if (count < 450) {
+    thin.push(id + ' (' + count + ' words)');
+    assert.ok(!process.env.STRICT_600, id + ': needs at least 450 words of supplementary content so the page exceeds 600 words (' + count + ' now)');
+  }
   assert.ok(sections.every(s => s.heading && Array.isArray(s.paragraphs) && s.paragraphs.length), id + ': every section needs a heading and paragraphs');
   assert.ok(!/<[^>]+>/.test(text), id + ': store plain text and escape at render time');
   assert.ok(!/guaranteed|#1 rated|top-rated|certified/i.test(text), id + ': remove unsupported claims');
@@ -263,3 +270,4 @@ for (const [id, sections] of Object.entries(content)) {
   }
 }
 console.log('OK: ' + Object.keys(content).length + ' product content entries; model-specific sections validated.');
+if (thin.length) console.log('NOTICE: ' + thin.length + ' entries are under 450 words and still need expanding to meet the over-600-word page standard.');
