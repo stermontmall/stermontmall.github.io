@@ -24,6 +24,18 @@ const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';   // public anon k
 const DIR = process.env.P_DIR || 'p';
 const NAMES_FILE = process.env.NAMES_FILE || 'product-names.json';
 const SEP = ' \u2013 ';
+const TITLE_LIMIT = 60;
+const clipTitle = value => {
+  const s = String(value || '').replace(/\\s+/g, ' ').trim();
+  if (s.length <= TITLE_LIMIT) return s;
+  const suffix = ' – Price in Kenya';
+  const name = s.split(/\\s+[–-]\\s+/)[0].trim();
+  const room = TITLE_LIMIT - suffix.length;
+  const clipped = name.length > room
+    ? name.slice(0, room + 1).replace(/\\s+\\S*$/, '').trim()
+    : name;
+  return (clipped || name.slice(0, room)).trim() + suffix;
+};
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const unesc = s => String(s ?? '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
@@ -33,10 +45,13 @@ const norm = s => unesc(s).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 export function pageTitle(row, multiSize) {
   const full = String(row.seo_title || '').trim();
   if (!full) return '';
-  if (!multiSize) return full;
-  const i = full.indexOf(SEP);
-  const head = String(row.seo_name || '').trim();
-  return i > 0 && head ? head + full.slice(i) : full;
+  let candidate = full;
+  if (multiSize) {
+    const i = full.indexOf(SEP);
+    const head = String(row.seo_name || '').trim();
+    candidate = i > 0 && head ? head + full.slice(i) : full;
+  }
+  return clipTitle(candidate);
 }
 
 // Visible name (H1) for a page: the title up to " - "; on a pack-size page products.seo_name (no size in brackets) when it is set.
