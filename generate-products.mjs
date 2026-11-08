@@ -617,3 +617,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-08: rebuild catalogue for 15 new rodent-control, fly-monitoring and PPE listings.
 
 // 2026-11-08: rebuild catalogue and sitemap for 15 new UV insect-control and flying-pest monitoring products.
+
+// 2026-11-08: rebuild product pages with expanded 600+ word catalogue descriptions.
