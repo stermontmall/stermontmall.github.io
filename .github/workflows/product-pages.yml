@@ -1,4 +1,211 @@
+# Stermont Arcade - rebuilds every product page, category page and the product sitemap automatically.
+# Runs: every 3 hours, when generate-products.mjs changes, and whenever you tap "Run workflow" in the Actions tab.
+# Rebuild requested 2026-11-02: five new products (Mos-Kill vaporizer and coils, Shenke, KMAX 20 L, solar traps).
+name: Build product pages
 
-# 2026-11-08: rebuild product pages and sitemap after publishing three fresh photo-verified Boxer BM150 parts (clutch cable, oil filter and air filter).
+on:
+  schedule:
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'generate-products.mjs'
+      - 'seo-indexing-guard.test.mjs'
+      - 'seo-product-identifiers.mjs'
+      - 'seo-product-identifiers.test.mjs'
+      - 'seo-product-extras.mjs'
+      - 'seo-meta.mjs'
+      - 'seo-safe-meta.mjs'
+      - 'seo-safe-meta.test.mjs'
+      - 'seo-overrides.mjs'
+      - 'seo-overrides.json'
+      - 'seo-titles.mjs'
+      - 'seo-titles.test.mjs'
+      - 'seo-shell-redirect.mjs'
+      - 'seo-related-fill.mjs'
+      - 'product-content.json'
+      - 'product-content.test.mjs'
+      - 'seo-kenya.mjs'
+      - '.github/workflows/product-pages.yml'
 
-# 2026-11-08: rebuild static product pages and sitemap after adding ten fresh TVS HLX photo-backed listings.
+permissions:
+  contents: write
+
+concurrency:
+  group: product-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the site files
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      - name: Test Google indexing safeguards (canonical, robots and sitemap)
+        run: node seo-indexing-guard.test.mjs
+
+      - name: Test validated optional GTIN/MPN Product schema fields
+        run: node seo-product-identifiers.test.mjs
+
+      - name: Test shared SEO metadata rules
+        run: node seo-meta.test.mjs
+
+      - name: Test owner-supplied product title length limits
+        run: node seo-titles.test.mjs
+
+      - name: Test allowlisted ordinary-product meta descriptions
+        run: node seo-safe-meta.test.mjs
+
+      - name: Test hand-written product content
+        run: node product-content.test.mjs
+
+      - name: Build pages and sitemap from the live catalog
+        run: node generate-products.mjs
+
+      - name: Kenya SEO titles, descriptions and price guides (seo-kenya.mjs)
+        continue-on-error: true
+        run: node seo-kenya.mjs
+
+      - name: Apply Google titles, descriptions and FAQs (seo-overrides.json)
+        run: node seo-overrides.mjs
+
+      - name: Apply the owner's exact Google titles (products.seo_title, from the Master Catalog SEO Mapping PDF)
+        continue-on-error: true
+        run: node seo-titles.mjs
+
+      - name: Apply allowlisted ordinary-product meta descriptions only
+        run: node seo-safe-meta.mjs
+
+      - name: Top up related-product links on pages in small categories (seo-related-fill.mjs)
+        continue-on-error: true
+        run: node seo-related-fill.mjs
+
+      - name: Phones on a product or category page go to the mobile shell, crawlers keep the page (seo-shell-redirect.mjs)
+        continue-on-error: true
+        run: node seo-shell-redirect.mjs
+
+      - name: Speed - connect to the shop database early (preconnect)
+        run: |
+          # Safe and repeatable: adds one line to the home page head if it is not there yet.
+          if ! grep -q 'rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co"' index.html; then
+            sed -i '0,/<meta charset="UTF-8">/s##&\n  <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>#' index.html
+          fi
+
+      - name: Warn about broken or placeholder links before saving (link-check.mjs)
+        continue-on-error: true
+        run: node link-check.mjs --warn
+
+      - name: Save changes (only if something changed)
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A p c guides sitemap-products.xml sitemap-state.json sitemap.xml products.html merchant-feed.xml product-names.json index.html
+          if git diff --cached --quiet; then
+            echo "Nothing changed - no commit needed."
+          else
+            git commit -m "Update product pages and sitemap"
+            # Another automation or maintainer may update main while this build is running.
+            # Fetch/rebase and retry a rejected push instead of losing this generated update.
+            for attempt in 1 2 3; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                echo "Generated pages and sitemap saved to main."
+                exit 0
+              fi
+              echo "Push attempt ${attempt} was rejected; retrying after fetching the latest main."
+              sleep $((attempt * 2))
+            done
+            echo "::error::Could not publish generated pages after three push attempts."
+            exit 1
+          fi
+
+      - name: Tell Bing and other search engines about changed pages (IndexNow)
+        run: |
+          if [ "$(git log -1 --format=%s)" != "Update product pages and sitemap" ]; then echo "No new commit - nothing to submit."; exit 0; fi
+          sleep 120   # give GitHub Pages time to publish the new files
+          git diff --name-only --diff-filter=AMD HEAD~1 HEAD | grep -E '^(p|c|guides)/.*\.html$|^products\.html$' | sed 's#^#https://stermontarcade.co.ke/#' | head -9000 > urls.txt || true
+          if [ ! -s urls.txt ]; then echo "No page URLs changed."; exit 0; fi
+          python3 - <<'PY'
+          import json, urllib.request
+          urls = [u.strip() for u in open('urls.txt') if u.strip()]
+          body = {"host": "stermontarcade.co.ke", "key": "8f12b16c2962614f0cce8ada60431436", "keyLocation": "https://stermontarcade.co.ke/8f12b16c2962614f0cce8ada60431436.txt", "urlList": urls}
+          req = urllib.request.Request("https://api.indexnow.org/indexnow", json.dumps(body).encode(), {"Content-Type": "application/json; charset=utf-8"})
+          try:
+              print("IndexNow response:", urllib.request.urlopen(req, timeout=30).status, "for", len(urls), "URLs")
+          except Exception as e:
+              print("IndexNow submit failed (not critical):", e)
+          PY
+
+# Catalog rebuild trigger: publish the ten owner-approved pest-control products (2026-11-05).
+
+# Rebuild catalog after adding the newly verified product records (2026-11-05).
+
+# Catalog rebuild requested after adding 10 verified photo-backed products (2026-11-05).
+
+# Rebuild catalog after the next ten photo-backed products were added (2026-11-05).
+
+# Rebuild after owner-authorized product publication from the Agrovet/Pest Control PDF (2026-11-06).
+
+# Rebuild again after adding Escort 19 EC verified packs (2026-11-06).
+
+# Rebuild after adding three verified PDF products with photo-backed Storage URLs (2026-11-06).
+
+# Rebuild catalogue after owner-directed publication of 20 fertilizer and crop-nutrition products (2026-11-06).
+
+# 2026-11-06: rebuild product pages after replacing the latest 20 product photos.
+
+# 2026-11-06: rebuild after three refreshed supplier-original product photos.
+
+# 2026-11-08: rebuild catalog after owner-approved Essie Mugo pack repricing from Jumia + 15%.
+
+# 2026-11-08: rebuild Tatua Advion 30g page after replacing its product image.
+
+# 2026-11-08: rebuild product pages and product sitemap after publishing 15 new photo-backed PPE products.
+
+# 2026-11-08: rebuild catalogue pages and sitemap after adding 15 new PPE products with photos and long-form SEO descriptions.
+
+# 2026-11-08: rebuild motorcycle spare-parts product pages and sitemap for Kenya-focused catalogue additions.
+
+# 2026-11-08: rebuild product pages and sitemap for the second Kenya-focused Bajaj Boxer spare-parts batch.
+
+# 2026-11-08: rebuild product pages and sitemap after adding 15 new Bajaj Boxer motorcycle spare parts with photos and Kenya SEO content.
+
+# 2026-11-08: rebuild product pages and sitemap after publishing 15 new Bajaj Boxer spare parts sourced from the official Bajaj East Africa catalogue.
+
+# 2026-11-08: rebuild product pages after replacing mismatched Bajaj Boxer spare-part photos.
+
+# 2026-11-08: include final verified BM150 CDI, BM100 cylinder-head and chain-tensioner image corrections.
+
+# 2026-11-08: refresh Bajaj Boxer crankshaft and lock-kit photos using exact model/part-number supplier references.
+
+# 2026-11-08: rebuild after replacing TVS HLX 125 carburettor photo with a model-matched supplier image.
+
+# 2026-11-08: rebuild product pages after verified Endurance Miles BM150 crankshaft, piston and oil-filter image replacements.
+
+# 2026-11-08: rebuild product pages after exact BM150 exhaust and TVS Apache NF160230 speedometer image replacements.
+
+# 2026-11-08: Rebuild product pages and sitemap after publishing 15 new TVS HLX motorcycle spare parts.
+
+# 2026-11-08: rebuild product pages and sitemap after publishing 20 additional Bajaj Boxer spare parts.
+
+# 2026-11-08: rebuild product detail pages and category thumbnails after Supabase photo-array updates for the latest Bajaj Boxer spare-parts batch.
+
+# 2026-11-08: rebuild static product pages after adding two verified TVS carburettor-adaptor photos and enforcing mandatory photo publication.
+
+# 2026-11-08: rebuild product pages after two verified FDR supplier photos were added to the latest motorcycle spare-parts batch.
+
+# 2026-11-08: rebuild product pages after adding a verified rechargeable mosquito racket photo.
+
+# 2026-11-08: rebuild product pages and sitemap for three fresh photo-verified Boxer BM150 listings.
+
+# 2026-11-08: rebuild static pages and sitemap for three additional fresh photo-backed spare parts.
+
+# 2026-11-08 20:55 Africa/Nairobi: restored from 122934a5. Commit 3d378d6b had replaced this whole workflow with comments only, so every push failed to start and no product pages were rebuilt after 19:38.
