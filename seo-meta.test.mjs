@@ -46,6 +46,14 @@ assert.ok(specific.includes('M-Pesa') && specific.includes('47 counties'), `Keny
 assert.notEqual(specific, pdpDescription('Sample Product', { catSlug: 'smartphones' }), 'product-specific copy should differ from generic fallback');
 n += 4;
 
+// Long product sentences must not be clipped into a broken fragment in Google snippets.
+const longFact = pdpDescription('Infinix Smart 20, 4GB RAM, 128GB', { catSlug: 'smartphones' },
+  'This Infinix Smart 20 listing is the 4GB RAM and 128GB storage configuration. It shares the model display and battery specification.');
+assert.ok(longFact.length <= DESC_MAX);
+assert.ok(!/storage…\\./i.test(longFact), `meta description contains a cut-off product fact: ${longFact}`);
+assert.ok(longFact.includes('M-Pesa') && longFact.includes('47 counties'));
+n += 3;
+
 for (const [c, slug] of cats) {
   const t = catTitle(c), d = catDescription(c, slug); n += 2;
   assert.ok(t.length <= TITLE_MAX, `cat title ${t.length}: ${t}`);
