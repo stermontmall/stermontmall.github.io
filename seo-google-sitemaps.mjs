@@ -9,7 +9,11 @@ import { createSign } from 'node:crypto';
 const SITE = 'https://stermontarcade.co.ke';
 const SITEMAPS = [`${SITE}/sitemap.xml`, `${SITE}/sitemap-products.xml`, `${SITE}/sitemap-images.xml`, `${SITE}/services/sitemap-services.xml`, `${SITE}/pest-control/sitemap.xml`];
 const raw = process.env.GSC_SERVICE_ACCOUNT_JSON, property = process.env.GSC_PROPERTY;
-if (!raw || !property) { console.log('Skipped: add the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets to turn this on.'); process.exit(0); }
+if (!raw || !property) {
+  console.error('Google sitemap submission is NOT configured. Add repository Actions secrets GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY, then rerun this workflow.');
+  console.error('Failing this job deliberately so GitHub Actions cannot report a green indexing run when Google was never contacted.');
+  process.exit(1);
+}
 
 const key = JSON.parse(raw);
 const b64 = o => Buffer.from(typeof o === 'string' ? o : JSON.stringify(o)).toString('base64url');
