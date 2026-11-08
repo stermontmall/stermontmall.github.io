@@ -45,6 +45,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Test Google indexing safeguards (canonical, robots and sitemap)
+        run: node seo-indexing-guard.test.mjs
+
       - name: Test shared SEO metadata rules
         run: node seo-meta.test.mjs
 
