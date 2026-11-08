@@ -81,6 +81,36 @@
       location.replace('/?' + q.toString());
     } catch (e) {}
   })();
+  </script>
+  <style>/* Product link (/?product=<slug>): do not show the Home view first. The Home screen stays hidden behind a small spinner until the product page is open, and the
+     product page then appears at once (no slide-in). Removed again by the script below as soon as the product page is open, an error toast or the grid error shows,
+     or after 10 s. Only addresses with ?product= are affected. To undo: delete this style block and the next script block. */
+  html.deep-open #appbar,html.deep-open #views,html.deep-open #bottom-nav,html.deep-open #wa-float{visibility:hidden!important}
+  html.deep-open .sheet,html.deep-open .scrim{transition:none!important}
+  html.deep-open body{background:#fff}
+  html.deep-open body::after{content:"";position:fixed;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border:3px solid #ddd6fe;border-top-color:#7c3aed;border-radius:50%;animation:deepspin .8s linear infinite;z-index:1}
+  @keyframes deepspin{to{transform:rotate(360deg)}}</style>
+  <script>
+  (function () {
+    try {
+      if (!/[?&]product=/.test(location.search)) return;
+      var h = document.documentElement, mo = null;
+      h.classList.add('deep-open');
+      var done = function () { h.classList.remove('deep-open'); if (mo) mo.disconnect(); };
+      var end = function () { requestAnimationFrame(function () { requestAnimationFrame(done); }); };   // two frames, so the instant (no-transition) open is painted before transitions come back
+      setTimeout(done, 10000);
+      var check = function () {
+        var pg = document.getElementById('page-product'), t = document.getElementById('toast'), g = document.getElementById('grid-empty');
+        if ((pg && pg.classList.contains('open')) || (t && t.style.opacity === '1') || (g && !g.hidden && /Could not/.test(g.textContent))) { end(); return true; }
+        return false;
+      };
+      document.addEventListener('DOMContentLoaded', function () {
+        if (check()) return;
+        mo = new MutationObserver(check);
+        mo.observe(document.body, { subtree: true, attributes: true, childList: true, characterData: true, attributeFilter: ['class', 'style', 'hidden'] });
+      });
+    } catch (e) {}
+  })();
   </script></head>
 <body class="min-h-dvh">
 <!-- The primary page heading is visible in the home view below. -->
