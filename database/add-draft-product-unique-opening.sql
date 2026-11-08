@@ -38,7 +38,13 @@ begin
   v_id := left(v_id, 70);
   if v_id = '' then v_id := 'product'; end if;
   if exists (select 1 from products where id = v_id) then v_id := v_id || '-' || substr(md5(random()::text), 1, 5); end if;
-  v_title := case when char_length(v_name || ' – Price in Kenya') <= 60 then v_name || ' – Price in Kenya' else left(v_name || ' – Kenya', 60) end;
+  v_title := case when char_length(v_name || ' – Price in Kenya') <= 60 then v_name || ' – Price in Kenya' else regexp_replace(left(v_name, 60 - char_length(' – Price in Kenya')), '[[:space:]]+[^[:space:]]*
+  insert into products (id, slug, name, seo_name, seo_title, description, price, cost, old_price, unit, category_id, images, active, stock, low_at, featured)
+  values (v_id, v_id, v_name, v_name, v_title, v_desc, v_selling_price, v_source_cost, null, coalesce(nullif(btrim(p_unit), ''), 'piece'), p_category_id, '{}', false, 1000, 20, false);
+  return v_id;
+end
+$function$;
+, '') || ' – Price in Kenya' end;
   insert into products (id, slug, name, seo_name, seo_title, description, price, cost, old_price, unit, category_id, images, active, stock, low_at, featured)
   values (v_id, v_id, v_name, v_name, v_title, v_desc, v_selling_price, v_source_cost, null, coalesce(nullif(btrim(p_unit), ''), 'piece'), p_category_id, '{}', false, 1000, 20, false);
   return v_id;
