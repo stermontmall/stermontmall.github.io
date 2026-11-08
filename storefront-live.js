@@ -69,6 +69,12 @@
     '#stm-pd .body{padding:1rem;max-width:980px;margin:0 auto}' +
     '#stm-pd .main{aspect-ratio:1;background:#fff;border:1px solid #ece8f6;border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:pan-y}' +
     '#stm-pd .main img{width:100%;height:100%;object-fit:contain}#stm-pd .ph{font-size:4rem}' +
+    '#stm-pd .mw{position:relative}#stm-pd .gnav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#5b21b6;font-size:1.6rem;line-height:1;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.22);display:grid;place-items:center;padding:0}#stm-pd .gnav.gp{left:.5rem}#stm-pd .gnav.gn{right:.5rem}' +
+    '#stm-pd .gctr{position:absolute;right:.6rem;bottom:.6rem;z-index:2;background:rgba(27,18,48,.72);color:#fff;font-size:.75rem;font-weight:700;border-radius:999px;padding:.2rem .6rem}#stm-pd .mw.one .gnav,#stm-pd .mw.one .gctr{display:none}' +
+    '#stm-pd .pn{display:flex;gap:.6rem;margin:1.1rem 0 .4rem;padding-top:.9rem;border-top:1px solid #ece8f6}#stm-pd .pn[hidden]{display:none}' +
+    '#stm-pd .pnb{flex:1;min-width:0;border:1px solid #d9d2ee;background:#fff;color:#5b21b6;border-radius:12px;padding:.65rem .8rem;font:inherit;font-weight:700;cursor:pointer;display:flex;flex-direction:column;gap:.1rem;text-align:left}#stm-pd .pnb.pnn{text-align:right;align-items:flex-end}' +
+    '#stm-pd .pnb small{font-weight:600;font-size:.78rem;color:#6b6480;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}#stm-pd .pnb[disabled]{opacity:.4;cursor:default}' +
+    '#stm-pd .gnav:focus-visible,#stm-pd .pnb:focus-visible{outline:3px solid #7c3aed;outline-offset:2px}' +
     '#stm-pd .thumbs{display:flex;gap:.5rem;overflow-x:auto;margin-top:.6rem;padding-bottom:.2rem}' +
     '#stm-pd .thumbs img{width:62px;height:62px;object-fit:cover;border-radius:10px;border:2px solid transparent;cursor:pointer;flex:none;background:#fff}#stm-pd .thumbs img.on{border-color:#7c3aed}' +
     '#stm-pd h2{font-size:1.25rem;line-height:1.3;margin:.9rem 0 .35rem}#stm-pd .pr{font-size:1.7rem;font-weight:800;color:#5b21b6;margin:.1rem 0 .4rem}' +
@@ -125,9 +131,10 @@
     if (pd) return;
     var st = mk('style'); st.textContent = CSS; D.head.appendChild(st);
     pd = mk('div'); pd.id = 'stm-pd'; pd.setAttribute('role', 'dialog'); pd.setAttribute('aria-modal', 'true');
-    pd.innerHTML = '<div class="pd"><div class="bar"><button type="button" class="back">← Back</button><b></b></div><a class="wat" target="_blank" rel="noopener">\uD83D\uDCAC Ask about this item on WhatsApp</a><div class="body"><div class="gal"><div class="main"></div><div class="thumbs"></div></div>' +
+    pd.innerHTML = '<div class="pd"><div class="bar"><button type="button" class="back">← Back</button><b></b></div><a class="wat" target="_blank" rel="noopener">\uD83D\uDCAC Ask about this item on WhatsApp</a><div class="body"><div class="gal"><div class="mw one"><div class="main"></div><button type="button" class="gnav gp" aria-label="Previous photo">‹</button><button type="button" class="gnav gn" aria-label="Next photo">›</button><span class="gctr" aria-live="polite"></span></div><div class="thumbs"></div></div>' +
       '<div class="info"><h2></h2><div class="pr"></div><div class="vopts" hidden></div><div class="unit-l" hidden style="color:#6b6b6b;font-size:.9rem;margin:-.2rem 0 .5rem"></div><div class="pdw" hidden></div><span class="st"></span><div><a class="wa" target="_blank" rel="noopener">Ask about this item on WhatsApp</a></div></div>' +
-      '<div class="full"><h3 class="dh">Product details</h3><div class="desc"></div><button type="button" class="more" hidden>Show more ▾</button></div></div>' +
+      '<div class="full"><h3 class="dh">Product details</h3><div class="desc"></div><button type="button" class="more" hidden>Show more ▾</button></div>' +
+      '<div class="full pn" hidden><button type="button" class="pnb pnp"><span>‹ Previous product</span><small></small></button><button type="button" class="pnb pnn"><span>Next product ›</span><small></small></button></div></div>' +
       '<div class="act"><div class="q"><button type="button" class="mn" aria-label="Less">−</button><span>1</span><button type="button" class="pl" aria-label="More">+</button></div><button type="button" class="add">Add to cart</button><button type="button" class="cart">🛒 Cart</button></div></div>';
     D.body.appendChild(pd);
     var q = function (s) { return pd.querySelector(s); };
@@ -136,6 +143,10 @@
     pd.addEventListener('click', function (e) { if (e.target === pd) closeView(); });
     q('.mn').onclick = function () { setQty(qty - 1); };
     q('.pl').onclick = function () { setQty(qty + 1); };
+    q('.gp').onclick = function () { if (imgs.length > 1) show(idx - 1); };
+    q('.gn').onclick = function () { if (imgs.length > 1) show(idx + 1); };
+    q('.pnp').onclick = function () { stepProduct(-1); };
+    q('.pnn').onclick = function () { stepProduct(1); };
     q('.cart').onclick = function () { hide(); window.STM && STM.open(); };
     q('.add').onclick = function () {
       if (!cur || !window.STM) return; var hh = cur.querySelector('h3'), h0 = hh && hh.textContent; if (hh && cur._p.variant_label) hh.textContent = cur._p.name; try { STM.add(cur, null, qty); } finally { if (hh) hh.textContent = h0; } var b = q('.add'); b.textContent = '✓ Added to cart'; setTimeout(function () { if (cur && cur._p.stock > 0) b.textContent = 'Add to cart'; }, 1600);
@@ -144,7 +155,11 @@
     var sx = 0, main = q('.main');
     main.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
     main.addEventListener('touchend', function (e) { var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40 && imgs.length > 1) show(idx + (dx < 0 ? 1 : -1)); }, { passive: true });
-    D.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pd.classList.contains('on')) closeView(); });
+    D.addEventListener('keydown', function (e) {
+      if (!pd.classList.contains('on')) return;
+      if (e.key === 'Escape') closeView();
+      else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && imgs.length > 1 && !(e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))) show(idx + (e.key === 'ArrowRight' ? 1 : -1));
+    });
     window.addEventListener('popstate', function () { if (pd.classList.contains('on')) hide(); });
   }
   function setQty(n) { var max = Math.max(1, Math.min(99, cur ? cur._p.stock : 1)); qty = Math.max(1, Math.min(max, n)); pd.querySelector('.q span').textContent = qty; }
@@ -152,6 +167,24 @@
     idx = (n + imgs.length) % imgs.length; var m = pd.querySelector('.main'); m.textContent = '';
     if (imgs.length) { var i = new Image(); i.src = imgs[idx]; i.alt = cur ? cur._p.name : ''; m.appendChild(i); } else { m.appendChild(mk('div', 'ph', '📦')); }
     [].forEach.call(pd.querySelectorAll('.thumbs img'), function (t, k) { t.classList.toggle('on', k === idx); });
+    pd.querySelector('.mw').classList.toggle('one', imgs.length < 2);
+    pd.querySelector('.gctr').textContent = imgs.length > 1 ? (idx + 1) + ' / ' + imgs.length : '';
+  }
+  /* previous / next product: the neighbours of the open card in the same list (category grid or featured row), skipping hidden pack sizes and filtered-out cards */
+  function siblings() {
+    if (!cur || !cur.parentNode) return [];
+    return [].filter.call(cur.parentNode.children, function (n) { return n.classList && n.classList.contains('pcard') && !n.classList.contains('vhide') && !n.classList.contains('dealhide') && n._p; });
+  }
+  function stepProduct(d) {
+    var l = siblings(), n = l[l.indexOf(cur) + d]; if (!n) return;
+    openView(n, true, true); pd.querySelector('.pd').scrollTop = 0;   /* replaces the URL in place, so Back still closes the view in one tap */
+  }
+  function paintNav() {
+    var l = siblings(), i = l.indexOf(cur), box = pd.querySelector('.pn'), pb = pd.querySelector('.pnp'), nb = pd.querySelector('.pnn'), a = i > 0 ? l[i - 1] : null, b = i > -1 ? l[i + 1] : null;
+    box.hidden = l.length < 2 || i < 0;
+    pb.disabled = !a; nb.disabled = !b;
+    pb.querySelector('small').textContent = a ? (a._p.vbase || a._p.name) : '';
+    nb.querySelector('small').textContent = b ? (b._p.vbase || b._p.name) : '';
   }
   function fmtDesc(text) {
     var box = mk('div');
@@ -193,10 +226,11 @@
     pd.classList.add('on'); D.documentElement.style.overflow = 'hidden'; if (!keep) q('.pd').scrollTop = 0;
     var more = q('.more'); d.classList.remove('clip'); more.hidden = true;
     if (d.scrollHeight > 270) { d.classList.add('clip'); more.hidden = false; more.textContent = 'Show more ▾'; }
+    paintNav();
     /* address bar shows the straight product URL; remember the page we came from so closing the view puts it back */
     if (!BASE && location.pathname.indexOf('/p/') !== 0) BASE = location.pathname + location.search;
     if (!noPush) { try { history.pushState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }
-    else if (keep) { try { history.replaceState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }   /* switching pack size: update the URL in place */
+    else if (keep) { try { history.replaceState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }   /* switching pack size or product: update the URL in place */
     setMeta(p);   /* tab title + meta description now match the product that is open */
   }
   function hide() {
