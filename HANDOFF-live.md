@@ -1,3 +1,12 @@
+## 2026-11-08 19:55 Africa/Nairobi - "links go to classic.html before the mobile shell" investigation (branch `wip-no-classic-hop`, from main f9fc911)
+Owner: "Now my links go to classic html before going to mobile shell. Fix the issue permanently". Symptom not yet pinned down.
+- [x] Traced real redirect chains in headless Chromium (phone 390px + desktop 1280px) against current main. NO ordinary link goes through classic.html: `/?product=`, `/p/<slug>.html` (phone: head script -> `/?product=`), `/c/<slug>.html`, `/#p-<slug>`, `/index.html`, `/mobile-shell/`, `/`, `/account.html` -> 0 requests to classic.html.
+- [x] Only two things reach classic.html: (1) direct `/classic.html` URLs (old bookmarks / old shared cart links `/classic.html?cart=...`) which hop once and land on `/` ; (2) the shell's Checkout button, which loads `/classic.html?checkout=1` in an iframe (`mobile-shell/app.js` line ~558; the whole 128 KB old home page loads and waits up to ~12 s for its cards before the checkout drawer opens).
+- [x] Ruled out: service worker (`sw.js` is network-first, cannot serve a stale index.html), Supabase `products.description`/`categories` (0 rows mention classic.html), other pages (no href to classic.html outside handoff notes).
+- [x] Also noted: on DESKTOP width (>820px) a `/p/<slug>.html` link stays on the static page (shell-chrome.js redirects phones only, owner decision 2026-11-08). If "classic html" means that static page, the fix is to redirect desktop too.
+- [ ] BLOCKED on owner answer: which link shows classic.html / the old page. Options: Checkout button, shared product link on desktop, old bookmark or shared cart link.
+- [ ] Earlier branch `wip-broken-links-fix` (pushed, fc1e8d4, based on old main) is still unmerged: 404 fallback, 30-min rebuild, page guard. Rebase onto main before merging.
+
 
 
 ## 2026-11-08 20:xx Africa/Nairobi - emoji/placeholder product photo audit
