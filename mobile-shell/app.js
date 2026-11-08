@@ -55,13 +55,15 @@ function buildCatalog(rows, cats, names) {
       subs: cats.filter(s => s.parent_id === c.id && subHave.has(c.slug + '|' + s.name)).sort((a, b) => a.sort_order - b.sort_order || a.id - b.id).map(s => s.name) }));
 }
 let catalogP = null;
+let fullCatalog = false;   // true once the WHOLE catalog is in PRODUCTS (the product link fast path in section 9b must never overwrite it)
+const PRODUCT_COLS = 'id,slug,name,category_id,price,old_price,stock,featured,images,unit,variant_group,variant_label';
 function loadCatalog() {
   if (!catalogP) {
     catalogP = Promise.all([
-      api('products?active=eq.true&select=id,slug,name,category_id,price,old_price,stock,featured,images,unit,variant_group,variant_label&order=created_at.asc'),
+      api('products?active=eq.true&select=' + PRODUCT_COLS + '&order=created_at.asc'),
       api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
       fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}))
-    ]).then(([rows, cats, names]) => buildCatalog(rows, cats, names)).catch(e => { catalogP = null; throw e; });  // a failed load can be retried
+    ]).then(([rows, cats, names]) => { buildCatalog(rows, cats, names); fullCatalog = true; }).catch(e => { catalogP = null; throw e; });  // a failed load can be retried
   }
   return catalogP;
 }
@@ -179,6 +181,7 @@ window.addEventListener('popstate', e => {
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
 const DEEP = new URLSearchParams(location.search).get('product');   // /?product=<slug>: a shared or reloaded product address, opened after the catalog loads
+let deepOpen = false;   // the product page for DEEP has been opened (by the fast path in section 9b, or after the full catalog)
 /* /?cart=<product id>:<qty>,<product id>:<qty>: a shared cart link (the Share cart link button). The cart itself lives in each phone's own storage, so the link
    carries the lines. They are kept in sessionStorage until the catalog has added them, so a reload before that does not lose them. */
 const CART_DEEP = (() => {
@@ -468,8 +471,37 @@ function openQuickBuy(id) {
 function openDeepLink(slug) {   // the full product page for a /?product=<slug> address (any pack size's slug works)
   const p = PRODUCTS.find(x => x.slug === slug || x.sizes.some(z => z.slug === slug));
   if (!p) { toast('That product is no longer available'); return; }
+  deepOpen = true;
   qb.p = p; qb.size = (p.sizes.find(z => z.slug === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
   renderQB(); openProductPage();
+}
+/* FAST PATH for /?product=<slug> (owner 2026-11-08: the link must go straight to the product, not wait for the whole catalog).
+   It reads only what that one product needs: its row, the other rows of its pack-size group, the (small) category list and product-names.json, in parallel with
+   the full catalog that Home still loads in the background, and opens the product page as soon as they arrive. When the full catalog lands, the open page is
+   refreshed (refreshDeep) so "More like this" fills in. If anything here fails or finds nothing (sold out, unknown slug), the normal path after the full catalog
+   still runs, so the behaviour is never worse than before. To undo: delete this function and the call to it in section 11. */
+async function quickDeepLink(slug) {
+  try {
+    if (!/^[A-Za-z0-9._%~-]+$/.test(slug)) return;
+    const [cats, names, rows0] = await Promise.all([
+      api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
+      fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({})),
+      api('products?active=eq.true&slug=eq.' + encodeURIComponent(slug) + '&select=' + PRODUCT_COLS)
+    ]);
+    if (deepOpen || fullCatalog || !rows0.length) return;
+    let rows = rows0; const g = rows0[0].variant_group;
+    if (g) { rows = await api('products?active=eq.true&variant_group=eq.' + encodeURIComponent(g) + '&select=' + PRODUCT_COLS); if (deepOpen || fullCatalog || !rows.length) return; }
+    buildCatalog(rows, cats, names);   // PRODUCTS = just this product; the full catalog replaces it when it arrives
+    if (!PRODUCTS.some(x => x.slug === slug || x.sizes.some(z => z.slug === slug))) { PRODUCTS = []; CATS = []; return; }
+    openDeepLink(slug);
+  } catch (e) { if (!deepOpen && !fullCatalog) { PRODUCTS = []; CATS = []; } }
+}
+function refreshDeep() {   // the full catalog is in: swap in the full product entry and redraw the open product page (related products, any size changes)
+  if (!qb.p) return;
+  const f = PRODUCTS.find(x => x.id === qb.p.id); if (!f) return;
+  qb.p = f; if (!f.sizes.some(s => s.label === qb.size)) qb.size = f.sizes[0].label;
+  if (stack.includes('page-product')) renderPP();
+  renderQB();
 }
 function openCatLink(slug) {   // the Home grid filtered to a /?cat=<slug> address: a top-level category, or a sub-category (its top-level parent + the sub name)
   const c = CATROWS.find(x => x.slug === slug), top = c && (c.parent_id ? CATROWS.find(x => x.id === c.parent_id) : c), t = top && CATS.find(x => x.id === top.slug);
@@ -597,8 +629,9 @@ $('#search-form').addEventListener('submit', e => {
 if (Q_DEEP && !DEEP && !CAT_DEEP) { store.set({ q: Q_DEEP }); $('#search').value = Q_DEEP; }   // a search typed on a static page
 const RESTORE_CAT = !DEEP && !CAT_DEEP && !Q_DEEP && !CART_DEEP.length && SAVED_CAT;   // a reload keeps the chosen category (checked against the live categories once they load)
 if (RESTORE_CAT) store.set({ chip: SAVED_CAT.chip, sub: SAVED_CAT.sub });
+if (DEEP) quickDeepLink(DEEP);   // product link: start the one-product fast path BEFORE the full catalog request below, so it is first in line
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
 if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
 if (CART_DEEP.length) toast('Loading shared cart...');
-loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) { store.set({ sub: '' }); refreshGrid(); } else $('#grid-title').textContent = store.get().sub || t.name; } } renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) openDeepLink(DEEP); else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
+loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) { store.set({ sub: '' }); refreshGrid(); } else $('#grid-title').textContent = store.get().sub || t.name; } } renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) { if (deepOpen) refreshDeep(); else openDeepLink(DEEP); } else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
 })();
