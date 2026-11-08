@@ -1,5 +1,8 @@
 # Instructions for any Claude session on this repo
 
+## Content standard — mandatory (owner rule 2026-11-08)
+All SEO, product, category and blog content must be high quality, Kenya-focused, high-intent and OVER 600 words per page. See "CONTENT STANDARD" in `PUBLISHING.md`. Never pad, never invent facts or statistics, never fake reviews. Task log for this work: `HANDOFF-seo-600.md`.
+
 ## Product posting — mandatory
 If the owner asks to add/post/list an advert or product, or attach product photos:
 1. Read `PUBLISHING.md` FIRST and follow it.

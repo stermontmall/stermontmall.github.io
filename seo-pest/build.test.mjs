@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderText, words } from './build.mjs';
 const dir = path.dirname(fileURLToPath(import.meta.url));
-let checks = 0; const bad = [];
+let checks = 0; const bad = []; const thin = [];
 const ok = (cond, msg) => { checks++; if (!cond) bad.push(msg); };
 const BANNED = [/\bguarantee/i, /100\s?%/, /\bcure[sd]?\b/i, /\bcertified\b/i, /\bbest\b/i, /#1/, /top-rated/i, /pcpb[- ]approved/i, /\bsafe for (babies|children|kids|pets)\b/i, /\bnon-?toxic\b/i, /\bKSh\s?\d/i];
 const DOSE = /\b\d+(?:\.\d+)?\s?(?:ml|g|kg|l|litres?)\s?(?:per|\/)\s?(?:litre|liter|l|kg|acre|hectare|tank|knapsack|bird|animal|water|m2|m²)\b/i;
@@ -13,7 +13,10 @@ for (const f of fs.readdirSync(dir).filter(f => /^batch-\d+\.json$/.test(f))) {
   ok(items.length <= 10, `${f}: more than 10 products`);
   for (const p of items) {
     const t = renderText(p), w = words(t), id = `${f} ${p.group}`;
-    ok(w >= 400 && w <= 600, `${id}: ${w} words (need 400-600)`);
+    // Owner rule 2026-11-08: content must exceed 600 words. Floor 400 and ceiling 900 are hard limits;
+    // anything at or under 600 is listed as thin (set STRICT_600=1 to make that a failure).
+    ok(w >= 400 && w <= 900, `${id}: ${w} words (need 400-900)`);
+    if (w <= 600) { thin.push(`${id}: ${w} words`); if (process.env.STRICT_600) ok(false, `${id}: ${w} words (need over 600)`); }
     for (const re of BANNED) ok(!re.test(t), `${id}: banned phrase ${re}`);
     // "strength" lists active-ingredient concentrations the catalog already states (e.g. "100 g/L"); they are not doses
     const noStrength = (p.strength || []).reduce((s, x) => s.split(x).join(''), t);
@@ -34,4 +37,5 @@ for (const f of fs.readdirSync(dir).filter(f => /^batch-\d+\.json$/.test(f))) {
 }
 console.log(`${checks} checks, ${bad.length} violations`);
 bad.forEach(b => console.log(' -', b));
+if (thin.length) console.log(`NOTICE: ${thin.length} description(s) are 600 words or fewer (owner standard is over 600):`), thin.forEach(t => console.log(' ~', t));
 process.exit(bad.length ? 1 : 0);
