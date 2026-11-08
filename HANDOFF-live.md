@@ -1,3 +1,9 @@
+## 2026-11-08 12:45 Africa/Nairobi - quotation item picker (branch `wip-quotation-item-picker-20261108`)
+Owner: "Add all the items to the items section of the quotation so that I search and select".
+- [x] `admin-quotations.js?v=2`: Items section now has a search box over EVERY product (active and hidden, with stock) and every service from `service_catalog` (price_min as price, open-price services leave it blank). Tap a result to add it; tapping again adds quantity. The item name box still suggests as you type.
+- [x] Tested with Playwright against a mocked Supabase (search filter, add product and service, qty bump, blank price for open-price service). Not tested against live data or a real staff login.
+- [ ] NEXT: owner opens /admin.html > Orders > Quotations > New quotation and tries the search.
+
 ## 2026-11-08 12:40 Africa/Nairobi - admin Quotations added (branch `wip-admin-quotations-20261108`)
 Owner: "Add an option of admin generation Quotation for different clients and enable all options. Make it exactly like the receipt".
 - [x] Supabase migration `client_quotations_table` applied (also saved as `setup-client-quotations.sql`): table `public.client_quotations` + sequence, refs like `QT-2611-0001`, RLS = staff only (`is_staff()`), no anon access.

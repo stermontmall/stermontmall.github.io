@@ -73,7 +73,7 @@
     root.textContent = '';
     var c = h('div'); root.appendChild(c);
     if (!Q()) { c.appendChild(h('div', 'err', 'The quotation tool did not load. Refresh the page (Ctrl+F5).')); return; }
-    var S = blank(), rows = [], filter = 'all', needle = '', clients = {}, products = {}, busy = false;
+    var S = blank(), rows = [], filter = 'all', needle = '', clients = {}, products = {}, catalog = [], pickRender = null, busy = false;
     var msgBox = h('div', 'err'); msgBox.hidden = true; c.appendChild(msgBox);
     function msg(t, ok) { msgBox.textContent = t || ''; msgBox.style.color = ok ? '#15803d' : ''; msgBox.style.background = ok ? '#dcfce7' : ''; msgBox.hidden = !t; }
     var bar = h('div', 'card'); c.appendChild(bar);
@@ -92,9 +92,16 @@
     }
     function loadSuggest() {
       req('/rest/v1/orders?select=customer_name,phone,email&order=created_at.desc&limit=400').then(function (r) { (r || []).forEach(function (o) { addClient(o.customer_name, '', o.phone, o.email); }); drawClients(); }).catch(function () {});
-      req('/rest/v1/products?select=name,price&active=eq.true&order=name&limit=1500').then(function (r) {
-        dlP.textContent = ''; (r || []).forEach(function (p) { products[String(p.name).toLowerCase()] = p; var o = h('option'); o.value = p.name; o.label = money(p.price); dlP.appendChild(o); });
-      }).catch(function () {});
+      function addCat(it) { catalog.push(it); products[it.name.toLowerCase()] = it; if (!it.off) { var o = h('option'); o.value = it.name; o.label = money(it.price); dlP.appendChild(o); } }
+      function done() { catalog.sort(function (a, b) { return a.name.localeCompare(b.name); }); if (pickRender) pickRender(); }
+      function title(slug) { return String(slug).replace(/-/g, ' ').replace(/\b[a-z]/g, function (m) { return m.toUpperCase(); }); }
+      req('/rest/v1/products?select=name,price,stock,active&order=name&limit=2000').then(function (r) {
+        (r || []).forEach(function (p) { addCat({ name: String(p.name), price: p.price, stock: p.stock, kind: 'Product', off: !p.active }); });
+      }).catch(function () {}).then(function () {
+        return req('/rest/v1/service_catalog?select=slug,price_min,price_open,active&order=slug').then(function (r) {
+          (r || []).forEach(function (v) { addCat({ name: title(v.slug), price: v.price_open ? '' : v.price_min, kind: 'Service', off: !v.active }); });
+        }).catch(function () {});
+      }).then(done);
     }
 
     /* ---------- form ---------- */
@@ -178,6 +185,27 @@
       [['Client name *', nm], ['Company', co], ['Phone', ph], ['Email', em], ['KRA PIN', pin], ['Address', ad]].forEach(function (x) { g.appendChild(fld(x[0], x[1])); });
 
       f.appendChild(h('div', 'qt-h', 'Items'));
+      var pk = h('div'); pk.style.cssText = 'border:1px solid var(--ln);border-radius:12px;padding:.6rem;margin-bottom:.7rem;background:#faf8ff';
+      var ps = inp('search', '', { placeholder: 'Search all products and services, then tap one to add it' }), pc = h('div', 'meta'), pl = h('div');
+      pl.style.cssText = 'max-height:260px;overflow:auto;margin-top:.4rem'; pk.appendChild(ps); pk.appendChild(pc); pk.appendChild(pl); f.appendChild(pk);
+      function addFromCatalog(p) {
+        var low = p.name.toLowerCase(), ex = S.items.filter(function (i) { return String(i.name).trim().toLowerCase() === low; })[0], em = S.items.filter(function (i) { return !String(i.name).trim(); })[0];
+        if (ex) ex.qty = (num(ex.qty) || 1) + 1; else if (em) { em.name = p.name; em.qty = 1; em.price = p.price; } else S.items.push({ name: p.name, qty: 1, price: p.price, disc: '' });
+        drawItems(); recalc();
+      }
+      function renderPick() {
+        var words = ps.value.toLowerCase().split(/\s+/).filter(Boolean);
+        var hits = catalog.filter(function (p) { var t = (p.name + ' ' + p.kind).toLowerCase(); return words.every(function (w) { return t.indexOf(w) > -1; }); });
+        pc.textContent = catalog.length ? hits.length + ' of ' + catalog.length + ' items' + (hits.length > 60 ? ' (showing the first 60, type more to narrow)' : '') : 'Loading items...';
+        pl.textContent = '';
+        hits.slice(0, 60).forEach(function (p) {
+          var b = h('button'); b.type = 'button'; b.style.cssText = 'display:flex;justify-content:space-between;gap:.6rem;width:100%;text-align:left;border:0;border-bottom:1px solid var(--ln);background:#fff;padding:.5rem .4rem;font:inherit;cursor:pointer';
+          var l = h('span'); l.appendChild(h('b', null, p.name)); l.appendChild(h('small', null, '  ' + p.kind + (p.kind === 'Product' && p.stock != null ? ' · ' + (p.stock > 0 ? p.stock + ' in stock' : 'out of stock') : '') + (p.off ? ' · hidden' : ''))); l.lastChild.style.cssText = 'color:var(--mu)';
+          b.appendChild(l); b.appendChild(h('span', null, p.price === '' || p.price == null ? 'price on quote' : money(p.price))); b.onclick = function () { addFromCatalog(p); };
+          pl.appendChild(b);
+        });
+      }
+      pickRender = renderPick; ps.addEventListener('input', renderPick); renderPick();
       itemsBox = h('div'); f.appendChild(itemsBox); drawItems();
       var ab = h('button', 'btn alt sm', '+ Add item'); ab.type = 'button'; ab.onclick = function () { S.items.push({ name: '', qty: 1, price: '', disc: '' }); drawItems(); }; f.appendChild(ab);
 
