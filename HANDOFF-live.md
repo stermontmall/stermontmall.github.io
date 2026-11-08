@@ -1700,3 +1700,11 @@ Owner confirmed to leave deleted products deleted and create fresh listings only
 - [ ] Product-page/sitemap GitHub Actions deployment is not yet verified. Do not claim static product pages live until the workflow run and generated URLs are checked.
 - [ ] Descriptions are model/fitment-specific and include installation/buying guidance, but are not yet 600+ words. Expand if maintaining prior long-form SEO requirement.
 - Product IDs: bajaj-boxer-bm150-chain-sprocket-kit-fresh-20261108; bajaj-boxer-bm150-piston-ring-set-36pf0116-fresh; tvs-hlx-150-4gear-chain-sprocket-kit-szn6320660-fresh.
+
+
+## 2026-11-08 - Fresh spare-parts batch 2 static pages deployed
+- [x] Product-pages workflow run 42500487307 passed all indexing, metadata, content and link-check steps; live-catalogue page generation and sitemap save succeeded. IndexNow notification was still running at last check.
+- [x] Verified all three generated files exist in repository `p/`: `bajaj-boxer-bm150-chain-sprocket-kit-fresh-20261108.html`, `bajaj-boxer-bm150-piston-ring-set-36pf0116-fresh.html`, and `tvs-hlx-150-4gear-chain-sprocket-kit-szn6320660-fresh.html`.
+- [x] Each generated HTML file contains canonical metadata and Product JSON-LD. All three entries are present in `sitemap-products.xml`.
+- [x] GitHub Pages deployment run 42500522145 completed successfully for the generated-pages commit.
+- Product URLs: https://stermontarcade.co.ke/p/bajaj-boxer-bm150-chain-sprocket-kit-fresh-20261108.html ; https://stermontarcade.co.ke/p/bajaj-boxer-bm150-piston-ring-set-36pf0116-fresh.html ; https://stermontarcade.co.ke/p/tvs-hlx-150-4gear-chain-sprocket-kit-szn6320660-fresh.html
