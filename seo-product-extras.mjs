@@ -170,8 +170,10 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     (GUIDES[slug] || []).filter(g => hasBlog(g[0])).forEach(g => items.push([g[0], esc(g[1])]));
     (SIBLINGS[slug] || []).filter(hasCat).forEach(k => items.push([`/c/${k}.html`, `Shop ${esc(catName(k))}`]));
     if (hub && hasCat(hub)) items.push([`/c/${hub}.html`, `All ${esc(HUB_NAME[hub] || catName(hub))}`]);
-    if (items.length) {
-      const rel = `<div class="box rel"><h2 style="margin-top:0">Related guides and categories</h2><ul>${items.map(([u, t]) => `<li><a href="${u}">${t}</a></li>`).join('')}</ul></div>\n`;
+    // The generator renders the complete product SILO footer (parent, subcategories, related products and guides).
+    // Keep the legacy related-links box only for older product pages without that component.
+    if (items.length && !h.includes('class="product-silo"')) {
+      const rel = `<div class="box rel"><h2 style="margin-top:0">Related guides and categories</h2><ul>${items.map(([u, t]) => `<li><a href="${u}">${t}</a></li>`).join('')}</ul></div>\\n`;
       h = h.replace('<div class="stk"', () => rel + '<div class="stk"');
     }
     if (h !== before) {
