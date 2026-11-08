@@ -47,6 +47,7 @@
 - [Shop Top Home Theatre & Sound Systems Online in Kenya](https://stermontarcade.co.ke/c/home-theatre.html): Order top-quality Home Theatre & Sound Systems online in Kenya. Pay by M-Pesa, Westlands pickup or fast delivery to all 47 counties.
 - [Shop Top Kitchen & Dining Online in Kenya](https://stermontarcade.co.ke/c/kitchen-dining.html): Order top-quality Kitchen & Dining online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
 - [Shop Top Men's Fashion Online in Kenya – M-Pesa & Delivery](https://stermontarcade.co.ke/c/mens-fashion.html): Order top-quality Men's Fashion online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
+- [Shop Top Men's Sneakers Online in Kenya – M-Pesa & Delivery](https://stermontarcade.co.ke/c/mens-sneakers.html): Order top-quality Men's Sneakers online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
 - [Shop Top Mosquito & Fly Control Online in Kenya](https://stermontarcade.co.ke/c/mosquito-fly-control.html): Order PCPB-approved, top-quality Mosquito & Fly Control at wholesale prices in Nairobi. Fast delivery across 47 counties with secure M-Pesa checkout.
 - [Shop Top Motorcycle Accessories Online in Kenya](https://stermontarcade.co.ke/c/motorcycle-accessories.html): Order top-quality Motorcycle Accessories online in Kenya. Pay by M-Pesa, Westlands pickup or fast delivery to all 47 counties.
 - [Shop Top Pest Control & Fumigation Online in Kenya](https://stermontarcade.co.ke/c/pest-control-fumigation.html): Order PCPB-approved, top-quality Pest Control & Fumigation at wholesale prices in Nairobi. Fast delivery across 47 counties with secure M-Pesa checkout.
@@ -69,6 +70,7 @@
 - [Shop Top Watches & Jewellery Online in Kenya](https://stermontarcade.co.ke/c/watches-jewellery.html): Order top-quality Watches & Jewellery online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
 - [Shop Top Water Tanks & Irrigation Online in Kenya](https://stermontarcade.co.ke/c/water-tanks-irrigation.html): Order top-quality Water Tanks & Irrigation online in Kenya. Pay by M-Pesa, Westlands pickup or fast delivery to all 47 counties.
 - [Shop Top Women's Fashion Online in Kenya – M-Pesa & Delivery](https://stermontarcade.co.ke/c/womens-fashion.html): Order top-quality Women's Fashion online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
+- [Shop Top Women's Sneakers Online in Kenya](https://stermontarcade.co.ke/c/womens-sneakers.html): Order top-quality Women's Sneakers online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.
 
 ## Guides
 - [Actellic 25EC: preparing a store before harvest](https://stermontarcade.co.ke/blog/actellic-25ec-preparing-an-empty-store-before-harvest-kenya.html): Spray empty stores and warehouses before stock goes in. Learn how Actellic 25EC pirimiphos-methyl insecticide is used for premises in Kenya.
@@ -143,6 +145,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 602 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 621 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
