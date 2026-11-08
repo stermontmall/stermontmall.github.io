@@ -1,3 +1,12 @@
+
+
+## 2026-11-08 19:09 Africa/Nairobi - audit and repair latest 50 motorcycle spare-part photos
+Owner requested photos for missing items among the latest 50 products and a permanent prevention fix.
+- [x] Audited the latest 50 rows in public.products: initially 11 had empty images arrays. After repair, 9 remain without photos.
+- [x] Uploaded and verified two exact supplier photos from FDR Auto Garage to Supabase Storage: TVS HLX 100cc carburettor adaptor N2041400 (FDR image IMG_5430-300x300.jpg) and TVS HLX 125/150 carburettor adaptor N3040980 (FDR image IMG_5440.jpg). Both products now have their own Supabase product-images URLs.
+- [x] Verified the DB photo-publication guard is installed: products_posting_rules_trg runs BEFORE INSERT OR UPDATE OF active, images; products_posting_rules() rejects active=true when images is empty. This protects new inserts/activations. The 9 remaining empty-image rows are legacy active rows created before/without this rule being effective; do not claim they are fixed.
+- [ ] Remaining 9 exact photos: Bajaj Boxer BM150 left side cover 52PF1829 (only wrong-colour/incorrect image found; do not attach); TVS HLX 150 5-gear chain & sprocket kit N6321170; front shock seals 2094T721; 4-gear speedometer assembly Class One; kick starter shaft; gearshift shaft Ocelot; gearshift shaft assembly; red front mudguard N62216606G; rear fender N5220460. Continue exact model/part-number sourcing; do not use generic lookalikes.
+- [x] Build trigger requested after the two photo additions; verify generated product pages and mobile-shell links after workflow completes.
 ## 2026-11-08 13:01 Africa/Nairobi - quotation without client details (branch `wip-quotation-no-client-20261108`)
 Owner: "add an option of only the quotation without indicating details of clients if they don't disclose... just selection of items and their prices".
 - [x] Supabase migration `client_quotations_anonymous`: column `anonymous boolean` (also in `setup-client-quotations.sql`). Anonymous rows store client_name 'Not disclosed' and null contact fields.
