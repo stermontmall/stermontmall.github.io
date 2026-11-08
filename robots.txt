@@ -1,7 +1,12 @@
 User-agent: *
 Allow: /
+
+# Keep storefront pages, category hubs, product photos, CSS and JavaScript crawlable.
+# Search/sort/filter query URLs are handled with noindex,follow in generated page HTML.
+# Do not block those parameters here: Google must be able to crawl them to see the noindex directive.
 Disallow: /admin.html
 Disallow: /account.html
+
 Sitemap: https://stermontarcade.co.ke/sitemap.xml
 Sitemap: https://stermontarcade.co.ke/sitemap-products.xml
 Sitemap: https://stermontarcade.co.ke/sitemap-images.xml
