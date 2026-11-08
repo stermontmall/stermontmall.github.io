@@ -1,3 +1,4 @@
+// Rebuild requested 2026-11-09: regenerate static product pages after catalog photo URL and SEO-description corrections.
 // Rebuild trigger 2026-10-26: new products added.
 // Stermont Arcade - builds a real web page for every product + category, and a sitemap for Google.
 // Runs automatically on GitHub (see .github/workflows/product-pages.yml). No installs needed (Node 18+).
