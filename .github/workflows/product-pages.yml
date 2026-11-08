@@ -208,4 +208,5 @@ jobs:
 
 # 2026-11-08: rebuild static pages and sitemap for three additional fresh photo-backed spare parts.
 
-# 2026-11-08 20:55 Africa/Nairobi: restored from 122934a5. Commit 3d378d6b had replaced this whole workflow with comments only, so every push failed to start and no product pages were rebuilt after 19:38.
+# 2026-11-08: rebuild static product pages and sitemap after adding ten fresh TVS HLX photo-backed listings.
+# 2026-11-08: rebuild after adding the latest three fresh Bajaj BM150 photo-backed products.
