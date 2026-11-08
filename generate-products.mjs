@@ -702,3 +702,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-08: rebuild product pages with expanded 600+ word catalogue descriptions.
 
 // 2026-11-08: regenerate all active catalogue product pages after expanding all short product descriptions beyond 600 words.
+
+// 2026-11-08: refresh generated catalogue pages after the latest verified supplier-photo replacements.
