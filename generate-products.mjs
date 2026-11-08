@@ -710,3 +710,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-08: regenerate motorcycle catalogue after the next verified Boxer and TVS spare-part photo batch.
 
 // 2026-11-08: final refresh after additional Boxer axle, chain-guide and ignition-coil image matches.
+
+// 2026-11-08: refresh catalogue after verified Boxer transmission and BM100 suspension photo matches.
