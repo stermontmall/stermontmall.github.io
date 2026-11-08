@@ -1884,3 +1884,17 @@ Owner instruction: “Continue with the next 20.”
 - [!] Explicit meta-description overrides, static product HTML, canonical tags, Product JSON-LD, sitemap inclusion, IndexNow notification and GitHub Pages deployment have not been verified for this batch. No Google indexing or ranking claim.
 - [ ] Next: audit the remaining short-description catalogue, now expected to be 90 active products below 600 words; then check the product-pages workflow and verify generated pages, canonical/JSON-LD and sitemap entries for this batch.
 - Customer links must use the mobile shell format `https://stermontarcade.co.ke/?product=<slug>` after confirming each product remains active.
+
+
+## 2026-11-09 - Next 30 catalogue descriptions expanded to 600–800 words
+Owner instruction: “Continue with the next 30.”
+- [x] Selected the next 30 active catalogue products with descriptions below 600 words, in catalogue order: Bajaj Boxer electrical, brake, clutch, cable, lighting, bearing, engine, filter and exhaust parts; and TVS HLX electrical, oil-service, chain, cylinder, clutch, brake and USB accessory parts.
+- [x] Supabase: updated all 30 descriptions with product-specific content between 734 and 776 words. Updated SEO names and Kenya-focused SEO titles; all 30 titles are 60 characters or fewer.
+- [x] Backups: one pre-change description backup for each product in `catalogue-seo-600-800-batch-07`.
+- [x] Verification query: 30/30 rows updated; 30/30 descriptions in the 600–800 word range; 0 SEO titles over 60 characters; 30/30 remain active with stock=1000, low_at=20, featured=true and at least one image reference; 30/30 backups present.
+- [x] Preserved product IDs, slugs, prices, inventory settings and existing image references. No products created or deleted.
+- [!] Existing image URLs were retained, not visually checked for exact model/variant match. The throttle cable listing uses an external-hosted image URL; verify image rights and availability. No photos were uploaded or replaced in this batch.
+- [!] Some part fitments and technical details remain conditional on exact part number, model year, connector/dimensions and physical sample. The copy explicitly avoids claiming OEM authenticity or unverified interchangeability. Brake, steering and throttle parts require mechanic fitment checks.
+- [!] Static product HTML, canonical tags, Product JSON-LD, sitemap inclusion, IndexNow notification and GitHub Pages deployment have not been verified for this batch. Google indexing and rankings are not claimed.
+- [ ] Next catalogue scan: expected 60 active products remain below 600 words; verify with a fresh SQL count before selecting the next batch.
+- Customer-facing product links must use the mobile-shell format `https://stermontarcade.co.ke/?product=<slug>` after confirming the item is active.
