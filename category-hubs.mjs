@@ -6,7 +6,7 @@ export const HUBS = {
   'agrovet': { name: 'Agrovet', label: 'Agrovet by type', kids: ['agrochemicals', 'fertilizers', 'veterinary-drugs', 'animal-feeds', 'disinfectants-hygiene'] },
   'tvs-audio': { name: 'TVs & Audio', label: 'TVs and audio by type', kids: ['televisions', 'home-theatre', 'bluetooth-speakers', 'tv-mounts-accessories'] },
   'tv-audio-video': { name: 'TV, Audio & Video', label: 'TV, audio and video by type', kids: ['tvs-audio', 'cameras-photography', 'music-audio', 'woofers'] },
-  'appliances': { name: 'Appliances', label: 'Appliances by type', kids: ['washing-machines', 'fridges-freezers', 'kitchen-dining'] },
+  'appliances': { name: 'Appliances', label: 'Appliances by type', kids: ['washing-machines', 'fridges-freezers'] },
   'automotive': { name: 'Automotive', label: 'Automotive by type', kids: ['cars-for-sale', 'car-accessories-parts', 'motorcycle-accessories'] },
   'fashion': { name: 'Clothing & Fashion', label: 'Clothing by type', kids: ['mens-fashion', 'womens-fashion', 'kids-fashion'] },
   'phones-accessories': { name: 'Phones & Accessories', label: 'Phones and accessories by type', kids: ['phones-tablets', 'phone-accessories', 'refurbished-phones', 'earphones-headset'] },
