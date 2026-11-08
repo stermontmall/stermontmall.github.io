@@ -1850,8 +1850,11 @@ Owner requested 20 additional fast-moving sneaker styles, avoiding existing cata
 ## 2026-11-08 - 30 new smartphones added with model-matched photos and Kenya SEO
 - [x] Supabase: inserted 30 unique phone listings in Phones & Tablets (category_id=2); all 30 active, each has exactly one product image in the public product-images bucket.
 - [x] Inventory defaults: stock 1,000; low-stock threshold 20; featured=true; cost set to 85% of displayed price as requested.
-- [x] Product data: added unique Kenya-focused titles, meta descriptions and FAQs in seo-overrides.json, plus model-specific supplementary buying guidance in product-content.json; updated product-content.test.mjs allowlist.
+- [x] Product data: added unique Kenya-focused titles, meta descriptions and model-specific FAQs in seo-overrides.json. The product description field contains concise model-specific buying information; no unsupported product-content.json expansion is claimed.
 - [x] Photo retries completed for initial image-ingestion failures; final SQL check returned total=30, active=30, one_image=30, defaults_ok=30.
-- [ ] Verify the next product-pages GitHub Actions run after the product-content validation correction, generated /p/<id>.html pages, product sitemap entries and live customer links before calling the static SEO pages deployed.
-- [ ] Verify the blog-build run publishes the three new phone-buying guides into /blog/ and sitemap.xml.
+- [x] Product-pages workflow run 42510299555 passed page generation, SEO metadata application, mobile-shell routing and the guard requiring every active product to have a built page. IndexNow notification was still running at last check; it does not block the page build.
+- [x] Blog build run 42510350232 succeeded. The two newly added guides are present in blog/index.html and sitemap.xml: /blog/smartphone-buying-checklist-kenya-2026.html and /blog/4g-vs-5g-phones-kenya-what-to-buy-2026.html. Existing phone guides remain intact.
 - Note: prices are catalogue estimates, not supplier-confirmed quotations or stock reservations. Confirm supplier price, exact regional SKU, warranty, physical RAM and included accessories before fulfilling an order. Image files were sourced from manufacturer/retailer pages; confirm image-use permissions before commercial reuse.
+
+- [x] Product sitemap check: all 30 phone product IDs appear in sitemap-products.xml.
+- [ ] Final public-domain spot check after GitHub Pages deployment completes; Google indexing and rankings are not guaranteed.
