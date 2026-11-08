@@ -1,3 +1,12 @@
+## 2026-11-08 12:40 Africa/Nairobi - admin Quotations added (branch `wip-admin-quotations-20261108`)
+Owner: "Add an option of admin generation Quotation for different clients and enable all options. Make it exactly like the receipt".
+- [x] Supabase migration `client_quotations_table` applied (also saved as `setup-client-quotations.sql`): table `public.client_quotations` + sequence, refs like `QT-2611-0001`, RLS = staff only (`is_staff()`), no anon access.
+- [x] `receipt.js` (now `?v=11` in admin.html): new `STM_RECEIPT.quote` = calc / pdf / email / text. Same header, hero, ticket tiles, three info cards, timeline, items table, totals panel, stamp, signature boxes and footer as the receipt (shared helpers `drawCards` and `drawTimeline` were split out of `infoCards` and `timeline`; receipt output unchanged).
+- [x] `admin-quotations.js` + `admin.html`: new Orders > Quotations tab. Client details (past clients and order customers suggested), items from the catalog or custom, per-line discount, overall discount (% or KSh), VAT %, delivery fee, deposit %, validity days, payment and delivery terms, notes, T&Cs, status. Save, edit, duplicate, delete, mark sent/accepted/declined, PDF, email (EmailJS status template), WhatsApp text.
+- [x] Tested: node syntax, mock-jsPDF run of quote + receipt PDFs (receipt unchanged), Playwright run of the admin tab against a mocked Supabase (create, autofill, totals, save, PDF, duplicate, accept, delete).
+- [ ] NOT tested: real PDF rendering (no route to the jsPDF CDN here), so open one quotation PDF and check the layout; email delivery (EmailJS) and a real staff login.
+- [ ] NEXT: owner opens /admin.html > Orders > Quotations, makes one quotation, taps PDF and Email.
+
 ## 2026-11-08 09:50 Africa/Nairobi - photo upload limits removed (Edge Function `upload-photos` v13)
 Owner: "remove the limits for uploading photos" (ChatGPT can publish products fully but the photo step had limits).
 - [x] Limits now: 50 MB per photo (was 25; 50 MB is the Supabase Storage per-file ceiling on the free plan, so it cannot go higher without a plan change), 60 photos per call (was 30), download wait 45 s (was 20 s), AVIF accepted (was rejected), any pixel size (already). Bucket `product-images` has no size or type limit of its own. Verified: live GET reports the new limits.

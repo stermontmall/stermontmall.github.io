@@ -176,7 +176,7 @@
   </div>
 </div>
 
-<script src="receipt.js?v=10"></script>
+<script src="receipt.js?v=11"></script>
 <script src="admin-suggest.js?v=1"></script>
 <script src="catalog-v10.js?v=13"></script>
 <script src="admin-extras.js?v=6"></script>
@@ -185,6 +185,7 @@
 <script src="admin-insights.js?v=2"></script>
 <script src="admin-blog.js?v=1"></script>
 <script src="admin-services.js?v=1"></script>
+<script src="admin-quotations.js?v=1"></script>
 <script src="admin-service-media.js?v=1"></script>
 <script src="admin-overview.js?v=1"></script>
 <script src="product-seo-optimizer.js?v=9"></script>
@@ -192,7 +193,7 @@
 <script>
 (function () {
   var D = document, SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
-  var TABS_OK = ['dashboard', 'pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'bulk', 'photo-ai', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'services', 'media', 'market-research'], TK = 'stm_admin_tab';
+  var TABS_OK = ['dashboard', 'pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'bulk', 'photo-ai', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'quotations', 'services', 'media', 'market-research'], TK = 'stm_admin_tab';
   function savedTab() { try { var t = (location.hash || '').replace('#', '') || localStorage.getItem(TK); return TABS_OK.indexOf(t) > -1 ? t : 'dashboard'; } catch (e) { return 'pending'; } }
   function rememberTab(t) { try { localStorage.setItem(TK, t); history.replaceState(null, '', location.pathname + location.search + '#' + t); } catch (e) {} }
   var sess = null, orders = [], tab = savedTab(), q = '';
@@ -274,10 +275,10 @@
 
   function count(s) { return orders.filter(function (o) { return (o.status || 'pending') === s; }).length; }
   var ORDER_TABS = ['pending', 'paid', 'declined', 'all'];
-  var EXTRA = ['dashboard', 'stock', 'catalog', 'bulk', 'photo-ai', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'services', 'media', 'market-research'];
+  var EXTRA = ['dashboard', 'stock', 'catalog', 'bulk', 'photo-ai', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'quotations', 'services', 'media', 'market-research'];
   var NAV = [
     ['Overview', [['dashboard', '🏠', 'Dashboard', 'Private overview of orders, service enquiries and recent business activity']]],
-    ['Orders', [['pending', '🕒', 'Pending', 'Orders waiting for payment confirmation'], ['paid', '✅', 'Confirmed', 'Paid orders: packing, delivery and receipts'], ['declined', '🚫', 'Declined', 'Orders that were not paid'], ['all', '📋', 'All orders', 'Every order, newest first']]],
+    ['Orders', [['pending', '🕒', 'Pending', 'Orders waiting for payment confirmation'], ['paid', '✅', 'Confirmed', 'Paid orders: packing, delivery and receipts'], ['declined', '🚫', 'Declined', 'Orders that were not paid'], ['all', '📋', 'All orders', 'Every order, newest first'], ['quotations', '🧾', 'Quotations', 'Create, save and send quotations to different clients: PDF, email and WhatsApp, laid out like the receipt']]],
     ['Services', [['quotes', '📨', 'Quote requests', 'Customers asking for a service quote (no payment taken): call, quote, then mark won or lost'], ['services', '🧰', 'Services overview', 'Every service and pest page, demand by service and town, and links to copy'], ['media', '🖼️', 'Service media', 'Upload photos and videos of your work and post them on the service pages']]],
     ['Store', [['catalog', '🛍️', 'Catalog & ledger', 'Products, prices, restocks, COGS, profit and the financial ledger'], ['stock', '📦', 'Stock', 'Switch products in or out of stock'], ['bulk', '📥', 'Bulk import', 'Add many products from a spreadsheet, and attach photos to items that have none'], ['photo-ai', '📸', 'AI photo upload', 'Attach online photos to existing products or create SEO-ready drafts']]],
     ['Growth', [['market-research', '🇰🇪', 'Kenya Market Research', 'Competitor intelligence, agrovet product categories, pest-control market reports and evidence sources'], ['blogs', '📝', 'Blogs & SEO', 'Published posts with SEO checks, the daily writer, and write your own']]],
@@ -316,6 +317,7 @@
     if (tab === 'market-research') { if (!window.STMMarketResearch) { L.innerHTML = '<div class="err">The Kenya Market Research dashboard did not load. Refresh the page.</div>'; return; } STMMarketResearch.mount(L); return; }
     if (tab === 'dashboard') { if (!window.STMOverview) { L.innerHTML = '<div class="err">The dashboard script did not load. Refresh the page.</div>'; return; } STMOverview.mount(L); return; }
     if (tab === 'quotes' || tab === 'services') { if (!window.STMServices) { L.innerHTML = '<div class="err">The services script did not load. Refresh the page (Ctrl+F5).</div>'; return; } var dq = want.quote; want.quote = null; STMServices.mount(L, tab, dq); return; }
+    if (tab === 'quotations') { if (!window.STMQuotations) { L.innerHTML = '<div class="err">The quotations script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMQuotations.mount(L); return; }
     if (tab === 'media') { if (!window.STMServiceMedia) { L.innerHTML = '<div class="err">The media script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMServiceMedia.mount(L); return; }
     if (tab === 'sales' || tab === 'mpesa' || tab === 'searches') { if (!window.STMInsights) { L.innerHTML = '<div class="err">The insights script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMInsights.mount(L, tab); return; }
     if (tab === 'blogs') { if (!window.STMBlog) { L.innerHTML = '<div class="err">The blog script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMBlog.mount(L); return; }

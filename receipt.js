@@ -248,13 +248,16 @@
   }
 
   function infoCards(d, o, y) {
-    var gap = 5, colW = (CW - 2 * gap) / 3, ew = colW - 9;
     var delivery = o.method === 'delivery';
     var cols = [
       { t: 'BILLED TO', e: [['Customer', o.customer_name], ['Phone', o.phone], ['Email', o.email]] },
       { t: 'PAYMENT', e: [['Order reference', o.ref], ['Business No. (M-Pesa Paybill)', BIZ.paybill], ['Account No.', BIZ.account]] },
       { t: delivery ? 'DELIVERY' : 'COLLECTION', e: [['Method', delivery ? 'Home delivery' : 'Store pickup'], [delivery ? 'Deliver to' : 'Pickup point', delivery ? [o.address, o.county].filter(Boolean).join(', ') : 'Stermont Arcade store'], ['Order placed', when(o.created_at)]] }
     ];
+    return drawCards(d, cols, y);
+  }
+  function drawCards(d, cols, y) {   // three info cards (shared by the receipt and the quotation)
+    var gap = 5, colW = (CW - 2 * gap) / 3, ew = colW - 9;
     var maxH = 0;
     cols.forEach(function (col) {   // measure first so all three cards are the same height
       var h = 11.5;
@@ -284,6 +287,10 @@
   function timeline(d, o, y) {
     var xs = [M + 5, W / 2, W - M - 5], now = new Date();
     var steps = [['Order placed', when(o.created_at), 'left'], ['Payment confirmed', when(o.handled_at || o.created_at), 'center'], ['Receipt issued', when(now), 'right']];
+    return drawTimeline(d, steps, y);
+  }
+  function drawTimeline(d, steps, y) {   // three-step timeline (shared by the receipt and the quotation)
+    var xs = [M + 5, W / 2, W - M - 5];
     var cy = y + 3.4;
     stroke(d, C.lav); d.setLineWidth(0.7); d.line(xs[0], cy, xs[2], cy);
     stroke(d, C.purple); d.setLineWidth(0.7); d.line(xs[0], cy, xs[1], cy);
@@ -379,7 +386,7 @@
       if (withDate) d.text('Date: ____ / ____ / ______', x + bw - 4, top + bh - 2.6, { align: 'right' });
     }
     box(M, 'AUTHORISED SIGNATORY', sig, BIZ.signatory, false);
-    box(M + bw + 5, 'RECEIVED BY (CUSTOMER)', null, '', true, String(o.customer_name || '').trim());
+    box(M + bw + 5, o.sigTitle || 'RECEIVED BY (CUSTOMER)', null, '', true, String(o.customer_name || '').trim());
     var sx = M + 2 * (bw + 5);
     stroke(d, C.line); d.setLineWidth(0.3); fill(d, C.white); d.roundedRect(sx, top, bw, bh, 2.4, 2.4, 'FD');
     font(d, 'bold', 6.8, C.purple); d.text('COMPANY STAMP', sx + 3.5, top + 4.6);
@@ -603,5 +610,300 @@
     }).then(function (x) { if (!x.ok) return x.text().then(function (t) { throw new Error('EmailJS: ' + (t || x.status)); }); });
   }
 
-  window.STM_RECEIPT = { pdf: pdf, email: email, text: text, notify: notify, review: review };
+  /* ================= QUOTATIONS (admin) =================
+     Same look as the receipt, built from the same helpers.
+     STM_RECEIPT.quote = { calc(draft), pdf(q), email(q), text(q), no(q), valid(q), status(q) }
+     q = { ref, created_at, status, client_name, client_company, client_phone, client_email, client_pin, client_address,
+           items:[{name, qty, price, disc}], discount_type('none'|'percent'|'fixed'), discount_value, vat_rate, delivery_fee,
+           deposit_percent, valid_days, valid_until, payment_terms, delivery_terms, notes, terms, accepted_at } */
+  var RED = [185, 28, 28];
+  function qdate(d) { try { return new Date(d).toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' }); } catch (e) { return ''; } }
+  function qnum(v) { var n = Number(v); return isFinite(n) && n > 0 ? n : 0; }
+  function qno(q) { return q.ref || 'QT-DRAFT'; }
+  function qcalc(q) {
+    var items = (q.items || []).map(function (it) {
+      var qty = qnum(it.qty) || 1, price = qnum(it.price), disc = Math.min(100, qnum(it.disc));
+      return { name: String(it.name || '').trim(), qty: qty, price: price, disc: disc, total: Math.round(qty * price * (1 - disc / 100)) };
+    }).filter(function (it) { return it.name; });
+    var sub = items.reduce(function (a, it) { return a + it.total; }, 0);
+    var dv = qnum(q.discount_value), dt = q.discount_type || 'none';
+    var disc = dt === 'percent' ? Math.round(sub * Math.min(100, dv) / 100) : dt === 'fixed' ? Math.min(Math.round(dv), sub) : 0;
+    var taxable = sub - disc, vr = Math.min(100, qnum(q.vat_rate)), vat = Math.round(taxable * vr / 100), del = Math.round(qnum(q.delivery_fee));
+    var total = taxable + vat + del, dep = Math.round(total * Math.min(100, qnum(q.deposit_percent)) / 100);
+    return { items: items, subtotal: sub, discount_amount: disc, vat_amount: vat, delivery_fee: del, total: total, deposit_amount: dep, balance_after_deposit: total - dep };
+  }
+  function qvalid(q) {
+    if (q.valid_until) { var v = new Date(String(q.valid_until).slice(0, 10) + 'T23:59:59'); if (!isNaN(v)) return v; }
+    var d = new Date(q.created_at || Date.now()); d.setDate(d.getDate() + (Number(q.valid_days) || 14)); return d;
+  }
+  function qstatus(q) {
+    var vd = qdate(qvalid(q)), st = q.status || 'draft';
+    if (st === 'accepted') return { label: 'ACCEPTED', col: C.green, main: 'ACCEPTED', sub: q.accepted_at ? 'ON ' + qdate(q.accepted_at).toUpperCase() : 'BY CLIENT' };
+    if (st === 'declined') return { label: 'DECLINED', col: C.amber, main: 'DECLINED', sub: 'BY CLIENT' };
+    if (st === 'expired' || qvalid(q) < new Date()) return { label: 'EXPIRED', col: RED, main: 'EXPIRED', sub: 'ON ' + vd.toUpperCase() };
+    if (st === 'draft') return { label: 'DRAFT', col: C.amber, main: 'DRAFT', sub: 'VALID UNTIL ' + vd.toUpperCase() };
+    return { label: 'VALID UNTIL ' + vd.toUpperCase(), col: C.green, main: 'QUOTE', sub: 'VALID UNTIL ' + vd.toUpperCase() };
+  }
+
+  function qHeader(d, logo, q) {
+    var hh = 44, steps = 56, st = qstatus(q);
+    for (var i = 0; i < steps; i++) { fill(d, mix(C.navy, C.purple, Math.pow(i / (steps - 1), 1.1) * 0.95)); d.rect(i * W / steps, 0, W / steps + 0.4, hh, 'F'); }
+    alpha(d, 0.07, function () { fill(d, C.white); d.circle(W - 16, 4, 34, 'F'); d.circle(W - 58, 46, 18, 'F'); d.circle(96, -6, 14, 'F'); });
+    fill(d, C.lime); d.rect(0, hh, W, 1.6, 'F');
+    fill(d, C.white); d.roundedRect(M, 9, 62, 23, 3.2, 3.2, 'F');
+    if (logo) { var s = fit(logo, 54, 16); d.addImage(logo.data, 'PNG', M + (62 - s.w) / 2, 9 + (23 - s.h) / 2, s.w, s.h); }
+    else {
+      font(d, 'bold', 19, C.navy);
+      var tw = d.getTextWidth('Stermont'), mw = d.getTextWidth('Mall'), total = tw + 2 + mw + 4, sx = M + (62 - total) / 2;
+      d.text('Stermont', sx, 9 + 14.2);
+      fill(d, C.lime); d.roundedRect(sx + tw + 2, 9 + 6.4, mw + 4, 10, 1.6, 1.6, 'F');
+      ink(d, [18, 18, 18]); d.text('Mall', sx + tw + 4, 9 + 14.2);
+    }
+    font(d, 'italic', 8.2, C.lav); d.text(BIZ.tag, M + 1, 38.5);
+    font(d, 'bold', 21, C.white); d.text('QUOTATION', W - M, 17.5, { align: 'right' });
+    font(d, 'bold', 11.5, C.lime); d.text(qno(q), W - M, 25.2, { align: 'right' });
+    font(d, 'normal', 8.2, C.lav); d.text('Issued ' + qdate(q.created_at || new Date()), W - M, 30.4, { align: 'right' });
+    font(d, 'bold', 7.2, C.white);
+    var pw = d.getTextWidth(st.label) + 15, px = W - M - pw, py = 34.4;
+    fill(d, st.col); d.roundedRect(px, py, pw, 6.6, 3.3, 3.3, 'F');
+    tick(d, px + 5.6, py + 3.2, 2.6, C.white, 0.55);
+    font(d, 'bold', 7.2, C.white); d.text(st.label, px + 9.4, py + 4.5);
+  }
+
+  function qQr(QR, q, c) {
+    if (!QR) return null;
+    try {
+      var o = QR(0, 'M');
+      o.addData(['STERMONT ARCADE - QUOTATION', 'Quote: ' + qno(q), 'Client: ' + (q.client_name || ''), 'Total: ' + money(c.total), 'Valid until: ' + qdate(qvalid(q)), BIZ.web].join('\n'));
+      o.make(); return o;
+    } catch (e) { return null; }
+  }
+
+  function qHero(d, q, c, qr, y) {
+    var h = 38;
+    card(d, M, y, CW, h, C.white, C.line);
+    fill(d, C.lime); d.roundedRect(M, y + 7, 1.8, h - 14, 0.9, 0.9, 'F');
+    font(d, 'bold', 7.5, C.purple); d.text(qnum(q.vat_rate) ? 'QUOTED TOTAL (INCLUDING VAT)' : 'QUOTED TOTAL', M + 8, y + 9);
+    font(d, 'bold', 27, C.navy); d.text(money(c.total), M + 8, y + 21);
+    font(d, 'italic', 7.8, C.mute);
+    d.splitTextToSize(words(c.total), 126).slice(0, 2).forEach(function (l, i) { d.text(l, M + 8, y + 27.4 + i * 3.7); });
+    var qx = W - M - 6 - 26, qy = y + 5;
+    if (qr) {
+      fill(d, C.white); stroke(d, C.line); d.setLineWidth(0.3); d.roundedRect(qx - 1.5, qy - 1.5, 29, 29, 2, 2, 'FD');
+      var n = qr.getModuleCount(), cell = 26 / n; fill(d, C.navy);
+      for (var r = 0; r < n; r++) for (var k = 0; k < n; k++) if (qr.isDark(r, k)) d.rect(qx + k * cell, qy + r * cell, cell + 0.03, cell + 0.03, 'F');
+      font(d, 'normal', 6, C.mute); d.text('Scan for quote details', qx + 13, y + h - 2.4, { align: 'center' });
+    } else {
+      var cx = qx + 13, cy = y + 17;
+      fill(d, C.tint); d.circle(cx, cy, 13, 'F'); fill(d, C.purple); d.circle(cx, cy, 9.5, 'F');
+      tick(d, cx, cy, 9, C.white, 1.3);
+    }
+    return y + h;
+  }
+
+  function qTicket(d, q, y) {   // the quote reference, printed as a row of ticket tiles (like the M-Pesa code on the receipt)
+    var h = 18, ref = String(qno(q)).toUpperCase(), n = ref.length;
+    fill(d, C.navy); d.roundedRect(M, y, CW, h, 3, 3, 'F');
+    fill(d, C.white); d.circle(M, y + h / 2, 2.8, 'F'); d.circle(W - M, y + h / 2, 2.8, 'F');
+    font(d, 'bold', 7.6, C.lime); d.text('QUOTATION', M + 8, y + 7.6);
+    font(d, 'normal', 6.8, C.lav); d.text('REFERENCE NO.', M + 8, y + 12.1);
+    alpha(d, 0.35, function () { stroke(d, C.lav); d.setLineDashPattern([1, 1], 0); d.setLineWidth(0.3); d.line(M + 41, y + 3.5, M + 41, y + h - 3.5); d.setLineDashPattern([], 0); });
+    var xs = M + 46, aw = CW - 46 - 33, pitch = Math.min(9.2, aw / n), tw = pitch - 1.1, th = 10.4, ty = y + (h - th) / 2;
+    var x0 = xs + (aw - n * pitch) / 2 + 0.55;
+    for (var i = 0; i < n; i++) {
+      fill(d, C.tile); d.roundedRect(x0 + i * pitch, ty, tw, th, 1.4, 1.4, 'F');
+      d.setFont('courier', 'bold'); d.setFontSize(Math.min(14, tw * 1.7)); ink(d, C.lime);
+      d.text(ref.charAt(i), x0 + i * pitch + tw / 2, ty + th / 2 + 1.5, { align: 'center' });
+    }
+    fill(d, C.green); d.circle(W - M - 25, y + h / 2, 3, 'F'); tick(d, W - M - 25, y + h / 2, 3, C.white, 0.5);
+    font(d, 'bold', 6.6, C.white); d.text('VALID UNTIL', W - M - 20.5, y + 8); d.text(qdate(qvalid(q)), W - M - 20.5, y + 11.6);
+    return y + h;
+  }
+
+  function qCols(q, c) {
+    function keep(list) { return list.filter(function (e, i) { return i === 0 || String(e[1] || '').trim(); }); }
+    var dep = c.deposit_amount ? [['Deposit to confirm', money(c.deposit_amount) + ' (' + qnum(q.deposit_percent) + '%)']] : [];
+    return [
+      { t: 'PREPARED FOR', e: keep([['Client', q.client_name], ['Company', q.client_company], ['Phone', q.client_phone], ['Email', q.client_email], ['KRA PIN', q.client_pin], ['Address', q.client_address]]) },
+      { t: 'QUOTATION', e: [['Quote reference', qno(q)], ['Issued', qdate(q.created_at || new Date())], ['Valid until', qdate(qvalid(q))], ['Prepared by', BIZ.name]] },
+      { t: 'PAYMENT & DELIVERY', e: [['Pay to (M-Pesa Paybill)', BIZ.paybill + '  |  Acc. ' + BIZ.account], ['Payment terms', q.payment_terms || 'As agreed'], ['Delivery / collection', q.delivery_terms || 'Confirmed when you accept']].concat(dep) }
+    ];
+  }
+  function qSteps(q) {
+    return [['Quotation issued', when(q.created_at || new Date()), 'left'], ['Client accepts', 'before ' + qdate(qvalid(q)), 'center'], ['Order & delivery', 'after payment', 'right']];
+  }
+
+  function qStamp(d, cx, cy, st) {
+    alpha(d, 0.82, function () {
+      stroke(d, st.col); ink(d, st.col);
+      d.setLineWidth(1.1); rotRect(d, cx, cy, 46, 16.5, 10);
+      d.setLineWidth(0.35); rotRect(d, cx, cy, 43.4, 13.9, 10);
+      font(d, 'bold', 18, st.col); d.text(st.main, cx - 0.4, cy + 1.2, { align: 'center', angle: 10 });
+      font(d, 'bold', 6.4, st.col); d.text(st.sub, cx + 1.2, cy + 6.3, { align: 'center', angle: 10 });
+    });
+  }
+
+  function qTotals(d, q, c, y) {
+    var t0 = y, pw = 86, px = W - M - pw, rh = 6.4, rows = [['Subtotal', money(c.subtotal)]];
+    if (c.discount_amount) rows.push(['Discount' + (q.discount_type === 'percent' ? ' (' + qnum(q.discount_value) + '%)' : ''), '- ' + money(c.discount_amount)]);
+    if (qnum(q.vat_rate)) rows.push(['VAT (' + qnum(q.vat_rate) + '%)', money(c.vat_amount)]);
+    if (c.delivery_fee) rows.push(['Delivery fee', money(c.delivery_fee)]);
+    var barTop = t0 + 4 + rows.length * rh, ph = barTop - t0 + 8.6 + (c.deposit_amount ? 14 : 3);
+    font(d, 'bold', 7.4, C.purple); d.text('NOTES', M, t0 + 4);
+    font(d, 'normal', 7.6, C.mute);
+    d.splitTextToSize('Prices are in Kenya shillings. This quotation is not a tax invoice or a receipt. A receipt is issued once payment is confirmed.', 76).slice(0, 3).forEach(function (l, i) { d.text(l, M, t0 + 9 + i * 3.7); });
+    qStamp(d, M + 44, t0 + Math.max(26, ph - 11), qstatus(q));
+    card(d, px, t0, pw, ph, C.tint, C.line);
+    var l = px + 5, r = px + pw - 5;
+    rows.forEach(function (rw, i) {
+      font(d, 'normal', 9.2, C.ink); d.text(rw[0], l, t0 + 7.4 + i * rh); d.text(rw[1], r, t0 + 7.4 + i * rh, { align: 'right' });
+    });
+    fill(d, C.navy); d.roundedRect(px + 3, barTop, pw - 6, 8.6, 2.2, 2.2, 'F');
+    font(d, 'bold', 8.8, C.white); d.text('TOTAL', l, barTop + 5.6);
+    font(d, 'bold', 11, C.lime); d.text(money(c.total), r, barTop + 5.7, { align: 'right' });
+    if (c.deposit_amount) {
+      font(d, 'bold', 8.2, C.ink); d.text('Deposit to confirm (' + qnum(q.deposit_percent) + '%)', l, barTop + 13);
+      d.text(money(c.deposit_amount), r, barTop + 13, { align: 'right' });
+    }
+    return t0 + ph;
+  }
+
+  function qNotes(d, q, y) {   // full-width notes and terms, flowing onto a new page if needed
+    function block(title, text) {
+      text = String(text || '').trim(); if (!text) return;
+      if (y + 14 > FOOT) { newPage(d); y = 18; }
+      font(d, 'bold', 7.4, C.purple); d.text(title, M, y + 3);
+      font(d, 'normal', 7.6, C.mute); y += 7;
+      d.splitTextToSize(text, CW).forEach(function (ln) { if (y + 4 > FOOT) { newPage(d); y = 18; } d.text(ln, M, y); y += 3.7; });
+      y += 3;
+    }
+    block('NOTES', q.notes);
+    block('TERMS & CONDITIONS', q.terms);
+    return y;
+  }
+
+  function qFooters(d, q) {
+    var n = d.getNumberOfPages();
+    for (var p = 1; p <= n; p++) {
+      d.setPage(p);
+      stroke(d, C.line); d.setLineWidth(0.25); d.line(M, H - 17.2, W - M, H - 17.2);
+      var lead = 'Quotation ' + qno(q) + '   |   Valid until ' + qdate(qvalid(q)) + '   |   Prepared for ' + (q.client_name || '');
+      font(d, 'normal', 6.6, C.mute); d.text(d.splitTextToSize(lead, 118)[0], M, H - 14.2);
+      font(d, 'normal', 6.4, C.mute); d.text('Computer-generated quotation. Prices valid until the date shown.', W - M, H - 14.2, { align: 'right' });
+      fill(d, C.purple); d.rect(0, H - 11, W, 11, 'F'); fill(d, C.lime); d.rect(0, H - 11, W, 0.9, 'F');
+      font(d, 'bold', 9, C.white); d.text('Thank you for considering ' + BIZ.name + '!', M, H - 4.4);
+      font(d, 'normal', 7.4, C.white); d.text(BIZ.phone + '   |   ' + BIZ.email + '   |   ' + BIZ.web + (n > 1 ? '   |   Page ' + p + '/' + n : ''), W - M, H - 4.4, { align: 'right' });
+    }
+  }
+
+  function qBuild(q, c, logo, sig, stamp, QR) {
+    return loadLib().then(function (JsPDF) {
+      var d = new JsPDF({ unit: 'mm', format: 'a4' });
+      d.setProperties({ title: 'Quotation ' + qno(q), subject: q.client_name || '', author: BIZ.name });
+      watermark(d);
+      qHeader(d, logo, q);
+      var y = qHero(d, q, c, qQr(QR, q, c), 51) + 3;
+      y = qTicket(d, q, y) + 4;
+      y = drawCards(d, qCols(q, c), y) + 4;
+      y = drawTimeline(d, qSteps(q), y) + 3;
+      y = itemsTable(d, { items: c.items.map(function (it) { return { name: it.name + (it.disc ? '  (' + it.disc + '% off)' : ''), qty: it.qty, price: it.price, total: it.total }; }) }, y) + 3;
+      if (y + 50 > FOOT) { newPage(d); y = 18; }
+      y = qTotals(d, q, c, y) + 4;
+      y = qNotes(d, q, y);
+      if (y + 33 > FOOT) { newPage(d); y = 18; }
+      signatures(d, y, sig, stamp, { customer_name: q.client_name, sigTitle: 'ACCEPTED BY (CLIENT)' });
+      qFooters(d, q);
+      return d;
+    });
+  }
+
+  function qcheck(q) {
+    var c = qcalc(q);
+    if (!String(q.client_name || '').trim()) throw new Error('Add the client name first.');
+    if (!c.items.length) throw new Error('Add at least one item first.');
+    return c;
+  }
+  function qpdf(q) {
+    var c; try { c = qcheck(q); } catch (e) { return Promise.reject(e); }
+    return Promise.all([loadImg(BIZ.logo), signatureImg(), loadImg(BIZ.stamp, STAMP_DATA, false), loadQR()]).then(function (im) {
+      return qBuild(q, c, im[0], im[1], im[2], im[3]);
+    }).then(function (doc) { doc.save('Quotation-' + String(qno(q)).replace(/[^\w-]+/g, '') + '.pdf'); });
+  }
+
+  function qlines(c) {
+    return c.items.map(function (i, k) { return (k + 1) + '. ' + i.name + ' x' + i.qty + ' @ ' + money(i.price) + (i.disc ? ' (-' + i.disc + '%)' : '') + ' = ' + money(i.total); });
+  }
+  function qtext(q) {
+    var c = qcalc(q);
+    var out = ['*' + BIZ.name.toUpperCase() + ' | QUOTATION*', '',
+      '📋 Quote no: ' + qno(q), '📅 Date: ' + qdate(q.created_at || new Date()), '⏳ Valid until: ' + qdate(qvalid(q)), '',
+      '👤 ' + (q.client_name || '') + (q.client_company ? ' (' + q.client_company + ')' : ''), '',
+      '*Items*', qlines(c).join('\n'), '', 'Subtotal: ' + money(c.subtotal)];
+    if (c.discount_amount) out.push('Discount: - ' + money(c.discount_amount));
+    if (qnum(q.vat_rate)) out.push('VAT (' + qnum(q.vat_rate) + '%): ' + money(c.vat_amount));
+    if (c.delivery_fee) out.push('Delivery: ' + money(c.delivery_fee));
+    out.push('*TOTAL: ' + money(c.total) + '*');
+    if (c.deposit_amount) out.push('Deposit to confirm (' + qnum(q.deposit_percent) + '%): ' + money(c.deposit_amount));
+    out.push('', 'Pay via M-Pesa Paybill ' + BIZ.paybill + ', Account ' + BIZ.account + ' once you accept.');
+    if (q.payment_terms) out.push('Payment terms: ' + q.payment_terms);
+    if (q.delivery_terms) out.push('Delivery: ' + q.delivery_terms);
+    out.push('', 'Reply YES to accept this quotation. Thank you for considering ' + BIZ.name + '!', BIZ.phone + ' | ' + BIZ.web);
+    return out.join('\n');
+  }
+
+  function qHtml(q, c) {
+    var F = 'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Arial,sans-serif;';
+    var rows = c.items.map(function (i) {
+      return '<tr><td style="padding:14px 0;border-bottom:1px solid #eee7fb;' + F + 'font-size:15px;color:#1b1230;">' + hx(i.name) + '<div style="font-size:12px;color:#8a7fa8;padding-top:2px;">Qty ' + hx(i.qty) + ' &times; ' + hx(money(i.price)) + (i.disc ? ' &middot; ' + hx(i.disc) + '% off' : '') + '</div></td>' +
+        '<td align="right" style="padding:14px 0;border-bottom:1px solid #eee7fb;' + F + 'font-size:15px;font-weight:700;color:#1b1230;white-space:nowrap;">' + hx(money(i.total)) + '</td></tr>';
+    }).join('');
+    function line(label, val) { return '<tr><td style="padding:6px 18px;' + F + 'font-size:14px;color:#4a4163;">' + label + '</td><td align="right" style="padding:6px 18px;' + F + 'font-size:14px;color:#1b1230;">' + hx(val) + '</td></tr>'; }
+    var extra = line('Subtotal', money(c.subtotal));
+    if (c.discount_amount) extra += line('Discount', '- ' + money(c.discount_amount));
+    if (qnum(q.vat_rate)) extra += line('VAT (' + qnum(q.vat_rate) + '%)', money(c.vat_amount));
+    if (c.delivery_fee) extra += line('Delivery fee', money(c.delivery_fee));
+    var dep = c.deposit_amount ? '<tr><td colspan="2" style="padding:0 18px 14px;' + F + 'font-size:13px;color:#5b21b6;font-weight:700;">Deposit to confirm (' + qnum(q.deposit_percent) + '%): ' + hx(money(c.deposit_amount)) + '</td></tr>' : '';
+    var wa = 'https://wa.me/' + String(BIZ.phone).replace(/\D/g, '') + '?text=' + encodeURIComponent('Hello ' + BIZ.name + ', I accept quotation ' + qno(q));
+    function btn(href, label, bg, fg) { return '<a href="' + href + '" style="display:inline-block;background:' + bg + ';color:' + fg + ';' + F + 'font-size:15px;font-weight:800;text-decoration:none;padding:14px 22px;border-radius:14px;margin:4px;">' + label + '</a>'; }
+    var terms = [q.payment_terms && ('Payment: ' + q.payment_terms), q.delivery_terms && ('Delivery: ' + q.delivery_terms), q.notes].filter(Boolean).map(hx).join('<br>');
+    return '<div style="background:#efe7ff;padding:28px 12px;">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;border-radius:24px;overflow:hidden;background:#ffffff;box-shadow:0 12px 40px rgba(91,33,182,.22);">' +
+      '<tr><td align="center" bgcolor="#5b21b6" style="background:#5b21b6;background-image:linear-gradient(135deg,#9d5cff 0%,#7c3aed 45%,#3b0f8c 100%);padding:34px 24px 28px;">' +
+        '<div style="' + F + 'font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#e9ddff;">Stermont <span style="background:#c8f31d;color:#2a0e5c;padding:1px 7px;border-radius:5px;">Arcade</span></div>' +
+        '<div style="' + F + 'font-size:30px;font-weight:900;line-height:1.15;color:#ffffff;padding-top:20px;">Your quotation</div>' +
+        '<div style="' + F + 'font-size:15px;color:#e9ddff;padding-top:8px;">Quote <b style="color:#c8f31d;">' + hx(qno(q)) + '</b> &middot; valid until ' + hx(qdate(qvalid(q))) + '</div>' +
+      '</td></tr>' +
+      '<tr><td style="padding:28px 26px 8px;"><div style="' + F + 'font-size:18px;font-weight:800;color:#1b1230;">Hi ' + hx(q.client_name || 'there') + ',</div>' +
+        '<p style="' + F + 'font-size:15px;line-height:1.65;color:#4a4163;margin:10px 0 0;">Thank you for asking for a price. Here is your quotation from ' + hx(BIZ.name) + '. Reply to this email or tap the button below to accept, and we will take it from there.</p></td></tr>' +
+      '<tr><td style="padding:18px 26px 6px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8f5ff;border:1px solid #e6dcfb;border-radius:18px;">' +
+        '<tr><td colspan="2" style="padding:16px 18px 2px;' + F + 'font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7c3aed;">Items quoted</td></tr>' +
+        '<tr><td colspan="2" style="padding:0 18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + rows + '</table></td></tr>' + extra +
+        '<tr><td style="padding:14px 18px;' + F + 'font-size:16px;font-weight:700;color:#1b1230;">Total</td><td align="right" style="padding:14px 18px;' + F + 'font-size:24px;font-weight:900;color:#5b21b6;">' + hx(money(c.total)) + '</td></tr>' + dep +
+      '</table></td></tr>' +
+      '<tr><td style="padding:12px 26px 6px;"><div style="background:#efe7ff;border-radius:16px;padding:14px 16px;"><div style="' + F + 'font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#5b21b6;">How to pay once you accept</div>' +
+        '<div style="' + F + 'font-size:14px;font-weight:600;line-height:1.5;color:#1b1230;padding-top:6px;">M-Pesa Paybill <b>' + hx(BIZ.paybill) + '</b>, Account <b>' + hx(BIZ.account) + '</b></div>' +
+        (terms ? '<div style="' + F + 'font-size:12.5px;line-height:1.6;color:#6b5f8a;padding-top:8px;">' + terms + '</div>' : '') + '</div></td></tr>' +
+      '<tr><td align="center" style="padding:20px 26px 24px;">' + btn(wa, 'Accept on WhatsApp', '#7c3aed', '#ffffff') + btn('tel:' + String(BIZ.phone).replace(/[^\d+]/g, ''), 'Call us', '#c8f31d', '#2a0e5c') + '</td></tr>' +
+      '<tr><td align="center" bgcolor="#2a0e5c" style="background:#2a0e5c;padding:22px 24px;"><div style="' + F + 'font-size:14px;font-weight:700;color:#ffffff;">Thank you for considering ' + hx(BIZ.name) + '</div>' +
+        '<div style="' + F + 'font-size:12px;line-height:1.7;color:#cdbdf3;padding-top:6px;">Prices are in Kenya shillings and valid until ' + hx(qdate(qvalid(q))) + '.<br>Call ' + hx(BIZ.phone) + ' &middot; <a href="https://' + BIZ.web + '" style="color:#c8f31d;text-decoration:none;">' + hx(BIZ.web) + '</a><br>The Sarit Centre, Westlands, Nairobi</div></td></tr>' +
+      '</table></div>';
+  }
+  function qemail(q) {
+    var c; try { c = qcheck(q); } catch (e) { return Promise.reject(e); }
+    if (!EMAILJS.serviceId || !EMAILJS.statusTemplateId || !EMAILJS.publicKey) return Promise.reject(new Error('Email is not set up yet'));
+    if (!q.client_email) return Promise.reject(new Error('This quotation has no client email.'));
+    var params = {
+      to_email: q.client_email, reply_to: BIZ.email, from_email: BIZ.email, support_email: BIZ.email, to_name: q.client_name, name: q.client_name, customer_name: q.client_name, user_name: q.client_name, email: q.client_email,
+      business: BIZ.name, phone: BIZ.phone, web: BIZ.web, order_id: qno(q), order_number: qno(q), order_ref: qno(q), status: 'Quotation',
+      subject: BIZ.name + ': Quotation ' + qno(q), headline: 'Your quotation', message: 'Your quotation ' + qno(q) + ' is ready.',
+      items: qlines(c).join('\n'), total: money(c.total), date: qdate(q.created_at || new Date()), html_body: qHtml(q, c)
+    };
+    return fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ service_id: EMAILJS.serviceId, template_id: EMAILJS.statusTemplateId, user_id: EMAILJS.publicKey, template_params: params })
+    }).then(function (r) { if (!r.ok) return r.text().then(function (t) { throw new Error('EmailJS: ' + (t || r.status)); }); });
+  }
+
+  window.STM_RECEIPT = { pdf: pdf, email: email, text: text, notify: notify, review: review,
+    quote: { calc: qcalc, pdf: qpdf, email: qemail, text: qtext, no: qno, valid: qvalid, status: qstatus } };
 })();
