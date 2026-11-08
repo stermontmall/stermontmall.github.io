@@ -1599,3 +1599,11 @@ Owner: "Post 15 spare parts products on my website".
 - [ ] Ten of the fifteen listings currently have no suitable verified photo. Photo is optional under the owner's latest rule; they are live without a photo rather than using a mismatched image.
 - [ ] Product pages and sitemap have not yet been rebuilt/verified. `.github/workflows/product-pages.yml` is scheduled every 3 hours and supports workflow_dispatch; this connector exposes no workflow-dispatch action. Trigger via GitHub Actions UI or API command: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`. Then verify the 15 `/p/<id>.html` pages, Product JSON-LD, canonical URLs and sitemap entries.
 - Source pricing: FDR Auto Garage product listings/category pages (see each row's source URL); no source prices were guessed.
+
+
+## 2026-11-08 17:45 Africa/Nairobi - TVS HLX product-page rebuild and Pages deployment verified
+- [x] Product-pages workflow #455 generated all 15 product HTML files successfully. Verified each file exists in GitHub `p/` and contains a title, canonical link and Product JSON-LD.
+- [x] Verified all 15 new product URLs are present in `sitemap-products.xml`.
+- [x] GitHub Pages deployment run 42492233503 completed successfully after the generated pages were pushed. Product pages are therefore deployed from the generated catalogue commit.
+- [ ] Product-pages workflow's final IndexNow notification step was still running at last check; page generation, save and deployment succeeded independently.
+- [ ] Ten products remain without a verified matching image; keep as live no-photo listings until exact photos are found.
