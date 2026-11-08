@@ -148,9 +148,10 @@ function syncOverlays() {
    domain and a product could not be copied, shared or reopened. The base entry under it stays "/", so Back returns to the list. */
 const BASE_TITLE = document.title;
 const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
-/* The address is the product's own page, /p/<slug>.html (+ "#<size slug>" when the chosen size is not the page's own): a copied or shared link then
-   previews as this product, from that page's head. On a phone the page sends people back here (/?product=<slug>, see seo-shell-redirect.mjs). */
-const productUrl = () => { if (!qb.p) return undefined; const z = sizeOf(qb.p, qb.size).slug || qb.p.slug; return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); };
+/* The address is the product's own page, /p/<slug>.html?shell=1 (+ "#<size slug>" when the chosen size is not the page's own): a copied or shared link then
+   previews as this product, from that page's head, and whoever opens it lands on this same product view inside the shell (shell-chrome.js sends the
+   ?shell=1 address to /?product=<slug>). The plain /p/<slug>.html address is not redirected for anyone. */
+const productUrl = () => { if (!qb.p) return undefined; const z = sizeOf(qb.p, qb.size).slug || qb.p.slug; return '/p/' + encodeURIComponent(qb.p.slug) + '.html?shell=1' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); };
 function syncProductMeta() {   // tab title + address follow the open product (and the chosen size); both return to normal when it closes
   const open = qb.p && stack.some(id => PRODUCT_OVERLAYS.includes(id));
   document.title = open ? qb.p.name + ' | Stermont Arcade' : BASE_TITLE;
@@ -446,11 +447,12 @@ document.addEventListener('click', e => {
   if (t.closest('[data-pp-retry]')) return renderPP();
   if (t.closest('[data-pp-cart]')) return closeAllThen(() => goTab('cart'));
 });
-/* Share: the link to give out is the product's own page /p/<slug>.html. It carries the product's title, photo and description in its head, so
-   WhatsApp / Facebook / Google show the product. (A /?product= address is one shell page, so it can only preview as the home page.) */
+/* Share: the link to give out is the product's own page with ?shell=1, /p/<slug>.html?shell=1 (+ "#<size slug>" for a chosen pack size). It carries the product's
+   title, photo and description in its head, so WhatsApp / Facebook / Google show the product, and whoever opens it lands on this product view inside the shell
+   (shell-chrome.js). (A /?product= address is one shell page, so it can only preview as the home page.) */
 $('#pp-share').addEventListener('click', async () => {
   if (!qb.p) return;
-  const url = location.origin + '/p/' + encodeURIComponent(qb.p.slug) + '.html', title = qb.p.name + ' | Stermont Arcade';
+  const url = location.origin + productUrl(), title = qb.p.name + ' | Stermont Arcade';
   try { if (navigator.share) { await navigator.share({ title, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { toast(url); }
 });

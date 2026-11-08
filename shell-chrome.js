@@ -4,6 +4,18 @@
    Load with: <script src="/shell-chrome.js?v=1" defer></script>. To undo: remove that line from the page.
    /p/ and /c/ pages get it from seo-shell-chrome.mjs (run by product-pages.yml); no tab is marked current there. */
 (function () {
+  /* Shared product links: /p/<slug>.html?shell=1 is the link the shell's Share button gives out (and its address bar shows while a product is open).
+     Whoever opens it lands on that product INSIDE the shell (/?product=<slug>), the full product view with pack sizes, quantity, Add to cart and Buy now.
+     WhatsApp / Facebook / Google read the page's own head for the preview (they do not run scripts), so the link still previews as the product.
+     Only the ?shell=1 address is sent to the shell. The plain /p/<slug>.html address is NOT redirected for anyone (no cloaking, see HANDOFF-stop-shell-redirect.md);
+     its canonical stays the plain address. A "#<size slug>" on the link selects that pack size. To undo: delete this try block. */
+  try {
+    var sm = /^\/p\/([^\/]+)\.html$/.exec(location.pathname);
+    if (sm && /[?&]shell=1(&|$)/.test(location.search)) {
+      var target = location.hash.length > 1 ? location.hash.slice(1) : sm[1];
+      if (/^[A-Za-z0-9._%~-]+$/.test(target)) { location.replace('/?product=' + target); return; }
+    }
+  } catch (e) {}
   try {
     if (window.__stmChrome) return; window.__stmChrome = 1;
     var P = '#7c3aed', LINE = '#e5e7eb';
