@@ -20,15 +20,23 @@ const PEST = new Set(['pest-control-fumigation', 'bed-bug-killers', 'cockroach-a
 // Plant inputs (rooting hormone, foliar feeds, growth regulators) are not sprayed pesticides: no PCPB, pre-harvest or "mixing and spraying" wording for them.
 const PLANT_INPUT = new Set(['adjuvants-growth-regulators']);
 
-const HUB_NAME = { 'pest-control-fumigation': 'Pest Control & Fumigation', 'agrochemicals': 'Agrochemicals', 'agrovet': 'Agrovet', 'tvs-audio': 'TVs & Audio', 'appliances': 'Appliances', 'automotive': 'Automotive' };
+const HUB_NAME = { 'pest-control-fumigation': 'Pest Control & Fumigation', 'agrochemicals': 'Agrochemicals', 'agrovet': 'Agrovet', 'tvs-audio': 'TVs & Audio', 'tv-audio-video': 'TV, Audio & Video', 'appliances': 'Appliances', 'automotive': 'Automotive', 'fashion': 'Clothing & Fashion', 'phones-accessories': 'Phones & Accessories', 'computers-accessories': 'Computers & Accessories', 'home-kitchen': 'Home & Kitchen', 'baby-products': 'Kids & Baby Products', 'shoes': 'Shoes', 'health-beauty': 'Health & Beauty' };
 const PARENT = {
   'bed-bug-killers': 'pest-control-fumigation', 'cockroach-ant-killers': 'pest-control-fumigation', 'mosquito-fly-control': 'pest-control-fumigation', 'rodent-control': 'pest-control-fumigation',
   'termite-control': 'pest-control-fumigation', 'fumigation-chemicals': 'pest-control-fumigation', 'sprayers-equipment': 'pest-control-fumigation',
   'crop-insecticides': 'agrochemicals', 'herbicides': 'agrochemicals', 'fungicides': 'agrochemicals', 'adjuvants-growth-regulators': 'agrochemicals',
   'agrochemicals': 'agrovet', 'fertilizers': 'agrovet', 'veterinary-drugs': 'agrovet', 'animal-feeds': 'agrovet', 'disinfectants-hygiene': 'agrovet',
   'televisions': 'tvs-audio', 'home-theatre': 'tvs-audio', 'bluetooth-speakers': 'tvs-audio', 'tv-mounts-accessories': 'tvs-audio',
-  'washing-machines': 'appliances', 'fridges-freezers': 'appliances', 'kitchen-dining': 'appliances',
-  'cars-for-sale': 'automotive', 'car-accessories-parts': 'automotive', 'motorcycle-accessories': 'automotive'
+  'washing-machines': 'appliances', 'fridges-freezers': 'appliances',
+  'cars-for-sale': 'automotive', 'car-accessories-parts': 'automotive', 'motorcycle-accessories': 'automotive',
+  'mens-fashion': 'fashion', 'womens-fashion': 'fashion', 'kids-fashion': 'fashion',
+  'phones-tablets': 'phones-accessories', 'phone-accessories': 'phones-accessories', 'refurbished-phones': 'phones-accessories', 'earphones-headset': 'phones-accessories',
+  'tvs-audio': 'tv-audio-video', 'cameras-photography': 'tv-audio-video', 'music-audio': 'tv-audio-video', 'woofers': 'tv-audio-video',
+  'computing': 'computers-accessories', 'gaming': 'computers-accessories', 'networking-smart-home': 'computers-accessories', 'printers-office-machines': 'computers-accessories', 'security-cctv': 'computers-accessories',
+  'home-office': 'home-kitchen', 'bedding-decor': 'home-kitchen', 'cleaning-laundry': 'home-kitchen', 'electrical-lighting': 'home-kitchen', 'furniture': 'home-kitchen', 'home-storage': 'home-kitchen', 'kitchen-dining': 'home-kitchen', 'solar-power': 'home-kitchen',
+  'toys-games': 'baby-products',
+  'mens-sneakers': 'shoes', 'womens-sneakers': 'shoes', 'ladies-sandals': 'shoes',
+  'medical-supplies': 'health-beauty'
 };
 const SIBLINGS = {
   'crop-insecticides': ['fungicides', 'herbicides', 'adjuvants-growth-regulators', 'sprayers-equipment'],
