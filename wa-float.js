@@ -1,6 +1,19 @@
 /* Floating WhatsApp button, shown on every public page so customers can ask about stock and delivery fees in one tap.
    Loaded directly by the info pages, and from /img-protect.js and /analytics.js (storefront, product, category and blog pages).
    Loading it twice is harmless: the second run sees the button and stops. */
+/* 2026-11-08: on the mobile shell (the page that has the full-screen product view #page-product) this also loads /mobile-shell/pp-whatsapp.js,
+   which puts WhatsApp buttons INSIDE the product view (this floating button is hidden while a product page is open).
+   Done here so index.html (which the build bot rewrites) did not need editing. To undo: delete this block and mobile-shell/pp-whatsapp.js. */
+(function () {
+  try {
+    if (!document.getElementById('page-product') || window.__ppWa) return;
+    window.__ppWa = 1;
+    var s = document.createElement('script');
+    s.src = '/mobile-shell/pp-whatsapp.js?v=1';
+    s.defer = true;
+    document.head.appendChild(s);
+  } catch (e) {}
+})();
 /* 2026-11-05: also loads the shell top bar and bottom nav (/shell-chrome.js) on every public static page that loads this file
    (nairobi, bulk-quote, blog, guides, ...), so the mobile shell look is the default everywhere without editing each generator.
    Skipped on the storefront shell itself, admin, classic and tool pages. shell-chrome.js is idempotent (window.__stmChrome).
