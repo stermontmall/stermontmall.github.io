@@ -1,3 +1,10 @@
+## 2026-11-08 20:50 Africa/Nairobi - MERGED to main: classic.html removed from every path (commit b908821, branch `wip-no-classic-hop`)
+- [x] Tested before merge: `node no-classic-hop.test.mjs` OK; `python3 mobile-shell/shell.test.py` 164/168 vs 155/159 on clean main: the SAME 4 checks fail on both (sandbox network ERR_TUNNEL errors, and 3 stale checks, see below), all 9 new checks pass. Not tested against the live domain (sandbox cannot reach it).
+- [ ] OWNER, on a phone (open the site twice so the new app.js?v=18 loads): (1) add 2 items, tap Checkout: the cart opens and the address stays `stermontarcade.co.ke/`; (2) open `stermontarcade.co.ke/classic.html` and `stermontarcade.co.ke/?item=agrimec-018ec-insecticide-100ml`: both end on the shell (the second on that product).
+- [ ] PRE-EXISTING failures on main, not caused by this change, still red in `shell.test.py`: "home page keeps the SEO head" (title/robots wording drifted), two "share:" checks (the share link now carries `?shell=1`). These will fail `seo-pr-quality.yml` on the next PR until the tests are updated to the current behavior.
+- [ ] Still open: `wip-broken-links-fix` (404 fallback, 30-min rebuild, page guard; based on an older main) is NOT merged. Rebase before merging.
+- Rollback: `git revert b908821` restores the old 128 KB classic.html as the checkout page.
+
 ## 2026-11-08 20:25 Africa/Nairobi - classic.html removed from every path (branch `wip-no-classic-hop`)
 Owner answered "Fix the issue permanently. Make everything work efficiently" (no single symptom named), so every route through classic.html was removed.
 - [x] `git mv classic.html checkout.html`: the checkout surface (M-Pesa, delivery fees, order e-mails) keeps all its code under an honest name. Still `noindex`; opened ONLY inside the shell's checkout frame. A direct visit without a cart handoff still bounces to `/`.
