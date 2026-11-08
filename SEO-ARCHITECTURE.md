@@ -80,22 +80,23 @@ Before considering an SEO release complete, verify:
 - IndexNow submission is not described as Google indexing.
 - Google Search Console indexing/performance must be checked separately; a sitemap submission does not guarantee indexing or rankings.
 
-## 7. Current audit snapshot (database)
+## 7. Current audit snapshot (database; checked 2026-11-09)
 
 - Active products: 729.
 - Active products with blank seo_title: 0.
-- Active products with blank seo_name: 40.
-- Active products with empty image arrays: 0.
+- Active products with blank seo_name: 0 (the 40 missing values were normalized using verified catalogue names and shared variant-group names).
+- Active products with seo_title longer than 60 characters: 0 (28 overlength titles were corrected).
+- Active products with no category_id: 0.
+- Active products with an empty images array: 0.
+- Seven active agrochemical listings still reference legacy github.io photo paths previously identified as missing from both repository and Storage. A non-empty image array is not proof that an image loads or matches the product; those seven remain blocked for photo replacement and visual verification.
 - Prior description audit: 0 active products below 600 words; 272 were in the 600–800 word band at the last check. Word count alone is not a quality or ranking score.
-
-The 40 blank seo_name values need a controlled, product-by-product normalization pass. Do not bulk-copy SEO titles into seo_name: seo_name also affects the visible product heading and grouped pack-size pages.
 
 ## 8. Ordered implementation queue
 
-1. **P0 — Technical release verification:** run the product-page workflow; inspect latest run, generated page guard, canonical/robots/sitemap output and live HTTP responses.
-2. **P1 — Product identity cleanup:** resolve the 40 missing seo_name records using verified product identity and variant grouping; check titles, H1s and Product JSON-LD together.
-3. **P1 — Image integrity:** verify actual image objects and visual product/pack match, not merely a non-empty database array.
-4. **P1 — Category taxonomy:** audit parent/child coverage, category index completeness, breadcrumbs and links from home/category/product pages.
+1. **P0 — Technical release verification:** current product-page workflow is rebuilding; confirm it finishes green, then verify live HTTP responses and the generated sitemap files.
+2. **P1 — Image integrity:** replace and visually verify the seven known dead legacy product-photo references; then sample the remaining catalogue for exact product/pack match.
+3. **P1 — Category taxonomy:** audit parent/child coverage, category index completeness, breadcrumbs, empty leaf categories and links from home/category/product pages.
+4. **P1 — Product-page structured data:** compare rendered H1, price, availability, image and JSON-LD for representative products and multi-size groups.
 5. **P2 — Services:** ensure each core service has one complete, indexable, distinct landing page and accurate local coverage.
 6. **P2 — Blog clusters:** map each existing article to one intent and cluster; merge or redirect only after URL and traffic review.
 7. **P3 — Measurement:** use Google Search Console query/page data to prioritize pages by impressions, clicks, CTR and position; track enquiries and product sales separately.
