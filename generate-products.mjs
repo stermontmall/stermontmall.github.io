@@ -397,6 +397,8 @@ function productSiloHtml(p, cat, related) {
     'fungicides': [['/blog/pest-control-products-for-hotels-and-restaurants-kenya.html','Product selection and safe storage guidance']]
   };
   const guides = (guideMap[cat.slug] || guideMap[hubSlug] || []).filter(([url]) => existsSync('.' + url));
+  const priceGuide = `/guides/cheapest-${cat.slug}-kenya.html`;
+  if (existsSync('.' + priceGuide) && !guides.some(([url]) => url === priceGuide)) guides.unshift([priceGuide, `Compare ${cat.name} prices in Kenya`]);
   return `<section class="product-silo" aria-label="Category links, related products and buying guides">
     <h2>Explore ${esc(cat.name)} and related buying guides</h2>
     <p>Browse the main category, compare related products and read practical guides before choosing.</p>
