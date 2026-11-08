@@ -1852,6 +1852,6 @@ Owner requested 20 additional fast-moving sneaker styles, avoiding existing cata
 - [x] Inventory defaults: stock 1,000; low-stock threshold 20; featured=true; cost set to 85% of displayed price as requested.
 - [x] Product data: added unique Kenya-focused titles, meta descriptions and FAQs in seo-overrides.json, plus model-specific supplementary buying guidance in product-content.json; updated product-content.test.mjs allowlist.
 - [x] Photo retries completed for initial image-ingestion failures; final SQL check returned total=30, active=30, one_image=30, defaults_ok=30.
-- [ ] Verify the product-pages GitHub Actions run, generated /p/<id>.html pages, product sitemap entries and live customer links before calling the static SEO pages deployed.
+- [ ] Verify the next product-pages GitHub Actions run after the product-content validation correction, generated /p/<id>.html pages, product sitemap entries and live customer links before calling the static SEO pages deployed.
 - [ ] Verify the blog-build run publishes the three new phone-buying guides into /blog/ and sitemap.xml.
 - Note: prices are catalogue estimates, not supplier-confirmed quotations or stock reservations. Confirm supplier price, exact regional SKU, warranty, physical RAM and included accessories before fulfilling an order. Image files were sourced from manufacturer/retailer pages; confirm image-use permissions before commercial reuse.
