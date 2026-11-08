@@ -1,3 +1,11 @@
+## 2026-11-08 09:10 Africa/Nairobi - admin "Find photos online" added (admin.html > AI photo upload tab)
+Owner: "Add that feature on admin app".
+- [x] New Edge Function `find-photo` (v1, verify_jwt true + staff check; source `supabase/functions/find-photo/index.ts`). Searches Bing images by product name (no API key), `suggest` mode returns up to 8 options; `auto` mode downloads candidates, keeps real jpg/png/webp >= 450x450, asks Gemini whether it is the SAME product (brand/model/pack size, no other shop's branding) and attaches the first that passes. Never replaces an existing photo; never changes price/stock/active.
+- [x] `admin-photo-ai.js` (`admin.html` loads `?v=4`): new "Find photos online" card at the top of the tab: loads active products with no photo, "Find photo" (pick from thumbnails, attaches via ai-add-product attach_existing) and "Find & attach all" (auto mode).
+- [x] Tested: JS syntax, function loads with a stubbed runtime, image-size parser on PNG/JPEG samples. NOT tested end to end (no staff login, and the sandbox cannot reach Bing/the site).
+- [ ] Needs Supabase secret GEMINI_API_KEY for "Find & attach all" (already needed by ai-add-product; without it only "Find photo" works). Bing may block the server; the card then says so and the manual link box still works.
+- [ ] NEXT: owner opens /admin.html > AI photo upload > Load products without a photo, tries one product with "Find photo", then rebuild pages: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+
 ## 2026-11-08 08:50 Africa/Nairobi - photo search attempt: 0 photos attached (no file changes besides this note)
 Owner: "Find photos online and attach them". 29 ACTIVE products have no photo (20 kids-*, 4 pest, 5 sprayer/protective items: aico-ac-8l, aico-japan-ac16l, chemical-spray-protective-suit, greenberg-gold-motorised-sprayer-15l, high-pressure-sprayer-hose-50-metres).
 - [x] Image search finds pictures but does not return direct image file URLs; web search for the exact pest items (Mortein Doom Aik Lemon, Grinbelt Vermin 100g, Mos-Kill Dudu 200g) returned other brands/pages. Attaching needs a direct https image URL of the EXACT product (`public.add_product_photo(id, url)` or upload-photos), so nothing was attached rather than risk a wrong photo.
