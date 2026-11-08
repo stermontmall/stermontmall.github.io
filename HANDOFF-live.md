@@ -1664,3 +1664,6 @@ Owner: "Post 15 spare parts products on my website".
 - [ ] Nine remaining images still need exact source photos. Do not use visually similar but wrong variants; the available image search results for the chain kit and 4-gear speedometer did not match the exact variant/part number.
 - [ ] Product-page rebuild after the two new image URLs; mobile shell reads Supabase directly, while static SEO product pages refresh on the product-pages workflow schedule.
 - Note: database function was updated directly in production; no repository migration file was generated because the Supabase CLI migration-new step was unavailable in this session. Preserve the function definition in a proper migration before future schema rollouts.
+
+- [x] Added a workflow-path change to request the static product-page rebuild after the two verified photo additions (commit a044e9958c2a4caa12284b136f2b9d1f9fc2d752). GitHub combined status returned no status checks, so do not claim the build/deployment passed yet.
+- [x] Corrected the Supabase add_product playbook opening so it no longer describes the photo as optional.
