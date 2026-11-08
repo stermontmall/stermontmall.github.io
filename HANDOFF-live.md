@@ -1676,3 +1676,15 @@ Owner: "Post 15 spare parts products on my website".
 
 - [x] Added a workflow-path change to request the static product-page rebuild after the two verified photo additions (commit a044e9958c2a4caa12284b136f2b9d1f9fc2d752). GitHub combined status returned no status checks, so do not claim the build/deployment passed yet.
 - [x] Corrected the Supabase add_product playbook opening so it no longer describes the photo as optional.
+
+
+## 2026-11-08 - Fresh Bajaj Boxer BM150 product batch (3 photo uploads verified; live rows)
+Owner explicitly instructed not to recover deleted listings and to start fresh with product-specific photos.
+- [x] Created three new product records from scratch (no restore/recovery): Bajaj Boxer BM150 Exhaust Assembly, BM150 Side Stand Kit, and BM150 Oil Filter Cap.
+- [x] Researched Kenya supplier prices from Bajaj East Africa: exhaust KSh 12,000; side stand KSh 300; oil-filter cap KSh 300. Source: https://bajajeastafrica.com/spares/
+- [x] Sourced matching product photos: Boxer 150 exhaust image; Boxer BM150 side stand kit image; Boxer BM150 UG oil-filter cap image. Source image URLs were ingested into Supabase Storage; each upload function response returned HTTP 200 and {"ok":true,"photos":1}.
+- [x] Verified all three Storage objects exist in public bucket product-images with image MIME types and HTTP 200 metadata; verified each product.images array contains its own Supabase Storage URL.
+- [x] Activated all three products through activate_product_if_photo_ok and verified active=true. Applied stock 1000, low_at 20, featured=true, and COGS at 85% of listed selling price (15% below selling price).
+- [ ] Static product-page build/sitemap deployment is NOT yet verified. The direct generated page URLs were not accessible during this session; check product-pages workflow and verify each /p/<slug>.html plus sitemap-products.xml before claiming static SEO pages deployed.
+- [ ] Product descriptions are factual but shorter than the 600+ word long-form standard requested previously; expand them before treating the content SEO task as complete.
+- Product IDs: bajaj-boxer-bm150-exhaust-assembly-fresh; bajaj-boxer-bm150-side-stand-kit-fresh; bajaj-boxer-bm150-oil-filter-cap-fresh.
