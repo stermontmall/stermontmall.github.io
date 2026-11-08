@@ -1,0 +1,39 @@
+# Stermont Arcade - guard against a broken or emptied workflow file.
+# Why: on 2026-11-08 commit 3d378d6b replaced product-pages.yml (9.5 KB) with a few comment lines. GitHub then could not start the workflow, every push
+# showed a red run with no steps, and no product pages were rebuilt for two hours (new products had no page, so their links were dead).
+# This check runs on every push that touches .github/workflows and fails (GitHub emails the owner) if any workflow file does not parse, has no
+# `on:` trigger, or has no jobs.
+name: Workflow guard
+
+on:
+  push:
+    paths:
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Every workflow file must parse and define a trigger and jobs
+        run: |
+          python3 -c 'import yaml' 2>/dev/null || pip install --quiet pyyaml
+          python3 - <<'PY'
+          import glob, sys, yaml
+          bad = []
+          for f in sorted(glob.glob('.github/workflows/*.yml') + glob.glob('.github/workflows/*.yaml')):
+              try:
+                  d = yaml.safe_load(open(f, encoding='utf-8'))
+              except Exception as e:
+                  bad.append(f'{f}: does not parse ({str(e).splitlines()[0]})'); continue
+              if not isinstance(d, dict): bad.append(f'{f}: empty or comments only'); continue
+              if not (d.get('on') or d.get(True)): bad.append(f'{f}: no trigger (on:)')
+              if not d.get('jobs'): bad.append(f'{f}: no jobs')
+          for b in bad: print('::error::' + b)
+          print('checked workflow files:', len(glob.glob('.github/workflows/*.y*ml')), '| problems:', len(bad))
+          sys.exit(1 if bad else 0)
+          PY
