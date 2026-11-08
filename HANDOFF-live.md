@@ -1629,7 +1629,7 @@ Owner: "Post 15 spare parts products on my website".
 
 
 ## 2026-11-08 - Added photos to recently created Boxer products
-- [x] Added and verified product photos in Supabase for 8 of the 10 recent products that previously had no image: BM100 6004 sprocket bearing; BM125/BM150 6301 front bearing; JA541211 oil filler cap; PF232601 ignition lock kit; 30151041 speedometer drive pinion; STD+ BM150 piston kit; PF531033 5-gear crankshaft; BM150 camshaft; and BM150 5-gear kick starter shaft.
+- [x] Added and verified product photos in Supabase for 9 of the 10 recent products that previously had no image: BM100 6004 sprocket bearing; BM125/BM150 6301 front bearing; JA541211 oil filler cap; PF232601 ignition lock kit; 30151041 speedometer drive pinion; STD+ BM150 piston kit; PF531033 5-gear crankshaft; STD+ piston kit; BM150 camshaft; and BM150 5-gear kick starter shaft.
 - [x] Confirmed photo URLs were saved into each product's images array and public Supabase product-images storage.
 - [ ] BM150 left side cover 52PF1829 remains without a photo. Search results found a white BM150 cover but not the listed cocktail white/red variant; do not substitute a visibly different colour/decoration.
 - [ ] No image was attached to any item using a generic unrelated motorcycle photo. Existing catalogue image records for the other recent products remain unchanged.
