@@ -722,3 +722,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-08: rebuild motorcycle product pages after adding 15 researched Boxer and TVS spare parts with matched images.
 
 // 2026-11-08: rebuild catalogue after adding 15 verified TVS HLX and Bajaj Boxer spare-part listings with matched supplier photos.
+
+// 2026-11-08: refresh catalogue after setting the new 15 motorcycle listings as featured products.
