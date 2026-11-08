@@ -1961,3 +1961,16 @@ Owner instruction: “Continue with the next 30.”
 - [!] Static product HTML, canonical tags, Product JSON-LD, sitemap inclusion, IndexNow notification and GitHub Pages deployment have not been verified for this batch. Google indexing and rankings are not claimed.
 - [ ] Next catalogue scan: fresh SQL count after this batch confirms 60 active products remain below 600 words.
 - Customer-facing product links must use the mobile-shell format `https://stermontarcade.co.ke/?product=<slug>` after confirming the item is active.
+
+
+## PROGRESS CHECKPOINT — 09 Nov 2026 (Africa/Nairobi)
+
+- Expanded `seo-check.mjs` to audit HTML pages under `pest-control/`, validate `pest-control/sitemap.xml`, detect missing local image files, flag legacy GitHub Pages product-photo URLs, and check local image sitemap entries. Merged to main in PRs #479 and #481.
+- Updated `.github/workflows/seo-daily.yml` so changes to `pest-control/**`, generated `p/**` and `c/**` pages, `products.html`, and sitemaps trigger the daily audit.
+- Shortened 19 overlong pest-control blog titles and corrected 4 meta descriptions. Merged PR #483. Latest audit no longer reports title or meta-description length problems.
+- Replaced missing image references for Total Touch 250 SC (1 L), Tower Extreme 680 WG (1 kg), Touchdown (1 L), Ortiva 250 SC (1 L), and NIVEA Sun SPF 50 (40 ml). Original image arrays backed up in `products_images_backup_20261109`. Product pages and image sitemap regenerated; sitemap now contains 672 image entries and excludes the 3 remaining missing image files.
+- Updated SEO names/titles for Livergen Plus, Layer Premix, Nilzan Plus, Amito 5.7WDG and Tower Extreme using Search Console opportunity terms. Rewrote the Livergen opening paragraph; verified it remains 791 words. Backups in `products_seo_keyword_backup_20261109` and `products_livergen_description_backup_20261109`.
+- Product build #504 completed successfully; active-product page guard passed. GitHub Pages deployment #1697 completed successfully. Google sitemap submission workflow #398 completed successfully. Build #505 is rebuilding the latest product SEO title changes; Google sitemap workflow #399 is queued/in progress after the preceding build.
+- Latest daily SEO report #487: 982 pages checked; only 3 missing local product-photo files remain: `jade-premium-bio-pesticide-1-litre.jpg`, `one-touch-crop-protector-insecticide-250-ml.jpg`, and `acetochlor-50-ec-herbicide-1-litre.jpg`. No exact, trustworthy matching photos were found, so do not substitute unrelated packaging. Obtain supplier photo/source URL before replacing.
+- Latest Google indexing report available (#464, 08 Nov): 178/183 inspected pages indexed, 5 not indexed, 67 not yet checked. Refresh Search Console indexing status after the next scheduled run; sitemap submission does not guarantee indexing.
+- Business pickup/service address wording was not changed because the actual customer-facing pickup address and service coverage still need owner confirmation.
