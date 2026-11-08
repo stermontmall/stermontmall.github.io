@@ -3,6 +3,11 @@
 name: SEO extras
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'seo-extras.mjs'
+      - '.github/workflows/seo-extras.yml'
   workflow_dispatch:
   schedule:
     - cron: '30 6 * * 1'
