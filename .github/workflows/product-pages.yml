@@ -11,6 +11,7 @@ on:
     branches: [main]
     paths:
       - 'generate-products.mjs'
+      - 'seo-product-extras.mjs'
       - 'seo-meta.mjs'
       - 'seo-safe-meta.mjs'
       - 'seo-safe-meta.test.mjs'
