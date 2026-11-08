@@ -86,7 +86,7 @@ export function pdpTagline(ctx = {}) {
   return 'M-Pesa checkout · Delivery to all 47 counties · Pickup at Sarit Centre, Westlands';
 }
 
-// PDP meta title, max 60 characters.
+// PDP meta title, max 60 characters. seo-catalog-guard.mjs enforces the same limit on every active database title.
 //   Best:   "<Original|Power word> <name> – Best Price in Kenya | Stermont Arcade"
 // "Original" leads when it is true (known brand or farm input); otherwise a type-appropriate power word leads.
 // Long names cannot fit all of that in 60 characters, so wording is dropped from the least important end:
