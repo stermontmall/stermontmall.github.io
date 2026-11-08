@@ -614,3 +614,4 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 
 // Rebuild trigger 2026-11-06: publish the T8 F10W G13 UV fly-killer replacement tube product page and sitemap entry.
 // 2026-11-08: rebuild product pages and product sitemap after adding four SEO-updated poultry products.
+// 2026-11-08: rebuild catalogue for 15 new rodent-control, fly-monitoring and PPE listings.
