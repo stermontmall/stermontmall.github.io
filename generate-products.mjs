@@ -58,7 +58,10 @@ const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).re
 // The files are the same, so serve them from the main domain: one site for Google to index, nothing breaks if github.io is ever turned off.
 const OLD_HOST = /^https?:\/\/stermontmall\.github\.io\//i;
 const fixImg = u => (typeof u === 'string' ? u.replace(OLD_HOST, SITE + '/') : u);
-const fixProducts = list => list.map(p => (Array.isArray(p.images) ? { ...p, images: p.images.map(fixImg) } : p));
+// Do not render known-missing legacy files as product photos. Keep the catalog rows active;
+// product pages fall back to the store identity until an exact, verified pack photo is uploaded.
+const MISSING_LEGACY_PRODUCT_PHOTO = /(?:acetochlor-50-ec-herbicide-1-litre|jade-premium-bio-pesticide-1-litre|one-touch-crop-protector-insecticide-250-ml|ortiva-250-sc-fungicide-1-litre|total-touch-250-sc-insecticide-1-litre|touchdown-herbicide-1-litre|tower-extreme-680-wg-fungicide-1-kg)\\.(?:jpg|webp)$/i;
+const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.images) ? p.images : []).filter(u => typeof u === 'string' && !MISSING_LEGACY_PRODUCT_PHOTO.test(u)).map(fixImg) }));
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
