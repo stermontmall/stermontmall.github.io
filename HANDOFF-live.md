@@ -1,3 +1,10 @@
+## 2026-11-08 21:25 Africa/Nairobi - "Cars for Sale" category, Mercedes-Benz CLA 200 first (branch `wip-cars-for-sale`)
+Owner: the Mercedes was buried at the bottom of Automotive (~130 featured motorcycle parts sort ahead of it) and asked for a category for selling cars.
+- [x] Supabase: new sub-category `categories.id=88` "Cars for Sale" (`cars-for-sale`, parent 15 Automotive, sort_order -1 so its chip comes first). `products.id='mercedes-benz-cla-200-for-sale-kenya'` moved from category_id 15 to 88. UNDO: `update products set category_id=15 where id='mercedes-benz-cla-200-for-sale-kenya'; delete from categories where id=88;`
+- [x] Generators: `generate-products.mjs` adds an `automotive` hub (kids cars-for-sale, car-accessories-parts, motorcycle-accessories) and an INFO entry for `cars-for-sale`; `seo-product-extras.mjs` adds the PARENT/HUB_NAME entries so product breadcrumbs read Home > Automotive > Cars for Sale > product. Tests pass (seo-meta, seo-titles, seo-safe-meta, product-content, not-found-fallback, check-product-pages, no-classic-hop, seo-indexing-guard).
+- [ ] VERIFY after the rebuild: `c/cars-for-sale.html` exists and lists the Mercedes; `c/automotive.html` lists cars + motorcycle parts; product page breadcrumb updated; shell Automotive shows a "Cars for Sale" chip. Shell cache: open the site twice.
+- [ ] To add the next car: add it in /admin.html with category Automotive > Cars for Sale, price, 10 photos (same rules as any product).
+
 ## 2026-11-08 21:10 Africa/Nairobi - wrong category in product breadcrumbs (branch `wip-breadcrumb-category-fix`)
 Owner: "Fix directly any issues that may affect my website ranking on google regarding links and any other issue".
 - [x] FOUND: `seo-product-extras.mjs` read each product's category with a GREEDY regex over the whole page, so it took the LAST `/c/` link on the page (a "Related categories" link). 353 of 602 product pages had the wrong category in the visible breadcrumb AND the BreadcrumbList JSON-LD (e.g. Bluetooth speaker under "TV Mounts & Accessories", Rootex 6 under "Crop Insecticides"). It also fed the wrong slug to the guides/related blocks.

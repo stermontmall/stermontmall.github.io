@@ -200,7 +200,8 @@ const HUBS = {
   'agrochemicals': { name: 'Agrochemicals', label: 'Agrochemicals by type', kids: ['herbicides', 'fungicides', 'crop-insecticides', 'adjuvants-growth-regulators'] },
   'agrovet': { name: 'Agrovet', label: 'Agrovet by type', kids: ['agrochemicals', 'fertilizers', 'veterinary-drugs', 'animal-feeds', 'disinfectants-hygiene'] },
   'tvs-audio': { name: 'TVs & Audio', label: 'TVs and audio by type', kids: ['televisions', 'home-theatre', 'bluetooth-speakers', 'tv-mounts-accessories'] },
-  'appliances': { name: 'Appliances', label: 'Appliances by type', kids: ['washing-machines', 'fridges-freezers', 'kitchen-dining'] }
+  'appliances': { name: 'Appliances', label: 'Appliances by type', kids: ['washing-machines', 'fridges-freezers', 'kitchen-dining'] },
+  'automotive': { name: 'Automotive', label: 'Automotive by type', kids: ['cars-for-sale', 'car-accessories-parts', 'motorcycle-accessories'] }
 };
 for (const [slug, h] of Object.entries(HUBS)) {
   const items = [...(byCat[slug]?.items || [])];
@@ -209,6 +210,9 @@ for (const [slug, h] of Object.entries(HUBS)) {
 }
 // Extra search-friendly text for category pages. Categories not listed here still get a normal page.
 const INFO = {
+  'cars-for-sale': { h1: 'Cars for Sale in Kenya', title: 'Cars for Sale in Kenya | Mercedes-Benz and More | Stermont Arcade',
+    desc: 'Browse cars for sale in Kenya at Stermont Arcade, starting with the Mercedes-Benz CLA 200. See photos and the price in KSh, then enquire on WhatsApp.',
+    intro: 'Cars for sale from Stermont Arcade, with photos and the price in Kenya shillings. Message us on WhatsApp to ask about a car, arrange a viewing and confirm the details before you pay.' },
   'pest-control-fumigation': { h1: 'Pest Control & Fumigation Products in Kenya', title: 'Pest Control & Fumigation Products in Kenya | Stermont Arcade',
     desc: 'Buy bed bug killers, insecticides and fumigation products online in Kenya. Pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.',
     intro: 'Stermont Arcade stocks insecticides and pest control supplies for homes, hotels, hostels, offices, farms and public places. Look for a PCPB registration number on the label, read the label before use and keep chemicals away from children and pets. For large premises or fumigation of stores and grain, use a licensed pest control operator.' },

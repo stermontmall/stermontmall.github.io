@@ -20,14 +20,15 @@ const PEST = new Set(['pest-control-fumigation', 'bed-bug-killers', 'cockroach-a
 // Plant inputs (rooting hormone, foliar feeds, growth regulators) are not sprayed pesticides: no PCPB, pre-harvest or "mixing and spraying" wording for them.
 const PLANT_INPUT = new Set(['adjuvants-growth-regulators']);
 
-const HUB_NAME = { 'pest-control-fumigation': 'Pest Control & Fumigation', 'agrochemicals': 'Agrochemicals', 'agrovet': 'Agrovet', 'tvs-audio': 'TVs & Audio', 'appliances': 'Appliances' };
+const HUB_NAME = { 'pest-control-fumigation': 'Pest Control & Fumigation', 'agrochemicals': 'Agrochemicals', 'agrovet': 'Agrovet', 'tvs-audio': 'TVs & Audio', 'appliances': 'Appliances', 'automotive': 'Automotive' };
 const PARENT = {
   'bed-bug-killers': 'pest-control-fumigation', 'cockroach-ant-killers': 'pest-control-fumigation', 'mosquito-fly-control': 'pest-control-fumigation', 'rodent-control': 'pest-control-fumigation',
   'termite-control': 'pest-control-fumigation', 'fumigation-chemicals': 'pest-control-fumigation', 'sprayers-equipment': 'pest-control-fumigation',
   'crop-insecticides': 'agrochemicals', 'herbicides': 'agrochemicals', 'fungicides': 'agrochemicals', 'adjuvants-growth-regulators': 'agrochemicals',
   'agrochemicals': 'agrovet', 'fertilizers': 'agrovet', 'veterinary-drugs': 'agrovet', 'animal-feeds': 'agrovet', 'disinfectants-hygiene': 'agrovet',
   'televisions': 'tvs-audio', 'home-theatre': 'tvs-audio', 'bluetooth-speakers': 'tvs-audio', 'tv-mounts-accessories': 'tvs-audio',
-  'washing-machines': 'appliances', 'fridges-freezers': 'appliances', 'kitchen-dining': 'appliances'
+  'washing-machines': 'appliances', 'fridges-freezers': 'appliances', 'kitchen-dining': 'appliances',
+  'cars-for-sale': 'automotive', 'car-accessories-parts': 'automotive', 'motorcycle-accessories': 'automotive'
 };
 const SIBLINGS = {
   'crop-insecticides': ['fungicides', 'herbicides', 'adjuvants-growth-regulators', 'sprayers-equipment'],
