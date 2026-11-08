@@ -1688,3 +1688,15 @@ Owner explicitly instructed not to recover deleted listings and to start fresh w
 - [ ] Static product-page build/sitemap deployment is NOT yet verified. The direct generated page URLs were not accessible during this session; check product-pages workflow and verify each /p/<slug>.html plus sitemap-products.xml before claiming static SEO pages deployed.
 - [ ] Product descriptions are factual but shorter than the 600+ word long-form standard requested previously; expand them before treating the content SEO task as complete.
 - Product IDs: bajaj-boxer-bm150-exhaust-assembly-fresh; bajaj-boxer-bm150-side-stand-kit-fresh; bajaj-boxer-bm150-oil-filter-cap-fresh.
+
+
+## 2026-11-08 - Fresh motorcycle spare-parts batch 2 (3 more photo-backed listings)
+Owner confirmed to leave deleted products deleted and create fresh listings only.
+- [x] Added fresh Bajaj Boxer BM150 Chain and Sprocket Drive Kit, reference price KSh 3,199 (FDR Auto Garage listing); photo is a Boxer BM150 14T/42T/122L drive-kit image.
+- [x] Added fresh Bajaj Boxer BM150 Piston Ring Set 36PF0116, reference price KSh 560 (FDR Auto Garage listing); photo came from the FDR product page for the exact SKU.
+- [x] Added fresh TVS HLX 150 4-Gear Chain and Sprocket Kit, local reference price KSh 3,480 (Maxy Group category listing); photo is a TVS HLX 150 drive kit from BEWI MOTOS. Photo page says TVS HLX 150 but does not itself state the Kenyan 4Gear SKU, so check part number/tooth counts with supplier before fulfilment.
+- [x] All three source-photo ingestions returned HTTP 200 and {"ok":true,"photos":1}; activated only after successful upload.
+- [x] Verified active=true, one Supabase Storage URL in each product.images array, stock=1000, low_at=20, featured=true, and COGS=85% of listed selling price.
+- [ ] Product-page/sitemap GitHub Actions deployment is not yet verified. Do not claim static product pages live until the workflow run and generated URLs are checked.
+- [ ] Descriptions are model/fitment-specific and include installation/buying guidance, but are not yet 600+ words. Expand if maintaining prior long-form SEO requirement.
+- Product IDs: bajaj-boxer-bm150-chain-sprocket-kit-fresh-20261108; bajaj-boxer-bm150-piston-ring-set-36pf0116-fresh; tvs-hlx-150-4gear-chain-sprocket-kit-szn6320660-fresh.
