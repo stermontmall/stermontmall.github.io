@@ -759,3 +759,4 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-09: rebuild product pages after replacing three failed external product-image URLs with verified matching photos.
 // 2026-11-09: remove the obsolete Toyota Taisor image URL from its gallery after replacing the failed source.
 // 2026-11-09: rebuild pages after optimizing the featured vehicle lead images into first-party WebP/AVIF storage assets.
+// 2026-11-09: rebuild pages after optimizing featured vehicle and rodent-control lead photos for lighter storefront images.
