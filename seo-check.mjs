@@ -1,6 +1,7 @@
 // Stermont Arcade - daily SEO health check. Reads the built pages in this repo and prints a Markdown report.
 // Runs from .github/workflows/seo-daily.yml (no installs needed, Node 18+).
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
+import { extractProductDescriptionText } from './seo-description-check.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const issues = {};   // problem -> [pages]
@@ -56,8 +57,9 @@ for (const f of pages) {
   for (const m of h.matchAll(/<script type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)) { try { JSON.parse(m[1]); } catch { add('Broken structured data (JSON-LD)', f); } }
   if (f.startsWith('p/')) {
     if (!/<img\b(?![^>]*placeholder\.svg)/i.test(h)) add('Product page has no photo (also left out of the Google Shopping feed)', f);
-    // The description sits in <div class="desc"> (or the older <section class="desc">). Count the real text, whichever heading the page builder uses.
-    const dd = h.match(/class="desc"[^>]*>([\s\S]*?)<\/(?:div|section)>/i), dtext = dd ? dd[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+    // Current pages render the description as multiple .product-description-section blocks;
+    // older pages used .desc. Read both formats so the checker does not report 698 false positives.
+    const dtext = extractProductDescriptionText(h);
     if (dtext.length < 100) add('Product has no description (short pages rank poorly)', f);
     if (!/"@type":"(Product|ProductGroup)"/.test(h)) add('Missing Product structured data', f);
   }
