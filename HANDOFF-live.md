@@ -7,9 +7,11 @@ Keep this file to about one page. Update it after every step (commit, merge, fin
 ## Done
 - 2026-11-10: HANDOFF-live.md reset to a short template (merged to main).
 - 2026-11-10: APPLIED `supabase/sql/lock-add-product-photo.sql` to the live Supabase project. The 4-argument `public.add_product_photo` is now executable only by postgres and service_role (verified in `proacl`). Security advisor re-run: it no longer appears in the anon/authenticated lists (anon 7 -> 6, authenticated 11 -> 10). Branch `wip-lock-add-product-photo` holds the SQL file; merge it so the repo matches the database.
+- 2026-11-10: Created inactive draft `lynfield-fruit-fly-monitoring-trap` from Simlaw Seeds listing (source KES 150; DB selling price KES 173; stock 1000; low_at 20; featured false). Photo upload request 1269 failed because Agriculture Victoria image host returned HTTP 403. Verified draft remains inactive with an empty images array; not published.
+- 2026-11-10: Checked Kenyan supplier listings for Delta Trap and Funnel Trap. Delta Trap is listed by Agroduka at KES 403 (minimum order 29) and M-Tolori at KES 560; Funnel Trap (Bucket Trap) listed by Agroduka at KES 1,139 (minimum order 10). No new records created because exact image asset has not yet been verified and uploaded.
 
 ## In progress
-- (none)
+- Find an accessible exact product image for Lynfield Fruit Fly Monitoring Trap, then upload and verify before activation.
 
 ## Next
 - [ ] Merge `wip-lock-add-product-photo` into main (adds the SQL file and this note; no site code changes).
@@ -18,7 +20,7 @@ Keep this file to about one page. Update it after every step (commit, merge, fin
 - [ ] Housekeeping: about 70 old backup tables (schema `archive` and `public.*_backup_*`) have RLS on but no policies; archive or drop the ones no longer needed.
 
 ## Blocked
-- (none)
+- Lynfield image: source image URL returned HTTP 403 during server-side download; no product was published.
 
 ## Decisions
 - Keep current product URLs `/p/<slug>.html` (no rename: GitHub Pages cannot send 301 redirects).
