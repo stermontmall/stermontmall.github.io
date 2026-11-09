@@ -1,3 +1,4 @@
+// Rebuild requested 2026-11-09: regenerate motorcycle spare-parts pages after removing repeated keyword-list boilerplate from 15 descriptions.
 // Rebuild requested 2026-11-09: publish final 792-word Kerol product page and contextual cross-links.
 // Rebuild requested 2026-11-09: render safe inline markdown links in product guide paragraphs.
 // Rebuild requested 2026-11-09: regenerate final Kerol 600-800 word page with verified usage sections.
