@@ -14,6 +14,24 @@
       '#om-i,#stm-pd .main img,.pg img{pointer-events:none}';
     document.head.appendChild(s);
   } catch (e) {}
+  // If a lead product photo fails, try the next genuine photo from that product's own gallery. Never show an emoji placeholder.
+  document.addEventListener('error', function (e) {
+    var img = e.target;
+    if (!img || img.tagName !== 'IMG' || !img.hasAttribute('data-fallbacks')) return;
+    var next = [];
+    try { next = JSON.parse(img.getAttribute('data-fallbacks') || '[]'); } catch (err) {}
+    if (next.length) {
+      img.setAttribute('data-fallbacks', JSON.stringify(next.slice(1)));
+      img.src = next[0];
+      return;
+    }
+    var note = document.createElement('p');
+    note.textContent = 'Product photo unavailable';
+    note.setAttribute('role', 'status');
+    img.parentNode.insertBefore(note, img.nextSibling);
+    img.removeAttribute('data-fallbacks');
+    img.style.display = 'none';
+  }, true);
   function isImg(t) { return !!t && t.nodeType === 1 && (t.tagName === 'IMG' || t.tagName === 'PICTURE'); }
   document.addEventListener('contextmenu', function (e) { if (isImg(e.target)) e.preventDefault(); });
   document.addEventListener('dragstart', function (e) { if (isImg(e.target)) e.preventDefault(); });
