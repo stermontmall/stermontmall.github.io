@@ -61,6 +61,24 @@ Do not include sitewide delivery, returns, address or M-Pesa copy in every secti
 - Do not describe Stermont Arcade as a new business or website.
 - Do not guarantee Google rankings, product performance or certification.
 
+
+### Required section labels for the storefront layout
+
+Use these exact uppercase labels on separate lines so the storefront can build a consistent, navigable product page. Include only sections supported by the product category and verified facts:
+
+- `PRODUCT SUMMARY` — concise, product-specific opening.
+- `KEY FEATURES` — bullet each confirmed feature and its practical benefit.
+- `SPECIFICATIONS` — bullet each fact as `Label: value`; the storefront converts these into a clean comparison table.
+- `WHERE IT HELPS` or `APPLICATION & USE` — relevant uses and buyer types.
+- `HOW TO USE` or `DIRECTIONS FOR USE` — only verified manufacturer or label instructions.
+- `BEFORE YOU START` — compatibility, selection or setup checks.
+- `SAFETY` — relevant precautions; never invent safety claims.
+- `STORAGE` — only where relevant.
+- `FAQS` — product-specific questions and direct answers.
+- `ORDER` — concise next step, without repeating sitewide shipping or payment boilerplate.
+
+Use a blank line between sections. Use `•` before each feature or specification line. Keep the wording plain text (no HTML), preserve exact facts and clearly label unverified supplier information. Do not pad thin source material; set humanReviewRequired=true when there are not enough verified facts for a useful long description.
+
 ### Output contract
 
 Return the product description as plain text with clear section headings and line breaks (not HTML or Markdown syntax), because the current storefront renders the database description as text. Return a separate machine-readable fact record containing:
