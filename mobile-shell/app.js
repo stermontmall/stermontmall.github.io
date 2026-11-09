@@ -107,7 +107,8 @@ const thumb = p => {
 };
 
 /* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
-async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 12 }) {
+// Keep the first mobile product batch small; infinite scroll fetches more only as the shopper approaches the list end.
+async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 8 }) {
   await loadCatalog();
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
   const r = PRODUCTS.filter(p => (cat === 'all' || p.cat === cat) && (!sub || p.sub === sub) && (!min || p.price >= min) && (!max || p.price <= max) && (!disc || discOf(p) > 0) &&
@@ -361,7 +362,7 @@ async function renderDeals() {
   const el = $('#deals-grid'); if (el.dataset.loaded) return;
   el.innerHTML = skeletons(6);
   let items;
-  try { ({ items } = await fetchProducts({ sort: 'disc', disc: true, size: 24 })); }
+  try { ({ items } = await fetchProducts({ sort: 'disc', disc: true, size: 12 })); }
   catch (e) { el.innerHTML = '<li class="text-center text-mute py-10" style="grid-column:1/-1">Could not load deals. <button class="underline text-brand" data-retry-deals>Try again</button></li>'; return; }
   items.forEach(p => feed.items.set(p.id, p));
   el.innerHTML = items.map(cardHTML).join(''); el.dataset.loaded = '1';
