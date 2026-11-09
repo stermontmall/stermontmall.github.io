@@ -1,3 +1,18 @@
+## 2026-11-09 12:45 Africa/Nairobi - Session pickup: GitHub + Supabase reconnected, live state re-audited (note-only commit on main)
+
+### Done
+- GitHub (stermontmall/stermontmall.github.io) and Supabase project `oewvtbnmyombbtggamor` (eu-west-1, ACTIVE_HEALTHY) connected for this session; repo cloned.
+- Re-audited live DB: 752 active products; 736 are 600-800 words; only 2 are over 800 (poultry-dust-insecticide-powder-200-g = 810, classic-men-s-black-formal-blazer-piece = 808). The 457-description backlog in the entry below is therefore ALREADY RESOLVED; do not redo it.
+
+### Newly found - NOT DONE
+- 14 "Cars for Sale" (category_id 88) products created 2026-11-09 are live (active=true, 5-10 photos each) but their descriptions are only 73-86 words, all disclaimer-style sourcing text: toyota-hilux-champ-2024-brand-new-pickup-kenya, suzuki-jimny-2026-brand-new-5-door-kenya, subaru-forester-2026-brand-new-hybrid-kenya, toyota-urban-cruiser-taisor-2024-brand-new-kenya, toyota-rav4-hybrid-2026-brand-new-kenya, toyota-fortuner-2024-brand-new-suv-kenya, toyota-land-cruiser-300-2025-brand-new-for-sale-kenya, lexus-lx500d-2023-brand-new-sourcing-kenya, toyota-land-cruiser-prado-j250-2024-brand-new-kenya, toyota-hiace-gl-grandia-2025-brand-new-kenya, toyota-hilux-2026-brand-new-for-sale-kenya, nissan-patrol-y63-2025-brand-new-kenya, lexus-gx550-2024-brand-new-kenya, range-rover-vogue-2023-brand-new-sourcing-kenya.
+- Their prices are competitor market references, not verified supplier quotes (descriptions say so). The CarMax entry at the bottom says KES 0 / no verified price for the Lexus GX 550 and Prado J250; those rows now carry prices (27,999,999 and 12,700,000). Owner should confirm the price basis before these are promoted.
+
+### Exact next work
+1. Rewrite the 14 car descriptions to unique 600-800 words each (no invented specs; keep the sourcing/enquiry disclaimer). Back up originals in `description_backup` first.
+2. Trim the 2 products over 800 words to 600-800.
+3. Rebuild pages: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`
+
 ## 2026-11-09 — SEO structure, category hubs and sitemap corrections
 
 ### Done
