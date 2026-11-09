@@ -193,6 +193,9 @@
       ['Safety information', /\\bSAFETY(?: INFORMATION| PRECAUTIONS)?\\s*:?\\s*/g],
       ['Storage & handling', /\\bSTORAGE(?:\\s*(?:&|AND)\\s*HANDLING)?\\s*:?\\s*/g],
       ['Frequently asked questions', /\\bFREQUENTLY ASKED QUESTIONS\\s*:?\\s*/g],
+      ['Vehicle-specific buying guide', /\\bVEHICLE-SPECIFIC BUYING GUIDE\\s*:?\\s*/g],
+      ['Vehicle enquiry & next steps', /\\bVEHICLE ENQUIRY & NEXT STEPS\\s*:?\\s*/g],
+      ['Buying notes', /\\bBUYING NOTES\\s*:?\\s*/g],
       ['Ordering, payment & delivery', /\\bORDER(?:ING)?\\s*:?\\s*/g]
     ];
     var hits = [];
