@@ -406,7 +406,7 @@ const INFO = {
   'adjuvants-growth-regulators': { h1: 'Adjuvants & Growth Regulators in Kenya', title: 'Spray Adjuvants & Growth Regulators in Kenya | Stermont Arcade',
     desc: 'Buy spreader stickers, wetters and rooting hormones online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
     intro: 'Spray additives that help products spread and stick, and rooting hormones for cuttings and seedlings.' },
-  'motorcycle-spare-parts': { h1: 'Motorcycle Spare Parts in Kenya', title: 'Motorcycle Spare Parts in Kenya | Bajaj Boxer Parts | Stermont Arcade',
+  'motorcycle-spare-parts': { h1: 'Motorcycle Spare Parts in Kenya', title: 'Motorcycle Spare Parts in Kenya | Stermont Arcade',
     desc: 'Shop motorcycle spare parts in Kenya, including Bajaj Boxer components. Check model compatibility, part numbers and fitment before ordering.',
     intro: 'Browse motorcycle replacement parts and components, including listings for Bajaj Boxer models. Match each part to the exact motorcycle model, engine variant and fitting position before ordering.',
     guide: `<h2>How to choose the correct motorcycle spare part</h2>
