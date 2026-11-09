@@ -406,8 +406,8 @@ const INFO = {
   'adjuvants-growth-regulators': { h1: 'Adjuvants & Growth Regulators in Kenya', title: 'Spray Adjuvants & Growth Regulators in Kenya | Stermont Arcade',
     desc: 'Buy spreader stickers, wetters and rooting hormones online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
     intro: 'Spray additives that help products spread and stick, and rooting hormones for cuttings and seedlings.' },
-  'disinfectants-hygiene': { h1: 'Disinfectants & Farm Hygiene Products in Kenya', title: 'Farm Disinfectants in Kenya | Poultry & Livestock Hygiene | Stermont Arcade',
-    desc: 'Compare farm disinfectants for poultry houses, livestock pens and general sanitation in Kenya. Check label-approved uses, dilution and pack size. Order by M-Pesa.',
+  'disinfectants-hygiene': { h1: 'Disinfectants & Farm Hygiene Products in Kenya', title: 'Farm Disinfectants in Kenya | Stermont Arcade',
+    desc: 'Compare farm disinfectants for poultry houses, livestock pens and sanitation in Kenya. Check label-approved uses, dilution and pack size.',
     intro: 'Shop disinfectants for poultry houses, livestock pens, equipment and general sanitation. Compare the active ingredient, label-approved application sites and pack size. Follow the exact product label for dilution, contact time, ventilation and animal re-entry.',
     guide: `<h2>How to choose a farm disinfectant in Kenya</h2>
 <p>Choose a disinfectant for the premises and surface you need to treat. A product intended for an empty poultry house may not be approved for use around animals, on food-contact surfaces or in drinking-water systems. Before ordering, read the label and confirm the target use, active ingredient, concentration, dilution instructions, contact time, application method and precautions. Check the registration details required for the product in Kenya and buy the correct pack size for the job.</p>
