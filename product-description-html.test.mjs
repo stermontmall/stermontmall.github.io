@@ -14,6 +14,10 @@ ok(/<h3>Safety information<\/h3><p>Read the label before use\.<\/p>/.test(out), 
 ok(/<strong>Why a gel\?<\/strong><br>Cockroaches eat it\. It is neat\./.test(out), 'FAQ question and multi-sentence answer');
 ok(/<strong>How much\?<\/strong><br>Use small dots\./.test(out), 'second FAQ item');
 
+// New premium-format headings must become distinct semantic sections.
+const premium = productDescriptionHtml('PRODUCT OVERVIEW\nA product-specific opening. KEY FEATURES & BENEFITS\n• Confirmed feature: practical benefit. SPECIFICATIONS\n• Pack size: 500 ml. BUYING GUIDE\nChoose by the exact use case. IMPORTANT NOTES\nCheck the current label. ORDERING & DELIVERY\nAsk for current availability.');
+assert.deepEqual(heads(premium), ['Product overview', 'Key features & benefits', 'Specifications & product details', 'Buying guide', 'Important notes', 'Ordering & delivery']); n++;
+
 // no labels: unchanged behaviour
 const plain = productDescriptionHtml('First paragraph.\n\nSecond paragraph.');
 assert.deepEqual(heads(plain), ['Product overview', 'Product details']); n++;
