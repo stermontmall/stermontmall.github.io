@@ -1974,3 +1974,14 @@ Owner instruction: “Continue with the next 30.”
 - Latest daily SEO report #487: 982 pages checked; only 3 missing local product-photo files remain: `jade-premium-bio-pesticide-1-litre.jpg`, `one-touch-crop-protector-insecticide-250-ml.jpg`, and `acetochlor-50-ec-herbicide-1-litre.jpg`. No exact, trustworthy matching photos were found, so do not substitute unrelated packaging. Obtain supplier photo/source URL before replacing.
 - Latest Google indexing report available (#464, 08 Nov): 178/183 inspected pages indexed, 5 not indexed, 67 not yet checked. Refresh Search Console indexing status after the next scheduled run; sitemap submission does not guarantee indexing.
 - Business pickup/service address wording was not changed because the actual customer-facing pickup address and service coverage still need owner confirmation.
+
+
+## 2026-11-09 — Brand-new car adverts from CarMax East Africa
+- [x] Owner specified https://www.carmaxea.com/ as the source and clarified: brand-new cars only; exclude used/pre-owned/foreign-used vehicles.
+- [x] Confirmed existing category `categories.id=88`, `Cars for Sale`, slug `cars-for-sale`; do not create a duplicate.
+- [x] Reviewed CarMax listing archive. Only two listings explicitly meet the brand-new condition: 2025 Lexus GX 550 (0 km, brand new) and 2024 Toyota Land Cruiser Prado J250 (0 km, brand new). Excluded 2024 Prado with 2,100 km (foreign used) and other listings with used/unclear condition.
+- [ ] Not published: CarMax displays KES 0 for both qualifying listings, so exact KES source price is missing. Existing posting workflow requires a verified exact-product KES source price and applies 15% markup; never invent a price or use KES 0 as a sell price.
+- [ ] Not published: CarMax pages were blocked by anti-bot verification on direct open; no verified direct photo URLs from the exact CarMax adverts were obtained. Do not substitute unrelated model photos or report photos uploaded.
+- [ ] Next: obtain the two actual CarMax advert URLs/photos and confirmed KES selling/source prices (or written seller quote); then create unique 600–800-word model-specific SEO descriptions, attach exact photos to Storage, publish and verify generated product pages, canonical, Product JSON-LD and sitemap.
+- [ ] Toyota Urban Cruiser Hyryder V (2025) remains excluded until CarMax confirms zero-km/brand-new condition and exact price; "new vehicle" category tag alone is not proof of new condition.
+- [ ] No product rows, photos, category metadata, GitHub generators or live listings were changed in this step.
