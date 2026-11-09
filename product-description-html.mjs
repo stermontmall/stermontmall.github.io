@@ -19,9 +19,10 @@ const LABELS = [
   ['Safety information', /(?:^|\s)SAFETY(?: PROTOCOLS)?(?:\s*&\s*PRECAUTIONS)?\s*:?\s*|(?:^|\s)SAFETY\s*:?\s*/g],
   ['Storage & handling', /(?:^|\s)STORAGE(?:\s*&\s*HANDLING)?\s*:?\s*/g],
   ['Buying guide', /(?:^|\s)VEHICLE-SPECIFIC BUYING GUIDE\s*|(?:^|\s)BUYING GUIDE\s*:?\s*/g],
+  ['Buying notes', /(?:^|\s)(?:IMPORTANT )?BUYING NOTES\s*:?\s*/g],
   ['Important notes', /(?:^|\s)IMPORTANT NOTES\s*:?\s*/g],
   ['Frequently asked questions', /(?:^|\s)FREQUENTLY ASKED QUESTIONS\s*|(?:^|\s)FAQS?\s*/g],
-  ['Vehicle enquiry & next steps', /(?:^|\s)VEHICLE ENQUIRY & NEXT STEPS\s*:?\s*/g],
+  ['Vehicle enquiry & next steps', /(?:^|\s)VEHICLE ENQUIRY\s*(?:&|AND)\s*NEXT STEPS\s*:?\s*/g],
   ['Ordering & delivery', /(?:^|\s)ORDERING(?:\s*&\s*DELIVERY)?\s*:?\s*|(?:^|\s)ORDER\s*:?\s*/g]
 ];
 
