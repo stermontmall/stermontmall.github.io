@@ -55,21 +55,23 @@ const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return
 const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
 
 /* Render catalogue descriptions as real semantic HTML, not one long paragraph.
-   Explicit source headings are preserved; unlabelled copy is split into useful product-specific topic groups. */
+   Explicit source headings are preserved; unlabelled copy is split into useful product-specific topic groups.
+   2026-11-09 fix: the heading patterns below are CAPITAL LETTERS ONLY (no /i flag) and must end at a word boundary.
+   With /i they matched ordinary words inside sentences ("used", "useful", "delivery", "ordering"), which cut descriptions into dozens of "Product details" fragments. */
 function productDescriptionHtml(source) {
   const raw = String(source || '').replace(/\bundefined\b/gi, '').replace(/Search phrases relevant to this advert include[\s\S]*$/i, '').trim();
   if (!raw) return '<p>Product information will be updated shortly.</p>';
   const aliases = [
-    ['Product overview', /\b(?:PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?/ig],
-    ['Key features & benefits', /\b(?:KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|BENEFITS)\s*:?/ig],
-    ['Specifications & details', /\b(?:SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\s*:?/ig],
-    ['Uses & applications', /\b(?:WHERE IT HELPS|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|IDEAL FOR)\s*:?/ig],
-    ['How to use', /\b(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|BEFORE YOU START)\s*:?/ig],
-    ['Safety information', /\b(?:SAFETY(?: INFORMATION| PRECAUTIONS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\s*:?/ig],
-    ['Storage & handling', /\b(?:STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\s*:?/ig],
-    ['Frequently asked questions', /\b(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\s*:?/ig],
-    ['Ordering, payment & delivery', /\b(?:ORDER(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\s*:?/ig],
-    ['Important buying notes', /\b(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\s*:?/ig]
+    ['Product overview', /\b(?:PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\b\s*:?/g],
+    ['Key features & benefits', /\b(?:KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|KEY BENEFITS|BENEFITS)\b\s*:?/g],
+    ['Specifications & details', /\b(?:SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\b\s*:?/g],
+    ['Uses & applications', /\b(?:WHERE IT HELPS|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|IDEAL FOR)\b\s*:?/g],
+    ['How to use', /\b(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|BEFORE YOU START)\b\s*:?/g],
+    ['Safety information', /\b(?:SAFETY(?: INFORMATION| PRECAUTIONS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\b\s*:?/g],
+    ['Storage & handling', /\b(?:STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\b\s*:?/g],
+    ['Frequently asked questions', /\b(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\b\s*:?/g],
+    ['Ordering, payment & delivery', /\b(?:ORDER(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\b\s*:?/g],
+    ['Important buying notes', /\b(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\b\s*:?/g]
   ];
   const hits = [];
   aliases.forEach(([heading, re]) => { re.lastIndex = 0; let m; while ((m = re.exec(raw))) hits.push({ at:m.index, end:re.lastIndex, heading }); });
@@ -164,7 +166,7 @@ h1{font-size:1.5rem;line-height:1.25;margin:.2rem 0 .6rem}.pr{font-size:1.7rem;f
 .ok{color:#15803d;font-weight:700}.no{color:#b91c1c;font-weight:700}.btn{display:block;text-align:center;background:#15803d;color:#fff;text-decoration:none;font-weight:800;padding:.85rem;border-radius:12px;margin:.8rem 0 .4rem}
 .btn.alt{background:#fff;color:#6d28d9;border:2px solid #7c3aed}.btn.ask{margin:.2rem 0 .8rem;font-size:1.02rem;box-shadow:0 2px 8px rgba(22,163,74,.3)}.box{background:#fff;border:1px solid #e6e1f5;border-radius:14px;padding:.9rem 1rem;margin:1rem 0}
 .desc{white-space:pre-line}.product-description-section{margin:1.1rem 0 0;padding:1rem 1.05rem;background:#fbfaff;border:1px solid #e8e1f5;border-left:4px solid #7c3aed;border-radius:12px}.product-description-section h3{margin:0 0 .55rem;color:#4c1d95;font-size:1.05rem;font-weight:800;line-height:1.35}.product-description-section p{margin:.35rem 0 .65rem;color:#373248;line-height:1.7}.product-description-section ul{margin:.35rem 0 .5rem;padding-left:1.25rem;list-style:disc}.product-description-section li{padding:.15rem 0 .3rem;line-height:1.6}.product-description-section:first-of-type{margin-top:.6rem}ul.g{list-style:none;padding:0;display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
-ul.g img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:.5rem}ul.g li{background:#fff;border:1px solid #e6e1f5;border-radius:12px;padding:.7rem}ul.g a{text-decoration:none;font-weight:600;color:#1f1b2e}ul.g span{display:block;color:#5b21b6;font-weight:800}
+ul.g img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:.5rem}ul.g li{background:#fff;border:1px solid #e6e1f5;border-radius:12px;padding:.7rem}ul.g li:target{outline:3px solid #7c3aed;outline-offset:2px}ul.g a{text-decoration:none;font-weight:600;color:#1f1b2e}ul.g span{display:block;color:#5b21b6;font-weight:800}
 .product-silo{margin:2rem 0;padding:1.2rem;background:#f7f9fc;border:1px solid #e3e8ef;border-radius:14px}.product-silo h2{margin:.1rem 0 .6rem;font-size:1.25rem}.product-silo h3{margin:1rem 0 .45rem;font-size:1rem}.product-silo p{color:#596579;margin:.35rem 0 .7rem}.silo-links{display:flex;flex-wrap:wrap;gap:.55rem}.silo-links a{display:inline-block;padding:.5rem .75rem;background:#fff;border:1px solid #dce3ec;border-radius:8px;text-decoration:none}.silo-products{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.65rem}.silo-products a{display:block;padding:.7rem;background:#fff;border:1px solid #e1e6ed;border-radius:8px;text-decoration:none;font-weight:600}.silo-products small{display:block;color:#5b21b6;margin-top:.25rem}.silo-guides{padding-left:1.2rem;line-height:1.9}.silo-guides a{font-weight:600} 
 footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85rem;border-top:1px solid #e6e1f5}
 .stk{display:none}
@@ -575,7 +577,7 @@ for (const p of products) {
   const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
   const revs = reviewsFor(p), rLd = reviewLd(revs);
-  // Meta title (max 60 chars) and description (max 155 chars) come from seo-meta.mjs: "[Original] <name> \u2013 Price in Kenya | Stermont Arcade".
+  // Meta title (max 60 chars) and description (max 155 chars) come from seo-meta.mjs: "[Original] <n> \u2013 Price in Kenya | Stermont Arcade".
   // "Original / genuine" is only claimed for known brands and farm inputs; the price stays in the Product schema and on the page.
   const ctx = { brand: brandOf(p.name), catSlug: cat?.slug };
   const approvedName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
@@ -611,9 +613,11 @@ for (const p of products) {
         seller: { '@id': `${SITE}/#store` } } }))
   }) : '';
   const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
+  // Each size row carries an id equal to that size's slug, so a link such as /p/<page>.html#<size-slug> scrolls to and highlights that size (li:target in CSS).
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
     const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${pdpVariantUrl(path, v.slug, p.slug)}`)}`;
-    return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
+    const vid = String(v.slug || v.id || '').trim();
+    return `<li${/^[a-z0-9][a-z0-9-]*$/.test(vid) ? ` id="${esc(vid)}"` : ''}>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
   // Local-utility sections (H2s): what it is used for, price and M-Pesa ordering, delivery and Sarit Centre pickup. Facts match shipping.html and nairobi.html.
   const nameE = esc(p.name), priceTxt = `${p.variants ? 'from ' : ''}${money(p.price)}${p.unit ? ' / ' + esc(p.unit) : ''}`;
   const usesTxt = isPcpb(cat?.slug)
