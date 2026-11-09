@@ -48,12 +48,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: product-pages
+  group: product-pages-v2
   cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Get the site files
         uses: actions/checkout@v7
@@ -189,6 +190,8 @@ jobs:
         run: node check-product-pages.mjs
 
       - name: Tell Bing and other search engines about changed pages (IndexNow)
+        timeout-minutes: 2
+        continue-on-error: true
         run: |
           if [ "$(git log -1 --format=%s)" != "Update product pages and sitemap" ]; then echo "No new commit - nothing to submit."; exit 0; fi
           sleep 120   # give GitHub Pages time to publish the new files
