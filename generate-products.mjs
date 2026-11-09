@@ -57,71 +57,72 @@ const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).re
 /* Render catalogue descriptions as real semantic HTML, not one long paragraph.
    Explicit source headings are preserved; unlabelled copy is split into useful product-specific topic groups. */
 function productDescriptionHtml(source) {
-  const raw = String(source || '').replace(/\bundefined\b/gi, '').replace(/Search phrases relevant to this advert include[\s\S]*$/i, '').trim();
+  // Remove generic buying-guide boilerplate; retain the product-specific copy.
+  const raw = String(source || '')
+    .replace(/\bundefined\b/gi, '')
+    .replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '')
+    .replace(/\s*PRODUCT BUYING GUIDE:[\s\S]*$/i, '')
+    .trim();
   if (!raw) return '<p>Product information will be updated shortly.</p>';
-  const aliases = [
-    ['Product overview', /\b(?:PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?/ig],
-    ['Key features & benefits', /\b(?:KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|BENEFITS)\s*:?/ig],
-    ['Specifications & details', /\b(?:SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\s*:?/ig],
-    ['Uses & applications', /\b(?:WHERE IT HELPS|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|IDEAL FOR)\s*:?/ig],
-    ['How to use', /\b(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|BEFORE YOU START)\s*:?/ig],
-    ['Safety information', /\b(?:SAFETY(?: INFORMATION| PRECAUTIONS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\s*:?/ig],
-    ['Storage & handling', /\b(?:STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\s*:?/ig],
-    ['Frequently asked questions', /\b(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\s*:?/ig],
-    ['Ordering, payment & delivery', /\b(?:ORDER(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\s*:?/ig],
-    ['Important buying notes', /\b(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\s*:?/ig]
+
+  // Match only explicit uppercase section labels. Never match ordinary words such as
+  // "used", "order" or "safety" inside sentences.
+  const labels = [
+    ['Product overview', /(?:^|\s)PRODUCT SUMMARY\s*:?\s*/g],
+    ['Key features & benefits', /(?:^|\s)KEY PRODUCT FEATURES\s*:?\s*|(?:^|\s)KEY FEATURES\s*:?\s*/g],
+    ['Specifications & product details', /(?:^|\s)SPECIFICATIONS\s*:?\s*/g],
+    ['Uses & applications', /(?:^|\s)WHERE IT HELPS\s*:?\s*|(?:^|\s)APPLICATION(?:S)?\s*&?\s*USE\s*:?\s*/g],
+    ['Application & dosage guidelines', /(?:^|\s)APPLICATION\s*&\s*DOSAGE GUIDELINES\s*:?\s*/g],
+    ['How to use', /(?:^|\s)HOW TO USE(?: IT)?\s*:?\s*|(?:^|\s)DIRECTIONS FOR USE\s*:?\s*/g],
+    ['Before you start', /(?:^|\s)BEFORE YOU START\s*:?\s*/g],
+    ['Safety information', /(?:^|\s)SAFETY(?: PROTOCOLS)?(?:\s*&\s*PRECAUTIONS)?\s*:?\s*|(?:^|\s)SAFETY\s*:?\s*/g],
+    ['Storage & handling', /(?:^|\s)STORAGE(?:\s*&\s*HANDLING)?\s*:?\s*/g],
+    ['Frequently asked questions', /(?:^|\s)FREQUENTLY ASKED QUESTIONS\s*|(?:^|\s)FAQS?\s*/g],
+    ['Ordering & delivery', /(?:^|\s)ORDER\s*:?\s*/g]
   ];
   const hits = [];
-  aliases.forEach(([heading, re]) => { re.lastIndex = 0; let m; while ((m = re.exec(raw))) hits.push({ at:m.index, end:re.lastIndex, heading }); });
-  hits.sort((a,b) => a.at-b.at);
-  let sections = [], cursor = 0;
-  hits.forEach(h => {
-    if (h.at < cursor) return;
-    const before = raw.slice(cursor,h.at).trim();
-    if (before) sections.push({ heading: sections.length ? 'Product details' : 'Product overview', body:before });
-    sections.push({ heading:h.heading, body:'' }); cursor = h.end;
-  });
-  const tail = raw.slice(cursor).trim();
-  if (tail) { if (sections.length) sections[sections.length-1].body = tail; else sections.push({heading:'Product overview',body:tail}); }
-  if (!hits.length) {
-    const chunks = raw.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
-    const sentences = chunks.length > 1 ? chunks : raw.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/);
-    const buckets = [
-      {heading:'Product overview', test:/./, body:[]},
-      {heading:'Key features & benefits', test:/\b(feature|benefit|design|performance|durable|effective|reliable|powerful|easy|convenient|quality|protect|control)\b/i, body:[]},
-      {heading:'Specifications & pack details', test:/\b(\d+(?:\.\d+)?\s?(?:ml|l|litre|litres|kg|g|w|v|mm|cm|inch|gb|mb|pack|pieces?)|size|model|capacity|material|voltage|active ingredient|concentration)\b/i, body:[]},
-      {heading:'Uses & applications', test:/\b(use|used|suitable|ideal|application|crop|pest|farm|home|office|vehicle|garden|livestock|surface)\b/i, body:[]},
-      {heading:'Buying, availability & delivery', test:/\b(order|buy|price|stock|available|delivery|Kenya|M-Pesa|WhatsApp|warranty|return)\b/i, body:[]}
-    ];
-    sentences.forEach((part,i) => {
-      const t=part.trim(); if(!t) return;
-      let b=buckets.find((x,j)=>j>0&&x.test.test(t));
-      if(!b) b=buckets[0];
-      b.body.push(t);
-    });
-    sections = buckets.filter(b=>b.body.length).map(b=>({heading:b.heading,body:b.body.join(' ')}));
-    if (sections.length===1 && sections[0].body.length>500) {
-      const words=sections[0].body.split(/\s+/), half=Math.ceil(words.length/2);
-      sections.push({heading:'Product details & buying information',body:words.splice(half).join(' ')});
-      sections[0].body=words.join(' ');
-    }
+  for (const [heading,re] of labels) {
+    re.lastIndex=0; let m;
+    while ((m=re.exec(raw))) hits.push({start:m.index,end:re.lastIndex,heading});
   }
-  const escText = x => esc(x);
-  return sections.filter(s=>s.body.trim()).map(s => {
-    const body=s.body.trim();
-    const bullets=body.split(/\s*[•●▪]\s*/).map(x=>x.trim()).filter(Boolean);
-    let content='';
-    if (bullets.length>1) {
-      const lead=bullets.shift(); if(lead) content += '<p>'+escText(lead)+'</p>';
-      content += '<ul>'+bullets.map(x=>'<li>'+escText(x.replace(/^[-–]\s*/,''))+'</li>').join('')+'</ul>';
-    } else {
-      const lines=body.split(/\n+/).map(x=>x.trim()).filter(Boolean);
-      content=lines.map(line=>/^[-–•●▪]\s*/.test(line)
-        ? '<ul><li>'+escText(line.replace(/^[-–•●▪]\s*/,''))+'</li></ul>'
-        : '<p>'+escText(line)+'</p>').join('');
+  hits.sort((a,b)=>a.start-b.start);
+  const sections=[]; let cursor=0;
+  for (const h of hits) {
+    if (h.start < cursor) continue;
+    const body=raw.slice(cursor,h.start).trim();
+    if (body) sections.push({heading:sections.length ? 'Product information' : 'Product overview',body});
+    sections.push({heading:h.heading,body:''});
+    cursor=h.end;
+  }
+  const tail=raw.slice(cursor).trim();
+  if (tail) {
+    if (sections.length) sections[sections.length-1].body=tail;
+    else sections.push({heading:'Product overview',body:tail});
+  }
+
+  // For products without authored headings, keep intact paragraphs instead of guessing
+  // topics from ordinary words. This avoids false headings and fragmented sentences.
+  if (!sections.length) {
+    const paragraphs=raw.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+    const body=paragraphs.length ? paragraphs : [raw];
+    return body.map((p,i)=>'<section class="product-description-section"><h3>'+(i===0?'Product overview':'Product details')+'</h3><p>'+esc(p)+'</p></section>').join('');
+  }
+
+  const renderBody = body => {
+    const pieces=body.split(/\s*[•●▪]\s*/).map(x=>x.trim()).filter(Boolean);
+    if (pieces.length>1) {
+      const lead=pieces.shift();
+      return (lead?'<p>'+esc(lead)+'</p>':'')+'<ul>'+pieces.map(x=>'<li>'+esc(x.replace(/^[-–]\s*/,''))+'</li>').join('')+'</ul>';
     }
-    return '<section class="product-description-section"><h3>'+escText(s.heading)+'</h3>'+content+'</section>';
-  }).join('');
+    return body.split(/\n+/).map(x=>x.trim()).filter(Boolean).map(line =>
+      /^[-–•●▪]\s*/.test(line)
+        ? '<ul><li>'+esc(line.replace(/^[-–•●▪]\s*/,''))+'</li></ul>'
+        : '<p>'+esc(line)+'</p>'
+    ).join('');
+  };
+  return sections.filter(x=>x.body.trim()).map(x =>
+    '<section class="product-description-section"><h3>'+esc(x.heading)+'</h3>'+renderBody(x.body.trim())+'</section>'
+  ).join('');
 }
 
 
