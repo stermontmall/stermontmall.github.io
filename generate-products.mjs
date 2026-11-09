@@ -232,6 +232,15 @@ const INFO = {
   'cars-for-sale': { h1: 'Cars for Sale in Kenya', title: 'New Cars for Sale in Kenya | Stermont Arcade',
     desc: 'Explore brand-new car sourcing adverts in Kenya, including Toyota, Lexus, Suzuki, Subaru, Nissan and Mercedes-Benz. Compare indicative market prices and enquire for a supplier-confirmed quote.',
     intro: 'Browse brand-new vehicle sourcing adverts for Kenya. Listings show indicative competitor-market price references and representative model photographs; vehicle availability, exact specification and final quotation are confirmed with the supplying dealer before payment.' },
+  'stermont-cars-for-sale': { h1: 'Cars for Sale in Kenya', title: 'Cars for Sale in Kenya | New Vehicle Sourcing | Stermont Arcade',
+    desc: 'Explore new vehicle sourcing listings in Kenya, including Toyota, Suzuki, Subaru, Nissan and Lexus. Compare model details and request a supplier-confirmed quotation.',
+    intro: 'Explore vehicle sourcing listings for buyers in Kenya. Each advert should be treated as an enquiry starting point: confirm the exact model year, trim, engine, drivetrain, colour, delivery timeline, availability and final landed price with the supplying dealer before making payment. Where a listing uses representative photographs or an indicative market-price reference, the final vehicle and quotation must be confirmed separately.',
+    faq: [
+      ['Are the displayed vehicle prices final?', 'Not necessarily. Some adverts use indicative market-price references. Request a written, supplier-confirmed quotation for the exact vehicle, specification, taxes, shipping and delivery costs before paying.'],
+      ['Are all vehicles physically in stock?', 'Availability depends on the supplying dealer and sourcing status. Ask us to confirm the exact vehicle, model year, trim and delivery timeline before placing an order.'],
+      ['Are the photographs of the exact vehicle for sale?', 'Some listings may use representative model photographs. Confirm the actual vehicle photographs, colour, condition and specification with the supplier before committing.'],
+      ['What should I confirm before buying a car in Kenya?', 'Confirm the model year, trim, engine, transmission, drivetrain, mileage or new condition, import and registration costs, warranty terms, delivery timeline and final written quotation.']
+    ] },
   'pest-control-fumigation': { h1: 'Pest Control & Fumigation Products in Kenya', title: 'Pest Control & Fumigation Products in Kenya | Stermont Arcade',
     desc: 'Buy bed bug killers, insecticides and fumigation products online in Kenya. Pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.',
     intro: 'Stermont Arcade stocks insecticides and pest control supplies for homes, hotels, hostels, offices, farms and public places. Look for a PCPB registration number on the label, read the label before use and keep chemicals away from children and pets. For large premises or fumigation of stores and grain, use a licensed pest control operator.' },
