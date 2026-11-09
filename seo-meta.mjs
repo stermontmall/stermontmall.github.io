@@ -162,7 +162,7 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
 //   "Shop Top & Reliable <Category> Online in Kenya – M-Pesa & Delivery"
 export function catTitle(catName) {
   const c = String(catName || '').replace(/\s+/g, ' ').trim();
-  if (/^(?:stermont\\s+)?cars for sale$/i.test(c)) return 'Cars for Sale in Kenya | Stermont Arcade';
+  if (/^(?:stermont\s+)?cars for sale$/i.test(c)) return 'Cars for Sale in Kenya | Stermont Arcade';
   const tiers = [
     `Shop ${c} Online in Kenya | ${STORE}`,
     `Buy ${c} Online in Kenya | ${STORE}`,
