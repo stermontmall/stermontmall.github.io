@@ -96,6 +96,24 @@ const CATEGORY_GUIDES = {
 <h3>Before checkout</h3>
 <ul><li>Confirm the model number, dimensions and capacity.</li><li>Check delivery access for large or heavy appliances.</li><li>Review the warranty, returns and installation requirements.</li><li>Keep packaging and the receipt until the item has been checked.</li></ul>
 <p>Open each product page for its current price, availability and full specifications, then confirm delivery arrangements before payment.</p>
+</section>`,
+  'motorcycle-spare-parts': `<section class="category-guide" data-seo-guide="motorcycle-spare-parts">
+<h2>How to choose Bajaj Boxer motorcycle spare parts in Kenya</h2>
+<p>Start with the exact motorcycle model and version, not engine capacity alone. Boxer 100, 125 and 150 models can use different assemblies, and old-model, KS, ES and later revisions may not share every part. Check the model designation, model year where known, engine or frame reference and the part number stamped on the original component. A similar-looking spare is not proof of compatibility.</p>
+<h3>Confirm fitment before ordering</h3>
+<p>Compare the replacement with the part removed from the motorcycle. Check dimensions, mounting holes, connector shape, terminal count, cable length, thread, spline, teeth and left- or right-hand orientation where relevant. For electrical components, match the wiring plug and rated specification. For brake, steering, wheel, engine and transmission components, have a qualified mechanic verify the exact application before installation.</p>
+<h3>Buy the correct part the first time</h3>
+<ul><li>Share a clear photo of the old part and any readable part number.</li><li>State the Boxer model and version, not just “Bajaj Boxer”.</li><li>Confirm whether the listing is for one piece or a complete assembly.</li><li>Check current stock, price and delivery before paying.</li><li>Inspect the supplied part before installation and report mismatches promptly.</li></ul>
+<p>For motorcycles used for commuting, delivery and boda-boda work, correct fitment helps avoid repeat workshop visits and unnecessary downtime. Keep service records with the model, part reference and replacement date so future orders can be matched accurately.</p>
+</section>`,
+  'sprayers-equipment': `<section class="category-guide" data-seo-guide="sprayers-equipment">
+<h2>Choosing pest control sprayers and application equipment</h2>
+<p>Choose equipment for the product label, treatment area and application method. Hand-pressure sprayers suit some small-scale spot applications, while larger areas may require a different capacity or powered equipment. Check the sprayer's tank size, seals, hose, lance, nozzle, pressure rating and availability of replacement parts. The largest tank is not always the best choice if the operator cannot carry or clean it safely.</p>
+<h3>Match the sprayer to the chemical and task</h3>
+<p>Before using a sprayer with a pesticide, disinfectant or other treatment product, confirm that the manufacturer states the materials are compatible with that formulation. Follow the chemical label for dilution, application rate, protective equipment, ventilation, re-entry and disposal. Never use the same equipment for food, animal drinking water or unrelated tasks unless it has been properly cleaned and the manufacturer and product label permit it.</p>
+<h3>Inspection, calibration and care</h3>
+<ul><li>Check the tank, cap, hose, trigger, seals and lance for leaks or damage.</li><li>Use the correct nozzle and verify the spray pattern before application.</li><li>Calibrate output using the product label and equipment instructions.</li><li>Depressurise and clean the equipment exactly as directed after use.</li><li>Store securely, away from children, food, feed and water sources.</li></ul>
+<p>Browse <a href="/c/disinfectants-hygiene.html">disinfectants and farm hygiene products</a> and <a href="/c/pest-control-fumigation.html">pest control and fumigation products</a> to compare equipment with the intended treatment supplies.</p>
 </section>`
 };
 
