@@ -18,17 +18,17 @@ ok(/<strong>How much\?<\/strong><br>Use small dots\./.test(out), 'second FAQ ite
 const premium = productDescriptionHtml('PRODUCT OVERVIEW\nA product-specific opening. KEY FEATURES & BENEFITS\n• Confirmed feature: practical benefit. SPECIFICATIONS\n• Pack size: 500 ml. BUYING GUIDE\nChoose by the exact use case. IMPORTANT NOTES\nCheck the current label. ORDERING & DELIVERY\nAsk for current availability.');
 assert.deepEqual(heads(premium), ['Product overview', 'Key features & benefits', 'Specifications & product details', 'Buying guide', 'Important notes', 'Ordering & delivery']); n++;
 
-// Car listings historically stored literal \\n sequences; they must still create separate headings.
-const vehicle = productDescriptionHtml('IMPORTANT NOTES\\n• Verify the vehicle.\\n\\nBUYING NOTES\\n• Confirm charges.\\n\\nVEHICLE-SPECIFIC BUYING GUIDE\\n\\nInspect the exact model.\\n\\nVEHICLE ENQUIRY & NEXT STEPS\\nRequest VIN and photos.');
+// Car listings historically stored literal \n sequences; they must still create separate headings.
+const vehicle = productDescriptionHtml('IMPORTANT NOTES\n• Verify the vehicle.\n\nBUYING NOTES\n• Confirm charges.\n\nVEHICLE-SPECIFIC BUYING GUIDE\n\nInspect the exact model.\n\nVEHICLE ENQUIRY & NEXT STEPS\nRequest VIN and photos.');
 assert.deepEqual(heads(vehicle), ['Important notes', 'Buying notes', 'Buying guide', 'Vehicle enquiry & next steps']); n++;
-ok(/<h3>Buying guide<\\/h3><p>Inspect the exact model\\.<\\/p>/.test(vehicle), 'vehicle buying guide is its own heading');
-ok(/<h3>Vehicle enquiry &amp; next steps<\\/h3><p>Request VIN and photos\\.<\\/p>/.test(vehicle), 'vehicle enquiry is its own heading');
+ok(/<h3>Buying guide<\/h3><p>Inspect the exact model\.<\/p>/.test(vehicle), 'vehicle buying guide is its own heading');
+ok(/<h3>Vehicle enquiry &amp; next steps<\/h3><p>Request VIN and photos\.<\/p>/.test(vehicle), 'vehicle enquiry is its own heading');
 
 // Car content: escaped line breaks and vehicle headings must render as separate sections.
-const car = productDescriptionHtml('PRODUCT SUMMARY\\nA buyer-facing introduction.\\n\\nIMPORTANT BUYING NOTES\\nConfirm the current quote.\\n\\nVEHICLE-SPECIFIC BUYING GUIDE\\nInspect the exact vehicle and compare its condition.\\n\\nVEHICLE ENQUIRY & NEXT STEPS\\nRequest current photos and a written quotation.');
+const car = productDescriptionHtml('PRODUCT SUMMARY\nA buyer-facing introduction.\n\nIMPORTANT BUYING NOTES\nConfirm the current quote.\n\nVEHICLE-SPECIFIC BUYING GUIDE\nInspect the exact vehicle and compare its condition.\n\nVEHICLE ENQUIRY & NEXT STEPS\nRequest current photos and a written quotation.');
 assert.deepEqual(heads(car), ['Product overview', 'Buying notes', 'Buying guide', 'Vehicle enquiry & next steps']); n++;
-ok(/<h3>Buying guide<\\/h3><p>Inspect the exact vehicle and compare its condition\\.<\\/p>/.test(car), 'car buying guide renders as a separate heading');
-ok(/<h3>Vehicle enquiry &amp; next steps<\\/h3><p>Request current photos and a written quotation\\.<\\/p>/.test(car), 'car enquiry renders as a separate heading');
+ok(/<h3>Buying guide<\/h3><p>Inspect the exact vehicle and compare its condition\.<\/p>/.test(car), 'car buying guide renders as a separate heading');
+ok(/<h3>Vehicle enquiry &amp; next steps<\/h3><p>Request current photos and a written quotation\.<\/p>/.test(car), 'car enquiry renders as a separate heading');
 
 // no labels: unchanged behaviour
 const plain = productDescriptionHtml('First paragraph.\n\nSecond paragraph.');
