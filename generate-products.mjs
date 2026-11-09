@@ -576,7 +576,13 @@ for (const p of products) {
   const ctx = { brand: brandOf(p.name), catSlug: cat?.slug };
   const approvedName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
   const title = pdpTitle(p.name, ctx), desc = pdpDescription(p.name, ctx, p.description), h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
-  NAMES[p.id] = h1; (p.variants || []).forEach(v => { NAMES[v.id] = h1; });
+  NAMES[p.id] = h1;
+  // Pack-size aliases must keep their own approved SEO name; copying the group heading
+  // made 100 ml / 250 ml links display the 1 litre heading in the mobile catalogue.
+  (p.variants || []).forEach(v => {
+    const variantSeoName = typeof v.seo_name === 'string' ? v.seo_name.trim() : '';
+    NAMES[v.id] = variantSeoName ? buyName(variantSeoName) : buyName(`${p.name} ${v.variant_label}`);
+  });
   // Related products rotate through the category (the 6 that follow this one, wrapping round), so EVERY product, including the newest, gets links from other product pages.
   const related = (() => {
     if (!cat) return [];
@@ -836,3 +842,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-09: rebuild catalogue after removing repeated buyer-check boilerplate from six remaining insecticide descriptions; factual label guidance remains in each overview.
 
 // 2026-11-09: rebuild product pages after cleaning four promotional-prefix product names in the catalogue.
+
+// 2026-11-09: preserve each pack-size variant's own approved heading in product-names.json.
