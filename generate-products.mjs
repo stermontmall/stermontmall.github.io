@@ -769,3 +769,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-09: remove the obsolete Toyota Taisor image URL from its gallery after replacing the failed source.
 // 2026-11-09: rebuild pages after optimizing the featured vehicle lead images into first-party WebP/AVIF storage assets.
 // 2026-11-09: rebuild pages after optimizing featured vehicle and rodent-control lead photos for lighter storefront images.
+
+// 2026-11-09: regenerate product pages after expanding 98 short catalogue descriptions, adding the dedicated Stermont Cars category SEO hub, and refining two short product SEO titles.
