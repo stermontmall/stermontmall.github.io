@@ -9,23 +9,26 @@ import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 const MARK = 'stm-pd-layout';
 const CSS = `<style id="${MARK}">
-.box.product-description.pd{padding:0;overflow:hidden}
-.pd .pd-title{margin:0;padding:.9rem 1rem .2rem;font-size:1.2rem}
-.pd-tabs{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;border-bottom:2px solid #ececf1;background:#fff;position:sticky;top:0;z-index:5;scrollbar-width:none}
+.box.product-description.pd{padding:0;overflow:hidden;border:1px solid #ded5f2;border-radius:18px;background:#fff;box-shadow:0 10px 28px rgba(42,24,70,.07)}
+.pd .pd-title{margin:0;padding:1.05rem 1.1rem .85rem;font-size:1.2rem;line-height:1.35;color:#281744;background:linear-gradient(135deg,#f6f0ff 0%,#fff 72%);border-bottom:1px solid #ece4f8}
+.pd-tabs{display:flex;gap:.45rem;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:.65rem .8rem;background:#faf8ff;border-bottom:1px solid #ece4f8;position:sticky;top:0;z-index:5;scrollbar-width:none}
 .pd-tabs::-webkit-scrollbar{display:none}
-.pd-tabs a{flex:none;padding:.7rem 1rem;font-weight:700;font-size:.95rem;color:#444;text-decoration:none;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
-.pd-tabs a:hover,.pd-tabs a:focus{color:#6d28d9;border-bottom-color:#7c3aed}
-.pd .product-description-section.pd-sec{margin:0;padding:0 1rem 1rem;background:none;border:0;border-radius:0;scroll-margin-top:3.2rem}
-.pd .pd-sec h3{margin:1.1rem -1rem .8rem;padding:.6rem 1rem;background:#f5f5f7;color:#222;font-size:1rem;font-weight:800;line-height:1.3}
-.pd .pd-sec p{margin:.3rem 0 .7rem;color:#373248;line-height:1.7}
-.pd .pd-sec ul{margin:.3rem 0 .6rem;padding-left:1.25rem;list-style:disc}
+.pd-tabs a{flex:none;padding:.55rem .85rem;font-weight:750;font-size:.9rem;color:#4b3b62;text-decoration:none;border:1px solid #e7def5;border-radius:999px;background:#fff;white-space:nowrap;transition:background .15s ease,color .15s ease,border-color .15s ease}
+.pd-tabs a:hover,.pd-tabs a:focus{color:#4c1d95;border-color:#a78bfa;background:#f2ebff;outline:none}
+.pd .product-description-section.pd-sec{margin:0;padding:0 1.05rem 1.05rem;background:#fff;border:0;border-radius:0;scroll-margin-top:3.2rem}
+.pd .pd-sec h3{margin:1rem -.15rem .75rem;padding:.72rem .9rem;background:#f4efff;border:1px solid #e8defa;border-left:4px solid #7c3aed;border-radius:10px;color:#3b176e;font-size:1rem;font-weight:800;line-height:1.35}
+.pd .pd-sec p{margin:.35rem 0 .75rem;color:#373248;line-height:1.75}
+.pd .pd-sec ul{margin:.35rem 0 .7rem;padding-left:1.25rem;list-style:disc}
 .pd .pd-sec ul.pd-feat{list-style:none;padding:0}
-.pd .pd-sec ul.pd-feat li{position:relative;padding:.35rem 0 .35rem 1.7rem;line-height:1.6}
-.pd .pd-sec ul.pd-feat li::before{content:"\\2713";position:absolute;left:0;top:.35rem;color:#15803d;font-weight:800}
-.pd-spec{width:100%;border-collapse:collapse;margin:.3rem 0 .7rem;font-size:.95rem}
-.pd-spec th,.pd-spec td{padding:.55rem .75rem;border:1px solid #ececf1;text-align:left;vertical-align:top;line-height:1.5}
-.pd-spec th{width:38%;background:#f5f5f7;color:#444;font-weight:600}
-@media(max-width:520px){.pd-spec th{width:42%}}
+.pd .pd-sec ul.pd-feat li{position:relative;padding:.42rem 0 .42rem 1.8rem;line-height:1.65;border-bottom:1px solid #f1edf7}
+.pd .pd-sec ul.pd-feat li:last-child{border-bottom:0}
+.pd .pd-sec ul.pd-feat li::before{content:"\\2713";position:absolute;left:.1rem;top:.42rem;color:#15803d;font-weight:900}
+.pd-spec{width:100%;border-collapse:separate;border-spacing:0;margin:.35rem 0 .8rem;font-size:.94rem;border:1px solid #e8e1f2;border-radius:12px;overflow:hidden}
+.pd-spec th,.pd-spec td{padding:.65rem .8rem;border-bottom:1px solid #eee8f5;text-align:left;vertical-align:top;line-height:1.55}
+.pd-spec tr:last-child th,.pd-spec tr:last-child td{border-bottom:0}
+.pd-spec th{width:38%;background:#f7f3ff;color:#4b3568;font-weight:700}
+.pd-spec td{background:#fff;color:#373248}
+@media(max-width:520px){.pd .pd-title{padding:.9rem .9rem .7rem}.pd .product-description-section.pd-sec{padding:0 .85rem .9rem}.pd-spec th{width:42%;padding:.55rem}.pd-spec td{padding:.55rem}}
 </style>`;
 
 const TAB = {
