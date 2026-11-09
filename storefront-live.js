@@ -78,7 +78,7 @@
     '#stm-pd .dh{font-size:1.05rem;margin:1.1rem 0 .4rem;padding-top:.9rem;border-top:1px solid #ece8f6}' +
     '#stm-pd .desc{position:relative;overflow:hidden;font-size:.95rem;line-height:1.55}#stm-pd .desc.clip{max-height:230px}' +
     '#stm-pd .desc.clip::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(rgba(255,255,255,0),#fff)}' +
-    '#stm-pd .desc h4{margin:.9rem 0 .25rem;font-size:.98rem;color:#5b21b6}#stm-pd .desc p{margin:.25rem 0}' +
+    '#stm-pd .desc-section{margin:.85rem 0 1rem;padding:.15rem 0 .15rem .85rem;border-left:3px solid #ddd6fe;background:linear-gradient(90deg,#faf8ff 0%,#fff 78%);border-radius:0 10px 10px 0}#stm-pd .desc-section h4{display:flex;align-items:center;gap:.45rem;margin:.25rem 0 .45rem;font-size:1rem;line-height:1.35;font-weight:800;color:#4c1d95;letter-spacing:.01em}#stm-pd .desc-section h4:before{content:"";display:inline-block;width:7px;height:7px;border-radius:2px;background:#7c3aed;flex:none}#stm-pd .desc-section p{margin:.25rem 0 .55rem;color:#343044;line-height:1.68}#stm-pd .desc-section p:last-child{margin-bottom:.2rem}' +
     '#stm-pd .more{border:0;background:none;color:#5b21b6;font:inherit;font-weight:700;padding:.5rem 0;cursor:pointer}' +
     '#stm-pd .act{position:sticky;bottom:0;z-index:3;display:flex;gap:.6rem;align-items:center;background:#fff;border-top:1px solid #ece8f6;padding:.7rem .9rem calc(.7rem + env(safe-area-inset-bottom,0px))}' +
     '#stm-pd .q{display:flex;align-items:center;border:1px solid #d9d2ee;border-radius:12px;overflow:hidden;flex:none}#stm-pd .q button{border:0;background:#f6f3fd;width:38px;height:42px;font-size:1.2rem;cursor:pointer}#stm-pd .q span{min-width:34px;text-align:center;font-weight:700}' +
@@ -176,34 +176,43 @@
     idx = (n + imgs.length) % imgs.length; renderGallery();
   }
   function fmtDesc(text) {
-    var box = mk('div'), raw = String(text || '')
-      .replace(/\bundefined\b/gi, '')
-      .replace(/Search phrases relevant to this advert include[\s\S]*$/i, '')
-      .replace(/\n{3,}/g, '\n\n').trim();
-    function addParagraph(line) {
-      line = line.trim(); if (!line) return;
-      var kv = line.match(/^([^:]{2,40}):\s*(.+)$/), el;
-      if (/^[A-Z][A-Z0-9 &/()'’,-]{3,58}$/.test(line) && !/[.,;:]$/.test(line)) {
-        box.appendChild(mk('h4', '', line)); return;
-      }
-      if (kv) { el = mk('p'); el.appendChild(mk('b', '', kv[1] + ': ')); el.appendChild(D.createTextNode(kv[2])); }
-      else if (/^(?:[-•*])\s+/.test(line)) { el = mk('p', 'desc-bullet', '• ' + line.replace(/^(?:[-•*])\s+/, '')); }
-      else { el = mk('p', '', line); }
-      box.appendChild(el);
-    }
-    raw.split(/\r?\n/).forEach(function (line) {
-      line = line.trim(); if (!line) return;
-      if (line.length > 520) {
-        var sentences = line.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [line], chunk = '';
-        sentences.forEach(function (sentence) {
-          sentence = sentence.trim(); if (!sentence) return;
-          if (chunk && (chunk.length + sentence.length > 360 || /[.!?]$/.test(chunk) && chunk.split(/[.!?]+/).filter(Boolean).length >= 2)) {
-            addParagraph(chunk); chunk = '';
-          }
-          chunk += (chunk ? ' ' : '') + sentence;
-        });
-        if (chunk) addParagraph(chunk);
-      } else addParagraph(line);
+    var box = mk('div', 'desc-layout'), raw = String(text || '')
+      .replace(/\\bundefined\\b/gi, '')
+      .replace(/Search phrases relevant to this advert include[\\s\\S]*$/i, '')
+      .replace(/\\n{3,}/g, '\\n\\n').trim();
+    var sections = [
+      {title:'Product Overview', key:'overview', items:[]},
+      {title:'Specifications & Key Details', key:'specs', items:[]},
+      {title:'Features & Benefits', key:'features', items:[]},
+      {title:'Applications & Compatibility', key:'uses', items:[]},
+      {title:'Availability, Delivery & Support', key:'buying', items:[]},
+      {title:'Important Buying Notes', key:'notes', items:[]}
+    ];
+    var sentences = raw.replace(/\\s+/g, ' ').split(/(?<=[.!?])\\s+(?=[A-Z0-9“"'])/);
+    sentences.forEach(function(sentence, index) {
+      sentence = sentence.trim(); if (!sentence) return;
+      var s = sentence.toLowerCase(), target;
+      if (index === 0) target = sections[0];
+      else if (/\\b(price|ksh|cost|engine|cc|mileage|km|voltage|watt|watts|size|capacity|dimensions|weight|material|model|year|specification|transmission|fuel|power|pack|quantity|colour|color|compatib|grade)\\b/.test(s)) target = sections[1];
+      else if (/\\b(feature|benefit|design|build|quality|performance|technology|safety|comfort|durab|efficient|function|includes|included|comes with)\\b/.test(s)) target = sections[2];
+      else if (/\\b(suitable|ideal|application|use|used for|works with|designed for|home|office|farm|vehicle|business|install|fitment)\\b/.test(s)) target = sections[3];
+      else if (/\\b(availability|available|stock|delivery|shipping|warranty|guarantee|return|payment|order|contact|enquir|quote|supplier|seller|dispatch|collection|support)\\b/.test(s)) target = sections[4];
+      else target = sections[5];
+      target.items.push(sentence);
+    });
+    sections.forEach(function(section) {
+      if (!section.items.length) return;
+      var wrap = mk('section', 'desc-section desc-' + section.key);
+      wrap.appendChild(mk('h4', '', section.title));
+      var chunk = '';
+      section.items.forEach(function(sentence) {
+        if (chunk && chunk.length + sentence.length > 440) {
+          wrap.appendChild(mk('p', '', chunk)); chunk = '';
+        }
+        chunk += (chunk ? ' ' : '') + sentence;
+      });
+      if (chunk) wrap.appendChild(mk('p', '', chunk));
+      box.appendChild(wrap);
     });
     return box;
   }
