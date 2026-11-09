@@ -1,3 +1,4 @@
+// Rebuild requested 2026-11-09: render safe inline markdown links in product guide paragraphs.
 // Rebuild requested 2026-11-09: regenerate final Kerol 600-800 word page with verified usage sections.
 // Rebuild requested 2026-11-09: rebuild Kerol product guide after content test length correction.
 // Rebuild requested 2026-11-09: render verified inline related-product links in authored product guidance.
@@ -88,14 +89,12 @@ function productContentHtml(p) {
   const sections = PRODUCT_CONTENT[p.id];
   if (!Array.isArray(sections) || !sections.length) return '';
   const paragraphHtml = x => {
-    if (typeof x === 'string') return `<p>${esc(x)}</p>`;
-    if (!x || typeof x !== 'object') return '';
-    const link = (label, url) => label && typeof url === 'string' && /^\/p\/[a-z0-9-]+\.html$/.test(url) ? `<a href="${url}">${esc(label)}</a>` : esc(label || '');
-    return `<p>${esc(x.before || '')}${link(x.linkText, x.url)}${esc(x.after || '')}${link(x.linkText2, x.url2)}${esc(x.after2 || '')}</p>`;
+    if (typeof x !== 'string') return '';
+    const safe = esc(x).replace(/\[([^\]]+)\]\((\/p\/[a-z0-9-]+\.html)\)/g, '<a href="$2">$1</a>');
+    return \`<p>\${safe}</p>\`;
   };
-  return `<div class="box product-content"><h2 style="margin-top:0">More about ${esc(p.name)}</h2>${sections.map(s => `<section><h3>${esc(s.heading)}</h3>${(s.paragraphs || []).map(paragraphHtml).join('')}${s.bullets?.length ? `<ul>${s.bullets.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</section>`).join('')}</div>`;
+  return \`<div class="box product-content"><h2 style="margin-top:0">More about \${esc(p.name)}</h2>\${sections.map(s => \`<section><h3>\${esc(s.heading)}</h3>\${(s.paragraphs || []).map(paragraphHtml).join('')}\${s.bullets?.length ? \`<ul>\${s.bullets.map(x => \`<li>\${esc(x)}</li>\`).join('')}</ul>\` : ''}</section>\`).join('')}</div>\`;
 }
-
 const CSS = `*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1f1b2e;background:#faf9fd}
 a{color:#6d28d9}header{background:#7c3aed;color:#fff;padding:.8rem 1rem}header a{color:#fff;text-decoration:none;font-weight:800;font-size:1.15rem}
 main{max-width:920px;margin:0 auto;padding:1rem}nav.bc{font-size:.85rem;color:#6b6b80;margin:.3rem 0 1rem}
