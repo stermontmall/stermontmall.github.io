@@ -354,7 +354,7 @@ let sideCat = '__top';
 const SERVICE_TILE_PHOTO = 'https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/service-media/pest-control-fumigation-nairobi/2026-11/mvzjhdh3-7c9e80602774.jpg';
 const photoOf = (cat, sub) => (PRODUCTS.find(p => p.cat === cat && (!sub || p.sub === sub) && p.img) || {}).img || '';
 const tile = (attrs, label, img, emoji, bg) => `<li><button class="tap w-full flex flex-col items-center gap-1.5" ${attrs}>
-      <span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:64px;height:64px;background:${bg}">${thumb({ img, emoji })}</span>
+      <span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:64px;height:64px;background:${bg}">${img ? thumb({ img, emoji }) : esc(emoji || '')}</span>
       <span class="text-xs text-center leading-4">${esc(label)}</span></button></li>`;
 function renderCategoriesView() {
   if (!CATS.length) { $('#cat-side').innerHTML = ''; $('#cat-main').innerHTML = '<p class="text-mute text-sm py-6 text-center">Loading categories&hellip;</p>'; return; }
