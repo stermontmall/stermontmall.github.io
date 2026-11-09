@@ -1,3 +1,4 @@
+// Rebuild requested 2026-11-09: remove one remaining search-phrase keyword list from the Toyota Probox listing.
 // Rebuild requested 2026-11-09: regenerate motorcycle listings after removing repeated model-intro boilerplate from 15 descriptions.
 // Rebuild requested 2026-11-09: regenerate motorcycle spare-parts pages after removing repeated keyword-list boilerplate from 15 descriptions.
 // Rebuild requested 2026-11-09: publish final 792-word Kerol product page and contextual cross-links.
