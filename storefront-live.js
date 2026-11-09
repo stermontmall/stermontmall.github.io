@@ -177,9 +177,9 @@
   }
   function fmtDesc(text) {
     var box = mk('div', 'desc-layout'), raw = String(text || '')
-      .replace(/\\bundefined\\b/gi, '')
-      .replace(/Search phrases relevant to this advert include[\\s\\S]*$/i, '')
-      .replace(/\\n{3,}/g, '\\n\\n').trim();
+      .replace(/\bundefined\b/gi, '')
+      .replace(/Search phrases relevant to this advert include[\s\S]*$/i, '')
+      .replace(/\s+/g, ' ').trim();
     var sections = [
       {title:'Product Overview', key:'overview', items:[]},
       {title:'Specifications & Key Details', key:'specs', items:[]},
@@ -188,15 +188,15 @@
       {title:'Availability, Delivery & Support', key:'buying', items:[]},
       {title:'Important Buying Notes', key:'notes', items:[]}
     ];
-    var sentences = raw.replace(/\\s+/g, ' ').split(/(?<=[.!?])\\s+(?=[A-Z0-9“"'])/);
+    var sentences = raw.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/);
     sentences.forEach(function(sentence, index) {
       sentence = sentence.trim(); if (!sentence) return;
       var s = sentence.toLowerCase(), target;
       if (index === 0) target = sections[0];
-      else if (/\\b(price|ksh|cost|engine|cc|mileage|km|voltage|watt|watts|size|capacity|dimensions|weight|material|model|year|specification|transmission|fuel|power|pack|quantity|colour|color|compatib|grade)\\b/.test(s)) target = sections[1];
-      else if (/\\b(feature|benefit|design|build|quality|performance|technology|safety|comfort|durab|efficient|function|includes|included|comes with)\\b/.test(s)) target = sections[2];
-      else if (/\\b(suitable|ideal|application|use|used for|works with|designed for|home|office|farm|vehicle|business|install|fitment)\\b/.test(s)) target = sections[3];
-      else if (/\\b(availability|available|stock|delivery|shipping|warranty|guarantee|return|payment|order|contact|enquir|quote|supplier|seller|dispatch|collection|support)\\b/.test(s)) target = sections[4];
+      else if (/\b(price|ksh|cost|engine|cc|mileage|km|voltage|watt|watts|size|capacity|dimensions|weight|material|model|year|specification|transmission|fuel|power|pack|quantity|colour|color|compatib|grade)\b/.test(s)) target = sections[1];
+      else if (/\b(feature|benefit|design|build|quality|performance|technology|safety|comfort|durab|efficient|function|includes|included|comes with)\b/.test(s)) target = sections[2];
+      else if (/\b(suitable|ideal|application|use|used for|works with|designed for|home|office|farm|vehicle|business|install|fitment)\b/.test(s)) target = sections[3];
+      else if (/\b(availability|available|stock|delivery|shipping|warranty|guarantee|return|payment|order|contact|enquir|quote|supplier|seller|dispatch|collection|support)\b/.test(s)) target = sections[4];
       else target = sections[5];
       target.items.push(sentence);
     });
