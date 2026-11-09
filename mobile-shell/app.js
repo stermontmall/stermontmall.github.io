@@ -835,7 +835,7 @@ if (Q_DEEP && !DEEP && !CAT_DEEP) { store.set({ q: Q_DEEP }); $('#search').value
 const RESTORE_CAT = !DEEP && !CAT_DEEP && !Q_DEEP && !CART_DEEP.length && SAVED_CAT;   // a reload keeps the chosen category (checked against the live categories once they load)
 if (RESTORE_CAT) store.set({ chip: SAVED_CAT.chip, sub: SAVED_CAT.sub });
 if (DEEP) quickDeepLink(DEEP);   // product link: start the one-product fast path BEFORE the full catalog request below, so it is first in line
-syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
+syncFilterUI(); refreshGrid(); // Category rails and the drawer are rendered after the live catalogue arrives below; avoid building empty hidden views during first paint.
 if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
 if (CART_DEEP.length) toast('Loading shared cart...');
 loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) { store.set({ sub: '' }); refreshGrid(); } else $('#grid-title').textContent = store.get().sub || t.name; } } renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); syncProductMeta(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) { if (deepOpen) refreshDeep(); else openDeepLink(DEEP); } else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
