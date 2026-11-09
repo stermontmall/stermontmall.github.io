@@ -29,7 +29,7 @@ assert.ok(out.includes('rel="canonical" href="https://stermontarcade.co.ke/p/exa
 assert.equal(applySafeMeta(page, 'wrong-id', desc), page); n++;
 assert.equal(applySafeMeta(page, id, 'too short'), page); n++;
 assert.equal(applySafeMeta(page, id, 'x'.repeat(156)), page); n++;
-assert.equal(Object.keys(SAFE_META).length, 11); n++;
+assert.equal(Object.keys(SAFE_META).length, 16); n++;
 for (const file of ['asus-zenbook-14-oled-laptop.html', 'classic-mens-black-formal-blazer.html']) {
   const item = SAFE_META[file];
   const fixture = '<meta name="stm-id" content="' + item.id + '">' +
@@ -41,6 +41,26 @@ for (const file of ['asus-zenbook-14-oled-laptop.html', 'classic-mens-black-form
   assert.ok(result.includes('<meta name="twitter:description" content="' + item.description + '">'));
   assert.doesNotMatch(result, /genuine|top-quality/i);
   n += 4;
+}
+
+for (const file of [
+  'itel-smartphone.html',
+  'infinix-smart-20-4gb-64gb.html',
+  'infinix-smart-20-4gb-128gb.html',
+  'apple-iphone-16-128gb-green.html',
+  'apple-iphone-16-128gb-white.html'
+]) {
+  const item = SAFE_META[file];
+  assert.ok(item.id && item.description.length >= 70 && item.description.length <= 155);
+  assert.match(item.description, /Kenya|listing/i);
+  assert.doesNotMatch(item.description, /100% genuine|top-quality|guaranteed|certified/i);
+  const fixture = '<meta name="stm-id" content="' + item.id + '"><meta name="description" content="old">' +
+    '<meta property="og:description" content="old"><meta name="twitter:description" content="old">';
+  const result = applySafeMeta(fixture, item.id, item.description);
+  assert.ok(result.includes('<meta name="description" content="' + item.description + '">'));
+  assert.ok(result.includes('<meta property="og:description" content="' + item.description + '">'));
+  assert.ok(result.includes('<meta name="twitter:description" content="' + item.description + '">'));
+  n += 7;
 }
 
 // Exercise the actual pass with a fixture and verify it only touches the allowlisted file.
