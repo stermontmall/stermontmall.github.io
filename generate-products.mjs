@@ -1,3 +1,4 @@
+// Rebuild requested 2026-11-09: render verified inline related-product links in authored product guidance.
 // Rebuild requested 2026-11-09: refresh high-intent product SEO titles and Livergen poultry opening copy.
 // Rebuild requested 2026-11-09: regenerate static product pages after catalog photo URL and SEO-description corrections.
 // Rebuild trigger 2026-10-26: new products added.
@@ -84,7 +85,13 @@ async function getProducts() {
 function productContentHtml(p) {
   const sections = PRODUCT_CONTENT[p.id];
   if (!Array.isArray(sections) || !sections.length) return '';
-  return `<div class="box product-content"><h2 style="margin-top:0">More about ${esc(p.name)}</h2>${sections.map(s => `<section><h3>${esc(s.heading)}</h3>${(s.paragraphs || []).map(x => `<p>${esc(x)}</p>`).join('')}${s.bullets?.length ? `<ul>${s.bullets.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</section>`).join('')}</div>`;
+  const paragraphHtml = x => {
+    if (typeof x === 'string') return `<p>${esc(x)}</p>`;
+    if (!x || typeof x !== 'object') return '';
+    const link = (label, url) => label && typeof url === 'string' && /^\\/p\\/[a-z0-9-]+\\.html$/.test(url) ? `<a href="${url}">${esc(label)}</a>` : esc(label || '');
+    return `<p>${esc(x.before || '')}${link(x.linkText, x.url)}${esc(x.after || '')}${link(x.linkText2, x.url2)}${esc(x.after2 || '')}</p>`;
+  };
+  return `<div class="box product-content"><h2 style="margin-top:0">More about ${esc(p.name)}</h2>${sections.map(s => `<section><h3>${esc(s.heading)}</h3>${(s.paragraphs || []).map(paragraphHtml).join('')}${s.bullets?.length ? `<ul>${s.bullets.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</section>`).join('')}</div>`;
 }
 
 const CSS = `*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1f1b2e;background:#faf9fd}
