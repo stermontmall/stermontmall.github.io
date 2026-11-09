@@ -746,3 +746,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-08: refresh catalogue after setting the new 15 motorcycle listings as featured products.
 
 // 2026-11-09: rebuild product pages, Cars for Sale category hub and sitemap for 15 brand-new vehicle sourcing adverts with representative image credits and Kenya market benchmark prices.
+
+// 2026-11-09: rerun vehicle listing build after tightening all 15 vehicle SEO titles to the 60-character limit.
