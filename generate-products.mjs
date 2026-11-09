@@ -834,3 +834,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-09: rebuild catalogue pages after removing repeated generic buyer-check boilerplate from 22 product descriptions.
 
 // 2026-11-09: rebuild catalogue after removing repeated buyer-check boilerplate from six remaining insecticide descriptions; factual label guidance remains in each overview.
+
+// 2026-11-09: rebuild product pages after cleaning four promotional-prefix product names in the catalogue.
