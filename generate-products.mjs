@@ -7,6 +7,7 @@ import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node
 import { createHash } from 'node:crypto';
 import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
+import { productDescriptionHtml } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
@@ -54,76 +55,6 @@ const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
 const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; };
 const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
 
-/* Render catalogue descriptions as real semantic HTML, not one long paragraph.
-   Explicit source headings are preserved; unlabelled copy is split into useful product-specific topic groups. */
-function productDescriptionHtml(source) {
-  // Remove generic buying-guide boilerplate; retain the product-specific copy.
-  const raw = String(source || '')
-    .replace(/\bundefined\b/gi, '')
-    .replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '')
-    .replace(/\s*PRODUCT BUYING GUIDE:[\s\S]*$/i, '')
-    .trim();
-  if (!raw) return '<p>Product information will be updated shortly.</p>';
-
-  // Match only explicit uppercase section labels. Never match ordinary words such as
-  // "used", "order" or "safety" inside sentences.
-  const labels = [
-    ['Product overview', /(?:^|\s)PRODUCT SUMMARY\s*:?\s*/g],
-    ['Key features & benefits', /(?:^|\s)KEY PRODUCT FEATURES\s*:?\s*|(?:^|\s)KEY FEATURES\s*:?\s*/g],
-    ['Specifications & product details', /(?:^|\s)SPECIFICATIONS\s*:?\s*/g],
-    ['Uses & applications', /(?:^|\s)WHERE IT HELPS\s*:?\s*|(?:^|\s)APPLICATION(?:S)?\s*&?\s*USE\s*:?\s*/g],
-    ['Application & dosage guidelines', /(?:^|\s)APPLICATION\s*&\s*DOSAGE GUIDELINES\s*:?\s*/g],
-    ['How to use', /(?:^|\s)HOW TO USE(?: IT)?\s*:?\s*|(?:^|\s)DIRECTIONS FOR USE\s*:?\s*/g],
-    ['Before you start', /(?:^|\s)BEFORE YOU START\s*:?\s*/g],
-    ['Safety information', /(?:^|\s)SAFETY(?: PROTOCOLS)?(?:\s*&\s*PRECAUTIONS)?\s*:?\s*|(?:^|\s)SAFETY\s*:?\s*/g],
-    ['Storage & handling', /(?:^|\s)STORAGE(?:\s*&\s*HANDLING)?\s*:?\s*/g],
-    ['Frequently asked questions', /(?:^|\s)FREQUENTLY ASKED QUESTIONS\s*|(?:^|\s)FAQS?\s*/g],
-    ['Ordering & delivery', /(?:^|\s)ORDER\s*:?\s*/g]
-  ];
-  const hits = [];
-  for (const [heading,re] of labels) {
-    re.lastIndex=0; let m;
-    while ((m=re.exec(raw))) hits.push({start:m.index,end:re.lastIndex,heading});
-  }
-  hits.sort((a,b)=>a.start-b.start);
-  const sections=[]; let cursor=0;
-  for (const h of hits) {
-    if (h.start < cursor) continue;
-    const body=raw.slice(cursor,h.start).trim();
-    if (body) sections.push({heading:sections.length ? 'Product information' : 'Product overview',body});
-    sections.push({heading:h.heading,body:''});
-    cursor=h.end;
-  }
-  const tail=raw.slice(cursor).trim();
-  if (tail) {
-    if (sections.length) sections[sections.length-1].body=tail;
-    else sections.push({heading:'Product overview',body:tail});
-  }
-
-  // For products without authored headings, keep intact paragraphs instead of guessing
-  // topics from ordinary words. This avoids false headings and fragmented sentences.
-  if (!sections.length) {
-    const paragraphs=raw.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
-    const body=paragraphs.length ? paragraphs : [raw];
-    return body.map((p,i)=>'<section class="product-description-section"><h3>'+(i===0?'Product overview':'Product details')+'</h3><p>'+esc(p)+'</p></section>').join('');
-  }
-
-  const renderBody = body => {
-    const pieces=body.split(/\s*[•●▪]\s*/).map(x=>x.trim()).filter(Boolean);
-    if (pieces.length>1) {
-      const lead=pieces.shift();
-      return (lead?'<p>'+esc(lead)+'</p>':'')+'<ul>'+pieces.map(x=>'<li>'+esc(x.replace(/^[-–]\s*/,''))+'</li>').join('')+'</ul>';
-    }
-    return body.split(/\n+/).map(x=>x.trim()).filter(Boolean).map(line =>
-      /^[-–•●▪]\s*/.test(line)
-        ? '<ul><li>'+esc(line.replace(/^[-–•●▪]\s*/,''))+'</li></ul>'
-        : '<p>'+esc(line)+'</p>'
-    ).join('');
-  };
-  return sections.filter(x=>x.body.trim()).map(x =>
-    '<section class="product-description-section"><h3>'+esc(x.heading)+'</h3>'+renderBody(x.body.trim())+'</section>'
-  ).join('');
-}
 
 
 // Product photos saved in the catalog before the custom domain still point at the old github.io address.
