@@ -176,14 +176,34 @@
     idx = (n + imgs.length) % imgs.length; renderGallery();
   }
   function fmtDesc(text) {
-    var box = mk('div');
-    String(text || '').split(/\r?\n/).forEach(function (line) {
+    var box = mk('div'), raw = String(text || '')
+      .replace(/\bundefined\b/gi, '')
+      .replace(/Search phrases relevant to this advert include[\s\S]*$/i, '')
+      .replace(/\n{3,}/g, '\n\n').trim();
+    function addParagraph(line) {
       line = line.trim(); if (!line) return;
       var kv = line.match(/^([^:]{2,40}):\s*(.+)$/), el;
+      if (/^[A-Z][A-Z0-9 &/()'’,-]{3,58}$/.test(line) && !/[.,;:]$/.test(line)) {
+        box.appendChild(mk('h4', '', line)); return;
+      }
       if (kv) { el = mk('p'); el.appendChild(mk('b', '', kv[1] + ': ')); el.appendChild(D.createTextNode(kv[2])); }
-      else if (line.length <= 34 && !/[.,;:]$/.test(line) && !/^\d+\s*x\s/i.test(line)) { el = mk('h4', '', line); }
+      else if (/^(?:[-•*])\s+/.test(line)) { el = mk('p', 'desc-bullet', '• ' + line.replace(/^(?:[-•*])\s+/, '')); }
       else { el = mk('p', '', line); }
       box.appendChild(el);
+    }
+    raw.split(/\r?\n/).forEach(function (line) {
+      line = line.trim(); if (!line) return;
+      if (line.length > 520) {
+        var sentences = line.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [line], chunk = '';
+        sentences.forEach(function (sentence) {
+          sentence = sentence.trim(); if (!sentence) return;
+          if (chunk && (chunk.length + sentence.length > 360 || /[.!?]$/.test(chunk) && chunk.split(/[.!?]+/).filter(Boolean).length >= 2)) {
+            addParagraph(chunk); chunk = '';
+          }
+          chunk += (chunk ? ' ' : '') + sentence;
+        });
+        if (chunk) addParagraph(chunk);
+      } else addParagraph(line);
     });
     return box;
   }
