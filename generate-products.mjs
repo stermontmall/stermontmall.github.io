@@ -771,3 +771,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-09: rebuild pages after optimizing featured vehicle and rodent-control lead photos for lighter storefront images.
 
 // 2026-11-09: regenerate product pages after expanding 98 short catalogue descriptions, adding the dedicated Stermont Cars category SEO hub, and refining two short product SEO titles.
+
+// 2026-11-09: rebuild car galleries after removing all cabin/interior shots and adding exterior-only replacement photos to four listings.
