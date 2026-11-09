@@ -18,7 +18,7 @@ const productImageObserver = typeof IntersectionObserver === 'function'
     }), { rootMargin: '160px 0px' })
   : null;
 const watchProductImages = root => {
-  const imgs = root.querySelectorAll ? root.querySelectorAll('img[data-src]') : [];
+  const imgs = [...(root.matches?.('img[data-src]') ? [root] : []), ...(root.querySelectorAll ? root.querySelectorAll('img[data-src]') : [])];
   imgs.forEach(img => {
     if (productImageObserver) productImageObserver.observe(img);
     else { img.src = img.dataset.src; delete img.dataset.src; }
