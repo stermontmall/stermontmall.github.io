@@ -59,6 +59,9 @@ function renderBody(body, heading) {
 export function productDescriptionHtml(source) {
   // Remove generic buying-guide boilerplate; retain the product-specific copy.
   const raw = String(source || '')
+    // Older car records stored escaped newline characters (\\n) instead of real line breaks.
+    // Decode them before heading detection so vehicle section labels become real headings.
+    .replace(/\\r\\n|\\n|\\r/g, '\n')
     .replace(/\bundefined\b/gi, '')
     .replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '')
     .replace(/\s*PRODUCT BUYING GUIDE:[\s\S]*$/i, '')
