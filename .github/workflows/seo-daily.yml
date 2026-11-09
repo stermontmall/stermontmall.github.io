@@ -10,6 +10,8 @@ on:
       - 'seo-meta.mjs'
       - 'seo-meta.test.mjs'
       - 'seo-check.mjs'
+      - 'seo-description-check.mjs'
+      - 'seo-description-check.test.mjs'
       - 'generate-products.mjs'
       - 'p/**'
       - 'c/**'
@@ -39,6 +41,8 @@ jobs:
           node-version: 20
       - name: Test shared SEO metadata rules
         run: node seo-meta.test.mjs
+      - name: Test product description extraction against current and legacy layouts
+        run: node seo-description-check.test.mjs
       - name: Run technical SEO check
         run: node seo-check.mjs > seo-report.md
       - name: Publish the report as an issue
