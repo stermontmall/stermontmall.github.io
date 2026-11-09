@@ -1,3 +1,16 @@
+## 2026-11-09 12:50 Africa/Nairobi - PROGRESS SAVE: rebuild green, `\1` cleared in generated pages (main, note-only commit)
+### Done
+- Commit c89988e (seo-overrides.mjs accepts desc-only/title-only entries) merged to main. Product build run 42595715650 completed SUCCESS: https://github.com/stermontmall/stermontmall.github.io/actions/runs/42595715650
+- After pulling the rebuilt pages: 0 pages in `p/` or `c/` contain a stray `\1` (was 77 pages, 14 in `<title>`). Local title now: "Air Chopper 7.5SC Insecticide 100 ml | Kenya".
+- Build annotation to fix: `guides/cheapest-cars-for-sale-kenya.html` links to missing `/c/cars-for-sale.html` (broken link).
+### In progress
+- GitHub Pages deployment `pages-build-deployment` run 42595761318 was queued at handoff; SEO extras 42596024236 and Google sitemap ping 42596024170 were running. Confirm all three finish green: `gh run list --limit 6`
+### Next
+1. Verify live (not cached): `curl -s https://stermontarcade.co.ke/p/air-chopper-7-5sc-insecticide-100-ml.html | grep -o '<title>[^<]*'` should have no `\1`.
+2. Fix the broken `/c/cars-for-sale.html` link (the category hub page is not generated; check `category-hubs.mjs` / `generate-products.mjs` INFO entry for `cars-for-sale`). Edit generators, never `c/` files.
+3. In Search Console, request indexing for the fixed product URLs; sitemap pings and IndexNow are not Google indexing.
+4. Still pending from earlier today: rewrite 14 Cars for Sale descriptions (73-86 words) to 600-800 words; trim 2 products over 800 words; confirm car price basis with the owner.
+
 ## 2026-11-09 13:05 Africa/Nairobi - Build crash fixed: seo-overrides.mjs now accepts desc-only / title-only entries (branch `wip-fix-seo-overrides-partial`)
 Owner report: product links (e.g. /p/air-chopper-7-5sc-insecticide-100-ml.html) are not ranking on Google.
 ### Findings
