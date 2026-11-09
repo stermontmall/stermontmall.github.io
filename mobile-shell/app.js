@@ -73,7 +73,7 @@ const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
 /* Product images never fall back to emoji. If a lead photo fails, try the next genuine gallery photo before showing a neutral unavailable-photo label. */
 const thumb = p => {
   const photos = [...new Set([p.img, ...(Array.isArray(p.photos) ? p.photos : [])].filter(u => typeof u === 'string' && u.trim()))];
-  if (!photos.length) return '<span class="photo-unavailable" role="img" aria-label="Product photo unavailable">Photo unavailable</span>';
+  if (!photos.length) return '<span class="photo-unavailable" role="img" aria-label="Product photo unavailable" style="display:grid;place-items:center;width:100%;height:100%;padding:8px;color:#64748b;background:#f8fafc;font:12px/1.4 system-ui;text-align:center">Photo unavailable</span>';
   return `<img src="${esc(photos[0])}" alt="" loading="lazy" decoding="async" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
 };
 
@@ -781,6 +781,7 @@ document.addEventListener('error', e => {
   unavailable.className = 'photo-unavailable';
   unavailable.setAttribute('role', 'img');
   unavailable.setAttribute('aria-label', 'Product photo unavailable');
+  unavailable.style.cssText = 'display:grid;place-items:center;width:100%;height:100%;padding:8px;color:#64748b;background:#f8fafc;font:12px/1.4 system-ui;text-align:center';
   unavailable.textContent = 'Photo unavailable';
   img.replaceWith(unavailable);
 }, true); // try genuine gallery photos in order; never substitute an emoji for a product image
