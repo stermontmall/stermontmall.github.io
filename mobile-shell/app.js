@@ -428,19 +428,29 @@ function splitProductDescription(source) {
   if (!raw) return [];
   const labels = [
     ['Product overview', /(?:^|\s)(?:PRODUCT SUMMARY|PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?\s*/g],
-    ['Key features & benefits', /(?:^|\s)(?:KEY PRODUCT FEATURES|KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|BENEFITS)\s*:?\s*/g],
-    ['Specifications & details', /(?:^|\s)(?:SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\s*:?\s*/g],
-    ['Uses & applications', /(?:^|\s)(?:WHERE IT HELPS|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|WHO MAY NEED THIS PRODUCT|IDEAL FOR)\s*:?\s*/g],
+    ['Why choose this product', /(?:^|\s)WHY BUY [A-Z][A-Z0-9-]*\s*:?\s*/g],
+    ["What's in the box", /(?:^|\s)(?:WHAT[’']?S IN THE BOX|IN THE BOX|BOX CONTENTS|PACKAGE CONTENTS|WHAT YOU GET)\s*:?\s*/g],
+    ['Details to confirm', /(?:^|\s)PRODUCT DETAILS TO CONFIRM\s*:?\s*/g],
+    ['Key features & benefits', /(?:^|\s)(?:KEY PRODUCT FEATURES|KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|KEY BENEFITS|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|BENEFITS)\s*:?\s*/g],
+    ['Specifications & details', /(?:^|\s)(?:KEY SPECIFICATIONS\s*(?:&|AND)\s*FEATURES|SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL SPECS(?:IFICATIONS)?|TECHNICAL DETAILS|PRODUCT DETAILS AT A GLANCE|PRODUCT DETAILS(?!\s+(?:AND|TO)\s)|KEY DETAILS)\s*:?\s*/g],
+    ['Uses & applications', /(?:^|\s)(?:WHERE IT HELPS|WHERE TO USE IT|WHERE IT IS USED|WHO MAY NEED THIS PRODUCT|WHO IT SUITS|EVERYDAY USES|GOOD FOR|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|IDEAL FOR)\s*:?\s*/g],
+    ['Mixing & application', /(?:^|\s)(?:MIXING\s*(?:&|AND)\s*APPLICATION(?: INSTRUCTIONS| DOSAGE| RATES)?|MIXING RATES|RATE FROM THE PACK|PLACEMENT AMOUNTS)(?:\s*\([^)]{1,40}\))?\s*:?\s*/g],
     ['How to use', /(?:^|\s)(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|PLANNING FOR USE)\s*:?\s*/g],
     ['Before you start', /(?:^|\s)BEFORE YOU START\s*:?\s*/g],
-    ['Safety information', /(?:^|\s)(?:SAFETY(?: INFORMATION| PRECAUTIONS| PROTOCOLS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\s*:?\s*/g],
-    ['Storage & handling', /(?:^|\s)(?:STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\s*:?\s*/g],
+    ['Safety information', /(?:^|\s)(?:SAFETY\s*(?:&|AND)\s*RE-?ENTRY(?: PRECAUTIONS)?|SAFETY AND STORAGE|SAFETY(?: INFORMATION| PRECAUTIONS| PROTOCOLS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\s*:?\s*/g],
+    ['Storage & handling', /(?:^|\s)(?:HANDLING\s*(?:&|AND)\s*STORAGE|CARE AND STORAGE|PRODUCT DETAILS AND STORAGE|STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\s*:?\s*/g],
+    ['Care & good practice', /(?:^|\s)(?:CARE TIPS|CARE AND INSPECTION|CARE AND MAINTENANCE|CLEANING AND MAINTENANCE|CLEANING AND REUSE|GOOD PRACTICE|INSPECTION AND RECORD KEEPING|INSTALLATION AND HANDLING)\s*:?\s*/g],
+    ['From the label', /(?:^|\s)FROM THE PRODUCT LABEL\s*:?\s*/g],
     ['Frequently asked questions', /(?:^|\s)(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\s*:?\s*/g],
-    ['Ordering, payment & delivery', /(?:^|\s)(?:ORDER(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\s*:?\s*/g],
-    ['Important buying notes', /(?:^|\s)(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\s*:?\s*/g]
+    ['Ordering, payment & delivery', /(?:^|\s)(?:PRODUCT DETAILS AND ORDERING|ORDER(?!\s+CHECKLIST)(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\s*:?\s*/g],
+    ['Important buying notes', /(?:^|\s)(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION|ORDER CHECKLIST|MEASURE BEFORE ORDERING|BUYING TIPS|BUYING GUIDANCE|PRACTICAL BUYING REMINDER)\s*:?\s*/g]
   ];
   const found = [];
   labels.forEach(([title, re]) => { re.lastIndex = 0; let m; while ((m = re.exec(raw))) found.push({ at: m.index, end: re.lastIndex, title }); });
+  /* Product-specific headings ("SEVEN WAYS TO COOK", "WHY WORM CONTROL MATTERS") are not in the list above. They are recognised by shape: 3+ ALL-CAPS words (letters only, so model codes like BM150 never qualify)
+     or 2 words straight after a full stop, followed by a normal sentence. Brand taglines ("... FROM STERMONT ARCADE") stay as text. Known labels are pushed first, so at the same position they win. */
+  const generic = [[/(?:^|\s)([A-Z][A-Z'’&-]*(?:\s+[A-Z][A-Z'’&-]*){2,6}):?(?=\s+[A-Z][a-z])/g, 0], [/(?<=[.!?:]\s)([A-Z][A-Z'’&-]{2,}\s+[A-Z][A-Z'’&-]{2,}):?(?=\s+[A-Z][a-z])/g, 1]];
+  generic.forEach(([re]) => { let m; while ((m = re.exec(raw))) { if (/STERMONT|ARCADE/.test(m[1])) continue; found.push({ at: m.index, end: re.lastIndex, title: headingCase(m[1]) }); } });
   found.sort((a, b) => a.at - b.at);
   // Text before the first label is the overview; the text after each label belongs to THAT label's heading.
   const sections = []; let pos = 0, cur = 'Product overview';
@@ -450,7 +460,7 @@ function splitProductDescription(source) {
   sections.forEach(s => { const prev = merged.find(x => x.title === s.title); if (prev) prev.body += ' ' + s.body; else merged.push({ ...s }); });
   return merged;
 }
-const PC_TAB = { 'Product overview': 'Overview', 'Key features & benefits': 'Features', 'Specifications & details': 'Specs', 'Uses & applications': 'Uses', 'How to use': 'How to use', 'Before you start': 'Prepare', 'Safety information': 'Safety', 'Storage & handling': 'Storage', 'Frequently asked questions': 'FAQs', 'Ordering, payment & delivery': 'Ordering', 'Important buying notes': 'Notes' };
+const PC_TAB = { 'Product overview': 'Overview', 'Why choose this product': 'Why buy', "What's in the box": 'In the box', 'Details to confirm': 'Confirm', 'Key features & benefits': 'Features', 'Specifications & details': 'Specs', 'Uses & applications': 'Uses', 'Mixing & application': 'Mixing', 'How to use': 'How to use', 'Before you start': 'Prepare', 'Safety information': 'Safety', 'Storage & handling': 'Storage', 'Care & good practice': 'Care', 'From the label': 'Label', 'Frequently asked questions': 'FAQs', 'Ordering, payment & delivery': 'Ordering', 'Important buying notes': 'Notes' };
 /* "Label: value" bullets become a two-column table (only when EVERY bullet has that shape). */
 function parseSpecs(items) {
   const rows = items.map(t => String(t).match(/^([^:]{2,40}):\s*(\S[\s\S]*)$/));
@@ -461,80 +471,179 @@ function splitSteps(body) {
   const s = String(body).replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+(?=[A-Z0-9])/).filter(Boolean);
   return s.length >= 2 ? s : null;
 }
+/* "SEVEN WAYS TO COOK" -> "Seven ways to cook" (short acronyms such as TV, LED, USB, PCPB keep their capitals). */
+function headingCase(s) {
+  const keep = /^(TV|LED|LCD|OLED|USB|UHD|HDR|HDMI|NPK|PCPB|EC|SC|WG|SL|HP|MFP|SUV|WIFI|GPS|UV|AC|DC|IPM)$/;
+  return String(s).trim().split(/\s+/).map((w, i) => keep.test(w) ? w : (i === 0 ? w[0] + w.slice(1).toLowerCase() : w.toLowerCase())).join(' ');
+}
+/* Instructions numbered in the text ("... 1. Half-fill the tank. 2. Add the product.") -> { intro, steps }. */
+function splitNumbered(body) {
+  const text = String(body).replace(/\s+/g, ' ').trim();
+  const first = text.search(/(?:^|\s)1[.)]\s+\S/);
+  if (first < 0) return null;
+  const steps = text.slice(first).trim().split(/\s+(?=\d{1,2}[.)]\s+\S)/).map(s => s.replace(/^\d{1,2}[.)]\s+/, '').trim()).filter(Boolean);
+  return steps.length >= 2 ? { intro: text.slice(0, first).trim(), steps } : null;
+}
+/* Body text becomes real paragraphs (a few sentences each), not one paragraph per sentence. A blank line in the source always starts a new paragraph. */
+function splitParagraphs(body) {
+  const out = [];
+  String(body).split(/\n\s*\n/).forEach(chunk => {
+    const sentences = chunk.replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/).filter(Boolean);
+    let cur = '', n = 0;
+    sentences.forEach(s => { if (cur && (n >= 3 || cur.length + s.length > 340)) { out.push(cur); cur = ''; n = 0; } cur = cur ? cur + ' ' + s : s; n++; });
+    if (cur) out.push(cur);
+  });
+  return out;
+}
+/* "Large capacity: a spacious bowl" -> bold label + text. */
+function splitLabel(item) {
+  const m = String(item).match(/^([^:.!?]{2,38}):\s+(\S[\s\S]*)$/);
+  return m ? { label: m[1].trim(), text: m[2].trim() } : null;
+}
+/* "1 x steam tray" -> quantity badge + text (What's in the box). */
+function parseBoxItem(item) {
+  const m = String(item).match(/^(\d+)\s*[x×]\s+(\S[\s\S]*)$/i);
+  return m ? { qty: m[1], text: m[2].trim() } : null;
+}
+/* Up to four short spec rows for the "at a glance" strip (always 2 or 4, so the 2-column grid has no gap). */
+function pickFacts(rows) {
+  const want = /^(brand|model|power|capacity|colou?r|size|material|warranty|weight|dimensions?|formulation|volume|screen|ram|battery|pack)/i;
+  const skip = /^(product|use|uses|type|appliance type)$/i;
+  const ok = rows.filter(([k, v]) => v.length <= 28 && k.length <= 22 && !skip.test(k));
+  const picked = ok.filter(([k]) => want.test(k)).concat(ok.filter(([k]) => !want.test(k))).slice(0, 4);
+  return picked.length >= 4 ? picked : picked.length >= 2 ? picked.slice(0, 2) : [];
+}
 /* @desc-end */
 /* @render-start */
-const PC_CSS = `#pp-desc, #qb-desc { white-space:normal !important; overflow-wrap:anywhere; } .product-copy-section { margin: 0 0 14px; padding: 15px 14px 13px; border: 1px solid #ece7f5; border-radius: 14px; background: #fff; box-shadow: 0 2px 8px rgba(34, 20, 60, .045); } .product-copy-section h3 { margin: 0 0 10px; padding: 0 0 9px; color: #5b21b6; font-size: 15px; line-height: 1.3; font-weight: 750; letter-spacing: -.01em; border-bottom: 1px solid #eee8f8; } .product-copy-section p { margin: 0 0 9px; color: #393543; font-size: 13.5px; line-height: 1.7; } .product-copy-section p:last-child { margin-bottom: 0; } .product-copy-section ul { display: grid; gap: 8px; margin: 4px 0 1px; padding: 0; list-style: none; } .product-copy-section li { position: relative; padding-left: 19px; color: #393543; font-size: 13.5px; line-height: 1.6; } .product-copy-section li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 7px; height: 7px; border-radius: 50%; background: #8b5cf6; }
-.pc-tabs{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px 10px;position:sticky;top:0;z-index:4;background:#fff;border-bottom:1px solid #ece7f5;scrollbar-width:none}
+const PC_CSS = `#pp-desc,#qb-desc{white-space:normal!important;overflow-wrap:anywhere;color:#3a3647}
+.pc-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
+.pc-fact{min-width:0;padding:11px 12px 10px;border-radius:12px;background:linear-gradient(180deg,#fbf9ff,#f3edfd);border:1px solid #e5dbf8}
+.pc-fact b{display:block;margin:0 0 3px;font-size:10px;line-height:1.2;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#7a68a6}
+.pc-fact span{display:block;font-size:13.5px;line-height:1.3;font-weight:700;color:#2b1d52}
+.pc-tabs{display:flex;gap:20px;overflow-x:auto;margin:0 -16px 14px;padding:0 16px;position:sticky;top:0;z-index:4;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-bottom:1px solid #ece7f5;scrollbar-width:none}
 .pc-tabs::-webkit-scrollbar{display:none}
-.pc-tabs a{flex:none;padding:7px 13px;border-radius:999px;border:1px solid #e0d8f0;background:#faf8ff;color:#5b21b6;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap}
-.pc-tabs a.on{background:#7c3aed;border-color:#7c3aed;color:#fff}
-.product-copy-section{scroll-margin-top:54px}
-.product-copy-section ul.pc-tick li::before{content:"\\2713";background:none;width:auto;height:auto;border-radius:0;left:0;top:0;color:#15803d;font-weight:800;font-size:13px}
-.product-copy-section ul.pc-tick li{padding-left:22px}
-.pc-spec{width:100%;border-collapse:collapse;font-size:13px}
-.pc-spec th,.pc-spec td{padding:9px 10px;border:1px solid #ece7f5;text-align:left;vertical-align:top;line-height:1.5}
-.pc-spec th{width:40%;background:#f6f3fc;color:#4a3d6b;font-weight:650}
-.pc-steps{counter-reset:pc;list-style:none;margin:4px 0 0;padding:0;display:grid;gap:11px}
-.pc-steps li{position:relative;padding-left:36px;counter-increment:pc;color:#393543;font-size:13.5px;line-height:1.6}
-.pc-steps li::before{content:counter(pc);position:absolute;left:0;top:0;width:25px;height:25px;border-radius:50%;background:#7c3aed;color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center}
-.product-copy-section.pc-warn{border-color:#f3d79a;background:#fffaf0}
-.product-copy-section.pc-warn h3{color:#92400e}
-.product-copy-section.pc-warn h3::before{content:"\\26A0\\FE0F  "}
-details.pc-q{border-top:1px solid #eee7f7;padding:2px 0}
-details.pc-q:first-of-type{border-top:0}
-details.pc-q summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-weight:700;font-size:13.5px;line-height:1.45;color:#2b2540;cursor:pointer;list-style:none}
+.pc-tabs a{flex:none;padding:12px 1px 10px;border-bottom:2px solid transparent;color:#8a7cab;font-size:13px;font-weight:600;letter-spacing:.01em;text-decoration:none;white-space:nowrap;transition:color .15s,border-color .15s}
+.pc-tabs a.on{color:#5b21b6;border-bottom-color:#7c3aed;font-weight:700}
+.product-copy-section{position:relative;scroll-margin-top:54px;margin:0 0 16px;padding:18px 16px 16px;border:1px solid #ebe4f7;border-radius:16px;background:#fff;box-shadow:0 1px 2px rgba(34,20,60,.04),0 8px 22px rgba(34,20,60,.05)}
+.product-copy-section h3{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding:0;border:0;color:#2b1d52;font:700 17px/1.25 Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;letter-spacing:-.005em}
+.product-copy-section h3::before{content:"";flex:none;width:7px;height:7px;background:#7c3aed;transform:rotate(45deg);border-radius:1px}
+.product-copy-section h3::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,#d8ccf3,rgba(216,204,243,0))}
+.product-copy-section p{margin:0 0 11px;color:#3a3647;font-size:14px;line-height:1.75;text-wrap:pretty}
+.product-copy-section p:last-child{margin-bottom:0}
+.product-copy-section p.pc-lead{color:#2b2540;font-size:15px;line-height:1.7;padding-left:12px;border-left:3px solid #c9b8f5}
+.product-copy-section ul{display:grid;gap:9px;margin:4px 0 1px;padding:0;list-style:none}
+.product-copy-section li{position:relative;padding-left:20px;color:#3a3647;font-size:14px;line-height:1.6}
+.product-copy-section li::before{content:"";position:absolute;left:2px;top:.65em;width:6px;height:6px;border-radius:50%;background:#8b5cf6}
+.product-copy-section li strong{color:#2b1d52;font-weight:700}
+.product-copy-section ul.pc-tick{gap:11px;margin-top:2px;padding:13px;background:#fbf9ff;border:1px solid #efe8fb;border-radius:12px}
+.product-copy-section ul.pc-tick li{padding-left:25px}
+.product-copy-section ul.pc-tick li::before{content:"✓";left:0;top:2px;width:17px;height:17px;border-radius:50%;background:#dcfce7;color:#15803d;font-size:11px;font-weight:800;line-height:17px;text-align:center}
+.product-copy-section ul.pc-box li{display:flex;gap:10px;align-items:baseline;padding:0 0 9px;border-bottom:1px dashed #e4dbf6}
+.product-copy-section ul.pc-box li:last-child{border-bottom:0;padding-bottom:0}
+.product-copy-section ul.pc-box li::before{display:none}
+.pc-qty{flex:none;min-width:30px;padding:2px 7px;border-radius:999px;background:#f1ebff;color:#5b21b6;font-size:12px;font-weight:800;text-align:center}
+.pc-spec{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #e9e1f6;border-radius:12px;overflow:hidden;font-size:13.5px}
+.pc-spec th,.pc-spec td{padding:10px 12px;border:0;border-top:1px solid #efe9f9;text-align:left;vertical-align:top;line-height:1.5}
+.pc-spec tr:first-child th,.pc-spec tr:first-child td{border-top:0}
+.pc-spec th{width:38%;background:#f8f5fe;color:#6b5b95;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.pc-spec td{color:#2b2540;font-weight:600}
+.pc-spec tr:nth-child(even) td{background:#fcfbff}
+.pc-steps{counter-reset:pc;list-style:none;margin:4px 0 0;padding:0;display:grid;gap:15px}
+.pc-steps li{position:relative;min-height:27px;padding-left:40px;counter-increment:pc;color:#3a3647;font-size:14px;line-height:1.65}
+.pc-steps li::before{content:counter(pc);position:absolute;left:0;top:0;width:27px;height:27px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;font-weight:800;font-size:12.5px;line-height:1;display:grid;place-items:center;box-shadow:0 2px 6px rgba(109,40,217,.28)}
+.pc-steps li:not(:last-child)::after{content:"";position:absolute;left:12px;top:29px;bottom:-13px;width:2px;background:#e6dcfa;border-radius:2px}
+details.pc-q{margin:0 0 8px;padding:0 13px;border:1px solid #ece4f8;border-radius:12px;background:#fff}
+details.pc-q[open]{background:#fcfbff;border-color:#ddd0f7}
+details.pc-q summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 0;font-weight:700;font-size:14px;line-height:1.45;color:#2b2540;cursor:pointer;list-style:none}
 details.pc-q summary::-webkit-details-marker{display:none}
-details.pc-q summary::after{content:"+";flex:none;width:22px;height:22px;border-radius:50%;background:#f1ebff;color:#5b21b6;font-weight:800;display:grid;place-items:center}
-details.pc-q[open] summary::after{content:"\\2212"}
-details.pc-q p{margin:0 0 12px;padding-right:6px}
-.product-copy-section.pc-order{background:#faf8ff;box-shadow:none}`;
+details.pc-q summary::after{content:"+";flex:none;width:24px;height:24px;border-radius:50%;background:#f1ebff;color:#5b21b6;font-weight:800;font-size:15px;display:grid;place-items:center}
+details.pc-q[open] summary::after{content:"−"}
+details.pc-q p{margin:0 0 13px;padding-right:4px;font-size:13.5px}
+.product-copy-section.pc-warn{background:#fffaf0;border-color:#f3d79a;border-left:4px solid #f59e0b}
+.product-copy-section.pc-warn h3{color:#92400e}
+.product-copy-section.pc-warn h3::before{content:"!";width:20px;height:20px;transform:none;border-radius:50%;background:#f59e0b;color:#fff;font:800 12px/20px system-ui,sans-serif;text-align:center}
+.product-copy-section.pc-warn h3::after{background:linear-gradient(90deg,#f3d79a,rgba(243,215,154,0))}
+.product-copy-section.pc-note{background:#faf8ff;border-left:4px solid #a78bfa}
+.product-copy-section.pc-order{background:linear-gradient(135deg,#f6f1ff,#fcfaff);border-color:#ddd0f7;box-shadow:none}`;
 function renderProductDescription(target, source) {
   const root = $(target); if (!root) return;
+  if (root._pcIO) { root._pcIO.disconnect(); root._pcIO = null; }
   root.replaceChildren();
   if (!document.getElementById('pc-style')) { const st = document.createElement('style'); st.id = 'pc-style'; st.textContent = PC_CSS; document.head.appendChild(st); }
   const sections = splitProductDescription(source);
   if (!sections.length) { root.textContent = 'Product information will be updated shortly.'; return; }
   const uid = String(target).replace(/[^a-z0-9]/gi, '') + '-s';
   const el = (tag, text, cls) => { const e = document.createElement(tag); if (text != null) e.textContent = text; if (cls) e.className = cls; return e; };
-  const cards = [];
+  const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cards = []; let facts = [];
   sections.forEach((section, i) => {
     const card = el('section', null, 'product-copy-section'); card.id = uid + i;
     card.appendChild(el('h3', section.title));
+    const isBox = section.title === "What's in the box";
     const startsWithBullet = /^\s*[•●▪]/.test(section.body);
     const bullets = section.body.split(/\s*[•●▪]\s*/).map(x => x.trim()).filter(Boolean);
     const isList = bullets.length > 1 || (startsWithBullet && bullets.length);
     const faq = section.title === 'Frequently asked questions' ? splitFaq(section.body) : null;
     const specs = isList && section.title === 'Specifications & details' ? parseSpecs(bullets) : null;
-    const steps = !isList && section.title === 'How to use' ? splitSteps(section.body) : null;
+    const numbered = !isList && /^(How to use|Mixing & application)$/.test(section.title) ? splitNumbered(section.body) : null;   // "1. ... 2. ..." written in the text
+    const steps = !isList && !numbered && section.title === 'How to use' ? splitSteps(section.body) : null;
     if (faq) {
       faq.forEach((item, k) => { const d = el('details', null, 'pc-q'); if (k === 0) d.open = true; d.appendChild(el('summary', item.q)); d.appendChild(el('p', item.a)); card.appendChild(d); });
     } else if (specs) {
       const t = el('table', null, 'pc-spec'), tb = el('tbody'); specs.forEach(([k, v]) => { const tr = el('tr'); const th = el('th', k); th.scope = 'row'; tr.append(th, el('td', v)); tb.appendChild(tr); }); t.appendChild(tb); card.appendChild(t);
-    } else if (steps) {
-      const ol = el('ol', null, 'pc-steps'); steps.forEach(x => ol.appendChild(el('li', x))); card.appendChild(ol);
+      facts = pickFacts(specs);
+    } else if (numbered || steps) {
+      if (numbered && numbered.intro) splitParagraphs(numbered.intro).forEach(t => card.appendChild(el('p', t)));
+      const ol = el('ol', null, 'pc-steps'); (numbered ? numbered.steps : steps).forEach(x => ol.appendChild(el('li', x))); card.appendChild(ol);
     } else if (isList) {
       const lead = startsWithBullet ? '' : bullets.shift(); if (lead) card.appendChild(el('p', lead));
-      const ul = el('ul', null, /^(Key features|Before you start)/.test(section.title) ? 'pc-tick' : ''); bullets.forEach(item => ul.appendChild(el('li', item.replace(/^[-–]\s*/, '')))); card.appendChild(ul);
+      const ul = el('ul', null, isBox ? 'pc-box' : /^(Key features|Before you start|Why choose)/.test(section.title) ? 'pc-tick' : '');
+      bullets.forEach(raw => {
+        const text = raw.replace(/^[-–]\s*/, ''), li = el('li'), box = isBox ? parseBoxItem(text) : null, lb = !isBox ? splitLabel(text) : null;
+        if (box) { li.append(el('span', box.qty + '×', 'pc-qty'), document.createTextNode(box.text)); }
+        else if (lb) { li.append(el('strong', lb.label + ': '), document.createTextNode(lb.text)); }
+        else li.textContent = text;
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
     } else {
-      section.body.split(/\n\s*\n|(?<=[.!?])\s+(?=[A-Z0-9“"'])/).forEach(t => { if (t.trim()) card.appendChild(el('p', t.trim())); });
+      splitParagraphs(section.body).forEach((t, k) => card.appendChild(el('p', t, i === 0 && k === 0 && section.title === 'Product overview' ? 'pc-lead' : '')));
     }
     if (section.title === 'Safety information') card.classList.add('pc-warn');
+    if (section.title === 'Important buying notes' || section.title === 'Details to confirm') card.classList.add('pc-note');
     if (section.title.startsWith('Ordering')) card.classList.add('pc-order');
     cards.push(card);
   });
+  if (facts.length) {
+    const grid = el('div', null, 'pc-facts');
+    facts.forEach(([k, v]) => { const f = el('div', null, 'pc-fact'); f.append(el('b', k), el('span', v)); grid.appendChild(f); });
+    root.appendChild(grid);
+  }
   if (cards.length >= 3) {
     const nav = el('nav', null, 'pc-tabs'); nav.setAttribute('aria-label', 'Product information sections');
+    const links = [];
+    const setOn = a => {
+      links.forEach(l => l[0].classList.toggle('on', l[0] === a));
+      if (nav.scrollTo) nav.scrollTo({ left: a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2, behavior: calm ? 'auto' : 'smooth' });
+    };
     sections.forEach((section, i) => {
       if (section.title.startsWith('Ordering')) return;
       const a = el('a', PC_TAB[section.title] || section.title); a.href = '#' + uid + i;
-      a.addEventListener('click', ev => { ev.preventDefault(); nav.querySelectorAll('a').forEach(x => x.classList.remove('on')); a.classList.add('on'); cards[i].scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-      nav.appendChild(a);
+      a.addEventListener('click', ev => { ev.preventDefault(); setOn(a); cards[i].scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' }); });
+      nav.appendChild(a); links.push([a, cards[i]]);
     });
     root.appendChild(nav);
+    links[0][0].classList.add('on');
+    if ('IntersectionObserver' in window) {   // the active tab follows the section being read
+      const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { const hit = links.find(l => l[1] === en.target); if (hit) setOn(hit[0]); } }), { rootMargin: '-70px 0px -65% 0px' });
+      links.forEach(l => io.observe(l[1])); root._pcIO = io;
+    }
   }
   cards.forEach(c => root.appendChild(c));
 }
 /* @render-end */
+
+const details = new Map();   // rowId -> details request; dropped by commit 7b80a7f (product details never loaded), restored 2026-11-09
 const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
 async function renderDetails(rowId) {
   const box = $('#qb-details'); if (!box) return;                  // an older cached index.html has no details block: leave the sheet as it was
