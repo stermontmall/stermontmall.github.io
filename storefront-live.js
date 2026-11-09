@@ -148,10 +148,32 @@
     window.addEventListener('popstate', function () { if (pd.classList.contains('on')) hide(); });
   }
   function setQty(n) { var max = Math.max(1, Math.min(99, cur ? cur._p.stock : 1)); qty = Math.max(1, Math.min(max, n)); pd.querySelector('.q span').textContent = qty; }
-  function show(n) {
-    idx = (n + imgs.length) % imgs.length; var m = pd.querySelector('.main'); m.textContent = '';
-    if (imgs.length) { var i = new Image(); i.src = imgs[idx]; i.alt = cur ? cur._p.name : ''; m.appendChild(i); } else { m.appendChild(mk('div', 'ph', '📦')); }
+  function renderThumbs() {
+    var th = pd.querySelector('.thumbs'); th.textContent = ''; th.hidden = imgs.length < 2;
+    imgs.forEach(function (u, k) {
+      var t = new Image(); t.src = u; t.alt = 'Photo ' + (k + 1) + ' of ' + (cur ? cur._p.name : 'product');
+      t.onerror = function () { var at = imgs.indexOf(u); if (at > -1) { imgs.splice(at, 1); if (at <= idx) idx = Math.max(0, idx - 1); renderGallery(); } };
+      t.onclick = function () { show(k); }; th.appendChild(t);
+    });
+  }
+  function renderGallery() {
+    var m = pd.querySelector('.main'); m.textContent = '';
+    if (!imgs.length) { m.appendChild(mk('div', 'ph', 'Photos temporarily unavailable')); renderThumbs(); return; }
+    if (idx >= imgs.length) idx = 0;
+    var current = imgs[idx], i = new Image(); i.alt = cur ? cur._p.name + ' product photo ' + (idx + 1) : 'Product photo';
+    i.loading = 'eager'; i.decoding = 'async';
+    i.onerror = function () {
+      var at = imgs.indexOf(current);
+      if (at > -1) imgs.splice(at, 1);
+      if (at >= 0 && at < idx) idx--;
+      renderGallery();
+    };
+    i.src = current; m.appendChild(i); renderThumbs();
     [].forEach.call(pd.querySelectorAll('.thumbs img'), function (t, k) { t.classList.toggle('on', k === idx); });
+  }
+  function show(n) {
+    if (!imgs.length) { idx = 0; renderGallery(); return; }
+    idx = (n + imgs.length) % imgs.length; renderGallery();
   }
   function fmtDesc(text) {
     var box = mk('div');
@@ -168,7 +190,7 @@
   function openView(c, noPush, keep) {
     var p = c._p; if (!p) return; build(); cur = c; var q = function (s) { return pd.querySelector(s); };
     q('.pd-h').setAttribute('data-id', c.id); paintHearts(); if (window.STM_track) window.STM_track(c.id);
-    imgs = (p.images || []).filter(Boolean); q('.bar b').textContent = p.vbase || p.name; q('h2').textContent = p.vbase || p.name; q('.pr').textContent = money(p.price); var ue = q('.unit-l'); ue.textContent = p.unit && !p.variant_label ? 'Per ' + p.unit : ''; ue.hidden = !ue.textContent;
+    imgs = (p.images || []).filter(function (u, k, a) { return typeof u === 'string' && /^https:\/\//i.test(u) && a.indexOf(u) === k; }); idx = 0; q('.bar b').textContent = p.vbase || p.name; q('h2').textContent = p.vbase || p.name; q('.pr').textContent = money(p.price); var ue = q('.unit-l'); ue.textContent = p.unit && !p.variant_label ? 'Per ' + p.unit : ''; ue.hidden = !ue.textContent;
     var vo = q('.vopts'); vo.textContent = ''; vo.hidden = !(c._grp && c._grp.length > 1);
     if (!vo.hidden) {
       vo.appendChild(mk('b', '', 'Select pack size:')); var vw = mk('div');
@@ -185,8 +207,7 @@
     var sum = ['Hello Stermont Arcade, I would like to enquire about this item:', '', 'Product: ' + p.name.replace(/^Buy\s+/i, ''), 'Price: ' + money(p.price) + (p.unit && !p.variant_label ? ' / ' + p.unit : ''),
       'Availability: ' + avail].concat(p.categories && p.categories.name ? ['Category: ' + p.categories.name] : [], ['Ref: ' + p.id, 'Link: ' + location.origin + purl(p.id), '', 'Please confirm availability and the delivery fee to my location.']).join('\n');
     var wl = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(sum); q('.wa').href = wl; q('.wat').href = wl;
-    var th = q('.thumbs'); th.textContent = ''; th.hidden = imgs.length < 2;
-    imgs.forEach(function (u, k) { var t = new Image(); t.src = u; t.alt = ''; t.onclick = function () { show(k); }; th.appendChild(t); });
+    renderGallery();
     var d = q('.desc'), full = q('.full'); d.textContent = ''; full.hidden = !p.description;
     if (p.description) d.appendChild(fmtDesc(p.description));
     var add = q('.add'); add.disabled = sold; add.textContent = sold ? 'Sold out' : 'Add to cart'; q('.q').style.display = sold ? 'none' : ''; setQty(1); show(0);
