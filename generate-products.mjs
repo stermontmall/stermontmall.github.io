@@ -581,7 +581,7 @@ for (const p of products) {
   // made 100 ml / 250 ml links display the 1 litre heading in the mobile catalogue.
   (p.variants || []).forEach(v => {
     const variantSeoName = typeof v.seo_name === 'string' ? v.seo_name.trim() : '';
-    NAMES[v.id] = variantSeoName ? buyName(variantSeoName) : buyName(`${p.name} ${v.variant_label}`);
+    NAMES[v.id] = buyName(variantSeoName || `${v.name || p.name} ${v.variant_label}`);
   });
   // Related products rotate through the category (the 6 that follow this one, wrapping round), so EVERY product, including the newest, gets links from other product pages.
   const related = (() => {
@@ -681,6 +681,14 @@ ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<
     ld: crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/']]) }));
   urls.push('/c/');
 }
+
+// Re-apply variant names from the original Supabase rows, not the grouped page object.
+// This guarantees that each pack-size URL keeps its own seo_name even when group headings differ.
+rows.forEach(row => {
+  if (!row.variant_group || !row.variant_label) return;
+  const exact = typeof row.seo_name === 'string' ? row.seo_name.trim() : '';
+  NAMES[row.id] = buyName(exact || `${row.name} ${row.variant_label}`);
+});
 
 // /products.html: one crawlable page that lists every product, grouped by category, so Google and visitors can reach all of them from one place.
 {
@@ -844,3 +852,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-09: rebuild product pages after cleaning four promotional-prefix product names in the catalogue.
 
 // 2026-11-09: preserve each pack-size variant's own approved heading in product-names.json.
+
+// 2026-11-09: build mobile catalogue pack-size names from the original database rows.
