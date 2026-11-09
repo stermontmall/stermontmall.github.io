@@ -283,7 +283,7 @@ function cardHTML(p) {
       </div>
     </div></li>`;
 }
-const SKELETON = `<li class="card pointer-events-none" aria-hidden="true"><div class="skel aspect-square !rounded-none"></div><div class="p-2 space-y-2"><div class="skel h-3 w-full"></div><div class="skel h-3 w-2/3"></div><div class="skel h-4 w-1/2"></div></div></li>`;
+const SKELETON = `<li class="card pointer-events-none" aria-hidden="true"><div class="skel aspect-square !rounded-none"></div><div class="p-2 space-y-2"><div class="skel h-8 w-full"></div><div class="skel h-4 w-1/2"></div><div class="flex items-center justify-between"><div class="skel h-3 w-1/3"></div><div class="skel h-7 w-7 rounded-full"></div></div></div></li>`;
 const skeletons = n => SKELETON.repeat(n);
 
 const grid = $('#grid'), sentinel = $('#sentinel'), EMPTY_TEXT = $('#grid-empty').textContent;
