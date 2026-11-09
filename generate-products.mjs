@@ -406,6 +406,26 @@ const INFO = {
   'adjuvants-growth-regulators': { h1: 'Adjuvants & Growth Regulators in Kenya', title: 'Spray Adjuvants & Growth Regulators in Kenya | Stermont Arcade',
     desc: 'Buy spreader stickers, wetters and rooting hormones online in Kenya. Pay by M-Pesa, delivery to all 47 counties.',
     intro: 'Spray additives that help products spread and stick, and rooting hormones for cuttings and seedlings.' },
+  'motorcycle-spare-parts': { h1: 'Motorcycle Spare Parts in Kenya', title: 'Motorcycle Spare Parts in Kenya | Bajaj Boxer Parts | Stermont Arcade',
+    desc: 'Shop motorcycle spare parts in Kenya, including Bajaj Boxer components. Check model compatibility, part numbers and fitment before ordering.',
+    intro: 'Browse motorcycle replacement parts and components, including listings for Bajaj Boxer models. Match each part to the exact motorcycle model, engine variant and fitting position before ordering.',
+    guide: `<h2>How to choose the correct motorcycle spare part</h2>
+<p>Start with the motorcycle make, model, engine capacity and model year. A part that looks similar may have different dimensions, electrical connections, mounting points or thread sizes. For Bajaj Boxer motorcycles, confirm whether your bike is a BM100, BM125, BM150 or another specific variant. Do not rely on the name “Boxer” alone when checking fitment.</p>
+<h2>Check the part number and fitting position</h2>
+<p>Where the old component has an OEM or manufacturer part number, compare it with the number supplied by the seller or printed on the replacement packaging. For parts fitted on one side of the motorcycle, confirm left or right before ordering. Electrical components such as regulators, CDI units and stators need extra care: connector shape, AC or DC system and wiring arrangement must match the motorcycle. Ask a qualified mechanic to verify uncertain electrical parts before installation.</p>
+<h2>Common parts and compatibility checks</h2>
+<ul><li><b>Filters and service parts:</b> compare the engine variant and filter dimensions or part reference.</li><li><b>Brake and clutch cables:</b> check cable length, end fittings and the correct front or rear application.</li><li><b>Lights and indicators:</b> compare mounting points, connector type and the exact assembly.</li><li><b>Bearings and seals:</b> match the printed bearing code, dimensions and application.</li><li><b>Engine and electrical components:</b> confirm model code, connector layout and manufacturer reference before fitting.</li></ul>
+<h2>Before you place an order</h2>
+<p>Send the seller the motorcycle model, engine capacity, year or frame details where appropriate, plus clear photographs of the old part and any visible part number. Confirm whether the listing is for one piece or a set, what is included in the package and whether installation is included. If a part is safety-critical, have a qualified motorcycle mechanic confirm compatibility and installation. Never force a component that does not align correctly.</p>
+<h2>Motorcycle spare parts delivery in Kenya</h2>
+<p>Compare the exact product description and listed price, then confirm current stock, dispatch timing and delivery fee before payment. Keep your order confirmation and inspect the supplied part against the agreed model and part reference before installation. Browse <a href="/c/motorcycle-accessories.html">motorcycle accessories</a> for additional riding and bike-related items.</p>`,
+    faq: [
+      ['How do I know if a Bajaj Boxer spare part will fit my motorcycle?', 'Confirm the exact Boxer model and engine variant, such as BM100, BM125 or BM150, then compare the part number, connector, dimensions and fitting position. Ask a mechanic or seller to verify uncertain fitment.'],
+      ['Can I order motorcycle spare parts online in Kenya?', 'You can browse the listings online and enquire about the exact part. Confirm stock, compatibility, package contents and delivery fee before paying.'],
+      ['What details should I send when asking about a spare part?', 'Send the make, model, engine capacity, model year if known, the old part number and clear photos of the component and its connector or mounting points.'],
+      ['Are motorcycle electrical parts interchangeable?', 'No. Regulators, CDI units and stators can differ by AC or DC system, connector and wiring layout. Match the exact motorcycle specification before installation.'],
+      ['Should I install a motorcycle brake or steering component myself?', 'For safety-critical parts, use a qualified motorcycle mechanic and have the replacement verified for the exact model before riding.']
+    ] },
   'disinfectants-hygiene': { h1: 'Disinfectants & Farm Hygiene Products in Kenya', title: 'Farm Disinfectants in Kenya | Stermont Arcade',
     desc: 'Compare farm disinfectants for poultry houses, livestock pens and sanitation in Kenya. Check label-approved uses, dilution and pack size.',
     intro: 'Shop disinfectants for poultry houses, livestock pens, equipment and general sanitation. Compare the active ingredient, label-approved application sites and pack size. Follow the exact product label for dilution, contact time, ventilation and animal re-entry.',
