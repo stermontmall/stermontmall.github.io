@@ -216,11 +216,14 @@
     parts.forEach(function(part){
       var content=part.text.trim(); if(!content)return;
       var section=mk('section','desc-section'); section.appendChild(mk('h4','',part.title));
+      var lines=content.split(/\n+/).map(function(x){return x.trim().replace(/^[-•●▪]\s*/, '');}).filter(Boolean);
       var bullets=content.split(/\s*[•●▪]\s*/).map(function(x){return x.trim();}).filter(Boolean);
-      if(bullets.length>1){
-        var lead=bullets.shift(); if(lead && lead.length>18)section.appendChild(mk('p','',lead));
+      var listSection=/key features|specifications/i.test(part.title) && lines.length>1;
+      if(listSection || bullets.length>1){
+        var items=listSection ? lines : bullets;
+        if(!listSection){var lead=items.shift(); if(lead && lead.length>18)section.appendChild(mk('p','',lead));}
         var ul=mk('ul','desc-list');
-        bullets.forEach(function(item){ul.appendChild(mk('li','',item.replace(/^[-–]\s*/,'')));});
+        items.forEach(function(item){ul.appendChild(mk('li','',item.replace(/^[-–]\s*/,'')));});
         section.appendChild(ul);
       }else{
         var paras=content.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/), chunk='';
