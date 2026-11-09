@@ -24,6 +24,12 @@ assert.deepEqual(heads(vehicle), ['Important notes', 'Buying notes', 'Buying gui
 ok(/<h3>Buying guide<\\/h3><p>Inspect the exact model\\.<\\/p>/.test(vehicle), 'vehicle buying guide is its own heading');
 ok(/<h3>Vehicle enquiry &amp; next steps<\\/h3><p>Request VIN and photos\\.<\\/p>/.test(vehicle), 'vehicle enquiry is its own heading');
 
+// Car content: escaped line breaks and vehicle headings must render as separate sections.
+const car = productDescriptionHtml('PRODUCT SUMMARY\\nA buyer-facing introduction.\\n\\nIMPORTANT BUYING NOTES\\nConfirm the current quote.\\n\\nVEHICLE-SPECIFIC BUYING GUIDE\\nInspect the exact vehicle and compare its condition.\\n\\nVEHICLE ENQUIRY & NEXT STEPS\\nRequest current photos and a written quotation.');
+assert.deepEqual(heads(car), ['Product overview', 'Buying notes', 'Buying guide', 'Vehicle enquiry & next steps']); n++;
+ok(/<h3>Buying guide<\\/h3><p>Inspect the exact vehicle and compare its condition\\.<\\/p>/.test(car), 'car buying guide renders as a separate heading');
+ok(/<h3>Vehicle enquiry &amp; next steps<\\/h3><p>Request current photos and a written quotation\\.<\\/p>/.test(car), 'car enquiry renders as a separate heading');
+
 // no labels: unchanged behaviour
 const plain = productDescriptionHtml('First paragraph.\n\nSecond paragraph.');
 assert.deepEqual(heads(plain), ['Product overview', 'Product details']); n++;
