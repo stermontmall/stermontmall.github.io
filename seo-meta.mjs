@@ -162,7 +162,7 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
 //   "Shop Top & Reliable <Category> Online in Kenya – M-Pesa & Delivery"
 export function catTitle(catName) {
   const c = String(catName || '').replace(/\s+/g, ' ').trim();
-  if (c.toLowerCase() === 'cars for sale') return 'New Cars for Sale in Kenya | Stermont Arcade';
+  if (/^(?:stermont\\s+)?cars for sale$/i.test(c)) return 'Cars for Sale in Kenya | Stermont Arcade';
   const tiers = [
     `Shop ${c} Online in Kenya | ${STORE}`,
     `Buy ${c} Online in Kenya | ${STORE}`,
@@ -177,7 +177,7 @@ export function catTitle(catName) {
 // Category meta description. "PCPB-approved" only for PCPB-regulated categories.
 export function catDescription(catName, catSlug) {
   const c = String(catName || '').replace(/\s+/g, ' ').trim();
-  if (catSlug === 'cars-for-sale') return 'Explore brand-new car sourcing adverts in Kenya. Compare indicative competitor prices and representative photos; confirm supplier availability and final quotes before payment.';
+  if (['cars-for-sale', 'stermont-cars-for-sale'].includes(catSlug)) return 'Explore brand-new cars for sale in Kenya. Compare model details, indicative prices and photos; confirm availability and the final supplier quote before payment.';
   const registrationNote = ['crop-insecticides', 'bed-bug-killers', 'adjuvants-growth-regulators'].includes(catSlug)
     ? ' Check each product label and PCPB registration.'
     : '';
