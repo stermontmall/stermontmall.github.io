@@ -11,6 +11,10 @@ export function auditProducts(rows) {
     if (!String(p.seo_title || '').trim()) errors.push(`${id}: missing seo_title`);
     if (String(p.seo_title || '').length > 60) errors.push(`${id}: seo_title exceeds 60 characters (${p.seo_title.length})`);
     if (p.category_id == null) errors.push(`${id}: missing category_id`);
+    // A stray backslash (e.g. a broken regexp_replace leaving a literal \1 in names) must never reach page titles, H1s or links.
+    for (const f of ['name', 'seo_name', 'seo_title', 'variant_label']) {
+      if (String(p[f] || '').includes('\\')) errors.push(`${id}: ${f} contains a stray backslash (${JSON.stringify(p[f])})`);
+    }
     if (!Array.isArray(p.images) || p.images.length === 0) errors.push(`${id}: no product image reference`);
     if ((p.images || []).some(u => /stermontmall\.github\.io\/product-photos\//i.test(String(u)))) {
       warnings.push(`${id}: legacy github.io product-photo URL requires availability and visual-match verification`);
@@ -20,7 +24,7 @@ export function auditProducts(rows) {
 }
 
 async function main() {
-  const url = `${SB}/rest/v1/products?active=eq.true&select=id,seo_name,seo_title,category_id,images&limit=1000`;
+  const url = `${SB}/rest/v1/products?active=eq.true&select=id,name,seo_name,seo_title,variant_label,category_id,images&limit=1000`;
   const response = await fetch(url, { headers: { apikey: KEY, accept: 'application/json' } });
   if (!response.ok) throw new Error(`Supabase catalogue audit failed: HTTP ${response.status}`);
   const rows = await response.json();

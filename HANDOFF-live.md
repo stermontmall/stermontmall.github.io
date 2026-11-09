@@ -1,3 +1,9 @@
+## 2026-11-09 13:10 Africa/Nairobi - Guard added so a stray backslash in product text fails the build (branch `wip-guard-stray-backslash`, merged to main)
+- Root cause of the `\1` on product pages: commit 36ef50b (02:02 today, "Save November 9 SEO audit and catalogue fixes") committed pages built from product names that contained a literal `\1` (broken regexp_replace leaving the backreference text). The DB was fixed later; bot commit 60060e9 (09:44) rebuilt clean pages.
+- `seo-catalog-guard.mjs` now errors if name / seo_name / seo_title / variant_label of any active product contains a backslash; unit test added to `seo-catalog-guard.test.mjs` (passes). The live-DB run could not be tested from the sandbox (no network); it runs in the product-pages workflow.
+- Live check at ~13:03 Nairobi still showed the old `\1` title although deployment 42597332810 succeeded 09:57Z: awaiting cache expiry; owner to confirm in a private tab.
+- RULE: before pushing, confirm no `pages-build-deployment` run is in_progress/queued (`gh run list --limit 8`), else the deployment fails with "in progress deployment" and must be re-run.
+
 ## 2026-11-09 13:00 Africa/Nairobi - Pages deployment collisions found and re-run (main, note-only)
 - Pages deployments for c89988e / 60060e9 / ac51384 failed or were cancelled with "Deployment request failed due to in progress deployment": bot rebuild commits and note-only pushes land while another deployment runs. NOT a code bug. Re-ran run 42596069683 (main head ac51384) -> SUCCESS at ~09:57Z.
 - Repo is clean (0 html files contain a stray backslash-1). The live page fetched right after the deploy STILL showed the old `\1` title; suspected CDN/edge cache, not confirmed. The session's sandbox cannot curl stermontarcade.co.ke.

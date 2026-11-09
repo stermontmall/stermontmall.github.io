@@ -23,4 +23,9 @@ const legacy = auditProducts([{ ...good, images: ['https://stermontmall.github.i
 assert.equal(legacy.errors.length, 0);
 assert.equal(legacy.warnings.length, 1);
 
+const slash = auditProducts([{ ...good, id: 'slash', seo_name: 'Air Chopper 7.5SC Insecticide \\1 100 ml' }]);
+assert.equal(slash.errors.length, 1);
+assert.ok(slash.errors[0].includes('stray backslash'));
+assert.deepEqual(auditProducts([{ ...good, variant_label: '100 ml' }]).errors, []);
+
 console.log('SEO catalogue guard tests passed.');
