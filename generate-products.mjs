@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
+import { productDescriptionHtml } from './product-description.mjs';   // sub-topic sections for product descriptions (tested in product-description.test.mjs)
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -53,77 +54,6 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
 const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; };
 const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
-
-/* Render catalogue descriptions as real semantic HTML, not one long paragraph.
-   Explicit source headings are preserved; unlabelled copy is split into useful product-specific topic groups. */
-function productDescriptionHtml(source) {
-  const raw = String(source || '').replace(/\bundefined\b/gi, '').replace(/Search phrases relevant to this advert include[\s\S]*$/i, '').trim();
-  if (!raw) return '<p>Product information will be updated shortly.</p>';
-  const aliases = [
-    ['Product overview', /\b(?:PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?/ig],
-    ['Key features & benefits', /\b(?:KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|BENEFITS)\s*:?/ig],
-    ['Specifications & details', /\b(?:SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\s*:?/ig],
-    ['Uses & applications', /\b(?:WHERE IT HELPS|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|IDEAL FOR)\s*:?/ig],
-    ['How to use', /\b(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|BEFORE YOU START)\s*:?/ig],
-    ['Safety information', /\b(?:SAFETY(?: INFORMATION| PRECAUTIONS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\s*:?/ig],
-    ['Storage & handling', /\b(?:STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\s*:?/ig],
-    ['Frequently asked questions', /\b(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\s*:?/ig],
-    ['Ordering, payment & delivery', /\b(?:ORDER(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\s*:?/ig],
-    ['Important buying notes', /\b(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\s*:?/ig]
-  ];
-  const hits = [];
-  aliases.forEach(([heading, re]) => { re.lastIndex = 0; let m; while ((m = re.exec(raw))) hits.push({ at:m.index, end:re.lastIndex, heading }); });
-  hits.sort((a,b) => a.at-b.at);
-  let sections = [], cursor = 0;
-  hits.forEach(h => {
-    if (h.at < cursor) return;
-    const before = raw.slice(cursor,h.at).trim();
-    if (before) sections.push({ heading: sections.length ? 'Product details' : 'Product overview', body:before });
-    sections.push({ heading:h.heading, body:'' }); cursor = h.end;
-  });
-  const tail = raw.slice(cursor).trim();
-  if (tail) { if (sections.length) sections[sections.length-1].body = tail; else sections.push({heading:'Product overview',body:tail}); }
-  if (!hits.length) {
-    const chunks = raw.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
-    const sentences = chunks.length > 1 ? chunks : raw.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/);
-    const buckets = [
-      {heading:'Product overview', test:/./, body:[]},
-      {heading:'Key features & benefits', test:/\b(feature|benefit|design|performance|durable|effective|reliable|powerful|easy|convenient|quality|protect|control)\b/i, body:[]},
-      {heading:'Specifications & pack details', test:/\b(\d+(?:\.\d+)?\s?(?:ml|l|litre|litres|kg|g|w|v|mm|cm|inch|gb|mb|pack|pieces?)|size|model|capacity|material|voltage|active ingredient|concentration)\b/i, body:[]},
-      {heading:'Uses & applications', test:/\b(use|used|suitable|ideal|application|crop|pest|farm|home|office|vehicle|garden|livestock|surface)\b/i, body:[]},
-      {heading:'Buying, availability & delivery', test:/\b(order|buy|price|stock|available|delivery|Kenya|M-Pesa|WhatsApp|warranty|return)\b/i, body:[]}
-    ];
-    sentences.forEach((part,i) => {
-      const t=part.trim(); if(!t) return;
-      let b=buckets.find((x,j)=>j>0&&x.test.test(t));
-      if(!b) b=buckets[0];
-      b.body.push(t);
-    });
-    sections = buckets.filter(b=>b.body.length).map(b=>({heading:b.heading,body:b.body.join(' ')}));
-    if (sections.length===1 && sections[0].body.length>500) {
-      const words=sections[0].body.split(/\s+/), half=Math.ceil(words.length/2);
-      sections.push({heading:'Product details & buying information',body:words.splice(half).join(' ')});
-      sections[0].body=words.join(' ');
-    }
-  }
-  const escText = x => esc(x);
-  return sections.filter(s=>s.body.trim()).map(s => {
-    const body=s.body.trim();
-    const bullets=body.split(/\s*[•●▪]\s*/).map(x=>x.trim()).filter(Boolean);
-    let content='';
-    if (bullets.length>1) {
-      const lead=bullets.shift(); if(lead) content += '<p>'+escText(lead)+'</p>';
-      content += '<ul>'+bullets.map(x=>'<li>'+escText(x.replace(/^[-–]\s*/,''))+'</li>').join('')+'</ul>';
-    } else {
-      const lines=body.split(/\n+/).map(x=>x.trim()).filter(Boolean);
-      content=lines.map(line=>/^[-–•●▪]\s*/.test(line)
-        ? '<ul><li>'+escText(line.replace(/^[-–•●▪]\s*/,''))+'</li></ul>'
-        : '<p>'+escText(line)+'</p>').join('');
-    }
-    return '<section class="product-description-section"><h3>'+escText(s.heading)+'</h3>'+content+'</section>';
-  }).join('');
-}
-
 
 // Product photos saved in the catalog before the custom domain still point at the old github.io address.
 // The files are the same, so serve them from the main domain: one site for Google to index, nothing breaks if github.io is ever turned off.
