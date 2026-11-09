@@ -5,7 +5,36 @@
 (() => {
 'use strict';
 const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const $ = (s, r = document) => [...r.querySelectorAll(s)];
+// Defer product-card image requests until they are close to the viewport.
+// Native loading="lazy" can fetch images far below the fold on mobile; this observer
+// keeps the initial homepage/category transfer smaller while preserving real photos.
+const productImageObserver = typeof IntersectionObserver === 'function'
+  ? new IntersectionObserver(entries => entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const img = entry.target;
+      if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
+      productImageObserver.unobserve(img);
+    }), { rootMargin: '160px 0px' })
+  : null;
+const watchProductImages = root => {
+  const imgs = root.querySelectorAll ? root.querySelectorAll('img[data-src]') : [];
+  imgs.forEach(img => {
+    if (productImageObserver) productImageObserver.observe(img);
+    else { img.src = img.dataset.src; delete img.dataset.src; }
+  });
+};
+if (typeof MutationObserver === 'function' && document.documentElement) {
+  const productImageDomObserver = new MutationObserver(records => records.forEach(record => {
+    record.addedNodes.forEach(node => {
+      if (node.nodeType === 1) {
+        if (node.matches?.('img[data-src]') && productImageObserver) productImageObserver.observe(node);
+        watchProductImages(node);
+      }
+    });
+  }));
+  productImageDomObserver.observe(document.documentElement, { childList: true, subtree: true });
+}
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = n => Number(n).toLocaleString('en-KE');
 const ls = {
@@ -74,7 +103,7 @@ const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
 const thumb = p => {
   const photos = [...new Set([p.img, ...(Array.isArray(p.photos) ? p.photos : [])].filter(u => typeof u === 'string' && u.trim()))];
   if (!photos.length) return '<span class="photo-unavailable" role="img" aria-label="Product photo unavailable" style="display:grid;place-items:center;width:100%;height:100%;padding:8px;color:#64748b;background:#f8fafc;font:12px/1.4 system-ui;text-align:center">Photo unavailable</span>';
-  return `<img src="${esc(photos[0])}" alt="${esc(p.name)} product photo" loading="lazy" decoding="async" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
+  return `<img data-src="${esc(photos[0])}" alt="${esc(p.name)} product photo" loading="lazy" decoding="async" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
 };
 
 /* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
