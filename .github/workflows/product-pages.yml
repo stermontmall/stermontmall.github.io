@@ -25,6 +25,8 @@ on:
       - 'seo-meta.mjs'
       - 'seo-safe-meta.mjs'
       - 'seo-safe-meta.test.mjs'
+      - 'seo-safe-category-meta.mjs'
+      - 'seo-safe-category-meta.test.mjs'
       - 'seo-overrides.mjs'
       - 'seo-overrides.json'
       - 'seo-titles.mjs'
@@ -83,6 +85,9 @@ jobs:
       - name: Test allowlisted ordinary-product meta descriptions
         run: node seo-safe-meta.test.mjs
 
+      - name: Test allowlisted ordinary-category meta descriptions
+        run: node seo-safe-category-meta.test.mjs
+
       - name: Test hand-written product content
         run: node product-content.test.mjs
 
@@ -108,6 +113,9 @@ jobs:
 
       - name: Apply allowlisted ordinary-product meta descriptions only
         run: node seo-safe-meta.mjs
+
+      - name: Apply allowlisted ordinary-category meta descriptions only
+        run: node seo-safe-category-meta.mjs
 
       - name: Top up related-product links on pages in small categories (seo-related-fill.mjs)
         continue-on-error: true
