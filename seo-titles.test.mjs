@@ -48,9 +48,9 @@ writeFileSync(join(dir, 'p', 'none.html'), page('none', 'Untouched', false));
 writeFileSync(join(dir, 'p', 'redir.html'), '<html><head><title>Redirecting</title></head></html>');
 writeFileSync(join(dir, 'names.json'), JSON.stringify({ keep: 'K', 'abs-1l': 'old' }));
 writeFileSync(join(dir, 'rows.json'), JSON.stringify([
-  { id: 'abs-1l', variant_group: 'abs', seo_name: null, seo_title: null },
-  { id: 'abs-250', variant_group: 'abs', seo_name: row.seo_name, seo_title: row.seo_title },
-  { id: 'abs-50', variant_group: 'abs', seo_name: row.seo_name, seo_title: row.seo_title.replace('(1L)', '(50ml)') },
+  { id: 'abs-1l', variant_group: 'abs', variant_label: '1 Litre', seo_name: null, seo_title: null },
+  { id: 'abs-250', variant_group: 'abs', variant_label: '250 ml', seo_name: row.seo_name, seo_title: row.seo_title },
+  { id: 'abs-50', variant_group: 'abs', variant_label: '50 ml', seo_name: row.seo_name, seo_title: row.seo_title.replace('(1L)', '(50ml)') },
   { id: 'euro', variant_group: null, seo_name: e.seo_name, seo_title: e.seo_title },
   { id: 'none', variant_group: null, seo_name: null, seo_title: null }]));
 const log = execFileSync('node', ['seo-titles.mjs'], { env: { ...process.env, P_DIR: join(dir, 'p'), NAMES_FILE: join(dir, 'names.json'), SEO_TITLES_JSON: join(dir, 'rows.json') }, encoding: 'utf8', cwd: process.cwd() });
@@ -62,6 +62,6 @@ const euroTitle = eu.match(/<title>([^<]+)<\/title>/)?.[1] || ''; assert.ok(euro
 assert.match(eu, /<h1>Buy Original Euroken 50x55 Standing Cooker \(3G\+1E\)<\/h1>/); n++;
 assert.match(no, /<title>Old title<\/title>/); n++; assert.match(no, /<h1>Untouched<\/h1>/); n++;
 const names = JSON.parse(readFileSync(join(dir, 'names.json'), 'utf8'));
-ok(names.keep, 'K'); ok(names['abs-1l'], 'Buy ' + row.seo_name); ok(names['abs-250'], 'Buy ' + row.seo_name); ok(names['abs-50'], 'Buy ' + row.seo_name); ok(names.euro, 'Buy ' + e.seo_name); ok(names.none, undefined);
+ok(names.keep, 'K'); ok(names['abs-1l'], 'Buy Top-Rated Absolute 375SC Systemic Fungicide 1 Litre'); ok(names['abs-250'], 'Buy Top-Rated Absolute 375SC Systemic Fungicide 250 ml'); ok(names['abs-50'], 'Buy Top-Rated Absolute 375SC Systemic Fungicide 50 ml'); ok(names.euro, 'Buy ' + e.seo_name); ok(names.none, undefined);
 assert.match(log, /2 page\(s\) updated/); n++; assert.doesNotMatch(log, /whose H1 is not/); n++;
 console.log(`OK: ${n} checks, 0 violations`);
