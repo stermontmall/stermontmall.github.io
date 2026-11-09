@@ -87,7 +87,7 @@ export function applyPage(h, title, name) {
 
 async function getRows() {
   if (process.env.SEO_TITLES_JSON) return JSON.parse(readFileSync(process.env.SEO_TITLES_JSON, 'utf8'));   // local testing only
-  const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=id,variant_group,seo_name,seo_title,created_at&order=created_at.asc`, { headers: { apikey: KEY } });
+  const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=id,variant_group,variant_label,seo_name,seo_title,created_at&order=created_at.asc`, { headers: { apikey: KEY } });
   if (!r.ok) throw new Error('Supabase answered ' + r.status);
   return r.json();
 }
@@ -124,7 +124,16 @@ async function main() {
     if (!title || !name) { noMatch++; continue; }
     const out = applyPage(h, title, name);
     if (out === h) same++; else { writeFileSync(file, out); applied++; }
-    for (const x of [id, ...((own && own.variant_group && groupAll[own.variant_group]) || [])]) nameOf[x] = buyName(name);
+    for (const x of [id, ...((own && own.variant_group && groupAll[own.variant_group]) || [])]) {
+      const variant = byId[x];
+      const label = String(variant?.variant_label || '').trim();
+      const variantSeoName = String(variant?.seo_name || '').trim();
+      const normalizedName = norm(variantSeoName), normalizedLabel = norm(label);
+      const nameMatchesPack = label && normalizedName.endsWith(normalizedLabel);
+      // ProductGroup page has one shared heading, but each selectable size in the shop keeps its own exact pack name.
+      const listName = label ? (nameMatchesPack ? variantSeoName : `${name} ${label}`) : name;
+      nameOf[x] = buyName(listName);
+    }
     // audit: the visible H1 must now be the owner's name
     const h1 = (out.match(/<h1>([\s\S]*?)<\/h1>/) || [])[1];
     if (!h1 || norm(h1) !== norm(buyName(name))) odd.push(`${f}: H1 "${unesc(h1)}" vs name "${name}"`);
@@ -145,3 +154,5 @@ async function main() {
 if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file://').href) {
   main().catch(e => console.log('seo-titles skipped:', e.message));
 }
+
+// 2026-11-09: preserve each pack-size seo_name in product-names.json; do not copy the shared ProductGroup heading to every size.
