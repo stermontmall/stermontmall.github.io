@@ -32,7 +32,7 @@ const CSS = `<style id="${MARK}">
 </style>`;
 
 const TAB = {
-  'product overview': 'Overview', 'key features & benefits': 'Key features', 'specifications & details': 'Specifications',
+  'product overview': 'Overview', 'buying guide': 'Buying guide', 'important notes': 'Notes', 'vehicle enquiry & next steps': 'Enquiry', 'key features & benefits': 'Key features', 'specifications & details': 'Specifications',
   'specifications & pack details': 'Specifications', 'uses & applications': 'Uses', 'how to use': 'How to use',
   'safety information': 'Safety', 'storage & handling': 'Storage', 'frequently asked questions': 'FAQs',
   'ordering, payment & delivery': 'Ordering', 'important buying notes': 'Notes', 'buying, availability & delivery': 'Buying',
