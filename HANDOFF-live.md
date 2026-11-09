@@ -2049,3 +2049,10 @@ Owner instruction: “Continue with the next 30.”
 - Titles NOT to be touched (CLAUDE.md rule).
 - In progress: fix label-to-body assignment, add numbered how-to steps and Q/A splitting for FAQs, add unit tests. Generated p/ pages are NOT edited by hand; rebuild via workflow dispatch after merge.
 - Next: `PRODUCTS_JSON=<scratch products.json> node generate-products.mjs` to test locally; then push branch.
+
+## 2026-11-09 14:40 (Africa/Nairobi) - Description heading fix DONE and tested (branch wip-product-seo-totalease-structure)
+- [x] New `product-description-html.mjs` (imported by generate-products.mjs): each uppercase label keeps its own heading (Key features & benefits, Specifications, Uses, How to use, Before you start, Safety, Storage, FAQs, Ordering); FAQ run-on paragraph split into bold question + answer; first bullet no longer rendered as a paragraph; duplicate labels merged.
+- [x] Tests: `node product-description-html.test.mjs` (12 checks) + seo-meta, seo-titles, product-content, check-product-pages, seo-product-extras tests all pass. Scratch one-product build + `seo-description-layout.mjs` gives 7 tabs, spec table and tick list.
+- DB audit (752 active): 395 descriptions have uppercase labels (benefit from this fix); 357 have NO labels (render as Overview + Details only). Meta descriptions are one template for every product (seo-meta.mjs).
+- Not wired into CI: new test is not in product-pages.yml (rule: never edit that workflow).
+- Next (needs owner choice): merge to main + dispatch rebuild: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`; then product-specific meta descriptions; then structure for the 357 unlabeled descriptions (needs Supabase rewrite with description_backup).
