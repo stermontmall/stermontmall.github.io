@@ -36,6 +36,13 @@ const productImages = h => {
   for (const match of h.matchAll(/<script type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)) {
     try { visit(JSON.parse(match[1])); } catch { /* malformed JSON-LD is reported by seo-check.mjs */ }
   }
+  // Include the product-page main image and explicit fallback gallery, not recommendation thumbnails.
+  for (const match of h.matchAll(/<img\b[^>]*\bdata-fallbacks=(["'])(.*?)\1[^>]*>/gi)) {
+    const tag = match[0];
+    const src = (tag.match(/\bsrc=(["'])(.*?)\1/i) || [])[2];
+    if (src) add(unesc(src));
+    try { add(JSON.parse(unesc(match[2]))); } catch { /* ignore malformed optional gallery data */ }
+  }
   if (!found.size) add(og(h));
   return [...found];
 };
