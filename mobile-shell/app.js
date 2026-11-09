@@ -304,10 +304,10 @@ function goTab(tab) {
 
 /* ---------- 6. Product grid + skeletons ---------- */
 const stars = r => `<span class="stars" style="--fill:${(r / 5 * 100).toFixed(0)}%" role="img" aria-label="${r} out of 5"></span>`;
-function cardHTML(p) {
+function cardHTML(p, eager = false) {
   const d = discOf(p);
   return `<li class="card" data-id="${esc(p.id)}">
-    <div class="relative aspect-square grid place-items-center text-6xl" style="background:${p.bg};overflow:hidden">${thumb(p)}
+    <div class="relative aspect-square grid place-items-center text-6xl" style="background:${p.bg};overflow:hidden">${thumb(p, eager)}
       ${d ? `<span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-sale text-white text-2xs font-semibold">-${d}%</span>` : ''}
     </div>
     <div class="p-2">
@@ -347,7 +347,8 @@ async function loadPage(reset) {
   const { items, hasMore } = res;
   $$('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
   items.forEach(p => feed.items.set(p.id, p));
-  grid.insertAdjacentHTML('beforeend', items.map(cardHTML).join(''));
+  const categoryView = query().cat !== 'all';
+  grid.insertAdjacentHTML('beforeend', items.map((p, i) => cardHTML(p, categoryView && feed.page === 1 && i < 2)).join(''));
   feed.page++; feed.hasMore = hasMore; feed.loading = false;
   const em = $('#grid-empty'); em.textContent = EMPTY_TEXT; em.hidden = grid.children.length > 0;
   if (feed.hasMore && store.get().tab === 'home' && sentinel.getBoundingClientRect().top < innerHeight + 400) loadPage(false);
