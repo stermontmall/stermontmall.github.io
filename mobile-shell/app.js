@@ -41,7 +41,8 @@ function buildCatalog(rows, cats, names) {
     const sizes = live.map(r => ({ rowId: r.id, slug: r.slug, label: r.variant_label || 'Standard', price: Number(r.price), old: Number(r.old_price) > Number(r.price) ? Number(r.old_price) : 0 }))
       .sort((a, b) => a.price - b.price);
     const rep = live[0], c = byId.get(rep.category_id), top = topOf(c); if (!c || !top) return;
-    const photos = [...new Set(live.flatMap(r => Array.isArray(r.images) ? r.images : []).filter(u => typeof u === 'string' && u.trim()))];
+    // The lightweight public catalogue RPC returns only each row's lead photo; full galleries load on product open.
+    const photos = [...new Set(live.map(r => r.cover_image).filter(u => typeof u === 'string' && u.trim()))];
     const low = sizes[0], img = photos[0] || '';
     out.push({
       id: key, slug: rep.slug, cat: top.slug, catName: top.name, sub: c.parent_id ? c.name : '', name: (names && names[rep.id]) || rep.name,
@@ -57,11 +58,10 @@ function buildCatalog(rows, cats, names) {
 }
 let catalogP = null;
 let fullCatalog = false;   // true once the WHOLE catalog is in PRODUCTS (the product link fast path in section 9b must never overwrite it)
-const PRODUCT_COLS = 'id,slug,name,category_id,price,old_price,stock,featured,images,unit,variant_group,variant_label';
 function loadCatalog() {
   if (!catalogP) {
     catalogP = Promise.all([
-      api('products?active=eq.true&select=' + PRODUCT_COLS + '&order=created_at.asc'),
+      api('rpc/get_store_catalog'),
       api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
       fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}))
     ]).then(([rows, cats, names]) => { buildCatalog(rows, cats, names); fullCatalog = true; }).catch(e => { catalogP = null; throw e; });  // a failed load can be retried
