@@ -348,7 +348,7 @@ async function loadPage(reset) {
   $$('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
   items.forEach(p => feed.items.set(p.id, p));
   const categoryView = query().cat !== 'all';
-  grid.insertAdjacentHTML('beforeend', items.map((p, i) => cardHTML(p, categoryView && feed.page === 1 && i < 2)).join(''));
+  grid.insertAdjacentHTML('beforeend', items.map((p, i) => cardHTML(p, categoryView && feed.page === 1 && i === 0)).join(''));
   feed.page++; feed.hasMore = hasMore; feed.loading = false;
   const em = $('#grid-empty'); em.textContent = EMPTY_TEXT; em.hidden = grid.children.length > 0;
   if (feed.hasMore && store.get().tab === 'home' && sentinel.getBoundingClientRect().top < innerHeight + 400) loadPage(false);
