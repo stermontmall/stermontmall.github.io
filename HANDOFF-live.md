@@ -1,3 +1,11 @@
+## 2026-11-09 13:00 Africa/Nairobi - Pages deployment collisions found and re-run (main, note-only)
+- Pages deployments for c89988e / 60060e9 / ac51384 failed or were cancelled with "Deployment request failed due to in progress deployment": bot rebuild commits and note-only pushes land while another deployment runs. NOT a code bug. Re-ran run 42596069683 (main head ac51384) -> SUCCESS at ~09:57Z.
+- Repo is clean (0 html files contain a stray backslash-1). The live page fetched right after the deploy STILL showed the old `\1` title; suspected CDN/edge cache, not confirmed. The session's sandbox cannot curl stermontarcade.co.ke.
+- Lesson: after a merge, do NOT push more commits until `gh run list --workflow=pages-build-deployment --limit 3` shows no in_progress run; otherwise rerun the failed run with `gh run rerun <id>`.
+### Next
+1. Owner opens https://stermontarcade.co.ke/p/air-chopper-7-5sc-insecticide-100-ml.html in a private tab: title should be "Air Chopper 7.5SC Insecticide 100 ml | Kenya" with no backslash-1. If it still shows it after ~15 min, check the DNS/CDN in front of the domain (HostAfrica) for a stale cache and purge it.
+2. Then Search Console > URL Inspection > Request indexing on the fixed product URLs.
+
 ## 2026-11-09 12:50 Africa/Nairobi - PROGRESS SAVE: rebuild green, `\1` cleared in generated pages (main, note-only commit)
 ### Done
 - Commit c89988e (seo-overrides.mjs accepts desc-only/title-only entries) merged to main. Product build run 42595715650 completed SUCCESS: https://github.com/stermontmall/stermontmall.github.io/actions/runs/42595715650
