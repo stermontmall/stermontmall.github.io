@@ -78,7 +78,7 @@
     '#stm-pd .dh{font-size:1.05rem;margin:1.1rem 0 .4rem;padding-top:.9rem;border-top:1px solid #ece8f6}' +
     '#stm-pd .desc{position:relative;overflow:hidden;font-size:.95rem;line-height:1.55}#stm-pd .desc.clip{max-height:230px}' +
     '#stm-pd .desc.clip::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(rgba(255,255,255,0),#fff)}' +
-    '#stm-pd .desc-section{margin:.85rem 0 1rem;padding:.15rem 0 .15rem .85rem;border-left:3px solid #ddd6fe;background:linear-gradient(90deg,#faf8ff 0%,#fff 78%);border-radius:0 10px 10px 0}#stm-pd .desc-section h4{display:flex;align-items:center;gap:.45rem;margin:.25rem 0 .45rem;font-size:1rem;line-height:1.35;font-weight:800;color:#4c1d95;letter-spacing:.01em}#stm-pd .desc-section h4:before{content:"";display:inline-block;width:7px;height:7px;border-radius:2px;background:#7c3aed;flex:none}#stm-pd .desc-section p{margin:.25rem 0 .55rem;color:#343044;line-height:1.68}#stm-pd .desc-section p:last-child{margin-bottom:.2rem}' +
+    '#stm-pd .desc-section{margin:.85rem 0 1rem;padding:.15rem 0 .15rem .85rem;border-left:3px solid #ddd6fe;background:linear-gradient(90deg,#faf8ff 0%,#fff 78%);border-radius:0 10px 10px 0}#stm-pd .desc-section h4{display:flex;align-items:center;gap:.45rem;margin:.25rem 0 .45rem;font-size:1rem;line-height:1.35;font-weight:800;color:#4c1d95;letter-spacing:.01em}#stm-pd .desc-section h4:before{content:"";display:inline-block;width:7px;height:7px;border-radius:2px;background:#7c3aed;flex:none}#stm-pd .desc-section p{margin:.25rem 0 .55rem;color:#343044;line-height:1.68}#stm-pd .desc-section p:last-child{margin-bottom:.2rem}#stm-pd .desc-list{margin:.35rem 0 .7rem;padding-left:1.25rem;display:grid;gap:.4rem}#stm-pd .desc-list li{padding-left:.15rem;color:#343044;line-height:1.6}#stm-pd .desc-section h4{border-bottom:1px solid #eee8fb;padding-bottom:.4rem}' +
     '#stm-pd .more{border:0;background:none;color:#5b21b6;font:inherit;font-weight:700;padding:.5rem 0;cursor:pointer}' +
     '#stm-pd .act{position:sticky;bottom:0;z-index:3;display:flex;gap:.6rem;align-items:center;background:#fff;border-top:1px solid #ece8f6;padding:.7rem .9rem calc(.7rem + env(safe-area-inset-bottom,0px))}' +
     '#stm-pd .q{display:flex;align-items:center;border:1px solid #d9d2ee;border-radius:12px;overflow:hidden;flex:none}#stm-pd .q button{border:0;background:#f6f3fd;width:38px;height:42px;font-size:1.2rem;cursor:pointer}#stm-pd .q span{min-width:34px;text-align:center;font-weight:700}' +
@@ -179,40 +179,53 @@
     var box = mk('div', 'desc-layout'), raw = String(text || '')
       .replace(/\bundefined\b/gi, '')
       .replace(/Search phrases relevant to this advert include[\s\S]*$/i, '')
-      .replace(/\s+/g, ' ').trim();
-    var sections = [
-      {title:'Product Overview', key:'overview', items:[]},
-      {title:'Specifications & Key Details', key:'specs', items:[]},
-      {title:'Features & Benefits', key:'features', items:[]},
-      {title:'Applications & Compatibility', key:'uses', items:[]},
-      {title:'Availability, Delivery & Support', key:'buying', items:[]},
-      {title:'Important Buying Notes', key:'notes', items:[]}
+      .replace(/\r\n?/g, '\n').replace(/[ \t]+/g, ' ').trim();
+    /* Detect section labels even when imported text has flattened everything into one paragraph. */
+    var rules = [
+      ['Product overview', /\b(?:PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?\s*/ig],
+      ['Key features & benefits', /\b(?:KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|BENEFITS)\s*:?\s*/ig],
+      ['Specifications', /\b(?:SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\s*:?\s*/ig],
+      ['Uses & applications', /\b(?:WHERE IT HELPS|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|WHO MAY NEED THIS PRODUCT|IDEAL FOR)\s*:?\s*/ig],
+      ['How to use', /\b(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|PLANNING FOR USE|BEFORE YOU START)\s*:?\s*/ig],
+      ['Safety information', /\b(?:SAFETY(?: INFORMATION| PRECAUTIONS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\s*:?\s*/ig],
+      ['Storage & handling', /\b(?:STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\s*:?\s*/ig],
+      ['Frequently asked questions', /\b(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\s*:?\s*/ig],
+      ['Ordering, payment & delivery', /\b(?:ORDER(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\s*:?\s*/ig],
+      ['Important buying notes', /\b(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\s*:?\s*/ig]
     ];
-    var sentences = raw.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/);
-    sentences.forEach(function(sentence, index) {
-      sentence = sentence.trim(); if (!sentence) return;
-      var s = sentence.toLowerCase(), target;
-      if (index === 0) target = sections[0];
-      else if (/\b(price|ksh|cost|engine|cc|mileage|km|voltage|watt|watts|size|capacity|dimensions|weight|material|model|year|specification|transmission|fuel|power|pack|quantity|colour|color|compatib|grade)\b/.test(s)) target = sections[1];
-      else if (/\b(feature|benefit|design|build|quality|performance|technology|safety|comfort|durab|efficient|function|includes|included|comes with)\b/.test(s)) target = sections[2];
-      else if (/\b(suitable|ideal|application|use|used for|works with|designed for|home|office|farm|vehicle|business|install|fitment)\b/.test(s)) target = sections[3];
-      else if (/\b(availability|available|stock|delivery|shipping|warranty|guarantee|return|payment|order|contact|enquir|quote|supplier|seller|dispatch|collection|support)\b/.test(s)) target = sections[4];
-      else target = sections[5];
-      target.items.push(sentence);
+    var hits=[];
+    rules.forEach(function(rule){ rule[1].lastIndex=0; var m; while((m=rule[1].exec(raw))!==null) hits.push({at:m.index,end:rule[1].lastIndex,title:rule[0]}); });
+    hits.sort(function(a,b){return a.at-b.at;});
+    var unique=[], edge=-1;
+    hits.forEach(function(h){if(h.at>=edge){unique.push(h);edge=h.end;}});
+    var parts=[], pos=0;
+    unique.forEach(function(h){
+      var before=raw.slice(pos,h.at).trim();
+      if(before) parts.push({title:parts.length?'More product information':'Product overview',text:before});
+      parts.push({title:h.title,text:''}); pos=h.end;
     });
-    sections.forEach(function(section) {
-      if (!section.items.length) return;
-      var wrap = mk('section', 'desc-section desc-' + section.key);
-      wrap.appendChild(mk('h4', '', section.title));
-      var chunk = '';
-      section.items.forEach(function(sentence) {
-        if (chunk && chunk.length + sentence.length > 440) {
-          wrap.appendChild(mk('p', '', chunk)); chunk = '';
-        }
-        chunk += (chunk ? ' ' : '') + sentence;
-      });
-      if (chunk) wrap.appendChild(mk('p', '', chunk));
-      box.appendChild(wrap);
+    var tail=raw.slice(pos).trim();
+    if(tail){if(parts.length)parts[parts.length-1].text=tail;else parts.push({title:'Product overview',text:tail});}
+    if(parts.length===1 && parts[0].text.length>520){
+      var sentences=parts[0].text.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/), groups=[];
+      for(var n=0;n<sentences.length;n+=3)groups.push(sentences.slice(n,n+3).join(' '));
+      parts=groups.map(function(t,n){return {title:n?'More product information':'Product overview',text:t};});
+    }
+    parts.forEach(function(part){
+      var content=part.text.trim(); if(!content)return;
+      var section=mk('section','desc-section'); section.appendChild(mk('h4','',part.title));
+      var bullets=content.split(/\s*[•●▪]\s*/).map(function(x){return x.trim();}).filter(Boolean);
+      if(bullets.length>1){
+        var lead=bullets.shift(); if(lead && lead.length>18)section.appendChild(mk('p','',lead));
+        var ul=mk('ul','desc-list');
+        bullets.forEach(function(item){ul.appendChild(mk('li','',item.replace(/^[-–]\s*/,'')));});
+        section.appendChild(ul);
+      }else{
+        var paras=content.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/), chunk='';
+        paras.forEach(function(sentence){if(chunk&&chunk.length+sentence.length>420){section.appendChild(mk('p','',chunk));chunk='';}chunk+=(chunk?' ':'')+sentence;});
+        if(chunk)section.appendChild(mk('p','',chunk));
+      }
+      box.appendChild(section);
     });
     return box;
   }
