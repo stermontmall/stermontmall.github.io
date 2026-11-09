@@ -162,6 +162,7 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
 //   "Shop Top & Reliable <Category> Online in Kenya – M-Pesa & Delivery"
 export function catTitle(catName) {
   const c = String(catName || '').replace(/\s+/g, ' ').trim();
+  if (c.toLowerCase() === 'cars for sale') return 'New Cars for Sale in Kenya | Stermont Arcade';
   const tiers = [
     `Shop Top & Reliable ${c} Online in Kenya – M-Pesa & Delivery`,
     `Shop Top & Reliable ${c} Online in Kenya | ${STORE}`,
@@ -178,6 +179,7 @@ export function catTitle(catName) {
 // Category meta description. "PCPB-approved" only for PCPB-regulated categories.
 export function catDescription(catName, catSlug) {
   const c = String(catName || '').replace(/\s+/g, ' ').trim();
+  if (catSlug === 'cars-for-sale') return 'Explore brand-new car sourcing adverts in Kenya. Compare indicative competitor prices and representative photos; confirm supplier availability and final quotes before payment.';
   const pcpb = isPcpb(catSlug);
   const tiers = pcpb ? [
     `Order PCPB-approved, top-quality ${c} at wholesale prices in Nairobi. Fast delivery across 47 counties with secure M-Pesa checkout.`,
