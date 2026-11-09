@@ -141,7 +141,28 @@ jobs:
             # Fetch/rebase and retry a rejected push instead of losing this generated update.
             for attempt in 1 2 3; do
               git fetch origin main
-              git rebase origin/main
+              if ! git rebase origin/main; then
+                # Concurrent catalogue builds may both regenerate the same product HTML.
+                # During rebase, --theirs is this run's freshly generated catalogue output.
+                conflicts="$(git diff --name-only --diff-filter=U)"
+                if [ -z "$conflicts" ]; then
+                  echo "::error::Rebase failed without resolvable generated-page conflicts."
+                  exit 1
+                fi
+                while IFS= read -r path; do
+                  case "$path" in
+                    p/*.html|c/*.html|guides/*.html|products.html|sitemap-products.xml|sitemap-state.json|sitemap.xml|merchant-feed.xml|product-names.json|index.html)
+                      git checkout --theirs -- "$path"
+                      git add -- "$path"
+                      ;;
+                    *)
+                      echo "::error::Unexpected source-file conflict: $path"
+                      exit 1
+                      ;;
+                  esac
+                done <<< "$conflicts"
+                GIT_EDITOR=true git rebase --continue
+              fi
               if git push origin HEAD:main; then
                 echo "Generated pages and sitemap saved to main."
                 exit 0
