@@ -1,6 +1,6 @@
 // Stermont Arcade - seo-extras
 // Builds two files from the pages already in this repo (no installs, Node 18+):
-//   1) sitemap-images.xml  - lets Google Images index every product photo (each product page + its main photo)
+//   1) sitemap-images.xml  - lets Google Images discover product gallery photos (all Product/ProductGroup images)
 //   2) llms.txt            - a plain-text guide for AI search (ChatGPT, Perplexity, Gemini, Claude) listing who you are,
 //                            how ordering works, and your main categories, guides and top products
 // Usage: node seo-extras.mjs
@@ -15,6 +15,30 @@ const read = f => readFileSync(f, 'utf8');
 const title = h => unesc(((h.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || '').trim());
 const desc = h => { const m = h.match(/<meta name=["']description["'] content=(?:"([^"]*)"|'([^']*)')/i); return m ? unesc(m[1] || m[2] || '').trim() : ''; };
 const og = h => (h.match(/<meta property=["']og:image["'] content=["']([^"']+)["']/i) || [])[1] || '';
+// Read every product photo from Product/ProductGroup JSON-LD, including images nested under hasVariant.
+// This makes the image sitemap reflect the actual gallery rather than only the Open Graph lead photo.
+const productImages = h => {
+  const found = new Set();
+  const add = value => {
+    const values = Array.isArray(value) ? value : [value];
+    for (const url of values) {
+      if (typeof url !== 'string' || !/^https?:\/\//i.test(url)) continue;
+      if (/placeholder\.svg|logo\.png$/i.test(url) || BROKEN_PRODUCT_IMAGES.test(url)) continue;
+      found.add(unesc(url));
+    }
+  };
+  const visit = value => {
+    if (!value || typeof value !== 'object') return;
+    if (Array.isArray(value)) { value.forEach(visit); return; }
+    if (value.image) add(value.image);
+    if (value.hasVariant) visit(value.hasVariant);
+  };
+  for (const match of h.matchAll(/<script type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)) {
+    try { visit(JSON.parse(match[1])); } catch { /* malformed JSON-LD is reported by seo-check.mjs */ }
+  }
+  if (!found.size) add(og(h));
+  return [...found];
+};
 // These seven catalogue image references were confirmed missing from both the repo and Storage; keep them out of the image sitemap until replaced.
 const BROKEN_PRODUCT_IMAGES = /(?:acetochlor-50-ec-herbicide-1-litre|jade-premium-bio-pesticide-1-litre|one-touch-crop-protector-insecticide-250-ml|ortiva-250-sc-fungicide-1-litre|total-touch-250-sc-insecticide-1-litre|touchdown-herbicide-1-litre|tower-extreme-680-wg-fungicide-1-kg)\.(?:jpg|webp)$/i;
 
@@ -24,11 +48,12 @@ let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sit
 for (const f of list('p')) {
   const h = read(`p/${f}`);
   if (/http-equiv="refresh"/i.test(h)) continue;                       // size-variant redirect pages are not indexable
-  const img = og(h);
-  if (!img || /placeholder\.svg/.test(img) || /logo\.png$/.test(img) || BROKEN_PRODUCT_IMAGES.test(img)) continue; // no verified product photo yet
+  const imgs = productImages(h);
+  if (!imgs.length) continue; // no verified product photo yet
   const name = title(h).split('|')[0].trim();
-  xml += `<url><loc>${SITE}/p/${f}</loc><image:image><image:loc>${esc(unesc(img))}</image:loc><image:title>${esc(name)}</image:title></image:image></url>\n`;
-  imgCount++; pageCount++;
+  const imageNodes = imgs.map(img => `<image:image><image:loc>${esc(img)}</image:loc><image:title>${esc(name)}</image:title></image:image>`).join('');
+  xml += `<url><loc>${SITE}/p/${f}</loc>${imageNodes}</url>\n`;
+  imgCount += imgs.length; pageCount++;
 }
 xml += `</urlset>\n`;
 writeFileSync('sitemap-images.xml', xml);
