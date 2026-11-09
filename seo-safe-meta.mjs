@@ -48,6 +48,26 @@ export const SAFE_META = Object.freeze({
     id: 'ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd',
     description: 'ECOMAX 2.1-channel multimedia speakers with Bluetooth, USB/SD and remote. Review the Kenya listing and checkout using M-Pesa.'
   }
+  'itel-smartphone.html': {
+    id: 'itel-smartphone',
+    description: 'Itel Smartphone listing in Kenya. Review the available model details, current price and delivery options on Stermont Arcade; checkout with M-Pesa.'
+  },
+  'infinix-smart-20-4gb-64gb.html': {
+    id: 'infinix-smart-20-4gb-64gb-20261108',
+    description: 'Infinix Smart 20 with 4GB RAM and 64GB storage. Check the Kenya listing for price, available details and delivery options; M-Pesa checkout.'
+  },
+  'infinix-smart-20-4gb-128gb.html': {
+    id: 'infinix-smart-20-4gb-128gb-20261108',
+    description: 'Infinix Smart 20 with 4GB RAM and 128GB storage. Check the Kenya listing for price, available details and delivery options; M-Pesa checkout.'
+  },
+  'apple-iphone-16-128gb-green.html': {
+    id: 'apple-iphone-16-128gb-green',
+    description: 'Apple iPhone 16 128GB in Green, with A18 chip and 6.1-inch Super Retina XDR display. Review the Kenya listing; M-Pesa checkout.'
+  },
+  'apple-iphone-16-128gb-white.html': {
+    id: 'apple-iphone-16-128gb-white',
+    description: 'Apple iPhone 16 128GB in White, with A18 chip and 6.1-inch Super Retina XDR display. Review the Kenya listing; M-Pesa checkout.'
+  }
 });
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
