@@ -100,10 +100,11 @@ function loadCatalog() {
 const discOf = p => p.old ? Math.round((1 - p.price / p.old) * 100) : 0;
 const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
 /* Product images never fall back to emoji. If a lead photo fails, try the next genuine gallery photo before showing a neutral unavailable-photo label. */
-const thumb = p => {
+const thumb = (p, eager = false) => {
   const photos = [...new Set([p.img, ...(Array.isArray(p.photos) ? p.photos : [])].filter(u => typeof u === 'string' && u.trim()))];
   if (!photos.length) return '<span class="photo-unavailable" role="img" aria-label="Product photo unavailable" style="display:grid;place-items:center;width:100%;height:100%;padding:8px;color:#64748b;background:#f8fafc;font:12px/1.4 system-ui;text-align:center">Photo unavailable</span>';
-  return `<img data-src="${esc(photos[0])}" alt="${esc(p.name)} product photo" loading="lazy" decoding="async" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
+  const source = eager ? `src="${esc(photos[0])}" fetchpriority="high" loading="eager"` : `data-src="${esc(photos[0])}" loading="lazy"`;
+  return `<img ${source} alt="${esc(p.name)} product photo" decoding="async" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
 };
 
 /* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
@@ -436,7 +437,7 @@ const qb = { p: null, size: '', qty: 1, shown: '' };
 function renderQB() {
   const { p } = qb; if (!p) return;
   const sz = sizeOf(p, qb.size);
-  $('#qb-img').style.background = p.bg; $('#qb-img').style.overflow = 'hidden'; $('#qb-img').innerHTML = thumb(p);
+  $('#qb-img').style.background = p.bg; $('#qb-img').style.overflow = 'hidden'; $('#qb-img').innerHTML = thumb(p, true);
   $('#qb-name').textContent = p.name; $('#qb-price').textContent = 'KSh ' + fmt(sz.price);
   $('#qb-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : '';
   $('#qb-qty').textContent = qb.qty;
@@ -599,7 +600,7 @@ async function renderPP() {
   const p = qb.p; if (!p) return;
   const sz = sizeOf(p, qb.size), off = sz.old ? Math.round((1 - sz.price / sz.old) * 100) : 0, rowId = sz.rowId;
   $('#pp-title').textContent = p.name; $('#pp-name').textContent = p.name;
-  $('#pp-img').style.background = '#fff'; $('#pp-img').innerHTML = thumb({ img: pp.img || p.img, emoji: p.emoji });
+  $('#pp-img').style.background = '#fff'; $('#pp-img').innerHTML = thumb({ img: pp.img || p.img, emoji: p.emoji }, true);
   $('#pp-price').textContent = 'KSh ' + fmt(sz.price); $('#pp-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : ''; $('#pp-off').textContent = off ? '-' + off + '%' : '';
   $('#pp-qty').textContent = qb.qty;
   $('#pp-sizes').innerHTML = p.sizes.map(x => `<button class="chip !h-9 !px-4" data-pp-size="${esc(x.label)}" aria-selected="${x.label === qb.size}">${esc(x.label)}</button>`).join('');
@@ -614,7 +615,7 @@ async function renderPP() {
   $('#pp-meta').textContent = [d.unit ? 'Unit: ' + d.unit : '', left > 0 ? (left <= low ? 'Only ' + left + ' left' : 'In stock') : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
   renderProductDescription('#pp-desc', d.description || '');
   const imgs = (d.images || []).filter(Boolean);
-  if (!pp.img && imgs[0]) $('#pp-img').innerHTML = thumb({ img: imgs[0], emoji: p.emoji });
+  if (!pp.img && imgs[0]) $('#pp-img').innerHTML = thumb({ img: imgs[0], emoji: p.emoji }, true);
   $('#pp-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-pp-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: p.emoji })}</button>`).join('') : '';
 }
 function openProductPage() { if (!qb.p) return; pp.img = ''; renderPP(); $('#pp-body').scrollTop = 0; openOverlay('page-product'); }
