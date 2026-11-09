@@ -164,35 +164,25 @@ export function catTitle(catName) {
   const c = String(catName || '').replace(/\s+/g, ' ').trim();
   if (c.toLowerCase() === 'cars for sale') return 'New Cars for Sale in Kenya | Stermont Arcade';
   const tiers = [
-    `Shop Top & Reliable ${c} Online in Kenya – M-Pesa & Delivery`,
-    `Shop Top & Reliable ${c} Online in Kenya | ${STORE}`,
-    `Shop Top ${c} Online in Kenya – M-Pesa & Delivery`,
-    `Shop Top ${c} Online in Kenya | ${STORE}`,
-    `Shop Top ${c} Online in Kenya`,
+    `Shop ${c} Online in Kenya | ${STORE}`,
     `Buy ${c} Online in Kenya | ${STORE}`,
+    `Shop ${c} in Kenya | ${STORE}`,
     `Buy ${c} in Kenya | ${STORE}`,
+    `Shop ${c} in Kenya`,
     `Buy ${c} in Kenya`
   ];
-  return tiers.find(t => t.length <= TITLE_MAX) || clip(`Buy ${c} in Kenya`, TITLE_MAX);
+  return tiers.find(t => t.length <= TITLE_MAX) || clip(`Shop ${c} in Kenya`, TITLE_MAX);
 }
 
 // Category meta description. "PCPB-approved" only for PCPB-regulated categories.
 export function catDescription(catName, catSlug) {
   const c = String(catName || '').replace(/\s+/g, ' ').trim();
   if (catSlug === 'cars-for-sale') return 'Explore brand-new car sourcing adverts in Kenya. Compare indicative competitor prices and representative photos; confirm supplier availability and final quotes before payment.';
-  const pcpb = isPcpb(catSlug);
-  const tiers = pcpb ? [
-    `Order PCPB-approved, top-quality ${c} at wholesale prices in Nairobi. Fast delivery across 47 counties with secure M-Pesa checkout.`,
-    `Order PCPB-approved, top-quality ${c} at wholesale prices in Nairobi. Delivery to 47 counties, M-Pesa checkout.`,
-    `Order PCPB-approved ${c} at wholesale prices in Nairobi, Kenya. Fast delivery to all 47 counties.`,
-    `Order PCPB-approved ${c} in Kenya. M-Pesa checkout, delivery to all 47 counties.`
-  ] : [
-    `Order top-quality ${c} online in Nairobi, Kenya. Pay by M-Pesa, pick up at Sarit Centre Westlands or get fast delivery to all 47 counties.`,
-    `Order top-quality ${c} online in Kenya. Pay by M-Pesa, Westlands pickup or fast delivery to all 47 counties.`,
-    `Order ${c} online in Kenya. Pay by M-Pesa, Westlands pickup or fast delivery to all 47 counties.`,
-    `Order ${c} in Kenya. M-Pesa checkout, delivery to all 47 counties.`
-  ];
-  return tiers.find(t => t.length <= DESC_MAX) || clip(`Order ${c} in Kenya. M-Pesa checkout, delivery to 47 counties.`, DESC_MAX);
+  const registrationNote = ['crop-insecticides', 'bed-bug-killers', 'adjuvants-growth-regulators'].includes(catSlug)
+    ? ' Check each product label and PCPB registration.'
+    : '';
+  const base = `Browse ${c} online in Kenya. Compare listed product details and current prices.${registrationNote} Pay by M-Pesa; delivery to all 47 counties.`;
+  return base.length <= DESC_MAX ? base : clip(base, DESC_MAX);
 }
 
 // Visible trust badges (pills) shown under the price on the product page. Same truthful-claims rule as everything above:
