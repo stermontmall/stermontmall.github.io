@@ -178,11 +178,13 @@
   function fmtDesc(text) {
     var box = mk('div', 'desc-layout'), raw = String(text || '')
       .replace(/\bundefined\b/gi, '')
+      .replace(/^#{1,6}\s*/gm, '')
       .replace(/Search phrases relevant to this advert include[\s\S]*$/i, '')
       .replace(/\r\n?/g, '\n').replace(/[ \t]+/g, ' ').trim();
     /* Detect section labels even when imported text has flattened everything into one paragraph. */
     var rules = [
       ['Product overview', /\b(?:PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?\s*/ig],
+      ['Product buying guide', /\bPRODUCT BUYING GUIDE\s*:?\s*/ig],
       ['Key features & benefits', /\b(?:KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|BENEFITS)\s*:?\s*/ig],
       ['Specifications', /\b(?:SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\s*:?\s*/ig],
       ['Uses & applications', /\b(?:WHERE IT HELPS|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|WHO MAY NEED THIS PRODUCT|IDEAL FOR)\s*:?\s*/ig],
