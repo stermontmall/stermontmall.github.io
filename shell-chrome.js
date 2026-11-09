@@ -47,11 +47,11 @@
     var css = 'body.stm-chrome{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}' +
       'body.stm-chrome>header{display:none}' +
       '#stm-bar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:4px;height:52px;padding:env(safe-area-inset-top,0px) 8px 0;box-sizing:content-box;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.08);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
-      '#stm-bar a,#stm-bar button{position:relative;display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:none;color:#1f2937;cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent}' +
+      '#stm-bar a,#stm-bar button{position:relative;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:none;color:#1f2937;cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent}' +
       '#stm-bar form{position:relative;flex:1;margin:0}' +
-      '#stm-bar input{width:100%;height:36px;box-sizing:border-box;padding:0 42px 0 34px;border:0;border-radius:999px;background:#f3f4f6;font:14px system-ui,sans-serif;color:#1f2937;outline:none}' +
+      '#stm-bar input{width:100%;height:44px;box-sizing:border-box;padding:0 42px 0 34px;border:0;border-radius:999px;background:#f3f4f6;font:14px system-ui,sans-serif;color:#1f2937;outline:none}' +
       '#stm-bar input:focus{box-shadow:0 0 0 2px rgba(124,58,237,.35)}' +
-      '#stm-bar form button{position:absolute;right:3px;top:3px;width:30px;height:30px;border:0;border-radius:50%;background:' + P + ';color:#fff;display:grid;place-items:center;font:600 12px system-ui,sans-serif;cursor:pointer}' +
+      '#stm-bar form button{position:absolute;right:4px;top:4px;width:36px;height:36px;border:0;border-radius:50%;background:' + P + ';color:#fff;display:grid;place-items:center;font:600 12px system-ui,sans-serif;cursor:pointer}' +
       '#stm-bar form svg{position:absolute;left:11px;top:50%;margin-top:-8px;width:16px;height:16px;color:#6b7280;pointer-events:none}' +
       '.stm-badge{position:absolute;top:1px;right:1px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:999px;background:#e11d48;color:#fff;font:600 10px/16px system-ui,sans-serif;text-align:center}' +
       '#stm-nav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;background:#fff;border-top:1px solid ' + LINE + ';padding-bottom:env(safe-area-inset-bottom,0px);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}' +
@@ -75,7 +75,7 @@
     var bar = document.createElement('div'); bar.id = 'stm-bar';
     bar.innerHTML = '<a href="/" id="stm-back" aria-label="Back">' + I.back + '</a>' +
       '<form action="/" method="get" role="search"><input name="q" type="search" enterkeyhint="search" autocomplete="off" placeholder="Search pest control, agrovet, phones..." aria-label="Search the shop">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><button type="submit" aria-label="Submit search">Go</button></form>' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><button type="submit" aria-label="Go - submit search">Go</button></form>' +
       '<a href="/?tab=cart" aria-label="Cart">' + I.cart + badge + '</a>';
     // Account pages are reached from the shell's Account tab; product (/p/) and category (/c/) pages are browsing pages, so no tab is current there.
     var browsing = /^\/(p|c)\//.test(location.pathname);
