@@ -41,10 +41,11 @@ function buildCatalog(rows, cats, names) {
     const sizes = live.map(r => ({ rowId: r.id, slug: r.slug, label: r.variant_label || 'Standard', price: Number(r.price), old: Number(r.old_price) > Number(r.price) ? Number(r.old_price) : 0 }))
       .sort((a, b) => a.price - b.price);
     const rep = live[0], c = byId.get(rep.category_id), top = topOf(c); if (!c || !top) return;
-    const low = sizes[0], img = (live.map(r => (r.images || [])[0]).find(Boolean)) || '';
+    const photos = [...new Set(live.flatMap(r => Array.isArray(r.images) ? r.images : []).filter(u => typeof u === 'string' && u.trim()))];
+    const low = sizes[0], img = photos[0] || '';
     out.push({
       id: key, slug: rep.slug, cat: top.slug, catName: top.name, sub: c.parent_id ? c.name : '', name: (names && names[rep.id]) || rep.name,
-      img, emoji: ICONS[top.slug] || '🛍️', bg: BGS[hashStr(key) % BGS.length],
+      img, photos, emoji: ICONS[top.slug] || '🛍️', bg: BGS[hashStr(key) % BGS.length],
       price: low.price, old: low.old, sizes, featured: !!rep.featured, rating: 0, reviews: 0   // no ratings exist in the database
     });
   });
@@ -69,8 +70,12 @@ function loadCatalog() {
 }
 const discOf = p => p.old ? Math.round((1 - p.price / p.old) * 100) : 0;
 const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
-/* thumbnail markup: the product photo, or the category emoji when there is none (or it fails to load, see the error listener in section 11) */
-const thumb = p => p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" decoding="async" data-emoji="${esc(p.emoji)}" style="width:100%;height:100%;object-fit:contain;background:#fff">` : p.emoji;
+/* Product images never fall back to emoji. If a lead photo fails, try the next genuine gallery photo before showing a neutral unavailable-photo label. */
+const thumb = p => {
+  const photos = [...new Set([p.img, ...(Array.isArray(p.photos) ? p.photos : [])].filter(u => typeof u === 'string' && u.trim()))];
+  if (!photos.length) return '<span class="photo-unavailable" role="img" aria-label="Product photo unavailable">Photo unavailable</span>';
+  return `<img src="${esc(photos[0])}" alt="" loading="lazy" decoding="async" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
+};
 
 /* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
 async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 12 }) {
@@ -761,7 +766,24 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-drawer-cat]'))) { const id = el.dataset.drawerCat; return closeAllThen(() => selectCategory(id)); }
   if ((el = t.closest('.card[data-id]'))) return openQuickBuy(el.dataset.id);
 });
-document.addEventListener('error', e => { const i = e.target; if (i && i.tagName === 'IMG' && i.dataset.emoji) i.replaceWith(document.createTextNode(i.dataset.emoji)); }, true); // photo failed: show the category emoji
+document.addEventListener('error', e => {
+  const img = e.target;
+  if (!img || img.tagName !== 'IMG' || !img.hasAttribute('data-fallbacks')) return;
+  let next = [];
+  try { next = JSON.parse(img.dataset.fallbacks || '[]'); } catch {}
+  const candidate = next.shift();
+  if (candidate) {
+    img.dataset.fallbacks = JSON.stringify(next);
+    img.src = candidate;
+    return;
+  }
+  const unavailable = document.createElement('span');
+  unavailable.className = 'photo-unavailable';
+  unavailable.setAttribute('role', 'img');
+  unavailable.setAttribute('aria-label', 'Product photo unavailable');
+  unavailable.textContent = 'Photo unavailable';
+  img.replaceWith(unavailable);
+}, true); // try genuine gallery photos in order; never substitute an emoji for a product image
 $('#search-form').addEventListener('submit', e => {
   e.preventDefault(); $('#search').blur();
   store.set({ q: $('#search').value.trim(), chip: 'all', sub: '' });
