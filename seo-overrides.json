@@ -2499,5 +2499,23 @@
   },
   "collapsible-live-capture-cage-trap": {
     "desc": "Shop Collapsible Live Capture Cage Trap in Kenya at {price}. Pay by M-Pesa at Stermont Arcade, with delivery to all 47 counties. Check details and order today."
+  },
+  "kids-pastel-blocks-windmill": {
+    "title": "Large Pastel Building Blocks Set with Windmill in Kenya",
+    "desc": "Shop a large pastel building-block set with a windmill feature at Stermont Arcade. Check pack contents and age guidance before ordering.",
+    "faq": [
+      [
+        "What is included in the Large Pastel Building Blocks Set?",
+        "The listing identifies a large pastel building-block set with a windmill feature. Confirm the exact piece count and included components from the packaging before ordering."
+      ],
+      [
+        "Is the building-block set suitable for my child's age?",
+        "The available listing does not state an age range. Check the manufacturer's age guidance and small-part warnings on the packaging before purchase."
+      ],
+      [
+        "Can children build different designs with this set?",
+        "The blocks are intended for imaginative building and arranging. Children can create different structures and play scenes, depending on the pieces supplied."
+      ]
+    ]
   }
 }
