@@ -5,7 +5,7 @@
 (() => {
 'use strict';
 const $ = (s, r = document) => r.querySelector(s);
-const $ = (s, r = document) => [...r.querySelectorAll(s)];
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 // Defer product-card image requests until they are close to the viewport.
 // Native loading="lazy" can fetch images far below the fold on mobile; this observer
 // keeps the initial homepage/category transfer smaller while preserving real photos.
