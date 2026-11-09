@@ -687,7 +687,9 @@ ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<
 rows.forEach(row => {
   if (!row.variant_group || !row.variant_label) return;
   const exact = typeof row.seo_name === 'string' ? row.seo_name.trim() : '';
-  NAMES[row.id] = buyName(exact || `${row.name} ${row.variant_label}`);
+  // Never use an SEO name that describes a different pack size.
+  const approvedForThisSize = exact && labelInName(exact, row.variant_label);
+  NAMES[row.id] = buyName(approvedForThisSize ? exact : `${row.name} ${row.variant_label}`);
 });
 
 // /products.html: one crawlable page that lists every product, grouped by category, so Google and visitors can reach all of them from one place.
