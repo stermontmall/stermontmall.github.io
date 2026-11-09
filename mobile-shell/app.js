@@ -663,15 +663,16 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
 async function quickDeepLink(slug) {
   try {
     if (!/^[A-Za-z0-9._%~-]+$/.test(slug)) return;
-    const [cats, names, rows0] = await Promise.all([
+    // Keep the deep-link critical path to the product row and category tree.
+    // The full catalog loads product-names.json in parallel and refreshes the title afterward.
+    const [cats, rows0] = await Promise.all([
       api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
-      fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({})),
       api('products?active=eq.true&or=(slug.eq.' + encodeURIComponent(slug) + ',id.eq.' + encodeURIComponent(slug) + ')&select=' + PRODUCT_COLS)
     ]);
     if (deepOpen || fullCatalog || !rows0.length) return;
     let rows = rows0; const g = rows0[0].variant_group;
     if (g) { rows = await api('products?active=eq.true&variant_group=eq.' + encodeURIComponent(g) + '&select=' + PRODUCT_COLS); if (deepOpen || fullCatalog || !rows.length) return; }
-    buildCatalog(rows, cats, names);   // PRODUCTS = just this product; the full catalog replaces it when it arrives
+    buildCatalog(rows, cats, {});   // Use the database name immediately; the full catalog replaces it when it arrives
     if (!PRODUCTS.some(x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug))) { PRODUCTS = []; CATS = []; return; }
     openDeepLink(slug);
   } catch (e) { if (!deepOpen && !fullCatalog) { PRODUCTS = []; CATS = []; } }
