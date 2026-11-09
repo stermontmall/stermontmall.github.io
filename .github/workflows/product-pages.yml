@@ -14,6 +14,8 @@ on:
     branches: [main]
     paths:
       - 'generate-products.mjs'
+      - 'product-description-html.mjs'
+      - 'product-description-html.test.mjs'
       - 'seo-description-layout.mjs'
       - 'seo-indexing-guard.test.mjs'
       - 'category-hubs.mjs'
@@ -89,6 +91,9 @@ jobs:
 
       - name: Test the 404 page fallback (unbuilt product and category links open in the shop)
         run: node not-found-fallback.test.mjs
+
+      - name: Test product description section rendering
+        run: node product-description-html.test.mjs
 
       - name: Test the product page guard
         run: node check-product-pages.test.mjs
