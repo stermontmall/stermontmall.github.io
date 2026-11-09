@@ -1,7 +1,7 @@
 // Stermont Arcade - marketplace-style product description layout (Kilimall-like outlook; layout pattern only, no copy or artwork from any other store).
 // Runs AFTER generate-products.mjs (see .github/workflows/product-pages.yml). It rewrites only the "About <product>" box of every /p/*.html page:
 //   - a tab bar that jumps to each section (Overview, Key features, Specifications, ...)
-//   - section titles as grey header bands
+//   - premium lavender section headers, rounded cards and polished specification tables
 //   - Key features as a tick list
 //   - Specifications as a two-column table when the lines look like "Label: value"
 // Safe and repeatable: a page that already has the layout (marker class "pd") is skipped, and any failure leaves the page as the generator wrote it.
