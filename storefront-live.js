@@ -176,59 +176,61 @@
     idx = (n + imgs.length) % imgs.length; renderGallery();
   }
   function fmtDesc(text) {
-    var box = mk('div', 'desc-layout'), raw = String(text || '')
-      .replace(/\bundefined\b/gi, '')
-      .replace(/^#{1,6}\s*/gm, '')
-      .replace(/Search phrases relevant to this advert include[\s\S]*$/i, '')
-      .replace(/\r\n?/g, '\n').replace(/[ \t]+/g, ' ').trim();
-    /* Detect section labels even when imported text has flattened everything into one paragraph. */
+    var box = mk('div', 'desc-layout');
+    var raw = String(text || '').replace(/\\bundefined\\b/gi, '')
+      .replace(/Search phrases relevant to this advert include[\\s\\S]*$/i, '')
+      .replace(/PRODUCT BUYING GUIDE:[\\s\\S]*$/i, '')
+      .replace(/\\r\\n?/g, '\\n').replace(/[ \\t]+/g, ' ').trim();
+
+    /* Only match explicit uppercase heading labels. Case-sensitive matching prevents
+       ordinary words such as "used", "uses" or "order" being cut out of sentences. */
     var rules = [
-      ['Product overview', /\b(?:PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?\s*/ig],
-      ['Product buying guide', /\bPRODUCT BUYING GUIDE\s*:?\s*/ig],
-      ['Key features & benefits', /\b(?:KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|BENEFITS)\s*:?\s*/ig],
-      ['Specifications', /\b(?:SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\s*:?\s*/ig],
-      ['Uses & applications', /\b(?:WHERE IT HELPS|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|WHO MAY NEED THIS PRODUCT|IDEAL FOR)\s*:?\s*/ig],
-      ['How to use', /\b(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|PLANNING FOR USE|BEFORE YOU START)\s*:?\s*/ig],
-      ['Safety information', /\b(?:SAFETY(?: INFORMATION| PRECAUTIONS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\s*:?\s*/ig],
-      ['Storage & handling', /\b(?:STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\s*:?\s*/ig],
-      ['Frequently asked questions', /\b(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\s*:?\s*/ig],
-      ['Ordering, payment & delivery', /\b(?:ORDER(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\s*:?\s*/ig],
-      ['Important buying notes', /\b(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\s*:?\s*/ig]
+      ['Key features & benefits', /\\bKEY FEATURES(?:\\s*(?:&|AND)\\s*BENEFITS)?\\s*:?\\s*/g],
+      ['Specifications', /\\bSPECIFICATIONS(?:\\s*(?:&|AND)\\s*KEY DETAILS)?\\s*:?\\s*/g],
+      ['Uses & applications', /\\bWHERE IT HELPS\\s*:?\\s*/g],
+      ['How to use', /\\bHOW TO USE(?: IT)?\\s*:?\\s*/g],
+      ['Before you start', /\\bBEFORE YOU START\\s*:?\\s*/g],
+      ['Safety information', /\\bSAFETY(?: INFORMATION| PRECAUTIONS)?\\s*:?\\s*/g],
+      ['Storage & handling', /\\bSTORAGE(?:\\s*(?:&|AND)\\s*HANDLING)?\\s*:?\\s*/g],
+      ['Frequently asked questions', /\\bFREQUENTLY ASKED QUESTIONS\\s*:?\\s*/g],
+      ['Ordering, payment & delivery', /\\bORDER(?:ING)?\\s*:?\\s*/g]
     ];
-    var hits=[];
-    rules.forEach(function(rule){ rule[1].lastIndex=0; var m; while((m=rule[1].exec(raw))!==null) hits.push({at:m.index,end:rule[1].lastIndex,title:rule[0]}); });
-    hits.sort(function(a,b){return a.at-b.at;});
-    var unique=[], edge=-1;
-    hits.forEach(function(h){if(h.at>=edge){unique.push(h);edge=h.end;}});
-    var parts=[], pos=0;
-    unique.forEach(function(h){
-      var before=raw.slice(pos,h.at).trim();
-      if(before) parts.push({title:parts.length?'More product information':'Product overview',text:before});
-      parts.push({title:h.title,text:''}); pos=h.end;
+    var hits = [];
+    rules.forEach(function(rule) {
+      rule[1].lastIndex = 0; var m;
+      while ((m = rule[1].exec(raw)) !== null) hits.push({at:m.index,end:rule[1].lastIndex,title:rule[0]});
     });
-    var tail=raw.slice(pos).trim();
-    if(tail){if(parts.length)parts[parts.length-1].text=tail;else parts.push({title:'Product overview',text:tail});}
-    if(parts.length===1 && parts[0].text.length>520){
-      var sentences=parts[0].text.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/), groups=[];
-      for(var n=0;n<sentences.length;n+=3)groups.push(sentences.slice(n,n+3).join(' '));
-      parts=groups.map(function(t,n){return {title:n?'More product information':'Product overview',text:t};});
-    }
+    hits.sort(function(a,b){return a.at-b.at;});
+    var clean=[], lastEnd=-1;
+    hits.forEach(function(h){ if(h.at>=lastEnd){clean.push(h);lastEnd=h.end;} });
+    var parts=[], firstEnd=clean.length?clean[0].at:raw.length;
+    var intro=raw.slice(0,firstEnd).trim();
+    if(intro) parts.push({title:'Product overview',text:intro});
+    clean.forEach(function(h,i){
+      var next=clean[i+1], content=raw.slice(h.end,next?next.at:raw.length).trim();
+      if(content) parts.push({title:h.title,text:content});
+    });
+    if(!parts.length && raw) parts.push({title:'Product overview',text:raw});
+
     parts.forEach(function(part){
       var content=part.text.trim(); if(!content)return;
-      var section=mk('section','desc-section'); section.appendChild(mk('h4','',part.title));
-      var lines=content.split(/\n+/).map(function(x){return x.trim().replace(/^[-•●▪]\s*/, '');}).filter(Boolean);
-      var bullets=content.split(/\s*[•●▪]\s*/).map(function(x){return x.trim();}).filter(Boolean);
-      var listSection=/key features|specifications/i.test(part.title) && lines.length>1;
-      if(listSection || bullets.length>1){
-        var items=listSection ? lines : bullets;
-        if(!listSection){var lead=items.shift(); if(lead && lead.length>18)section.appendChild(mk('p','',lead));}
+      var section=mk('section','desc-section');
+      section.appendChild(mk('h4','',part.title));
+      var lines=content.split(/\\n+/).map(function(x){return x.trim().replace(/^[-•●▪]\\s*/, '');}).filter(Boolean);
+      var bullets=content.split(/\\s*[•●▪]\\s*/).map(function(x){return x.trim();}).filter(Boolean);
+      if(/key features|specifications|before you start/i.test(part.title) && bullets.length>1){
         var ul=mk('ul','desc-list');
-        items.forEach(function(item){ul.appendChild(mk('li','',item.replace(/^[-–]\s*/,'')));});
+        bullets.forEach(function(item){ul.appendChild(mk('li','',item));});
         section.appendChild(ul);
-      }else{
-        var paras=content.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/), chunk='';
-        paras.forEach(function(sentence){if(chunk&&chunk.length+sentence.length>420){section.appendChild(mk('p','',chunk));chunk='';}chunk+=(chunk?' ':'')+sentence;});
-        if(chunk)section.appendChild(mk('p','',chunk));
+      } else {
+        lines.forEach(function(line){
+          if(/^[•●▪-]/.test(line)){
+            var ul=section.querySelector('ul') || mk('ul','desc-list');
+            if(!ul.parentNode)section.appendChild(ul);
+            ul.appendChild(mk('li','',line.replace(/^[-•●▪]\\s*/,'')));
+          } else section.appendChild(mk('p','',line));
+        });
+        if(!lines.length) section.appendChild(mk('p','',content));
       }
       box.appendChild(section);
     });
