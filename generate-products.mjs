@@ -691,6 +691,12 @@ rows.forEach(row => {
   const approvedForThisSize = exact && labelInName(exact, row.variant_label);
   NAMES[row.id] = buyName(approvedForThisSize ? exact : `${row.name} ${row.variant_label}`);
 });
+const badVariantNames = rows.filter(row => row.variant_group && row.variant_label)
+  .filter(row => !labelInName(NAMES[row.id] || '', row.variant_label));
+if (badVariantNames.length) {
+  throw new Error(`Pack-size heading mismatch: ${badVariantNames.slice(0, 10).map(row => row.id).join(', ')}`);
+}
+console.log(`[variant-name-audit] ${rows.filter(row => row.variant_group && row.variant_label).length} pack-size headings match their own labels.`);
 
 // /products.html: one crawlable page that lists every product, grouped by category, so Google and visitors can reach all of them from one place.
 {
