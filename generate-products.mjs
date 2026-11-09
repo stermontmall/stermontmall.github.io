@@ -1,3 +1,4 @@
+// Rebuild requested 2026-11-09: regenerate final Kerol 600-800 word page with verified usage sections.
 // Rebuild requested 2026-11-09: rebuild Kerol product guide after content test length correction.
 // Rebuild requested 2026-11-09: render verified inline related-product links in authored product guidance.
 // Rebuild requested 2026-11-09: refresh high-intent product SEO titles and Livergen poultry opening copy.
