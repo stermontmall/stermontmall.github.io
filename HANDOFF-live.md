@@ -1,3 +1,16 @@
+## 2026-11-09 13:05 Africa/Nairobi - Build crash fixed: seo-overrides.mjs now accepts desc-only / title-only entries (branch `wip-fix-seo-overrides-partial`)
+Owner report: product links (e.g. /p/air-chopper-7-5sc-insecticide-100-ml.html) are not ranking on Google.
+### Findings
+- Product build run 42592008950 (commit f028f7f, 30 new meta descriptions) FAILED in `seo-overrides.mjs`: 23 entries in `seo-overrides.json` have only `desc` (no `title`), and the script called `.replace` on `undefined`. Because the build fails, no page fixes were deployed.
+- Live pages still show a stray `\1` in title/H1/og:title (e.g. "Air Chopper 7.5SC Insecticide \1 100 ml | Kenya"). 14 pages checked in main had it in `<title>`. Supabase is clean now (0 active rows with a backslash in name/seo_name/seo_title/description/variant_label), so these are stale builds; a green rebuild should clear them. VERIFY after the rebuild.
+- Variant pages (e.g. `-15-ml-3-pk.html`, `-250-ml.html`, hash-named copies) are "Redirecting..." stubs canonicalised to the 100 ml page: this is intentional; the `#air-chopper-...-15-ml-3-pk` part of the shared link is only a page anchor.
+### Done
+- Edited `seo-overrides.mjs`: title and desc are each optional. Tested in a scratch copy: exit 0, overrides applied to 194 pages; seo-meta, seo-product-extras, product-content and seo-indexing-guard tests pass.
+### Next
+1. Confirm the new product-pages run on main is green: `gh run list --workflow=product-pages.yml --limit 3`
+2. Re-check live titles/H1 for `\1`: `curl -s https://stermontarcade.co.ke/p/air-chopper-7-5sc-insecticide-100-ml.html | grep -o '<title>[^<]*'`
+3. Then request indexing in Search Console for the product URLs (IndexNow is not Google).
+
 ## 2026-11-09 12:45 Africa/Nairobi - Session pickup: GitHub + Supabase reconnected, live state re-audited (note-only commit on main)
 
 ### Done

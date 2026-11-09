@@ -20,11 +20,12 @@ for (const [id, o] of Object.entries(O)) {
   const pm = h.match(/product:price:amount" content="(\d+)"/);
   const price = pm ? 'KSh ' + Number(pm[1]).toLocaleString('en-KE') : '';
   const fill = s => s.replace(/\{price\}/g, price);
-  const title = esc(clip(fill(o.title), 60)), desc = esc(clip(fill(o.desc), 155));
-  h = h.replace(/<title>[\s\S]*?<\/title>/, `<title>${title}</title>`)
-    .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${desc}">`)
-    .replace(/(<meta property="og:title" content=")[^"]*(">)/, `$1${title}$2`).replace(/(<meta property="og:description" content=")[^"]*(">)/, `$1${desc}$2`)
-    .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, `$1${title}$2`).replace(/(<meta name="twitter:description" content=")[^"]*(">)/, `$1${desc}$2`);
+  // Entries may carry only a title, only a desc, or both: a missing field leaves the page's existing value untouched.
+  const title = o.title ? esc(clip(fill(o.title), 60)) : '', desc = o.desc ? esc(clip(fill(o.desc), 155)) : '';
+  if (title) h = h.replace(/<title>[\s\S]*?<\/title>/, `<title>${title}</title>`)
+    .replace(/(<meta property="og:title" content=")[^"]*(">)/, `$1${title}$2`).replace(/(<meta name="twitter:title" content=")[^"]*(">)/, `$1${title}$2`);
+  if (desc) h = h.replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${desc}">`)
+    .replace(/(<meta property="og:description" content=")[^"]*(">)/, `$1${desc}$2`).replace(/(<meta name="twitter:description" content=")[^"]*(">)/, `$1${desc}$2`);
   if (o.faq && o.faq.length) {
     const faq = o.faq.map(([q, a]) => [fill(q), fill(a)]);
     h = h.replace(/<script type="application\/ld\+json">([^<]*)<\/script>/g, (m, j) => {
