@@ -88,7 +88,7 @@ function productContentHtml(p) {
   const paragraphHtml = x => {
     if (typeof x === 'string') return `<p>${esc(x)}</p>`;
     if (!x || typeof x !== 'object') return '';
-    const link = (label, url) => label && typeof url === 'string' && /^\\/p\\/[a-z0-9-]+\\.html$/.test(url) ? `<a href="${url}">${esc(label)}</a>` : esc(label || '');
+    const link = (label, url) => label && typeof url === 'string' && /^\/p\/[a-z0-9-]+\.html$/.test(url) ? `<a href="${url}">${esc(label)}</a>` : esc(label || '');
     return `<p>${esc(x.before || '')}${link(x.linkText, x.url)}${esc(x.after || '')}${link(x.linkText2, x.url2)}${esc(x.after2 || '')}</p>`;
   };
   return `<div class="box product-content"><h2 style="margin-top:0">More about ${esc(p.name)}</h2>${sections.map(s => `<section><h3>${esc(s.heading)}</h3>${(s.paragraphs || []).map(paragraphHtml).join('')}${s.bullets?.length ? `<ul>${s.bullets.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</section>`).join('')}</div>`;
