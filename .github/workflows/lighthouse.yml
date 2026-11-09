@@ -4,6 +4,14 @@
 name: Weekly speed check
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'generate-products.mjs'
+      - 'mobile-shell/app.js'
+      - 'mobile-shell/tailwind.css'
+      - '.github/workflows/lighthouse.yml'
   schedule:
     - cron: '0 7 * * 1'
   workflow_dispatch:
