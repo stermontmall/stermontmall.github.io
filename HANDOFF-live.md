@@ -1,3 +1,22 @@
+## 2026-11-09 14:48 Africa/Nairobi - Classic product descriptions in the shell + restored `details` Map (branch `wip-classic-descriptions`, NOT merged to main)
+### Done
+- BUG FOUND ON MAIN: commit 7b80a7f deleted `const details = new Map();` in `mobile-shell/app.js`, so opening a product (quick-buy sheet or product page) threw "details is not defined" and the description stayed on "Loading details...". Restored right before `detailsFor`. This is live-breaking until this branch is merged.
+- Owner request: shell product descriptions must look classic, designed and perfectly formatted. Changes (all in `mobile-shell/app.js`; `src.css` / `tailwind.css` untouched, styles stay in the injected `PC_CSS`):
+  - New card design: serif section headings with diamond ornament, "at a glance" facts strip (from the specs table, 2 or 4 tiles), underline tabs with scroll-spy, tick-list panel with bold "Label:" text, spec table with zebra rows, numbered steps with connector line, FAQ accordion cards, amber safety callout, box-contents list with quantity badges, order panel.
+  - Parser (`splitProductDescription` and helpers inside the `@desc-start` block): many more known headings (ORDER CHECKLIST, WHAT'S IN THE BOX, KEY BENEFITS, KEY SPECIFICATIONS & FEATURES, SAFETY & RE-ENTRY PRECAUTIONS, HANDLING & STORAGE, MIXING & APPLICATION..., GOOD FOR, etc.); product-specific ALL-CAPS headings are detected generically (3+ words, or 2 words after a full stop; no digits; "... FROM STERMONT ARCADE" taglines stay text); sentences are grouped into real paragraphs (`splitParagraphs`); inline "1. ... 2. ..." steps (`splitNumbered`); `headingCase`, `splitLabel`, `parseBoxItem`, `pickFacts`.
+- `?v=` for app.js bumped 23 -> 24 in `index.html`.
+- Tests: `node mobile-shell/description.test.mjs` 47 checks pass; `navigation.test.mjs` and `no-classic-hop.test.mjs` pass. Visually checked at 390px wide with real descriptions (air-chopper, hisense pressure cooker, dynamec, toyota hilux, abasi): no horizontal overflow, no JS errors.
+### Not done / Blocked
+- `python3 mobile-shell/shell.test.py` was NOT run to completion (stopped twice at the owner's request). Run it before merging.
+- Not merged to main, so the live shell still has the `details` bug.
+- Pre-existing, unchanged: `splitProductDescription` cuts everything after `PRODUCT BUYING GUIDE:`, which also hides real content that follows it on some products (example: dynamec-18ec-insecticide-1l loses its "1 LITRE ABAMECTIN PACK - RESTRICTION FIRST" PCPB notice). Needs a decision: salvage non-boilerplate paragraphs after the guide, or fix the descriptions in the database.
+- Thin descriptions (the 14 Cars for Sale at 73-86 words, Dynamec) still look sparse: that is the data backlog listed below, not the design.
+### Next
+1. `cd /home/claude/stermontmall.github.io && git checkout wip-classic-descriptions && python3 mobile-shell/shell.test.py`
+2. `gh run list --workflow=pages-build-deployment --limit 3` must show nothing in_progress/queued before pushing main.
+3. Merge: `git checkout main && git pull origin main && git merge --no-ff wip-classic-descriptions && git push origin main`
+4. Owner: open https://stermontarcade.co.ke/?product=air-chopper-7-5sc-insecticide-100-ml in a private tab (the shell is cached by `?v=`, 24 is new).
+
 ## 2026-11-09 13:10 Africa/Nairobi - Guard added so a stray backslash in product text fails the build (branch `wip-guard-stray-backslash`, merged to main)
 - Root cause of the `\1` on product pages: commit 36ef50b (02:02 today, "Save November 9 SEO audit and catalogue fixes") committed pages built from product names that contained a literal `\1` (broken regexp_replace leaving the backreference text). The DB was fixed later; bot commit 60060e9 (09:44) rebuilt clean pages.
 - `seo-catalog-guard.mjs` now errors if name / seo_name / seo_title / variant_label of any active product contains a backslash; unit test added to `seo-catalog-guard.test.mjs` (passes). The live-DB run could not be tested from the sandbox (no network); it runs in the product-pages workflow.
