@@ -55,8 +55,6 @@ jobs:
         run: node no-classic-hop.test.mjs
       - name: Run mobile shell browser regression suite
         run: python3 mobile-shell/shell.test.py
-      - name: Broken and placeholder links (link-check.mjs)
-        run: node link-check.mjs
       - name: Check JavaScript syntax
         run: |
           node --check seo-check.mjs
@@ -93,6 +91,9 @@ jobs:
           node seo-shell-redirect.mjs
       - name: Run full on-page SEO audit against production-equivalent generated pages
         run: node seo-check.mjs > seo-pr-report.md
+
+      - name: Broken and placeholder links (link-check.mjs)
+        run: node link-check.mjs
       - name: Add audit summary
         if: always()
         run: |
