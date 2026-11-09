@@ -14,6 +14,7 @@ on:
     branches: [main]
     paths:
       - 'generate-products.mjs'
+      - 'seo-description-layout.mjs'
       - 'seo-indexing-guard.test.mjs'
       - 'category-hubs.mjs'
       - 'category-hubs.test.mjs'
@@ -108,6 +109,10 @@ jobs:
 
       - name: Apply allowlisted ordinary-product meta descriptions only
         run: node seo-safe-meta.mjs
+
+      - name: Marketplace-style product description layout - tabs, spec table, tick list (seo-description-layout.mjs)
+        continue-on-error: true
+        run: node seo-description-layout.mjs
 
       - name: Top up related-product links on pages in small categories (seo-related-fill.mjs)
         continue-on-error: true
@@ -228,7 +233,7 @@ jobs:
 
 # 2026-11-08: rebuild product pages and sitemap after adding 15 new Bajaj Boxer motorcycle spare parts with photos and Kenya SEO content.
 
-# 2026-11-08: rebuild product pages and sitemap after publishing 15 new Bajaj Boxer spare parts sourced from the official Bajaj East Africa catalogue.
+# 2026-11-08: rebuild product pages and sitemap after publishing 15 new Bajaj Boxer spare parts sourced from the official Bajaj East Africa catalog.
 
 # 2026-11-08: rebuild product pages after replacing mismatched Bajaj Boxer spare-part photos.
 
