@@ -20,7 +20,7 @@ assert.deepEqual(heads(premium), ['Product overview', 'Key features & benefits',
 
 // Car listings historically stored literal \\n sequences; they must still create separate headings.
 const vehicle = productDescriptionHtml('IMPORTANT NOTES\\n• Verify the vehicle.\\n\\nBUYING NOTES\\n• Confirm charges.\\n\\nVEHICLE-SPECIFIC BUYING GUIDE\\n\\nInspect the exact model.\\n\\nVEHICLE ENQUIRY & NEXT STEPS\\nRequest VIN and photos.');
-assert.deepEqual(heads(vehicle), ['Important notes', 'Important notes', 'Buying guide', 'Vehicle enquiry & next steps']); n++;
+assert.deepEqual(heads(vehicle), ['Important notes', 'Buying notes', 'Buying guide', 'Vehicle enquiry & next steps']); n++;
 ok(/<h3>Buying guide<\\/h3><p>Inspect the exact model\\.<\\/p>/.test(vehicle), 'vehicle buying guide is its own heading');
 ok(/<h3>Vehicle enquiry &amp; next steps<\\/h3><p>Request VIN and photos\\.<\\/p>/.test(vehicle), 'vehicle enquiry is its own heading');
 
