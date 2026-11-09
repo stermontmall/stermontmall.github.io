@@ -9,20 +9,20 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 
 // Only explicit uppercase section labels match. Never ordinary words such as "used", "order" or "safety" inside sentences.
 const LABELS = [
-  ['Product overview', /(?:^|\\s)(?:PRODUCT SUMMARY|PRODUCT OVERVIEW)\\s*:?\\s*/g],
-  ['Key features & benefits', /(?:^|\\s)KEY PRODUCT FEATURES\\s*:?\\s*|(?:^|\\s)KEY FEATURES(?:\\s*&\\s*BENEFITS)?\\s*:?\\s*/g],
-  ['Specifications & product details', /(?:^|\\s)SPECIFICATIONS\\s*:?\\s*/g],
-  ['Uses & applications', /(?:^|\\s)WHERE IT HELPS\\s*:?\\s*|(?:^|\\s)APPLICATION(?:S)?\\s*&?\\s*USE\\s*:?\\s*/g],
-  ['Application & dosage guidelines', /(?:^|\\s)APPLICATION\\s*&\\s*DOSAGE GUIDELINES\\s*:?\\s*/g],
-  ['How to use', /(?:^|\\s)HOW TO USE(?: IT)?\\s*:?\\s*|(?:^|\\s)DIRECTIONS FOR USE\\s*:?\\s*/g],
-  ['Before you start', /(?:^|\\s)BEFORE YOU START\\s*:?\\s*/g],
-  ['Safety information', /(?:^|\\s)SAFETY(?: PROTOCOLS)?(?:\\s*&\\s*PRECAUTIONS)?\\s*:?\\s*|(?:^|\\s)SAFETY\\s*:?\\s*/g],
-  ['Storage & handling', /(?:^|\\s)STORAGE(?:\\s*&\\s*HANDLING)?\\s*:?\\s*/g],
-  ['Buying guide', /(?:^|\\s)VEHICLE-SPECIFIC BUYING GUIDE\\s*|(?:^|\\s)BUYING GUIDE\\s*:?\\s*/g],
-  ['Important notes', /(?:^|\\s)IMPORTANT NOTES\\s*:?\\s*/g],
-  ['Frequently asked questions', /(?:^|\\s)FREQUENTLY ASKED QUESTIONS\\s*|(?:^|\\s)FAQS?\\s*/g],
-  ['Vehicle enquiry & next steps', /(?:^|\\s)VEHICLE ENQUIRY & NEXT STEPS\\s*:?\\s*/g],
-  ['Ordering & delivery', /(?:^|\\s)ORDERING(?:\\s*&\\s*DELIVERY)?\\s*:?\\s*|(?:^|\\s)ORDER\\s*:?\\s*/g]
+  ['Product overview', /(?:^|\s)(?:PRODUCT SUMMARY|PRODUCT OVERVIEW)\s*:?\s*/g],
+  ['Key features & benefits', /(?:^|\s)KEY PRODUCT FEATURES\s*:?\s*|(?:^|\s)KEY FEATURES(?:\s*&\s*BENEFITS)?\s*:?\s*/g],
+  ['Specifications & product details', /(?:^|\s)SPECIFICATIONS\s*:?\s*/g],
+  ['Uses & applications', /(?:^|\s)WHERE IT HELPS\s*:?\s*|(?:^|\s)APPLICATION(?:S)?\s*&?\s*USE\s*:?\s*/g],
+  ['Application & dosage guidelines', /(?:^|\s)APPLICATION\s*&\s*DOSAGE GUIDELINES\s*:?\s*/g],
+  ['How to use', /(?:^|\s)HOW TO USE(?: IT)?\s*:?\s*|(?:^|\s)DIRECTIONS FOR USE\s*:?\s*/g],
+  ['Before you start', /(?:^|\s)BEFORE YOU START\s*:?\s*/g],
+  ['Safety information', /(?:^|\s)SAFETY(?: PROTOCOLS)?(?:\s*&\s*PRECAUTIONS)?\s*:?\s*|(?:^|\s)SAFETY\s*:?\s*/g],
+  ['Storage & handling', /(?:^|\s)STORAGE(?:\s*&\s*HANDLING)?\s*:?\s*/g],
+  ['Buying guide', /(?:^|\s)VEHICLE-SPECIFIC BUYING GUIDE\s*|(?:^|\s)BUYING GUIDE\s*:?\s*/g],
+  ['Important notes', /(?:^|\s)IMPORTANT NOTES\s*:?\s*/g],
+  ['Frequently asked questions', /(?:^|\s)FREQUENTLY ASKED QUESTIONS\s*|(?:^|\s)FAQS?\s*/g],
+  ['Vehicle enquiry & next steps', /(?:^|\s)VEHICLE ENQUIRY & NEXT STEPS\s*:?\s*/g],
+  ['Ordering & delivery', /(?:^|\s)ORDERING(?:\s*&\s*DELIVERY)?\s*:?\s*|(?:^|\s)ORDER\s*:?\s*/g]
 ];
 
 // "Question? Answer. Question? Answer." run together in one paragraph -> one block per question.
