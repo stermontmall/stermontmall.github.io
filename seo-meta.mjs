@@ -163,6 +163,7 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
 export function catTitle(catName) {
   const c = String(catName || '').replace(/\s+/g, ' ').trim();
   if (/^(?:stermont\s+)?cars for sale$/i.test(c)) return 'Cars for Sale in Kenya | Stermont Arcade';
+  if (/^motorcycle spare parts$/i.test(c)) return 'Motorcycle Spare Parts in Kenya | Stermont Arcade';
   const tiers = [
     `Shop ${c} Online in Kenya | ${STORE}`,
     `Buy ${c} Online in Kenya | ${STORE}`,
@@ -178,6 +179,7 @@ export function catTitle(catName) {
 export function catDescription(catName, catSlug) {
   const c = String(catName || '').replace(/\s+/g, ' ').trim();
   if (['cars-for-sale', 'stermont-cars-for-sale'].includes(catSlug)) return 'Explore brand-new cars for sale in Kenya. Compare model details, indicative prices and photos; confirm availability and the final supplier quote before payment.';
+  if (catSlug === 'motorcycle-spare-parts') return 'Shop motorcycle spare parts in Kenya for Bajaj Boxer and other listed models. Check model, engine variant and part fitment before ordering.';
   const registrationNote = ['crop-insecticides', 'bed-bug-killers', 'adjuvants-growth-regulators'].includes(catSlug)
     ? ' Check each product label and PCPB registration.'
     : '';
