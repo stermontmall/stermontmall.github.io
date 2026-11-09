@@ -755,3 +755,4 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-09: refresh Cars for Sale category hub copy for brand-new vehicle sourcing and transparent market-reference pricing.
 
 // 2026-11-09: rebuild car pages after fixing the Toyota Taisor lead photo so the storefront and static SEO page use the corrected first gallery image.
+// 2026-11-09: rebuild product pages after topping up the four car galleries to the 8–10 photo minimum.
