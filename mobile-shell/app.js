@@ -424,7 +424,7 @@ function splitFaq(body) {
   return items.length >= 2 && items.every(i => i.a.length) ? items.map(i => ({ q: i.q, a: i.a.join(' ') })) : null;
 }
 function splitProductDescription(source) {
-  const raw = String(source || '').replace(/\bundefined\b/gi, '').replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '').replace(/\s*PRODUCT BUYING GUIDE:[\s\S]*$/i, '').trim();
+  const raw = String(source || '').replace(/\bundefined\b/gi, '').replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '').trim();
   if (!raw) return [];
   const labels = [
     ['Product overview', /(?:^|\s)(?:PRODUCT SUMMARY|PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?\s*/g],
