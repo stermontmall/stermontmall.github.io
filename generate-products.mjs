@@ -226,9 +226,9 @@ const INFO = {
   'health-beauty': { h1: 'Health & Beauty Products in Kenya', title: 'Health & Beauty Products in Kenya | Stermont Arcade',
     desc: 'Browse health, beauty and wellness products in Kenya. Check ingredients, pack size, intended use and product instructions before ordering.',
     intro: 'Browse health, beauty and wellness listings. Review the ingredients, pack size, intended use, warnings and instructions shown on the product label.' },
-  'cars-for-sale': { h1: 'Cars for Sale in Kenya', title: 'Cars for Sale in Kenya | Mercedes-Benz and More | Stermont Arcade',
-    desc: 'Browse cars for sale in Kenya at Stermont Arcade, starting with the Mercedes-Benz CLA 200. See photos and the price in KSh, then enquire on WhatsApp.',
-    intro: 'Cars for sale from Stermont Arcade, with photos and the price in Kenya shillings. Message us on WhatsApp to ask about a car, arrange a viewing and confirm the details before you pay.' },
+  'cars-for-sale': { h1: 'Cars for Sale in Kenya', title: 'New Cars for Sale in Kenya | Stermont Arcade',
+    desc: 'Explore brand-new car sourcing adverts in Kenya, including Toyota, Lexus, Suzuki, Subaru, Nissan and Mercedes-Benz. Compare indicative market prices and enquire for a supplier-confirmed quote.',
+    intro: 'Browse brand-new vehicle sourcing adverts for Kenya. Listings show indicative competitor-market price references and representative model photographs; vehicle availability, exact specification and final quotation are confirmed with the supplying dealer before payment.' },
   'pest-control-fumigation': { h1: 'Pest Control & Fumigation Products in Kenya', title: 'Pest Control & Fumigation Products in Kenya | Stermont Arcade',
     desc: 'Buy bed bug killers, insecticides and fumigation products online in Kenya. Pay by M-Pesa, delivery to all 47 counties. Order online at Stermont Arcade.',
     intro: 'Stermont Arcade stocks insecticides and pest control supplies for homes, hotels, hostels, offices, farms and public places. Look for a PCPB registration number on the label, read the label before use and keep chemicals away from children and pets. For large premises or fumigation of stores and grain, use a licensed pest control operator.' },
@@ -748,3 +748,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-09: rebuild product pages, Cars for Sale category hub and sitemap for 15 brand-new vehicle sourcing adverts with representative image credits and Kenya market benchmark prices.
 
 // 2026-11-09: rerun vehicle listing build after tightening all 15 vehicle SEO titles to the 60-character limit.
+
+// 2026-11-09: refresh Cars for Sale category hub copy for brand-new vehicle sourcing and transparent market-reference pricing.
