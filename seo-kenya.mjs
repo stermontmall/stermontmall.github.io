@@ -40,6 +40,65 @@ const SW = {
   'shoes': 'viatu', 'health-beauty': 'afya na urembo'
 };
 
+// Unique buyer-help sections for high-intent category pages that were thin on useful guidance.
+// Keep these practical and category-specific; never pad pages with repeated generic copy.
+const CATEGORY_GUIDES = {
+  'disinfectants-hygiene': `<section class="category-guide" data-seo-guide="disinfectants-hygiene">
+<h2>Choosing farm and household disinfectants in Kenya</h2>
+<p>Choose a disinfectant for the surface and setting you need to clean, not just by pack size or price. Poultry houses, livestock pens, equipment, drains and household surfaces can have different label-approved uses. Check the product name, active ingredients, concentration, intended application sites and current Kenyan registration details before ordering.</p>
+<h3>How to use a disinfectant responsibly</h3>
+<p>Remove visible dirt and organic matter first because cleaning is an important step before disinfection. Read the container label for the exact dilution, application method and contact time. Do not transfer a dilution rate from one brand to another. Keep animals, children, feed and drinking water away unless the label specifically allows the intended use. Allow the treated area to dry and ventilate as directed before people or animals return.</p>
+<h3>What to check before buying</h3>
+<ul><li>Confirm the correct formulation and pack size for the job.</li><li>Check the label, expiry date, batch details and storage instructions.</li><li>Use suitable gloves, eye protection and other label-required PPE.</li><li>Ask a qualified professional if the intended use or dilution is unclear.</li></ul>
+<p>For broader farm hygiene and pest-control supplies, browse <a href="/c/pest-control-fumigation.html">pest control and fumigation products</a> and <a href="/c/sprayers-equipment.html">sprayers and application equipment</a>.</p>
+</section>`,
+  'crop-insecticides': `<section class="category-guide" data-seo-guide="crop-insecticides">
+<h2>How to choose crop insecticides in Kenya</h2>
+<p>Start by identifying the crop and the pest causing damage. Similar symptoms can have different causes, so check the crop, pest stage and affected plant parts before selecting a product. Compare the active ingredient, formulation, pack size and the crops and pests named on the label. A product listed for one crop or pest is not automatically suitable for another.</p>
+<h3>Check the label before application</h3>
+<p>Use only products whose current Kenyan registration and label directions match the intended crop and pest. Follow the stated rate, mixing order, application interval, pre-harvest interval and re-entry instructions. Wear the specified protective equipment, avoid drift onto people, animals, water and neighbouring crops, and do not spray in unsuitable weather. Never guess a dose or combine products unless the label or a qualified agronomist permits it.</p>
+<h3>Plan the complete crop-protection programme</h3>
+<p>Consider monitoring, field sanitation and non-chemical controls alongside pesticide use. Rotate modes of action where the label and agronomic advice support it, rather than repeatedly relying on the same active ingredient. Keep records of the product, batch, date, crop and application details.</p>
+<p>Compare related <a href="/c/fungicides.html">fungicides</a>, <a href="/c/herbicides.html">herbicides</a> and <a href="/c/sprayers-equipment.html">sprayers and equipment</a> when planning your farm-input purchase.</p>
+</section>`,
+  'fertilizers': `<section class="category-guide" data-seo-guide="fertilizers">
+<h2>Choosing fertilizer for crops in Kenya</h2>
+<p>The right fertilizer depends on the crop, soil condition, growth stage and nutrients required. Where possible, use a soil test and local agronomic advice to guide your choice. Compare the nutrient analysis on the bag, such as the stated nitrogen, phosphorus and potassium content, as well as any secondary or micronutrients. Do not choose a product from its name or colour alone.</p>
+<h3>Compare formulation, pack size and application timing</h3>
+<p>Check whether the product is granular, soluble, foliar or another formulation and confirm that it is suitable for the intended crop and application method. Pack size affects handling and storage, while the label explains the correct rate and timing. Do not assume that products with similar NPK numbers are interchangeable; nutrient sources and additional ingredients can differ.</p>
+<h3>Storage and buying checks</h3>
+<ul><li>Inspect the seal, batch number, manufacture or expiry details where supplied.</li><li>Keep fertilizer dry and protected from moisture.</li><li>Store it separately from food, animal feed and children.</li><li>Follow the manufacturer's directions and local agronomic advice.</li></ul>
+<p>You can also browse <a href="/c/agrovet.html">agrovet supplies</a> and <a href="/c/seeds-seedlings.html">seeds and seedlings</a> when planning a complete planting season order.</p>
+</section>`,
+  'protective-wear-safety': `<section class="category-guide" data-seo-guide="protective-wear-safety">
+<h2>Choosing protective wear and safety equipment</h2>
+<p>Select protective equipment according to the hazard and task. Work involving chemicals, dust, heat, sharp objects, machinery or general handling may require different protection. Check the product description and manufacturer's markings for the intended use, material, size and any stated standard or certification. Do not assume that one glove, mask or pair of boots protects against every workplace hazard.</p>
+<h3>Check fit and compatibility</h3>
+<p>Gloves should fit securely while allowing safe handling. Eye protection should sit comfortably and provide the coverage required for the task. Respirators need the correct facepiece size and compatible filters or cartridges for the specific hazard; fit testing and a suitable respiratory-protection programme may be necessary. Replace damaged, expired or contaminated equipment according to the manufacturer's instructions.</p>
+<h3>Before placing an order</h3>
+<ul><li>Confirm sizes, quantities and material specifications.</li><li>Match filters, cartridges and accessories to the exact equipment model.</li><li>Check care, cleaning, storage and replacement instructions.</li><li>Use the workplace risk assessment and safety data sheet to guide selection.</li></ul>
+<p>For chemical application work, also review the relevant <a href="/c/sprayers-equipment.html">sprayers and equipment</a> and follow the pesticide label and safety data sheet.</p>
+</section>`,
+  'phones-tablets': `<section class="category-guide" data-seo-guide="phones-tablets">
+<h2>How to choose a phone or tablet in Kenya</h2>
+<p>Compare devices by the way you plan to use them. For everyday calls, messaging and browsing, check battery capacity, storage, memory and software support. For photography, compare the camera system and available storage. For gaming or demanding apps, look at the processor, memory, screen refresh rate and heat management. The largest specification is not automatically the best value for every buyer.</p>
+<h3>Verify the exact model before buying</h3>
+<p>Check the full model number, storage configuration, RAM, network compatibility and whether the device supports the bands used by your mobile operator. Confirm whether it is new or refurbished, what accessories are included, the warranty terms and the return conditions. Regional versions of the same phone name can have different specifications, so use the exact listing details rather than relying on a model family name.</p>
+<h3>Plan for everyday ownership</h3>
+<p>Consider charging requirements, screen protection, cases, repair support and the cost of additional storage or accessories. Keep your purchase receipt and confirm the device condition and included items when it arrives.</p>
+<p>Compare the available models on this page and check the individual product listing for current price, stock and specifications before ordering.</p>
+</section>`,
+  'home-kitchen': `<section class="category-guide" data-seo-guide="home-kitchen">
+<h2>Choosing home and kitchen appliances in Kenya</h2>
+<p>Start with the space and job the appliance needs to handle. Measure the available width, depth and height, and compare the product's capacity with the needs of your household. For electrical appliances, check the rated power, voltage, plug type and any installation requirements. For cookware and kitchen tools, compare material, dimensions, cleaning instructions and compatibility with your cooker or other equipment.</p>
+<h3>Compare useful specifications, not just the headline price</h3>
+<p>Look at capacity, controls, included accessories, energy use where stated, warranty coverage and after-sales support. Check whether a product needs a separate stand, regulator, hose, filter or other accessory, and confirm exactly what is included in the listing. Product photographs help with appearance, but the written specification should guide decisions about size and compatibility.</p>
+<h3>Before checkout</h3>
+<ul><li>Confirm the model number, dimensions and capacity.</li><li>Check delivery access for large or heavy appliances.</li><li>Review the warranty, returns and installation requirements.</li><li>Keep packaging and the receipt until the item has been checked.</li></ul>
+<p>Open each product page for its current price, availability and full specifications, then confirm delivery arrangements before payment.</p>
+</section>`
+};
+
 // ---------- 1) product pages ----------
 let pDone = 0;
 if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.html'))) {
@@ -101,7 +160,11 @@ if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.h
     const slug = f.replace(/\.html$/, ''), file = `c/${f}`; let h = readFileSync(file, 'utf8');
     const h1 = unesc(((h.match(/<h1>([\s\S]*?)<\/h1>/) || [])[1] || '').replace(/<[^>]+>/g, '').trim());
     const items = [...h.matchAll(ITEM)].map(m => ({ url: m[1], name: m[2], price: Number(m[3].replace(/,/g, '')) })).filter(i => i.price > 0);
-    if (!h1 || items.length < 3) continue;
+    const guide = CATEGORY_GUIDES[slug];
+    if (guide && !h.includes(`data-seo-guide="${slug}"`)) {
+      h = h.replace(/<ul class="g">/, `${guide}\\n<ul class="g">`);
+    }
+    if (!h1 || items.length < 3) { if (guide) writeFileSync(file, h); continue; }
     items.sort((a, b) => a.price - b.price);
     const label = h1.replace(/\s+in Kenya$/i, '');
     const min = items[0].price, max = items[items.length - 1].price;
