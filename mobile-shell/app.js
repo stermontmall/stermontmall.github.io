@@ -535,6 +535,7 @@ function renderProductDescription(target, source) {
   cards.forEach(c => root.appendChild(c));
 }
 /* @render-end */
+const details = new Map(); // Cache product-detail requests by variant row ID; renderDetails() and renderPP() share this cache.
 const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
 async function renderDetails(rowId) {
   const box = $('#qb-details'); if (!box) return;                  // an older cached index.html has no details block: leave the sheet as it was
