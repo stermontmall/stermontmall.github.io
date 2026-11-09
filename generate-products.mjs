@@ -162,7 +162,7 @@ rows.forEach(p => { if (p.variant_group && p.variant_label) (gmap[p.variant_grou
 const products = [], aliases = [], seenG = new Set();
 const inS = x => x.stock == null || Number(x.stock) > 0;
 // true when the name already ends with the variant label, or every word/number of the label is already in the name
-const labelInName = (name, label) => { const n = String(name).toLowerCase(), l = String(label).toLowerCase(), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
+const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\\d+(?:\\.\\d+)?)\\s*(millilitres?|milliliters?|ml)\\b/g, '$1ml').replace(/(\\d+(?:\\.\\d+)?)\\s*(litres?|liters?|l)\\b/g, '$1l').replace(/(\\d+(?:\\.\\d+)?)\\s*(kilograms?|kg)\\b/g, '$1kg').replace(/(\\d+(?:\\.\\d+)?)\\s*(grams?|g)\\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
 for (const p of rows) {
   const g = p.variant_group && p.variant_label ? gmap[p.variant_group] : null;
   if (g && g.length > 1) {
