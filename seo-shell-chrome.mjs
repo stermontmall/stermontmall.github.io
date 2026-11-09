@@ -19,7 +19,7 @@ export const STYLE = '<style>header{min-height:52px;display:flex;align-items:cen
   + 'body.stm-chrome .stk{bottom:calc(56px + env(safe-area-inset-bottom,0px));padding-bottom:.6rem}'
   + 'body.stm-chrome main{padding-bottom:9rem}'
   + 'body.stm-chrome footer{margin-bottom:5rem}</style>';
-export const SCRIPT = '<script src="/shell-chrome.js?v=2" defer></script>';
+export const SCRIPT = '<script src="/shell-chrome.js?v=3" defer></script>';
 // Phone-width real visitors on /p/<slug>.html or /c/<slug>.html go straight to the shell; so does anyone (any width) on the old /p/<slug>.html?shell=1 links.
 // Crawlers, preview bots and ?classic=1 / ?noshell=1 stay on the static page, and so do desktop-width visitors on a plain address.
 export const EARLY = '<script>(function(){try{var l=location,u=navigator.userAgent||"";'
