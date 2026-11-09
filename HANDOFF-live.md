@@ -2040,3 +2040,12 @@ Owner instruction: “Continue with the next 30.”
 - [ ] Next: obtain the two actual CarMax advert URLs/photos and confirmed KES selling/source prices (or written seller quote); then create unique 600–800-word model-specific SEO descriptions, attach exact photos to Storage, publish and verify generated product pages, canonical, Product JSON-LD and sitemap.
 - [ ] Toyota Urban Cruiser Hyryder V (2025) remains excluded until CarMax confirms zero-km/brand-new condition and exact price; "new vehicle" category tag alone is not proof of new condition.
 - [ ] No product rows, photos, category metadata, GitHub generators or live listings were changed in this step.
+
+
+## 2026-11-09 14:05 (Africa/Nairobi) - Product page SEO restructure like Totalease (branch wip-product-seo-totalease-structure)
+- Owner asked (link: totaleaseventures.co.ke/product/advion-cockroach-gel-bait-30g/) for ALL product SEO/description layout organised the same way as that page: Key Features, How it works, How to apply (numbered), Storage, Safety, FAQ, Conclusion, internal links.
+- Finding 1 (bug): `productDescriptionHtml()` in generate-products.mjs gives the text AFTER an uppercase label (KEY FEATURES, SPECIFICATIONS, HOW TO USE, SAFETY...) the generic heading "Product information" instead of the label's own heading. Result: 568 of 806 real pages show repeated "Product information" H3s; only the last label keeps its heading. seo-description-layout.mjs (tabs, tick list, spec table) therefore cannot work.
+- Finding 2: meta description is the same sentence template on every product (seo-meta.mjs); Totalease writes a product-specific one.
+- Titles NOT to be touched (CLAUDE.md rule).
+- In progress: fix label-to-body assignment, add numbered how-to steps and Q/A splitting for FAQs, add unit tests. Generated p/ pages are NOT edited by hand; rebuild via workflow dispatch after merge.
+- Next: `PRODUCTS_JSON=<scratch products.json> node generate-products.mjs` to test locally; then push branch.
