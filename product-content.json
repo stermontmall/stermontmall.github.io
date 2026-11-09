@@ -1609,71 +1609,56 @@
   ],
   "kerol-disinfectant-fluid-1-litre": [
     {
-      "heading": "Kerol Disinfectant Overview and Active Ingredient",
-      "paragraphs": [
-        "Kerol Disinfectant Fluid (1L) is a concentrated disinfectant listed for farm, institutional and general sanitation. This listing identifies 38% neutral tar acids and a Rideal-Walker coefficient of 18–20. Dilute it before applying to suitable surfaces; it is not a medicine or a product for direct application to people or animals. Always check the exact formulation and directions printed on the bottle, because similarly named products can have different instructions."
-      ],
-      "bullets": [
-        "Pack size: 1 litre concentrate.",
-        "Listed active ingredient: 38% neutral tar acids; Rideal-Walker coefficient 18–20."
-      ]
-    },
-    {
       "heading": "How to Dilute Kerol Disinfectant",
       "paragraphs": [
-        "Kenyan product listings commonly state general disinfection at 1 litre of Kerol in 600 litres of water, and stronger disinfection at 1 litre in 300 litres. These equal approximately 1.67 ml/L and 3.33 ml/L respectively. Use these rates only if they match the directions on the exact bottle supplied. The container label and safety data sheet take priority over online descriptions; never borrow a rate from another disinfectant or formulation."
+        "Kenyan Kerol listings commonly state 1 litre in 600 litres of water for general disinfection and 1 litre in 300 litres for stronger disinfection (about 1.67 ml/L and 3.33 ml/L). Confirm these rates on the exact bottle supplied: the container label and safety data sheet take priority over online listings. Measure accurately with a graduated chemical measure, use clean water and follow the label's mixing order. Never guess, increase the strength or mix Kerol with bleach, acids, detergents or other disinfectants."
       ],
       "bullets": [
-        "General rate reported by Kenyan listings: 1 L in 600 L water (about 1.67 ml/L).",
-        "Stronger rate reported by Kenyan listings: 1 L in 300 L water (about 3.33 ml/L).",
-        "Confirm both rates against your own bottle label before mixing."
+        "General rate reported online: 1 L / 600 L water.",
+        "Stronger rate reported online: 1 L / 300 L water.",
+        "Use only if confirmed by your product label."
       ]
     },
     {
-      "heading": "Poultry House Applications and Biosecurity",
+      "heading": "Poultry House Applications",
       "paragraphs": [
-        "For poultry operations, use only on suitable hard surfaces in an empty poultry house where the label permits, such as washable floors, walls, doorways, drains and approved equipment. Remove birds, eggs, litter, droppings, dust and loose feed first. Clean the building, allow excess water to drain, then apply the correctly diluted solution according to the label, including its coverage and contact-time directions.",
-        "Plan treatment between flocks and record the date, area treated, dilution used and person responsible. This makes the cleaning routine repeatable and helps staff avoid mixing up containers or applying a solution prepared for a different task. If a flock has a suspected infectious disease, obtain veterinary guidance on the disinfectant and protocol required for that organism."
+        "Use only on label-approved hard surfaces in an empty poultry house, such as washable floors, walls, doorways, drains and suitable equipment. Remove birds, eggs, litter, droppings, dust and feed first; clean the building before disinfection. Apply the diluted solution as directed and observe the label's coverage, contact-time, drying and ventilation instructions. Do not spray Kerol onto chickens, chicks, eggs, feed or drinking water. Keep birds out until the label permits re-entry."
       ]
     },
     {
-      "heading": "Livestock Housing and General Sanitation Uses",
+      "heading": "Livestock Housing and General Sanitation",
       "paragraphs": [
-        "The listing identifies livestock houses and sanitation areas as intended uses. Depending on the exact label, suitable locations may include empty cattle sheds, goat and sheep pens, pig housing, kennels, stables, washable floors, drains, foot-dips and wheel-dips. Remove animals before treating housing unless the label explicitly permits use with animals present. Clear manure, bedding and organic debris before treating approved surfaces.",
-        "For busy farms, treat one zone at a time and keep clean equipment separate from dirty tools. Put up a clear notice while a room is being cleaned and disinfected, and prevent unnecessary movement between untreated and treated areas. These practical steps support farm biosecurity but do not guarantee that every pathogen has been eliminated."
+        "The listing identifies livestock houses and sanitation areas as intended uses. Depending on the bottle label, suitable areas may include empty cattle sheds, goat and sheep pens, pig housing, kennels, stables, washable floors, drains, foot-dips and wheel-dips. Remove animals unless the label explicitly permits treatment with them present. For general sanitation, use on approved hard, washable surfaces such as toilets and drains. Do not assume one dilution rate suits every application."
       ]
     },
     {
-      "heading": "Safety Precautions, Storage and Handling",
+      "heading": "Application Steps and Safe Handling",
       "paragraphs": [
-        "Wear suitable gloves, protective clothing and eye protection when measuring, mixing or applying the concentrate. Avoid breathing spray or mist and work with good ventilation. Prevent splashes onto skin and into eyes. If exposure occurs, follow the first-aid instructions on the container and seek medical advice where directed. Keep children, pets, livestock, feed, food and drinking water away from the mixing and treatment area.",
-        "Store Kerol in its original, tightly closed container in a cool, dry, secure place away from heat, sunlight, food and animal feed. Never decant it into beverage bottles or unlabelled containers, and do not reuse empty packaging. Dispose of leftovers and packaging according to the label; never pour concentrate into streams, ponds or water sources. During a suspected disease outbreak, contact a veterinarian or animal-health professional.",
-        "Prepare solutions in a well-lit, ventilated area where spills can be controlled. Keep the measuring equipment dedicated to chemicals and rinse it only as the label directs. Do not eat, drink or smoke while handling the concentrate, and wash hands after removing protective equipment."
+        "Remove organic dirt, wash surfaces and allow excess water to drain before disinfecting. Prepare only the amount needed, apply with an approved mop, brush or sprayer, and follow the label's contact time. Wear gloves, protective clothing and eye protection; avoid breathing mist and provide ventilation. Keep children, pets, livestock, feed, food and drinking water away. Store the concentrate in its original closed container in a cool, secure place. Never pour concentrate into streams or ponds."
       ]
     },
     {
-      "heading": "Kerol vs Zagro Ultraxide: Which Should You Choose?",
+      "heading": "Kerol vs Zagro Ultraxide",
       "paragraphs": [
         {
-          "before": "Kerol and Zagro Ultraxide are different formulations, so compare their active ingredients, approved uses and label directions rather than treating their dilution rates as interchangeable. This Kerol listing identifies 38% neutral tar acids. Kenya's veterinary medicines register lists Ultraxide with glutaraldehyde 15% w/v and a quaternary ammonium compound 10% w/v. Ultraxide has its own application rates and precautions. See the ",
+          "before": "These are different formulations, not interchangeable products. This Kerol listing identifies 38% neutral tar acids. Kenya's veterinary medicines register lists Ultraxide with glutaraldehyde 15% w/v and a quaternary ammonium compound 10% w/v. Compare each product's own label, approved uses and safety instructions. See ",
           "linkText": "Zagro Ultraxide Disinfectant 1L",
           "url": "/p/zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre.html",
-          "after": " listing to compare its pack and current store details. Choose the product whose label matches your task."
+          "after": " for its pack details."
         }
       ]
     },
     {
-      "heading": "Kerol Price in Nairobi and Ordering from Stermont Arcade",
+      "heading": "Kerol Price in Nairobi and Related Equipment",
       "paragraphs": [
-        "The listed Stermont Arcade price for Kerol Disinfectant Fluid (1L) is KSh 2,529. Price and availability may change, so confirm the current amount and stock status on this page before paying. Delivery fees and timing depend on destination; request the charge and estimated dispatch time for your location.",
         {
-          "before": "For application equipment, compare the ",
+          "before": "The Stermont Arcade listing price for Kerol Disinfectant Fluid (1L) is KSh 2,529; confirm live stock and price before payment. For application equipment, compare the ",
           "linkText": "2 Litre Hand Pressure Sprayer",
           "url": "/p/2-litre-hand-pressure-sprayer-2-litres.html",
-          "after": " or the ",
+          "after": " or ",
           "linkText2": "Aico 5-Litre Manual Pressure Sprayer",
           "url2": "/p/aico-ac-5l-5-litre-manual-pressure-sprayer.html",
-          "after2": ". Use a sprayer only if its materials and the Kerol label permit it. Order through Stermont Arcade, use available checkout options including M-Pesa, and confirm the label and delivery details before use."
+          "after2": ". Use equipment only when its materials and the Kerol label permit it. Ask for delivery fees to your location before checkout."
         }
       ]
     }
