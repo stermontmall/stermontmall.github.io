@@ -54,6 +54,77 @@ const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
 const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; };
 const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
 
+/* Render catalogue descriptions as real semantic HTML, not one long paragraph.
+   Explicit source headings are preserved; unlabelled copy is split into useful product-specific topic groups. */
+function productDescriptionHtml(source) {
+  const raw = String(source || '').replace(/\\bundefined\\b/gi, '').replace(/Search phrases relevant to this advert include[\\s\\S]*$/i, '').trim();
+  if (!raw) return '<p>Product information will be updated shortly.</p>';
+  const aliases = [
+    ['Product overview', /\\b(?:PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\\s*:?/ig],
+    ['Key features & benefits', /\\b(?:KEY FEATURES(?:\\s*(?:&|AND)\\s*BENEFITS)?|FEATURES(?:\\s*(?:&|AND)\\s*BENEFITS)?|BENEFITS)\\s*:?/ig],
+    ['Specifications & details', /\\b(?:SPECIFICATIONS(?:\\s*(?:&|AND)\\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\\s*:?/ig],
+    ['Uses & applications', /\\b(?:WHERE IT HELPS|USES?(?:\\s*(?:&|AND)\\s*APPLICATIONS?)?|APPLICATIONS?|IDEAL FOR)\\s*:?/ig],
+    ['How to use', /\\b(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|BEFORE YOU START)\\s*:?/ig],
+    ['Safety information', /\\b(?:SAFETY(?: INFORMATION| PRECAUTIONS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\\s*:?/ig],
+    ['Storage & handling', /\\b(?:STORAGE(?:\\s*(?:&|AND)\\s*HANDLING)?|HANDLING)\\s*:?/ig],
+    ['Frequently asked questions', /\\b(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\\s*:?/ig],
+    ['Ordering, payment & delivery', /\\b(?:ORDER(?:ING)?(?:\\s*(?:&|AND)\\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\\s*(?:&|AND)\\s*DELIVERY)?|DELIVERY(?:\\s*(?:&|AND)\\s*PAYMENT)?|PAYMENT(?:\\s*(?:&|AND)\\s*DELIVERY)?)\\s*:?/ig],
+    ['Important buying notes', /\\b(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\\s*:?/ig]
+  ];
+  const hits = [];
+  aliases.forEach(([heading, re]) => { re.lastIndex = 0; let m; while ((m = re.exec(raw))) hits.push({ at:m.index, end:re.lastIndex, heading }); });
+  hits.sort((a,b) => a.at-b.at);
+  let sections = [], cursor = 0;
+  hits.forEach(h => {
+    if (h.at < cursor) return;
+    const before = raw.slice(cursor,h.at).trim();
+    if (before) sections.push({ heading: sections.length ? 'Product details' : 'Product overview', body:before });
+    sections.push({ heading:h.heading, body:'' }); cursor = h.end;
+  });
+  const tail = raw.slice(cursor).trim();
+  if (tail) { if (sections.length) sections[sections.length-1].body = tail; else sections.push({heading:'Product overview',body:tail}); }
+  if (!hits.length) {
+    const chunks = raw.split(/\\n\\s*\\n/).map(x=>x.trim()).filter(Boolean);
+    const sentences = chunks.length > 1 ? chunks : raw.split(/(?<=[.!?])\\s+(?=[A-Z0-9“"'])/);
+    const buckets = [
+      {heading:'Product overview', test:/./, body:[]},
+      {heading:'Key features & benefits', test:/\\b(feature|benefit|design|performance|durable|effective|reliable|powerful|easy|convenient|quality|protect|control)\\b/i, body:[]},
+      {heading:'Specifications & pack details', test:/\\b(\\d+(?:\\.\\d+)?\\s?(?:ml|l|litre|litres|kg|g|w|v|mm|cm|inch|gb|mb|pack|pieces?)|size|model|capacity|material|voltage|active ingredient|concentration)\\b/i, body:[]},
+      {heading:'Uses & applications', test:/\\b(use|used|suitable|ideal|application|crop|pest|farm|home|office|vehicle|garden|livestock|surface)\\b/i, body:[]},
+      {heading:'Buying, availability & delivery', test:/\\b(order|buy|price|stock|available|delivery|Kenya|M-Pesa|WhatsApp|warranty|return)\\b/i, body:[]}
+    ];
+    sentences.forEach((part,i) => {
+      const t=part.trim(); if(!t) return;
+      let b=buckets.find((x,j)=>j>0&&x.test.test(t));
+      if(!b) b=buckets[0];
+      b.body.push(t);
+    });
+    sections = buckets.filter(b=>b.body.length).map(b=>({heading:b.heading,body:b.body.join(' ')}));
+    if (sections.length===1 && sections[0].body.length>500) {
+      const words=sections[0].body.split(/\\s+/), half=Math.ceil(words.length/2);
+      sections.push({heading:'Product details & buying information',body:words.splice(half).join(' ')});
+      sections[0].body=words.join(' ');
+    }
+  }
+  const escText = x => esc(x);
+  return sections.filter(s=>s.body.trim()).map(s => {
+    const body=s.body.trim();
+    const bullets=body.split(/\\s*[•●▪]\\s*/).map(x=>x.trim()).filter(Boolean);
+    let content='';
+    if (bullets.length>1) {
+      const lead=bullets.shift(); if(lead) content += '<p>'+escText(lead)+'</p>';
+      content += '<ul>'+bullets.map(x=>'<li>'+escText(x.replace(/^[-–]\\s*/,''))+'</li>').join('')+'</ul>';
+    } else {
+      const lines=body.split(/\\n+/).map(x=>x.trim()).filter(Boolean);
+      content=lines.map(line=>/^[-–•●▪]\\s*/.test(line)
+        ? '<ul><li>'+escText(line.replace(/^[-–•●▪]\\s*/,''))+'</li></ul>'
+        : '<p>'+escText(line)+'</p>').join('');
+    }
+    return '<section class="product-description-section"><h3>'+escText(s.heading)+'</h3>'+content+'</section>';
+  }).join('');
+}
+
+
 // Product photos saved in the catalog before the custom domain still point at the old github.io address.
 // The files are the same, so serve them from the main domain: one site for Google to index, nothing breaks if github.io is ever turned off.
 const OLD_HOST = /^https?:\/\/stermontmall\.github\.io\//i;
@@ -92,7 +163,7 @@ main{max-width:920px;margin:0 auto;padding:1rem}nav.bc{font-size:.85rem;color:#6
 h1{font-size:1.5rem;line-height:1.25;margin:.2rem 0 .6rem}.pr{font-size:1.7rem;font-weight:800;color:#5b21b6}.pr s{font-size:1rem;font-weight:500;color:#6b6b80}
 .ok{color:#15803d;font-weight:700}.no{color:#b91c1c;font-weight:700}.btn{display:block;text-align:center;background:#15803d;color:#fff;text-decoration:none;font-weight:800;padding:.85rem;border-radius:12px;margin:.8rem 0 .4rem}
 .btn.alt{background:#fff;color:#6d28d9;border:2px solid #7c3aed}.btn.ask{margin:.2rem 0 .8rem;font-size:1.02rem;box-shadow:0 2px 8px rgba(22,163,74,.3)}.box{background:#fff;border:1px solid #e6e1f5;border-radius:14px;padding:.9rem 1rem;margin:1rem 0}
-.desc{white-space:pre-line}ul.g{list-style:none;padding:0;display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.desc{white-space:pre-line}.product-description-section{margin:1.1rem 0 0;padding:1rem 1.05rem;background:#fbfaff;border:1px solid #e8e1f5;border-left:4px solid #7c3aed;border-radius:12px}.product-description-section h3{margin:0 0 .55rem;color:#4c1d95;font-size:1.05rem;font-weight:800;line-height:1.35}.product-description-section p{margin:.35rem 0 .65rem;color:#373248;line-height:1.7}.product-description-section ul{margin:.35rem 0 .5rem;padding-left:1.25rem;list-style:disc}.product-description-section li{padding:.15rem 0 .3rem;line-height:1.6}.product-description-section:first-of-type{margin-top:.6rem}ul.g{list-style:none;padding:0;display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
 ul.g img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:.5rem}ul.g li{background:#fff;border:1px solid #e6e1f5;border-radius:12px;padding:.7rem}ul.g a{text-decoration:none;font-weight:600;color:#1f1b2e}ul.g span{display:block;color:#5b21b6;font-weight:800}
 .product-silo{margin:2rem 0;padding:1.2rem;background:#f7f9fc;border:1px solid #e3e8ef;border-radius:14px}.product-silo h2{margin:.1rem 0 .6rem;font-size:1.25rem}.product-silo h3{margin:1rem 0 .45rem;font-size:1rem}.product-silo p{color:#596579;margin:.35rem 0 .7rem}.silo-links{display:flex;flex-wrap:wrap;gap:.55rem}.silo-links a{display:inline-block;padding:.5rem .75rem;background:#fff;border:1px solid #dce3ec;border-radius:8px;text-decoration:none}.silo-products{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.65rem}.silo-products a{display:block;padding:.7rem;background:#fff;border:1px solid #e1e6ed;border-radius:8px;text-decoration:none;font-weight:600}.silo-products small{display:block;color:#5b21b6;margin-top:.25rem}.silo-guides{padding-left:1.2rem;line-height:1.9}.silo-guides a{font-weight:600} 
 footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85rem;border-top:1px solid #e6e1f5}
@@ -563,7 +634,7 @@ for (const p of products) {
 <a class="btn" href="${esc(wa)}">Order on WhatsApp</a><a class="btn alt" href="${SITE}/">Shop all products and add to cart</a>
 <div class="box">✔ Pay by M-Pesa &nbsp; ✔ Delivery to all 47 counties &nbsp; ✔ 48-hour returns on faulty items</div></div></div>
 ${sizeBox}
-${`<div class="box"><h2 style="margin-top:0">About ${esc(p.name)}</h2><div class="desc">${esc(productDescription)}</div></div>`}
+${`<div class="box product-description"><h2 style="margin-top:0">About ${esc(p.name)}</h2>${productDescriptionHtml(productDescription)}</div>`}
 ${productContentHtml(p)}
 ${seoBoxes}
 ${buyerNotes}
