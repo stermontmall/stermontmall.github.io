@@ -58,6 +58,7 @@ for (const [c, slug] of cats) {
   const t = catTitle(c), d = catDescription(c, slug); n += 2;
   assert.ok(t.length <= TITLE_MAX, `cat title ${t.length}: ${t}`);
   assert.ok(d.length <= DESC_MAX, `cat desc ${d.length}: ${d}`);
+  assert.ok(!/(top-quality|wholesale prices|PCPB-approved)/i.test(d), `category description contains an unsupported blanket claim: ${d}`);
   const regulated = /PCPB/.test(d);
   assert.equal(regulated, ['crop-insecticides', 'bed-bug-killers', 'adjuvants-growth-regulators'].includes(slug), `PCPB claim wrong for ${slug}: ${d}`);
 }
