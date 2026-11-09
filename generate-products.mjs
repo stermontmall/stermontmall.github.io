@@ -96,7 +96,9 @@ function productContentHtml(p) {
   return '<div class="box product-content"><h2 style="margin-top:0">More about ' + esc(p.name) + '</h2>' +
     sections.map(s => '<section><h3>' + esc(s.heading) + '</h3>' + (s.paragraphs || []).map(paragraphHtml).join('') +
       (s.bullets && s.bullets.length ? '<ul>' + s.bullets.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '') + '</section>').join('') + '</div>';
-}const CSS = `*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1f1b2e;background:#faf9fd}
+}
+
+const CSS = `*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1f1b2e;background:#faf9fd}
 a{color:#6d28d9}header{background:#7c3aed;color:#fff;padding:.8rem 1rem}header a{color:#fff;text-decoration:none;font-weight:800;font-size:1.15rem}
 main{max-width:920px;margin:0 auto;padding:1rem}nav.bc{font-size:.85rem;color:#6b6b80;margin:.3rem 0 1rem}
 .pg{display:grid;gap:1.2rem}@media(min-width:720px){.pg{grid-template-columns:1fr 1fr}}
