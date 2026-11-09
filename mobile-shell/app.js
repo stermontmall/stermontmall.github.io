@@ -22,7 +22,7 @@ const SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQi
 const api = path => fetch(SB + '/rest/v1/' + path, { headers: { apikey: KEY }, cache: 'no-store' })
   .then(r => { if (!r.ok) throw new Error('Supabase HTTP ' + r.status); return r.json(); });
 const ICONS = { 'pest-control-fumigation': '🪳', agrovet: '🌱', 'phones-accessories': '📱', 'tv-audio-video': '📺', appliances: '🍳', 'home-kitchen': '🏠',
-  fashion: '👗', shoes: '👟', bags: '👜', 'watches-jewellery': '⌚', 'computers-accessories': '💻', 'health-beauty': '💄', automotive: '🚗', 'baby-products': '🧸', others: '🛍️' };
+  fashion: '👗', shoes: '👟', bags: '👜', 'watches-jewellery': '⌚', 'computers-accessories': '💻', 'health-beauty': '💄', automotive: '🚗', 'stermont-cars-for-sale': '🚗', 'baby-products': '🧸', others: '🛍️' };
 const BGS = ['#ede9fe', '#fce7f3', '#dcfce7', '#fef3c7', '#e0f2fe', '#ffe4e6', '#f1f5f9'];
 const hashStr = s => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
 let CATS = [];      // [{id: top-level slug, name, icon, subs: [sub-category names]}], built from the live data
@@ -155,10 +155,26 @@ const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
    the shell (the inline script at the top of the page head, seo-shell-chrome.mjs, and shell-chrome.js send /p/<slug>.html to /?product=<slug>).
    Crawlers get the static page, whose canonical is this same clean address. Older links that still end in ?shell=1 keep working (same two scripts). */
 const productUrl = () => { if (!qb.p) return undefined; const z = sizeOf(qb.p, qb.size).slug || qb.p.slug; return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); };
-function syncProductMeta() {   // tab title + address follow the open product (and the chosen size); both return to normal when it closes
+/* A category has its own address too (owner 2026-11-09: "when I tap on categories, make a direct link"): /c/<slug>.html, the clean address of the generated category page
+   (a sub-category uses its own slug). A copied or shared link previews as that category, and a phone that opens it goes straight back into the same category in the shell
+   (the inline script of seo-shell-chrome.mjs sends /c/<slug>.html to /?cat=<slug>, handled by openCatLink in section 9b). The address only changes in place (replaceState):
+   no history entry is added, so Back behaves exactly as before. It is "/" again on "For you", on search results and on every other tab.
+   To undo: make catUrl return '/' and remove the #cat-share button from index.html. */
+const catSlugOf = (chip, sub) => {   // slug of the open category or sub-category; '' for "For you"
+  if (!chip || chip === 'all') return '';
+  if (sub) { const top = CATROWS.find(x => !x.parent_id && x.slug === chip), s = top && CATROWS.find(x => x.parent_id === top.id && x.name === sub); if (s) return s.slug; }
+  return chip;
+};
+const catUrl = () => { const s = store.get(), z = s.tab === 'home' && !s.q ? catSlugOf(s.chip, s.sub) : ''; return z && /^[A-Za-z0-9._~-]+$/.test(z) ? '/c/' + z + '.html' : '/'; };
+const catTitle = () => { const s = store.get(), z = catUrl() !== '/' ? (s.sub || (CATS.find(c => c.id === s.chip) || {}).name) : ''; return z ? z + ' | Stermont Arcade' : BASE_TITLE; };
+function syncProductMeta() {   // tab title + address follow the open product (and the chosen size), else the open category; both return to normal when nothing is open
   const open = qb.p && stack.some(id => PRODUCT_OVERLAYS.includes(id));
-  document.title = open ? qb.p.name + ' | Stermont Arcade' : BASE_TITLE;
+  const cu = catUrl(), share = $('#cat-share');
+  if (share) share.style.display = cu === '/' ? 'none' : '';   // the share-link button next to the grid title only shows inside a category
+  document.title = open ? qb.p.name + ' | Stermont Arcade' : catTitle();
   if (open) { const u = productUrl(); if (u && location.pathname + location.search + location.hash !== u) history.replaceState(history.state, '', u); }
+  else if (cu !== '/') { if (location.pathname + location.search + location.hash !== cu) history.replaceState(history.state, '', cu); }
+  else if (/^\/c\/[^/]+\.html$/.test(location.pathname)) history.replaceState(history.state, '', '/');   // only an address this code set is reset: other parameters (campaign tags) stay
 }
 function openOverlay(id) {
   if (stack.includes(id)) return;
@@ -221,6 +237,7 @@ function showTab(tab) {
   $('#chips-wrap').hidden = tab !== 'home';
   $('#appbar').classList.remove('is-compact');
   if (tab === 'deals') { if (dealsCount) ls.set('dealsSeen', dealsCount); store.set({ dealsNew: 0 }); renderDeals(); }   // dealsCount is 0 until the catalog is in (a reload on Deals): syncDealsBadge saves it then
+  syncProductMeta();   // the category address belongs to the Home tab only
   window.scrollTo(0, scrollPos[tab] || 0);
 }
 function goTab(tab) {
@@ -304,7 +321,7 @@ new IntersectionObserver(es => { if (es[0].isIntersecting && store.get().tab ===
 function refreshGrid() {
   const s = store.get(), cat = CATS.find(c => c.id === s.chip);
   $('#grid-title').textContent = s.q ? `Results for "${s.q}"` : s.sub || (cat ? cat.name : 'Recommended for you');
-  renderChips(); loadPage(true);
+  renderChips(); loadPage(true); syncProductMeta();   // the address bar follows the open category (see catUrl)
 }
 async function renderDeals() {
   const el = $('#deals-grid'); if (el.dataset.loaded) return;
@@ -627,6 +644,14 @@ $('#search-form').addEventListener('submit', e => {
   if (store.get().tab !== 'home') goTab('home');
   refreshGrid();
 });
+/* Category link: the share button next to the grid title gives out the open category's own clean address (/c/<slug>.html), the same address the address bar shows.
+   It is only visible inside a category (syncProductMeta). A phone that opens the link lands in this same category in the shell. */
+$('#cat-share')?.addEventListener('click', async () => {
+  const u = catUrl(); if (u === '/') return;
+  const url = location.origin + u, title = document.title;
+  try { if (navigator.share) { await navigator.share({ title, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(url); toast('Category link copied'); } catch (e) { toast(url); }
+});
 
 if (Q_DEEP && !DEEP && !CAT_DEEP) { store.set({ q: Q_DEEP }); $('#search').value = Q_DEEP; }   // a search typed on a static page
 const RESTORE_CAT = !DEEP && !CAT_DEEP && !Q_DEEP && !CART_DEEP.length && SAVED_CAT;   // a reload keeps the chosen category (checked against the live categories once they load)
@@ -635,5 +660,5 @@ if (DEEP) quickDeepLink(DEEP);   // product link: start the one-product fast pat
 syncFilterUI(); renderCategoriesView(); renderDrawer(); refreshGrid();
 if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
 if (CART_DEEP.length) toast('Loading shared cart...');
-loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) { store.set({ sub: '' }); refreshGrid(); } else $('#grid-title').textContent = store.get().sub || t.name; } } renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) { if (deepOpen) refreshDeep(); else openDeepLink(DEEP); } else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
+loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) { store.set({ sub: '' }); refreshGrid(); } else $('#grid-title').textContent = store.get().sub || t.name; } } renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); syncProductMeta(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) { if (deepOpen) refreshDeep(); else openDeepLink(DEEP); } else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
 })();
