@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 const src = readFileSync(new URL('./app.js', import.meta.url), 'utf8');
 const block = src.slice(src.indexOf('/* @desc-start'), src.indexOf('/* @desc-end */'));
 assert.ok(block.includes('function splitProductDescription'), 'markers found');
-const { splitProductDescription, splitFaq } = new Function(block + '\nreturn { splitProductDescription, splitFaq };')();
+const { splitProductDescription, splitFaq, parseSpecs, splitSteps } = new Function(block + '\nreturn { splitProductDescription, splitFaq, parseSpecs, splitSteps };')();
 let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; };
 const titles = s => s.map(x => x.title);
 
@@ -25,4 +25,9 @@ ok(splitProductDescription('').length === 0, 'empty');
 assert.deepEqual(titles(splitProductDescription('Intro. SAFETY Wear gloves. STORAGE Keep dry. SAFETY Wash hands.')), ['Product overview', 'Safety information', 'Storage & handling']); n++;
 ok(splitFaq('Why a gel? Cockroaches eat it. It is neat. How much? Use small dots.').length === 2, 'faq pairs');
 ok(splitFaq('Only one sentence.') === null, 'non faq text');
+// spec table: only when every bullet is "Label: value"
+assert.deepEqual(parseSpecs(['Brand: Tatua', 'Form: Ready-to-use gel: tube']), [['Brand', 'Tatua'], ['Form', 'Ready-to-use gel: tube']]); n++;
+ok(parseSpecs(['Brand: Tatua', 'No label here']) === null && parseSpecs(['Brand: Tatua']) === null, 'mixed or single rows stay a list');
+// numbered steps need at least two sentences
+ok(splitSteps('Clean first. Apply dots. Check later.').length === 3 && splitSteps('One sentence only.') === null, 'steps');
 console.log(`mobile-shell description: ${n} checks passed`);

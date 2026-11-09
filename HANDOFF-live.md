@@ -2063,3 +2063,10 @@ Owner instruction: “Continue with the next 30.”
 - [x] Replaced with pure helpers splitProductDescription()/splitFaq() (uppercase-only labels at word start, own heading per label, FAQ Q&A, boilerplate stripped, first bullet stays a bullet) + renderer. index.html `app.js?v=22`.
 - [x] Tests: `node mobile-shell/description.test.mjs` (13 checks), navigation.test.mjs pass. `python3 mobile-shell/shell.test.py` could NOT run here (needs Supabase network; times out): run it where network exists.
 - Next: verify on phone after Pages deploy (hard refresh / v=22), then product-specific meta descriptions and the 357 unlabeled descriptions (owner choice).
+
+## 2026-11-09 15:05 (Africa/Nairobi) - Shell description redesign (branch wip-shell-description-layout)
+- Root cause found for "plain text" look: the product-copy-section card CSS exists in mobile-shell/src.css but was NEVER built into mobile-shell/tailwind.css (0 matches), so the live shell showed unstyled text. tailwindcss is not installable in the sandbox (no npm), so the card CSS is now injected by app.js (PC_CSS) and cannot go stale.
+- [x] Shell description now: sticky tab chips (Overview, Features, Specs, Uses, How to use, Prepare, Safety, Storage, FAQs; tap scrolls to section), tick list for features and before-you-start, two-column spec table, numbered how-to steps, amber safety box, FAQ accordions (first open), subtle ordering note. No generic "More product information".
+- [x] Verified in real Chrome at 390px (Playwright, scratchpad harness): 9 tabs, tap on Safety scrolls to it, 0 console errors, screenshots reviewed. Tests: `node mobile-shell/description.test.mjs` (16 checks), navigation.test.mjs, no-classic-hop.test.mjs pass. `python3 mobile-shell/shell.test.py` needs Supabase network: NOT run here.
+- index.html now `app.js?v=23`.
+- Optional follow-up: run `npm i -D tailwindcss@4 && node mobile-shell/build-css.mjs` where npm works, to rebuild tailwind.css (PC_CSS then duplicates the card rules harmlessly).

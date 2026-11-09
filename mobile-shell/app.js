@@ -450,31 +450,91 @@ function splitProductDescription(source) {
   sections.forEach(s => { const prev = merged.find(x => x.title === s.title); if (prev) prev.body += ' ' + s.body; else merged.push({ ...s }); });
   return merged;
 }
+const PC_TAB = { 'Product overview': 'Overview', 'Key features & benefits': 'Features', 'Specifications & details': 'Specs', 'Uses & applications': 'Uses', 'How to use': 'How to use', 'Before you start': 'Prepare', 'Safety information': 'Safety', 'Storage & handling': 'Storage', 'Frequently asked questions': 'FAQs', 'Ordering, payment & delivery': 'Ordering', 'Important buying notes': 'Notes' };
+/* "Label: value" bullets become a two-column table (only when EVERY bullet has that shape). */
+function parseSpecs(items) {
+  const rows = items.map(t => String(t).match(/^([^:]{2,40}):\s*(\S[\s\S]*)$/));
+  return rows.length >= 2 && rows.every(Boolean) ? rows.map(r => [r[1].trim(), r[2].trim()]) : null;
+}
+/* Instructions written as sentences become numbered steps. */
+function splitSteps(body) {
+  const s = String(body).replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+(?=[A-Z0-9])/).filter(Boolean);
+  return s.length >= 2 ? s : null;
+}
 /* @desc-end */
+/* @render-start */
+const PC_CSS = `#pp-desc, #qb-desc { white-space:normal !important; overflow-wrap:anywhere; } .product-copy-section { margin: 0 0 14px; padding: 15px 14px 13px; border: 1px solid #ece7f5; border-radius: 14px; background: #fff; box-shadow: 0 2px 8px rgba(34, 20, 60, .045); } .product-copy-section h3 { margin: 0 0 10px; padding: 0 0 9px; color: #5b21b6; font-size: 15px; line-height: 1.3; font-weight: 750; letter-spacing: -.01em; border-bottom: 1px solid #eee8f8; } .product-copy-section p { margin: 0 0 9px; color: #393543; font-size: 13.5px; line-height: 1.7; } .product-copy-section p:last-child { margin-bottom: 0; } .product-copy-section ul { display: grid; gap: 8px; margin: 4px 0 1px; padding: 0; list-style: none; } .product-copy-section li { position: relative; padding-left: 19px; color: #393543; font-size: 13.5px; line-height: 1.6; } .product-copy-section li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 7px; height: 7px; border-radius: 50%; background: #8b5cf6; }
+.pc-tabs{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 12px;padding:8px 16px 10px;position:sticky;top:0;z-index:4;background:#fff;border-bottom:1px solid #ece7f5;scrollbar-width:none}
+.pc-tabs::-webkit-scrollbar{display:none}
+.pc-tabs a{flex:none;padding:7px 13px;border-radius:999px;border:1px solid #e0d8f0;background:#faf8ff;color:#5b21b6;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap}
+.pc-tabs a.on{background:#7c3aed;border-color:#7c3aed;color:#fff}
+.product-copy-section{scroll-margin-top:54px}
+.product-copy-section ul.pc-tick li::before{content:"\\2713";background:none;width:auto;height:auto;border-radius:0;left:0;top:0;color:#15803d;font-weight:800;font-size:13px}
+.product-copy-section ul.pc-tick li{padding-left:22px}
+.pc-spec{width:100%;border-collapse:collapse;font-size:13px}
+.pc-spec th,.pc-spec td{padding:9px 10px;border:1px solid #ece7f5;text-align:left;vertical-align:top;line-height:1.5}
+.pc-spec th{width:40%;background:#f6f3fc;color:#4a3d6b;font-weight:650}
+.pc-steps{counter-reset:pc;list-style:none;margin:4px 0 0;padding:0;display:grid;gap:11px}
+.pc-steps li{position:relative;padding-left:36px;counter-increment:pc;color:#393543;font-size:13.5px;line-height:1.6}
+.pc-steps li::before{content:counter(pc);position:absolute;left:0;top:0;width:25px;height:25px;border-radius:50%;background:#7c3aed;color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center}
+.product-copy-section.pc-warn{border-color:#f3d79a;background:#fffaf0}
+.product-copy-section.pc-warn h3{color:#92400e}
+.product-copy-section.pc-warn h3::before{content:"\\26A0\\FE0F  "}
+details.pc-q{border-top:1px solid #eee7f7;padding:2px 0}
+details.pc-q:first-of-type{border-top:0}
+details.pc-q summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-weight:700;font-size:13.5px;line-height:1.45;color:#2b2540;cursor:pointer;list-style:none}
+details.pc-q summary::-webkit-details-marker{display:none}
+details.pc-q summary::after{content:"+";flex:none;width:22px;height:22px;border-radius:50%;background:#f1ebff;color:#5b21b6;font-weight:800;display:grid;place-items:center}
+details.pc-q[open] summary::after{content:"\\2212"}
+details.pc-q p{margin:0 0 12px;padding-right:6px}
+.product-copy-section.pc-order{background:#faf8ff;box-shadow:none}`;
 function renderProductDescription(target, source) {
   const root = $(target); if (!root) return;
   root.replaceChildren();
+  if (!document.getElementById('pc-style')) { const st = document.createElement('style'); st.id = 'pc-style'; st.textContent = PC_CSS; document.head.appendChild(st); }
   const sections = splitProductDescription(source);
   if (!sections.length) { root.textContent = 'Product information will be updated shortly.'; return; }
-  sections.forEach(section => {
-    const card = document.createElement('section'); card.className = 'product-copy-section';
-    const heading = document.createElement('h3'); heading.textContent = section.title; card.appendChild(heading);
-    const faq = section.title === 'Frequently asked questions' ? splitFaq(section.body) : null;
+  const uid = String(target).replace(/[^a-z0-9]/gi, '') + '-s';
+  const el = (tag, text, cls) => { const e = document.createElement(tag); if (text != null) e.textContent = text; if (cls) e.className = cls; return e; };
+  const cards = [];
+  sections.forEach((section, i) => {
+    const card = el('section', null, 'product-copy-section'); card.id = uid + i;
+    card.appendChild(el('h3', section.title));
     const startsWithBullet = /^\s*[•●▪]/.test(section.body);
     const bullets = section.body.split(/\s*[•●▪]\s*/).map(x => x.trim()).filter(Boolean);
+    const isList = bullets.length > 1 || (startsWithBullet && bullets.length);
+    const faq = section.title === 'Frequently asked questions' ? splitFaq(section.body) : null;
+    const specs = isList && section.title === 'Specifications & details' ? parseSpecs(bullets) : null;
+    const steps = !isList && section.title === 'How to use' ? splitSteps(section.body) : null;
     if (faq) {
-      faq.forEach(i => { const p = document.createElement('p'); const q = document.createElement('strong'); q.textContent = i.q; p.append(q, document.createElement('br'), i.a); card.appendChild(p); });
-    } else if (bullets.length > 1 || (startsWithBullet && bullets.length)) {
-      const lead = startsWithBullet ? '' : bullets.shift(); if (lead) { const p = document.createElement('p'); p.textContent = lead; card.appendChild(p); }
-      const ul = document.createElement('ul'); bullets.forEach(item => { const li = document.createElement('li'); li.textContent = item.replace(/^[-–]\s*/, ''); ul.appendChild(li); }); card.appendChild(ul);
+      faq.forEach((item, k) => { const d = el('details', null, 'pc-q'); if (k === 0) d.open = true; d.appendChild(el('summary', item.q)); d.appendChild(el('p', item.a)); card.appendChild(d); });
+    } else if (specs) {
+      const t = el('table', null, 'pc-spec'), tb = el('tbody'); specs.forEach(([k, v]) => { const tr = el('tr'); const th = el('th', k); th.scope = 'row'; tr.append(th, el('td', v)); tb.appendChild(tr); }); t.appendChild(tb); card.appendChild(t);
+    } else if (steps) {
+      const ol = el('ol', null, 'pc-steps'); steps.forEach(x => ol.appendChild(el('li', x))); card.appendChild(ol);
+    } else if (isList) {
+      const lead = startsWithBullet ? '' : bullets.shift(); if (lead) card.appendChild(el('p', lead));
+      const ul = el('ul', null, /^(Key features|Before you start)/.test(section.title) ? 'pc-tick' : ''); bullets.forEach(item => ul.appendChild(el('li', item.replace(/^[-–]\s*/, '')))); card.appendChild(ul);
     } else {
-      section.body.split(/\n\s*\n|(?<=[.!?])\s+(?=[A-Z0-9“"'])/).forEach(t => { if (!t.trim()) return; const p = document.createElement('p'); p.textContent = t.trim(); card.appendChild(p); });
+      section.body.split(/\n\s*\n|(?<=[.!?])\s+(?=[A-Z0-9“"'])/).forEach(t => { if (t.trim()) card.appendChild(el('p', t.trim())); });
     }
-    root.appendChild(card);
+    if (section.title === 'Safety information') card.classList.add('pc-warn');
+    if (section.title.startsWith('Ordering')) card.classList.add('pc-order');
+    cards.push(card);
   });
+  if (cards.length >= 3) {
+    const nav = el('nav', null, 'pc-tabs'); nav.setAttribute('aria-label', 'Product information sections');
+    sections.forEach((section, i) => {
+      if (section.title.startsWith('Ordering')) return;
+      const a = el('a', PC_TAB[section.title] || section.title); a.href = '#' + uid + i;
+      a.addEventListener('click', ev => { ev.preventDefault(); nav.querySelectorAll('a').forEach(x => x.classList.remove('on')); a.classList.add('on'); cards[i].scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+      nav.appendChild(a);
+    });
+    root.appendChild(nav);
+  }
+  cards.forEach(c => root.appendChild(c));
 }
-
-const details = new Map();
+/* @render-end */
 const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
 async function renderDetails(rowId) {
   const box = $('#qb-details'); if (!box) return;                  // an older cached index.html has no details block: leave the sheet as it was
