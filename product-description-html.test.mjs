@@ -18,6 +18,12 @@ ok(/<strong>How much\?<\/strong><br>Use small dots\./.test(out), 'second FAQ ite
 const premium = productDescriptionHtml('PRODUCT OVERVIEW\nA product-specific opening. KEY FEATURES & BENEFITS\n• Confirmed feature: practical benefit. SPECIFICATIONS\n• Pack size: 500 ml. BUYING GUIDE\nChoose by the exact use case. IMPORTANT NOTES\nCheck the current label. ORDERING & DELIVERY\nAsk for current availability.');
 assert.deepEqual(heads(premium), ['Product overview', 'Key features & benefits', 'Specifications & product details', 'Buying guide', 'Important notes', 'Ordering & delivery']); n++;
 
+// Car listings historically stored literal \\n sequences; they must still create separate headings.
+const vehicle = productDescriptionHtml('IMPORTANT NOTES\\n• Verify the vehicle.\\n\\nBUYING NOTES\\n• Confirm charges.\\n\\nVEHICLE-SPECIFIC BUYING GUIDE\\n\\nInspect the exact model.\\n\\nVEHICLE ENQUIRY & NEXT STEPS\\nRequest VIN and photos.');
+assert.deepEqual(heads(vehicle), ['Important notes', 'Important notes', 'Buying guide', 'Vehicle enquiry & next steps']); n++;
+ok(/<h3>Buying guide<\\/h3><p>Inspect the exact model\\.<\\/p>/.test(vehicle), 'vehicle buying guide is its own heading');
+ok(/<h3>Vehicle enquiry &amp; next steps<\\/h3><p>Request VIN and photos\\.<\\/p>/.test(vehicle), 'vehicle enquiry is its own heading');
+
 // no labels: unchanged behaviour
 const plain = productDescriptionHtml('First paragraph.\n\nSecond paragraph.');
 assert.deepEqual(heads(plain), ['Product overview', 'Product details']); n++;
