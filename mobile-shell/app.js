@@ -74,7 +74,7 @@ const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
 const thumb = p => {
   const photos = [...new Set([p.img, ...(Array.isArray(p.photos) ? p.photos : [])].filter(u => typeof u === 'string' && u.trim()))];
   if (!photos.length) return '<span class="photo-unavailable" role="img" aria-label="Product photo unavailable" style="display:grid;place-items:center;width:100%;height:100%;padding:8px;color:#64748b;background:#f8fafc;font:12px/1.4 system-ui;text-align:center">Photo unavailable</span>';
-  return `<img src="${esc(photos[0])}" alt="" loading="lazy" decoding="async" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
+  return `<img src="${esc(photos[0])}" alt="${esc(p.name)} product photo" loading="lazy" decoding="async" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
 };
 
 /* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
