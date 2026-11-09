@@ -2056,3 +2056,10 @@ Owner instruction: “Continue with the next 30.”
 - DB audit (752 active): 395 descriptions have uppercase labels (benefit from this fix); 357 have NO labels (render as Overview + Details only). Meta descriptions are one template for every product (seo-meta.mjs).
 - Not wired into CI: new test is not in product-pages.yml (rule: never edit that workflow).
 - Next (needs owner choice): merge to main + dispatch rebuild: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`; then product-specific meta descriptions; then structure for the 357 unlabeled descriptions (needs Supabase rewrite with description_backup).
+
+## 2026-11-09 14:20 (Africa/Nairobi) - App view (mobile shell) description sections fixed (branch wip-shell-description-sections)
+- Owner screenshots of ?product=tatua-advion-cockroach-gel-bait-30-g showed: words cut mid-sentence ("Ready-to-" / "cockroach", "are" / "d"), "More product information" repeated, PRODUCT BUYING GUIDE filler visible.
+- Cause: renderProductDescription() in mobile-shell/app.js matched labels case-insensitively (/ig), so "use", "used", "order", "delivery", "application" in normal sentences became headings; text after a label also got the generic heading; buying-guide boilerplate was not stripped.
+- [x] Replaced with pure helpers splitProductDescription()/splitFaq() (uppercase-only labels at word start, own heading per label, FAQ Q&A, boilerplate stripped, first bullet stays a bullet) + renderer. index.html `app.js?v=22`.
+- [x] Tests: `node mobile-shell/description.test.mjs` (13 checks), navigation.test.mjs pass. `python3 mobile-shell/shell.test.py` could NOT run here (needs Supabase network; times out): run it where network exists.
+- Next: verify on phone after Pages deploy (hard refresh / v=22), then product-specific meta descriptions and the 357 unlabeled descriptions (owner choice).

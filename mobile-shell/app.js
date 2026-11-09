@@ -411,45 +411,64 @@ function renderQB() {
 }
 /* Details (description, unit, stock, extra photos, page link) are fetched when a product is opened, not with the list: the descriptions are long
    (about 500 words for the agrochemicals), so loading all of them up front would slow the grid. Only named columns are read (never `cost`). */
+/* @desc-start  (pure helpers; mobile-shell/description.test.mjs runs this block on its own) */
+/* Section labels are matched in UPPERCASE only and only at a word start. The old case-insensitive patterns turned ordinary words ("use" in "Ready-to-use", "used", "before use", "get delivery", "Order ...") into headings and cut sentences in half. */
+function splitFaq(body) {
+  const sentences = String(body).replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+(?=[A-Z0-9])/);
+  const items = []; let cur = null;
+  for (const s of sentences) {
+    if (/\?$/.test(s)) { cur = { q: s, a: [] }; items.push(cur); }
+    else if (cur) cur.a.push(s);
+    else return null;
+  }
+  return items.length >= 2 && items.every(i => i.a.length) ? items.map(i => ({ q: i.q, a: i.a.join(' ') })) : null;
+}
+function splitProductDescription(source) {
+  const raw = String(source || '').replace(/\bundefined\b/gi, '').replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '').replace(/\s*PRODUCT BUYING GUIDE:[\s\S]*$/i, '').trim();
+  if (!raw) return [];
+  const labels = [
+    ['Product overview', /(?:^|\s)(?:PRODUCT SUMMARY|PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?\s*/g],
+    ['Key features & benefits', /(?:^|\s)(?:KEY PRODUCT FEATURES|KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|BENEFITS)\s*:?\s*/g],
+    ['Specifications & details', /(?:^|\s)(?:SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\s*:?\s*/g],
+    ['Uses & applications', /(?:^|\s)(?:WHERE IT HELPS|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|WHO MAY NEED THIS PRODUCT|IDEAL FOR)\s*:?\s*/g],
+    ['How to use', /(?:^|\s)(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|PLANNING FOR USE)\s*:?\s*/g],
+    ['Before you start', /(?:^|\s)BEFORE YOU START\s*:?\s*/g],
+    ['Safety information', /(?:^|\s)(?:SAFETY(?: INFORMATION| PRECAUTIONS| PROTOCOLS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\s*:?\s*/g],
+    ['Storage & handling', /(?:^|\s)(?:STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\s*:?\s*/g],
+    ['Frequently asked questions', /(?:^|\s)(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\s*:?\s*/g],
+    ['Ordering, payment & delivery', /(?:^|\s)(?:ORDER(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\s*:?\s*/g],
+    ['Important buying notes', /(?:^|\s)(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\s*:?\s*/g]
+  ];
+  const found = [];
+  labels.forEach(([title, re]) => { re.lastIndex = 0; let m; while ((m = re.exec(raw))) found.push({ at: m.index, end: re.lastIndex, title }); });
+  found.sort((a, b) => a.at - b.at);
+  // Text before the first label is the overview; the text after each label belongs to THAT label's heading.
+  const sections = []; let pos = 0, cur = 'Product overview';
+  found.forEach(h => { if (h.at < pos) return; const body = raw.slice(pos, h.at).trim(); if (body) sections.push({ title: cur, body }); cur = h.title; pos = h.end; });
+  const tail = raw.slice(pos).trim(); if (tail) sections.push({ title: cur, body: tail });
+  const merged = [];
+  sections.forEach(s => { const prev = merged.find(x => x.title === s.title); if (prev) prev.body += ' ' + s.body; else merged.push({ ...s }); });
+  return merged;
+}
+/* @desc-end */
 function renderProductDescription(target, source) {
   const root = $(target); if (!root) return;
   root.replaceChildren();
-  let raw = String(source || '').replace(/\bundefined\b/gi, '').replace(/Search phrases relevant to this advert include[\s\S]*$/i, '').trim();
-  if (!raw) { root.textContent = 'Product information will be updated shortly.'; return; }
-  const labels = [
-    ['Product overview', /\b(?:PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?\s*/ig],
-    ['Key features & benefits', /\b(?:KEY FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|FEATURES(?:\s*(?:&|AND)\s*BENEFITS)?|BENEFITS)\s*:?\s*/ig],
-    ['Specifications & details', /\b(?:SPECIFICATIONS(?:\s*(?:&|AND)\s*KEY DETAILS)?|TECHNICAL DETAILS|PRODUCT DETAILS|KEY DETAILS)\s*:?\s*/ig],
-    ['Uses & applications', /\b(?:WHERE IT HELPS|USES?(?:\s*(?:&|AND)\s*APPLICATIONS?)?|APPLICATIONS?|WHO MAY NEED THIS PRODUCT|IDEAL FOR)\s*:?\s*/ig],
-    ['How to use', /\b(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|PLANNING FOR USE|BEFORE YOU START)\s*:?\s*/ig],
-    ['Safety information', /\b(?:SAFETY(?: INFORMATION| PRECAUTIONS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\s*:?\s*/ig],
-    ['Storage & handling', /\b(?:STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\s*:?\s*/ig],
-    ['Frequently asked questions', /\b(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\s*:?\s*/ig],
-    ['Ordering, payment & delivery', /\b(?:ORDER(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\s*:?\s*/ig],
-    ['Important buying notes', /\b(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\s*:?\s*/ig]
-  ];
-  const found = [];
-  labels.forEach(([title, re]) => { re.lastIndex=0; let m; while ((m=re.exec(raw))) found.push({at:m.index,end:re.lastIndex,title}); });
-  found.sort((a,b)=>a.at-b.at);
-  const sections=[]; let pos=0;
-  found.forEach(h => { if (h.at<pos) return; const before=raw.slice(pos,h.at).trim(); if(before) sections.push({title:sections.length?'More product information':'Product overview',body:before}); sections.push({title:h.title,body:''}); pos=h.end; });
-  const tail=raw.slice(pos).trim(); if(tail){if(sections.length)sections[sections.length-1].body=tail;else sections.push({title:'Product overview',body:tail});}
-  if(sections.length===1 && sections[0].body.length>420){
-    const sentences=sections[0].body.split(/(?<=[.!?])\s+(?=[A-Z0-9“"'])/), grouped=[];
-    for(let i=0;i<sentences.length;i+=3) grouped.push(sentences.slice(i,i+3).join(' '));
-    sections.splice(0,1,...grouped.map((body,i)=>({title:i?'More product information':'Product overview',body})));
-  }
-  sections.forEach(section=>{
-    if(!section.body.trim()) return;
-    const card=document.createElement('section'); card.className='product-copy-section';
-    const heading=document.createElement('h3'); heading.textContent=section.title; card.appendChild(heading);
-    const bullets=section.body.split(/\s*[•●▪]\s*/).map(x=>x.trim()).filter(Boolean);
-    if(bullets.length>1){
-      const lead=bullets.shift(); if(lead.length>16){const p=document.createElement('p');p.textContent=lead;card.appendChild(p);}
-      const ul=document.createElement('ul'); bullets.forEach(item=>{const li=document.createElement('li');li.textContent=item.replace(/^[-–]\s*/,'');ul.appendChild(li);});card.appendChild(ul);
-    }else{
-      const paragraphs=section.body.split(/\n\s*\n|(?<=[.!?])\s+(?=[A-Z0-9“"'])/);
-      paragraphs.forEach(t=>{if(!t.trim())return;const p=document.createElement('p');p.textContent=t.trim();card.appendChild(p);});
+  const sections = splitProductDescription(source);
+  if (!sections.length) { root.textContent = 'Product information will be updated shortly.'; return; }
+  sections.forEach(section => {
+    const card = document.createElement('section'); card.className = 'product-copy-section';
+    const heading = document.createElement('h3'); heading.textContent = section.title; card.appendChild(heading);
+    const faq = section.title === 'Frequently asked questions' ? splitFaq(section.body) : null;
+    const startsWithBullet = /^\s*[•●▪]/.test(section.body);
+    const bullets = section.body.split(/\s*[•●▪]\s*/).map(x => x.trim()).filter(Boolean);
+    if (faq) {
+      faq.forEach(i => { const p = document.createElement('p'); const q = document.createElement('strong'); q.textContent = i.q; p.append(q, document.createElement('br'), i.a); card.appendChild(p); });
+    } else if (bullets.length > 1 || (startsWithBullet && bullets.length)) {
+      const lead = startsWithBullet ? '' : bullets.shift(); if (lead) { const p = document.createElement('p'); p.textContent = lead; card.appendChild(p); }
+      const ul = document.createElement('ul'); bullets.forEach(item => { const li = document.createElement('li'); li.textContent = item.replace(/^[-–]\s*/, ''); ul.appendChild(li); }); card.appendChild(ul);
+    } else {
+      section.body.split(/\n\s*\n|(?<=[.!?])\s+(?=[A-Z0-9“"'])/).forEach(t => { if (!t.trim()) return; const p = document.createElement('p'); p.textContent = t.trim(); card.appendChild(p); });
     }
     root.appendChild(card);
   });
