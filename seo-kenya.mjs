@@ -162,7 +162,8 @@ if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.h
     const items = [...h.matchAll(ITEM)].map(m => ({ url: m[1], name: m[2], price: Number(m[3].replace(/,/g, '')) })).filter(i => i.price > 0);
     const guide = CATEGORY_GUIDES[slug];
     if (guide && !h.includes(`data-seo-guide="${slug}"`)) {
-      h = h.replace(/<ul class="g">/, `${guide}\\n<ul class="g">`);
+      h = h.replace(/<ul class="g">/, `${guide}
+<ul class="g">`);
     }
     if (!h1 || items.length < 3) { if (guide) writeFileSync(file, h); continue; }
     items.sort((a, b) => a.price - b.price);
