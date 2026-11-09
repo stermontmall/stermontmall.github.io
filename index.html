@@ -166,7 +166,7 @@
       <div class="flex items-center gap-1 min-w-0">
         <h2 id="grid-title" class="text-sm font-semibold">Recommended for you</h2>
         <!-- Category link: shown by mobile-shell/app.js (syncProductMeta) only inside a category; it shares the category's own address /c/<slug>.html -->
-        <button id="cat-share" class="icon-btn !w-8 !h-8" aria-label="Share a link to this category" style="display:none"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg></button>
+        <button id="cat-share" class="icon-btn" aria-label="Share a link to this category" style="display:none"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg></button>
       </div>
       <button id="open-filters" data-open="sheet-filters" class="tap flex items-center gap-1 text-xs text-ink px-2 h-8 rounded-full bg-white shadow-card">
         <svg class="w-4 h-4"><use href="#i-filter"/></svg>Filter<span id="filter-count" class="text-brand font-semibold" hidden></span>
@@ -282,9 +282,9 @@
       <div class="flex items-center justify-between" style="margin-top:14px">
         <span class="text-xs font-semibold">Quantity</span>
         <div class="flex items-center gap-3">
-          <button id="pp-minus" class="icon-btn bg-gray-100 !w-8 !h-8" aria-label="Less"><svg class="w-4 h-4"><use href="#i-minus"/></svg></button>
+          <button id="pp-minus" class="icon-btn bg-gray-100" aria-label="Less"><svg class="w-4 h-4"><use href="#i-minus"/></svg></button>
           <span id="pp-qty" class="w-6 text-center font-semibold">1</span>
-          <button id="pp-plus" class="icon-btn bg-gray-100 !w-8 !h-8" aria-label="More"><svg class="w-4 h-4"><use href="#i-plus"/></svg></button>
+          <button id="pp-plus" class="icon-btn bg-gray-100" aria-label="More"><svg class="w-4 h-4"><use href="#i-plus"/></svg></button>
         </div>
       </div>
     </div>
@@ -372,9 +372,9 @@
   <div class="px-4 pb-4 flex items-center justify-between">
     <span class="text-xs font-semibold">Quantity</span>
     <div class="flex items-center gap-3">
-      <button id="qb-minus" class="icon-btn bg-gray-100 !w-8 !h-8" aria-label="Less"><svg class="w-4 h-4"><use href="#i-minus"/></svg></button>
+      <button id="qb-minus" class="icon-btn bg-gray-100" aria-label="Less"><svg class="w-4 h-4"><use href="#i-minus"/></svg></button>
       <span id="qb-qty" class="w-6 text-center font-semibold">1</span>
-      <button id="qb-plus" class="icon-btn bg-gray-100 !w-8 !h-8" aria-label="More"><svg class="w-4 h-4"><use href="#i-plus"/></svg></button>
+      <button id="qb-plus" class="icon-btn bg-gray-100" aria-label="More"><svg class="w-4 h-4"><use href="#i-plus"/></svg></button>
     </div>
   </div>
   <div class="flex gap-3 p-3 border-t border-line">
@@ -385,7 +385,7 @@
 
 <div id="toast" class="fixed left-1/2 -translate-x-1/2 top-[64px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
 
-<script src="/mobile-shell/app.js?v=35"></script>
+<script src="/mobile-shell/app.js?v=36"></script>
 <script src="/analytics.js"></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
 </body>
