@@ -879,3 +879,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-10: rebuild after tightening the Marigold Crackerjack SEO title.
 
 // Rebuild requested 2026-11-10: refresh corrected full-resolution product photos for the latest agrovet batch.
+
+// 2026-11-10: Rebuild product pages after verified photo replacements for the 20-product agrovet batch (Mavuno Bora, Rio Grande, Fugo, Chamomile, Fordhook Giant, Marigold Crackerjack and SC Tembo 73).
