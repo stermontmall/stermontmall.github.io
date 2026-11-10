@@ -871,3 +871,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-10: rebuild the static catalogue after adding the Premier 3-in-1 mist blower.
 
 // 2026-11-10: rebuild all product pages after removing internal markup and supplier-cost wording from catalogue descriptions.
+
+// 2026-11-10: rebuild the live catalogue after adding 15 researched agrovet products with verified Supabase photos and Kenya-focused product content.
