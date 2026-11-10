@@ -863,3 +863,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-09: preserve each pack-size variant's own approved heading in product-names.json.
 
 // 2026-11-09: build mobile catalogue pack-size names from the original database rows.
+
+// 2026-11-10: rebuild product pages after publishing two verified agrovet products (YAGO TPH01803 soil tester and WQ 6 kg poultry feeder).
