@@ -38,6 +38,7 @@
 - [Shop Computing Online in Kenya](https://stermontarcade.co.ke/c/computing.html): Browse Computing online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Crop Insecticides Online in Kenya](https://stermontarcade.co.ke/c/crop-insecticides.html): Browse Crop Insecticides online in Kenya. Compare listed product details and current prices. Check each product label and PCPB registration. Pay by…
 - [Farm Disinfectants in Kenya](https://stermontarcade.co.ke/c/disinfectants-hygiene.html): Compare farm disinfectants for poultry houses, livestock pens and sanitation in Kenya. Check label-approved uses, dilution and pack size.
+- [Shop Earphones & Headset Online in Kenya](https://stermontarcade.co.ke/c/earphones-headset.html): Browse Earphones & Headset online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Electrical & Lighting Online in Kenya](https://stermontarcade.co.ke/c/electrical-lighting.html): Browse Electrical & Lighting online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Farm & Garden Tools Online in Kenya](https://stermontarcade.co.ke/c/farm-garden-tools.html): Browse Farm & Garden Tools online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Clothing & Fashion Online in Kenya](https://stermontarcade.co.ke/c/fashion.html): Browse Clothing & Fashion online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
@@ -67,8 +68,10 @@
 - [Shop Printers & Office Machines in Kenya](https://stermontarcade.co.ke/c/printers-office-machines.html): Browse Printers & Office Machines online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Protective Wear & Safety in Kenya](https://stermontarcade.co.ke/c/protective-wear-safety.html): Browse Protective Wear & Safety online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Rodent Control Online in Kenya](https://stermontarcade.co.ke/c/rodent-control.html): Browse Rodent Control online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
+- [Shop Security & CCTV Online in Kenya](https://stermontarcade.co.ke/c/security-cctv.html): Browse Security & CCTV online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Seeds & Seedlings Online in Kenya](https://stermontarcade.co.ke/c/seeds-seedlings.html): Browse Seeds & Seedlings online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Shoes Online in Kenya](https://stermontarcade.co.ke/c/shoes.html): Browse Shoes online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
+- [Shop Sporting Goods & Fitness in Kenya](https://stermontarcade.co.ke/c/sporting-goods-fitness.html): Browse Sporting Goods & Fitness online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Sprayers & Equipment Online in Kenya](https://stermontarcade.co.ke/c/sprayers-equipment.html): Browse Sprayers & Equipment online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Cars for Sale in Kenya](https://stermontarcade.co.ke/c/stermont-cars-for-sale.html): Explore brand-new cars for sale in Kenya. Compare model details, indicative prices and photos; confirm availability and the final supplier quote before payment.
 - [Shop Televisions Online in Kenya](https://stermontarcade.co.ke/c/televisions.html): Browse Televisions online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
@@ -78,7 +81,7 @@
 - [TV Wall Mounts & Accessories in Kenya](https://stermontarcade.co.ke/c/tv-mounts-accessories.html): Buy TV wall mounts and brackets online in Kenya. Fixed and tilting mounts for 32 to 60 inch TVs. Pay by M-Pesa, delivery to all 47 counties.
 - [Shop TVs & Audio Online in Kenya](https://stermontarcade.co.ke/c/tvs-audio.html): Browse TVs & Audio online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Veterinary Drugs & Vaccines in Kenya](https://stermontarcade.co.ke/c/veterinary-drugs.html): Browse Veterinary Drugs & Vaccines online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
-- [Washing Machines in Kenya](https://stermontarcade.co.ke/c/washing-machines.html): Buy washing machines online in Kenya, including twin tub models. Pay by M-Pesa, delivery to all 47 counties.
+- [Shop Washing Machines Online in Kenya](https://stermontarcade.co.ke/c/washing-machines.html): Browse Washing Machines online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Watches & Jewellery Online in Kenya](https://stermontarcade.co.ke/c/watches-jewellery.html): Browse Watches & Jewellery online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Water Tanks & Irrigation in Kenya](https://stermontarcade.co.ke/c/water-tanks-irrigation.html): Browse Water Tanks & Irrigation online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Women's Fashion Online in Kenya](https://stermontarcade.co.ke/c/womens-fashion.html): Browse Women's Fashion online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
@@ -162,6 +165,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 700 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 742 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
