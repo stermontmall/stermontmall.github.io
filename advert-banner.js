@@ -1,5 +1,5 @@
 /* Stermont Arcade · Advert banner.
-   Every product marked "Feature as advert / top banner" in the admin Catalog becomes a slide at the top of the home page
+   The 6 newest in-stock products (with a photo) automatically become slides at the top of the home page
    (photo, badge, price with old price and % off, Order now + Add to cart). Auto-rotates, pauses when touched, updates the dots.
    Add at the end of index.html, after account-panel.js:  <script src="advert-banner.js" defer></script> */
 (function () {
@@ -40,7 +40,8 @@
     var age = (Date.now() - new Date(p.created_at).getTime()) / 864e5;
     if (p.stock <= 5) return ['Only ' + p.stock + ' left', 'hot'];
     if (age <= 14) return ['✨ New arrival', ''];
-    return ['🔥 Hot deal', 'hot'];
+    if (+p.old_price > +p.price) return ['🔥 Hot deal', 'hot'];
+    return ['✨ Just in', ''];
   }
   function slide(p, i) {
     var s = mk('div', 'slide ad'), t = mk('div', 'ad-t'), im = mk('div', 'ad-i'), b = badge(p);
@@ -68,6 +69,7 @@
     var sl = D.getElementById('slides'), dots = D.getElementById('dots'); if (!sl || !dots || !rows.length) return;
     var st = mk('style'); st.textContent = css; D.head.appendChild(st);
     var first = sl.firstChild;
+    /* rows are newest first; insert in order so the newest product is the first slide */
     rows.forEach(function (p, i) { if (!sl.querySelector('[data-ad="' + p.id + '"]')) sl.insertBefore(slide(p, i), first); });
     sl.scrollLeft = 0;
     var timer = null, hold = 0;
@@ -94,14 +96,16 @@
   }
 
   /* One slide per product (not per pack size). Sizes of the same product share a variant_group. */
-  function get(q) { return fetch(SB + '/rest/v1/products?' + q, { headers: { apikey: KEY } }); }
-  var BASE = 'active=eq.true&featured=eq.true&stock=gt.0&order=created_at.desc&limit=30&select=';
+  function get(q) { return fetch(SB + '/rest/v1/products?' + q, { headers: { apikey: KEY }, cache: 'no-store' }); }
+  /* newest active, in-stock products first; no "featured" tick needed any more */
+  var BASE = 'active=eq.true&stock=gt.0&order=created_at.desc&limit=40&select=';
   get(BASE + 'id,name,price,old_price,stock,images,created_at,variant_group,variant_label')
     .then(function (r) { return r.ok ? r : get(BASE + 'id,name,price,stock,images,created_at,variant_group,variant_label'); })   /* old_price column not added yet */
     .then(function (r) { return r.ok ? r : get(BASE + 'id,name,price,stock,images,created_at'); })   /* pack-size columns not added yet */
     .then(function (r) { return r.ok ? r.json() : []; })
     .then(function (rows) {
       var seen = {}, out = [];
+      rows = rows.filter(function (p) { return (p.images || []).filter(Boolean).length > 0; });   /* banner slides need a photo */
       rows.forEach(function (p) {
         var k = p.variant_group && p.variant_label ? p.variant_group : null;
         if (!k) { out.push(p); return; }
