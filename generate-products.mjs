@@ -875,3 +875,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-10: rebuild the live catalogue after adding 15 researched agrovet products with verified Supabase photos and Kenya-focused product content.
 
 // 2026-11-10: rebuild the static product catalogue after publishing 20 new agrovet products with Supabase photos.
+
+// 2026-11-10: rebuild after tightening the Marigold Crackerjack SEO title.
