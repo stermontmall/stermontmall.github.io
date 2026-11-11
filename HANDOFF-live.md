@@ -279,3 +279,12 @@
 - `200-micron-uv-greenhouse-polythene-cover-8m-x-15m` draft created at calculated source cost KSh 13,800 (120m² × KSh115/m²); photo imports 1497/1498 failed HTTP 422. Remains inactive.
 - `16mm-0-3mm-double-emitter-drip-tape-1000m-roll` draft created from Hortitechno KSh 7,500/roll; photo import request 1499 failed HTTP 422. Remains inactive.
 - Do not activate failed-image drafts until an exact product image is uploaded and verified. Product-page generation/sitemap refresh not yet verified.
+
+
+## 2026-11-11 — SEO description length audit (owner correction)
+
+- Owner requires 600+ words in every product description (target 600–900 words, original and SKU-specific). Short product blurbs are not acceptable SEO content.
+- Audited active catalogue in Supabase: 892 active products; 402 descriptions are under 600 words; 490 meet the minimum. This is a confirmed content backlog, not a completed fix.
+- The six new poultry/net listings from this batch are currently only 44–56 words and therefore FAIL the owner’s SEO word-count requirement. Their images/prices/activation do not make their descriptions SEO-compliant.
+- Existing `add_draft_product` currently accepts 40–2,000 words, despite PUBLISHING.md specifying 600–900. This validation mismatch must be corrected so future short descriptions cannot pass.
+- Next: remediate descriptions in small, verifiable batches; preserve each existing description in `description_backup` before updates; use product-specific verified facts, Kenyan search intent, meaningful buying/application guidance and FAQs, not repeated filler. Run word-count audit after each batch. Do not claim all catalogue SEO fixed until every active product is >=600 words and quality checked.
