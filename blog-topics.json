@@ -240,7 +240,8 @@
         "/products.html",
         "/blog/how-to-order-and-pay-by-mpesa-online-kenya.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "drafted": "2026-11-06"
     },
     {
       "slug": "travelling-and-bed-bugs-kenya-tips",
