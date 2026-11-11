@@ -253,3 +253,14 @@
 - To avoid publishing potentially misleading images, both rows were set to `active=false`. Their draft records and uploaded files remain for later photo replacement/verification.
 - The insect-exclusion net published earlier remains separate and active.
 - Static page/sitemap generation remains unverified; do not claim generated pages exist until checked.
+
+
+## 2026-11-11 — Existing shade-net draft photo replaced and product activated
+
+- Resumed the existing draft `50-uv-shade-net-4m-x-50m-roll`; no duplicate row was created.
+- Supplier listing: Symnet Agro 50% UV Shade Net, 4m × 50m, KSh 15,000 per roll: https://www.symnet.co.ke/solutions/agro-shade-nets
+- Replaced the prior suspect image using the supplier's shade-net product page via `public.add_product_photo(..., false, false)`. Upload request 1490 returned HTTP 200 and `{ok:true, live:false, photos:1}`.
+- Verified Storage object `product-images/50-uv-shade-net-4m-x-50m-roll.webp`, image/webp, 66,170 bytes, HTTP 200. `products.images` now references the new public URL.
+- Activated the existing row after image and row verification. Final row: active=true, cost KSh 15,000, selling price KSh 19,500 (30% batch markup), stock=1000, low_at=20, featured=false.
+- Mobile-shell link: https://stermontarcade.co.ke/?product=50-uv-shade-net-4m-x-50m-roll
+- Automatic static page/sitemap build is expected within 30 minutes; not yet independently checked.
