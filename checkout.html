@@ -1602,8 +1602,7 @@ try { if (localStorage.getItem('stm_handoff')) { document.documentElement.classN
 <script src="advert-banner.js" defer></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
 <script src="/analytics.js" defer></script><script>
-/* Mobile shell -> checkout handoff. The shell at / stores its cart lines under `stm_handoff` and sends the customer here with ?checkout=1.
-   Once the product cards exist, each line is added through the shop's own STM.add (so prices, delivery fees, M-Pesa and order e-mails stay the one proven flow), then the cart opens. */
+/* Mobile shell -> checkout handoff. Fast path fetches only the exact cart rows, not the full catalogue. */
 (function () {
   var raw; try { raw = localStorage.getItem('stm_handoff'); } catch (e) {}
   if (!raw) return;
@@ -1615,33 +1614,69 @@ try { if (localStorage.getItem('stm_handoff')) { document.documentElement.classN
     d.style.cssText = 'position:fixed;left:8px;right:8px;top:8px;z-index:99999;background:#7c2d12;color:#fff;padding:12px 14px;border-radius:10px;font:600 14px/1.4 system-ui,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3)';
     d.textContent = text + ' (tap to close)'; d.onclick = function () { d.remove(); }; document.body.appendChild(d);
   }
-  var tries = 0, timer = setInterval(function () {
-    tries++;
-    var ready = window.STM && items.every(function (i) { return document.getElementById('p-' + i.rowId); });
-    if (!ready && tries < 80) return;                      /* wait up to ~12 s for the catalog to build the cards */
-    clearInterval(timer);
-    if (!ready) { document.documentElement.classList.remove('stm-co', 'stm-co-wait'); note('The shop is still loading your items. Reload this page to continue to checkout.'); return; }   /* handoff kept, so a reload retries */
+  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+  var wanted = items.map(function (i) { return String(i && i.rowId || ''); }).filter(function (id) { return /^[a-z0-9][a-z0-9-]{0,120}$/i.test(id); });
+  var fast = Promise.resolve(false);
+  if (wanted.length && wanted.length === items.length) {
+    var url = SB + '/rest/v1/products?active=eq.true&id=in.%28' + wanted.map(encodeURIComponent).join('%2C') + '%29&select=id,name,price,stock,images';
+    fast = fetch(url, { headers: { apikey: KEY }, cache: 'no-store', credentials: 'omit' }).then(function (r) {
+      if (!r.ok) throw new Error('Product lookup ' + r.status); return r.json();
+    }).then(function (rows) {
+      if (!Array.isArray(rows)) throw new Error('Invalid product response');
+      var byId = {}; rows.forEach(function (r) { byId[r.id] = r; });
+      var host = document.querySelector('#featured .row') || document.body;
+      items.forEach(function (item) {
+        var id = String(item.rowId), row = byId[id];
+        if (!row || !(Number(row.stock) > 0) || document.getElementById('p-' + id)) return;
+        var card = document.createElement('div'); card.className = 'pcard stm-checkout-fast-card';
+        card.id = 'p-' + id; card.style.cssText = 'position:absolute;left:-100000px;top:0;width:1px;height:1px;overflow:hidden';
+        var title = document.createElement('h3'); title.textContent = item.name || row.name || id;
+        var price = document.createElement('p'); price.className = 'price';
+        price.textContent = 'KSh ' + Math.round(Number(row.price)).toLocaleString('en-KE');
+        card.appendChild(title); card.appendChild(price);
+        if (Array.isArray(row.images) && row.images[0]) { var img = document.createElement('img'); img.src = row.images[0]; img.alt = ''; card.appendChild(img); }
+        host.appendChild(card);
+      });
+      return true;
+    });
+  }
+  function finish() {
+    var missing = items.filter(function (i) { return !document.getElementById('p-' + i.rowId); });
+    if (missing.length) { document.documentElement.classList.remove('stm-co', 'stm-co-wait'); note('Some items could not be loaded. Your cart is saved; please return to the shop and try again.'); return; }
     var skipped = [];
     items.forEach(function (i) {
-      var card = document.getElementById('p-' + i.rowId), pe = card.querySelector('.price'), shown = pe ? parseInt(pe.textContent.replace(/\D/g, ''), 10) : NaN;
-      if (shown !== Number(i.price)) { skipped.push(i.name + (i.size && i.size !== 'Standard' ? ' (' + i.size + ')' : '')); return; }   /* never charge a price the customer did not see */
+      var card = document.getElementById('p-' + i.rowId), pe = card && card.querySelector('.price');
+      var shown = pe ? parseInt(pe.textContent.replace(/\D/g, ''), 10) : NaN;
+      if (shown !== Number(i.price)) { skipped.push(i.name + (i.size && i.size !== 'Standard' ? ' (' + i.size + ')' : '')); return; }
       window.STM.add(card, null, Math.max(1, Math.min(99, parseInt(i.qty, 10) || 1)));
     });
     try { localStorage.removeItem('stm_handoff'); } catch (e) {}
     if (skipped.length) note('Please add these again from the shop, their price changed: ' + skipped.join(', ') + '.');
-    window.STM.open();
-    var root = document.documentElement; root.classList.remove('stm-co-wait');
-    /* Closing the checkout (X, backdrop, or Back) returns to the shell, never to the old home page. If the shop cart is empty the order is done (or everything was removed), so the shell cart is cleared too; otherwise the shell cart is kept. */
+    window.STM.open(); document.documentElement.classList.remove('stm-co-wait');
     var dr = document.getElementById('dr'), leaving = false;
     function leave() {
       if (leaving || dr.classList.contains('on')) return; leaving = true;
       try { if (!Object.keys(JSON.parse(localStorage.getItem('stm_cart') || '{}') || {}).length) localStorage.setItem('shell.cart', '[]'); } catch (e) {}
-      /* Inside the shell's checkout layer: tell the shell to close it (no page change). Opened on its own: go to the shell. */
       if (window.parent !== window) { try { window.parent.postMessage({ stmCheckout: 'closed' }, location.origin); return; } catch (e) {} }
       location.replace('/');
     }
     new MutationObserver(leave).observe(dr, { attributes: true, attributeFilter: ['class'] });
-  }, 150);
+  }
+  var started = Date.now(), completed = false;
+  function poll() {
+    if (completed) return;
+    var ready = window.STM && items.every(function (i) { return document.getElementById('p-' + i.rowId); });
+    if (ready) { completed = true; return finish(); }
+    if (Date.now() - started > 15000) {
+      completed = true; document.documentElement.classList.remove('stm-co', 'stm-co-wait');
+      note('Checkout could not load your items yet. Your cart is saved; tap Retry checkout to try again.');
+      var retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Retry checkout';
+      retry.style.cssText = 'position:fixed;top:62px;left:8px;right:8px;z-index:100000;padding:12px;border:0;border-radius:10px;background:#7c3aed;color:white;font-weight:700';
+      retry.onclick = function () { location.reload(); }; document.body.appendChild(retry); return;
+    }
+    setTimeout(poll, 100);
+  }
+  fast.catch(function () {}).then(poll);
 })();
 </script>
 <script>
