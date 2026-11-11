@@ -143,3 +143,19 @@
 
 ### Next
 - Continue with distinct non-chemical physical exclusion or monitoring products only. Require exact current KES price, exact matching supplier/manufacturer photo, and duplicate-free catalogue check before insertion. Apply the user's batch-specific 30% markup, stock 1,000 and low_at 20 after all evidence is verified.
+
+
+## 2026-11-11 — Owner authorised immediate publication of Knicker gauze wire
+
+### Verified
+- Supplier listing reports Knicker Green Gauze Wire, 3 ft × 25 m (code AHQT-A004-01) in stock at KSh 1,885: https://ahihqtraders.com/products/green-gauze-wire-3ft-25m-roll-wholesale
+- Batch selling price at 30% markup: KSh 2,450.50.
+- Catalogue check did not return an existing green gauze wire / Knicker listing. Relevant categories available: Pest Control & Fumigation (31) and Pest Monitoring & Inspection Tools (91); intended category is Pest Monitoring & Inspection Tools.
+
+### Blocked — not inserted or published
+- Supplier page exposes a product image description (“Roll of green gauze wire mesh”), but no direct, retrievable image URL or image bytes were available from the indexed page. Direct page fetch returned cache miss; exact-image search did not yield a downloadable asset.
+- Per mandatory photo rule, do not create an active listing or claim publication without an exact verified image (minimum 450×450), uploaded to Storage, and referenced in products.images.
+- Owner explicitly authorised immediate publication, but authorisation does not waive the exact-photo requirement. No product row was inserted, no image uploaded, and no activation performed.
+
+### Next exact action
+- Obtain the exact Knicker Green Gauze Wire product image from AHIHQ Traders (or another official supplier/manufacturer source) as a direct accessible image URL or upload. Then upload/verify Storage object and image array, insert with cost KSh 1,885, price KSh 2,450.50, stock 1,000, low_at 20, and activate. Do not substitute generic imagery.
