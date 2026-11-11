@@ -69,3 +69,21 @@
 - 30% markup was applied as a batch-specific owner override. Leave the global 15% default unchanged for future batches unless the owner changes it.
 - Descriptions are concise and SKU-specific; do not pad them to satisfy the stale 600–900-word helper check.
 - Keep the four deleted, failed-photo candidates out of the catalogue; do not recreate them without a verified image source.
+
+
+## 2026-11-11 — Follow-up pest-control batch: blocked before insertion
+
+### Status
+- No products were created or activated in this follow-up batch.
+- Duplicate check found several candidate non-chemical items already in the live catalogue, including door sweeps, universal fly-light glue monitors, UV replacement tubes, and multiple insect monitoring products. These must not be duplicated under new IDs.
+- The currently confirmed Kenyan supplier pages for the door sweep and fly-glue board also correspond to products already represented in the catalogue; they do not establish 20 new distinct SKUs.
+- Product photos remain mandatory. No new photo was uploaded or marked attached in this step.
+
+### Publishing-rule conflict to resolve in implementation
+- Owner's batch instruction in chat requests 30% markup; the database helper `public.add_draft_product` hardcodes 15%. Do not call it for this batch unless the 30% override is implemented without changing the global default.
+- Existing playbook requires 600–900-word descriptions. Keep descriptions SKU-specific and do not pad with generic copy.
+
+### Next
+- Continue researching distinct, non-chemical and age-appropriate pest-exclusion / monitoring products only.
+- For each candidate, require an exact current KES supplier price, a matching direct product photo, and a duplicate-free catalogue check before insertion.
+- If fewer than 20 can be fully verified, publish only the verified eligible items and report the remainder as blocked; never fabricate products, costs or images.
