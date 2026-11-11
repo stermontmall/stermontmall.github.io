@@ -104,3 +104,25 @@
 
 ### Next exact action
 - Obtain a directly verifiable product photo for the Ragsons 4 ft × 20 m green insect mesh and/or the Generation Space sweep net; then insert only if the exact current KES source price and stock are confirmed, apply the batch-specific 30% markup, upload through public.add_product_photo, verify the Storage object and products.images, and only then activate.
+
+## 2026-11-11 — Sweep net product published
+
+### Published
+- Product: Sweep Net for Insect Collection
+- Product ID / slug: `sweep-net-for-insect-collection`
+- Category: Pest Monitoring & Inspection Tools (category 91)
+- Price source: Generation Space, KSh 618.00, listed in stock: https://generationspace.co.ke/product/sweep-net/
+- Photo source: ScienceLab Sweep Net listing: https://sciencelab.co.ke/products/sweep-net/
+- Photo uploaded to public Storage bucket as `product-images/sweep-net-for-insect-collection.webp`; Storage metadata reports image/webp, 28,634 bytes, HTTP status 200.
+- `products.images` contains the public Storage URL.
+- `active=true`, `stock=1000`, `low_at=20`, `featured=false`.
+- Cost KSh 618.00; selling price KSh 803.40 (30% batch-specific markup). Global 15% default unchanged.
+- Mobile-shell link: https://stermontarcade.co.ke/?product=sweep-net-for-insect-collection
+
+### Notes
+- No existing exact product name or ID was found before insertion.
+- Description uses only supplier-confirmed details; handle variant, dimensions and weight remain unspecified and are flagged for supplier confirmation.
+- The product is a non-chemical field-sampling tool, not a chemical pest treatment.
+- The database row and Storage object are verified. The web fetch tool could not independently render the Storage URL, but Storage metadata confirms HTTP 200 and the image reference is present.
+- Product-page workflow dispatch is still pending because no GitHub workflow-dispatch action is exposed in the connected toolset. Do not edit generated HTML or workflow files. Run the documented dispatch when an Actions-capable GitHub session is available:
+  `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`
