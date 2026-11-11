@@ -244,3 +244,12 @@
 - Product page/sitemap generation has not yet been independently checked. The current site playbook says the automatic build runs every 30 minutes; verify generated page and sitemap after that window.
 
 - Follow-up GitHub check after publication: generated page `p/uv-stabilised-hdpe-insect-net-3m-x-50m.html` is not present yet, and sitemap-products.xml does not yet include this slug. Recheck after the automatic 30-minute build window; do not claim the static page is generated until both are present.
+
+
+## 2026-11-11 — Nursery tray and shade-net candidates held back
+
+- Created draft catalogue rows for `uv-treated-seedling-propagation-tray` (source KSh 100, 30% markup KSh 130) and `50-uv-shade-net-4m-x-50m-roll` (source KSh 15,000, 30% markup KSh 19,500).
+- Both supplier-page photo imports returned HTTP 200 and produced Storage objects, but both files have the same 1,255,029-byte size and identical ETag. That suggests the page importer may have captured a shared/default site image rather than distinct product-specific photos.
+- To avoid publishing potentially misleading images, both rows were set to `active=false`. Their draft records and uploaded files remain for later photo replacement/verification.
+- The insect-exclusion net published earlier remains separate and active.
+- Static page/sitemap generation remains unverified; do not claim generated pages exist until checked.
