@@ -1,6 +1,8 @@
 /* Stermont Arcade · publishes products added in the admin onto the storefront (cards + Jumia-style product view).
    Loaded at the end of index.html:  <script src="storefront-live.js" defer></script> */
 (function () {
+  // Checkout has its own lightweight cart flow. Do not start the full catalogue fetch or product UI there.
+  if (document.documentElement.classList.contains('stm-co')) return;
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', D = document, WA = '254748888230';
   function money(n) { return 'KSh ' + Math.round(n).toLocaleString('en-KE'); }
   function mk(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
