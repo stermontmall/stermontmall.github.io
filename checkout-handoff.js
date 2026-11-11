@@ -1,12 +1,69 @@
-/* Checkout hand-off failsafe (2026-11-11).
+/* Checkout hand-off failsafe + self-heal (2026-11-11).
    checkout.html covers the page with "Preparing your checkout..." (html.stm-co-wait) until the shell's cart has been
    rebuilt and the checkout panel has opened. If anything in that hand-off failed, the cover stayed forever with no message.
-   checkout.html itself gives up after about 12 s, so this waits 16 s, then lifts the cover and shows a message with ways forward.
-   It does nothing on any other page, and nothing when the checkout opened normally (the cover class is already gone by then). */
+   checkout.html itself gives up after about 15 s, so this waits 16 s, then lifts the cover and shows a message with ways forward.
+   It does nothing on any other page, and nothing when the checkout opened normally (the cover class is already gone by then).
+
+   SELF-HEAL: checkout.html looks the cart items up in Supabase ONCE. On a weak mobile connection that single request can
+   fail or hang, and then the checkout gave up even though the products are fine. If the cart cards are still missing about
+   2.5 s after the page loads, this script repeats the lookup (short timeout, up to 5 tries, inside the same 15 s window) and
+   adds the same hidden cards, so checkout.html's own poll finds them and opens normally. Cards that already exist are never
+   touched, so it cannot double up the cart. Everything is wrapped in try/catch and can never block checkout. */
 (function () {
   try {
     var root = document.documentElement;
     if (!root.classList.contains('stm-co-wait')) return;
+
+    /* ---- self-heal: retry the cart lookup if the first one did not produce the cards ---- */
+    try {
+      (function () {
+        var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+        var items; try { items = JSON.parse(localStorage.getItem('stm_handoff') || 'null'); } catch (e) { items = null; }
+        if (!Array.isArray(items) || !items.length) return;
+        var ids = items.map(function (i) { return String(i && i.rowId || ''); }).filter(function (id) { return /^[a-z0-9][a-z0-9-]{0,120}$/i.test(id); });
+        if (!ids.length || ids.length !== items.length) return;
+        var tries = 0, t0 = Date.now();
+        function missing() { return ids.filter(function (id) { return !document.getElementById('p-' + id); }); }
+        function host() {
+          var h = document.getElementById('stm-fast-cards');
+          if (!h) {
+            h = document.createElement('div'); h.id = 'stm-fast-cards'; h.setAttribute('aria-hidden', 'true');
+            h.style.cssText = 'position:absolute;left:-100000px;top:0;width:1px;height:1px;overflow:hidden';
+            document.body.appendChild(h);
+          }
+          return h;
+        }
+        function attempt() {
+          try {
+            if (!root.classList.contains('stm-co-wait')) return;            /* checkout already opened or gave up */
+            var miss = missing(); if (!miss.length) return;                  /* all cards present: nothing to heal */
+            if (++tries > 5 || Date.now() - t0 > 14000) return;
+            var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function () { if (ctl) ctl.abort(); }, 6000);
+            var url = SB + '/rest/v1/products?active=eq.true&id=in.%28' + miss.map(encodeURIComponent).join('%2C') + '%29&select=id,name,price,stock,images';
+            fetch(url, { headers: { apikey: KEY }, cache: 'no-store', credentials: 'omit', signal: ctl ? ctl.signal : undefined }).then(function (r) {
+              clearTimeout(to); if (!r.ok) throw new Error('Product lookup ' + r.status); return r.json();
+            }).then(function (rows) {
+              if (!Array.isArray(rows)) throw new Error('Invalid product response');
+              var byId = {}; rows.forEach(function (r) { byId[r.id] = r; });
+              items.forEach(function (item) {
+                var id = String(item.rowId), row = byId[id];
+                if (!row || !(Number(row.stock) > 0) || document.getElementById('p-' + id)) return;
+                var card = document.createElement('div'); card.className = 'pcard stm-checkout-fast-card'; card.id = 'p-' + id;
+                var title = document.createElement('h3'); title.textContent = item.name || row.name || id;
+                var price = document.createElement('p'); price.className = 'price'; price.textContent = 'KSh ' + Math.round(Number(row.price)).toLocaleString('en-KE');
+                card.appendChild(title); card.appendChild(price);
+                if (Array.isArray(row.images) && row.images[0]) { var img = document.createElement('img'); img.src = row.images[0]; img.alt = ''; card.appendChild(img); }
+                host().appendChild(card);
+              });
+              if (missing().length) setTimeout(attempt, 1500);
+            }).catch(function () { clearTimeout(to); setTimeout(attempt, 1500); });
+          } catch (e) {}
+        }
+        setTimeout(attempt, 2500);
+      })();
+    } catch (e) {}
+
+    /* ---- failsafe: lift the cover and show a message if checkout still has not opened ---- */
     setTimeout(function () {
       try {
         if (!root.classList.contains('stm-co-wait')) return;
