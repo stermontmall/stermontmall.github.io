@@ -87,3 +87,20 @@
 - Continue researching distinct, non-chemical and age-appropriate pest-exclusion / monitoring products only.
 - For each candidate, require an exact current KES supplier price, a matching direct product photo, and a duplicate-free catalogue check before insertion.
 - If fewer than 20 can be fully verified, publish only the verified eligible items and report the remainder as blocked; never fabricate products, costs or images.
+
+
+## 2026-11-11 — New-catalogue pest-exclusion research
+
+### Done
+- Rechecked the live catalogue for mosquito net kits, insect-screen mesh, door seals/sweeps and insect sweep nets. The catalogue already has the Mosquito Window Net Kit and two door-sweep listings; do not duplicate those.
+- Identified a potentially new local listing: Ragsons Insect Screen Mesh, 4 ft × 20 m, green, KES 3,694.59. Supplier page: https://www.ragsons.co.ke/shop/insect-screen-mesh-6966. Supplier's direct product image URL is exposed in the indexed page: https://www.ragsons.co.ke/web/image/product.template/6966/image_1920?unique=6e490f8. The supplier page could not be opened by the browser during this run, so image dimensions/visual match and current stock could not be independently checked.
+- Identified a generic Sweep Net for Insect Collection at KES 618 from Generation Space: https://generationspace.co.ke/product/sweep-net/. The product page lists it in stock, but its image link resolves to a lazy-loading placeholder in the browser, not the product photograph. A second local listing at ScienceLab is KES 650: https://sciencelab.co.ke/products/sweep-net.
+- Confirmed these are non-chemical physical screening / insect-monitoring items; excluded pesticide, insecticide, rodenticide and other hazardous chemical listings from this research.
+
+### Blocked — not published
+- No new row was inserted or activated. Neither candidate currently has an independently verified, accessible exact product image (minimum 450 × 450) that can be checked in Storage after upload.
+- The live publishing helper still applies 15% markup. Owner's earlier batch-specific 30% request must be applied by a safe batch override, not by silently calling the helper and accepting 15%.
+- Do not claim the above candidates are live. Do not use generic or mismatched photos.
+
+### Next exact action
+- Obtain a directly verifiable product photo for the Ragsons 4 ft × 20 m green insect mesh and/or the Generation Space sweep net; then insert only if the exact current KES source price and stock are confirmed, apply the batch-specific 30% markup, upload through public.add_product_photo, verify the Storage object and products.images, and only then activate.
