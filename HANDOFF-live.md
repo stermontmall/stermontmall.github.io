@@ -159,3 +159,11 @@
 
 ### Next exact action
 - Obtain the exact Knicker Green Gauze Wire product image from AHIHQ Traders (or another official supplier/manufacturer source) as a direct accessible image URL or upload. Then upload/verify Storage object and image array, insert with cost KSh 1,885, price KSh 2,450.50, stock 1,000, low_at 20, and activate. Do not substitute generic imagery.
+
+
+## 2026-11-11 — Online image search for Knicker Green Gauze Wire
+
+- Re-searched the exact Knicker product and AHIHQ collection. Supplier listing confirms KSh 1,885 and 3 ft × 25 m; the page only exposes the alt description “Roll of green gauze wire mesh” in indexed text, not a retrievable direct image URL.
+- Found visually similar green gauze/screen rolls on Takealot and Auto Paints & Plates, but their visible labels/specifications are 900 mm × 30 m and/or MTS brand, not Knicker 3 ft × 25 m. Also found unrelated green PVC-coated welded mesh images. Rejected all as mismatched product photos; do not upload them for this SKU.
+- Supplier page direct fetch/download failed. No exact image was retrieved, uploaded, or verified. Product remains unpublished; no database writes made.
+- Next: request/obtain AHIHQ's own product image or use an exact Knicker 3 ft × 25 m image from its manufacturer/authorised distributor. Do not use a visually similar substitute as if it were the listed product.
