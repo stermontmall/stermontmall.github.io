@@ -288,3 +288,11 @@
 - The six new poultry/net listings from this batch are currently only 44–56 words and therefore FAIL the owner’s SEO word-count requirement. Their images/prices/activation do not make their descriptions SEO-compliant.
 - Existing `add_draft_product` currently accepts 40–2,000 words, despite PUBLISHING.md specifying 600–900. This validation mismatch must be corrected so future short descriptions cannot pass.
 - Next: remediate descriptions in small, verifiable batches; preserve each existing description in `description_backup` before updates; use product-specific verified facts, Kenyan search intent, meaningful buying/application guidance and FAQs, not repeated filler. Run word-count audit after each batch. Do not claim all catalogue SEO fixed until every active product is >=600 words and quality checked.
+
+
+## 2026-11-11 — Corrected the five recent live product descriptions
+
+- Owner called out the five recent product uploads as messy/short. Backed up original descriptions into `public.product_description_backups` before edits.
+- Rewrote all five descriptions with product-specific sections (overview, facts/specifications, use/planning, buying guide, care, FAQs and Kenyan search intent), 600+ words each. No price, stock, image, slug or activation changes.
+- Verified word counts: 5kg broiler feeder 778; 3L manual drinker 733; 6L manual drinker 770; 24-hole trough feeder 735; UV bird net 748. All five remain active with their existing images and verified source-price rows.
+- Next: enforce 600–900 words at the database publishing function and repair remaining catalogue descriptions in audited batches; active catalogue audit previously found 402/892 under 600 words.
