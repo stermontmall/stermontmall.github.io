@@ -126,3 +126,20 @@
 - The database row and Storage object are verified. The web fetch tool could not independently render the Storage URL, but Storage metadata confirms HTTP 200 and the image reference is present.
 - Product-page workflow dispatch is still pending because no GitHub workflow-dispatch action is exposed in the connected toolset. Do not edit generated HTML or workflow files. Run the documented dispatch when an Actions-capable GitHub session is available:
   `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`
+
+
+## 2026-11-11 — Continued non-chemical pest-exclusion research
+
+### Done
+- Rechecked the live catalogue for mosquito/insect mesh products. Existing mosquito window net kit is already active; do not duplicate it.
+- Found a distinct candidate: Knicker Green Gauze Wire 3 ft × 25 m, listed in stock at KSh 1,885 by AHIHQ Traders (Nairobi): https://ahihqtraders.com/products/green-gauze-wire-3ft-25m-roll-wholesale. The supplier page describes a woven screen for windows, vents and doors that keeps mosquitoes and flies out while allowing airflow. Batch selling price at 30% markup would be KSh 2,450.50.
+- A second candidate, Ragsons Insect Screen Mesh 4 ft × 20 m, lists KES 3,694.59 and a supplier image URL: https://www.ragsons.co.ke/shop/insect-screen-mesh-6966. The page lists colour variants but stock for the selected variant was not confirmed.
+- Search-result image data showed a product image for Knicker green gauze wire, but no accessible direct image URL was exposed. Attempts to open supplier pages and the Ragsons direct image failed; the direct image download also failed.
+
+### Blocked — not published
+- No new row inserted or activated. Exact product photograph could not be downloaded and verified at 450×450 minimum, so publication requirement is not met.
+- Do not substitute a generic mesh photo or use an unrelated image. Existing catalogue contains the Mosquito Window Net Kit, so that SKU is not a new candidate.
+- No product page, sitemap or build changes were made in this step.
+
+### Next
+- Continue with distinct non-chemical physical exclusion or monitoring products only. Require exact current KES price, exact matching supplier/manufacturer photo, and duplicate-free catalogue check before insertion. Apply the user's batch-specific 30% markup, stock 1,000 and low_at 20 after all evidence is verified.
