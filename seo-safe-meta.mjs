@@ -36,9 +36,37 @@ export const SAFE_META = Object.freeze({
     id: 'waanzilish-mens-black-feather-casual-sneakers',
     description: 'Waanzilish men’s black feather casual sneakers with white sole. Check listing details and delivery options in Kenya; M-Pesa checkout.'
   },
+  'asus-zenbook-14-oled-laptop.html': {
+    id: 'asus-zenbook-14-oled-laptop',
+    description: 'ASUS Zenbook 14 OLED laptop. Check the Kenya listing for its configuration, current price and delivery options; pay by M-Pesa at Stermont Arcade.'
+  },
+  'classic-mens-black-formal-blazer.html': {
+    id: 'classic-men-s-black-formal-blazer-piece',
+    description: "Classic men's black formal blazer (piece). Review the Kenya listing for available details and delivery options; M-Pesa checkout at Stermont Arcade."
+  },
   'ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd.html': {
     id: 'ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd',
     description: 'ECOMAX 2.1-channel multimedia speakers with Bluetooth, USB/SD and remote. Review the Kenya listing and checkout using M-Pesa.'
+  }
+  'itel-smartphone.html': {
+    id: 'itel-smartphone',
+    description: 'Itel Smartphone listing in Kenya. Review the available model details, current price and delivery options on Stermont Arcade; checkout with M-Pesa.'
+  },
+  'infinix-smart-20-4gb-64gb.html': {
+    id: 'infinix-smart-20-4gb-64gb-20261108',
+    description: 'Infinix Smart 20 with 4GB RAM and 64GB storage. Check the Kenya listing for price, available details and delivery options; M-Pesa checkout.'
+  },
+  'infinix-smart-20-4gb-128gb.html': {
+    id: 'infinix-smart-20-4gb-128gb-20261108',
+    description: 'Infinix Smart 20 with 4GB RAM and 128GB storage. Check the Kenya listing for price, available details and delivery options; M-Pesa checkout.'
+  },
+  'apple-iphone-16-128gb-green.html': {
+    id: 'apple-iphone-16-128gb-green',
+    description: 'Apple iPhone 16 128GB in Green, with A18 chip and 6.1-inch Super Retina XDR display. Review the Kenya listing; M-Pesa checkout.'
+  },
+  'apple-iphone-16-128gb-white.html': {
+    id: 'apple-iphone-16-128gb-white',
+    description: 'Apple iPhone 16 128GB in White, with A18 chip and 6.1-inch Super Retina XDR display. Review the Kenya listing; M-Pesa checkout.'
   }
 });
 
