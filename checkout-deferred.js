@@ -44,11 +44,19 @@
       window.addEventListener('storage', function (e) { if (e.key && e.key.indexOf('-auth-token') > -1) { checkWho(); if (isOpen) render(); } });
       var counties = [].map.call(D.querySelectorAll('.counties li'), function (l) { return l.textContent; });
 
-      D.querySelectorAll('#featured .pcard:not(.cta)').forEach(function (c) {
-        c.id = 'p-' + slug(c.querySelector('h3').textContent);
-        var old = c.querySelector('.btn'), b = h('button', 'btn btn-main', 'Add to cart'); b.type = 'button';
-        old.parentNode.insertBefore(b, old); old.className = 'btn btn-alt';
-        b.addEventListener('click', function () { add(c, b); });
+      /* FIX (2026-11-11): checkout.html's fast cart hand-off adds hidden .stm-checkout-fast-card elements (no button, id = the real product id)
+         to #featured .row. If that lookup finished BEFORE this script ran (very common on a slow connection, because this file is big),
+         this loop picked those cards up, rewrote their ids and then crashed on the missing button, so window.STM was never defined
+         and checkout always ended on "Checkout could not load your items yet". Skip those cards and never throw here. */
+      D.querySelectorAll('#featured .pcard:not(.cta):not(.stm-checkout-fast-card)').forEach(function (c) {
+        try {
+          var hh = c.querySelector('h3'), old = c.querySelector('.btn');
+          if (!hh || !old || !old.parentNode) return;
+          c.id = 'p-' + slug(hh.textContent);
+          var b = h('button', 'btn btn-main', 'Add to cart'); b.type = 'button';
+          old.parentNode.insertBefore(b, old); old.className = 'btn btn-alt';
+          b.addEventListener('click', function () { add(c, b); });
+        } catch (e) {}
       });
 
       function info(id) {
