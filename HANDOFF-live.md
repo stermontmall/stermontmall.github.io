@@ -167,3 +167,20 @@
 - Found visually similar green gauze/screen rolls on Takealot and Auto Paints & Plates, but their visible labels/specifications are 900 mm × 30 m and/or MTS brand, not Knicker 3 ft × 25 m. Also found unrelated green PVC-coated welded mesh images. Rejected all as mismatched product photos; do not upload them for this SKU.
 - Supplier page direct fetch/download failed. No exact image was retrieved, uploaded, or verified. Product remains unpublished; no database writes made.
 - Next: request/obtain AHIHQ's own product image or use an exact Knicker 3 ft × 25 m image from its manufacturer/authorised distributor. Do not use a visually similar substitute as if it were the listed product.
+
+
+## 2026-11-11 — Poultry equipment batch: two drafts created, image upload blocked
+
+### Researched and inserted as inactive drafts
+- WQ 3kg Poultry Feeder – Floor or Hanging. MyAgrovet source price KSh 600: https://myagrovet.com/product/premium-3kg-uv-resistant-poultry-feeder-dual-mount-system. Batch price at 30% markup: KSh 780. Draft ID: `wq-3kg-poultry-feeder-dual-mount`.
+- 1.5kg Poultry Feeder with Anti-Scatter Ring. Ecochicks source price KSh 180: https://ecochickspoultry.com/shop/1-5kg-poultry-feeder-with-anti-scatter-ring/. Batch price at 30% markup: KSh 234. Draft ID: `1-5kg-poultry-feeder-anti-scatter-ring`.
+- Both have stock=1000, low_at=20, featured=false, category_id=44, active=false.
+
+### Blocked — not published
+- Exact 512×512 product image results were found for both products on MyAgrovet, but the upload-photos endpoint rejected both image URLs with HTTP 422: “link is a web page, not a direct image file; use the direct image link or send image_base64”.
+- No Storage object was created and both products.images arrays remain empty. Both rows remain inactive. Do not activate or report as published.
+- Upload request 1481 failed for the WQ 3kg feeder; request 1482 failed for the 1.5kg anti-scatter feeder.
+- Existing catalogue duplicate check returned no matching exact WQ 3kg or 1.5kg anti-scatter item.
+
+### Next exact action
+- Obtain accessible image bytes or a direct image URL that the upload endpoint can fetch for each exact product. Upload and verify Storage object + products.images, then activate only after verification. Continue the remaining batch only with distinct safe poultry/farm equipment; no chemicals or veterinary medicines.
