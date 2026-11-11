@@ -38,3 +38,11 @@ Direct workflow page: https://github.com/stermontmall/stermontmall.github.io/act
 - [x] Confirmed the shell checkout handoff routes to `/classic.html?checkout=1` and loads `checkout-deferred.js`; checkout route remains exempt from the storefront shell redirect.
 - [!] Payment acceptance still depends on Supabase Edge Function `paystack-init` having a valid live Paystack secret (`sk_live_...`) and the merchant account being live. I could not inspect the secret value through available Supabase tools or verify a live charge in this session. Do not claim live card payment was tested.
 - [ ] Next verification: run checkout on the live website with a cart, confirm card option renders, and complete a Paystack live test/real authorized payment; inspect Paystack dashboard and Supabase `card_payments` + order record.
+
+
+## 2026-11-11 — checkout handoff performance fix
+- [x] Found the mobile-shell checkout wait was coupled to the storefront's full product-card build. The storefront fetches the complete active catalogue (including descriptions), so checkout could remain on “Preparing your checkout...” on slower mobile connections.
+- [x] Updated the inline handoff in `checkout.html` to fetch only the exact product rows in `stm_handoff` from Supabase REST (`id=in.(...)`, selecting id/name/price/stock/images), create minimal off-screen checkout cards, and hand them to the existing `STM.add` flow. Live database prices are still compared with the price shown in the shell; changed prices are refused.
+- [x] Start handoff polling immediately while the targeted request runs; retain the full-catalogue cards as fallback. Added a bounded 15-second failure state with a retry button instead of an indefinite loading cover. Cart handoff remains saved if products cannot be loaded.
+- [x] GitHub commit on `main`: `d1c1a6aedb4c27ecd5a3d1134a1cc1f14052ccb3` (follow-up to `fc00285840300e6d1a3898060d738b8050a1b124`).
+- [!] This is a code-level fix committed to GitHub; a live customer checkout and payment were not submitted in this session. The Paystack card option remains deliberately fail-closed in `checkout-deferred.js` (`CFG.card: false`) until live credentials and a real payment flow are verified; do not claim card payment is live based on the old progress note.
