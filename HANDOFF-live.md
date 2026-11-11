@@ -203,3 +203,30 @@
 
 ### Remaining
 - Product rows and image objects are verified in Supabase. GitHub product-page generation and sitemap refresh have not been dispatched or verified; no claim that generated static pages are updated.
+
+
+## 2026-11-11 — Safe farm-protection catalogue continuation
+
+### Scope
+- Continue only with non-chemical crop protection, physical exclusion, nursery and irrigation supplies. Do not add or promote pesticides, herbicides, insecticides, rodenticides, toxic baits or other hazardous chemical products.
+- Do not alter existing catalogue products.
+
+### Research completed
+- Reviewed the live product catalogue for duplicates. Existing products already include a crop-support net, mosquito window net kit, insect-monitoring traps, yellow sticky monitoring boards, sweep net, and several other pest-control listings; do not recreate these under new IDs.
+- Found Kenyan supplier listings for agricultural insect netting, bird netting, shade nets, greenhouse materials and nursery supplies:
+  - Afeef Maimun agricultural nets: https://afeefmaimun.com/c/agriculture/agricultural-nets/ (published specifications and prices; page fetch failed during verification).
+  - Afeef Maimun agriculture catalogue: https://afeefmaimun.com/c/agriculture/
+  - Hortitechno insect net page: https://hortitechnogreenhouses.com/product/insect-nets-kenya/; product photo URL exposed as https://hortitechnogreenhouses.com/wp-content/uploads/2021/04/net-600x629.jpg. Page specifies 40-mesh insect net in 2.5m x 50m and 3m x 50m sizes, but the page does not provide an exact price for either configuration.
+  - Hortitechno seedling tray page: https://hortitechnogreenhouses.com/product/planting-trays-kenya/; direct photo https://hortitechnogreenhouses.com/wp-content/uploads/2021/04/tray-600x394.jpg. The page describes 50, 66, 78, 128, 200 and 288 cell variants, but the image height is below the 450px minimum.
+  - Symnet 50-mesh insect net listing: https://www.symnet.co.ke/solutions/insect-nets; publishes prices for 3m x 50m and 5.5m x 50m rolls, but exact direct product photo verification is still outstanding.
+  - Symnet shade net pricing: https://www.symnet.co.ke/solutions/agro-shade-nets; publishes several shade-net sizes and prices, but exact direct product photo verification is still outstanding.
+- Web retrieval failed to fetch the candidate direct images during this pass. No new photo was uploaded or verified in Supabase Storage.
+
+### Blocked — no products published in this continuation
+- No new product row was inserted or activated. This is intentional: each product needs an exact current KES supplier price, a duplicate-free catalogue check, and a sharp exact product photo of at least 450 x 450 that can be uploaded and verified.
+- The requested 600+ word descriptions must remain factual and SKU-specific. Do not pad with repetitive generic SEO copy when the source does not provide enough product detail.
+- No product-page workflow was dispatched; no new static pages or sitemap entries are claimed.
+
+### Next
+- Continue only with safe non-chemical physical barriers and ordinary farm supplies.
+- Publish only the individually verified items; if the evidence does not support 30 distinct SKUs, report the smaller verified count rather than inventing products, prices or photos.
