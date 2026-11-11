@@ -1676,7 +1676,7 @@ try { if (localStorage.getItem('stm_handoff')) { document.documentElement.classN
     }
     setTimeout(poll, 100);
   }
-  fast.catch(function () {}).then(poll);
+  fast.catch(function () {}); poll();
 })();
 </script>
 <script>
