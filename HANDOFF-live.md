@@ -242,3 +242,5 @@
 - Supabase row verified: active=true, stock=1000, low_at=20, featured=false, one image.
 - First upload attempt from Irri-hub page returned HTTP 404; it was not attached. The successful image was sourced from Symnet's 50-mesh product page.
 - Product page/sitemap generation has not yet been independently checked. The current site playbook says the automatic build runs every 30 minutes; verify generated page and sitemap after that window.
+
+- Follow-up GitHub check after publication: generated page `p/uv-stabilised-hdpe-insect-net-3m-x-50m.html` is not present yet, and sitemap-products.xml does not yet include this slug. Recheck after the automatic 30-minute build window; do not claim the static page is generated until both are present.
