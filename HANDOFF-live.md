@@ -264,3 +264,18 @@
 - Activated the existing row after image and row verification. Final row: active=true, cost KSh 15,000, selling price KSh 19,500 (30% batch markup), stock=1000, low_at=20, featured=false.
 - Mobile-shell link: https://stermontarcade.co.ke/?product=50-uv-shade-net-4m-x-50m-roll
 - Automatic static page/sitemap build is expected within 30 minutes; not yet independently checked.
+
+
+
+## 2026-11-11 — Additional safe farm products published
+
+- `5-kg-broiler-chicken-feeder`: Mkulima Jovial cost KSh 450, retail price KSh 585 (30% markup); photo import request 1491 HTTP 200; active=true; stock=1000; low_at=20.
+- `uv-treated-bird-net-4m-x-50m-roll`: Symnet supplier cost KSh 12,500, selling KSh 16,250; photo import request 1493 HTTP 200; active=true; stock=1000; low_at=20. Supplier: https://www.symnet.co.ke/solutions/bird-nets.
+- `6-litre-manual-chicken-drinker`: Mkulima Jovial cost KSh 450, selling KSh 585; request 1494 HTTP 200; active=true; stock=1000; low_at=20.
+- `3-litre-manual-chicken-drinker`: Mkulima Jovial cost KSh 350, selling KSh 455; request 1495 HTTP 200; active=true; stock=1000; low_at=20.
+- `24-hole-chicken-trough-feeder`: Mkulima Jovial cost KSh 250, selling KSh 325; request 1496 HTTP 200; active=true; stock=1000; low_at=20.
+- Product rows and image URLs verified in Supabase; source price links and factual descriptions stored in each product record.
+- `40-mesh-insect-net-2-5m-x-50m-roll` draft was created from Hortitechno KSh 100/m² (calculated KSh 12,500 for 2.5m×50m), but photo import request 1492 failed HTTP 422 (network timeout). Remains inactive; not reported live.
+- `200-micron-uv-greenhouse-polythene-cover-8m-x-15m` draft created at calculated source cost KSh 13,800 (120m² × KSh115/m²); photo imports 1497/1498 failed HTTP 422. Remains inactive.
+- `16mm-0-3mm-double-emitter-drip-tape-1000m-roll` draft created from Hortitechno KSh 7,500/roll; photo import request 1499 failed HTTP 422. Remains inactive.
+- Do not activate failed-image drafts until an exact product image is uploaded and verified. Product-page generation/sitemap refresh not yet verified.
