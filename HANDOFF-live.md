@@ -230,3 +230,15 @@
 ### Next
 - Continue only with safe non-chemical physical barriers and ordinary farm supplies.
 - Publish only the individually verified items; if the evidence does not support 30 distinct SKUs, report the smaller verified count rather than inventing products, prices or photos.
+
+
+## 2026-11-11 — UV-stabilised insect-exclusion net published
+
+- Added and activated `uv-stabilised-hdpe-insect-net-3m-x-50m`.
+- Supplier: Irri-hub, product page https://shop.irrihub.com/products/pro-insect-net; published KSh 15,000 for the 3m × 50m configuration.
+- The 30% batch markup gives source cost KSh 15,000 and selling price KSh 19,500.
+- Description records material, dimensions, coverage calculation and buyer checks without unsupported claims or repetitive SEO padding.
+- Photo upload from the Symnet exact 50-mesh 3m × 50m product page succeeded (HTTP 200). Public Storage object: `product-images/uv-stabilised-hdpe-insect-net-3m-x-50m.jpg`, JPEG 39,669 bytes; `products.images` contains the public URL.
+- Supabase row verified: active=true, stock=1000, low_at=20, featured=false, one image.
+- First upload attempt from Irri-hub page returned HTTP 404; it was not attached. The successful image was sourced from Symnet's 50-mesh product page.
+- Product page/sitemap generation has not yet been independently checked. The current site playbook says the automatic build runs every 30 minutes; verify generated page and sitemap after that window.
