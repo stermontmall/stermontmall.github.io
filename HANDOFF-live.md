@@ -184,3 +184,22 @@
 
 ### Next exact action
 - Obtain accessible image bytes or a direct image URL that the upload endpoint can fetch for each exact product. Upload and verify Storage object + products.images, then activate only after verification. Continue the remaining batch only with distinct safe poultry/farm equipment; no chemicals or veterinary medicines.
+
+
+## 2026-11-11 — Poultry feeder drafts activated after image-link upload fix
+
+### Published in Supabase
+- WQ 3kg Poultry Feeder – Floor or Hanging
+  - ID/slug: `wq-3kg-poultry-feeder-dual-mount`
+  - Source cost: KSh 600; selling price: KSh 780 (30% batch markup)
+  - Public image: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/wq-3kg-poultry-feeder-dual-mount.webp
+- 1.5kg Poultry Feeder with Anti-Scatter Ring
+  - ID/slug: `1-5kg-poultry-feeder-anti-scatter-ring`
+  - Source cost: KSh 180; selling price: KSh 234 (30% batch markup)
+  - Public image: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/1-5kg-poultry-feeder-anti-scatter-ring.jpg
+- Both product rows are now active=true, stock=1000, low_at=20, featured=false.
+- Both image URLs are present in products.images. Storage metadata verifies public bucket objects: WQ image image/webp, 57,376 bytes, HTTP 200; 1.5kg feeder image image/jpeg, 43,123 bytes, HTTP 200.
+- Catalogue check found no exact duplicate IDs/names before insertion.
+
+### Remaining
+- Product rows and image objects are verified in Supabase. GitHub product-page generation and sitemap refresh have not been dispatched or verified; no claim that generated static pages are updated.
