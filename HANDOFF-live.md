@@ -578,3 +578,12 @@ SEO follow-through for the 20-product batch: updated all 20 active product descr
 - The catalogue-wide photo audit is not complete. Shared pack-size images and other visual mismatches still need item-by-item review.
 - Supabase already has a staff-only `find-photo` Edge Function. Its `auto` mode searches candidate photos, checks dimensions (minimum 450×450), and uses Gemini to verify brand/model/pack-size match and reject other-shop branding. It requires a signed-in staff Authorization header and will not replace an existing image. Run it through the authenticated admin workflow for products with suspect existing photos; do not bypass its checks or guess source URLs.
 - Prioritize exact-pack-size mismatches, generic brand banners/social cards, images with other sellers' watermarks, and images showing a different brand/model. Replace only after exact match is verified. Do not deactivate otherwise-valid products solely because an image URL is reused.
+
+
+## 2026-11-12 — Azumo 80 WG 250g product photo corrected
+
+- Owner supplied a mobile screenshot showing the Azumo 80 WG Fungicide and Miticide 250g card using a Kenagro logo graphic instead of an item photo.
+- Replaced the image on product `azumo-80-wg-fungicide-and-miticide-250g` using the exact 250g SKU listing: https://agropests.com/products/azumo-80wg-250g
+- Upload request 1799 returned HTTP 200 with `ok:true`, `live:true`, and `photos:1`. The product remains active and its `products.images` field contains the public Storage object URL.
+- No product name, price, stock, description or activation status was changed.
+- Note: the separate Agroduka image result shows a 1kg pack and was deliberately not used for the 250g listing. The image source used was the Agropests 250g product page, not a standalone Kenagro logo.
