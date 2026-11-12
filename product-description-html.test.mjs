@@ -40,4 +40,15 @@ assert.deepEqual(heads(productDescriptionHtml('Intro. SAFETY Wear gloves. STORAG
 ok(productDescriptionHtml('').includes('will be updated shortly'), 'empty fallback');
 // FAQ splitter refuses text that is not a clean Q&A list
 ok(splitFaq('Just one sentence.') === null && splitFaq('Only one? Yes.') === null, 'non-FAQ text is left alone');
+
+
+// Safety headings used by crop-protection listings must remain whole section labels.
+const safetyHandling = productDescriptionHtml('PRODUCT OVERVIEW\nA crop-protection product. SAFETY AND RESPONSIBLE HANDLING\nRead the current label and wear the specified PPE. STORAGE AND DISPOSAL\nKeep in original packaging and dispose as directed.');
+assert.deepEqual(heads(safetyHandling), ['Product overview', 'Safety information', 'Storage & handling']); n++;
+ok(/<h3>Safety information<\/h3><p>Read the current label and wear the specified PPE\.<\/p>/.test(safetyHandling), 'responsible-handling heading does not leak into safety body');
+ok(/<h3>Storage &amp; handling<\/h3><p>Keep in original packaging and dispose as directed\.<\/p>/.test(safetyHandling), 'storage-and-disposal heading is preserved');
+
+const safetyUse = productDescriptionHtml('PRODUCT OVERVIEW\nA public-health product. SAFETY AND RESPONSIBLE USE\nRead the label before handling. STORAGE AND DISPOSAL\nStore securely in original packaging.');
+assert.deepEqual(heads(safetyUse), ['Product overview', 'Safety information', 'Storage & handling']); n++;
+
 console.log(`product-description-html: ${n} checks passed`);
