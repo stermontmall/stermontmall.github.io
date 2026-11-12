@@ -195,8 +195,8 @@ export function pdpBadges(ctx = {}) {
   return [first, 'Top-Quality Selection', 'Fast M-Pesa Checkout', 'Sarit Centre Pickup | Delivery to 47 Counties'].filter(Boolean).map(t => `✓ ${t}`);
 }
 
-// Product page H2 headings. `features` only for pesticides and crop chemicals (null otherwise), the other two are on every product.
-// `delivery` is the heading of the separate delivery box that generate-products.mjs still renders. Before it existed that box printed an EMPTY <h2> on every product page.
+// Product page H2 headings. Product uses, price/ordering and delivery headings are rendered on every product page.
+// Feature headings are available to category-specific sections; wording stays factual and matched to the product category.
 export function pdpHeadings(catSlug) {
   const uses = isPest(catSlug) ? 'Target Pests & Where to Use This Product'
     : PCPB_CATS.has(catSlug) ? 'Crop Protection Uses & Application Guidance'
