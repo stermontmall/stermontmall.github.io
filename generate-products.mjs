@@ -14,7 +14,7 @@
 // Runs automatically on GitHub (see .github/workflows/product-pages.yml). No installs needed (Node 18+).
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
+import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
 import { productDescriptionHtml } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
@@ -632,8 +632,10 @@ for (const p of products) {
   // Local-utility sections (H2s): what it is used for, price and M-Pesa ordering, delivery and Sarit Centre pickup. Facts match shipping.html and nairobi.html.
   const nameE = esc(p.name), priceTxt = `${p.variants ? 'from ' : ''}${money(p.price)}${p.unit ? ' / ' + esc(p.unit) : ''}`;
   const usesTxt = isPcpb(cat?.slug)
-    ? `Use ${nameE} only as directed on the label: the ${isPest(cat?.slug) ? 'pests' : 'crops and pests'} it lists, the rate and the interval between treatments. Check the PCPB registration number on the pack, wear the gloves and mask the label recommends and keep children, pets and food away.${isPest(cat?.slug) ? ' Fighting kunguni, mchwa, mende, mbu or panya?' : ''} Not sure it fits your problem? <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> before you order.`
-    : `Follow the use and dosage instructions on the pack and read the label before you buy. <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> if you are not sure it suits your need.`;
+    ? `Use ${nameE} only as directed on the product label: check the listed target, approved use, application rate and interval. Follow the specified protective equipment and keep children, pets and food away where the label requires it.${isPest(cat?.slug) ? ' Looking for help with kunguni, mchwa, mende, mbu or panya?' : ''} Not sure it fits your problem? <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> before you order.`
+    : productType(cat?.slug) === 'farm'
+      ? `Check the pack for the intended crop, animal species or farm use, and follow its stated application, feeding or handling directions. Do not guess rates or combine products without qualified advice. <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> if you need help confirming suitability.`
+      : `Check the product details, exact model or size and the manufacturer's instructions before use. Confirm that it suits your intended setup and any accessories or compatibility requirements. <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> if you need help checking a detail.`;
   const seoBoxes = `${hd.uses ? `<div class="box"><h2 style="margin-top:0">${esc(hd.uses)}</h2><p>${usesTxt}</p></div>` : ''}
 <div class="box"><h2 style="margin-top:0">${esc(hd.price)}</h2><p>${nameE} costs <b>${priceTxt}</b> at ${BRAND}${inStock ? ' and is in stock' : ', but is currently sold out, so ask us when it is back'}. Add it to your cart, pay by M-Pesa and enter the M-Pesa code from your SMS, or <a href="${esc(inStock ? wa : ask)}" rel="noopener">order on WhatsApp</a>. Buying in bulk? Message us for a quote.</p></div>
 <div class="box"><h2 style="margin-top:0">${esc(hd.delivery)}</h2><p>Orders to Nairobi usually arrive the same day or the next day, and the other counties usually within 1 to 3 days. We confirm the delivery fee for your location before you pay. Prefer store pickup? Collect at The Sarit Centre, Karuna Road, Westlands, open daily 8 AM to 8 PM, and confirm stock on WhatsApp first. See <a href="/shipping.html">shipping</a> and <a href="/nairobi.html">Nairobi delivery and pickup</a>.</p></div>`;
