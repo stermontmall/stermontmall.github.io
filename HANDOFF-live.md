@@ -1,3 +1,26 @@
+## 2026-11-12 15:15 (Africa/Nairobi) — Remove Daraja M-Pesa STK prompt (owner request, permanent)
+
+### Why
+- Owner test payment KSh 3,350 (order STM-7PHZRP, receipt UKCQ51SNJQ) was credited to "Daraja-Sandbox", not the business. The STK prompt must not be offered to customers.
+- The callback also failed: phone check rejected it, then the `amount_mismatch` status violated `mpesa_payments_status_check`, so the row stayed pending.
+
+### Done
+- Branch `wip-remove-daraja-stk` created from main.
+- Data backup: `public.mpesa_payments_backup_20261112` (6 rows). `mpesa_payments` itself is KEPT (the `orders_verify_payment` trigger reads it).
+- Old code saved under `removed/daraja-20261112/`: repo copies of stk-push, stk-status, mpesa-callback, mpesa-mode, setup-daraja.sql, plus the DEPLOYED mpesa-callback v21 (it differed from the repo copy). mpesa-probe was already an empty 410 stub.
+- Supabase functions stk-push (v22), stk-status (v19), mpesa-callback (v22), mpesa-mode (v8) redeployed as disabled stubs (410 / enabled:false). Live in Supabase already.
+- `checkout-deferred.js`: removed `CFG.stk`, the mpesa-mode fetch, stkOn, stkPoll, stkPay, rStk and the prompt box. `stkFn` is KEPT because the Paystack card flow uses it. `checkout.html` now loads `checkout-deferred.js?v=3`.
+- Repo `supabase/functions/*` files for those four functions replaced with the same stubs.
+- Checks: `node --check checkout-deferred.js` OK; `node --test no-classic-hop.test.mjs not-found-fallback.test.mjs seo-shell-chrome.test.mjs` 3/3 pass; no remaining `stk-push|stk-status|mpesa-mode` references outside `removed/` and `supabase/`.
+
+### In progress
+- Merge `wip-remove-daraja-stk` to main, then confirm the live checkout shows no M-Pesa prompt.
+
+### Next
+- Add one line to HANDOFF.md after merge.
+- Owner still to do: forward SMS to 456 and call Safaricom 100 for the KSh 3,350; secrets MPESA_* can be deleted in the Supabase dashboard (no tool here deletes secrets).
+- `payments-in` (bank Paybill notifications) is NOT Daraja STK and is left untouched.
+
 ## 2026-11-12 — Pest-control batch progress update 2
 
 ### Published and verified: 13 of 50

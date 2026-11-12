@@ -5,8 +5,6 @@
         /* Card payments (Paystack). Keep hidden until a verified live PAYSTACK_SECRET_KEY is configured. */
         card: false,
         sbUrl: 'https://oewvtbnmyombbtggamor.supabase.co', sbKey: 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', sbRef: 'oewvtbnmyombbtggamor',
-        /* M-Pesa STK Push (Daraja). Keep false while on sandbox; set true when production keys are live. Test any time with ?stk=1 in the page URL. */
-        stk: true,
         /* Free key from https://web3forms.com (enter the email that should receive order alerts) */
         mailKey: '2c55cbd0-5ec1-4603-a6a0-293b8a68faab',
         /* Optional second inbox: paste a key made with the other email here */
@@ -37,7 +35,7 @@
       /* If the signed-in account changes while the page is open (sign out / sign in as someone else), clear everything typed or saved for the previous person. */
       function checkWho() {
         var u = myUid(); if (u === lastUid) return; lastUid = u;
-        cust = {}; ls('stm_cust', null); ref = ''; stkPhone = ''; stkMsg = ''; errs = {}; if (step === 'done') step = 'cart';
+        cust = {}; ls('stm_cust', null); ref = ''; errs = {}; if (step === 'done') step = 'cart';
         form.name = ''; form.phone = ''; form.email = ''; form.county = ''; form.addr = ''; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.payVia = ''; form.vc = null; form.vcode = '';
         var us = (session() || {}).user; if (us) { var m2 = us.user_metadata || {}; form.name = m2.full_name || ''; form.phone = m2.phone || ''; form.email = us.email || ''; }
       }
@@ -206,51 +204,10 @@
         }
         b.appendChild(w);
       }
-      var stkBusy = false, stkMsg = '', stkPhone = '', stkLive = false;
-      /* The backend reports whether M-Pesa is in production mode; sandbox keys keep the old Paybill flow for buyers. */
-      try { fetch(CFG.sbUrl + '/functions/v1/mpesa-mode', { headers: { apikey: CFG.sbKey } }).then(function (r) { return r.json(); }).then(function (j) { stkLive = !!(j && j.enabled); if (stkLive && isOpen) render(); }).catch(function () {}); } catch (e) {}
-      function stkOn() { return CFG.stk === true || stkLive || /[?&]stk=1\b/.test(location.search); }
+      /* Small helper that posts JSON to a Supabase edge function (used by the card flow). */
       function stkFn(name, body) {
         return fetch(CFG.sbUrl + '/functions/v1/' + name, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.sbKey }, body: JSON.stringify(body) })
           .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || ('Error ' + r.status)); return j; }); });
-      }
-      function stkPoll(id) {
-        return new Promise(function (res, rej) {
-          (function tick(k) {
-            if (k > 50) { rej(new Error('We did not get your M-Pesa confirmation. If you were charged, message us on WhatsApp with the SMS.')); return; }
-            setTimeout(function () {
-              stkFn('stk-status', { checkoutRequestId: id }).then(function (j) {
-                if (j.status === 'success') res({ receipt: j.receipt, amount: j.amount });
-                else if (j.status === 'pending') tick(k + 1);
-                else rej(new Error(j.message || 'The payment was not completed. You can try again.'));
-              }).catch(function () { tick(k + 1); });
-            }, 3000);
-          })(0);
-        });
-      }
-      function stkPay(T) {
-        if (stkBusy) return;
-        var phone = normPhone(stkPhone || form.phone), amt = due(T);
-        if (!/^254[17]\d{8}$/.test(phone)) { stkMsg = 'Enter the M-Pesa phone number as 07XX XXX XXX.'; render(); return; }
-        if (!ref) ref = newRef();
-        stkBusy = true; stkMsg = 'Sending the M-Pesa prompt to your phone...'; render();
-        stkFn('stk-push', { phone: phone, amount: amt, ref: ref }).then(function (j) {
-          stkMsg = 'Check your phone and enter your M-Pesa PIN to pay ' + money(amt) + '.'; render();
-          return stkPoll(j.checkoutRequestId);
-        }).then(function (p) {
-          stkBusy = false; stkMsg = '';
-          form.payVia = ''; form.payCode = p.receipt; form.payAmt = String(p.amount); form.payTouched = true; place(T);
-        }).catch(function (e) { stkBusy = false; stkMsg = (e && e.message) || 'Payment failed. Try again.'; render(); });
-      }
-      function rStk(b, T) {
-        var x = h('div', 'pay'); x.appendChild(h('h4', null, 'Pay with an M-Pesa prompt (fastest)'));
-        var f = h('div', 'fld'), l = h('label', null, 'M-Pesa phone number'); l.htmlFor = 'stkphone'; f.appendChild(l);
-        var i = h('input'); i.id = 'stkphone'; i.type = 'tel'; i.inputMode = 'tel'; i.placeholder = '07XX XXX XXX'; i.value = stkPhone || form.phone || ''; i.disabled = stkBusy;
-        i.addEventListener('input', function () { stkPhone = i.value; }); f.appendChild(i); x.appendChild(f);
-        if (stkMsg) x.appendChild(h('p', 'note', stkMsg));
-        var bt = h('button', 'btn btn-main', stkBusy ? 'Waiting for payment...' : 'Pay ' + money(due(T)) + ' with M-Pesa'); bt.type = 'button'; bt.disabled = stkBusy; bt.onclick = function () { stkPay(T); }; x.appendChild(bt);
-        x.appendChild(h('p', 'note', 'Or pay manually with the Paybill details below and enter your code.'));
-        b.appendChild(x);
       }
       /* ---- Card payments (Paystack). Card details are typed in Paystack's own window; this page only gets a payment reference back. ---- */
       var cardBusy = false, cardMsg = '', cardRefLast = '', keepObs = null;
@@ -383,7 +340,6 @@
         var amt = due(T); if (!form.payTouched) form.payAmt = String(amt);
         rCard(b, T);
         var mb = b;
-        if (stkOn()) { rStk(b, T); mb = h('details', 'man'); if (stkMsg && !stkBusy) mb.open = true; mb.appendChild(h('summary', null, 'Paid manually instead? Enter your M-Pesa code')); b.appendChild(mb); }
         mb.appendChild(h('p', 'note', 'Step 1: pay with M-Pesa using the details below. Step 2: enter the code from your M-Pesa SMS. Your order is only placed after you enter it.'));
         payBox(mb, amt);
         var pc = h('div', 'fld'), pl = h('label', null, 'M-Pesa transaction code'); pl.htmlFor = 'paycode'; pc.appendChild(pl);
