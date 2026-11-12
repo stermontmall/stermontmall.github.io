@@ -76,11 +76,42 @@ export function productDescriptionHtml(source) {
   }
   hits.sort((a, b) => a.start - b.start);
 
-  // Without authored headings keep intact paragraphs instead of guessing topics from ordinary words.
+  // Owner request: every catalogue description should have useful, search-friendly section subtitles.
+  // For unlabelled copy, split at sentence boundaries and apply conservative topic cues. No facts are added or removed.
   if (!hits.length) {
     const paragraphs = raw.split(/\n\s*\n/).map(x => x.trim()).filter(Boolean);
-    const body = paragraphs.length ? paragraphs : [raw];
-    return body.map((p, i) => '<section class="product-description-section"><h3>' + (i === 0 ? 'Product overview' : 'Product details') + '</h3><p>' + esc(p) + '</p></section>').join('');
+    const source = paragraphs.length ? paragraphs.join(' ') : raw;
+    const parts = source.match(/[^.!?]+(?:[.!?]+|$)/g) || [source];
+    const sentences = [];
+    for (const part of parts.map(x => x.trim()).filter(Boolean)) {
+      const prev = sentences[sentences.length - 1] || '';
+      if (/\b(?:e\.g|i\.e|etc|approx|Dr|Mr|Mrs|Ms|St|No|vs)\.$/i.test(prev)) sentences[sentences.length - 1] += ' ' + part;
+      else sentences.push(part);
+    }
+    const groups = [];
+    for (let i = 0; i < sentences.length; i += 3) groups.push(sentences.slice(i, i + 3).join(' '));
+    if (!groups.length) groups.push(source);
+    const rules = [
+      ['Safety information', /\b(safety|safe handling|avoid|never|warning|risk|injur|children|pets|protective|PPE|veterinar|withdrawal|poison|hazard|distress)\b/i],
+      ['Care, cleaning & storage', /\b(clean|wash|rinse|store|storage|maintenance|inspect|replace|dry|care|after use|shelf life|keep .{0,15} dry)\b/i],
+      ['How to use & application', /\b(how to|before use|apply|application|install|prepare|fill|mix|follow|directions|instructions|operate|procedure|feeding|feed rate|dose|dosage|use the|using the)\b/i],
+      ['Uses & applications', /\b(used for|suitable for|ideal for|intended for|designed for|useful for|application|farmers|household|commercial|smallholder|livestock|crop|garden|home use)\b/i],
+      ['Features & specifications', /\b(features?|design|material|made from|capacity|size|dimensions|specification|model|pack size|weight|power|voltage|length|width|diameter|formulation|contains|includes|construction)\b/i],
+      ['Buying guide & product checks', /\b(before ordering|before purchase|confirm|ask the seller|ask supplier|check with|compare|listing|purchase|buying|exact model|variant|compatib|supplied|availability)\b/i]
+    ];
+    const sections = groups.map((body, i) => {
+      if (i === 0) return { heading: 'Product overview', body };
+      const ranked = rules.map(([heading, re], order) => ({ heading, score: (body.match(new RegExp(re.source, 'gi')) || []).length, order }))
+        .sort((a, b) => b.score - a.score || a.order - b.order);
+      return { heading: ranked[0].score ? ranked[0].heading : 'Product details', body };
+    });
+    const merged = [];
+    for (const section of sections) {
+      const prev = merged[merged.length - 1];
+      if (prev && prev.heading === section.heading) prev.body += ' ' + section.body;
+      else merged.push({ ...section });
+    }
+    return merged.map(x => '<section class="product-description-section"><h3>' + esc(x.heading) + '</h3>' + renderBody(x.body, x.heading) + '</section>').join('');
   }
 
   // Text before the first label is the overview; the text after each label belongs to THAT label's heading.
