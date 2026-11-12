@@ -109,3 +109,9 @@
 (function () {
   try { var s = document.createElement('script'); s.src = '/admin-shell.js?v=1'; s.defer = true; document.head.appendChild(s); } catch (e) {}
 })();
+
+/* Loader for the "Accounts" admin menu item (list of everyone who created an account).
+   To undo: delete this block. Code: /admin-accounts-nav.js, page: /admin-accounts.html */
+(function () {
+  try { var s = document.createElement('script'); s.src = '/admin-accounts-nav.js?v=1'; s.defer = true; document.head.appendChild(s); } catch (e) {}
+})();
