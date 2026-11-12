@@ -17,7 +17,7 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 ## Posting route
 1. Read `CLAUDE.md`, this file, and Supabase `public.site_playbook` topics `READ_ME_FIRST`, `add_product`, `add_photo`.
 2. Check the live catalogue for duplicates and confirm a valid category.
-3. Create the product row (the `add_draft_product` helper inserts it with `active=false`; that is only the starting state). Write an original factual description of 600-900 words in the structured layout from `site_playbook` `READ_ME_FIRST`. The helper rejects any description outside 600-900 words, and rejects one whose first 200 words match an existing product, so write a specific opening for the exact item. Pass the source KES cost as `p_price` (the helper adds the 15% markup itself and sets stock 1000, low_at 20, featured false). The helper builds `seo_title` as the product name plus "– Price in Kenya" (at most 60 characters); check that it reads well with brand, model, pack size and Kenya.
+3. Create the product row (the `add_draft_product` helper inserts it with `active=false`; that is only the starting state). Write an original factual description of 600-900 words in the structured layout from `site_playbook` `READ_ME_FIRST`. The helper rejects any description outside 600-900 words, and rejects one whose first 200 words match an existing product, so write a specific opening for the exact item. Pass the source KES cost as `p_price` (the helper adds the 25% markup itself and sets stock 1000, low_at 20, featured false). The helper builds `seo_title` as the product name plus "– Price in Kenya" (at most 60 characters); check that it reads well with brand, model, pack size and Kenya.
 4. PHOTO IS A PUBLICATION REQUIREMENT (owner instruction 2026-11-08): find a sharp direct image of the EXACT product on the manufacturer, supplier or an official retailer page (at least 450x450, correct brand, model, part number, colour and pack size; no other shop's watermark/logo). Attach it with `upload-photos` or `public.add_product_photo`. If rejected, try another exact source. Verify the uploaded Storage object, reachable public URL and `products.images` array.
 5. Never invent a photo URL. Report a photo as attached only after the Storage object and the `products.images` reference are checked.
 6. PUBLISH LIVE only after both exact photo and source price are verified. Set `active=true` only when `images` contains the uploaded photo URL. The database now rejects a new product activation with an empty photo array. If no exact suitable photo can be found/uploaded, leave `active=false` and report the blocker. After activation, verify the generated product page, image, canonical, Product JSON-LD and sitemap entry once the product-pages workflow completes.
@@ -33,8 +33,8 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 - Find the source price online yourself (owner rule 2026-11-08): the lowest current in-stock KES listing of the EXACT product (same brand, model, pack size) on a reputable Kenyan seller or supplier page. Record that page URL as the source. Never invent or estimate a price. If no KES listing of the exact product exists, stop and ask the owner.
 - Let `C` be that source price in KES.
 - Save `cost = round(C, 2)`.
-- Save `price = round(C * 1.15, 2)` (15% markup on source cost).
-- Do not apply 16%, the old 85%-of-selling-price calculation, or any other formula unless the owner explicitly changes the rule for that batch.
+- Save `price = round(C * 1.25, 2)` (25% markup on source cost).
+- Never apply a markup below 25% to new products unless the owner explicitly requests a higher rate.
 - Do not convert foreign currency without an owner-approved exchange rate.
 - Set `stock = 1000`, `low_at = 20`, and `featured = false` unless the owner explicitly requests featured placement.
 - New products are published live (`active=true`) after verification (owner rule 2026-11-08). The earlier draft-first / owner-review rule no longer applies.
@@ -50,7 +50,7 @@ from public.products
 where id = '<product-id>';
 ```
 
-Confirm exactly one intended row exists; cost equals the verified source KES price; price equals round(cost * 1.15, 2); stock=1000; low_at=20. Before activation, require `cardinality(images) > 0`, confirm the Storage object exists and the URL opens. Only then set `active=true`.
+Confirm exactly one intended row exists; cost equals the verified source KES price; price equals round(cost * 1.25, 2); stock=1000; low_at=20. Before activation, require `cardinality(images) > 0`, confirm the Storage object exists and the URL opens. Only then set `active=true`.
 
 Report the product ID, source cost, selling price, stock, alert threshold, draft status, photo status, the mobile-shell link (`https://stermontarcade.co.ke/?product=<slug>`) and blockers. Do not say "posted", "published" or "photo attached" beyond the evidence actually checked.
 
