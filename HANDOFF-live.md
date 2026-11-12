@@ -1,3 +1,36 @@
+## 2026-11-13 — Pest-control equipment batch continued (20 of 50 LIVE)
+
+### Newly published in this step
+All six products below were created with the explicit batch markup argument of 30%, given original long-form descriptions (946–1,006 words), supplied with an exact supplier product-page image through `public.add_product_photo`, and verified active in Supabase. Their Storage objects exist in the public `product-images` bucket with HTTP metadata status 200. All have stock=1000 and low_at=20.
+
+| Product | Source price / cost (KSh) | Stored selling price (KSh) | Photo |
+|---|---:|---:|---|
+| INGCO HSPP42002 20L Knapsack Sprayer | 7,500 | 9,750 | uploaded WebP |
+| Premier Heavy Duty 20L Manual Knapsack Sprayer | 2,200 | 2,899 | uploaded WebP |
+| Premier Heavy Duty 16L Manual Knapsack Sprayer | 2,200 | 2,899 | uploaded WebP |
+| Premier 767 25L 2-Stroke Petrol Knapsack Sprayer | 15,000 | 19,500 | uploaded WebP |
+| Premier 767 25L 4-Stroke Petrol Knapsack Sprayer | 19,800 | 25,750 | uploaded WebP |
+| Premier 3-in-1 25cc 20L 4-Stroke Mist Blower | 17,500 | 22,750 | uploaded WebP |
+
+- The site price-point trigger rounds some calculated prices upward: Premier manual models store KSh 2,899 rather than the raw 30%-markup KSh 2,860, and the Premier 4-stroke model stores KSh 25,750 rather than KSh 25,740. Do not change the trigger; disclose this rounding when reporting.
+- The earlier Aico Japan 60L 7.5HP trolley sprayer, previously noted as photo-blocked, is now active and verified with its matching Storage object (HTTP 200), stock 1000 and low_at 20.
+- Current project count: 13 previously published + Aico 60L recovered and verified + these 6 = 20 of 50 live. Continue from 20/50 and check duplicates across the entire catalogue before each new row.
+- Six new products have SEO titles under 60 characters. Their descriptions and inventory fields were verified by a read-only SQL query.
+
+### Mobile-shell product links
+- https://stermontarcade.co.ke/?product=ingco-hspp42002-20l-knapsack-sprayer
+- https://stermontarcade.co.ke/?product=premier-heavy-duty-20l-manual-knapsack-sprayer
+- https://stermontarcade.co.ke/?product=premier-heavy-duty-16l-manual-knapsack-sprayer
+- https://stermontarcade.co.ke/?product=premier-767-25l-2-stroke-petrol-knapsack-sprayer
+- https://stermontarcade.co.ke/?product=premier-767-25l-4-stroke-petrol-knapsack-sprayer
+- https://stermontarcade.co.ke/?product=premier-3-in-1-25cc-20l-4-stroke-mist-blower
+
+### Next
+- Continue the 50-item pest-control equipment batch from 20/50. Research exact current KES source prices and matching supplier photos; avoid duplicates already in any category.
+- Product pages are rebuilt by `.github/workflows/product-pages.yml` every 30 minutes. Do not edit generated pages or manually rewrite the workflow. Verify the next successful scheduled build and generated product pages/sitemap after it completes.
+
+---
+
 ## 2026-11-13 00:05 (Africa/Nairobi) — Bactrolure fruit fly lure & Lynfield trap (LIVE)
 
 - Product `bactrolure-fruit-fly-lure-lynfield-trap` (category 31): existing draft kept, description rewritten in the structured layout from the Jumia listing and sachet label, seo_title confirmed. Owner asked for selling price KES 1,099 (cost 700 from the Jumia listing, seller Vetagro and Pulpers). Stock 1000, low_at 20, featured false.
