@@ -452,6 +452,7 @@ $('#f-reset').addEventListener('click', () => {
 
 /* ---------- 9. Quick buy sheet ---------- */
 const qb = { p: null, size: '', qty: 1, shown: '' };
+let editingCartKey = ''; // Existing cart line being changed from the cart screen.
 function renderQB() {
   const { p } = qb; if (!p) return;
   const sz = sizeOf(p, qb.size);
@@ -618,6 +619,8 @@ async function renderPP() {
   const p = qb.p; if (!p) return;
   const sz = sizeOf(p, qb.size), off = sz.old ? Math.round((1 - sz.price / sz.old) * 100) : 0, rowId = sz.rowId;
   $('#pp-title').textContent = p.name; $('#pp-name').textContent = p.name;
+  $('#pp-add').textContent = editingCartKey ? 'Update cart item' : 'Add to cart';
+  $('#pp-buy').hidden = !!editingCartKey;
   $('#pp-img').style.background = '#fff'; $('#pp-img').innerHTML = thumb({ img: pp.img || p.img, emoji: p.emoji }, true);
   $('#pp-price').textContent = 'KSh ' + fmt(sz.price); $('#pp-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : ''; $('#pp-off').textContent = off ? '-' + off + '%' : '';
   $('#pp-qty').textContent = qb.qty;
@@ -636,13 +639,13 @@ async function renderPP() {
   if (!pp.img && imgs[0]) $('#pp-img').innerHTML = thumb({ img: imgs[0], emoji: p.emoji }, true);
   $('#pp-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-pp-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: p.emoji })}</button>`).join('') : '';
 }
-function openProductPage() { if (!qb.p) return; pp.img = ''; renderPP(); $('#pp-body').scrollTop = 0; openOverlay('page-product'); }
+function openProductPage() { if (!qb.p) return; editingCartKey = ''; pp.img = ''; renderPP(); $('#pp-body').scrollTop = 0; openOverlay('page-product'); }
 $('#qb-page').addEventListener('click', e => { e.preventDefault(); openProductPage(); });   // the href stays as a fallback (new tab / no script)
 document.addEventListener('click', e => {
   const t = e.target; let el;
   if ((el = t.closest('[data-pp-size]'))) { qb.size = el.dataset.ppSize; pp.img = ''; renderPP(); renderQB(); return; }
   if ((el = t.closest('[data-pp-photo]'))) { pp.img = el.dataset.ppPhoto; $('#pp-img').innerHTML = thumb({ img: pp.img, emoji: qb.p.emoji }); return; }
-  if ((el = t.closest('[data-pp-open]'))) { const x = PRODUCTS.find(y => y.id === el.dataset.ppOpen); if (!x) return; qb.p = x; qb.size = x.sizes[0].label; qb.qty = 1; qb.shown = ''; pp.img = ''; renderPP(); renderQB(); $('#pp-body').scrollTop = 0; return; }
+  if ((el = t.closest('[data-pp-open]'))) { const x = PRODUCTS.find(y => y.id === el.dataset.ppOpen); if (!x) return; editingCartKey = ''; qb.p = x; qb.size = x.sizes[0].label; qb.qty = 1; qb.shown = ''; pp.img = ''; renderPP(); renderQB(); $('#pp-body').scrollTop = 0; return; }
   if (t.closest('[data-pp-retry]')) return renderPP();
   if (t.closest('[data-pp-cart]')) return closeAllThen(() => goTab('cart'));
 });
@@ -657,11 +660,30 @@ $('#pp-share').addEventListener('click', async () => {
 });
 $('#pp-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderPP(); renderQB(); });
 $('#pp-minus').addEventListener('click', () => { qb.qty = Math.max(1, qb.qty - 1); renderPP(); renderQB(); });
-$('#pp-add').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty); toast('Added to cart'); });
+function updateCartLine() {
+  if (!editingCartKey || !qb.p) return false;
+  const sz = sizeOf(qb.p, qb.size), nextKey = qb.p.id + '|' + sz.label;
+  const current = store.get().cart.map(i => ({ ...i }));
+  const old = current.find(i => i.key === editingCartKey);
+  if (!old) { editingCartKey = ''; toast('That cart item is no longer available'); return false; }
+  const qty = old.qty;
+  const next = current.filter(i => i.key !== editingCartKey && i.key !== nextKey);
+  const same = current.find(i => i.key === nextKey && i.key !== editingCartKey);
+  if (same) next.push({ ...same, qty: Math.min(99, same.qty + qty) });
+  else next.push({ key: nextKey, id: qb.p.id, rowId: sz.rowId, name: qb.p.name, size: sz.label, qty, price: sz.price, img: qb.p.img, emoji: qb.p.emoji, bg: qb.p.bg });
+  store.set({ cart: next });
+  editingCartKey = '';
+  toast('Cart item updated');
+  closeTop();
+  goTab('cart');
+  return true;
+}
+$('#pp-add').addEventListener('click', () => { if (editingCartKey) { updateCartLine(); return; } addToCart(qb.p, qb.size, qb.qty); toast('Added to cart'); });
 $('#pp-buy').addEventListener('click', () => { addToCart(qb.p, qb.size, qb.qty); closeAllThen(() => goTab('cart')); });
 
 function openQuickBuy(id) {
   const p = feed.items.get(id); if (!p) return;
+  editingCartKey = '';
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
 }
 function openDeepLink(slug) {   // the full product page for a /?product=<slug> address (any pack size's slug works)
@@ -726,7 +748,7 @@ store.subscribe(s => {
   $('#cart-list').innerHTML = s.cart.map(i => `<li class="flex gap-3 bg-white rounded-lg p-2 shadow-card">
     <div class="w-20 h-20 rounded-lg shrink-0 grid place-items-center text-4xl" style="background:${i.bg};overflow:hidden">${thumb(i)}</div>
     <div class="flex-1 min-w-0 flex flex-col justify-between">
-      <div><p class="text-xs line-clamp-2">${esc(i.name)}</p><p class="text-2xs text-mute">${esc(i.size)}</p></div>
+      <button type="button" class="text-left" data-edit="${esc(i.key)}" aria-label="Change pack size for ${esc(i.name)}"><p class="text-xs line-clamp-2 font-semibold">${esc(i.name)}</p><p class="text-2xs text-brand underline">${esc(i.size)} · Change pack size</p></button>
       <div class="flex items-center justify-between"><span class="text-sale font-bold">KSh ${fmt(i.price)}</span>
         <span class="flex items-center gap-2">
           <button class="icon-btn bg-gray-100 !w-7 !h-7" data-qty="${esc(i.key)}" data-d="-1" aria-label="Less"><svg class="w-3.5 h-3.5"><use href="#i-minus"/></svg></button>
@@ -737,6 +759,15 @@ store.subscribe(s => {
     </div></li>`).join('');
 });
 $('#cart-list').addEventListener('click', e => {
+  const edit = e.target.closest('[data-edit]');
+  if (edit) {
+    const item = store.get().cart.find(i => i.key === edit.dataset.edit);
+    const p = item && PRODUCTS.find(x => x.id === item.id);
+    if (!item || !p) { toast('Product details are unavailable. Please refresh and try again.'); return; }
+    editingCartKey = item.key; qb.p = p; qb.size = item.size; qb.qty = item.qty; qb.shown = ''; pp.img = '';
+    renderQB(); renderPP(); $('#pp-body').scrollTop = 0; openOverlay('page-product');
+    return;
+  }
   const remove = e.target.closest('[data-remove]');
   if (remove) {
     const cart = store.get().cart.filter(i => i.key !== remove.dataset.remove);
