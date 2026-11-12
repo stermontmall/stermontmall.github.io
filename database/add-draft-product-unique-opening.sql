@@ -33,7 +33,7 @@ begin
   end if;
   if exists (select 1 from products where lower(name) = lower(v_name)) then raise exception 'a product with this name already exists'; end if;
   v_source_cost := round(p_price, 2);
-  v_selling_price := round(v_source_cost * 1.15, 2);
+  v_selling_price := round(v_source_cost * 1.25, 2);
   v_id := btrim(regexp_replace(lower(v_name), '[^a-z0-9]+', '-', 'g'), '-');
   v_id := left(v_id, 70);
   if v_id = '' then v_id := 'product'; end if;
