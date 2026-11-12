@@ -1,3 +1,32 @@
+## 2026-11-13 — Pest Control & Fumigation accessories published (31 of 50 LIVE)
+
+### Three new products published and verified
+All three listings were created in category 31 (Pest Control & Fumigation) using the batch-specific 30% markup helper. Each has a unique long-form description over 600 words, active=true, stock=1000, low_at=20, and one product image uploaded into the public `product-images` bucket. Storage object metadata returned HTTP 200. The site price-point trigger rounds prices upward.
+
+| Product | ID / slug | Reference cost (KSh) | Stored website price (KSh) | Description words | Image |
+|---|---|---:|---:|---:|---|
+| Plunger and Tip for Gel Bait Syringe | `plunger-and-tip-for-gel-bait-syringe` | 99 | 150 | 912 | WebP, Storage HTTP 200 |
+| Philips 15W Shatterproof UV Replacement Tube for Fly Lights | `philips-15w-shatterproof-uv-replacement-tube-for-fly-lights` | 6,999 | 9,099 | 843 | PNG, Storage HTTP 200 |
+| Atrix SFU15/6 Dust Sampling Filters – Pack of 6 | `atrix-sfu15-6-dust-sampling-filters-pack-of-6` | 26,999 | 35,099 | 856 | JPEG, Storage HTTP 200 |
+
+### Product-specific qualifications
+- Plunger and Tip: supplier describes compatibility with 27g, 30g and 33g roach/ant gel bait syringes. Listing is for one replacement plunger-and-tip set; check barrel fit before ordering. Image is a matching replacement plunger/tip product image.
+- Philips UV tube: supplier listing describes a 15W Philips shatterproof UV tube. Exact fixture model/length/pin compatibility is not fully specified by the local listing; customer description instructs buyers to verify the existing lamp and unit model before purchase. The uploaded image shows a Philips 15W Actinic Secura shatterproof tube.
+- Atrix SFU15/6: exact six-filter Atrix sampling pack. Manufacturer specifications include U15 PTFE media, 5.10-inch length, 3.06-inch diameter and compatibility with Atrix Omega/Express/High Capacity/Ergo vacuums, with adapter needs depending on model. Listing cautions users to confirm their vacuum and connector.
+- Reference prices are published supplier retail listings used as the requested pricing basis, not verified acquisition costs. Customer-facing product descriptions do not mention markup or source-price calculations.
+
+### Mobile-shell product links
+- https://stermontarcade.co.ke/?product=plunger-and-tip-for-gel-bait-syringe
+- https://stermontarcade.co.ke/?product=philips-15w-shatterproof-uv-replacement-tube-for-fly-lights
+- https://stermontarcade.co.ke/?product=atrix-sfu15-6-dust-sampling-filters-pack-of-6
+
+### Progress and next
+- Verified progress is now 31 / 50.
+- Continue sourcing unique Pest Control & Fumigation products. Check the entire catalogue before each insert; require a current Kenyan KES supplier price, exact matching image, and model/compatibility facts before activation.
+- Supabase active state and Storage are verified. Do not claim the generated static pages or sitemap have refreshed until the existing product-pages GitHub Actions workflow completes successfully and the pages are checked.
+
+---
+
 ## 2026-11-13 — Pest-control equipment batch continued (25 of 50 LIVE)
 
 ### Five newly published products
