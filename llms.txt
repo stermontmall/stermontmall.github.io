@@ -45,7 +45,7 @@
 - [Shop Fertilizers Online in Kenya](https://stermontarcade.co.ke/c/fertilizers.html): Browse Fertilizers online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Buy Fogging & ULV Machines Online in Kenya](https://stermontarcade.co.ke/c/fogging-ulv-machines.html): Browse Fogging & ULV Machines online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Fridges & Freezers Online in Kenya](https://stermontarcade.co.ke/c/fridges-freezers.html): Browse Fridges & Freezers online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
-- [Fumigation Chemicals in Kenya](https://stermontarcade.co.ke/c/fumigation-chemicals.html): Buy fumigation chemicals online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
+- [Shop Fumigation Chemicals Online in Kenya](https://stermontarcade.co.ke/c/fumigation-chemicals.html): Browse Fumigation Chemicals online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Fungicides Online in Kenya](https://stermontarcade.co.ke/c/fungicides.html): Browse Fungicides online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Shop Garden & Outdoors Online in Kenya](https://stermontarcade.co.ke/c/garden-outdoors.html): Browse Garden & Outdoors online in Kenya. Compare listed product details and current prices. Pay by M-Pesa; delivery to all 47 counties.
 - [Health & Beauty Products in Kenya](https://stermontarcade.co.ke/c/health-beauty.html): Browse health, beauty and wellness products in Kenya. Check ingredients, pack size, intended use and product instructions before ordering.
@@ -165,6 +165,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 890 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 945 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
