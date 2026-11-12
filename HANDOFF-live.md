@@ -498,7 +498,7 @@ All seven rows below are active, each has one uploaded product image in the publ
 - SEO title: `Portable Thermal Fogging Machine – Price in Kenya`
 - Stock=1000, low_at=20, featured=false.
 - Supplier page photograph URL located: https://www.metrotools.co.ke/images/fogging1.jpg
-- Attempted upload using both the direct image URL and supplier product-page URL. Supabase upload-photos returned HTTP 422: could not download image (timeout/network error); requested image_base64 for retry.
+- Attempted upload using both the direct image URL and supplier product-page URL. Supabase upload-photos returned HTTP 422: could not download image (timeout/network error); requested image_base64 for retry. A third attempt against the non-www image host also returned HTTP 422 with the same network timeout.
 - Product remains inactive with no image (correctly not published). Do not send a live product link. Next: obtain the exact supplier image bytes (or another exact supplier/manufacturer image) and upload via image_base64; verify Storage object + products.images, then activate.
 
 ### Next
