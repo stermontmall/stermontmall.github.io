@@ -1,3 +1,36 @@
+## 2026-11-13 — Pest-control equipment batch continued (25 of 50 LIVE)
+
+### Five newly published products
+The following five distinct sprayers were checked against the existing catalogue before creation. All are in category 38 (Sprayers & Equipment), use the 30% batch markup helper, have original SEO descriptions over 600 words, and are active after their product photos were uploaded. All five have stock=1000, low_at=20 and featured=false.
+
+| Product | Supplier reference cost (KSh) | Stored website price (KSh) | Description words | Photo verification |
+|---|---:|---:|---:|---|
+| Ryobi 42cc 20L Petrol Backpack Sprayer 2.9HP | 37,200 | 48,399 | 957 | Storage object present, HTTP 200 |
+| Ryobi 18V 12L Cordless Backpack Sprayer | 14,700 | 19,150 | 958 | Storage object present, HTTP 200 |
+| WOKIN 573320 20L Knapsack Sprayer with Fibreglass Spray Bar | 5,900 | 7,699 | 933 | Storage object present, HTTP 200 |
+| Farmate KSL-20L 20L Manual Knapsack Sprayer with Brass Pump | 3,900 | 5,099 | 918 | Storage object present, HTTP 200 |
+| IPCONE IP20LMN 20L Manual Knapsack Sprayer | 2,600 | 3,399 | 881 | Storage object present, HTTP 200 |
+
+- The site's price-point trigger rounds some computed 30% markup prices upward to its supported price points. Raw calculations are 48,360 / 19,110 / 7,670 / 5,070 / 3,380 respectively; stored prices above reflect the trigger. Do not disable or bypass the trigger.
+- Product photos were saved in the public `product-images` bucket and matched by product-specific image sources. WOKIN, Farmate and Ryobi 18V photos were replaced after identifying repeated fallback-image hashes; the replacement files have distinct ETags and verified JPEG content. The other two photos are also distinct product image objects.
+- Ryobi 18V listing explicitly excludes battery and charger; retain that warning in the customer-facing listing.
+- Ryobi 42cc supplier lists 2-stroke, 42cc, 2.9HP, 20L, 7,500rpm and 25:1 fuel mix. Always defer to the delivered manual for the exact fuel ratio and safety instructions.
+- WOKIN 573320 supplier does not publish a pump pressure figure; do not invent one.
+- The SEO title for WOKIN was shortened to `WOKIN 573320 20L Sprayer – Price in Kenya` to avoid a truncated phrase.
+
+### Mobile-shell product links
+- https://stermontarcade.co.ke/?product=ryobi-42cc-20l-petrol-backpack-sprayer-2-9hp
+- https://stermontarcade.co.ke/?product=ryobi-18v-12l-cordless-backpack-sprayer
+- https://stermontarcade.co.ke/?product=wokin-573320-20l-knapsack-sprayer-with-fibreglass-spray-bar
+- https://stermontarcade.co.ke/?product=farmate-ksl-20l-20l-manual-knapsack-sprayer-with-brass-pump
+- https://stermontarcade.co.ke/?product=ipcone-ip20lmn-20l-manual-knapsack-sprayer
+
+### Next
+- Continue the 50-item pest-control equipment project from 25/50. Search new models or complementary equipment and check all categories for duplicates before creating rows.
+- Product pages are rebuilt by `.github/workflows/product-pages.yml` every 30 minutes. Do not edit generated pages. Verify the next successful scheduled build and the generated product pages/sitemap separately; Supabase activation and Storage upload do not prove that the scheduled static build has run.
+
+---
+
 ## 2026-11-13 — Pest-control equipment batch continued (20 of 50 LIVE)
 
 ### Newly published in this step
