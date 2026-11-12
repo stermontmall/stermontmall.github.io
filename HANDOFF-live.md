@@ -296,3 +296,18 @@
 - Rewrote all five descriptions with product-specific sections (overview, facts/specifications, use/planning, buying guide, care, FAQs and Kenyan search intent), 600+ words each. No price, stock, image, slug or activation changes.
 - Verified word counts: 5kg broiler feeder 778; 3L manual drinker 733; 6L manual drinker 770; 24-hole trough feeder 735; UV bird net 748. All five remain active with their existing images and verified source-price rows.
 - Next: enforce 600–900 words at the database publishing function and repair remaining catalogue descriptions in audited batches; active catalogue audit previously found 402/892 under 600 words.
+
+## 2026-11-12 (Africa/Nairobi, ~10:15) - whole-number prices, 00/50/99 endings, checkout check
+
+### Done
+- Owner rule: every product price and old_price must end in 00, 50 or 99 (e.g. 250, 399, 300), no decimals. Applied to all 955 products by rounding UP to the next allowed ending (avg +KSh 16, never lowers a price). Old prices kept above the selling price.
+- Backups: `products_price_backup_20261112` (original decimal prices) and `products_price_backup_20261112b` (after whole-number rounding).
+- Guard: trigger `trg_products_round_prices` on `public.products` (function `products_round_prices`) snaps price/old_price on insert or update, so new products follow the rule automatically.
+- Product pages and merchant feed rebuilt via the product-pages workflow dispatch (run 43167368829). Google's cached snippet (e.g. Grain-Save Dust KSh 590.52) is stale and clears after re-crawl; request indexing in Search Console to speed up.
+- Checkout review: cart/total code reads prices from the displayed text with `replace(/\D/g, '')`, so decimals in displayed prices would have inflated totals (590.52 -> 59052). Whole numbers remove that risk.
+
+### Not verified
+- Live checkout page could not be fetched from this session (domain not on allowlist). Card payment is still off in code (`card: false`) until Paystack live is approved; M-Pesa STK push is on (`stk: true`), production vs sandbox not checked. `orders` table is empty, so no real order to inspect.
+
+### Next
+- Place one test order on stermontarcade.co.ke (M-Pesa) and confirm the total matches the displayed prices.
