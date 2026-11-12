@@ -107,8 +107,8 @@ export function productDescriptionHtml(source) {
     });
     const merged = [];
     for (const section of sections) {
-      const prev = merged[merged.length - 1];
-      if (prev && prev.heading === section.heading) prev.body += ' ' + section.body;
+      const prev = merged.find(x => x.heading === section.heading);
+      if (prev) prev.body += ' ' + section.body;
       else merged.push({ ...section });
     }
     return merged.map(x => '<section class="product-description-section"><h3>' + esc(x.heading) + '</h3>' + renderBody(x.body, x.heading) + '</section>').join('');
