@@ -26,7 +26,7 @@ jobs:
       - id: fp
         run: node product-watch.mjs >> "$GITHUB_OUTPUT"
       - id: seen
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: .product-fingerprint
           key: product-fingerprint-${{ steps.fp.outputs.hash }}
@@ -40,7 +40,7 @@ jobs:
           echo "${{ steps.fp.outputs.hash }}" > .product-fingerprint
       - name: Remember this fingerprint
         if: steps.seen.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: .product-fingerprint
           key: product-fingerprint-${{ steps.fp.outputs.hash }}
