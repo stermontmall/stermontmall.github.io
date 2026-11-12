@@ -363,7 +363,7 @@ with sync_playwright() as p:
     check('product page: Buy now lands on the Cart tab with both items', p8.locator('#page-product.open').count() == 0 and p8.locator('#view-cart').is_visible() and p8.locator('#cart-list li').count() == 2, p8.locator('#cart-list li').count())
     # change an existing cart line to another pack without removing/re-adding it
     p8.locator('#bottom-nav [data-tab="cart"]').click(); p8.wait_for_selector('#view-cart:not([hidden])')
-    p8.locator('#cart-list [data-edit]').filter(has=p8.locator('#cart-list [data-edit]')).first.click()
+    p8.locator('#cart-list [data-edit^="garden-set|"]').click()
     p8.wait_for_selector('#page-product.open')
     p8.locator('#pp-sizes [data-pp-size="250 ml"]').click()
     check('cart pack editor shows Update cart item and hides Buy now', p8.locator('#pp-add').inner_text() == 'Update cart item' and p8.locator('#pp-buy').is_hidden())
