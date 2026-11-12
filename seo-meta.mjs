@@ -127,7 +127,8 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
     .replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&quot;/gi, '"')
     .replace(/&#39;|&apos;/gi, "'").replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
-    .replace(/[•▪●]/g, ' ').replace(/\s+/g, ' ').trim();
+    .replace(/[•▪●]/g, ' ').replace(/^\s*(?:PRODUCT OVERVIEW|PRODUCT SUMMARY)\s*:?\s*/i, '')
+    .replace(/\s+/g, ' ').trim();
   // Skip catalogue sentences that start with "Buy": the description already opens with "Buy <name> in Kenya: ", so using one
   // produced "Buy X in Kenya: Buy X…" cut off mid-phrase (seen on the NIVEA Sun page). Use the first real product sentence instead.
   const sentences = (source.match(/[^.!?]+[.!?](?=\s|$)/g) || []).map(s => s.trim());
