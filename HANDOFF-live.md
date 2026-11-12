@@ -478,3 +478,29 @@ All seven rows below are active, each has one uploaded product image in the publ
 - No new product was created. The direct matching image for the 20W model was not verified; image search showed other brands/models, which must not be substituted. No image upload or activation was attempted.
 - A category_id 31 name query did not return a matching insect-killer name, but catalogue-wide duplicate checking and exact model identity still need to be confirmed before a generic unit is inserted.
 - Next: continue with non-chemical physical pest-control equipment. Require exact supplier model, current KES price/tax treatment, in-stock status, matching direct photo and catalogue-wide duplicate check. Keep the agreed 30% markup, 600+ word description, stock 1000, low_at 20 and featured=true; activate only after image verification.
+
+
+## 2026-11-12 — Pest-control product batch continuation
+
+### Verified catalogue state
+- Rechecked `PUBLISHING.md`, `CLAUDE.md`, and Supabase `site_playbook` topics `READ_ME_FIRST`, `add_product`, and `add_photo`.
+- The latest batch-specific Supabase rule uses the 7-argument `add_draft_product(..., 30)` for the owner's 30% markup. It does not change the global default.
+- The 13 sprayer products in the current batch are all active, each has one image URL, and each description now measures over 600 words.
+- Pest Control & Fumigation category 31 currently has 54 active products and 56 total rows (including two inactive drafts). This is the entire category, not the count of newly added items.
+
+### New draft — photo upload blocked
+- Product: Portable Thermal Fogging Machine
+- ID/slug: `portable-thermal-fogging-machine`
+- Source page: https://www.metrotools.co.ke/fogging-machine-price-in-kenya.html
+- Supplier listing price: KSh 32,000; stored as source cost KSh 32,000.
+- Batch markup: 30%; stored selling price KSh 41,600.
+- Description: 942 words, product-specific, includes confirmed facts and clearly marks unknown machine specifications for supplier confirmation.
+- SEO title: `Portable Thermal Fogging Machine – Price in Kenya`
+- Stock=1000, low_at=20, featured=false.
+- Supplier page photograph URL located: https://www.metrotools.co.ke/images/fogging1.jpg
+- Attempted upload using both the direct image URL and supplier product-page URL. Supabase upload-photos returned HTTP 422: could not download image (timeout/network error); requested image_base64 for retry.
+- Product remains inactive with no image (correctly not published). Do not send a live product link. Next: obtain the exact supplier image bytes (or another exact supplier/manufacturer image) and upload via image_base64; verify Storage object + products.images, then activate.
+
+### Next
+- Continue researching distinct pest-control equipment with current Kenyan KES source prices and exact product photos.
+- Keep 30% batch markup, stock 1000, low_at 20, 600+ word descriptions, and photo-before-activation gate. Do not duplicate existing sprayers, traps, nets or pest-control products.
