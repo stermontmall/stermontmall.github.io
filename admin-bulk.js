@@ -8,8 +8,8 @@
   function norm(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
   function baseName(f) { return String(f).replace(/\.[^.]+$/, ''); }
   function A() { return window.STMAdmin; }
-  /* Owner rule 2026-11-02: +15% on the price and old price of every NEW item (existing items are never repriced here) */
-  function up(n) { return Math.ceil(n * 1.15); }
+  /* Owner rule 2026-11-02: +25% on the price and old price of every NEW item (existing items are never repriced here) */
+  function up(n) { return Math.ceil(n * 1.25); }
 
   /* ---------- CSV ---------- */
   function parseCSV(t) {
@@ -81,7 +81,7 @@
     /* =============== 1. spreadsheet import =============== */
     var c1 = h('div', 'card'); c.appendChild(c1);
     c1.appendChild(h('h3', null, '1 · Add many products from a spreadsheet')); c1.firstChild.style.margin = '0 0 .3rem';
-    c1.appendChild(h('p', 'meta', 'Fill the template in Excel or Google Sheets, save as CSV, then choose it below together with the product photos. Every row needs a selling_price. 15% is added to the price and old_price of every NEW item when it is imported. Rows with the same name and different pack_size become sizes of one product.'));
+    c1.appendChild(h('p', 'meta', 'Fill the template in Excel or Google Sheets, save as CSV, then choose it below together with the product photos. Every row needs a selling_price. 25% is added to the price and old_price of every NEW item when it is imported. Rows with the same name and different pack_size become sizes of one product.'));
     var a1 = h('div', 'acts'); a1.appendChild(btn('⬇ Download template', 'alt sm', function () { download('stermont-products-template.csv', TEMPLATE.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n')); })); c1.appendChild(a1);
     var csvIn = fileInput(false, '.csv,text/csv,text/plain'), phIn = fileInput(true, 'image/*');
     var lb1 = h('label', null, 'Spreadsheet (.csv)'), lb2 = h('label', null, 'Photos (select all of them together)');
