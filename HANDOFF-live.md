@@ -830,3 +830,14 @@ SEO follow-through for the 20-product batch: updated all 20 active product descr
 - Final DB verification: active=true, stock=1000, low_at=20, one image URL and one matching Storage object. Product link: https://stermontarcade.co.ke/?product=fugo-chick-and-duckling-mash-50kg
 - Demand context: poultry and dairy feeds are core Kenyan commercial feed categories in the Competition Authority of Kenya's 2024 animal-feed market inquiry. This is a category-level demand signal, not proof of individual SKU search volume.
 - Static page rebuild and sitemap verification remain separate and are not claimed complete.
+
+
+## 2026-11-13 — Demand-led poultry feed continuation (2 listings verified)
+
+- **FUGO Chick and Duckling Mash 50kg** — `fugo-chick-and-duckling-mash-50kg`; AgriJibu source price KSh 4,210, available in stock when checked; stored website price KSh 5,499. Description: 807 words. Manufacturer guidance: day 1 to 8 weeks, dry and ad libitum, approx. 2kg average per chick across the period; follow current bag label. Exact FUGO 50kg product photo uploaded as PNG, 66,142 bytes, Storage HTTP 200.
+- **Fugo Fast-Gro Finisher Mash 50kg** — `fugo-fast-gro-finisher-mash-50kg`; AgriJibu source price KSh 4,300, available in stock when checked; stored website price KSh 5,599. Description: 858 words. Supplier guidance places it in the broiler finishing stage from about day 25 until slaughter; current bag label takes precedence. Exact FUGO Fast-Gro Finisher Mash 50kg image uploaded as JPEG, 43,069 bytes, Storage HTTP 200.
+- Both products are in category 39, active=true, stock=1000, low_at=20, with one matching public Storage object and one image URL each. The 30% pricing rule was applied and the store price-point trigger rounded the results upward.
+- Customer links:
+  - https://stermontarcade.co.ke/?product=fugo-chick-and-duckling-mash-50kg
+  - https://stermontarcade.co.ke/?product=fugo-fast-gro-finisher-mash-50kg
+- Demand basis is category-level poultry/feed interest; do not claim these individual SKUs are the most searched without SKU-level keyword data. Static page rebuild/sitemap status is not independently verified.
