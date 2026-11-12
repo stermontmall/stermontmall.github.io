@@ -447,3 +447,24 @@ All seven rows below are active, each has one uploaded product image in the publ
 - Live sprayer product descriptions meeting 600+ words: 13 / 13.
 - Remaining catalogue batch items to add: 37.
 - Aico Japan 60L 7.5HP trolley sprayer remains inactive and photo-blocked; not counted as published.
+
+
+## 2026-11-12 — Pest-control batch continuation: Fly Catcher Sticky Fly Paper
+
+### Published and verified
+- Added and activated `fly-catcher-sticky-fly-paper-8-piece-pack` in category 31 (Pest Control & Fumigation).
+- Supplier listing: Rafiki Pest Control Agrovet, eight-piece variant KSh 1,200: https://shop.rafikipestcontrol.com/products/fly-catcher
+- Exact product photo imported from the supplier's product image CDN: https://sokowise-api.b-cdn.net/media/7961.webp?etag=ee67af5f6b916e7e9e95f4147e9d5817&height=640&width=640
+- Photo upload request 1766 returned HTTP 200 with `ok:true`, one photo stored, and `live:false` before activation. Public Storage URL: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/fly-catcher-sticky-fly-paper-8-piece-pack-mwdfbje041.jpg
+- Verified final row: active=true, featured=true, stock=1000, low_at=20, cost=KSh 1,200, stored selling price KSh 1,599, one image in `products.images`.
+- Description word count: 982 (verified in database), with product-specific details, supplier limitations, placement guidance, hygiene, safety, Kenyan buying checks and FAQs.
+- The 30% helper markup calculates KSh 1,560 before the site's price-point trigger; the trigger rounds the stored selling price up to KSh 1,599. The source listing price is a retail reference, not a verified acquisition cost or guaranteed net profit.
+- Product link: https://stermontarcade.co.ke/?product=fly-catcher-sticky-fly-paper-8-piece-pack
+
+### Build status
+- Database activation and image attachment are verified. Product-page rebuild/static HTML and sitemap refresh are still pending verification; do not claim the public static page is refreshed until the generated page and sitemap are checked.
+
+### Batch status
+- Live products: 14 / 50.
+- Remaining items: 36.
+- Continue only with distinct items supported by a current Kenyan KES reference price and exact matching photo. Keep descriptions at 600+ words and verify image storage before activation.
