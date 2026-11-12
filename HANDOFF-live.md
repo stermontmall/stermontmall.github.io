@@ -1,3 +1,34 @@
+## 2026-11-12 20:30 (Africa/Nairobi) — Spinach seed varieties published
+
+### Published and verified in Supabase
+- Added five live listings in category 41 (Seeds & Seedlings). All have an uploaded public Storage object referenced in `products.images`, `active=true`, `stock=1000`, `low_at=20`, and `featured=false`.
+- Photo uploads returned HTTP 200 with `ok=true`; activation used `public.activate_product_if_photo_ok`, which confirmed each Storage object exists before setting active.
+- Source KES costs used with the owner's explicit 30% batch markup. The site's price-point trigger rounds selling prices upward to the next supported price point, so actual displayed markup can exceed 30%.
+
+| Product | Supplier source cost | Stored selling price | Photo source |
+|---|---:|---:|---|
+| Piano F1 Baby Spinach Seeds 5g | 112 | 150 | Agroduka exact Piano F1 listing image |
+| Fordhook Giant Spinach Seeds Agripack 50g | 170 | 250 | Agropests exact Agripack 50g listing |
+| Fordhook Giant Spinach Seeds Royal 10g | 80 | 150 | AgriJibu exact Royal 10g listing |
+| Florida Broadleaf Mustard Spinach Seeds | 345 | 450 | Starke Ayres Florida Broadleaf 15g packet image; AgriJibu KES listing used for source price (AgriJibu listing did not state pack weight, so site unit remains generic “pack”) |
+| Hudson F1 Spinach Seeds Florian | 260 | 350 | MyAgrovet exact Hudson F1 product listing |
+
+### Mobile-shell product links
+- https://stermontarcade.co.ke/?product=piano-f1-baby-spinach-seeds-5g
+- https://stermontarcade.co.ke/?product=fordhook-giant-spinach-seeds-agripack-50g
+- https://stermontarcade.co.ke/?product=fordhook-giant-spinach-seeds-royal-10g
+- https://stermontarcade.co.ke/?product=florida-broadleaf-mustard-spinach-seeds
+- https://stermontarcade.co.ke/?product=hudson-f1-spinach-seeds-florian
+
+### Blocked draft / source qualification
+- Earlier draft `fordhook-giant-spinach-seeds-agripack-10g` remains inactive with no image. Tropika lists that pack as “available on order,” not confirmed in stock, and the page-photo extraction failed. It was not published. The in-stock Agripack 50g variant above was used instead.
+- Piano F1 supplier-page photo extraction returned HTTP 403; the exact Piano F1 image from Agroduka's matching product listing uploaded successfully on retry.
+- Static product-page generation/sitemap refresh is on the scheduled product-pages workflow; no workflow run after this batch has been verified yet. Supabase live state and Storage objects are verified. Check the next successful `product-pages.yml` run and verify all five static pages and sitemap entries.
+
+### GitHub progress
+- Handoff saved on branch `wip-spinach-seed-products`. No storefront source files or generated product HTML were edited.
+- Next: review/merge this handoff-only PR if checks pass; then verify the scheduled product-pages build and public pages.
+ 
 ## 2026-11-12 15:15 (Africa/Nairobi) — Remove Daraja M-Pesa STK prompt (owner request, permanent)
 
 ### Why
