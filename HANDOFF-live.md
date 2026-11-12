@@ -626,3 +626,28 @@ SEO follow-through for the 20-product batch: updated all 20 active product descr
 
 ### Next
 - Open and merge PR after review; then verify the live mobile storefront on a phone.
+
+
+## 2026-11-12 — Agrovet, pest-control and fumigation batch: 50 published
+
+### Supabase publication verified
+- Added 50 new live product listings using the existing product helper and photo uploader in Supabase project `oewvtbnmyombbtggamor`.
+- Final verification window: 88 rows created during this run; 50 active and public, 38 inactive drafts left unpublished because their initial supplier page/photo sources could not be verified or downloaded. The 38 inactive rows are not counted as published.
+- All 50 active rows have one public `product-images` Storage object and a matching `products.images[1]` URL. Final Storage join returned 50/50 objects.
+- All 50 have `stock=1000`, `low_at=20`, and `featured=false`.
+- All 50 stored selling prices are at least 30% above the supplier reference cost. The site's price-point rounding trigger can increase the effective markup above 30% on low-priced items; observed price/cost ratios ranged from 1.30 to 1.875.
+- Supplier prices are public Kenyan KES retail references, not verified wholesale acquisition costs or guaranteed net profit.
+- Active image object sizes after the final image-quality cleanup ranged from 1,130 to 38,989 bytes. The Jacto SP Lance without nozzle candidate was deactivated because its supplier page yielded a 146-byte placeholder, and it is not part of the 50. V-Multinor Injectable Multivitamin 50ml was added as the replacement.
+- Trevin Dudu Dust 200g image was replaced using the exact 200g product page at https://agropests.com/products/trevin-dudu-dust-200g; final PNG object size is 38,989 bytes.
+- Category breakdown: Agrovet 3; Cockroach & Ant Killers 2; Crop Insecticides 18; Fertilizers 5; Fumigation Chemicals 1; Fungicides 10; Mosquito & Fly Control 1; Rodent Control 2; Seeds & Seedlings 4; Sprayers & Equipment 4.
+- Product routes use the owner's mobile-shell format: `https://stermontarcade.co.ke/?product=<slug>`. New product IDs/slugs are unique and the 50 active rows were checked in Supabase.
+
+### SEO and static page follow-up — not yet complete
+- Current descriptions are concise, factual starter copy (roughly 50–70 words), not the required 600–900-word product SEO descriptions in `PUBLISHING.md`. Do not mark this batch SEO-complete. Next: write original, SKU-specific 600–900-word descriptions for the 50 active products, back up existing descriptions first, then verify title length and description word count.
+- Latest successful `Build product pages` GitHub Actions run before this batch was run 43226535437 at 2026-11-12 13:21:38Z (schedule). No product-pages run after the 50 Supabase activations was visible at final check.
+- The connected GitHub toolset does not expose workflow-dispatch. Run the documented command when an Actions-capable GitHub session is available:
+  `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`
+- After the workflow completes, verify generated static product HTML, canonical/JSON-LD and sitemap entries for the 50 new slugs. Until then, report Supabase activation as verified, but static HTML/sitemap refresh as pending.
+
+### Important next action
+- Continue from this handoff by expanding the 50 active product descriptions to the required 600–900 words, then dispatch and verify the product-pages workflow. Do not reactivate the 38 photo-blocked drafts without exact, usable product images.
