@@ -468,3 +468,13 @@ All seven rows below are active, each has one uploaded product image in the publ
 - Live products: 14 / 50.
 - Remaining items: 36.
 - Continue only with distinct items supported by a current Kenyan KES reference price and exact matching photo. Keep descriptions at 600+ words and verify image storage before activation.
+
+
+## 2026-11-12 — Pest-control batch continuation: UV fly-killer research (held, not published)
+
+- Weighing Scale Solutions lists a 20W Electric Fly Insect Killer at KSh 5,500 excluding VAT: https://weighingscalessolutions.co.ke/product/20w-electric-fly-insect-killer/. Supplier claims two UV tubes, 60 m² stated coverage, enclosed steel safety net, hanging chain and removable collection tray; free Nairobi shipping, other areas charged.
+- The same supplier's category page lists 10W replacement lamps (two-piece pack) at KSh 600 excluding VAT and 15W fly-killer bulbs at KSh 800 excluding VAT. Compatibility must be checked against the exact installed unit before listing replacement tubes.
+- The supplier's 30W page is internally inconsistent: title says 30W while detailed specification says 6W. Do not use until clarified.
+- No new product was created. The direct matching image for the 20W model was not verified; image search showed other brands/models, which must not be substituted. No image upload or activation was attempted.
+- A category_id 31 name query did not return a matching insect-killer name, but catalogue-wide duplicate checking and exact model identity still need to be confirmed before a generic unit is inserted.
+- Next: continue with non-chemical physical pest-control equipment. Require exact supplier model, current KES price/tax treatment, in-stock status, matching direct photo and catalogue-wide duplicate check. Keep the agreed 30% markup, 600+ word description, stock 1000, low_at 20 and featured=true; activate only after image verification.
