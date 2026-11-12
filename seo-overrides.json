@@ -2835,9 +2835,9 @@
     ]
   },
   "livergen-plus-poultry-liver-tonic-500-ml": {
-    "desc": "Livergen Plus poultry liver tonic 500 ml in Kenya for KSh {price}. Check label directions before use. M-Pesa checkout and delivery across Kenya."
+    "desc": "Livergen Plus poultry liver tonic 500 ml in Kenya for {price}. Check label directions before use. M-Pesa checkout and delivery across Kenya."
   },
   "nilzan-plus-drench-1-litre": {
-    "desc": "Nilzan Plus livestock drench 1 litre in Kenya for KSh {price}. Confirm species, dose and withdrawal periods with a vet. M-Pesa and Kenya delivery."
+    "desc": "Nilzan Plus livestock drench 1 litre in Kenya for {price}. Confirm species, dose and withdrawal periods with a vet. M-Pesa and Kenya delivery."
   }
 }
