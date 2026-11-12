@@ -344,11 +344,11 @@
   /* product-names.json (written by every site rebuild) = the heading each product page shows, with its ranking words ("Original ...", "#1 Top ...").
      The list and the product view use it so they read exactly like the page; if it cannot be loaded the plain database name is shown. */
   var NAMES = {}, namesP = fetch('product-names.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
-  getProducts('id,slug,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)')
-    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)'); })
-    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,stock,images,featured,description,categories(name,slug)'); })
-    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,stock,images,featured,description,categories(name,slug)'); })   /* unit column not added yet */
-    .then(function (r) { return r.ok ? r : getProducts('id,name,price,stock,images,featured,description,categories(name,slug)'); })   /* old_price column not added yet: still show products */
+  getProducts('id,slug,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,categories(name,slug)')
+    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,categories(name,slug)'); })
+    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,stock,images,featured,categories(name,slug)'); })
+    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,stock,images,featured,categories(name,slug)'); })   /* unit column not added yet */
+    .then(function (r) { return r.ok ? r : getProducts('id,name,price,stock,images,featured,categories(name,slug)'); })   /* old_price column not added yet: still show products */
     .then(function (r) { return r.ok ? r.json() : []; }).then(function (rows) { return namesP.then(function (nm) { NAMES = nm && typeof nm === 'object' ? nm : {}; return rows; }); }).then(function (rows) {
       var root = D.querySelector('#music-gear .wrap'), groups = {};
       rows.forEach(function (p) { if (p.slug && p.slug !== p.id) SLUGS[p.id] = p.slug; });
