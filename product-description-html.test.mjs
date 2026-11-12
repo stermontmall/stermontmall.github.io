@@ -30,11 +30,13 @@ assert.deepEqual(heads(car), ['Product overview', 'Buying notes', 'Buying guide'
 ok(/<h3>Buying guide<\/h3><p>Inspect the exact vehicle and compare its condition\.<\/p>/.test(car), 'car buying guide renders as a separate heading');
 ok(/<h3>Vehicle enquiry &amp; next steps<\/h3><p>Request current photos and a written quotation\.<\/p>/.test(car), 'car enquiry renders as a separate heading');
 
-// no labels: unchanged behaviour
-const plain = productDescriptionHtml('First paragraph.\n\nSecond paragraph.');
-assert.deepEqual(heads(plain), ['Product overview', 'Product details']); n++;
-// words that merely look like labels in lower case are not headings
-ok(heads(productDescriptionHtml('Use it safely and order today. Storage is easy.')).length === 1, 'lowercase words never create headings');
+// Unlabelled descriptions now receive useful subtitles, with every original sentence retained.
+const plain = productDescriptionHtml('A stainless steel milk can has a 20 litre capacity. Its smooth metal body is designed for dairy collection. Farmers use it to carry milk from the shed to the collection point. Before use, wash and sanitise the can. After each collection, rinse it and store it in a clean dry place. Confirm the exact model and lid arrangement before ordering.');
+assert.deepEqual(heads(plain), ['Product overview', 'Uses & applications', 'How to use & application', 'Care, cleaning & storage', 'Buying guide & product checks']); n++;
+ok(plain.includes('20 litre capacity') && plain.includes('collection point') && plain.includes('clean dry place') && plain.includes('lid arrangement'), 'all source facts remain in rendered copy');
+// Short plain descriptions still get one useful overview heading.
+const shortPlain = productDescriptionHtml('Use it safely and order today. Storage is easy.');
+assert.deepEqual(heads(shortPlain), ['Product overview']); n++;
 // duplicate label merges, empty source falls back
 assert.deepEqual(heads(productDescriptionHtml('Intro. SAFETY Wear gloves. STORAGE Keep dry. SAFETY Wash hands.')), ['Product overview', 'Safety information', 'Storage & handling']); n++;
 ok(productDescriptionHtml('').includes('will be updated shortly'), 'empty fallback');
