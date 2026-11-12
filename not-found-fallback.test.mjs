@@ -10,8 +10,10 @@ const code = m[0].replace(/^<script>/, '').replace(/<\/script>$/, '');
 assert.ok(html.indexOf('stm-404-fallback') < html.indexOf('</head>'), 'script must run in <head> so there is no flash of the 404 page');
 assert.ok(/<meta name="robots" content="noindex">/.test(html), '404 page must stay noindex');
 
-const run = pathname => { let to = null; vm.runInNewContext(code, { location: { pathname, replace: u => { to = u; } }, encodeURIComponent }); return to; };
+const run = pathname => { let to = null; vm.runInNewContext(code, { location: { pathname, search: '?ref=share', hash: '#pack', replace: u => { to = u; } }, encodeURIComponent }); return to; };
 const cases = [
+  ['/p/alto-100-sl-fungicide-250ml.htm', '/p/alto-100-sl-fungicide-250ml.html?ref=share#pack'],
+  ['/p/Some-Slug-2.HTM', '/p/Some-Slug-2.html?ref=share#pack'],
   ['/p/agrimec-018ec-insecticide-100ml.html', '/?product=agrimec-018ec-insecticide-100ml'],
   ['/p/confidor-200sl-insecticide-250ml.html', '/?product=confidor-200sl-insecticide-250ml'],
   ['/c/crop-insecticides.html', '/?cat=crop-insecticides'],
