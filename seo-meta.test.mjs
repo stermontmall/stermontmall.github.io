@@ -54,6 +54,19 @@ assert.ok(!/storage…\\./i.test(longFact), `meta description contains a cut-off
 assert.ok(longFact.includes('M-Pesa') && longFact.includes('47 counties'));
 n += 3;
 
+// Heading labels at the start of catalogue descriptions must not leak into Google snippets.
+// Skip a generic "Buy ..." opening and use the first factual sentence instead.
+for (const [name, ctx, source] of [
+  ['Livergen Plus Poultry Liver Tonic (500ml)', { catSlug: 'veterinary-drugs' }, 'PRODUCT OVERVIEW Buy Livergen Plus Poultry Liver Tonic (500ml) online in Kenya. Livergen Plus for chicken and poultry is a 500 ml herbal liver tonic for use in drinking water according to the product label.'],
+  ['Nilzan Plus Drench', { catSlug: 'veterinary-drugs' }, 'PRODUCT OVERVIEW Buy Nilzan Plus Drench 1 Litre online in Kenya. Nilzan Plus is a combined fluke and roundworm drench for cattle, sheep and goats.']
+]) {
+  const d = pdpDescription(name, ctx, source);
+  assert.ok(!/PRODUCT OVERVIEW/i.test(d), `heading label leaked into snippet: ${d}`);
+  assert.ok(!/Buy .*Kenya: Buy/i.test(d), `repeated Buy phrase in snippet: ${d}`);
+  assert.ok(d.length <= DESC_MAX);
+}
+n += 3;
+
 for (const [c, slug] of cats) {
   const t = catTitle(c), d = catDescription(c, slug); n += 2;
   assert.ok(t.length <= TITLE_MAX, `cat title ${t.length}: ${t}`);
