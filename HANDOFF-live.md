@@ -587,3 +587,13 @@ SEO follow-through for the 20-product batch: updated all 20 active product descr
 - Upload request 1799 returned HTTP 200 with `ok:true`, `live:true`, and `photos:1`. The product remains active and its `products.images` field contains the public Storage object URL.
 - No product name, price, stock, description or activation status was changed.
 - Note: the separate Agroduka image result shows a 1kg pack and was deliberately not used for the 250g listing. The image source used was the Agropests 250g product page, not a standalone Kenagro logo.
+
+
+## 2026-11-12 17:21 (Africa/Nairobi) — Pest-control 50-item batch: continuation check
+
+- Rechecked live Supabase category 31 (Pest Control & Fumigation) before any activation.
+- Current category contains three inactive records: `portable-thermal-fogging-machine`, `aico-japan-60l-7-5hp-trolley-agricultural-sprayer`, and `faya-dudu-dust-insecticide-50g`. All three have empty `images` arrays; none was activated.
+- Existing active catalogue rows were left unchanged. No new products were inserted, no prices or stock values were modified, and no product was falsely reported as newly published.
+- Supplier research surfaced catalogues at Agropests, KitutoAfrica, Geoffe Mitch, Kejani and others. Some listings were explicitly out of stock, so they were not used as publish-ready sources. Examples: https://agropests.com/products/subcategories/insecticides and https://agropests.com/products/categories/fumigation.
+- Blocker: this session did not expose a working product-photo upload action that could verify exact item photos in Storage. The database publication trigger correctly rejects active products without verified images.
+- Next: continue only with new, duplicate-free SKUs supported by an in-stock Kenyan KES price and exact matching photo; create the 600+ word product copy; apply the 30% batch markup, stock 1000, low_at 20; upload and verify each image before activation. Do not treat supplier search results alone as publication.
