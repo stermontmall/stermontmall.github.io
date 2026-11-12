@@ -51,7 +51,7 @@
     var img = mk('span', 'img'); img.style.position = 'relative';
     if (p.images && p.images[0]) { var i = new Image(); i.src = p.images[0]; i.alt = p.name; i.width = i.height = 288; i.loading = 'lazy'; img.appendChild(i); }
     var d = disc(p); if (d) img.appendChild(badge(d));
-    img.appendChild(heart(c.id)); setTimeout(paintHearts, 0);
+    img.appendChild(heart(c.id));
     c.dataset.price = p.price; c.dataset.disc = d ? d.pct : 0; c.dataset.i = (card.n = (card.n || 0) + 1);
     var b = mk('div', 'b'), h = mk('h3', '', p.name), pr = mk('p', 'price' + (d ? ' sale' : ''), money(p.price));
     var btn = mk('button', 'btn btn-main'); btn.type = 'button';
@@ -380,6 +380,7 @@
         }
         if ((p._g ? p._g.rep === p && p._g.some(function (x) { return x.featured; }) : p.featured)) { var row = D.querySelector('#featured .row'), cta = row && row.querySelector('.cta'); if (row) { var fc = card(p); if (p._g) { fc._p = p; fc.id = 'f-' + p.id; vfix(fc, p); fc.querySelector('.price'); } row.insertBefore(fc, cta); } }
       });
+      paintHearts(); /* once after the catalogue is built; never scan every wishlist button per product */
       try { buildDeals(rows); buildToolbar(); } catch (e) {}
       var hm = location.hash.match(/^#p-(.+)$/);   /* old shared #p- links still open the item, and now switch to the straight /p/ URL */
       if (hm) { var hid = decodeURIComponent(hm[1]); rows.forEach(function (p) { if (p.slug === hid) hid = p.id; }); var c0 = D.getElementById('p-' + hid); if (c0 && c0._p) openView(c0); }
