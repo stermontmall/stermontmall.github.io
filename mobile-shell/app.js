@@ -50,6 +50,23 @@ const ls = {
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
 const api = path => fetch(SB + '/rest/v1/' + path, { headers: { apikey: KEY }, cache: 'no-store' })
   .then(r => { if (!r.ok) throw new Error('Supabase HTTP ' + r.status); return r.json(); });
+// PostgREST caps a response at 1,000 rows. Page the public catalogue RPC so new listings
+// remain visible after the shop grows beyond that cap.
+async function apiAll(path, pageSize = 1000) {
+  const all = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const r = await fetch(SB + '/rest/v1/' + path, {
+      headers: { apikey: KEY, Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
+      cache: 'no-store'
+    });
+    if (!r.ok) throw new Error('Supabase HTTP ' + r.status + ' while loading catalogue page ' + (offset / pageSize + 1));
+    const batch = await r.json();
+    if (!Array.isArray(batch)) throw new Error('Supabase returned an invalid catalogue page');
+    all.push(...batch);
+    if (batch.length < pageSize) break;
+  }
+  return all;
+}
 const ICONS = { 'pest-control-fumigation': '🪳', agrovet: '🌱', 'phones-accessories': '📱', 'tv-audio-video': '📺', appliances: '🍳', 'home-kitchen': '🏠',
   fashion: '👗', shoes: '👟', bags: '👜', 'watches-jewellery': '⌚', 'computers-accessories': '💻', 'health-beauty': '💄', automotive: '🚗', 'stermont-cars-for-sale': '🚗', 'baby-products': '🧸', others: '🛍️' };
 const BGS = ['#ede9fe', '#fce7f3', '#dcfce7', '#fef3c7', '#e0f2fe', '#ffe4e6', '#f1f5f9'];
@@ -90,7 +107,7 @@ let fullCatalog = false;   // true once the WHOLE catalog is in PRODUCTS (the pr
 function loadCatalog() {
   if (!catalogP) {
     catalogP = Promise.all([
-      api('rpc/get_store_catalog'),
+      apiAll('rpc/get_store_catalog'),
       api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
       fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}))
     ]).then(([rows, cats, names]) => { buildCatalog(rows, cats, names); fullCatalog = true; }).catch(e => { catalogP = null; throw e; });  // a failed load can be retried
