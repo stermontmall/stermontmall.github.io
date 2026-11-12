@@ -302,3 +302,5 @@ jobs:
 # 2026-11-12: rebuild again after adding Decis Forte EC 250ml, Decis EC 25 1L and Bandur Forte SC 600 1L; all have supplier photos, 600+ word copy and stock/markup defaults.
 # 2026-11-12: rebuild product pages and sitemap after adding 16 new supplier-backed agrochemical and fertilizer SKUs with 25% markup and storage photos.
 # 2026-11-12: final rebuild after normalizing the earlier seven product prices to exactly 25% over recorded supplier cost.
+
+# 2026-11-12: rebuild product pages and sitemap after publishing four additional supplier-photo-backed agrochemical and pest-control listings.
