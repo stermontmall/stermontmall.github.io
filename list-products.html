@@ -58,7 +58,7 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
     </div>
     <label class="chk"><input id="disc" type="checkbox" checked> Show a previous price (crossed out) using that discount</label>
     <label class="chk"><input id="dfeat" type="checkbox" checked> Feature every item as advert / top banner</label>
-    <p class="hint"><b>15% is added to the price (and previous price) you type when you post.</b> The selling price is what you type for each item. Price Watch may update it later to follow market prices. The previous price should be a price you really charged or will honour, so customers are not misled. You can change anything on each item before posting.</p>
+    <p class="hint"><b>25% is added to the price (and previous price) you type when you post.</b> The selling price is what you type for each item. Price Watch may update it later to follow market prices. The previous price should be a price you really charged or will honour, so customers are not misled. You can change anything on each item before posting.</p>
   </div>
   <div id="msg"></div>
   <div id="rows"></div>
@@ -80,8 +80,8 @@ button.pri{background:var(--p);color:#fff}button.ok{background:var(--ok);border-
   function str(v, n) { return String(v == null ? '' : v).replace(/[ \t]+/g, ' ').trim().slice(0, n); }
   function num(v) { v = parseFloat(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return v > 0 ? Math.round(v) : 0; }
   function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
-  /* Owner rule 2026-11-02: 15% is added to the price and previous price of every new item when it is posted */
-  function up(n) { return Math.ceil(n * 1.15); }
+  /* Owner rule 2026-11-02: 25% is added to the price and previous price of every new item when it is posted */
+  function up(n) { return Math.ceil(n * 1.25); }
   /* previous (crossed-out) price: the selling price plus the chosen discount, rounded up to the next KSh 10 */
   function autoOld(it) { return S.opt.disc && it.price > 0 ? Math.ceil(it.price / (1 - it.d / 100) / 10) * 10 : 0; }
   function readOpt() {
