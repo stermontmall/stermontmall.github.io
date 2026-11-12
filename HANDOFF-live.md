@@ -817,3 +817,16 @@ SEO follow-through for the 20-product batch: updated all 20 active product descr
 
 ### Important next action
 - Continue from this handoff by expanding the 50 active product descriptions to the required 600–900 words, then dispatch and verify the product-pages workflow. Do not reactivate the 38 photo-blocked drafts without exact, usable product images.
+
+
+## 2026-11-13 — Demand-led poultry feed addition (verified in Supabase)
+
+- Added **FUGO Chick and Duckling Mash 50kg** in category 39 (Animal Feeds).
+- Product ID/slug: `fugo-chick-and-duckling-mash-50kg`.
+- Kenyan supplier listing: https://agrijibu.co.ke/fugo-chick-and-duckling-mash-50kg/ — KSh 4,210, listed in stock at time checked. Manufacturer feeding guidance: day 1 to 8 weeks, feed dry and ad libitum, approximate average 2kg per chick over the period; confirm current bag label.
+- Applied the agreed 30% pricing rule through `add_draft_product(...,30)`; site price-point trigger stored the selling price as KSh 5,499.
+- Original description: approximately 780 words, product-specific, no internal markup/source-price language.
+- Exact matching FUGO Chick & Duckling Mash 50kg bag photo sourced from https://agroduka.ke/images/thumbnails/600/600/detailed/9/Chick-and-Duckling-mash_sz6j-5f.png and uploaded to public Storage as `product-images/fugo-chick-and-duckling-mash-50kg.png`. Storage metadata confirms PNG, 66,142 bytes, HTTP 200.
+- Final DB verification: active=true, stock=1000, low_at=20, one image URL and one matching Storage object. Product link: https://stermontarcade.co.ke/?product=fugo-chick-and-duckling-mash-50kg
+- Demand context: poultry and dairy feeds are core Kenyan commercial feed categories in the Competition Authority of Kenya's 2024 animal-feed market inquiry. This is a category-level demand signal, not proof of individual SKU search volume.
+- Static page rebuild and sitemap verification remain separate and are not claimed complete.
