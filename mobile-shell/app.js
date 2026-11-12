@@ -488,7 +488,7 @@ function splitProductDescription(source) {
     ['How to use', /(?:^|\s)(?:HOW TO USE(?: IT)?|DIRECTIONS FOR USE|USAGE INSTRUCTIONS|PLANNING FOR USE)\s*:?\s*/g],
     ['Before you start', /(?:^|\s)BEFORE YOU START\s*:?\s*/g],
     ['Safety information', /(?:^|\s)(?:SAFETY(?:\s+AND\s+RESPONSIBLE\s+HANDLING| INFORMATION| PRECAUTIONS| PROTOCOLS)?|IMPORTANT SAFETY NOTES|PRECAUTIONS)\s*:?\s*/g],
-    ['Storage & handling', /(?:^|\s)(?:STORAGE(?:\s*(?:&|AND)\s*HANDLING)?|HANDLING)\s*:?\s*/g],
+    ['Storage & handling', /(?:^|\s)(?:STORAGE(?:\s*(?:&|AND)\s*(?:HANDLING|DISPOSAL))?|HANDLING|DISPOSAL)\s*:?\s*/g],
     ['Frequently asked questions', /(?:^|\s)(?:FREQUENTLY ASKED QUESTIONS|FAQS?|COMMON QUESTIONS)\s*:?\s*/g],
     ['Ordering, payment & delivery', /(?:^|\s)(?:ORDER(?:ING)?(?:\s*(?:&|AND)\s*(?:DELIVERY|PAYMENT))?|AVAILABILITY(?:\s*(?:&|AND)\s*DELIVERY)?|DELIVERY(?:\s*(?:&|AND)\s*PAYMENT)?|PAYMENT(?:\s*(?:&|AND)\s*DELIVERY)?)\s*:?\s*/g],
     ['Important buying notes', /(?:^|\s)(?:IMPORTANT NOTES|BUYING NOTES|PLEASE NOTE|IMPORTANT INFORMATION)\s*:?\s*/g]
