@@ -84,7 +84,7 @@ assert.equal(pdpHeadings('smartphones').guide, 'How to Choose, Use & Care for Th
 assert.equal(pdpHeadings('smartphones').uses, 'Product Uses & Practical Buying Guide');
 assert.equal(pdpHeadings('fertilizers').uses, 'Farm Uses & Application Guidance');
 assert.equal(pdpHeadings('herbicides').uses, 'Crop Protection Uses & Application Guidance');
-assert.equal(pdpHeadings('smartphones').price, 'Price, M-Pesa Checkout & Kenya Delivery');
+assert.equal(pdpHeadings('smartphones').price, 'Product Price, M-Pesa Checkout & Ordering in Kenya');
 n += 8;
 
 // generate-products.mjs prints pdpHeadings().delivery as an <h2>; it must never be empty (it was, on every product page, before 2026-10-29).
