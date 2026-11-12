@@ -268,6 +268,16 @@ const expected = [
   "vivo-v50-lite-4g-8gb-256gb-20261108",
   "itel-power-80-4gb-128gb-20261108",
   "honor-600-lite-5g-8gb-256gb-20261108",
+  "stainless-steel-milking-bucket-15l",
+  "aluminium-milking-can-20l",
+  "agroz-black-and-white-silage-bag-350-400kg",
+  "cow-rubber-mattress-for-dairy-stall",
+  "cow-ear-tags-pack-of-100",
+  "sheep-goat-and-pig-ear-tags",
+  "calf-suckling-preventer",
+  "burdizzo-castrator-for-goats-and-sheep",
+  "non-return-teat-dip-cup",
+  "milk-strip-cup-for-mastitis-checking",
 ];
 assert.deepEqual(Object.keys(content).sort(), [...expected].sort(), 'Only reviewed product IDs should be present');
 const allText = [];
