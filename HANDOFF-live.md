@@ -1,3 +1,9 @@
+## 2026-11-12 23:40 (Africa/Nairobi) - Tonic F1 Spinach Seeds 50g LIVE (verified)
+- `add_product_photo` request 1890 returned HTTP 200 ok=true; `products.images` holds the Storage URL and the `product-images/tonic-f1-spinach-seeds-50g.jpg` object exists.
+- `activate_product_if_photo_ok` returned LIVE. Row: price 1499, cost 1040, stock 1000, low_at 20, active=true, featured=false (price/description unchanged).
+- Link: https://stermontarcade.co.ke/?product=tonic-f1-spinach-seeds-50g
+- Branch `wip-tonic-f1-spinach-50g` carries only the transport copy of the photo plus this note. Next: check the next product-pages.yml run for the static page and sitemap entry; the branch can be deleted or merged as a note-only commit.
+
 ## 2026-11-12 23:25 (Africa/Nairobi) - Tonic F1 Spinach Seeds 50g going live
 
 ### In progress
