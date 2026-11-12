@@ -841,3 +841,43 @@ SEO follow-through for the 20-product batch: updated all 20 active product descr
   - https://stermontarcade.co.ke/?product=fugo-chick-and-duckling-mash-50kg
   - https://stermontarcade.co.ke/?product=fugo-fast-gro-finisher-mash-50kg
 - Demand basis is category-level poultry/feed interest; do not claim these individual SKUs are the most searched without SKU-level keyword data. Static page rebuild/sitemap status is not independently verified.
+
+
+## 2026-11-13 — Dairy and livestock equipment batch (10 listings verified)
+
+Research sources included Mkulima Jovial's current Kenyan dairy/livestock catalogue and price list, Ecochicks dairy equipment, and supporting product references. Products were checked against the existing catalogue before creation. Each listing was created with the batch-specific 30% pricing argument, then received a photo through `public.add_product_photo`. The store price-point trigger rounds some prices upward. All ten are now active=true, stock=1000, low_at=20, with exactly one public Storage image URL and one matching object in `product-images`. Descriptions were extended and verified at 607–674 words each.
+
+| Product | ID / slug | Reference supplier price (KSh) | Stored website price (KSh) | Description words |
+|---|---|---:|---:|---:|
+| Stainless Steel Milking Bucket 15L | `stainless-steel-milking-bucket-15l` | 2,500 | 3,250 | 674 |
+| Aluminium Milking Can 20L | `aluminium-milking-can-20l` | 8,500 | 11,050 | 649 |
+| AgroZ Black and White Silage Bag 350–400kg | `agroz-black-and-white-silage-bag-350-400kg` | 1,200 | 1,599 | 672 |
+| Cow Rubber Mattress for Dairy Stall | `cow-rubber-mattress-for-dairy-stall` | 3,000 | 3,900 | 653 |
+| Cow Ear Tags Pack of 100 | `cow-ear-tags-pack-of-100` | 2,800 | 3,650 | 639 |
+| Sheep Goat and Pig Ear Tags | `sheep-goat-and-pig-ear-tags` | 2,500 | 3,250 | 630 |
+| Calf Suckling Preventer | `calf-suckling-preventer` | 100 | 150 | 615 |
+| Burdizzo Castrator for Goats and Sheep | `burdizzo-castrator-for-goats-and-sheep` | 3,000 | 3,900 | 610 |
+| Non-Return Teat Dip Cup | `non-return-teat-dip-cup` | 1,000 | 1,300 | 628 |
+| Milk Strip Cup for Mastitis Checking | `milk-strip-cup-for-mastitis-checking` | 1,200 | 1,599 | 607 |
+
+### Photo and product accuracy notes
+- All ten image uploads ultimately returned HTTP 200 and `live:true`; four initial remote image hosts failed and were replaced with alternate downloadable product-type images before activation.
+- The AgroZ image is a matching AgroZ silage bag. The Burdizzo image is from the supplier's Burdizzo product listing.
+- The cow mattress, cow ear tags, sheep/goat/pig tags, milking bucket, aluminium milk can, teat dip cup and strip cup use representative product-type images from other catalogues, not verified exact photos of the Kenyan seller's supplied stock. The calf weaner image is a matching calf-weaner model reference. Do not describe these representative images as exact seller-stock photographs.
+- For the 20L aluminium can, confirm the actual supplied can capacity/material and food-contact suitability with the supplier before order fulfilment. For ear tags, confirm exact pack composition and applicator compatibility. For Burdizzo, the description stresses use only by a qualified/trained operator and appropriate animal-welfare/veterinary oversight.
+- Supplier prices are published Kenyan retail references used as the cost basis; availability and prices can change. Customer descriptions do not mention internal markup or source-price calculations.
+
+### Customer links
+- https://stermontarcade.co.ke/?product=stainless-steel-milking-bucket-15l
+- https://stermontarcade.co.ke/?product=aluminium-milking-can-20l
+- https://stermontarcade.co.ke/?product=agroz-black-and-white-silage-bag-350-400kg
+- https://stermontarcade.co.ke/?product=cow-rubber-mattress-for-dairy-stall
+- https://stermontarcade.co.ke/?product=cow-ear-tags-pack-of-100
+- https://stermontarcade.co.ke/?product=sheep-goat-and-pig-ear-tags
+- https://stermontarcade.co.ke/?product=calf-suckling-preventer
+- https://stermontarcade.co.ke/?product=burdizzo-castrator-for-goats-and-sheep
+- https://stermontarcade.co.ke/?product=non-return-teat-dip-cup
+- https://stermontarcade.co.ke/?product=milk-strip-cup-for-mastitis-checking
+
+### Static page status
+Supabase activation and Storage object checks passed. The GitHub static product-page rebuild and sitemap refresh have not been independently verified in this batch; do not claim storefront page rendering is confirmed until the existing product-pages workflow succeeds and generated pages are checked.
