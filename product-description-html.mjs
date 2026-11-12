@@ -88,8 +88,8 @@ export function productDescriptionHtml(source) {
       if (/\b(?:e\.g|i\.e|etc|approx|Dr|Mr|Mrs|Ms|St|No|vs)\.$/i.test(prev)) sentences[sentences.length - 1] += ' ' + part;
       else sentences.push(part);
     }
-    const groups = [];
-    for (let i = 0; i < sentences.length; i += 3) groups.push(sentences.slice(i, i + 3).join(' '));
+    const groups = sentences.length ? [sentences.slice(0, 2).join(' ')] : [];
+    for (let i = 2; i < sentences.length; i += 2) groups.push(sentences.slice(i, i + 2).join(' '));
     if (!groups.length) groups.push(source);
     const rules = [
       ['Safety information', /\b(safety|safe handling|avoid|never|warning|risk|injur|children|pets|protective|PPE|veterinar|withdrawal|poison|hazard|distress)\b/i],
