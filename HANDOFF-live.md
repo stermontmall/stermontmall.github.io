@@ -1,3 +1,34 @@
+## 2026-11-12 — Pest-control batch progress update 2
+
+### Published and verified: 13 of 50
+The following new product rows are active in Supabase. Each has one uploaded product image, and the upload-photos endpoint returned HTTP 200 with `live:true`. Stock=1000 and low_at=20 for each. The 30% batch markup is applied through `add_draft_product(...,30)`, then the site's price rounding trigger rounds to the next supported price point.
+
+| Product | Reference cost (KSh) | Stored selling price (KSh) |
+|---|---:|---:|
+| Total TSPLI20162 20V 16L Cordless Backpack Sprayer | 14,800 | 19,250 |
+| Turbo TR20 20L 2-in-1 Manual and Battery Knapsack Sprayer | 7,800 | 10,150 |
+| EMAS 16L Manual Knapsack Sprayer | 2,500 | 3,250 |
+| Aico Japan AC767-4 25L 4-Stroke Petrol Knapsack Sprayer | 19,000 | 24,700 |
+| Aico Japan AC840PS 8HP Petrol Trolley Sprayer with Hose Reel | 26,999 | 35,099 |
+| SOLO Model 425 Professional 15L Piston Backpack Sprayer | 9,500 | 12,350 |
+| Aico Japan AC1609 160L 8HP Petrol Trolley Sprayer | 69,995 | 90,999 |
+| Aico Japan AC-8L 8L Shoulder Strap Manual Pressure Sprayer | 2,550 | 3,350 |
+| Kato Germany KT767-4 25L 4-Stroke Petrol Knapsack Sprayer | 19,500 | 25,350 |
+| Milano Italia ML767-4 25L 4-Stroke Petrol Knapsack Sprayer | 19,500 | 25,350 |
+| Kzubr KBS-20L 20L Rechargeable Battery Knapsack Sprayer | 9,500 | 12,350 |
+| Kenagro 20L Manual and Electric Battery Knapsack Sprayer | 7,450 | 9,699 |
+| Uvuko UVBM20L 20L Dual Battery and Manual Knapsack Sprayer | 7,500 | 9,750 |
+
+### Draft blocked by photo retrieval
+- Aico Japan 60L 7.5HP Trolley Agricultural Sprayer: draft row with reference cost KSh 52,000, computed selling price KSh 67,600, stock 1000, low_at 20. Supplier page image download returned HTTP 404. It remains inactive and must not be treated as published.
+
+### Pricing qualification
+- Published supplier retail listings are being used as reference costs per the owner's latest instruction. They are not verified acquisition costs; the 30% is a markup over the published reference price, not guaranteed net profit.
+- The site's product pages rebuild on the 30-minute schedule. Mobile-shell links use the product slug. The public web viewer could not independently fetch the shell URL; Supabase active state, image storage, and upload response are verified.
+
+### Next
+- Continue adding genuinely distinct products in Pest Control & Fumigation; run duplicate checks first and require a Kenyan KES price reference plus exact product photo before activation. Progress: 13 / 50 live, 1 draft blocked by photo.
+
 ## 2026-11-12 — Pest-control batch progress update
 
 ### Published and verified: 7 of 50
