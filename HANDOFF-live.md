@@ -559,3 +559,22 @@ The helper applies store price-point rounding after the 30% markup calculation, 
 
 
 SEO follow-through for the 20-product batch: updated all 20 active product descriptions to long-form, product-specific copy exceeding 600 words each (database verification returned descriptions_600_plus=20). Re-verified after this update: active_count=20, one_image_count=20, stock_correct_count=20. No image or activation status changed during the description update.
+
+
+## 2026-11-12 — Product-photo mismatch audit and first corrections
+
+### Confirmed issue
+- Owner supplied a screenshot of a Rafiki Pest Control Products banner being used where an individual product photograph should appear. A banner/logo is not an acceptable product image.
+- Supabase catalogue currently contains 1,141 product rows, 1,109 active; no active product row is image-empty.
+- A catalogue query found repeated image URLs across distinct pack-size variants, which is a strong mismatch signal and requires exact pack-size review before replacement. Examples include Actellic 50EC (100ml/250ml/500ml/1L), Air Chopper 7.5SC (15ml 3-pack/100ml/250ml/1L), Bat CRP (250ml/500ml/1L), and several other insecticide families. A shared URL is not automatically wrong when the same packaging image genuinely applies, so do not bulk-delete based only on URL reuse.
+
+### Replaced the known generic Rafiki banner image
+- `actara-25-wg-insecticide-8g`: replaced the generic Rafiki social-card image with the product image extracted from the exact 8g Actara 25WG listing: https://agropests.com/products/actara-25wg-40g. Upload request 1796 returned HTTP 200, `ok=true`, `live=true`, one photo. Row remains active.
+- `rafiki-magnetic-mosquito-net-for-windows`: replaced the generic social card with the image extracted from the matching Rafiki product listing: https://shop.rafikipestcontrol.com/products/magnetic-mosquito-nets-for-windows. Request 1797 returned HTTP 200, `ok=true`, `live=false`, one photo. Row remains inactive.
+- `rafiki-magnetic-mosquito-window-screen`: replaced the generic social card with the image extracted from the matching Rafiki kitchen-window net listing: https://shop.rafikipestcontrol.com/products/magnetic-mosquito-net-for-kitchen-windows. Request 1798 returned HTTP 200, `ok=true`, `live=false`, one photo. Row remains inactive.
+- Final database check confirms each row now has one new product-image Storage URL; activation states were preserved.
+
+### Remaining work / guardrails
+- The catalogue-wide photo audit is not complete. Shared pack-size images and other visual mismatches still need item-by-item review.
+- Supabase already has a staff-only `find-photo` Edge Function. Its `auto` mode searches candidate photos, checks dimensions (minimum 450×450), and uses Gemini to verify brand/model/pack-size match and reject other-shop branding. It requires a signed-in staff Authorization header and will not replace an existing image. Run it through the authenticated admin workflow for products with suspect existing photos; do not bypass its checks or guess source URLs.
+- Prioritize exact-pack-size mismatches, generic brand banners/social cards, images with other sellers' watermarks, and images showing a different brand/model. Replace only after exact match is verified. Do not deactivate otherwise-valid products solely because an image URL is reused.
