@@ -321,3 +321,17 @@
 
 ### Open
 - Generic Rafiki "Product" social card is used as the photo on `actara-25-wg-insecticide-8g`, `rafiki-magnetic-mosquito-net-for-windows`, `rafiki-magnetic-mosquito-window-screen` (identical 45,080-byte file in product-images). Waiting for real photos from the owner (8 g sachet for Actara; Rafiki screens). Also waiting on owner choice for the missing Actara 1 kg pack.
+
+## 2026-11-12 (Africa/Nairobi, ~12:30) - Magnetic Mosquito Net Door Curtain 90 x 210 cm (draft)
+
+### Done
+- Draft created: `magnetic-mosquito-net-door-curtain-90-x-210-cm` (category 28 Garden & Outdoors, unit "1 piece"). Source page: https://brightstartech.co.ke/product/magnetic-mosquito-net-door-curtain-90-x-210-cm/ (not reachable from the session; the owner supplied the KES price 1300 as the source cost).
+- Owner asked for 30% profit: 1300 x 1.30 = 1690, snapped up by the price trigger to 1699 (00/50/99 rule). stock=1000, low_at=20, featured=false, active=false.
+- Description is generic and factual (size 90 x 210 cm from the listing title); colour, material, magnets and accessories were NOT verified from the supplier page and the description tells buyers to confirm them.
+
+### Blocked
+- No photo yet (mandatory before `active=true`). Needs an exact photo of this door curtain from the owner or a reachable source.
+
+### Next
+- When a photo is supplied: attach via `upload-photos` / `public.add_product_photo`, verify Storage object and `products.images`, then `select public.activate_product_if_photo_ok('magnetic-mosquito-net-door-curtain-90-x-210-cm');`, rebuild pages with the product-pages workflow dispatch.
+- Possible duplicate to review: live `magnetic-mosquito-door-screen-90x210cm` (KSh 699).
