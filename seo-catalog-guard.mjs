@@ -24,11 +24,18 @@ export function auditProducts(rows) {
 }
 
 async function main() {
-  const url = `${SB}/rest/v1/products?active=eq.true&select=id,name,seo_name,seo_title,variant_label,category_id,images&limit=1000`;
-  const response = await fetch(url, { headers: { apikey: KEY, accept: 'application/json' } });
-  if (!response.ok) throw new Error(`Supabase catalogue audit failed: HTTP ${response.status}`);
-  const rows = await response.json();
-  if (!Array.isArray(rows)) throw new Error('Supabase catalogue audit returned an invalid response');
+  const rows = [];
+  let offset = 0;
+  while (true) {
+    const url = `${SB}/rest/v1/products?active=eq.true&select=id,name,seo_name,seo_title,variant_label,category_id,images&order=created_at.asc&limit=1000&offset=${offset}`;
+    const response = await fetch(url, { headers: { apikey: KEY, accept: 'application/json' } });
+    if (!response.ok) throw new Error(`Supabase catalogue audit failed: HTTP ${response.status}`);
+    const batch = await response.json();
+    if (!Array.isArray(batch)) throw new Error('Supabase catalogue audit returned an invalid response');
+    rows.push(...batch);
+    if (batch.length < 1000) break;
+    offset += batch.length;
+  }
   const result = auditProducts(rows);
   console.log(`SEO catalogue guard: checked ${result.count} active products.`);
   for (const warning of result.warnings) console.warn('WARNING:', warning);
