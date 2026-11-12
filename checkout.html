@@ -1619,8 +1619,9 @@ try { if (localStorage.getItem('stm_handoff')) { document.documentElement.classN
   var fast = Promise.resolve(false);
   if (wanted.length && wanted.length === items.length) {
     var url = SB + '/rest/v1/products?active=eq.true&id=in.%28' + wanted.map(encodeURIComponent).join('%2C') + '%29&select=id,name,price,stock,images';
-    fast = fetch(url, { headers: { apikey: KEY }, cache: 'no-store', credentials: 'omit' }).then(function (r) {
-      if (!r.ok) throw new Error('Product lookup ' + r.status); return r.json();
+    var fastCtl = window.AbortController ? new AbortController() : null, fastTimer = setTimeout(function () { if (fastCtl) fastCtl.abort(); }, 8000);
+    fast = fetch(url, { headers: { apikey: KEY }, cache: 'no-store', credentials: 'omit', signal: fastCtl ? fastCtl.signal : undefined }).then(function (r) {
+      clearTimeout(fastTimer); if (!r.ok) throw new Error('Product lookup ' + r.status); return r.json();
     }).then(function (rows) {
       if (!Array.isArray(rows)) throw new Error('Invalid product response');
       var byId = {}; rows.forEach(function (r) { byId[r.id] = r; });

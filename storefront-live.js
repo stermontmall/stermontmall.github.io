@@ -51,7 +51,7 @@
     var img = mk('span', 'img'); img.style.position = 'relative';
     if (p.images && p.images[0]) { var i = new Image(); i.src = p.images[0]; i.alt = p.name; i.width = i.height = 288; i.loading = 'lazy'; img.appendChild(i); }
     var d = disc(p); if (d) img.appendChild(badge(d));
-    img.appendChild(heart(c.id)); setTimeout(paintHearts, 0);
+    img.appendChild(heart(c.id));
     c.dataset.price = p.price; c.dataset.disc = d ? d.pct : 0; c.dataset.i = (card.n = (card.n || 0) + 1);
     var b = mk('div', 'b'), h = mk('h3', '', p.name), pr = mk('p', 'price' + (d ? ' sale' : ''), money(p.price));
     var btn = mk('button', 'btn btn-main'); btn.type = 'button';
@@ -344,11 +344,11 @@
   /* product-names.json (written by every site rebuild) = the heading each product page shows, with its ranking words ("Original ...", "#1 Top ...").
      The list and the product view use it so they read exactly like the page; if it cannot be loaded the plain database name is shown. */
   var NAMES = {}, namesP = fetch('product-names.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
-  getProducts('id,slug,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)')
-    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,description,categories(name,slug)'); })
-    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,stock,images,featured,description,categories(name,slug)'); })
-    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,stock,images,featured,description,categories(name,slug)'); })   /* unit column not added yet */
-    .then(function (r) { return r.ok ? r : getProducts('id,name,price,stock,images,featured,description,categories(name,slug)'); })   /* old_price column not added yet: still show products */
+  getProducts('id,slug,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,categories(name,slug)')
+    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,variant_group,variant_label,stock,images,featured,categories(name,slug)'); })
+    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,unit,stock,images,featured,categories(name,slug)'); })
+    .then(function (r) { return r.ok ? r : getProducts('id,name,price,old_price,stock,images,featured,categories(name,slug)'); })   /* unit column not added yet */
+    .then(function (r) { return r.ok ? r : getProducts('id,name,price,stock,images,featured,categories(name,slug)'); })   /* old_price column not added yet: still show products */
     .then(function (r) { return r.ok ? r.json() : []; }).then(function (rows) { return namesP.then(function (nm) { NAMES = nm && typeof nm === 'object' ? nm : {}; return rows; }); }).then(function (rows) {
       var root = D.querySelector('#music-gear .wrap'), groups = {};
       rows.forEach(function (p) { if (p.slug && p.slug !== p.id) SLUGS[p.id] = p.slug; });
@@ -380,6 +380,7 @@
         }
         if ((p._g ? p._g.rep === p && p._g.some(function (x) { return x.featured; }) : p.featured)) { var row = D.querySelector('#featured .row'), cta = row && row.querySelector('.cta'); if (row) { var fc = card(p); if (p._g) { fc._p = p; fc.id = 'f-' + p.id; vfix(fc, p); fc.querySelector('.price'); } row.insertBefore(fc, cta); } }
       });
+      paintHearts(); /* once after the catalogue is built; never scan every wishlist button per product */
       try { buildDeals(rows); buildToolbar(); } catch (e) {}
       var hm = location.hash.match(/^#p-(.+)$/);   /* old shared #p- links still open the item, and now switch to the straight /p/ URL */
       if (hm) { var hid = decodeURIComponent(hm[1]); rows.forEach(function (p) { if (p.slug === hid) hid = p.id; }); var c0 = D.getElementById('p-' + hid); if (c0 && c0._p) openView(c0); }
