@@ -16,7 +16,7 @@ const LABELS = [
   ['Application & dosage guidelines', /(?:^|\s)APPLICATION\s*&\s*DOSAGE GUIDELINES\s*:?\s*/g],
   ['How to use', /(?:^|\s)HOW TO USE(?: IT)?\s*:?\s*|(?:^|\s)DIRECTIONS FOR USE\s*:?\s*/g],
   ['Before you start', /(?:^|\s)BEFORE YOU START\s*:?\s*/g],
-  ['Safety information', /(?:^|\s)SAFETY(?:\s+AND\s+RESPONSIBLE\s+HANDLING|\s+INFORMATION|\s+PRECAUTIONS|\s+PROTOCOLS(?:\s*&\s*PRECAUTIONS)?)?\s*:?\s*/g],
+  ['Safety information', /(?:^|\s)SAFETY(?:\s+AND\s+RESPONSIBLE\s+(?:HANDLING|USE)|\s+INFORMATION|\s+PRECAUTIONS|\s+PROTOCOLS(?:\s*&\s*PRECAUTIONS)?)?\s*:?\s*/g],
   ['Storage & handling', /(?:^|\s)STORAGE(?:\s*(?:&|AND)\s*HANDLING|\s+AND\s+DISPOSAL)?\s*:?\s*/g],
   ['Buying guide', /(?:^|\s)VEHICLE-SPECIFIC BUYING GUIDE\s*|(?:^|\s)BUYING GUIDE\s*:?\s*/g],
   ['Buying notes', /(?:^|\s)(?:IMPORTANT )?BUYING NOTES\s*:?\s*/g],
