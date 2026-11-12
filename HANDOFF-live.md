@@ -597,3 +597,16 @@ SEO follow-through for the 20-product batch: updated all 20 active product descr
 - Supplier research surfaced catalogues at Agropests, KitutoAfrica, Geoffe Mitch, Kejani and others. Some listings were explicitly out of stock, so they were not used as publish-ready sources. Examples: https://agropests.com/products/subcategories/insecticides and https://agropests.com/products/categories/fumigation.
 - Blocker: this session did not expose a working product-photo upload action that could verify exact item photos in Storage. The database publication trigger correctly rejects active products without verified images.
 - Next: continue only with new, duplicate-free SKUs supported by an in-stock Kenyan KES price and exact matching photo; create the 600+ word product copy; apply the 30% batch markup, stock 1000, low_at 20; upload and verify each image before activation. Do not treat supplier search results alone as publication.
+
+
+## 2026-11-12 — Three pending pest-control products photographed and activated
+
+- Rechecked the three inactive category 31 rows. Supplier product pages were used as image sources; the uploader extracted the page's primary product image and saved it into the public `product-images` bucket.
+- `portable-thermal-fogging-machine`: source page https://njunexpowertools.co.ke/product/portable-thermal-fogging-machine/; source reference price KSh 28,995 at the time researched (existing row retained its Metro Tools source cost KSh 32,000 and stored selling price KSh 41,600). Photo stored as `product-images/portable-thermal-fogging-machine.jpg`.
+- `aico-japan-60l-7-5hp-trolley-agricultural-sprayer`: exact Aico Japan 60L trolley sprayer source page https://gramax.co.ke/shop/farm-equipments/aico-japan-petrol-engine-trolley-sprayer-tank-capacity-60-litres/ (Power X Tools was also checked). Existing source cost KSh 52,000 and stored selling price KSh 67,600 retained. Photo stored as `product-images/aico-japan-60l-7-5hp-trolley-agricultural-sprayer.jpg`.
+- `faya-dudu-dust-insecticide-50g`: exact 50g listing https://mtolori.com/product/details/faya-dudu-dust-50gm-2939. Photo stored as `product-images/faya-dudu-dust-insecticide-50g.webp`. Existing price/description retained; no pack-size or price edits.
+- Ran `public.activate_product_if_photo_ok` for all three only after upload. Final SQL verification: all three `active=true`, each has one image URL, and each URL resolves to one object in Storage bucket `product-images`.
+- Final category 31 count: 78 total, 78 active, 0 inactive.
+- No other products, prices, stock quantities, descriptions or images were changed.
+- Product photo upload was performed through the existing authenticated-by-passcode `upload-photos` workflow via `public.add_product_photo`; no credentials were exposed.
+- Static product-page generation / sitemap refresh has not yet been checked. Do not claim those pages are rebuilt until the existing GitHub workflow confirms success.
