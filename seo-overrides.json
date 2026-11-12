@@ -2641,5 +2641,25 @@
   "chariot-500-sc-fungicide-50ml": {
     "title": "Chariot 500 SC 50ml Fungicide Kenya - {price}",
     "desc": "Buy Chariot 500 SC 50ml in Kenya at {price}. Verify crop-specific use, re-entry interval and original product label."
+  },
+  "daconil-720-sc-fungicide-500ml": {
+    "title": "Daconil 720 SC 500ml Fungicide Kenya - {price}",
+    "desc": "Buy Daconil 720 SC 500ml fungicide in Kenya at {price}. Chlorothalonil contact fungicide; check registered crops and label directions."
+  },
+  "milestone-250-sc-fungicide-100ml": {
+    "title": "Milestone 250 SC 100ml Fungicide Kenya - {price}",
+    "desc": "Shop Milestone 250 SC 100ml in Kenya at {price}. Verify crop use, pack size and pre-harvest interval on the approved label."
+  },
+  "orondis-ultra-28-sc-fungicide-25ml": {
+    "title": "Orondis Ultra 28 SC 25ml Kenya - {price}",
+    "desc": "Buy Orondis Ultra 28 SC 25ml fungicide in Kenya at {price}. For labelled oomycete disease programmes; follow approved directions."
+  },
+  "previcur-energy-sl-840-fungicide-1l": {
+    "title": "Previcur Energy SL 840 1L Kenya - {price}",
+    "desc": "Shop Previcur Energy SL 840 1 litre in Kenya at {price}. Check crop-specific approved uses and safe handling instructions."
+  },
+  "score-250-ec-fungicide-20ml": {
+    "title": "Score 250 EC 20ml Fungicide Kenya - {price}",
+    "desc": "Buy Score 250 EC 20ml in Kenya at {price}. Difenoconazole systemic fungicide; confirm crop registration and label directions."
   }
 }
