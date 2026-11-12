@@ -533,3 +533,6 @@ New live products (source cost → current selling price, KSh):
 - Bottom Door Sealer Strip 1m: 350 → 499
 
 The helper applies store price-point rounding after the 30% markup calculation, so some displayed prices have an effective markup above 30%; do not reset these without explicit owner instruction. Each item has a supplier source URL recorded in its product row. All are live and should use the mobile-shell product route `https://stermontarcade.co.ke/?product=<slug>`; generated static pages follow the existing rebuild schedule.
+
+
+SEO follow-through for the 20-product batch: updated all 20 active product descriptions to long-form, product-specific copy exceeding 600 words each (database verification returned descriptions_600_plus=20). Re-verified after this update: active_count=20, one_image_count=20, stock_correct_count=20. No image or activation status changed during the description update.
