@@ -1,3 +1,12 @@
+## 2026-11-12 23:25 (Africa/Nairobi) - Tonic F1 Spinach Seeds 50g going live
+
+### In progress
+- Product row `tonic-f1-spinach-seeds-50g` already exists in Supabase (category 41, cost 1040, price 1499, stock 1000, low_at 20, 593-word description) but is `active=false` with empty `images`.
+- Owner supplied the pack photo (1254x1254). Compressed to JPEG and committed to branch `wip-tonic-f1-spinach-50g` as `product-photos/tonic-f1-spinach-seeds-50g.jpg` only as a public transport URL (shell cannot reach supabase.co).
+- Next: `select public.add_product_photo('tonic-f1-spinach-seeds-50g','https://raw.githubusercontent.com/stermontmall/stermontmall.github.io/wip-tonic-f1-spinach-50g/product-photos/tonic-f1-spinach-seeds-50g.jpg', false);` then check net._http_response for status 200, check storage.objects and products.images, then `select public.activate_product_if_photo_ok('tonic-f1-spinach-seeds-50g');`
+- Link to give owner: https://stermontarcade.co.ke/?product=tonic-f1-spinach-seeds-50g
+- Price and description left unchanged (existing row).
+
 ## 2026-11-12 20:30 (Africa/Nairobi) — Spinach seed varieties published
 
 ### Published and verified in Supabase
