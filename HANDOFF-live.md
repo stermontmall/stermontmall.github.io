@@ -1,8 +1,9 @@
-## 2026-11-13 00:05 (Africa/Nairobi) — Bactrolure fruit fly lure & Lynfield trap (draft fixed, photos in progress)
+## 2026-11-13 00:05 (Africa/Nairobi) — Bactrolure fruit fly lure & Lynfield trap (LIVE)
 
 - Product `bactrolure-fruit-fly-lure-lynfield-trap` (category 31): existing draft kept, description rewritten in the structured layout from the Jumia listing and sachet label, seo_title confirmed. Owner asked for selling price KES 1,099 (cost 700 from the Jumia listing, seller Vetagro and Pulpers). Stock 1000, low_at 20, featured false.
 - Photos: the sandbox proxy returned 403 for oewvtbnmyombbtggamor.supabase.co, so upload-photos could not be called from the shell. The five owner photos were added to `product-photos/` on branch `wip-bactrolure-photos` so `public.add_product_photo` can fetch them from https://stermontarcade.co.ke/product-photos/. A sixth attachment (not a product photo) was not used.
-- Next: after Pages deploys, run `select public.add_product_photo('bactrolure-fruit-fly-lure-lynfield-trap', '<url>', false)` for each photo, verify `products.images`, then activate.
+- Done 2026-11-13 00:10: 5 photos uploaded through add_product_photo (all 5 Storage objects verified), images array set in order, activated with activate_product_if_photo_ok. Live: https://stermontarcade.co.ke/?product=bactrolure-fruit-fly-lure-lynfield-trap. Note: parallel add_product_photo appends overwrite each other; run them one at a time.
+- Next: confirm the static /p/ page and sitemap entry after the next product-pages run.
 - Old draft description (before rewrite): short HTML version, about 190 words, same facts as above.
 
 ## 2026-11-12 20:30 (Africa/Nairobi) — Spinach seed varieties published
