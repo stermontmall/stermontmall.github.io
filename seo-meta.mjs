@@ -198,10 +198,20 @@ export function pdpBadges(ctx = {}) {
 // Product page H2 headings. `features` only for pesticides and crop chemicals (null otherwise), the other two are on every product.
 // `delivery` is the heading of the separate delivery box that generate-products.mjs still renders. Before it existed that box printed an EMPTY <h2> on every product page.
 export function pdpHeadings(catSlug) {
-  const features = isPest(catSlug) ? 'Powerful Features & Target Dudu Control'
-    : PCPB_CATS.has(catSlug) ? 'Powerful Features & Target Crop Protection'
-    : null;
-  return { features, guide: 'Reliable Quality & Application Guide', price: 'Price, M-Pesa Checkout & Kenya Delivery', delivery: 'Delivery to Nairobi & All 47 Counties' };
+  const uses = isPest(catSlug) ? 'Target Pests & Where to Use This Product'
+    : PCPB_CATS.has(catSlug) ? 'Crop Protection Uses & Application Guidance'
+    : FARM_CATS.has(catSlug) ? 'Farm Uses & Application Guidance'
+    : 'Product Uses & Practical Buying Guide';
+  const features = isPest(catSlug) ? 'Product Features & Target Dudu Control'
+    : PCPB_CATS.has(catSlug) ? 'Product Features & Crop Protection'
+    : 'Product Features & Key Details';
+  return {
+    features,
+    uses,
+    guide: 'How to Choose, Use & Care for This Product',
+    price: 'Product Price, M-Pesa Checkout & Ordering in Kenya',
+    delivery: 'Delivery to Nairobi & All 47 Counties'
+  };
 }
 
 
