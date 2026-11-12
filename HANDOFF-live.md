@@ -1,3 +1,22 @@
+## 2026-11-12 — Pest-control catalogue batch (30% markup)
+
+### Done
+- Checked GitHub `PUBLISHING.md` / `CLAUDE.md` and Supabase `site_playbook`, product helper, image uploader and publication trigger.
+- Confirmed the batch-specific 30% override is supported by the 7-argument `public.add_draft_product(..., 30)`; global default left unchanged.
+- Added and published 1 distinct product in category 31: **Total TSPLI20162 20V 16L Cordless Backpack Sprayer**.
+- Supplier price reference: KSh 14,800, Power X Tools Kenya (listing says in stock): https://powerxtoolske.com/collections/sprayers/products/total-20v-16l-cordless-backpack-sprayer-tspli20162
+- Stored reference cost KSh 14,800; raw 30% markup gives KSh 19,240; site's price-point rounding trigger stores KSh 19,250.
+- Exact model photo uploaded from https://total-tools.by/image/cache/catalog/products/16/915240/55049568/55049569/hero-tspli20162-650x650.jpg to public bucket; uploader returned HTTP 200.
+- Verified row active=true, images has the uploaded URL, storage object count=1, stock=1000, low_at=20, and SEO title is within 60 characters.
+- Product mobile-shell link: https://stermontarcade.co.ke/?product=total-tspli20162-20v-16l-cordless-backpack-sprayer
+
+### Pricing note
+- Supplier page price is a published retail listing used as the requested reference-price basis, not the owner's actual wholesale acquisition cost. The resulting 30% is a markup over that reference listing, not verified net profit.
+
+### In progress / next
+- Continue researching distinct items, check duplicates in `public.products`, verify current in-stock KES price and exact model photo, then create with 30% batch markup and publish only after image verification.
+- Current batch progress: 1 / 50 published.
+
 # HANDOFF-live
 
 ## 2026-11-11 — 20-product batch completed
