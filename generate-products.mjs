@@ -1,4 +1,5 @@
 // Rebuild requested 2026-11-11: publish newly verified Ramtons appliance listings and refreshed product prices/photos.
+// Rebuild requested 2026-11-12: apply the corrected heading-aware meta descriptions and Livergen/Nilzan overrides.
 // Rebuild requested 2026-11-09: remove one remaining search-phrase keyword list from the Toyota Probox listing.
 // Rebuild requested 2026-11-09: regenerate motorcycle listings after removing repeated model-intro boilerplate from 15 descriptions.
 // Rebuild requested 2026-11-09: regenerate motorcycle spare-parts pages after removing repeated keyword-list boilerplate from 15 descriptions.
