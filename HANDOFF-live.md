@@ -424,3 +424,26 @@ All seven rows below are active, each has one uploaded product image in the publ
 - Content is SKU-specific, distinguishes supplier-listed facts from unconfirmed specifications, and covers suitable use, calibration considerations, safe operation, cleaning, maintenance, buying checks and FAQs. No prices, stock, images, activation or slugs were changed.
 - SEO-compliant descriptions among the 13 live sprayer products: 7 / 13 verified. Six still need 600+ word rewrites: Aico AC-8L, Kato KT767-4, Milano ML767-4, Kzubr KBS-20L, Kenagro 20L and Uvuko UVBM20L.
 - Product-page rebuild and sitemap refresh are still pending verification for these description changes.
+
+
+## 2026-11-12 — Pest-control sprayer SEO descriptions completed
+
+- Rewrote and verified the remaining six active sprayer descriptions in category 31, bringing the 13/13 live products in this 50-item batch to at least 600 words each.
+- Latest database-verified word counts:
+  - Aico Japan AC-8L 8L Manual Pressure Sprayer — 1,299.
+  - Kato Germany KT767-4 25L Petrol Knapsack Sprayer — 1,405.
+  - Milano Italia ML767-4 25L Petrol Knapsack Sprayer — 1,350.
+  - Kzubr KBS-20L Rechargeable Knapsack Sprayer — 1,311.
+  - Kenagro 20L Manual and Electric Sprayer — 1,325.
+  - Uvuko UVBM20L Dual Battery and Manual Sprayer — 1,410.
+- Combined with prior verified counts (Total 1,240; Turbo 1,043; EMAS 1,110; Aico AC767-4 1,320; AC840PS 1,421; SOLO 425 1,357; AC1609 1,403), all 13 active sprayer listings now pass the 600-word minimum.
+- All 13 remain active. No price, image, stock, slug or activation fields were changed in the SEO rewrite.
+- Original descriptions for the seven products edited in this latest pass are preserved in `products_description_backup_20261112`. For the first three rewritten earlier in this workflow, the backup rows were inserted only after the rewrite as snapshots of the new descriptions; their original short blurbs were not captured in that table. Do not describe those three snapshot rows as pre-edit originals.
+- SEO copy distinguishes listed facts from details requiring seller confirmation; no runtime, coverage or compatibility guarantees were invented.
+- Product page rebuild, static HTML refresh, SEO meta description/title review and sitemap verification remain pending. No claim that the updated text is already visible on the live website.
+
+### Batch status
+- Live products: 13 / 50.
+- Live sprayer product descriptions meeting 600+ words: 13 / 13.
+- Remaining catalogue batch items to add: 37.
+- Aico Japan 60L 7.5HP trolley sprayer remains inactive and photo-blocked; not counted as published.
