@@ -1,3 +1,35 @@
+## 2026-11-13 — High-demand farm products batch (4 new listings verified)
+
+Research basis: Kenya agri-search coverage and 2024 agro-input transaction trends indicate sustained interest in poultry/dairy and farm tools; feeds and veterinary products maintain demand year-round, while seeds/fertilizers are seasonal. AgriJibu lists the selected Fugo products among its popular/top-selling feed lines. This is demand-led product selection, not a guarantee of future sales or a measured Google search ranking.
+
+### Newly active listings
+| Product | ID / slug | Reference supplier price (KSh) | Website price (KSh) | Description words | Image |
+|---|---|---:|---:|---:|---|
+| 16mm 0.3mm Double-Emitter Drip Tape 1000m Roll | `16mm-0-3mm-double-emitter-drip-tape-1000m-roll` | 7,500 | 9,750 | 1,092 | AVIF, Storage HTTP 200 |
+| Fugo Fast-Gro Broiler Starter Crumbs 50kg | `fugo-fast-gro-broiler-starter-crumbs-50kg` | 4,750 | 6,199 | 898 | WebP, Storage HTTP 200 |
+| Fugo Fast-Gro Broiler Finisher Pellets 50kg | `fugo-fast-gro-broiler-finisher-pellets-50kg` | 4,350 | 5,699 | 928 | PNG, Storage HTTP 200 |
+| Fugo Grower Mash 50kg | `fugo-grower-mash-50kg` | 3,470 | 4,550 | 954 | WebP, Storage HTTP 200 |
+
+All four are active=true, stock=1000, low_at=20, have one image in the public `product-images` bucket and descriptions exceeding 600 words. The user's 30% pricing rule was applied via add_draft_product; the website's price-point trigger rounded the displayed selling prices upward. Customer-facing descriptions do not mention markup or source-price calculations.
+
+### Product-specific notes
+- Drip tape: 16mm diameter, 1,000m roll, double emitter. Supplier lists 0.3mm and 0.4mm wall thickness options, 20cm/30cm emitter spacing and flow options 1.2/1.4/1.6/2.3 L/hr. The Stermont item is priced from the supplier's 0.3mm roll; buyers are told to confirm thickness, spacing and flow configuration.
+- Broiler starter crumbs: supplier feeding window day 1–21; dry, ad libitum, clean water always available; supplier recommends transition to finisher after three weeks.
+- Broiler finisher pellets: supplier indicates day 22 to slaughter; the listing avoids treating the supplier's unclear intake figure as a daily ration.
+- Grower mash: supplier recommends 9–18 weeks and gives an average 7kg per pullet over that period; description qualifies actual intake as variable and directs buyers to the bag label.
+- Feed supplier prices and product details sourced from AgriJibu. Product bag images are matching Fugo pack images from Kenyan feed retailers.
+
+### Links
+- https://stermontarcade.co.ke/?product=16mm-0-3mm-double-emitter-drip-tape-1000m-roll
+- https://stermontarcade.co.ke/?product=fugo-fast-gro-broiler-starter-crumbs-50kg
+- https://stermontarcade.co.ke/?product=fugo-fast-gro-broiler-finisher-pellets-50kg
+- https://stermontarcade.co.ke/?product=fugo-grower-mash-50kg
+
+### Next
+Continue prioritising evidence-backed high-demand products in underfilled categories (animal feeds, irrigation, farm tools, poultry/dairy equipment), with duplicate checks, current Kenyan KES pricing, accurate pack details and matching photos before activation. Do not state that these are the most searched individual SKUs unless keyword-volume data supports that claim. Static product-page rebuild and sitemap refresh remain unverified until GitHub Actions succeeds and the live pages are checked.
+
+---
+
 ## 2026-11-13 — Pest Control & Fumigation accessories published (31 of 50 LIVE)
 
 ### Three new products published and verified
