@@ -77,10 +77,13 @@ for (const ctx of ctxs) {
 assert.ok(pdpBadges({ catSlug: 'crop-insecticides' })[0].includes('PCPB Approved'));
 assert.ok(!pdpBadges({ catSlug: 'fertilizers' }).join().includes('PCPB'));
 assert.ok(!pdpBadges({ catSlug: 'kitchen', brand: 'Stermont Arcade' }).join().includes('Original'));
-assert.equal(pdpHeadings('bed-bug-killers').features, 'Powerful Features & Target Dudu Control');
-assert.equal(pdpHeadings('herbicides').features, 'Powerful Features & Target Crop Protection');
+assert.equal(pdpHeadings('bed-bug-killers').features, 'Product Features & Target Dudu Control');
+assert.equal(pdpHeadings('herbicides').features, 'Product Features & Crop Protection');
 assert.equal(pdpHeadings('smartphones').features, null);
-assert.equal(pdpHeadings('smartphones').guide, 'Reliable Quality & Application Guide');
+assert.equal(pdpHeadings('smartphones').guide, 'How to Choose, Use & Care for This Product');
+assert.equal(pdpHeadings('smartphones').uses, 'Product Uses & Practical Buying Guide');
+assert.equal(pdpHeadings('fertilizers').uses, 'Farm Uses & Application Guidance');
+assert.equal(pdpHeadings('herbicides').uses, 'Crop Protection Uses & Application Guidance');
 assert.equal(pdpHeadings('smartphones').price, 'Price, M-Pesa Checkout & Kenya Delivery');
 n += 8;
 
