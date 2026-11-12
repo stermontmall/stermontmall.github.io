@@ -19,6 +19,10 @@ ok(all.includes('pay by M-Pesa and get delivery to all 47 counties'), '"get deli
 ok(!/BUYING GUIDE|filler/.test(all), 'buying guide boilerplate removed');
 ok(!s.some(x => x.title === 'More product information'), 'no generic repeated heading');
 ok(s.find(x => x.title === 'Safety information').body.startsWith('Read the label'), 'safety text under Safety');
+const responsible = splitProductDescription('Product overview text. SAFETY AND RESPONSIBLE HANDLING Read the complete label. Wear the required protective equipment. STORAGE AND DISPOSAL Keep in the original container.');
+ok(titles(responsible).includes('Safety information'), 'full responsible-handling heading is recognized');
+ok(!responsible.find(x => x.title === 'Safety information').body.startsWith('AND RESPONSIBLE'), 'responsible-handling words are not left in safety body');
+ok(responsible.find(x => x.title === 'Safety information').body.startsWith('Read the complete label'), 'safety body begins with actual safety guidance');
 
 assert.deepEqual(titles(splitProductDescription('One paragraph of plain text with no labels. It is used daily and it is safe to order. '.repeat(12))), ['Product overview']); n++;
 ok(splitProductDescription('').length === 0, 'empty');
