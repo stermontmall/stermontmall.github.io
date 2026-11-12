@@ -311,3 +311,13 @@
 
 ### Next
 - Place one test order on stermontarcade.co.ke (M-Pesa) and confirm the total matches the displayed prices.
+
+## 2026-11-12 (Africa/Nairobi, ~12:20) - Mosquito Window Net Kit size added
+
+### Done
+- Product `mosquito-window-net-screen` (created 2026-11-05 08:50 Nairobi): description now has a SPECIFICATIONS section (listed size 130-150 cm, mesh 250 cm x 120 cm, fits most home indoor windows, self-adhesive, cut to fit), and the three sentences telling buyers to confirm the size from the pack were updated. Sizes supplied by the owner.
+- Backup of the previous description: `products_description_backup_20261112`.
+- Product pages rebuilt via the product-pages workflow dispatch.
+
+### Open
+- Generic Rafiki "Product" social card is used as the photo on `actara-25-wg-insecticide-8g`, `rafiki-magnetic-mosquito-net-for-windows`, `rafiki-magnetic-mosquito-window-screen` (identical 45,080-byte file in product-images). Waiting for real photos from the owner (8 g sachet for Actara; Rafiki screens). Also waiting on owner choice for the missing Actara 1 kg pack.
