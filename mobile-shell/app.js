@@ -723,10 +723,11 @@ store.subscribe(s => {
   $('#cart-title-count').textContent = n ? `(${n})` : '';
   $('#cart-empty').hidden = n > 0; $('#cart-total-bar').hidden = n === 0; $('#share-cart').hidden = n === 0;
   $('#cart-total').textContent = 'KSh ' + fmt(cartTotal(s));
+  /* The photo and the name/size block open the product page (data-cart-open, handled below); the quantity buttons and Remove keep their own jobs. */
   $('#cart-list').innerHTML = s.cart.map(i => `<li class="flex gap-3 bg-white rounded-lg p-2 shadow-card">
-    <div class="w-20 h-20 rounded-lg shrink-0 grid place-items-center text-4xl" style="background:${i.bg};overflow:hidden">${thumb(i)}</div>
+    <div class="w-20 h-20 rounded-lg shrink-0 grid place-items-center text-4xl" style="background:${i.bg};overflow:hidden;cursor:pointer" role="button" tabindex="0" data-cart-open="${esc(i.key)}" aria-label="View ${esc(i.name)}">${thumb(i)}</div>
     <div class="flex-1 min-w-0 flex flex-col justify-between">
-      <div><p class="text-xs line-clamp-2">${esc(i.name)}</p><p class="text-2xs text-mute">${esc(i.size)}</p></div>
+      <div role="button" tabindex="0" data-cart-open="${esc(i.key)}" style="cursor:pointer"><p class="text-xs line-clamp-2">${esc(i.name)}</p><p class="text-2xs text-mute">${esc(i.size)}</p></div>
       <div class="flex items-center justify-between"><span class="text-sale font-bold">KSh ${fmt(i.price)}</span>
         <span class="flex items-center gap-2">
           <button class="icon-btn bg-gray-100 !w-7 !h-7" data-qty="${esc(i.key)}" data-d="-1" aria-label="Less"><svg class="w-3.5 h-3.5"><use href="#i-minus"/></svg></button>
@@ -736,6 +737,16 @@ store.subscribe(s => {
       <button class="text-xs text-red-600 underline self-start mt-1" data-remove="${esc(i.key)}" aria-label="Remove ${esc(i.name)} from cart">Remove</button>
     </div></li>`).join('');
 });
+/* Open the product page for a cart line: the same full product view the grid cards lead to. The line is matched by product id first, then by its size's row id
+   (older saved carts), and the size that is in the cart is the one shown. Quantity starts at 1 on the page; the cart line itself is not changed. */
+async function openCartProduct(key) {
+  const line = store.get().cart.find(i => i.key === key); if (!line) return;
+  try { await loadCatalog(); } catch { toast('Could not open the product. Please try again.'); return; }
+  const p = PRODUCTS.find(x => x.id === line.id) || PRODUCTS.find(x => x.sizes.some(z => z.rowId === line.rowId));
+  if (!p) { toast('That product is no longer available'); return; }
+  qb.p = p; qb.size = (p.sizes.find(z => z.rowId === line.rowId) || p.sizes.find(z => z.label === line.size) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
+  renderQB(); openProductPage();
+}
 $('#cart-list').addEventListener('click', e => {
   const remove = e.target.closest('[data-remove]');
   if (remove) {
@@ -744,9 +755,15 @@ $('#cart-list').addEventListener('click', e => {
     toast('Product removed from cart');
     return;
   }
-  const b = e.target.closest('[data-qty]'); if (!b) return;
+  const b = e.target.closest('[data-qty]');
+  if (!b) { const o = e.target.closest('[data-cart-open]'); if (o) openCartProduct(o.dataset.cartOpen); return; }
   const cart = store.get().cart.map(i => i.key === b.dataset.qty ? { ...i, qty: i.qty + +b.dataset.d } : i).filter(i => i.qty > 0);
   store.set({ cart });
+});
+$('#cart-list').addEventListener('keydown', e => {   // keyboard / screen reader: Enter or Space on the photo or name opens the product too
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const o = e.target.closest('[data-cart-open]'); if (!o || e.target !== o) return;
+  e.preventDefault(); openCartProduct(o.dataset.cartOpen);
 });
 /* Checkout: the shop's own checkout (M-Pesa, delivery fees, order e-mails) lives on /checkout.html. The cart lines are handed over
    under `stm_handoff`; that page adds them through its STM.add once its product cards exist, then opens its cart. */
