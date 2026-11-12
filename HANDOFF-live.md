@@ -1,3 +1,28 @@
+## 2026-11-12 — Pest-control batch progress update
+
+### Published and verified: 7 of 50
+All seven rows below are active, each has one uploaded product image in the public `product-images` bucket, and the matching Storage object exists. All have stock 1000 and low_at 20. The 30% batch markup was passed as the seventh argument to `add_draft_product`; the site's price-rounding trigger rounds the computed selling price up to its supported price points.
+
+| Product | Reference cost (KSh) | Stored selling price (KSh) |
+|---|---:|---:|
+| Total TSPLI20162 20V 16L Cordless Backpack Sprayer | 14,800 | 19,250 |
+| Turbo TR20 20L 2-in-1 Manual and Battery Knapsack Sprayer | 7,800 | 10,150 |
+| EMAS 16L Manual Knapsack Sprayer | 2,500 | 3,250 |
+| Aico Japan AC767-4 25L 4-Stroke Petrol Knapsack Sprayer | 19,000 | 24,700 |
+| Aico Japan AC840PS 8HP Petrol Trolley Sprayer with Hose Reel | 26,999 | 35,099 |
+| SOLO Model 425 Professional 15L Piston Backpack Sprayer | 9,500 | 12,350 |
+| Aico Japan AC1609 160L 8HP Petrol Trolley Sprayer | 69,995 | 90,999 |
+
+### Draft blocked by photo retrieval
+- Aico Japan 60L 7.5HP Trolley Agricultural Sprayer: draft row exists with reference cost KSh 52,000, computed selling price KSh 67,600, stock 1000, low_at 20. Photo extraction from the supplier product page returned HTTP 404, so it remains inactive and must not be linked as live. Next: find an exact direct product image and upload, then verify before activation.
+
+### Pricing qualification
+- Published retail prices are being used as the reference-cost basis per the owner's latest chat instruction. They are not verified acquisition costs, so the resulting 30% is a markup on the listed reference price, not guaranteed net profit.
+- The product-pages workflow rebuilds static pages on its 30-minute schedule. Mobile-shell links use the product slug. The web viewer could not independently fetch the mobile-shell URL during this session; database publication and image storage are verified.
+
+### Next
+- Continue sourcing distinct products only; run duplicate checks before each insert. Require a current Kenyan KES reference listing and exact photo before publishing. Progress: 7 / 50 live, 1 draft blocked by photo.
+
 ## 2026-11-12 — Pest-control catalogue batch (30% markup)
 
 ### Done
