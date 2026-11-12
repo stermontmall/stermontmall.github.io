@@ -715,9 +715,18 @@ store.subscribe(s => {
           <button class="icon-btn bg-gray-100 !w-7 !h-7" data-qty="${esc(i.key)}" data-d="-1" aria-label="Less"><svg class="w-3.5 h-3.5"><use href="#i-minus"/></svg></button>
           <span class="w-5 text-center text-sm font-semibold">${i.qty}</span>
           <button class="icon-btn bg-gray-100 !w-7 !h-7" data-qty="${esc(i.key)}" data-d="1" aria-label="More"><svg class="w-3.5 h-3.5"><use href="#i-plus"/></svg></button>
-        </span></div></div></li>`).join('');
+        </span></div>
+      <button class="text-xs text-red-600 underline self-start mt-1" data-remove="${esc(i.key)}" aria-label="Remove ${esc(i.name)} from cart">Remove</button>
+    </div></li>`).join('');
 });
 $('#cart-list').addEventListener('click', e => {
+  const remove = e.target.closest('[data-remove]');
+  if (remove) {
+    const cart = store.get().cart.filter(i => i.key !== remove.dataset.remove);
+    store.set({ cart });
+    toast('Product removed from cart');
+    return;
+  }
   const b = e.target.closest('[data-qty]'); if (!b) return;
   const cart = store.get().cart.map(i => i.key === b.dataset.qty ? { ...i, qty: i.qty + +b.dataset.d } : i).filter(i => i.qty > 0);
   store.set({ cart });
