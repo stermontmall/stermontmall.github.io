@@ -2681,5 +2681,25 @@
   "pearl-500-sc-fungicide-100ml": {
     "title": "Pearl 500 SC 100ml Fungicide Kenya - {price}",
     "desc": "Buy Pearl 500 SC 100ml in Kenya at {price}. Carbendazim fungicide for label-listed rose diseases; check approved use."
+  },
+  "fortress-gold-720-wp-fungicide-40g": {
+    "title": "Fortress Gold 720 WP 40g Fungicide Kenya - {price}",
+    "desc": "Buy Fortress Gold 720 WP 40g in Kenya at {price}. Cymoxanil and mancozeb fungicide for labelled blight and mildew uses."
+  },
+  "impress-720-wp-fungicide-40g": {
+    "title": "Impress 720 WP 40g Fungicide Kenya - {price}",
+    "desc": "Shop Impress 720 WP 40g in Kenya at {price}. Fungicide for label-listed blight and downy mildew control."
+  },
+  "tajiri-720-wp-fungicide-40g": {
+    "title": "Tajiri 720 WP 40g Fungicide Kenya - {price}",
+    "desc": "Buy Tajiri 720 WP 40g in Kenya at {price}. Mancozeb and cymoxanil fungicide; follow crop-specific label directions."
+  },
+  "ransom-600-wp-fungicide-30g": {
+    "title": "Ransom 600 WP 30g Fungicide Kenya - {price}",
+    "desc": "Shop Ransom 600 WP 30g in Kenya at {price}. Carbendazim and triadimefon fungicide for approved crop uses."
+  },
+  "riomax-720-wp-fungicide-40g": {
+    "title": "Riomax 720 WP 40g Fungicide Kenya - {price}",
+    "desc": "Buy Riomax 720 WP 40g in Kenya at {price}. Cymoxanil and mancozeb fungicide for approved blight and mildew uses."
   }
 }
