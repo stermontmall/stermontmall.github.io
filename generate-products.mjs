@@ -782,16 +782,19 @@ try {
   console.log('Warning: could not parse sitemap-state.json, resetting state.', e.message);
   prev = {};
 }
+// Only advertise URLs whose generated HTML exists. Prevent stale/missing product or category files
+// from entering Google's sitemap (a missing file otherwise gets an empty hash and still gets listed).
+const sitemapUrls = urls.filter(u => existsSync(u.endsWith('/') ? `.${u}index.html` : fileOf(u)));
 const next = {};
-for (const u of urls) {
+for (const u of sitemapUrls) {
   const file = u.endsWith('/') ? `.${u}index.html` : fileOf(u);
-  const hash = existsSync(file) ? createHash('sha1').update(readFileSync(file)).digest('hex') : '';
+  const hash = createHash('sha1').update(readFileSync(file)).digest('hex');
   next[u] = { hash, lastmod: prev[u] && prev[u].hash === hash ? prev[u].lastmod : today };
 }
 writeFileSync('product-names.json', JSON.stringify(NAMES));
 writeFileSync(STATE, JSON.stringify(next, null, 1));
 writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${next[u].lastmod}</lastmod></url>`).join('\n') + `\n</urlset>\n`);
+  sitemapUrls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${next[u].lastmod}</lastmod></url>`).join('\n') + `\n</urlset>\n`);
 console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages.`);
 
 // Catalog rebuild trigger: publish the owner-approved Ocean Blue nitrile gloves listing (2026-11-05).
