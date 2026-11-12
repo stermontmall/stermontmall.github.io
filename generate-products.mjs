@@ -896,3 +896,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // Rebuild requested 2026-11-10: refresh corrected full-resolution product photos for the latest agrovet batch.
 
 // 2026-11-10: Rebuild product pages after verified photo replacements for the 20-product agrovet batch (Mavuno Bora, Rio Grande, Fugo, Chamomile, Fordhook Giant, Marigold Crackerjack and SC Tembo 73).
+
+// 2026-11-12: rebuild static product pages and sitemap after the six spinach product descriptions and SEO titles were updated in Supabase.
