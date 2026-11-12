@@ -84,8 +84,19 @@ async function getProducts() {
                 'id,name,price,old_price,unit,stock,images,description,categories(name,slug)',
                 'id,name,price,stock,images,description,categories(name,slug)'];
   for (const c of cols) {
-    const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=${c}&order=created_at.asc`, { headers: { apikey: KEY } });
-    if (r.ok) return fixProducts(await r.json());
+    const all = [];
+    let offset = 0;
+    let failed = false;
+    while (true) {
+      const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=${c}&order=created_at.asc&limit=1000&offset=${offset}`, { headers: { apikey: KEY } });
+      if (!r.ok) { failed = true; break; }
+      const batch = await r.json();
+      if (!Array.isArray(batch)) { failed = true; break; }
+      all.push(...batch);
+      if (batch.length < 1000) break;
+      offset += batch.length;
+    }
+    if (!failed) return fixProducts(all);
   }
   throw new Error('Could not read products from Supabase');
 }
