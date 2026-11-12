@@ -23,6 +23,7 @@ const responsible = splitProductDescription('Product overview text. SAFETY AND R
 ok(titles(responsible).includes('Safety information'), 'full responsible-handling heading is recognized');
 ok(!responsible.find(x => x.title === 'Safety information').body.startsWith('AND RESPONSIBLE'), 'responsible-handling words are not left in safety body');
 ok(responsible.find(x => x.title === 'Safety information').body.startsWith('Read the complete label'), 'safety body begins with actual safety guidance');
+ok(responsible.find(x => x.title === 'Storage & handling').body.startsWith('Keep in the original container'), 'storage and disposal words are consumed as one heading');
 
 assert.deepEqual(titles(splitProductDescription('One paragraph of plain text with no labels. It is used daily and it is safe to order. '.repeat(12))), ['Product overview']); n++;
 ok(splitProductDescription('').length === 0, 'empty');
