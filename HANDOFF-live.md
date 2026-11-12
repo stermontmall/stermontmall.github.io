@@ -610,3 +610,19 @@ SEO follow-through for the 20-product batch: updated all 20 active product descr
 - No other products, prices, stock quantities, descriptions or images were changed.
 - Product photo upload was performed through the existing authenticated-by-passcode `upload-photos` workflow via `public.add_product_photo`; no credentials were exposed.
 - Static product-page generation / sitemap refresh has not yet been checked. Do not claim those pages are rebuilt until the existing GitHub workflow confirms success.
+
+
+## 2026-11-12 — Fix faded product cards on touch
+
+### Done
+- Traced the mobile storefront styling and found the product-card active state applied `opacity:.8` to the entire card while it was being pressed, dimming the product photo along with the card.
+- Removed the opacity fade from the shared `.card:active` state; retained a very small press-scale effect only.
+- Bumped the mobile-shell stylesheet URL in `index.html` from `tailwind.css?v=4` to `v=5` so browsers fetch the corrected stylesheet.
+- Branch: `wip-fix-faded-product-images`. CSS commit: `c6250904d1629ca7f266f2dd1d7366ea8276ffc6`; index commit: `eea882b56a76bab97b277e720c4c36d7be972f55`.
+
+### Verification
+- Confirmed the old `.card:active{...opacity:.8}` rule was replaced and the page now references stylesheet version `v=5`.
+- Source-level verification only; no browser screenshot/device test has been run yet.
+
+### Next
+- Open and merge PR after review; then verify the live mobile storefront on a phone.
