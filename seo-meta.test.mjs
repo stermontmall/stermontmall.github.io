@@ -79,7 +79,7 @@ assert.ok(!pdpBadges({ catSlug: 'fertilizers' }).join().includes('PCPB'));
 assert.ok(!pdpBadges({ catSlug: 'kitchen', brand: 'Stermont Arcade' }).join().includes('Original'));
 assert.equal(pdpHeadings('bed-bug-killers').features, 'Product Features & Target Dudu Control');
 assert.equal(pdpHeadings('herbicides').features, 'Product Features & Crop Protection');
-assert.equal(pdpHeadings('smartphones').features, null);
+assert.equal(pdpHeadings('smartphones').features, 'Product Features & Key Details');
 assert.equal(pdpHeadings('smartphones').guide, 'How to Choose, Use & Care for This Product');
 assert.equal(pdpHeadings('smartphones').uses, 'Product Uses & Practical Buying Guide');
 assert.equal(pdpHeadings('fertilizers').uses, 'Farm Uses & Application Guidance');
