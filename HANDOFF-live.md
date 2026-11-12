@@ -881,3 +881,29 @@ Research sources included Mkulima Jovial's current Kenyan dairy/livestock catalo
 
 ### Static page status
 Supabase activation and Storage object checks passed. The GitHub static product-page rebuild and sitemap refresh have not been independently verified in this batch; do not claim storefront page rendering is confirmed until the existing product-pages workflow succeeds and generated pages are checked.
+
+
+## 2026-11-13 — Product-description subtitles and SEO headings applied catalogue-wide
+
+Owner request: add clear subtitles throughout all product descriptions and improve the SEO section headings.
+
+Implementation:
+- Updated `product-description-html.mjs` so descriptions with explicit authored section labels keep those headings, while previously unlabelled catalogue descriptions receive semantic section subtitles at page-render time.
+- Plain descriptions are split at sentence boundaries. A conservative keyword classifier assigns sections such as Product overview, Uses & applications, Features & specifications, How to use & application, Safety information, Care, cleaning & storage, and Buying guide & product checks. Original description sentences are retained; no product facts, prices or costs are changed by this renderer.
+- Repeated automatically generated section types are grouped so the product-description tab bar does not show duplicate tabs for the same heading.
+- Updated `seo-meta.mjs` so product pages have category-appropriate use/application H2 headings: target-pest guidance for pest control, crop-protection guidance for regulated crop inputs, farm-use guidance for farm inputs, and product-use/buying guidance for general retail products.
+- Updated `generate-products.mjs` so the SEO use section has category-appropriate copy. General consumer products now refer to model, size, manufacturer instructions and compatibility; farm inputs refer to pack directions and intended crop/species; regulated products refer to the product label. Avoids irrelevant dosage wording on ordinary retail products.
+- Existing hand-written `product-content.json` sections (274 product entries at the time checked) remain intact and retain their own authored headings.
+- Database product descriptions, prices, costs, stock and images were not modified in this task.
+
+Validation and deployment:
+- GitHub Actions workflow: `Build product pages`, run ID `43317996496`, commit `c46118b1be5d3b4f2010f32ee114f517dfb12c43`.
+- Shared SEO metadata tests passed.
+- Product description section-rendering tests passed.
+- Live catalogue SEO quality audit passed.
+- Product pages and sitemap were regenerated successfully.
+- Marketplace-style description tabs/layout pass completed successfully.
+- Broken/placeholder link check passed.
+- Guard confirming every active product has a generated page passed.
+- IndexNow notification step was still running at the last check; it does not block the completed page build, SEO tests or page-existence guard.
+- Example generated product pages inspected in GitHub: `p/stainless-steel-milking-bucket-15l.html` and `p/fugo-chick-and-duckling-mash-50kg.html`; both contain multiple semantic description sections, tab navigation, and the new SEO use heading.
