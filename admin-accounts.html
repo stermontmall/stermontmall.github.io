@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#7c3aed">
+<title>Stermont Arcade | Accounts</title>
+<style>
+  :root { --p:#7c3aed; --pd:#5b21b6; --bg:#f6f4fb; --tx:#1c1830; --mu:#6b6785; --ln:#e6e2f2; --ok:#15803d; --okb:#dcfce7; --no:#b91c1c; --nob:#fee2e2; --wa:#f59e0b; --wab:#fef3c7; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--tx); }
+  header { background:linear-gradient(135deg,#2a0e5c,#5b21b6); color:#fff; padding:0 1rem; height:56px; display:flex; align-items:center; justify-content:space-between; gap:.5rem; position:sticky; top:0; z-index:6; box-shadow:0 2px 10px rgba(42,14,92,.25); }
+  header h1 { font-size:1.02rem; margin:0; }
+  header a { color:#fff; text-decoration:none; background:rgba(255,255,255,.18); border-radius:8px; padding:.45rem .8rem; font-size:.9rem; white-space:nowrap; }
+  main { max-width:1000px; margin:0 auto; padding:1rem; }
+  .card { background:#fff; border:1px solid var(--ln); border-radius:14px; padding:.9rem 1rem; margin-bottom:.7rem; box-shadow:0 1px 2px rgba(28,24,48,.04); }
+  .btn { display:inline-block; border:0; border-radius:10px; padding:.6rem .9rem; font:inherit; font-size:.9rem; font-weight:600; background:var(--p); color:#fff; cursor:pointer; text-decoration:none; text-align:center; }
+  .btn.alt { background:#eceaf5; color:var(--tx); }
+  .btn.ok { background:var(--ok); }
+  .btn:disabled { opacity:.55; }
+  .err { background:var(--nob); color:var(--no); padding:.6rem .8rem; border-radius:10px; margin:.7rem 0; }
+  .meta { color:var(--mu); font-size:.9rem; margin:.15rem 0; overflow-wrap:anywhere; } .meta b { color:var(--tx); }
+  .kpis { display:grid; grid-template-columns:repeat(2,1fr); gap:.5rem; margin-bottom:.9rem; }
+  @media (min-width:700px) { .kpis { grid-template-columns:repeat(4,1fr); } }
+  .kp { background:#fff; border:1px solid var(--ln); border-radius:12px; padding:.65rem .8rem; }
+  .kp small { display:block; color:var(--mu); font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+  .kp b { font-size:1.2rem; }
+  .kp.hi { background:var(--p); border-color:var(--p); color:#fff; } .kp.hi small { color:#e9ddff; }
+  #q { width:100%; padding:.7rem .9rem; border:1px solid var(--ln); border-radius:12px; font:inherit; background:#fff; margin-bottom:.6rem; }
+  #q:focus { outline:2px solid #c4b5fd; outline-offset:1px; }
+  .chips { display:flex; gap:.4rem; overflow-x:auto; margin-bottom:.7rem; scrollbar-width:none; }
+  .chips button { border:1px solid var(--ln); background:#fff; border-radius:999px; padding:.4rem .85rem; font:inherit; font-size:.88rem; white-space:nowrap; cursor:pointer; }
+  .chips button.on { background:var(--p); border-color:var(--p); color:#fff; }
+  .bulk { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.8rem; }
+  .top { display:flex; justify-content:space-between; gap:.5rem; align-items:flex-start; }
+  .nm { font-weight:700; font-size:1.02rem; overflow-wrap:anywhere; }
+  .badge { font-size:.72rem; font-weight:700; padding:.2rem .55rem; border-radius:999px; white-space:nowrap; }
+  .b-ok { background:var(--okb); color:var(--ok); } .b-wa { background:var(--wab); color:#92400e; }
+  .acts { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.7rem; }
+  .empty { text-align:center; color:var(--mu); padding:2rem 1rem; }
+  #note { position:fixed; left:50%; bottom:1.2rem; transform:translateX(-50%); background:#1c1830; color:#fff; padding:.6rem 1rem; border-radius:10px; font-size:.9rem; z-index:20; max-width:90vw; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Stermont Arcade · Accounts</h1>
+  <a href="/admin.html#inbox">← Back to admin</a>
+</header>
+<main>
+  <div id="msg" class="err" hidden></div>
+  <div id="app" hidden>
+    <p class="meta">Everyone who created an account on the website. Staff only. Use Email or WhatsApp to contact them.</p>
+    <div class="kpis" id="kpis"></div>
+    <input id="q" type="search" placeholder="Search name, email or phone" autocomplete="off">
+    <div class="chips" id="chips"></div>
+    <div class="bulk" id="bulk"></div>
+    <div id="list"></div>
+  </div>
+  <div id="note" hidden></div>
+</main>
+<script>
+(function () {
+  var D = document, SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session', TZ = 'Africa/Nairobi';
+  var rows = [], q = '', flt = 'all';
+  function $(id) { return D.getElementById(id); }
+  function h(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  function day(d) { if (!d) return 'never'; try { return new Date(d).toLocaleDateString('en-KE', { timeZone: TZ, day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return ''; } }
+  function say(t) { var n = $('note'); n.textContent = t; n.hidden = false; clearTimeout(say.t); say.t = setTimeout(function () { n.hidden = true; }, 2200); }
+  function fail(t, login) {
+    var m = $('msg'); m.textContent = ''; m.appendChild(D.createTextNode(t));
+    if (login) { m.appendChild(D.createTextNode(' ')); var a = h('a', null, 'Open admin and sign in'); a.href = '/admin.html'; m.appendChild(a); }
+    m.hidden = false; $('app').hidden = true;
+  }
+
+  /* Same login as the admin page (stored in this browser). Renew once if it has expired. */
+  function token() {
+    var s = null; try { s = JSON.parse(localStorage.getItem(SK)); } catch (e) {}
+    if (!s || !s.access_token) return Promise.reject('login');
+    if (Date.now() < s.exp) return Promise.resolve(s.access_token);
+    if (!s.refresh_token) return Promise.reject('login');
+    return fetch(SB + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: s.refresh_token }) })
+      .then(function (r) { if (!r.ok) throw 'login'; return r.json(); })
+      .then(function (j) {
+        var n = { access_token: j.access_token, refresh_token: j.refresh_token, email: (j.user && j.user.email) || s.email || '', exp: Date.now() + (j.expires_in || 3600) * 1000 - 60000 };
+        try { localStorage.setItem(SK, JSON.stringify(n)); } catch (e) {}
+        return n.access_token;
+      });
+  }
+
+  function waNumber(p) {
+    var d = String(p || '').replace(/\D/g, '');
+    if (!d) return '';
+    if (d.indexOf('254') === 0) return d;
+    if (d.charAt(0) === '0') return '254' + d.slice(1);
+    if (d.length === 9) return '254' + d;
+    return d;
+  }
+  function copy(text, okMsg) {
+    function fallback() { var t = D.createElement('textarea'); t.value = text; t.style.position = 'fixed'; t.style.opacity = '0'; D.body.appendChild(t); t.select(); try { D.execCommand('copy'); say(okMsg); } catch (e) { say('Could not copy'); } D.body.removeChild(t); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { say(okMsg); }, fallback); else fallback();
+  }
+
+  function visible() {
+    var w = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    return rows.filter(function (r) {
+      if (flt === 'ordered' && !(r.orders_count > 0)) return false;
+      if (flt === 'none' && r.orders_count > 0) return false;
+      if (flt === 'unconfirmed' && r.email_confirmed) return false;
+      var hay = [r.full_name, r.email, r.phone].join(' ').toLowerCase(), pd = String(r.phone || '').replace(/\D/g, '');
+      return w.every(function (x) { if (hay.indexOf(x) > -1) return true; var d = x.replace(/\D/g, '').replace(/^(254|0)/, ''); return d.length >= 3 && pd.indexOf(d) > -1; });
+    });
+  }
+
+  function kpis() {
+    var k = $('kpis'); k.textContent = '';
+    var week = Date.now() - 7 * 86400000;
+    [['Accounts', rows.length, 'hi'], ['Have ordered', rows.filter(function (r) { return r.orders_count > 0; }).length, ''], ['No order yet', rows.filter(function (r) { return !(r.orders_count > 0); }).length, ''], ['Joined in 7 days', rows.filter(function (r) { return new Date(r.created_at).getTime() >= week; }).length, '']].forEach(function (x) {
+      var d = h('div', 'kp ' + x[2]); d.appendChild(h('small', null, x[0])); d.appendChild(h('b', null, String(x[1]))); k.appendChild(d);
+    });
+  }
+  function chips() {
+    var c = $('chips'); c.textContent = '';
+    [['all', 'All'], ['ordered', 'Have ordered'], ['none', 'No order yet'], ['unconfirmed', 'Email not confirmed']].forEach(function (x) {
+      var b = h('button', flt === x[0] ? 'on' : '', x[1]); b.type = 'button'; b.onclick = function () { flt = x[0]; draw(); }; c.appendChild(b);
+    });
+  }
+  function csv(list) {
+    var esc = function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+    var out = ['Name,Email,Phone,Joined,Last sign-in,Orders'];
+    list.forEach(function (r) { out.push([r.full_name, r.email, r.phone, r.created_at, r.last_sign_in_at, r.orders_count].map(esc).join(',')); });
+    var a = h('a'); a.href = URL.createObjectURL(new Blob([out.join('\n')], { type: 'text/csv' })); a.download = 'stermont-accounts.csv'; D.body.appendChild(a); a.click(); D.body.removeChild(a);
+  }
+  function bulk(list) {
+    var b = $('bulk'); b.textContent = '';
+    var mails = list.map(function (r) { return r.email; }).filter(Boolean);
+    var cp = h('button', 'btn alt', 'Copy ' + mails.length + ' email' + (mails.length === 1 ? '' : 's')); cp.type = 'button'; cp.disabled = !mails.length;
+    cp.onclick = function () { copy(mails.join(', '), 'Emails copied'); }; b.appendChild(cp);
+    var all = h('a', 'btn', 'Email everyone shown'); var href = 'mailto:support@stermontarcade.co.ke?bcc=' + encodeURIComponent(mails.join(','));
+    if (!mails.length) all.hidden = true; else if (href.length > 1800) { all.href = '#'; all.onclick = function (e) { e.preventDefault(); say('Too many for one email link. Use Copy emails and paste into BCC.'); }; } else all.href = href;
+    b.appendChild(all);
+    var ex = h('button', 'btn alt', 'Download CSV'); ex.type = 'button'; ex.disabled = !list.length; ex.onclick = function () { csv(list); }; b.appendChild(ex);
+  }
+  function card(r) {
+    var c = h('div', 'card'), top = h('div', 'top'), l = h('div');
+    l.appendChild(h('div', 'nm', r.full_name || r.email || 'Unnamed account'));
+    if (r.full_name) l.appendChild(h('div', 'meta', r.email));
+    top.appendChild(l); top.appendChild(h('span', 'badge ' + (r.orders_count > 0 ? 'b-ok' : 'b-wa'), r.orders_count > 0 ? r.orders_count + ' order' + (r.orders_count === 1 ? '' : 's') : 'No orders yet')); c.appendChild(top);
+    function meta(k, v) { if (!v) return; var m = h('div', 'meta'); m.appendChild(h('b', null, k + ': ')); m.appendChild(D.createTextNode(v)); c.appendChild(m); }
+    meta('Phone', r.phone); meta('Joined', day(r.created_at)); meta('Last sign-in', day(r.last_sign_in_at));
+    if (r.last_order_at) meta('Last order', day(r.last_order_at));
+    if (!r.email_confirmed) meta('Email', 'not confirmed yet');
+    var a = h('div', 'acts');
+    if (r.email) {
+      var em = h('a', 'btn sm', 'Email'); em.href = 'mailto:' + r.email + '?subject=' + encodeURIComponent('Stermont Arcade'); a.appendChild(em);
+      var cp = h('button', 'btn alt', 'Copy email'); cp.type = 'button'; cp.onclick = function () { copy(r.email, 'Email copied'); }; a.appendChild(cp);
+    }
+    var wn = waNumber(r.phone);
+    if (wn) { var w = h('a', 'btn alt', 'WhatsApp'); w.href = 'https://wa.me/' + wn; w.target = '_blank'; w.rel = 'noopener'; a.appendChild(w); }
+    c.appendChild(a); return c;
+  }
+  function draw() {
+    chips(); var list = visible(), L = $('list'); L.textContent = '';
+    bulk(list);
+    if (!list.length) { L.appendChild(h('div', 'empty', rows.length ? 'No accounts match.' : 'No accounts found.')); return; }
+    list.forEach(function (r) { L.appendChild(card(r)); });
+  }
+
+  $('q').addEventListener('input', function () { q = this.value; draw(); });
+  token().then(function (t) {
+    return fetch(SB + '/rest/v1/rpc/admin_list_accounts', { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' }, body: '{}' });
+  }).then(function (r) {
+    if (r.status === 401) throw 'login';
+    if (!r.ok) throw 'load';
+    return r.json();
+  }).then(function (j) {
+    rows = j || []; $('app').hidden = false; kpis(); draw();
+    if (!rows.length) { var m = $('msg'); m.textContent = 'No accounts returned. If you expected some, make sure your email is in the staff table.'; m.hidden = false; }
+  }).catch(function (e) {
+    if (e === 'login') fail('Your session has expired.', true);
+    else fail('Could not load accounts. Run setup-admin-accounts.sql in Supabase and check that you are staff.', false);
+  });
+})();
+</script>
+</body>
+</html>
