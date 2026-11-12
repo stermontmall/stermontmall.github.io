@@ -12,9 +12,18 @@ const DIR = process.env.P_DIR || 'p';
 
 async function rows() {
   if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));
-  const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=id,slug&order=created_at.asc`, { headers: { apikey: KEY } });
-  if (!r.ok) throw new Error(`Could not read products from Supabase (HTTP ${r.status})`);
-  return r.json();
+  const all = [];
+  let offset = 0;
+  while (true) {
+    const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=id,slug&order=created_at.asc&limit=1000&offset=${offset}`, { headers: { apikey: KEY } });
+    if (!r.ok) throw new Error(`Could not read products from Supabase (HTTP ${r.status})`);
+    const batch = await r.json();
+    if (!Array.isArray(batch)) throw new Error('Supabase returned an invalid product-page list');
+    all.push(...batch);
+    if (batch.length < 1000) break;
+    offset += batch.length;
+  }
+  return all;
 }
 
 export function missingPages(list, has) {
