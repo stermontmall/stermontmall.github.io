@@ -905,3 +905,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-12: rebuild Piano F1 Baby Spinach Seeds 50g page after the owner supplied the exact pack photo.
 
 // Catalogue rebuild requested 2026-11-13: include newly verified agrovet and pest-control listings.
+
+// Trigger static catalogue rebuild for poultry drinker batch added 2026-11-13.
