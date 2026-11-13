@@ -6,7 +6,8 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 //   Passcode lives in public.upload_settings (key 'photo_passcode'). Rotate it with SQL. Never commit it.
 //
 // WAYS TO SEND PHOTOS
-//  1. JSON  { product_id, image_url }                      public https link to a jpg/png/webp/gif/avif
+//  1. JSON  { product_id, image_url }                      public https link to a jpg/png/webp/gif/avif, OR a public https product/web page
+//                                                          (the page's main photo is found automatically: og:image, twitter:image, image_src, JSON-LD image)
 //  2. JSON  { product_id, image_base64 }                   raw base64 or a data: URL
 //  3. JSON  { product_id, images: [ ... ] }                several photos for one product; each item is a link string, a data: URL,
 //                                                          or an object { image_url | image_base64 | download_link | url }
@@ -19,11 +20,14 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 // LIMITS (owner request 2026-11-08: remove limits): 50 MB per photo (the Supabase Storage per-file ceiling on this plan), up to 60
 //  photos per call, any pixel size; jpg/png/webp/gif/avif. The type is checked from the file's own bytes, because the bucket is
 //  public and must never serve HTML/SVG/scripts. HEIC is not accepted (browsers cannot display it).
+// 2026-11-11 (owner request): web-page links are accepted. The page is downloaded, up to 4 candidate image addresses are read from it,
+//  and each candidate goes through the same https-only / no-IP / byte-sniffing checks as a direct image link.
 // Result: file saved to bucket product-images, URL(s) saved into products.images.
 const BUCKET = "product-images";
 const MAX_BYTES = 50 * 1024 * 1024;
 const MAX_LABEL = "50 MB";
 const MAX_PER_CALL = 60;
+const MAX_PAGE_CANDIDATES = 4;
 const TYPES: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "image/avif": "avif" };
 const ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const cors = {
@@ -46,11 +50,16 @@ function sniff(b: Uint8Array): string {
   return "";
 }
 
+function looksLikeHtml(b: Uint8Array): boolean {
+  const start = new TextDecoder().decode(b.slice(0, 2048)).toLowerCase();
+  return start.includes("<!doctype html") || start.includes("<html") || start.includes("<head") || start.includes("<meta");
+}
+
 function notSupportedReason(b: Uint8Array): string {
   const head = new TextDecoder().decode(b.slice(4, 12));
   if (head.startsWith("ftyp") && /heic|heix|mif1/.test(head)) return "image is HEIC, which browsers cannot display; convert it to jpg, png or webp first (the upload page does this for you)";
   const start = new TextDecoder().decode(b.slice(0, 15)).toLowerCase();
-  if (start.includes("<!doctype") || start.includes("<html")) return "link is a web page, not a direct image file; use the direct image link or send image_base64";
+  if (start.includes("<!doctype") || start.includes("<html")) return "link is a web page and no usable product photo could be found on it; use the direct image link or send image_base64";
   if (start.includes("<svg") || start.includes("<?xml")) return "image is SVG; only jpg, png, webp, gif or avif are accepted";
   return "file is not a jpg, png, webp, gif or avif image";
 }
@@ -63,9 +72,62 @@ function safeHttps(u: URL): boolean {
   return true;
 }
 
+function decodeEntities(s: string): string {
+  return s.replace(/&amp;/g, "&").replace(/&#38;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#x2F;/g, "/");
+}
+
+// Reads candidate photo addresses from a web page, best first. Returned as absolute URLs; each is checked again before use.
+function pageImageCandidates(html: string, pageUrl: URL): string[] {
+  const found: string[] = [];
+  const add = (raw: string | undefined | null) => {
+    if (!raw) return;
+    const t = decodeEntities(raw.trim());
+    if (!t || t.startsWith("data:")) return;
+    try {
+      const abs = new URL(t, pageUrl).toString();
+      if (!found.includes(abs)) found.push(abs);
+    } catch { /* ignore bad address */ }
+  };
+  const metaRe = /<meta\b[^>]*>/gi;
+  const metas = html.match(metaRe) ?? [];
+  const metaVal = (tag: string, keys: string[]) => {
+    const k = tag.match(/\b(?:property|name|itemprop)\s*=\s*["']([^"']+)["']/i);
+    if (!k || !keys.includes(k[1].toLowerCase())) return null;
+    const c = tag.match(/\bcontent\s*=\s*["']([^"']+)["']/i);
+    return c ? c[1] : null;
+  };
+  for (const m of metas) add(metaVal(m, ["og:image:secure_url", "og:image", "og:image:url"]));
+  for (const m of metas) add(metaVal(m, ["twitter:image", "twitter:image:src"]));
+  const links = html.match(/<link\b[^>]*>/gi) ?? [];
+  for (const l of links) {
+    if (/\brel\s*=\s*["']image_src["']/i.test(l)) { const h = l.match(/\bhref\s*=\s*["']([^"']+)["']/i); add(h ? h[1] : null); }
+  }
+  for (const m of metas) add(metaVal(m, ["image"]));
+  const ld = html.match(/<script\b[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) ?? [];
+  for (const block of ld) {
+    const inner = block.replace(/^<script[^>]*>/i, "").replace(/<\/script>$/i, "");
+    try {
+      const walk = (n: unknown) => {
+        if (Array.isArray(n)) { n.forEach(walk); return; }
+        if (n && typeof n === "object") {
+          const o = n as Record<string, unknown>;
+          const img = o.image;
+          if (typeof img === "string") add(img);
+          else if (Array.isArray(img)) img.forEach((x) => { if (typeof x === "string") add(x); else if (x && typeof x === "object") add((x as Record<string, unknown>).url as string); });
+          else if (img && typeof img === "object") add((img as Record<string, unknown>).url as string);
+          Object.values(o).forEach(walk);
+        }
+      };
+      walk(JSON.parse(inner));
+    } catch { /* ignore bad JSON-LD */ }
+  }
+  return found.slice(0, MAX_PAGE_CANDIDATES);
+}
+
 type Got = { bytes: Uint8Array } | { error: string };
 
-async function fetchImage(raw: string): Promise<Got> {
+// depth 0 = the address the caller sent (a web page is allowed); depth 1 = an address found on that page (must be a real image).
+async function fetchImage(raw: string, depth = 0): Promise<Got> {
   let url: URL;
   try { url = new URL(raw); } catch { return { error: "image_url is not a valid URL" }; }
   for (let hop = 0; hop < 4; hop++) {
@@ -77,7 +139,7 @@ async function fetchImage(raw: string): Promise<Got> {
         signal: AbortSignal.timeout(45000),
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-          Accept: "image/jpeg,image/png,image/webp,image/avif,image/*;q=0.8",
+          Accept: depth === 0 ? "image/jpeg,image/png,image/webp,image/avif,image/*;q=0.8,text/html;q=0.7" : "image/jpeg,image/png,image/webp,image/avif,image/*;q=0.8",
           Referer: url.origin + "/",
         },
       });
@@ -93,8 +155,20 @@ async function fetchImage(raw: string): Promise<Got> {
     if (len > MAX_BYTES) return { error: "image over " + MAX_LABEL + "; use a smaller or compressed image" };
     const bytes = new Uint8Array(await r.arrayBuffer());
     if (bytes.length > MAX_BYTES) return { error: "image over " + MAX_LABEL + "; use a smaller or compressed image" };
-    if (!sniff(bytes)) return { error: notSupportedReason(bytes) };
-    return { bytes };
+    if (sniff(bytes)) return { bytes };
+    if (depth === 0 && looksLikeHtml(bytes)) {
+      const html = new TextDecoder().decode(bytes.slice(0, 2 * 1024 * 1024));
+      const cands = pageImageCandidates(html, url);
+      if (!cands.length) return { error: notSupportedReason(bytes) };
+      let lastErr = "";
+      for (const c of cands) {
+        const got = await fetchImage(c, 1);
+        if ("bytes" in got) return got;
+        lastErr = got.error;
+      }
+      return { error: "found photo links on the page but none could be downloaded as an image (" + lastErr + "); send image_base64 instead" };
+    }
+    return { error: notSupportedReason(bytes) };
   }
   return { error: "too many redirects" };
 }
@@ -170,7 +244,7 @@ Deno.serve(async (req: Request) => {
   if (req.method === "GET") {
     return json({
       service: "Stermont product photo upload",
-      how: "POST JSON {product_id, image_url | image_base64 | images:[...] | openaiFileIdRefs:[{download_link}], activate?, append?} or multipart/form-data (product_id, files). Send the passcode as `pass` or as Authorization: Bearer <passcode>.",
+      how: "POST JSON {product_id, image_url | image_base64 | images:[...] | openaiFileIdRefs:[{download_link}], activate?, append?} or multipart/form-data (product_id, files). image_url may be a direct image link or a public product web page (its main photo is found automatically). Send the passcode as `pass` or as Authorization: Bearer <passcode>.",
       limits: "jpg/png/webp/gif/avif, 50 MB per photo, up to 60 photos per call, no minimum pixel size",
     });
   }
@@ -194,7 +268,7 @@ Deno.serve(async (req: Request) => {
       else if (Array.isArray(b?.openaiFileIdRefs) && b.openaiFileIdRefs.length) items = b.openaiFileIdRefs;
       else if (typeof b?.image_base64 === "string" && b.image_base64.length > 0) items = [{ image_base64: b.image_base64 }];
       else if (typeof b?.image_url === "string" && b.image_url.length > 0) items = [{ image_url: b.image_url }];
-      else return json({ ok: false, reason: "send image_url (direct https link), image_base64, images:[...] or openaiFileIdRefs" }, 400);
+      else return json({ ok: false, reason: "send image_url (https link to an image or a product page), image_base64, images:[...] or openaiFileIdRefs" }, 400);
       if (items.length > MAX_PER_CALL) return json({ ok: false, reason: "at most " + MAX_PER_CALL + " photos per call" }, 400);
 
       const activate = truthy(b?.activate);
