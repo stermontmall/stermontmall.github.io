@@ -1,3 +1,31 @@
+## 2026-11-13 — Forging / metalworking machinery addition
+
+### One new listing activated and verified
+- Product: Hydraulic Press Machine 30 Tonne
+- Product ID / slug: `hydraulic-press-machine-30-tonne`
+- Category: Tools & Machinery (30)
+- Source supplier listing: https://kreatives.co.ke/product/30-ton-hydraulic-shop-press-KkSDz
+- Supplier-listed price: KSh 49,000; listing showed 48 available at time of research.
+- Stored cost: KSh 49,000; selling price: KSh 63,700 (30% markup; no charm-price adjustment).
+- Photo: supplier product-page image uploaded to public `product-images` Storage; upload response HTTP 200; one Storage object and one `products.images` URL verified.
+- Live state: `active=true`; appears once in `public.get_store_catalog()`.
+- Stock=1000; low_at=20; featured=false.
+- Mobile-shell link: https://stermontarcade.co.ke/?product=hydraulic-press-machine-30-tonne
+- Classification note: this is a hydraulic workshop press used for pressing/forming/straightening, not a dedicated blacksmith forging hammer.
+
+### Not published — supplier quotation required
+The following Kenya supplier listings have no public KES price, so no source cost can be verified and the 30% selling price cannot be calculated. Do not create or activate listings with invented prices:
+- Air Hammer C41 (models 16–150 kg): https://shop.pindustrial.co.ke/p/air-hammer-c41
+- Four Column Power Press HP4/JHP4: https://shop.pindustrial.co.ke/c/machinery-press-machine
+- JH21 Open Front Fixed Bed Press: https://shop.pindustrial.co.ke/c/machinery-press-machine
+
+### Verification / next
+- Supabase row, public Storage object and live catalogue entry were verified for the 30-tonne hydraulic press.
+- Static generated product page and sitemap entry are pending the next successful `.github/workflows/product-pages.yml` run; verify them after that run.
+- Obtain written KES quotations for the C41, HP4/JHP4 and JH21 machines before pricing and publishing them.
+
+---
+
 ## 2026-11-13 — 15 pest-control equipment products published and verified
 
 ### Supabase publication status
