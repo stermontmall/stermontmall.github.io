@@ -1277,3 +1277,12 @@ Sources reviewed in this turn: https://www.kilimall.co.ke/category/Pest-Control,
 - Mobile-shell link: https://stermontarcade.co.ke/?product=pyagro-4-pyrethrin-insecticide-125ml
 - This is 1 of the requested 30, not a completed 30-item batch. Do not report 30 as published. Remaining candidates need individual exact-pack KES in-stock price and exact product photo verification; several likely popular PCPB-listed products already exist in the catalogue. Continue screening for missing SKUs and create only when all gates pass.
 - Sources: https://agroduka.ke/pyagro/?variation_id=6094 ; https://www.pcpb.go.ke/crops/ ; https://www.pcpb.go.ke/public-health/ ; https://www.pcpb.go.ke/public-health-bio-pesticides/
+
+
+## 2026-11-13 — Pyagro image mismatch correction
+- Owner reported that live Pyagro 4 listing displayed the Agroduka vendor logo rather than the product bottle. Owner screenshot confirmed mismatch.
+- Immediately deactivated `pyagro-4-pyrethrin-insecticide-125ml` and cleared its `images` array. It is no longer live and should not be reported as published.
+- Root cause: supplier page image field resolved to vendor logo. Prior upload/Storage verification only proved file availability, not that the image visually depicted the SKU.
+- Updated `PUBLISHING.md` with a mandatory visual QA gate: inspect the exact source image and final public Storage image at full resolution; verify brand/product/pack visually. Vendor logos, placeholders, generic bottles and mismatched packs are rejected.
+- Product can be republished only after obtaining and visually verifying a genuine Pyagro 4 packshot for the correct pack size. The supplier listing is not a valid image source in its current state.
+- Next: continue product expansion only with exact verified photographs; no image URL/Storage check alone is sufficient.
