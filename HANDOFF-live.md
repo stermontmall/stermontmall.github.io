@@ -937,3 +937,50 @@ Owner requested continuation of agrovet and pest-control product publishing. Add
 Source listings: MyAgrovet 6L model product 430-20130 (https://www.myagrovet.co.ke/products.php?id=6968), WQ 7.5L drinker in poultry drinker category (https://www.myagrovet.co.ke/products.php?cid=430). The second photo source is a matching 7.5L handled model with 31cm diameter and 25.5cm height. Product photos are stored in Supabase Storage; no direct remote hotlink remains in the product image arrays.
 
 Static product page generation remains on the GitHub Actions schedule (every 30 minutes). Check the generated HTML and sitemap after the next successful build before claiming static SEO URLs are live.
+
+
+## 2026-11-13 — 15 poultry, livestock and farm-equipment products published
+
+### Published and verified in Supabase
+All 15 listings below were created through the draft-product workflow with the explicit 30% markup argument. The site's existing price-ending trigger rounds computed prices upward to supported endings (0, 50, 99 or 100). All descriptions are 937–958 words. Each product photo upload returned HTTP 200 and produced one public Storage object; the activation guard then verified the object exists before setting active=true. All rows have stock=1000, low_at=20 and featured=false.
+
+| Product | ID / slug | Reference cost (KSh) | Stored selling price (KSh) | Description words |
+|---|---|---:|---:|---:|
+| 8kg Poultry Feeder with Lid and Anti-Waste Tray | `8kg-poultry-feeder-with-lid-and-anti-waste-tray` | 2,900 | 3,799 | 953 |
+| 11L Plastic Poultry Drinker with Red Base | `11l-plastic-poultry-drinker-with-red-base` | 850 | 1,150 | 948 |
+| Kenpoly 14L Poultry Drinker on Legs | `kenpoly-14l-poultry-drinker-on-legs` | 1,000 | 1,300 | 946 |
+| 50cm Linear Chick Feeder with 28 Feeding Holes | `50cm-linear-chick-feeder-with-28-feeding-holes` | 350 | 499 | 948 |
+| Tehno Mss A42 Automatic Poultry Nipple Drinkers Set of 10 | `tehno-mss-a42-automatic-poultry-nipple-drinkers-set-of-10` | 950 | 1,250 | 958 |
+| WQ 1.5kg Poultry Feeder with Adjustable Legs | `wq-1-5kg-poultry-feeder-with-adjustable-legs` | 350 | 499 | 943 |
+| 3kg Poultry Feeder with Anti-Waste Separator Ring | `3kg-poultry-feeder-with-anti-waste-separator-ring` | 350 | 499 | 940 |
+| GAUN Spain 40L Silo Poultry Feeder | `gaun-spain-40l-silo-poultry-feeder` | 8,200 | 10,699 | 946 |
+| INGCO 8L Pressure Sprayer with Lance | `ingco-8l-pressure-sprayer-with-lance` | 3,500 | 4,550 | 942 |
+| 1L Calf Feeding Bottle with Silicone Teat | `1l-calf-feeding-bottle-with-silicone-teat` | 800 | 1,050 | 947 |
+| Universal Livestock Ear Tag Applicator Pliers | `universal-livestock-ear-tag-applicator-pliers` | 1,800 | 2,350 | 940 |
+| Reusable 30-Egg Plastic Tray | `reusable-30-egg-plastic-tray` | 100 | 150 | 937 |
+| WQ Poultry Egg Transportation Crate | `wq-poultry-egg-transportation-crate` | 2,500 | 3,250 | 939 |
+| WQ 1L Cone Poultry Drinker for Day-Old Chicks | `wq-1l-cone-poultry-drinker-for-day-old-chicks` | 180 | 250 | 946 |
+| DAMLY Gas Brooder Heater for Poultry | `damly-gas-brooder-heater-for-poultry` | 30,000 | 39,000 | 942 |
+
+Product-specific photo sources were chosen to match the named item/model/capacity as closely as the available listings allowed; images are now served from Stermont's Supabase Storage rather than hotlinked. One initial 1L drinker image host blocked the fetch; a matching 1L red/white poultry drinker image from a Kenyan poultry-equipment retailer was used successfully on retry. No listing was activated until its final image upload returned HTTP 200.
+
+### Mobile-shell product links
+- https://stermontarcade.co.ke/?product=8kg-poultry-feeder-with-lid-and-anti-waste-tray
+- https://stermontarcade.co.ke/?product=11l-plastic-poultry-drinker-with-red-base
+- https://stermontarcade.co.ke/?product=kenpoly-14l-poultry-drinker-on-legs
+- https://stermontarcade.co.ke/?product=50cm-linear-chick-feeder-with-28-feeding-holes
+- https://stermontarcade.co.ke/?product=tehno-mss-a42-automatic-poultry-nipple-drinkers-set-of-10
+- https://stermontarcade.co.ke/?product=wq-1-5kg-poultry-feeder-with-adjustable-legs
+- https://stermontarcade.co.ke/?product=3kg-poultry-feeder-with-anti-waste-separator-ring
+- https://stermontarcade.co.ke/?product=gaun-spain-40l-silo-poultry-feeder
+- https://stermontarcade.co.ke/?product=ingco-8l-pressure-sprayer-with-lance
+- https://stermontarcade.co.ke/?product=1l-calf-feeding-bottle-with-silicone-teat
+- https://stermontarcade.co.ke/?product=universal-livestock-ear-tag-applicator-pliers
+- https://stermontarcade.co.ke/?product=reusable-30-egg-plastic-tray
+- https://stermontarcade.co.ke/?product=wq-poultry-egg-transportation-crate
+- https://stermontarcade.co.ke/?product=wq-1l-cone-poultry-drinker-for-day-old-chicks
+- https://stermontarcade.co.ke/?product=damly-gas-brooder-heater-for-poultry
+
+### Next
+- Continue adding evidence-backed poultry and livestock equipment, with duplicate checks across the full active catalogue and a verified product-matching image before activation.
+- Triggered a static product-page rebuild after this batch. Do not claim static /p/ pages or sitemap entries are live until the scheduled GitHub Actions run succeeds and those URLs are checked.
