@@ -1,3 +1,62 @@
+## 2026-11-13 — 15 pest-control equipment products published and verified
+
+### Supabase publication status
+- Added 15 distinct listings in category 38 (Sprayers & Equipment) after checking the existing catalogue for duplicates.
+- All 15 are active=true and appear in `public.get_store_catalog()` (15 rows verified).
+- All 15 have exactly one image URL in `products.images`; all 15 corresponding objects exist in the public `product-images` Storage bucket.
+- Photo uploads were staged inactive, checked, and retried with exact direct image URLs where supplier product pages did not expose usable image metadata. Final status: 15/15 photo objects present; each upload response returned HTTP 200 and `photos:1`.
+- All products have stock=1000, low_at=20, featured=false, SEO titles no longer than 60 characters, and factual SKU-specific descriptions of 129–151 words, in line with the current 2026-11-11 playbook rule (40–2,000 words; no padding).
+- Final catalogue query confirmed all 15 active and the mobile-shell catalogue function returned all 15.
+- The two Selecta source costs were corrected to the latest Osho listed KES prices (1L KSh180; 1.5L KSh211) before final verification. Their stored selling prices remain KSh250 and KSh299 after the site's charm-price trigger.
+- The existing price-point trigger rounds some calculated 30% prices upward. Do not claim exact 30% displayed margin after rounding.
+
+### Products, source cost and stored selling price
+| Product | ID / slug | Source cost (KSh) | Stored price (KSh) |
+|---|---|---:|---:|
+| Greenberg Platinum Motorised Sprayer 25L | `greenberg-platinum-motorised-sprayer-25l` | 20,706 | 26,950 |
+| High Pressure Sprayer Hose 50 Metres | `high-pressure-sprayer-hose-50-metres` | 7,000 | 9,100 |
+| Jacto Marca Sprayer HH5 5L | `jacto-marca-sprayer-hh5-5l` | 3,227 | 4,199 |
+| Jacto PJB Battery Knapsack Sprayer 16L | `jacto-pjb-battery-knapsack-sprayer-16l` | 31,343 | 40,750 |
+| Jacto PJB Battery Knapsack Sprayer 20L | `jacto-pjb-battery-knapsack-sprayer-20l` | 33,581 | 43,699 |
+| Jacto XP Knapsack Sprayer 16L | `jacto-xp-knapsack-sprayer-16l` | 6,318 | 8,250 |
+| Jacto XP Knapsack Sprayer 20L | `jacto-xp-knapsack-sprayer-20l` | 7,434 | 9,699 |
+| Osho Hillor Rocking Sprayer HR14 | `osho-hillor-rocking-sprayer-hr14` | 14,116 | 18,399 |
+| Osho Leader Bucket Sprayer | `osho-leader-bucket-sprayer` | 9,459 | 12,299 |
+| Osho Standard Bucket Sprayer | `osho-standard-bucket-sprayer` | 7,886 | 10,299 |
+| Selecta Trigger Sprayer 1 Litre | `selecta-trigger-sprayer-1-litre` | 180 | 250 |
+| Selecta Trigger Sprayer 1.5 Litres | `selecta-trigger-sprayer-1-5-litres` | 211 | 299 |
+| PB 16 Sprayer Spare Parts Lock Nut TE/2AC | `pb-16-sprayer-spare-parts-lock-nut-te-2ac` | 143 | 199 |
+| PB 16 Sprayer Spare Parts Suction Valve CPT 312 | `pb-16-sprayer-spare-parts-suction-valve-cpt-312` | 358 | 499 |
+| PB 16 Sprayer Spare Parts PI Strainer for Chamber 322(pi) | `pb-16-sprayer-spare-parts-pi-strainer-for-chamber-322-pi` | 344 | 450 |
+
+### Product links (mobile shell)
+- https://stermontarcade.co.ke/?product=greenberg-platinum-motorised-sprayer-25l
+- https://stermontarcade.co.ke/?product=high-pressure-sprayer-hose-50-metres
+- https://stermontarcade.co.ke/?product=jacto-marca-sprayer-hh5-5l
+- https://stermontarcade.co.ke/?product=jacto-pjb-battery-knapsack-sprayer-16l
+- https://stermontarcade.co.ke/?product=jacto-pjb-battery-knapsack-sprayer-20l
+- https://stermontarcade.co.ke/?product=jacto-xp-knapsack-sprayer-16l
+- https://stermontarcade.co.ke/?product=jacto-xp-knapsack-sprayer-20l
+- https://stermontarcade.co.ke/?product=osho-hillor-rocking-sprayer-hr14
+- https://stermontarcade.co.ke/?product=osho-leader-bucket-sprayer
+- https://stermontarcade.co.ke/?product=osho-standard-bucket-sprayer
+- https://stermontarcade.co.ke/?product=selecta-trigger-sprayer-1-litre
+- https://stermontarcade.co.ke/?product=selecta-trigger-sprayer-1-5-litres
+- https://stermontarcade.co.ke/?product=pb-16-sprayer-spare-parts-lock-nut-te-2ac
+- https://stermontarcade.co.ke/?product=pb-16-sprayer-spare-parts-suction-valve-cpt-312
+- https://stermontarcade.co.ke/?product=pb-16-sprayer-spare-parts-pi-strainer-for-chamber-322-pi
+
+### Sources and qualifications
+- Supplier KES prices and model details: Agroduka Sprayers listings (Amiran, Greenberg, hose, Osho and PB16 items) and Osho Chemical Industries' official shop pages for Jacto and Selecta sprayers.
+- Exact product images were uploaded from matching product pages or direct model-specific image files. All Storage objects are verified; no generic category image was substituted.
+- Some Jacto image files came from international retailer/manufacturer image hosts because local product-page image extraction returned 422. The visible model/capacity matches each listing.
+- The descriptions explicitly advise buyers to confirm compatibility, package contents and chemical-label/PPE instructions where supplier details are incomplete.
+
+### Next
+- Static generated `/p/` pages and sitemap were not browser-verified in this batch. The repo's `.github/workflows/product-pages.yml` runs on its 30-minute schedule; after the next successful run, verify the 15 generated pages, photos, canonical tags, Product JSON-LD and sitemap entries. Do not edit generated HTML directly.
+
+---
+
 ## 2026-11-13 — High-demand farm products batch (4 new listings verified)
 
 Research basis: Kenya agri-search coverage and 2024 agro-input transaction trends indicate sustained interest in poultry/dairy and farm tools; feeds and veterinary products maintain demand year-round, while seeds/fertilizers are seasonal. AgriJibu lists the selected Fugo products among its popular/top-selling feed lines. This is demand-led product selection, not a guarantee of future sales or a measured Google search ranking.
