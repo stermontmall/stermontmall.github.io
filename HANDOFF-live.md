@@ -907,3 +907,21 @@ Validation and deployment:
 - Guard confirming every active product has a generated page passed.
 - IndexNow notification step was still running at the last check; it does not block the completed page build, SEO tests or page-existence guard.
 - Example generated product pages inspected in GitHub: `p/stainless-steel-milking-bucket-15l.html` and `p/fugo-chick-and-duckling-mash-50kg.html`; both contain multiple semantic description sections, tab navigation, and the new SEO use heading.
+
+
+## 2026-11-13 — Agrovet and pest-control product batch (2 new listings verified in Supabase)
+
+Owner request: add products focused on agrovet and pest control, with photos uploaded using the existing GitHub/Supabase publishing workflow.
+
+### New active listings
+- **WQ RT53 Chick Feeding Tray 53x35cm Red HDPE** — ID/slug `wq-rt53-chick-feeding-tray-53x35cm-red-hdpe`; category 44 (Poultry & Dairy Equipment); source price KSh 550; 30% markup applied; stored selling price KSh 750; description 941 words. Exact WQ RT53 red 53x35cm tray photo sourced from the supplier's RT53 page and uploaded to public Storage as `product-images/wq-rt53-chick-feeding-tray-53x35cm-red-hdpe.webp` (19,098 bytes, image/webp, HTTP 200).
+- **WOKIN 573102 2L Pressure Sprayer PE Body Brass Nozzle** — ID/slug `wokin-573102-2l-pressure-sprayer-pe-body-brass-nozzle`; category 38 (Sprayers & Equipment); source price KSh 1,500; 30% markup applied; stored selling price KSh 1,950; description 917 words. Matching WOKIN 573102 2L photo sourced from a product image explicitly marked model 573102 and uploaded to public Storage as `product-images/wokin-573102-2l-pressure-sprayer-pe-body-brass-nozzle.webp` (37,500 bytes, image/webp, HTTP 200).
+- Both new rows verified: active=true, stock=1000, low_at=20, featured=false, cost equal to source price, exactly one image URL pointing to one matching public `product-images` Storage object. The activation guard returned LIVE for both.
+
+### Duplicate protection
+- A Tehno Mss G010 10L poultry drinker and an IPCONE IP20LMN 20L sprayer were already present as active catalogue items, so no duplicate records were created for those products.
+
+### Static SEO pages
+- `.github/workflows/product-pages.yml` rebuilds every 30 minutes and builds static product pages and the sitemap from the live Supabase catalogue. This workflow was inspected; the GitHub connector available in this session does not expose workflow_dispatch or repository_dispatch.
+- Supabase activation and Storage upload are verified. Static HTML page/sitemap regeneration for these two new slugs is pending the next scheduled GitHub Actions run; do not claim the static pages are built until the workflow run is checked.
+- Customer routes: `https://stermontarcade.co.ke/?product=wq-rt53-chick-feeding-tray-53x35cm-red-hdpe` and `https://stermontarcade.co.ke/?product=wokin-573102-2l-pressure-sprayer-pe-body-brass-nozzle`.
