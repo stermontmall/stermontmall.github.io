@@ -247,8 +247,7 @@ All six products below were created with the explicit batch markup argument of 3
 ## 2026-11-12 20:30 (Africa/Nairobi) — Spinach seed varieties published
 
 ### Published and verified in Supabase
-- Added five live listings in category 41 (Seeds & Seedlings). All have an uploaded public Storage object referenced in `products.images`, `active=true`, `stock=1000`, `low_at=20`, and `featured=false`.
-- Photo uploads returned HTTP 200 with `ok=true`; activation used `public.activate_product_if_photo_ok`, which confirmed each Storage object exists before setting active.
+- Added five live listings in category 41 (Seeds & Seedlings). All have an uploaded public Storage object referenced in `products.images`, `active=true`, `stock=1000`, `low_at=20`, and `featured=false`.- Photo uploads returned HTTP 200 with `ok=true`; activation used `public.activate_product_if_photo_ok`, which confirmed each Storage object exists before setting active.
 - Source KES costs used with the owner's explicit 30% batch markup. The site's price-point trigger rounds selling prices upward to the next supported price point, so actual displayed markup can exceed 30%.
 
 | Product | Supplier source cost | Stored selling price | Photo source |
@@ -497,8 +496,7 @@ All seven rows below are active, each has one uploaded product image in the publ
 ### Notes
 - No existing exact product name or ID was found before insertion.
 - Description uses only supplier-confirmed details; handle variant, dimensions and weight remain unspecified and are flagged for supplier confirmation.
-- The product is a non-chemical field-sampling tool, not a chemical pest treatment.
-- The database row and Storage object are verified. The web fetch tool could not independently render the Storage URL, but Storage metadata confirms HTTP 200 and the image reference is present.
+- The product is a non-chemical field-sampling tool, not a chemical pest treatment.- The database row and Storage object are verified. The web fetch tool could not independently render the Storage URL, but Storage metadata confirms HTTP 200 and the image reference is present.
 - Product-page workflow dispatch is still pending because no GitHub workflow-dispatch action is exposed in the connected toolset. Do not edit generated HTML or workflow files. Run the documented dispatch when an Actions-capable GitHub session is available:
   `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`
 
@@ -748,7 +746,6 @@ All seven rows below are active, each has one uploaded product image in the publ
 - Remaining catalogue batch items to add: 37.
 - Aico Japan 60L 7.5HP trolley sprayer remains inactive and photo-blocked; not counted as published.
 
-
 ## 2026-11-12 — Pest-control batch continuation: Fly Catcher Sticky Fly Paper
 
 ### Published and verified
@@ -997,7 +994,6 @@ Supabase activation and Storage object checks passed. The GitHub static product-
 ## 2026-11-13 — Product-description subtitles and SEO headings applied catalogue-wide
 
 Owner request: add clear subtitles throughout all product descriptions and improve the SEO section headings.
-
 Implementation:
 - Updated `product-description-html.mjs` so descriptions with explicit authored section labels keep those headings, while previously unlabelled catalogue descriptions receive semantic section subtitles at page-render time.
 - Plain descriptions are split at sentence boundaries. A conservative keyword classifier assigns sections such as Product overview, Uses & applications, Features & specifications, How to use & application, Safety information, Care, cleaning & storage, and Buying guide & product checks. Original description sentences are retained; no product facts, prices or costs are changed by this renderer.
@@ -1247,8 +1243,7 @@ Sources reviewed in this turn: https://www.kilimall.co.ke/category/Pest-Control,
 
 - Re-read CLAUDE.md, PUBLISHING.md and live Supabase site_playbook rules. Confirmed publication requires exact product photo (450x450+, correct product/pack) uploaded to product-images and verified in products.images before active=true.
 - Rechecked candidate catalogue names in Supabase: no exact matching product rows found for Falltrack, Crytrack Lure, Femtrack, FCM Pherolure 1U, Bactrocera Complete Set or Delta Trap.
-- Rechecked supplier pages: Agroduka lists Falltrack KSh 368, Crytrack Lure KSh 368, Femtrack KSh 748, FCM Pherolure 1U KSh 748 (minimum quantity 15), Bactrocera Complete Set KSh 403, all shown in stock at lookup. These are source costs; planned 30% markup before the site's charm-price rounding.
-- Photo blocker remains: Agroduka product pages resolve the visible image to a Kenya Biologics vendor/logo, not a verifiable exact SKU photo. Search results found generic pheromone dispensers / unrelated trap visuals, which are not acceptable substitutes. Therefore no product rows were created and nothing was activated or published.
+- Rechecked supplier pages: Agroduka lists Falltrack KSh 368, Crytrack Lure KSh 368, Femtrack KSh 748, FCM Pherolure 1U KSh 748 (minimum quantity 15), Bactrocera Complete Set KSh 403, all shown in stock at lookup. These are source costs; planned 30% markup before the site's charm-price rounding.- Photo blocker remains: Agroduka product pages resolve the visible image to a Kenya Biologics vendor/logo, not a verifiable exact SKU photo. Search results found generic pheromone dispensers / unrelated trap visuals, which are not acceptable substitutes. Therefore no product rows were created and nothing was activated or published.
 - Official PCPB biopesticide register confirms CRYTRACK registration PCPB(CR)1860 for monitoring/mass trapping of false codling moth in chili peppers; do not broaden the approved use beyond the register/label.
 - Exact supplier pages: https://agroduka.ke/falltrack/ ; https://agroduka.ke/crytrack-lure/ ; https://agroduka.ke/femtrack/ ; https://agroduka.ke/fcm-pherolure-1u/ ; https://agroduka.ke/kenya-biologics/?category_id=286&currency=KES .
 - Next: request/download exact high-resolution pack/product photos from Kenya Biologics/Agroduka (supplier contact shown on their materials: +254 710 724 629 / kb@agroduka.com), then use upload-photos, verify Storage + products.images, activate, and report mobile-shell links. Do not use generic pheromone photos.
@@ -1329,3 +1324,13 @@ Sources reviewed in this turn: https://www.kilimall.co.ke/category/Pest-Control,
 - Kenyan supplier evidence: Agropests Tatua Zyrox 500g listing KSh 2,600 and in stock; M-Tolori lists 500g at KSh 2,720. The listing page exposes a product-specific image link, but Zyrox is already in Stermont's live catalogue. Osho official shop lists Kilex 5g/30g (KSh 278–946), Mosthrin 30ml/1L (KSh 74–1,714), and Moskill Vermin Powder 200g (KSh 110). Flower Insect Killer Aerosol was confirmed in PCPB register, but no reliable exact-pack Kenya price/photo pair was found.
 - No new product was created or activated in this continuation. Exact image verification and source pricing remain incomplete for the missing candidates. Do not substitute Flower Duduspray, Flower Home & Garden Dudu Spray, or vendor logos for Flower Insect Killer Aerosol; these are distinct products.
 - Sources: https://www.pcpb.go.ke/public-health/ ; https://shop.oshochem.com/product/kilex-0-5-gel/ ; https://shop.oshochem.com/product/mosthrin-2-5-ec/ ; https://shop.oshochem.com/product-category/public-health/?product-page=2 ; https://agropests.com/products/tatua-zyrox-fly-bait-granular-500-g ; https://mtolori.com/product/details/tatua-zyrox-fly-bait-500gms-6505 ; https://kapiltd.co.ke/
+
+## 2026-11-13 22:07 (Africa/Nairobi) — Top-25 consumer-product shortlist: first candidate held for final image QA
+
+- Audited the first 25 categories from the current Nairobi online-demand shortlist against the live Supabase catalogue. Numerous category examples are already represented: smartphones (Apple, Samsung, Infinix, Redmi), TVs, Bluetooth speakers, wireless earbuds and wired earphones, chargers, power banks, kettles, water dispensers and blenders. Do not add generic duplicate listings.
+- Identified one exact missing model: TP-Link M7200 4G LTE Mobile Wi-Fi Router (no matching M7200 row found in the catalogue). Category 20 (Networking & Smart Home).
+- Source cost: KSh 5,200 from TechBro Africa listing, marked Available: https://www.techbroafrica.com/product/tp-link-4g-lte-mobile-wi-fi-tl-m7200-6p . Photo source: Silicon Kenya exact M7200 packshot (device plus matching retail box), visually inspected in image search: https://www.silicon.co.ke/cdn/shop/products/TL-M7200-4G_mmbi-vt_1024x.jpg?v=1681834027 . Manufacturer specs checked against TP-Link M7200 datasheet.
+- Created tp-link-m7200-4g-lte-mobile-wi-fi-router using add_draft_product with 30% markup. Source cost KSh 5,200; charm-price trigger stored price KSh 6,799; stock 1000; low_at 20; featured false. SEO title: TP-Link M7200 4G LTE Mobile Wi-Fi Router – Price in Kenya. Original factual structured description: 4,144 characters.
+- Uploaded the exact-source photo to product-images; products.images has one URL and Storage metadata reports WebP, 47,490 bytes, HTTP 200. However, the final public Storage URL could not be opened in the available browser/runtime to visually inspect the stored WebP itself. To honour the 2026-11-13 visual QA hard gate, the row was set back to active=false (draft) pending a visual open/check of this exact stored image: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/tp-link-m7200-4g-lte-mobile-wi-fi-router.webp . Do not report as published until final stored image has been visually inspected and active=true.
+- Product shell URL once activated: https://stermontarcade.co.ke/?product=tp-link-m7200-4g-lte-mobile-wi-fi-router . Shell URL could not be browser-verified from this environment.
+- Next: visually open the stored WebP in the admin/product preview (or on the owner's phone), confirm it still clearly shows the TP-Link M7200 device/box, then activate and verify the row + shell link. Continue screening the remaining top-25 categories for missing specific models; check duplicates, exact current KES source cost and matching photo for every SKU. No other new rows created in this pass.
