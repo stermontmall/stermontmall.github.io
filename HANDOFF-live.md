@@ -1208,3 +1208,27 @@ Continue adding other machinery with current supplier references and image match
 ### Next
 1. Confirm the next successful .github/workflows/product-pages.yml scheduled run.
 2. Check the 35 generated static product pages, their product images, canonical tags, Product JSON-LD and sitemap entries. Do not edit generated HTML directly.
+
+
+## 2026-11-13 — Pest-control demand and catalogue coverage audit
+
+### Completed
+- Read `PUBLISHING.md`, `CLAUDE.md`, and the current live handoff before product work.
+- Read-only Supabase audit: live catalogue counts include Pest Control & Fumigation 91; Crop Insecticides 137; Sprayers & Equipment 56; Protective Wear & Safety 53; Rodent Control 34; Mosquito & Fly Control 31; Insect Light Traps & UV Lamps 23; Cockroach & Ant Killers 21; Fogging & ULV Machines 20; Pest Monitoring & Inspection Tools 20; Termite Control 16; Bed Bug Killers 14; Fumigation Chemicals 13.
+- Kenyan marketplace/retailer demand signals: 20L knapsack sprayers, household aerosol insecticides, bed-bug treatments, cockroach gel/powder, mosquito coils/electric vaporizers/refills, electric mosquito zappers, mouse/rat traps and glue boards, and professional foggers.
+- Sales-history caveat: `product_stats` shows only one recorded pest-control sale (Total 20L Knapsack Sprayer; 1 unit) and one insecticide sale (Abasi 5% EC; 1 unit). Not enough history to rank Stermont's fast sellers; market demand signals are provisional.
+- Duplicate check confirmed high-demand SKUs already live, including Bedlam 200SL (multiple pack sizes), Chali Dudu Dust, Combat/Mos-Kill coils, FASTKILL aerosols, Fumakilla refills/mats, Goodknight aerosol, Green Leaf cockroach bait, Krochkill 3, Mortein/Doom aerosol, Moskill aerosol sizes, Raid liquid mosquito refill, and Trevin Dudu Dust.
+- PCPB official public-health register reviewed. Treat registration and label use as a publication gate. Rodekil 0.5 RB is listed WHO Class 1b highly hazardous and must not be casually added.
+
+### In progress / blocked
+- No new product was created or activated in this audit. Gap candidates did not yet have both an exact in-stock Kenyan KES price and an exact matching image verified.
+- Google Trends Kenya public trending-now did not expose pest-control query volumes. Marketplace bestseller counts/review counts are directional demand evidence, not Google search-volume metrics.
+- Candidate gaps for further verification: Mosquito vaporizer refills/mats and coils in distinct pack sizes; Culexon 10WP, Vectron T 500 WP, Buglam 700 WDG, Klap-It 250 WDG, and GreenNet ITN. Recheck exact variants before adding.
+
+### Next exact actions
+1. Source exact in-stock KES listings and matching product photos for missing high-demand household SKUs first (aerosol insecticides, mosquito coils/vaporizer refills, cockroach bait, bed-bug products, rat/mouse traps), then professional equipment gaps.
+2. Check every candidate against live and draft rows, PCPB approval/label where applicable, supplier price/stock, and matching photo. Only then create with `add_draft_product(...,30)`, upload and verify the unique image in Storage, activate, and verify the mobile-shell link.
+3. Maintain source cost + 30% markup, stock 1000, low_at 20, featured false; write original factual SEO descriptions using current 40–2,000-word rule without padding.
+4. Do not report products as published until active=true and both Storage object and products.images are verified.
+
+Sources reviewed in this turn: https://www.kilimall.co.ke/category/Pest-Control, https://www.kilimall.co.ke/category/sprayers, https://www.jumia.co.ke/mlp-insecticide/, https://www.jumia.co.ke/mlp-bed-bug-spray/, https://www.jumia.co.ke/mlp-fogger/, https://www.carrefour.ke/mafken/en//c/NFKEN3070000, https://samwest.co.ke/catalogue/group/pesticides, https://kejanicleaning.co.ke/shop/collections/pest-control/page/2/, https://www.pcpb.go.ke/public-health/.
