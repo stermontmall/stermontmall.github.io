@@ -1286,3 +1286,11 @@ Sources reviewed in this turn: https://www.kilimall.co.ke/category/Pest-Control,
 - Updated `PUBLISHING.md` with a mandatory visual QA gate: inspect the exact source image and final public Storage image at full resolution; verify brand/product/pack visually. Vendor logos, placeholders, generic bottles and mismatched packs are rejected.
 - Product can be republished only after obtaining and visually verifying a genuine Pyagro 4 packshot for the correct pack size. The supplier listing is not a valid image source in its current state.
 - Next: continue product expansion only with exact verified photographs; no image URL/Storage check alone is sufficient.
+
+
+## 2026-11-13 — Continued missing-product screening (no unsafe image approval)
+- Rechecked live product catalogue for public-health pyrethrum product names. Pymos, Pylarvex, Pyrebex, Pesthrin, Flower Killer Sticks, Borakill, PM6 Granules, Pestmatic Aerosol, etc. were not found as matching existing product records. Existing Moskill aerosol SKUs are present, so do not duplicate them.
+- PCPB public-health biopesticide register lists PYMOS 0.6 EC (PCPB(CR)0911), PYLARVEX 0.5 EC (PCPB(CR)0910), PYREBEX 0.3% Aerosol (PCPB(CR)1590), PESTHRIN Public Health 6% EC (PCPB(CR)0851-p(i)), FLOWER KILLER STICKS (PCPB(CR)0900), and other registered candidates. Note exact approved uses differ by product; Pylarvex is a mosquito-larvae larvicide, not a general spray.
+- Found PPCK official product shop entries and supplier price ranges: Pymos KSh 255–16,850; Pylarvex KSh 140–19,440; Pareto Roach Spray KSh 200–1,310; Pydust KSh 110–960; Pyagro KSh 400–15,260. Agropests lists Pymos 0.6 EC 250ml at KSh 345 discounted / KSh 500 list, and states in stock in its search listing.
+- Exact product images were not retrievable/visually inspectable from the search results and PPCK product pages failed to open in the web cache. Therefore **no new product was activated or uploaded**. Do not use supplier site banners/logos as images. Obtain the actual packshot by opening/download from official PPCK product listing or request image from PPCK, then visually inspect before publishing.
+- References: https://www.pcpb.go.ke/public-health-bio-pesticides/ ; https://ppck.co.ke/ ; https://agropests.com/products/pymos-06-ec-250ml ; https://www.pcpb.go.ke/crops/
