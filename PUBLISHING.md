@@ -33,7 +33,7 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 - Find the source price online yourself (owner rule 2026-11-08): the lowest current in-stock KES listing of the EXACT product (same brand, model, pack size) on a reputable Kenyan seller or supplier page. Record that page URL as the source. Never invent or estimate a price. If no KES listing of the exact product exists, stop and ask the owner.
 - Let `C` be that source price in KES.
 - Save `cost = round(C, 2)`.
-- Save `price = round(C * 1.30, 2)` (25% markup on source cost).
+- Save `price = round(C * 1.30, 2)` (30% markup on source cost).
 - Default to a 30% markup on all new products. A different rate applies only when the owner explicitly specifies it for that batch.
 - Do not convert foreign currency without an owner-approved exchange rate.
 - Set `stock = 1000`, `low_at = 20`, and `featured = false` unless the owner explicitly requests featured placement.
