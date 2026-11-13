@@ -57,6 +57,8 @@
   }
   function fileMap(files) { var m = {}; Array.prototype.forEach.call(files || [], function (f) { m[f.name.toLowerCase()] = f; m[slug(baseName(f.name))] = m[slug(baseName(f.name))] || f; }); return m; }
   function findFile(m, token) { token = String(token).trim(); return m[token.toLowerCase()] || m[slug(baseName(token))] || null; }
+  /* Supabase returns at most 1000 rows per request: read big tables page by page */
+  function reqAll(path) { var rows = [], size = null; function page(off) { return req(path + '&limit=1000&offset=' + off).then(function (r) { r = Array.isArray(r) ? r : []; rows = rows.concat(r); if (size === null) size = r.length; if (!r.length || r.length < size || off > 100000) return rows; return page(off + r.length); }); } return page(0); }
   function req(path, method, body, prefer) {
     return A().api(path, { method: method || 'GET', body: body, headers: prefer ? { Prefer: prefer } : {} }).then(function (r) {
       if (r.status === 401) throw new Error('Your session expired. Sign in again.');
@@ -90,7 +92,7 @@
     var out1 = h('div'); out1.style.marginTop = '.8rem'; c1.appendChild(out1);
 
     function load() {
-      return Promise.all([req('/rest/v1/categories?select=id,name,slug'), req('/rest/v1/products?select=id,name,images,variant_group,variant_label&limit=3000')]).then(function (r) { cats = r[0] || []; prods = r[1] || []; });
+      return Promise.all([req('/rest/v1/categories?select=id,name,slug'), reqAll('/rest/v1/products?select=id,name,images,variant_group,variant_label&order=id.asc')]).then(function (r) { cats = r[0] || []; prods = r[1] || []; });
     }
 
     function check() {

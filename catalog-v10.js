@@ -105,6 +105,20 @@
       });
     });
   }
+  /* Supabase returns at most 1000 rows per request, so read big tables page by page (stable order, stop on a short page) */
+  function callAll(path) {
+    var rows = [], size = null;
+    function page(off) {
+      return call(path + '&limit=1000&offset=' + off).then(function (r) {
+        r = Array.isArray(r) ? r : [];
+        rows = rows.concat(r);
+        if (size === null) size = r.length;
+        if (!r.length || r.length < size || off > 100000) return rows;
+        return page(off + r.length);
+      });
+    }
+    return page(0);
+  }
   var RANGES = [['all', 'All time'], ['today', 'Today'], ['7d', '7 days'], ['30d', '30 days'], ['month', 'This month']];
   function bounds() {
     var d = new Date(), t = new Date(d.getFullYear(), d.getMonth(), d.getDate()), r = S.range;
@@ -132,7 +146,7 @@
     S.warn = '';
     function retry(fn) { return fn().catch(function (e) { if (/signed out|expired/i.test(e.message)) throw e; return new Promise(function (ok) { setTimeout(ok, 700); }).then(fn); }); }
     var catsP = retry(function () { return call('/rest/v1/categories?select=*&order=name'); }).catch(function (e) { S.warn = 'Categories could not load (' + e.message + '). Items are still shown.'; return S.cats || []; });
-    var prodP = retry(function () { return call('/rest/v1/products?select=*&order=created_at.desc'); }).catch(function () { return call('/rest/v1/products?select=*'); });
+    var prodP = retry(function () { return callAll('/rest/v1/products?select=*&order=created_at.desc,id.asc'); }).catch(function () { return callAll('/rest/v1/products?select=*&order=id.asc'); });
     return Promise.all([catsP, prodP, statsCall(), logsCall(), restCall()])
       .then(function (r) { r[1] = Array.isArray(r[1]) ? r[1] : []; r[2] = Array.isArray(r[2]) ? r[2] : []; S.cats = Array.isArray(r[0]) ? r[0] : []; S.prods = r[1].map(function (p) { if (typeof p.images === 'string') { try { p.images = JSON.parse(p.images); } catch (e) { p.images = p.images ? [p.images] : []; } } if (!Array.isArray(p.images)) p.images = []; p.name = p.name || 'Unnamed item'; p.stock = Number(p.stock) || 0; p.low_at = Number(p.low_at) || 0; p.price = Number(p.price) || 0; p.cost = Number(p.cost) || 0; p.base = p.name; if (p.variant_label) p.name = p.base + ' \u2013 ' + p.variant_label; return p; }); S.st = {}; r[2].forEach(function (x) { S.st[x.product_id] = x; }); S.logs = r[3] || []; S.rest = r[4] || []; });
   }

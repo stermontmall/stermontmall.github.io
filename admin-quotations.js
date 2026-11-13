@@ -10,6 +10,8 @@
   function money(n) { return 'KSh ' + Number(n || 0).toLocaleString('en-KE'); }
   function num(v) { var n = Number(v); return isFinite(n) && n > 0 ? n : 0; }
   function ymd(d) { function p(n) { return (n < 10 ? '0' : '') + n; } return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+  /* Supabase returns at most 1000 rows per request: read big tables page by page */
+  function reqAll(path) { var rows = [], size = null; function page(off) { return req(path + '&limit=1000&offset=' + off).then(function (r) { r = Array.isArray(r) ? r : []; rows = rows.concat(r); if (size === null) size = r.length; if (!r.length || r.length < size || off > 100000) return rows; return page(off + r.length); }); } return page(0); }
   function req(path, method, body, prefer) {
     return A().ready().then(function () { return A().api(path, { method: method || 'GET', body: body, headers: prefer ? { Prefer: prefer } : {} }); })
       .then(function (r) {
@@ -96,7 +98,7 @@
       function addCat(it) { catalog.push(it); products[it.name.toLowerCase()] = it; if (!it.off) { var o = h('option'); o.value = it.name; o.label = money(it.price); dlP.appendChild(o); } }
       function done() { catalog.sort(function (a, b) { return a.name.localeCompare(b.name); }); if (pickRender) pickRender(); }
       function title(slug) { return String(slug).replace(/-/g, ' ').replace(/\b[a-z]/g, function (m) { return m.toUpperCase(); }); }
-      req('/rest/v1/products?select=name,price,stock,active&order=name&limit=2000').then(function (r) {
+      reqAll('/rest/v1/products?select=name,price,stock,active&order=name.asc,id.asc').then(function (r) {
         (r || []).forEach(function (p) { addCat({ name: String(p.name), price: p.price, stock: p.stock, kind: 'Product', off: !p.active }); });
       }).catch(function () {}).then(function () {
         return req('/rest/v1/service_catalog?select=slug,price_min,price_open,active&order=slug').then(function (r) {

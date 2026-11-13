@@ -1,3 +1,14 @@
+## 2026-11-13 20:55 (Africa/Nairobi) — Admin catalog showed only 1000 of 1470 products
+
+### Done (branch `wip-admin-catalog-over-1000`, not yet merged to main)
+- Cause: Supabase returns max 1000 rows per request. `catalog-v10.js` load() fetched `products?select=*` in one call, so the admin list stopped at 1000. `limit=3000/2000` in `admin-bulk.js` and `admin-quotations.js` is capped the same way.
+- Fix: added paging helpers (`callAll` in `catalog-v10.js`, `reqAll` in `admin-bulk.js` and `admin-quotations.js`) that read 1000 rows at a time with a stable order until a short page. Mock test: 0/5/999/1000/1001/1468/2500 rows all returned in full with no duplicates. `node --check` passes on all three files.
+- DB at time of fix: 1470 products (1400 active, 70 drafts).
+
+### Next
+- Merge to `main` after checking `/admin.html` shows all 1470 items (search for a recently added item, e.g. Hydraulic Press Machine 30 Tonne).
+- Still capped at 1000 and not changed: `storefront-live.js` getProducts (legacy storefront), `seo-titles.mjs`, `list-products.html` and `data-health.mjs` (limit=5000/2000).
+
 ## 2026-11-13 — Forging / metalworking machinery addition
 
 ### One new listing activated and verified
