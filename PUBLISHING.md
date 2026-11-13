@@ -34,7 +34,7 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 - Let `C` be that source price in KES.
 - Save `cost = round(C, 2)`.
 - Save `price = round(C * 1.30, 2)` (30% markup on source cost).
-- Default to a 30% markup on all new products. A different rate applies only when the owner explicitly specifies it for that batch.
+- Default to a 30% markup on all new products. An explicitly requested batch override must be within the helper's accepted 25–300% range.
 - Do not convert foreign currency without an owner-approved exchange rate.
 - Set `stock = 1000`, `low_at = 20`, and `featured = false` unless the owner explicitly requests featured placement.
 - New products are published live (`active=true`) after verification (owner rule 2026-11-08). The earlier draft-first / owner-review rule no longer applies.
