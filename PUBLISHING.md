@@ -60,3 +60,11 @@ Report the product ID, source cost, selling price, stock, alert threshold, draft
 - Never change payments, orders, staff, secrets, or unrelated settings during product posting.
 - Never apply new-product rules retroactively to existing catalogue items.
 - Save progress to `HANDOFF-live.md` after each meaningful step, including blockers and exact next action.
+
+
+## Mandatory visual-image QA correction — 2026-11-13
+- A Pyagro 4 listing was mistakenly activated with the Agroduka vendor logo as its product image. The owner identified the mismatch from the live mobile-shell screenshot.
+- **New hard gate:** a successful image URL fetch, Storage upload, populated `images` array, or image metadata check is NOT proof that the image depicts the product. Before activation, open and visually inspect the actual downloaded/uploaded image at full resolution. Confirm the exact product name/brand and pack/formulation are visibly represented. A supplier logo, category banner, placeholder, search thumbnail, unrelated pack size, generic bottle, or unverified image is a failure.
+- When a supplier page displays only its vendor logo, do not use that page as the image source. Find a manufacturer/registrant product photo or ask the supplier for a product packshot. If no exact packshot is available, leave the product inactive with no image and report the blocker.
+- After upload, fetch/open the final public Storage URL and visually inspect that exact stored image again. Do not infer correctness from the source page or successful upload response.
+- Product is not publish-ready until visual QA is complete and recorded.
