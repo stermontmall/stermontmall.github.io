@@ -984,3 +984,53 @@ Product-specific photo sources were chosen to match the named item/model/capacit
 ### Next
 - Continue adding evidence-backed poultry and livestock equipment, with duplicate checks across the full active catalogue and a verified product-matching image before activation.
 - Triggered a static product-page rebuild after this batch. Do not claim static /p/ pages or sitemap entries are live until the scheduled GitHub Actions run succeeds and those URLs are checked.
+
+
+## 2026-11-13 — 15 agricultural machinery products published
+
+Created 15 distinct machinery listings after duplicate checks against the active catalogue. Category assignments: Tools & Machinery (30), Poultry & Dairy Equipment (44), and Water Tanks & Irrigation (45). All products were added through `public.add_draft_product(..., 30)`; stored cost equals supplier reference price and stored selling price is exactly 30% higher (no price-ending adjustment occurred in this batch). All descriptions are 635–651 words. Every product has stock=1000, low_at=20, featured=false.
+
+| Product | Slug | Reference cost (KSh) | Selling price (KSh) | Words |
+|---|---|---:|---:|---:|
+| Mini Feed Crusher for Poultry and Livestock | `mini-feed-crusher-for-poultry-and-livestock` | 50,000 | 65,000 | 645 |
+| 500kg/hr Feed Grinder and Mixer Set | `500kg-hr-feed-grinder-and-mixer-set` | 100,000 | 130,000 | 636 |
+| 1 Ton/hr Feed Grinder and Mixer Set | `1-ton-hr-feed-grinder-and-mixer-set` | 260,000 | 338,000 | 635 |
+| 300kg Feed Pellet Making Machine | `300kg-feed-pellet-making-machine` | 130,000 | 169,000 | 643 |
+| 500kg Feed Pellet Making Machine | `500kg-feed-pellet-making-machine` | 160,000 | 208,000 | 644 |
+| 2-in-1 Petrol Power Shredder | `2-in-1-petrol-power-shredder` | 145,000 | 188,500 | 643 |
+| Power Tiller and Walking Cultivator | `power-tiller-and-walking-cultivator` | 180,000 | 234,000 | 641 |
+| Petrol Maize Sheller Machine | `petrol-maize-sheller-machine` | 35,000 | 45,500 | 647 |
+| Heavy Duty Chaff Cutter Machine | `heavy-duty-chaff-cutter-machine` | 40,000 | 52,000 | 648 |
+| Electric Vegetable Shredder for Farm Produce | `electric-vegetable-shredder-for-farm-produce` | 15,000 | 19,500 | 647 |
+| 64-Egg Automatic Incubator with Digital Controls | `64-egg-automatic-incubator-with-digital-controls` | 13,000 | 16,900 | 642 |
+| 528-Egg Commercial Automatic Incubator | `528-egg-commercial-automatic-incubator` | 55,000 | 71,500 | 639 |
+| 1056-Egg Fully Automatic Commercial Incubator | `1056-egg-fully-automatic-commercial-incubator` | 80,000 | 104,000 | 642 |
+| 100-Chick Automatic Smart Brooder Controller | `100-chick-automatic-smart-brooder-controller` | 30,000 | 39,000 | 651 |
+| 1HP Electric Water Pump for Farm Irrigation | `1hp-electric-water-pump-for-farm-irrigation` | 8,500 | 11,050 | 646 |
+
+All 15 image uploads returned HTTP 200 and were stored under the Supabase public `product-images` bucket. The activation guard returned LIVE and the final database verification confirmed active=true and exactly one image for every product. Three initial image hosts failed; alternate images were successfully uploaded for the walking tractor, maize sheller and vegetable shredder. The 2-in-1 petrol shredder image was replaced with a more suitable petrol multipurpose shredder image; the smart brooder image was replaced with a chick temperature/humidity controller image. Product photos are category/model reference photos, not a guarantee of identical supplier brand/paint/accessories; confirm exact machine model, capacity, power source, included accessories, warranty and delivery with supplier before accepting an order.
+
+### Product links
+- https://stermontarcade.co.ke/?product=mini-feed-crusher-for-poultry-and-livestock
+- https://stermontarcade.co.ke/?product=500kg-hr-feed-grinder-and-mixer-set
+- https://stermontarcade.co.ke/?product=1-ton-hr-feed-grinder-and-mixer-set
+- https://stermontarcade.co.ke/?product=300kg-feed-pellet-making-machine
+- https://stermontarcade.co.ke/?product=500kg-feed-pellet-making-machine
+- https://stermontarcade.co.ke/?product=2-in-1-petrol-power-shredder
+- https://stermontarcade.co.ke/?product=power-tiller-and-walking-cultivator
+- https://stermontarcade.co.ke/?product=petrol-maize-sheller-machine
+- https://stermontarcade.co.ke/?product=heavy-duty-chaff-cutter-machine
+- https://stermontarcade.co.ke/?product=electric-vegetable-shredder-for-farm-produce
+- https://stermontarcade.co.ke/?product=64-egg-automatic-incubator-with-digital-controls
+- https://stermontarcade.co.ke/?product=528-egg-commercial-automatic-incubator
+- https://stermontarcade.co.ke/?product=1056-egg-fully-automatic-commercial-incubator
+- https://stermontarcade.co.ke/?product=100-chick-automatic-smart-brooder-controller
+- https://stermontarcade.co.ke/?product=1hp-electric-water-pump-for-farm-irrigation
+
+### Supplier references
+- NiceHatch machinery and price references: https://nicehatchincubators.com/agri-machineries/ and https://nicehatchincubators.com/incubators/ (feed crusher, grinder/mixer, pellet machines, shredder, tiller, chaff cutter, vegetable shredder, incubators, smart brooder)
+- Cadeda Farm Equipment: https://cadedafarmequipments.com/shop/ (1056-egg commercial incubator)
+- Timiza Agro Machinery: https://timizaagro.co.ke/shop/category/water-pumps/ (1HP electric water pump)
+
+### Next
+Continue adding other machinery with current supplier references and image matching. Avoid duplicate capacities already added, and do not claim generated static /p/ product pages or sitemap entries are live until a successful GitHub Actions run and direct URL verification.
