@@ -909,3 +909,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // Trigger static catalogue rebuild for poultry drinker batch added 2026-11-13.
 
 // 2026-11-13: rebuild static product pages and sitemap after publishing 15 poultry, livestock and farm-equipment products with verified Storage photos.
+
+// 2026-11-13: trigger static product-page and sitemap rebuild after 15 agricultural machinery products were activated with verified Storage photos.
