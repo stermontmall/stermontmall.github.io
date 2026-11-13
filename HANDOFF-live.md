@@ -1410,3 +1410,12 @@ Sources reviewed in this turn: https://www.kilimall.co.ke/category/Pest-Control,
 - For new listings, create the product row, then pass the exact supplier/product-page URL directly to `upload-photos` using `{product_id, image_url}`. If extraction fails, use the direct image URL; if download is blocked, pass the exact image bytes as `image_base64` or multipart `files`.
 - Always open and visually inspect the final stored public Storage URL. The function validates image file type/bytes, not product identity.
 - Once visual QA and price checks pass, activate and verify the product in `public.get_store_catalog()`. Never ask the owner for screenshots as the routine upload method; only use them as a last-resort visual QA fallback.
+
+
+## 2026-11-13 22:45 Africa/Nairobi — Retried pending product photos through supplier-page extraction
+
+- Re-ran the documented Supabase `public.add_product_photo()` helper for the laptop stand using the Zicco supplier product page URL and for the HY300 Pro using the Sokommerce supplier product page URL. This exercises the deployed `upload-photos` v14 supplier-page extraction route (no passcode or secret exposed).
+- Both calls returned HTTP 200 and `ok:true` with one photo stored. Laptop stand's main image URL is now `.../foldable-aluminum-laptop-stand-with-carry-bag.jpg`; projector remains `.../hy300-pro-portable-smart-mini-projector-720p-native.webp`. The uploader's `savePhoto` implementation stores the fetched bytes unchanged; it does not transform the image.
+- Rechecked product rows: laptop stand KSh1,050, cost KSh800; projector KSh6,950, cost KSh5,310; both stock 1000, low_at 20, each has one image, and both remain `active=false`.
+- Blocker: the exact final public Storage URLs are still inaccessible to the available visual/browser fetcher (HTTP/browser tool reports inaccessible), so I cannot visually inspect the newly stored final files. Per the publication rule, neither product was activated. No live catalogue link should be reported.
+- Next: use an image-capable browser/runtime that can open the public Storage object URLs, inspect both images, then activate only the ones that visibly match their exact product and verify `public.get_store_catalog()`.
