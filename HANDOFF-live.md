@@ -1267,3 +1267,13 @@ Sources reviewed in this turn: https://www.kilimall.co.ke/category/Pest-Control,
 - Further source evidence: manufacturer brochure for TUTRACK / pheromone products: https://www.elephant-vert.com/wp-content/uploads/2023/12/EV_A5_4-fold-brochure_EVPROTECT_KENYA_ENG-1.pdf. This may help locate a proper manufacturer photo, but no photo was extracted or uploaded in this session.
 - **No products published in this continuation.** No Storage objects or product rows were changed. Do not report any of these candidates as live.
 - Next: obtain exact product photos from Kenya Biologics / manufacturer (supplier contact previously recorded: kb@agroduka.com / +254 710 724 629), or find a manufacturer/official-retailer image that clearly matches each SKU and is at least 450×450. Then create via approved helper, upload via `upload-photos`, verify Storage + `products.images`, activate, and verify the mobile-shell link.
+
+
+## 2026-11-13 — Pesticide catalogue expansion batch
+- Audited the live Supabase catalogue (1,497 product rows) and confirmed popular pesticide listings including Actellic, Agita, Fendona, Termidor, Advion, Bestox, Nexal, etc. already exist; exclude them from new batch to avoid duplicates.
+- Checked Kenyan PCPB public-health/crop registration sources and supplier pages before selecting candidates. Current search surfaced a verified exact-pack supplier listing for Pyagro 4 125ml (Agroduka variation 6094, KSh 638 shown in stock; PCPB registration PCPB(CR)1278).
+- Created product `pyagro-4-pyrethrin-insecticide-125ml` with an original 872-word SEO description, source cost KSh 638, 30% markup, stock 1000, low_at 20. Helper/site charm-price rounding stored selling price KSh 850.
+- Uploaded the exact Pyagro product-page image through `public.add_product_photo`; verification query confirms active=true, images array populated with public product-images URL, and one matching Storage object.
+- Mobile-shell link: https://stermontarcade.co.ke/?product=pyagro-4-pyrethrin-insecticide-125ml
+- This is 1 of the requested 30, not a completed 30-item batch. Do not report 30 as published. Remaining candidates need individual exact-pack KES in-stock price and exact product photo verification; several likely popular PCPB-listed products already exist in the catalogue. Continue screening for missing SKUs and create only when all gates pass.
+- Sources: https://agroduka.ke/pyagro/?variation_id=6094 ; https://www.pcpb.go.ke/crops/ ; https://www.pcpb.go.ke/public-health/ ; https://www.pcpb.go.ke/public-health-bio-pesticides/
