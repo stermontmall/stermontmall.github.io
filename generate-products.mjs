@@ -907,3 +907,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // Catalogue rebuild requested 2026-11-13: include newly verified agrovet and pest-control listings.
 
 // Trigger static catalogue rebuild for poultry drinker batch added 2026-11-13.
+
+// 2026-11-13: rebuild static product pages and sitemap after publishing 15 poultry, livestock and farm-equipment products with verified Storage photos.
