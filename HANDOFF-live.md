@@ -1,3 +1,10 @@
+## 2026-11-13 21:25 (Africa/Nairobi) — Drafts with photos: 2 published, 9 held
+
+- Published (active=true, in get_store_catalog): `rafiki-retractable-magnetic-mosquito-screen`, `stick-and-go-self-adhesive-window-mosquito-net-1-5m-x-2m` (each has its own unique photo).
+- Held as drafts, photo reused across different products (same Storage eTag): uv-treated-seedling-propagation-tray, 50-cell-uv-treated-seedling-propagation-tray, symnet-vertical-grow-bag-120-plants (one image); three pb-16-sprayer-spare-parts-* items (one image); rafiki-magnetic-mosquito-window-screen and rafiki-magnetic-mosquito-net-for-windows (one image). Need exact photos per product.
+- Held: `azumo-80-wg-fungicide-and-miticide-250g` (name/slug say 1kg, id and image say 250g, price 200 / cost 160: pack size and price must be confirmed).
+- Not for publication: `zz-upload-flow-test-item-5-litre` (test item).
+
 ## 2026-11-13 21:15 (Africa/Nairobi) — Admin all-products fix merged to main
 
 - Merged `wip-admin-catalog-over-1000` into `main` (fast-forward, commit `6d83e76`). Script versions bumped in `admin.html`: catalog-v10.js v14, admin-bulk.js v4, admin-quotations.js v5.
