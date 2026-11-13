@@ -1388,3 +1388,25 @@ Sources reviewed in this turn: https://www.kilimall.co.ke/category/Pest-Control,
 - The final stored WebP could not be opened in the available browser/runtime for visual QA. Therefore the product remains inactive and is not counted as published. Do not activate until the stored file itself is visually checked to confirm it still depicts the HY300 Pro projector and accessories.
 - Live product link only after activation: https://stermontarcade.co.ke/?product=hy300-pro-portable-smart-mini-projector-720p-native
 - Source references: Sokommerce wholesale listing; Magcubic HY300 Pro spec sheet (native 720p, 170 ANSI lumens for that manufacturer variant); product photo preview from SmartWayMart. The listing uses the Sokommerce-specific 160 ANSI-lumen claim, not the different manufacturer's 170 ANSI spec.
+
+
+## 2026-11-13 — Product photo upload workflow synchronised with deployed Supabase v14
+
+### Done
+- Inspected the live Supabase Edge Function `upload-photos`: ACTIVE, version 14. It accepts direct HTTPS image URLs, public HTTPS supplier/product-page URLs, Base64 image bytes, arrays of photos, ChatGPT attachment download links and multipart file uploads.
+- Confirmed page-image extraction checks up to four candidates: Open Graph image, Twitter image, `image_src`, image metadata and Product JSON-LD. It downloads and validates image bytes, then saves to public Storage bucket `product-images` and updates `products.images`.
+- Synced `supabase/functions/upload-photos/index.ts` in GitHub to the exact deployed Supabase v14 source. GitHub commit: `e31b023d99691041d7107777a8eabc0fa034a1d0`. No Supabase function redeployment was needed or performed.
+- Updated `PUBLISHING.md` with page-URL extraction, direct-image/Base64/multipart fallbacks, uploader interface and mandatory final stored-image visual QA. Commit: `298f991333b906075743e6972ca671520e55324c`.
+- Rewrote `.claude/commands/post-product.md` so future product sessions follow the live upload route, require final visual inspection, publish only after exact-photo/source-price verification, and verify `get_store_catalog()`. Commit: `a79f2dd9fad4d9134a2720ebec603bfb7bf798fe`.
+- Updated `CLAUDE.md` with the current photo extraction and visual QA requirements. Commit: `6e08f54865b9ebf82a017fd88e981f4c6e76ca90`.
+
+### Verification
+- Re-fetched GitHub `supabase/functions/upload-photos/index.ts` and confirmed byte-for-byte text equality with the deployed Supabase v14 `index.ts`.
+- Confirmed deployed function status ACTIVE, version 14. Confirmed the updated command and CLAUDE instructions contain the supplier-page extraction and final stored-image visual QA rules.
+- No secrets or passcodes were read, printed, or committed.
+- No product rows, product photos, prices, active states, or live website content were changed during this documentation/source synchronisation.
+
+### Next
+- For new listings, create the product row, then pass the exact supplier/product-page URL directly to `upload-photos` using `{product_id, image_url}`. If extraction fails, use the direct image URL; if download is blocked, pass the exact image bytes as `image_base64` or multipart `files`.
+- Always open and visually inspect the final stored public Storage URL. The function validates image file type/bytes, not product identity.
+- Once visual QA and price checks pass, activate and verify the product in `public.get_store_catalog()`. Never ask the owner for screenshots as the routine upload method; only use them as a last-resort visual QA fallback.
