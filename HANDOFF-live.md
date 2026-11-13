@@ -925,3 +925,15 @@ Owner request: add products focused on agrovet and pest control, with photos upl
 - `.github/workflows/product-pages.yml` rebuilds every 30 minutes and builds static product pages and the sitemap from the live Supabase catalogue. This workflow was inspected; the GitHub connector available in this session does not expose workflow_dispatch or repository_dispatch.
 - Supabase activation and Storage upload are verified. Static HTML page/sitemap regeneration for these two new slugs is pending the next scheduled GitHub Actions run; do not claim the static pages are built until the workflow run is checked.
 - Customer routes: `https://stermontarcade.co.ke/?product=wq-rt53-chick-feeding-tray-53x35cm-red-hdpe` and `https://stermontarcade.co.ke/?product=wokin-573102-2l-pressure-sprayer-pe-body-brass-nozzle`.
+
+
+## 2026-11-13 — Poultry equipment batch 2 (2 products activated)
+
+Owner requested continuation of agrovet and pest-control product publishing. Added two additional poultry drinkers using the established Supabase draft -> exact photo upload to Storage -> activation guard sequence.
+
+- **Tehno Mss 6L Tough Red and White Poultry Drinker** — slug `tehno-mss-6l-tough-red-and-white-poultry-drinker`; category 44; supplier source KSh 400; stored cost KSh 400 and selling price KSh 550; stock 1,000; low-stock alert 20; active=true; featured=false; description 893 words. Uploaded a matching 6L red/white poultry drinker photo to `product-images/tehno-mss-6l-tough-red-and-white-poultry-drinker.jpg`; HTTP 200, activation guard returned LIVE.
+- **WQ 7.5L Pot-Shaped Poultry Drinker with Handle** — slug `wq-7-5l-pot-shaped-poultry-drinker-with-handle`; category 44; supplier source KSh 450; stored cost KSh 450 and selling price KSh 599; stock 1,000; low-stock alert 20; active=true; featured=false; description 867 words. Uploaded matching 7.5L pot-shaped white/red handled poultry drinker photo to `product-images/wq-7-5l-pot-shaped-poultry-drinker-with-handle.jpg`; HTTP 200, activation guard returned LIVE.
+
+Source listings: MyAgrovet 6L model product 430-20130 (https://www.myagrovet.co.ke/products.php?id=6968), WQ 7.5L drinker in poultry drinker category (https://www.myagrovet.co.ke/products.php?cid=430). The second photo source is a matching 7.5L handled model with 31cm diameter and 25.5cm height. Product photos are stored in Supabase Storage; no direct remote hotlink remains in the product image arrays.
+
+Static product page generation remains on the GitHub Actions schedule (every 30 minutes). Check the generated HTML and sitemap after the next successful build before claiming static SEO URLs are live.
