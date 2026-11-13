@@ -1,11 +1,15 @@
--- Applied directly to Supabase project oewvtbnmyombbtggamor.
--- Enforces 600-900 words, rejects exact duplicate first-200-word openings across all
--- products and drafts, and preserves the "Price in Kenya" suffix within 60 characters.
-create or replace function public.add_draft_product(
-  p_name text, p_price numeric, p_category_id bigint, p_unit text, p_description text, p_source_url text
+-- Canonical product publisher: 30% default markup, explicit per-batch override (25–300%).
+-- Descriptions are factual and SKU-specific (40–2,000 words); do not pad to a word target.
+-- Supplier URLs must be valid HTTPS product pages. Existing products are not modified.
+CREATE OR REPLACE FUNCTION public.add_draft_product(
+  p_name text, p_price numeric, p_category_id bigint, p_unit text,
+  p_description text, p_source_url text, p_markup_pct numeric default 30
 )
-returns text language plpgsql security definer set search_path to 'public'
-as $function$
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
 declare
   v_name text := btrim(regexp_replace(p_name, '[[:space:]]+', ' ', 'g'));
   v_desc text := btrim(regexp_replace(p_description, '[[:space:]]+', ' ', 'g'));
@@ -18,9 +22,10 @@ declare
 begin
   if char_length(v_name) < 3 or char_length(v_name) > 90 then raise exception 'name must be 3-90 characters'; end if;
   if p_price is null or p_price <= 0 then raise exception 'p_price must be the exact source KES cost'; end if;
-  if p_source_url is null or p_source_url !~ '^https://[^/]+\.[^/]+' then raise exception 'p_source_url must be the https product page the source price came from'; end if;
+  if p_markup_pct is null or p_markup_pct < 25 or p_markup_pct > 300 then raise exception 'p_markup_pct must be between 25 and 300 (percent)'; end if;
+  if p_source_url is null or p_source_url !~ '^https://[^/]+[.][^/]+' then raise exception 'p_source_url must be the https product page the source price came from'; end if;
   if not exists (select 1 from categories where id = p_category_id) then raise exception 'unknown category_id; select id,name from categories'; end if;
-  if v_words < 600 or v_words > 900 then raise exception 'description must be 600-900 words (got %)', v_words; end if;
+  if v_words < 40 or v_words > 2000 then raise exception 'description must be 40-2000 words (got %)', v_words; end if;
   v_opening := array_to_string((regexp_split_to_array(lower(v_desc), '[[:space:]]+'))[1:200], ' ');
   if exists (
     select 1 from products p
@@ -33,7 +38,7 @@ begin
   end if;
   if exists (select 1 from products where lower(name) = lower(v_name)) then raise exception 'a product with this name already exists'; end if;
   v_source_cost := round(p_price, 2);
-  v_selling_price := round(v_source_cost * 1.25, 2);
+  v_selling_price := round(v_source_cost * (1 + p_markup_pct / 100.0), 2);
   v_id := btrim(regexp_replace(lower(v_name), '[^a-z0-9]+', '-', 'g'), '-');
   v_id := left(v_id, 70);
   if v_id = '' then v_id := 'product'; end if;
@@ -46,4 +51,16 @@ begin
   values (v_id, v_id, v_name, v_name, v_title, v_desc, v_selling_price, v_source_cost, null, coalesce(nullif(btrim(p_unit), ''), 'piece'), p_category_id, '{}', false, 1000, 20, false);
   return v_id;
 end
+$function$;
+
+CREATE OR REPLACE FUNCTION public.add_draft_product(
+  p_name text, p_price numeric, p_category_id bigint, p_unit text,
+  p_description text, p_source_url text
+)
+RETURNS text
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+  select public.add_draft_product(p_name, p_price, p_category_id, p_unit, p_description, p_source_url, 30::numeric)
 $function$;
