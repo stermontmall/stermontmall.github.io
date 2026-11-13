@@ -1034,3 +1034,66 @@ All 15 image uploads returned HTTP 200 and were stored under the Supabase public
 
 ### Next
 Continue adding other machinery with current supplier references and image matching. Avoid duplicate capacities already added, and do not claim generated static /p/ product pages or sitemap entries are live until a successful GitHub Actions run and direct URL verification.
+
+---
+## 2026-11-13 — 35 poultry, livestock and farm-tool products published
+
+### Supabase publication verification
+- Created 35 new products after checking for duplicates; excluded the already-existing GAUN automatic piston waterer, WQ avocado fruit picker and WQ WBHD101 wheelbarrow instead of duplicating them.
+- All 35 are active in Supabase and appear in public.get_store_catalog() (35 rows verified).
+- All 35 have exactly one photo in products.images; all 35 corresponding objects exist in the public product-images bucket.
+- Photo requests 2104–2138 all returned HTTP 200 with ok:true, photos:1; uploads were staged with live:false, then activated only after checking image references and Storage objects.
+- Stock=1000, low_at=20 and featured=false for all 35. SEO titles are present and at most 60 characters; several truncated titles were rewritten to natural product-specific titles.
+- Source prices were taken from the individual MyAgrovet product pages listed below. The helper saved source price as cost and applied 30%; the site's charm-price trigger rounds some retail prices to the next supported price point. Do not claim exact 30% after this rounding.
+- Backup table: public.products_backup_before_publish_35_20261113 (35 rows).
+- Static generated /p/ pages and sitemap were NOT browser-verified in this task. The repo's product-pages workflow is scheduled every 30 minutes; verify a successful run and then check the pages/sitemap separately.
+
+### Live products, source cost and stored selling price
+
+| Product | Source cost (KSh) | Selling price (KSh) | Mobile-shell link |
+|---|---:|---:|---|
+| Tehno Mss 10-Litre Poultry Drinker | 750 | 999 | https://stermontarcade.co.ke/?product=tehno-mss-10-litre-poultry-drinker |
+| Tehno Mss 3-Litre Drinker and 1.5kg Feeder Set | 550 | 750 | https://stermontarcade.co.ke/?product=tehno-mss-3-litre-drinker-and-1-5kg-feeder-set |
+| Tehno Mss 1.5-Litre Poultry Drinkers Set of 10 | 1,950 | 2,550 | https://stermontarcade.co.ke/?product=tehno-mss-1-5-litre-poultry-drinkers-set-of-10 |
+| Tehno Mss 8-Litre Poultry Drinker | 450 | 599 | https://stermontarcade.co.ke/?product=tehno-mss-8-litre-poultry-drinker |
+| WQ 1-Litre Chick and Poultry Drinker | 200 | 299 | https://stermontarcade.co.ke/?product=wq-1-litre-chick-and-poultry-drinker |
+| Tehno Mss Automatic Poultry Nipple Drinker A1 | 80 | 150 | https://stermontarcade.co.ke/?product=tehno-mss-automatic-poultry-nipple-drinker-a1 |
+| Tehno Mss ECO 12kg Chicken Feeder | 2,700 | 3,550 | https://stermontarcade.co.ke/?product=tehno-mss-eco-12kg-chicken-feeder |
+| Tehno Mss W6 6kg Poultry Feeder | 450 | 599 | https://stermontarcade.co.ke/?product=tehno-mss-w6-6kg-poultry-feeder |
+| Tehno Mss W1.5 1.5kg Poultry Feeder Set of 10 | 1,900 | 2,499 | https://stermontarcade.co.ke/?product=tehno-mss-w1-5-1-5kg-poultry-feeder-set-of-10 |
+| Tehno Mss W6 6kg Poultry Feeder Set of 10 | 4,900 | 6,399 | https://stermontarcade.co.ke/?product=tehno-mss-w6-6kg-poultry-feeder-set-of-10 |
+| Tehno Mss 1.5kg Feeder with Anti-Scatter Ring | 180 | 250 | https://stermontarcade.co.ke/?product=tehno-mss-1-5kg-feeder-with-anti-scatter-ring |
+| Tehno Mss Automatic Bucket or Cage Poultry Drinker | 120 | 199 | https://stermontarcade.co.ke/?product=tehno-mss-automatic-bucket-or-cage-poultry-drinker |
+| WQ 11-Litre Poultry Drinker | 850 | 1,150 | https://stermontarcade.co.ke/?product=wq-11-litre-poultry-drinker |
+| Tehno Mss 36cm Automatic Bell Poultry Drinker | 1,350 | 1,799 | https://stermontarcade.co.ke/?product=tehno-mss-36cm-automatic-bell-poultry-drinker |
+| WQ 39cm Poultry Feeder Plate | 300 | 399 | https://stermontarcade.co.ke/?product=wq-39cm-poultry-feeder-plate |
+| Tehno Mss Bucket-Mount Tube Chicken Feeder | 650 | 850 | https://stermontarcade.co.ke/?product=tehno-mss-bucket-mount-tube-chicken-feeder |
+| Tehno Mss 6-Litre Poultry Drinker | 400 | 550 | https://stermontarcade.co.ke/?product=tehno-mss-6-litre-poultry-drinker |
+| WQ ACME 5-Litre Poultry Drinker | 400 | 550 | https://stermontarcade.co.ke/?product=wq-acme-5-litre-poultry-drinker |
+| Kenpoly 4-Litre Poultry Drinker | 350 | 499 | https://stermontarcade.co.ke/?product=kenpoly-4-litre-poultry-drinker |
+| WQ JF-64 Automatic Egg Incubator 64 Eggs | 14,700 | 19,150 | https://stermontarcade.co.ke/?product=wq-jf-64-automatic-egg-incubator-64-eggs |
+| WQ Solar-Powered 56-Egg Incubator | 11,990 | 15,599 | https://stermontarcade.co.ke/?product=wq-solar-powered-56-egg-incubator |
+| WQ Solar-Powered 128-Egg Incubator | 21,999 | 28,599 | https://stermontarcade.co.ke/?product=wq-solar-powered-128-egg-incubator |
+| WQ Digital Automatic 56-Egg Incubator | 11,500 | 14,950 | https://stermontarcade.co.ke/?product=wq-digital-automatic-56-egg-incubator |
+| WQ SP-104 Dual-Power 104-Egg Incubator | 18,000 | 23,400 | https://stermontarcade.co.ke/?product=wq-sp-104-dual-power-104-egg-incubator |
+| WQ Stainless Steel Livestock Balling Gun 42cm | 3,500 | 4,550 | https://stermontarcade.co.ke/?product=wq-stainless-steel-livestock-balling-gun-42cm |
+| WQ Silicone Teats for Sheep and Goats 5.8 x 3cm | 100 | 150 | https://stermontarcade.co.ke/?product=wq-silicone-teats-for-sheep-and-goats-5-8-x-3cm |
+| WQ Piglet Feeder Trough Anti-Waste | 1,900 | 2,499 | https://stermontarcade.co.ke/?product=wq-piglet-feeder-trough-anti-waste |
+| WQ Multi-Cell Seedling Starter Trays | 150 | 199 | https://stermontarcade.co.ke/?product=wq-multi-cell-seedling-starter-trays |
+| Magic Expandable Garden Hose with 8-Function Nozzle | 1,200 | 1,599 | https://stermontarcade.co.ke/?product=magic-expandable-garden-hose-with-8-function-nozzle |
+| WQ Star 10-Litre Green Watering Can | 450 | 599 | https://stermontarcade.co.ke/?product=wq-star-10-litre-green-watering-can |
+| WQ Heavy-Duty Garden Spade with Stainless Handle | 700 | 950 | https://stermontarcade.co.ke/?product=wq-heavy-duty-garden-spade-with-stainless-handle |
+| Farmate 15-Litre Manual Backpack Sprayer | 3,500 | 4,550 | https://stermontarcade.co.ke/?product=farmate-15-litre-manual-backpack-sprayer |
+| WQ 1/2-Inch Chicken Wire Mesh 30m Roll | 1,950 | 2,550 | https://stermontarcade.co.ke/?product=wq-1-2-inch-chicken-wire-mesh-30m-roll |
+| WQ 3/4-Inch Brass 360-Degree Irrigation Sprinkler | 450 | 599 | https://stermontarcade.co.ke/?product=wq-3-4-inch-brass-360-degree-irrigation-sprinkler |
+| WQ 2-Litre Hand Pressure Garden Sprayer | 450 | 599 | https://stermontarcade.co.ke/?product=wq-2-litre-hand-pressure-garden-sprayer |
+
+### Publisher repair and GitHub alignment
+- Fixed the live Supabase publisher's HTTPS source-URL validation regex from a double-escaped dot to [.] ; valid supplier product pages were previously rejected.
+- Live 7-argument add_draft_product now defaults p_markup_pct to 30; the six-argument overload delegates with 30. Explicit batch overrides remain limited by the helper to 25–300%.
+- Updated GitHub database/minimum-25-percent-product-markup.sql and database/add-draft-product-unique-opening.sql to match the live helper: 30% default, corrected URL validation and 40–2,000-word factual descriptions.
+- PUBLISHING.md and CLAUDE.md remain the required product-posting instructions.
+
+### Next
+1. Confirm the next successful .github/workflows/product-pages.yml scheduled run.
+2. Check the 35 generated static product pages, their product images, canonical tags, Product JSON-LD and sitemap entries. Do not edit generated HTML directly.
