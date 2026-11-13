@@ -1,3 +1,9 @@
+## 2026-11-13 21:15 (Africa/Nairobi) — Admin all-products fix merged to main
+
+- Merged `wip-admin-catalog-over-1000` into `main` (fast-forward, commit `6d83e76`). Script versions bumped in `admin.html`: catalog-v10.js v14, admin-bulk.js v4, admin-quotations.js v5.
+- Next: owner confirms `/admin.html` shows all 1470 products after a hard refresh. Not tested against live Supabase from the sandbox (network blocked).
+- Read-only data audit run (no changes made): 15 live products with cost >= price, 620 live products under 25% markup, 56 live with no cost, 2 live out of stock, 58 drafts without a photo, 12 drafts with a photo.
+
 ## 2026-11-13 20:55 (Africa/Nairobi) — Admin catalog showed only 1000 of 1470 products
 
 ### Done (branch `wip-admin-catalog-over-1000`, not yet merged to main)

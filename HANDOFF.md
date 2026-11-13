@@ -1,3 +1,4 @@
+- 2026-11-13: merged wip-admin-catalog-over-1000 (admin reads all products past Supabase's 1000-row cap); details in HANDOFF-live.md.
 # Handoff
 
 Previous handoff contents cleared at the owner's request.
