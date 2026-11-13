@@ -1252,3 +1252,18 @@ Sources reviewed in this turn: https://www.kilimall.co.ke/category/Pest-Control,
 - Official PCPB biopesticide register confirms CRYTRACK registration PCPB(CR)1860 for monitoring/mass trapping of false codling moth in chili peppers; do not broaden the approved use beyond the register/label.
 - Exact supplier pages: https://agroduka.ke/falltrack/ ; https://agroduka.ke/crytrack-lure/ ; https://agroduka.ke/femtrack/ ; https://agroduka.ke/fcm-pherolure-1u/ ; https://agroduka.ke/kenya-biologics/?category_id=286&currency=KES .
 - Next: request/download exact high-resolution pack/product photos from Kenya Biologics/Agroduka (supplier contact shown on their materials: +254 710 724 629 / kb@agroduka.com), then use upload-photos, verify Storage + products.images, activate, and report mobile-shell links. Do not use generic pheromone photos.
+
+
+## 2026-11-13 — Continued pest-monitoring product research; no new publication
+
+- Re-read `CLAUDE.md`, `PUBLISHING.md`, and Supabase playbook topics `READ_ME_FIRST`, `add_product`, and `add_photo`. The owner's latest hard gate remains: **publish only products with verified exact product photos**. 30% markup; stock 1000; low_at 20; publish only after Storage and `products.images` verification.
+- Checked candidate supplier listings from Agroduka / Kenya Biologics:
+  - Water Trap (KB083): KSh 1,725, in stock; minimum order 7; https://agroduka.ke/water-trap/
+  - Tutrack (KB077): KSh 345, in stock; minimum order 33; https://agroduka.ke/tutrack/
+  - Rhynchophorus Ferrugineus Palm Weevil Trap (KB071): KSh 3,450, in stock; minimum order 3; https://agroduka.ke/rhynchophorus-ferrugineus-palm-weevil-trap/
+  - Omnilure Rhynchophorus Ferrugineus: KSh 1,093, in stock; https://agroduka.ke/omnilure-rhynchophorus-ferrugineus/
+- These pages render the vendor image as “Kenya Biologics”, not an identifiable exact product photograph. They therefore fail the owner's image gate and were not uploaded, drafted, or activated.
+- Duplicate audit found existing active products for yellow sticky traps and a Wing Trap, so those were excluded. The new trap candidates above were not found in the targeted name search, but no product rows were created because exact photos were not available.
+- Further source evidence: manufacturer brochure for TUTRACK / pheromone products: https://www.elephant-vert.com/wp-content/uploads/2023/12/EV_A5_4-fold-brochure_EVPROTECT_KENYA_ENG-1.pdf. This may help locate a proper manufacturer photo, but no photo was extracted or uploaded in this session.
+- **No products published in this continuation.** No Storage objects or product rows were changed. Do not report any of these candidates as live.
+- Next: obtain exact product photos from Kenya Biologics / manufacturer (supplier contact previously recorded: kb@agroduka.com / +254 710 724 629), or find a manufacturer/official-retailer image that clearly matches each SKU and is at least 450×450. Then create via approved helper, upload via `upload-photos`, verify Storage + `products.images`, activate, and verify the mobile-shell link.
