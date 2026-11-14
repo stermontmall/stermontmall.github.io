@@ -24,4 +24,4 @@ If the owner asks to add/post/list an advert or product, or attach product photo
 ## Current owner master product prompt (2026-11-14)
 - Use exact source KES cost and `round(cost * 1.15, 2)` selling price; do not apply a second markup or charm-price uplift. Stock=1000, low_at=20, featured=false.
 - Product descriptions must be 600–900 original, factual words for this workflow. The database helper accepts 40–2,000 words; skip thin-fact products rather than pad.
-- `public.products` has `seo_title` but no dedicated `meta_description` column. Do not invent a column or make schema changes for this batch.
+- `public.products` has `seo_title` but no dedicated `meta_description` column. The page generator builds the meta description from the first factual sentence of the product description (max 155 characters); make that sentence concise and product-specific. Do not invent a column or make schema changes for this batch.
