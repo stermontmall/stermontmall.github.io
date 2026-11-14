@@ -33,7 +33,7 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 - Find the source price online yourself (owner rule 2026-11-08): the lowest current in-stock KES listing of the EXACT product (same brand, model, pack size) on a reputable Kenyan seller or supplier page. Record that page URL as the source. Never invent or estimate a price. If no KES listing of the exact product exists, stop and ask the owner.
 - Let `C` be that source price in KES.
 - Save `cost = round(C, 2)`.
-- Calculate the initial selling price as `round(C * 1.15, 2)`. The existing charm-price trigger may round the stored selling price upward to a supported price point. Do not bypass that trigger; verify and report the actual stored `price`, and do not claim the final displayed margin is exactly 30% after rounding.
+- Calculate the initial selling price as `round(C * 1.15, 2)`. The existing charm-price trigger may round the stored selling price upward to a supported price point. Do not bypass that trigger; verify and report the actual stored `price`, and do not add a second markup; stored selling price must equal `round(cost * 1.15, 2)`.
 - Default to a 15% markup on all new products. An explicitly requested batch override must be within the helper's accepted 15–300% range.
 - Do not convert foreign currency without an owner-approved exchange rate.
 - Set `stock = 1000`, `low_at = 20`, and `featured = false` unless the owner explicitly requests featured placement.
