@@ -134,7 +134,7 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
   const sentences = (source.match(/[^.!?]+[.!?](?=\s|$)/g) || []).map(s => s.trim());
   const fact = sentences.find(s => s.length >= 28 && s.length <= 260 && !/^buy\b/i.test(s)) || '';
   const prefix = `Buy ${n} in Kenya: `;
-  const suffix = '. Pay by M-Pesa; delivery to 47 counties.';
+  const suffix = ' Pay by M-Pesa; delivery to 47 counties.';
   const room = DESC_MAX - prefix.length - suffix.length;
   // Never cut a factual sentence in the middle. A clipped fragment can produce broken snippets
   // (for example, ending a storage specification with an ellipsis). Use the Kenya-specific fallback
