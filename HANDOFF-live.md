@@ -1645,3 +1645,15 @@ All three were created via add_draft_product with explicit 15% markup, uploaded 
 - Public catalogue get_store_catalog() returns the active product and cover image.
 - Product URL: https://stermontarcade.co.ke/?product=flower-perfumed-mosquito-coils-125g.
 - Important pricing note: KSh 80 was the retail reference used as source-cost input to honour the existing 15% markup workflow, so verify actual wholesale procurement cost before treating margin as final.
+
+
+## 2026-11-14 — Market-led product publication: Goodknight Naturals Skin Spray 100ml
+
+- Product ID/slug: goodknight-naturals-anti-mosquito-skin-spray-100ml.
+- Published active in category 34 (Mosquito & Fly Control); public catalogue confirms cover image.
+- Kenyan retail price reference: Carrefour Kenya KSh 299 at research time: https://www.carrefour.ke/mafken/en/insect-sprays-repellents/goodknight-m-insect-aerosol-100ml/p/65397. Carrefour page's description identifies this specific listing as Naturals Anti-Mosquito Skin Spray with citronella, eucalyptus and lemon peel oil; despite URL/title slug mentioning aerosol, do not confuse with Goodknight household insecticide aerosol.
+- Product image exact 100ml Good Knight Naturals skin spray bottle from BigBasket product listing; uploaded to product-images as goodknight-naturals-anti-mosquito-skin-spray-100ml.webp; upload HTTP 200; activation function returned LIVE.
+- Product listing uses source-cost input KSh 299 and 15% markup; verified DB selling price KSh 343.85, cost KSh 299, stock 1000, low_at 20, featured=false, active=true. Retail source price is not a verified wholesale acquisition cost.
+- Original long-form description and SEO title generated; public get_store_catalog() returned the item and cover_image.
+- Product URL: https://stermontarcade.co.ke/?product=goodknight-naturals-anti-mosquito-skin-spray-100ml.
+- Market rationale: Kenyan retail audit reports mosquito coils, aerosol sprays and topical repellents as common purchase categories; current Kenyan retailer listings include this 100ml Goodknight skin spray. Do not claim it is a top-selling SKU by sales volume; sales ranking data unavailable.
