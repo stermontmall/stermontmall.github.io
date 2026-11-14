@@ -32,4 +32,4 @@ For every item:
 - Never tell the owner to upload a screenshot as the normal photo-upload workflow. Use supplier-page extraction, direct image URLs or image bytes first; ask for a screenshot only as a last-resort visual QA fallback.
 
 
-Owner master prompt update (2026-11-14): source cost is the exact in-stock Kenyan retail price; selling price is exactly `round(cost * 1.15, 2)`. Do not add charm-price markup. Descriptions must be 600–900 original factual words; skip thin-fact products rather than pad. No dedicated `meta_description` column exists in `public.products`; do not invent one.
+Owner master prompt update (2026-11-14): source cost is the exact in-stock Kenyan retail price; selling price is exactly `round(cost * 1.15, 2)`. Do not add charm-price markup. Descriptions must be 600–900 original factual words; skip thin-fact products rather than pad. The page generator builds the meta description from the first factual sentence of the product description (max 155 characters); make it concise and unique. No dedicated `meta_description` column exists; do not invent one.
