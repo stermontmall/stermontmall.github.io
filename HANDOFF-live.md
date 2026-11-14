@@ -1657,3 +1657,26 @@ All three were created via add_draft_product with explicit 15% markup, uploaded 
 - Original long-form description and SEO title generated; public get_store_catalog() returned the item and cover_image.
 - Product URL: https://stermontarcade.co.ke/?product=goodknight-naturals-anti-mosquito-skin-spray-100ml.
 - Market rationale: Kenyan retail audit reports mosquito coils, aerosol sprays and topical repellents as common purchase categories; current Kenyan retailer listings include this 100ml Goodknight skin spray. Do not claim it is a top-selling SKU by sales volume; sales ranking data unavailable.
+
+
+## 2026-11-14 — Market-led product publication: Mos-Kill Aerosol 450ml
+
+- Product ID/slug: mos-kill-aerosol-insecticide-spray-450ml.
+- Published active in category 34 (Mosquito & Fly Control); public catalogue verified cover image and active item.
+- Product identity/size/price: Carrefour Kenya 450ml listing, KSh 604 at research time: https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-aerosol-insecticide-450ml/p/23557. Osho official online shop confirms Moskill aerosol pack-size options include 450ml: https://shop.oshochem.com/product/moskill-aerosol/.
+- PCPB public-health register lists MOSKILL Aerosol PCPB(CR)1002 with pyrethrins 0.35% + permethrin 0.15%, approved for mosquitoes, cockroaches and ants in domestic environments: https://www.pcpb.go.ke/public-health/.
+- Image: Osho Chemical Industries official product image uploaded to product-images as mos-kill-aerosol-insecticide-spray-450ml.png. Note official image represents the MOSKILL aerosol product family and does not visibly confirm the 450ml can size; source retailer confirms 450ml listing. Prefer exact 450ml pack image replacement when accessible.
+- Photo upload HTTP 200; activation function returned LIVE. Verified active=true, stock=1000, low_at=20, featured=false, cost input KSh604, selling price KSh694.60 (catalogue rounds to KSh695), SEO title generated.
+- Retail reference price used as source-cost input is not confirmed wholesale acquisition cost; verify supplier invoice before relying on margin.
+- Product URL: https://stermontarcade.co.ke/?product=mos-kill-aerosol-insecticide-spray-450ml.
+
+## 2026-11-14 — Market-led product publication: Goodknight Naturals Skin Spray 100ml
+
+- Product ID/slug: goodknight-naturals-anti-mosquito-skin-spray-100ml.
+- Published active in category 34; public catalogue confirms cover image.
+- Carrefour Kenya retail reference KSh299 at research time. Product page describes the specific item as Goodknight Naturals Anti-Mosquito Skin Spray, with citronella, eucalyptus and lemon peel oil. Do not confuse with household Goodknight insecticide aerosol.
+- Exact 100ml bottle image from BigBasket product listing uploaded to product-images as goodknight-naturals-anti-mosquito-skin-spray-100ml.webp; upload HTTP 200; activation function returned LIVE.
+- Verified active=true, stock=1000, low_at=20, featured=false, cost input KSh299, selling price KSh343.85, SEO title generated.
+- Retail reference price used as source-cost input is not confirmed wholesale acquisition cost; verify supplier invoice before relying on margin.
+- Product URL: https://stermontarcade.co.ke/?product=goodknight-naturals-anti-mosquito-skin-spray-100ml.
+- Market rationale: topical mosquito repellents appear among commonly purchased product categories in a Kenyan retail audit; this is a market-demand category signal, not SKU-specific sales data.
