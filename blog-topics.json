@@ -503,7 +503,8 @@
         "/products.html",
         "/blog/how-to-order-and-pay-by-mpesa-online-kenya.html"
       ],
-      "status": "pending"
+      "status": "drafted",
+      "drafted": "2026-11-14"
     },
     {
       "slug": "how-often-should-you-fumigate-your-home-or-office-kenya",
@@ -865,7 +866,8 @@
         "/products.html",
         "/blog/how-to-order-and-pay-by-mpesa-online-kenya.html"
       ],
-      "status": "pending"
+      "status": "duplicate",
+      "note": "too similar to an existing post"
     },
     {
       "slug": "pest-control-after-flooding-or-rainy-season-kenya",
