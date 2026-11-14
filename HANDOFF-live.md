@@ -1617,3 +1617,17 @@ All three were created via add_draft_product with explicit 15% markup, uploaded 
 - Candidate checks from current Kenyan retail listings found Premier Heavy Duty 20L Manual Knapsack Sprayer (MyAgrovet KSh2,200) and WQ 2L Hand Pressure Sprayer (MyAgrovet KSh450), but both are duplicates of existing live product listings in the database. Do not add them again.
 - Additional Jumia/Bioderma product candidates (including generic ULV foggers and other knapsack sprayers) require exact model/image and duplicate verification before use. No new listings were created in this audit; no price or image checks were bypassed.
 - Next search should prioritise genuinely missing pest-control categories/products, especially specific commercial fly-light consumables, exclusion hardware, monitoring accessories and verified household pest-control devices, while checking current records first. Pesticides require PCPB registration verification before listing.
+
+
+## 2026-11-14 — Pest-control listing published
+
+- Published and verified one new product: Flower Natural Rose Mosquito Killer Sticks 20g.
+- Product ID/slug: flower-natural-rose-mosquito-killer-sticks-20g.
+- Source price: KSh 200 from Kejani Cleaning Services pest-control listing (page 2); selling price: KSh 230 using 15% markup; cost: KSh 200.
+- Category: Mosquito & Fly Control (34). Stock 1000; low-stock alert 20; featured false.
+- SEO name: Flower Natural Rose Mosquito Killer Sticks 20g. SEO title: Flower Natural Rose Mosquito Killer Sticks – Price in Kenya.
+- Description: 6,268 characters; includes pack-specific detail, manufacturer information, PCPB public-health register reference PCPB(CR)2235 / pyrethrins 0.5%, safe-handling cautions and Kenyan search wording.
+- Photo: manufacturer Flowerbrand/KAPI image Killer-Sticks-Fragrances.png uploaded into product-images; storage URL is attached as cover image. Carrefour's exact rose-pack image URL was rejected by the photo uploader, so manufacturer range photo was used instead; review visual exactness if a single-pack Rose image becomes available.
+- Supabase photo request 2251 returned HTTP 200; activate_product_if_photo_ok returned LIVE; final database verification confirmed active=true, image_count=1, stock=1000, low_at=20, featured=false, price=230, cost=200. get_store_catalog() returned the product and cover image.
+- Live URL: https://stermontarcade.co.ke/?product=flower-natural-rose-mosquito-killer-sticks-20g
+- One new live product in this continuation. Other candidates were not published where price/photo/stock/registration checks were insufficient. No unrelated product, payment, order or staff settings changed.
