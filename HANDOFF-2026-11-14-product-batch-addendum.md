@@ -30,3 +30,27 @@ All three products passed duplicate-name/model checks, were created inactive, ha
 
 ### Progress
 Three newly published listings in this continuation; 3/20 of the requested batch are complete. No other products are counted. The source values are Kenyan retail references used as cost inputs, not confirmed wholesale acquisition costs. Do not treat gross markup as net profit until actual procurement, shipping, fees and taxes are accounted for. The site's price trigger rounds prices upward to supported price points.
+
+## Pest-control products published in this continuation
+Four existing inactive product drafts were checked against the catalogue and source listings, then activated through `public.activate_product_if_photo_ok`. All four now have active=true and are present in `public.get_store_catalog()` with image, price and stock values.
+
+| Product | Slug | Source | Cost basis | Stored website price | Image / description |
+|---|---|---|---:|---:|---|
+| Magnetic Mosquito-Proof Screen Door Curtain 210 x 100 cm | `magnetic-mosquito-proof-screen-door-curtain-210-x-100-cm` | Jumia Kenya listing, KSh920 at time of research; listed polyester, 210 x 100 cm | KSh800 existing cost basis | KSh1,050 | Uploaded successfully (HTTP 200) from a matching 210 x 100 cm product image; description 3,767 chars |
+| PB 16 Sprayer Spare Parts Lock Nut TE/2AC | `pb-16-sprayer-spare-parts-lock-nut-te-2ac` | Agroduka Kenya listing | KSh143 | KSh199 | Existing stored image; description 823 chars |
+| PB 16 Sprayer Spare Parts PI Strainer for Chamber 322(pi) | `pb-16-sprayer-spare-parts-pi-strainer-for-chamber-322-pi` | Agroduka Kenya listing | KSh344 | KSh450 | Existing stored image; description 928 chars |
+| PB 16 Sprayer Spare Parts Suction Valve CPT 312 | `pb-16-sprayer-spare-parts-suction-valve-cpt-312` | Agroduka Kenya listing | KSh358 | KSh499 | Existing stored image; description 898 chars |
+
+### Live product pages
+- https://stermontarcade.co.ke/?product=magnetic-mosquito-proof-screen-door-curtain-210-x-100-cm
+- https://stermontarcade.co.ke/?product=pb-16-sprayer-spare-parts-lock-nut-te-2ac
+- https://stermontarcade.co.ke/?product=pb-16-sprayer-spare-parts-pi-strainer-for-chamber-322-pi
+- https://stermontarcade.co.ke/?product=pb-16-sprayer-spare-parts-suction-valve-cpt-312
+
+### Source references
+- Jumia exact 210 x 100 cm magnetic door screen listing: https://www.jumia.co.ke/generic-magnetic-mosquito-proof-screen-door-curtain-size210x100cm-325559978.html
+- Agroduka sprayer listings, including PB 16 lock nut and suction valve: https://agroduka.ke/sprayers/
+- Agroduka PB 16 PI strainer listing: https://agroduka.ke/agrichem-africa-ltd/?currency=KES&items_per_page=24&layout=short_list&sort_by=product&sort_order=desc
+- PB-16/PB-20 parts guide: https://irp.cdn-website.com/ab519157/files/uploaded/2021_07_19%20PB%20Maintainance%20Guide.pdf
+
+The four products above are separate from the three Oraimo listings recorded earlier in this file. Pest-control additions: 4 newly activated listings. The magnetic screen image upload succeeded with HTTP 200; the attempted Jumia page-image extraction returned HTTP 403 and was not used. The final image is a matching 210 x 100 cm magnetic mosquito screen sourced from another product listing; keep product details conservative and verify actual supplied colour/fasteners before fulfilment.
