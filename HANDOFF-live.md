@@ -1519,3 +1519,16 @@ New listings activated through the established `add_draft_product`, `add_product
 3. AILYONS HD-199A 1000W Electric Dry Iron Silver & Black — source KSh700; cost KSh700; selling KSh805; stock 1000; low_at 20; featured false; 860-word description; SEO title; official AILYONS HD199A product image uploaded to product-images (PNG 90,769 bytes; Storage HTTP 200); active=true. URL: https://stermontarcade.co.ke/?product=ailyons-hd-199a-1000w-electric-dry-iron-silver-black
 
 All three activation calls returned LIVE and subsequent DB checks confirm active=true with image URLs. The public Storage objects exist with valid image MIME types and non-zero byte sizes. External browser cannot fetch Supabase public object URLs directly in this environment, but Storage metadata returns HTTP 200. Current batch count: 5/20 live (Rashnik RN-999, Oraimo Watch 5 Lite, Ramtons RF/203, Sonar SR-A3, AILYONS HD-199A). Continue with 15 remaining, strict exact-price and exact-image checks. Do not create duplicates or publish ambiguous variants.
+
+
+## 2026-11-14 — Further continuation: ElectroMate WD01 activated (6/20 live)
+
+- Published ElectroMate WD01 Hot & Normal Water Dispenser White.
+- Source: Jumia Kenya official-store WD01 listing, KSh2,299 at research time; product had 2,747 ratings and was marked low stock on the top-seller page. Source page: https://www.jumia.co.ke/water-dispenser/-em/ .
+- Duplicate check returned no matching WD01 product in the existing catalogue.
+- Product image: Kilimall WD01 white dispenser image, showing the correct freestanding white cabinet unit and two taps. Uploaded to `product-images/electromate-wd01-hot-normal-water-dispenser-white.jpg`; Storage metadata confirms JPEG, 13,332 bytes, HTTP 200.
+- Created through `add_draft_product` at source cost KSh2,299, explicit 15% markup; sell price KSh2,643.85; stock 1000; low_at 20; featured false; 900-word description; SEO title present.
+- Activated with `activate_product_if_photo_ok`; returned LIVE. Database confirms active=true and image URL populated.
+- Product URL: https://stermontarcade.co.ke/?product=electromate-wd01-hot-normal-water-dispenser-white
+- Current 20-product batch count: 6/20 live (Rashnik RN-999, Oraimo Watch 5 Lite, Ramtons RF/203, Sonar SR-A3, AILYONS HD-199A, ElectroMate WD01). 14 remain.
+- Screening notes: AILYONS TYB-205 was skipped because the photo/source variant capacity did not match. Nunix dryer was skipped because exact kit photo was uncertain. Ramtons RM/553 vacuum, NIVEA sunscreen 40ml and men's checked boxer 6-pack were duplicates. EM BD01 blender was not published because available imagery may depict a different BD01/BD02 variant/accessory bundle. Ramtons RM/694 iron was not published pending model-level duplicate resolution against an existing generic Ramtons steam-iron listing.
