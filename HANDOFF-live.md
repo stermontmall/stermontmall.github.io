@@ -1453,3 +1453,14 @@ Sources reviewed in this turn: https://www.kilimall.co.ke/category/Pest-Control,
 - Queried the active database for mosquito-control items and exact adjacent fast-moving products. Existing live listings include Combat red coil 125g, Sevin Dudu Dust 50g/100g, and Blue-Touch Jumbo Rat Glue Traps 2 Pack. Mos-Kill red 10-piece coils remain a genuine catalogue gap; existing Mos-Kill green coils and other Mos-Kill formats remain live.
 - The Mos-Kill red-coil draft remains inactive with no image. No new item was published. Continue only with an exact manufacturer/retailer pack photo that can be stored and visually inspected; never substitute the Combat coil image.
 - Current source references: Carrefour https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-mosquito-coil-red-10s/p/23552 ; Naivas https://www.naivas.online/mos-kill-red-mosquito-coils-125g ; Epepea/Naivas https://www.epepea.com/public/item/9472860 .
+
+
+## 2026-11-14 — 15-product publishing request: catalogue audit and publication blocker
+
+- Owner requested 15 new pest-control products with online photos and live publication.
+- Re-read the current product-posting rules in `CLAUDE.md`, `PUBLISHING.md`, `.claude/commands/post-product.md` and Supabase `site_playbook` topics `READ_ME_FIRST`, `add_product`, `add_photo`. Current requirements remain exact current Kenyan KES source price, unique SKU/category, 30% markup, stock 1000, low_at 20, and exact product photo uploaded and visually inspected at the final public Storage URL before activation.
+- Audited the current Supabase product catalogue across pest-control categories. The catalogue is already extensive and includes many sprayers, foggers, insecticides, baits, rodent stations, UV traps, monitoring tools and mosquito-control products. Existing products and inactive drafts must be excluded from any new batch to avoid duplicates.
+- Web sourcing found Kenyan listings and supplier categories (including Xpest, Bioderma, Mybigorder, Arrow Pest and Surveil), but search snippets alone do not establish exact current stock, exact pack-price matches, or the visual identity of each product image.
+- No product rows, prices, photos, active flags, or live site content were changed in this audit. No new items are claimed as published.
+- Blocker: before any item can be activated, each candidate still needs an exact non-duplicate SKU, a verified in-stock KES price, successful photo upload, and full-resolution visual inspection of the final stored image. The current available fetch path has not yet demonstrated that final-image visual QA can be completed reliably for a 15-item batch.
+- Next: source and validate 15 genuinely new candidates one by one; do not create or activate rows until exact price and photo checks can be completed. If a final stored image cannot be opened and inspected, keep that item inactive.
