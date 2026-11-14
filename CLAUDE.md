@@ -19,3 +19,9 @@ If the owner asks to add/post/list an advert or product, or attach product photo
 4. If the sandbox has no network or clone, say which tests could not be run and put the exact command in `HANDOFF-live.md`.
 5. To rebuild product pages NEVER edit or rewrite `.github/workflows/product-pages.yml` (on 2026-11-08 a commit replaced it with comments only and no page was rebuilt for two hours). Trigger it with `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`. `workflow-guard.yml` fails the push if any workflow file is empty or invalid.
 6. Never link to `/classic.html`; the checkout is `/checkout.html` (opened only inside the shell). `no-classic-hop.test.mjs` enforces this.
+
+
+## Current owner master product prompt (2026-11-14)
+- Use exact source KES cost and `round(cost * 1.15, 2)` selling price; do not apply a second markup or charm-price uplift. Stock=1000, low_at=20, featured=false.
+- Product descriptions must be 600–900 original, factual words for this workflow. The database helper accepts 40–2,000 words; skip thin-fact products rather than pad.
+- `public.products` has `seo_title` but no dedicated `meta_description` column. Do not invent a column or make schema changes for this batch.
