@@ -82,4 +82,4 @@ Report the product ID, source cost, selling price, stock, alert threshold, draft
 ## Current owner master-prompt rules (2026-11-14)
 - New products use `cost = exact verified Kenyan source price` and `price = round(cost * 1.15, 2)`. Stock=1000, low_at=20, featured=false. The helper's 6-argument and 7-argument defaults are now 15%; explicit percentages must be 15–300.
 - The price trigger preserves exact `cost * 1.15` prices for new listings; legacy charm-price rounding remains for other price updates.
-- The current product schema has `seo_title` but no dedicated `meta_description` column. Do not invent a column or alter schema for this batch. The product page generator's current metadata behavior must be reviewed before claiming a separately stored meta description.
+- The current product schema has `seo_title` but no dedicated `meta_description` column. Product meta descriptions are generated at build time by `pdpDescription()` in `seo-meta.mjs` from the first factual sentence in `description` (maximum 155 characters). Write a concise, unique first sentence that fits the remaining snippet budget; do not invent a database column.
