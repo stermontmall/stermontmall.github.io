@@ -1680,3 +1680,13 @@ All three were created via add_draft_product with explicit 15% markup, uploaded 
 - Retail reference price used as source-cost input is not confirmed wholesale acquisition cost; verify supplier invoice before relying on margin.
 - Product URL: https://stermontarcade.co.ke/?product=goodknight-naturals-anti-mosquito-skin-spray-100ml.
 - Market rationale: topical mosquito repellents appear among commonly purchased product categories in a Kenyan retail audit; this is a market-demand category signal, not SKU-specific sales data.
+
+## 2026-11-15 — Default product markup changed to 30%
+- Owner requested that 30% markup become the website-wide default for new product listings.
+- Updated the admin Catalog new-item flow in `catalog-v10.js`: new item price input is now labelled source/cost price; it adds 30% (rounds up to whole KSh). Editing an existing item still saves the entered selling price exactly.
+- Updated `admin-photo-ai.js` price guidance and the Supabase `ai-add-product` Edge Function to apply and report 30% for source-priced drafts. Edge Function deployed successfully as version 15.
+- Updated Supabase `public.add_draft_product`: its six-argument wrapper defaults to 30%; its seven-argument form accepts explicit 15–300% overrides without a conflicting default. Updated legacy `public.post_product` to 30%.
+- Updated `public.products_round_prices()` so exact 30% source-cost prices are preserved rather than altered by legacy charm-price rounding.
+- Updated `public.site_playbook` topics `READ_ME_FIRST`, `add_product`, and `rules` to 30%, plus repository instructions `PUBLISHING.md`, `CLAUDE.md`, `.claude/commands/post-product.md`, and `TESTING-product-photo-upload.md`.
+- Verification: a temporary product test with cost KSh100 produced selling price KSh130.00 through the six-argument database helper; the test row was rolled back. Existing live product prices were not changed.
+- GitHub commits: `catalog-v10.js` 0502f775; `admin-photo-ai.js` 0cdede76; `PUBLISHING.md` 5648f728; `CLAUDE.md` 559e028e; `.claude/commands/post-product.md` 0cd866ed; `TESTING-product-photo-upload.md` 9e895c5a.
