@@ -281,6 +281,7 @@ ${g.sections.map(x => `<h2>${esc(x.h)}</h2>${x.p.map(p => `<p>${esc(p)}</p>`).jo
   h += `<nav class="crumbs"><a href="/">Home</a> / <a href="/services/">Services</a> / Guides</nav>
 ${hero({ eyebrow: 'Guides', h1: 'Service guides for Nairobi and Kenya', lead: 'Straight answers and typical prices before you book.' })}
 <h2>How to use these guides</h2><p>Each guide answers the questions people ask before they book a home or farm service: what the job usually costs in Nairobi and across Kenya, what changes the price, how to prepare and what to ask before you agree. Start with the quick answer at the top of the guide, then read the sections that match your job. When you are ready, send your location and a short description of the job on WhatsApp and we reply with the next step.</p>
+<h2>Service and delivery information by city</h2><p>Read locally tailored information for Nairobi, Mombasa, Kisumu, Nakuru and Eldoret:</p><ul class="checks"><li><a href="/services/guides/nairobi.html">Services and delivery in Nairobi</a></li><li><a href="/services/guides/mombasa.html">Services and delivery in Mombasa</a></li><li><a href="/services/guides/kisumu.html">Services and delivery in Kisumu</a></li><li><a href="/services/guides/nakuru.html">Services and delivery in Nakuru</a></li><li><a href="/services/guides/eldoret.html">Services and delivery in Eldoret</a></li></ul>
 <h2>All guides</h2><div class="grid">${data.guides.map(g => `<a href="/services/guides/${g.slug}.html">${esc(g.title)}<small>${esc(g.desc)}</small></a>`).join('')}</div>
 <h2>What the prices in our guides mean</h2><p>The price ranges in the guides are typical figures for Nairobi and Kenya, not fixed quotes. The final price depends on the size of the property, the materials or equipment needed, how easy the site is to reach and how many visits the job takes. We confirm the scope, availability and final quote with you before work begins, and you pay by M-Pesa.</p>
 <h2>Services these guides cover</h2><ul class="checks">${data.services.map(s => `<li><a href="/services/${s.slug}.html">${esc(s.name)}</a>: ${kes(s.priceMin)} to ${kes(s.priceMax)}${s.priceOpen ? '+' : ''}</li>`).join('')}</ul>
@@ -358,7 +359,9 @@ ${pestCoverage({ name: 'Pest control' })}
   write('pests-data.json', JSON.stringify({ published: data.published, pests: pests.map(p => ({ name: p.name, slug: p.slug, group: p.group, varieties: p.varieties.map(v => v.n) })) }, null, 1) + '\n');
 }
 
-const urls = ['/services/', '/services/guides/', ...(pests.length ? ['/services/pests/', ...pests.map(p => `/services/pests/${p.slug}.html`)] : []), ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`)];
+// These five locally tailored city guides are maintained as static editorial pages alongside generated service guides.
+const CITY_GUIDES = ['nairobi', 'mombasa', 'kisumu', 'nakuru', 'eldoret'].map(city => `/services/guides/${city}.html`);
+const urls = ['/services/', '/services/guides/', ...(pests.length ? ['/services/pests/', ...pests.map(p => `/services/pests/${p.slug}.html`)] : []), ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`), ...CITY_GUIDES];
 write('sitemap-services.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
 

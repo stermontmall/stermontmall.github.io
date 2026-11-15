@@ -132,10 +132,10 @@ footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85
 .stk b{flex:1;min-width:0;font-size:.95rem;line-height:1.2;color:#5b21b6}.stk b small{display:block;color:#1f1b2e;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stk a{flex:none;text-decoration:none;font-weight:800;border-radius:10px;padding:.7rem .9rem;background:#15803d;color:#fff}.stk a.call{background:#fff;color:#6d28d9;border:2px solid #7c3aed;padding:.6rem .8rem}}`;
 
-const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '' }) => `<!doctype html>
+const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '', robots = 'index, follow, max-image-preview:large' }) => `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${SITE}${path}"><meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="${SITE}${path}"><meta name="robots" content="${esc(robots)}">
 <script>(function(){var q=new URLSearchParams(location.search);if(["search","sort","filter"].some(function(k){return q.has(k)})){var m=document.querySelector('meta[name="robots"]');if(m)m.setAttribute("content","noindex,follow");}})();</script>
 <meta property="og:type" content="${ogType}"><meta property="og:site_name" content="${BRAND}"><meta property="og:locale" content="en_KE">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${SITE}${path}">
@@ -508,7 +508,7 @@ function productSiloHtml(p, cat, related) {
     <p>Browse the main category, compare related products and read practical guides before choosing.</p>
     <h3>Shop the main category</h3>
     <div class="silo-links"><a href="${hubUrl}">${esc(hub.name || cat.name)} in Kenya</a></div>
-    ${children.length ? `<h3>Related categories</h3><div class="silo-links">${children.map(slug => `<a href="/c/${encodeURIComponent(slug)}.html">${esc(byCat[slug].name)}</a>`).join('')}</div>` : ''}
+    ${children.length ? `<h3>Related categories</h3><div class="silo-links">${children.map(slug => `<a href="${categoryPath(slug)}">${esc(byCat[slug].name)}</a>`).join('')}</div>` : ''}
     ${related.length ? `<h3>Related products</h3><div class="silo-products">${related.slice(0,6).map(x => `<a href="/p/${encodeURIComponent(sl(x.id))}.html">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div>` : ''}
     ${guides.length ? `<h3>Helpful guides</h3><ul class="silo-guides">${guides.map(([url,label]) => `<li><a href="${url}">${esc(label)}</a></li>`).join('')}</ul>` : ''}
   </section>`;
@@ -668,8 +668,12 @@ for (const a of aliases) {
   writeFileSync(fileOf(from), `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Redirecting\u2026</title><link rel="canonical" href="${to}"><meta http-equiv="refresh" content="0;url=${to}"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><p>This product moved. <a href="${to}">Continue to the product page</a>.</p></body></html>`);
 }
 
+const categoryPath = slug => slug === 'stermont-cars-for-sale' ? '/cars-for-sale.html' : slug === 'mens-fashion' ? '/fashion.html' : `/c/${encodeURIComponent(slug)}.html`;
 for (const [slug, c] of Object.entries(byCat)) {
-  const path = `/c/${encodeURIComponent(slug)}.html`;
+  const legacyPath = `/c/${encodeURIComponent(slug)}.html`;
+  const path = categoryPath(slug);
+  const robots = c.items.length < 5 ? 'noindex, follow' : 'index, follow, max-image-preview:large';
+  const redirect = to => `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category moved | ${BRAND}</title><link rel="canonical" href="${SITE}${to}"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0; url=${to}"></head><body><p>This category has moved. <a href="${to}">Continue to the current category page</a>.</p><script>window.location.replace("${to}")</script></body></html>`;
   const info = INFO[slug] || {};
   const title = info.title || catTitle(c.name);   // seo-meta.mjs pattern, <= 60 chars (small categories are skipped by seo-kenya.mjs, so they must be right here)
   const desc = info.desc || catDescription(c.name, slug);
@@ -678,12 +682,13 @@ for (const [slug, c] of Object.entries(byCat)) {
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
 <p>${esc(info.intro || 'Browse the products listed below and compare the exact model, pack size or variant before ordering.')}</p><p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or ask about pickup at Sarit Centre, Westlands. Delivery fees are confirmed before payment.</p>${helpCta}${serviceCrosslink}<ul class="g">${c.items.map(card).join('')}</ul>
-${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
+${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="${categoryPath(k)}">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
 ${info.guide || ''}
 ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<div class="box"><b>${esc(q)}</b><p>${esc(a)}</p></div>`).join('') : ''}
 <p><a href="/c/">Browse all categories</a></p>`;
   const faqLd = info.faq ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: info.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
-  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]) }));
+  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]), robots }));
+  if (legacyPath !== path) writeFileSync(`.${legacyPath}`, redirect(path));
   urls.push(path);
 }
 
@@ -692,7 +697,7 @@ ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<
   const order = Object.entries(byCat).sort((a, b) => (b[0] === 'pest-control-fumigation') - (a[0] === 'pest-control-fumigation') || a[1].name.localeCompare(b[1].name));
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › All categories</nav><h1>Shop by category in Kenya</h1>
 <p>Pest control and fumigation, agrovet, electronics, home goods and more. Pay by M-Pesa, delivery to all 47 counties.</p>
-<ul class="g">${order.map(([slug, c]) => `<li><a href="/c/${encodeURIComponent(slug)}.html">${esc(c.name)}</a><span>${c.items.length} product${c.items.length === 1 ? '' : 's'}</span></li>`).join('')}</ul>`;
+<ul class="g">${order.map(([slug, c]) => `<li><a href="${categoryPath(slug)}">${esc(c.name)}</a><span>${c.items.length} product${c.items.length === 1 ? '' : 's'}</span></li>`).join('')}</ul>`;
   writeFileSync('c/index.html', shell({ title: `Shop by Category in Kenya | ${BRAND}`, desc: `Browse all categories at ${BRAND}: pest control and fumigation, agrovet, electronics, home goods and more. Pay by M-Pesa, delivery to all 47 counties.`, path: '/c/', body,
     ld: crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/']]) }));
   urls.push('/c/');
@@ -765,7 +770,7 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
 <section class="seo-links" aria-labelledby="seo-cats"><div class="wrap">
 <style>.seo-links{padding:1.5rem 0 .5rem}.seo-links h2{font-size:1.25rem;margin:0 0 .6rem}.seo-links ul{list-style:none;display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 1.2rem;padding:0}.seo-links li a{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem;font-size:.92rem;color:var(--ink);text-decoration:none}.seo-links li a:hover{border-color:currentColor}</style>
 <h2 id="seo-cats">Shop by category</h2>
-<ul>${catsAll.map(([slug, c]) => `<li><a href="/c/${encodeURIComponent(slug)}.html">${esc(c.name)}</a></li>`).join('')}</ul>
+<ul>${catsAll.map(([slug, c]) => `<li><a href="${categoryPath(slug)}">${esc(c.name)}</a></li>`).join('')}</ul>
 <h2>Popular products</h2>
 <ul>${picks.slice(0, 12).map(p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${esc(p.name)}</a></li>`).join('')}</ul>
 <h2>Professional services and business orders</h2>
