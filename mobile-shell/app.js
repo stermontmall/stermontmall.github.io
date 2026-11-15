@@ -686,6 +686,15 @@ function openQuickBuy(id) {
   editingCartKey = '';
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
 }
+/* Owner 2026-11-15: tapping a product opens its FULL product page at once (every description section, specs, FAQs, related products), not the small quick-buy sheet
+   that needed a second tap on "See full product details". The "+" button on a multi-size card still opens the quick-buy sheet to pick a size (openQuickBuy).
+   To undo: make the .card[data-id] click in section 11 call openQuickBuy again. */
+function openProductFromCard(id) {
+  const p = feed.items.get(id); if (!p) return;
+  editingCartKey = '';
+  qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; pp.img = '';
+  renderQB(); openProductPage();
+}
 function openDeepLink(slug) {   // the full product page for a /?product=<slug> address (any pack size's slug works)
   const hit = x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug);   // /p/<id>.html pages are named by the row id, which differs from the slug on some products
   const p = PRODUCTS.find(hit);
@@ -854,7 +863,7 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-cat-all]'))) return selectCategory(el.dataset.catAll);
   if ((el = t.closest('[data-cat]'))) return selectCategory(el.dataset.cat, el.dataset.sub);
   if ((el = t.closest('[data-drawer-cat]'))) { const id = el.dataset.drawerCat; return closeAllThen(() => selectCategory(id)); }
-  if ((el = t.closest('.card[data-id]'))) return openQuickBuy(el.dataset.id);
+  if ((el = t.closest('.card[data-id]'))) return openProductFromCard(el.dataset.id);   // owner 2026-11-15: a product tap opens the full product page (was openQuickBuy)
 });
 document.addEventListener('error', e => {
   const img = e.target;
