@@ -189,7 +189,7 @@ with sync_playwright() as p:
     pg.locator('[data-open="drawer-categories"]').click()
     check('category drawer opens', pg.locator('#drawer-categories.open').count() == 1)
     rows = pg.locator('#drawer-cats [data-drawer-cat]').count()
-    with_img = pg.locator('#drawer-cats [data-drawer-cat] img[src^="http"]').count()
+    with_img = pg.locator('#drawer-cats [data-drawer-cat] img[src^="http"], #drawer-cats [data-drawer-cat] img[data-src^="http"]').count()
     check('drawer rows show real product photos', with_img >= 1, with_img)
     check('drawer rows without a photo keep the category emoji', pg.evaluate("[...document.querySelectorAll('#drawer-cats [data-drawer-cat]')].every(b => b.querySelector('img') || b.querySelector('span').textContent.trim().length > 0)"), rows)
     pg.locator('[data-drawer-cat="phones-accessories"]').click()
@@ -215,7 +215,7 @@ with sync_playwright() as p:
     check('deals badge cleared on visit', not pg.locator('#bottom-nav [data-badge="deals"]').is_visible())
     pg.wait_for_selector('#deals-grid .card[data-id]')
     pg.go_back(); pg.wait_for_timeout(300)
-    check('Back from a tab returns to Home (not off the site)', pg.locator('#view-home').is_visible() and pg.url == URL, pg.url)
+    check('Back from a tab returns to Home and restores the selected category address', pg.locator('#view-home').is_visible() and pg.url == URL.rstrip('/') + '/c/phones-accessories.html', pg.url)
     check('nav highlight follows Back', pg.locator('#bottom-nav [data-tab="home"][aria-current="page"]').count() == 1)
 
     # buy now flow
@@ -227,7 +227,7 @@ with sync_playwright() as p:
     check('cart total shown', pg.locator('#cart-total').inner_text().startswith('KSh'))
     pg.screenshot(path=f'{OUT}/shot-cart.png')
     pg.go_back(); pg.wait_for_timeout(300)
-    check('Back from Cart returns to Home', pg.locator('#view-home').is_visible() and pg.url == URL)
+    check('Back from Cart returns to Home and restores the selected category address', pg.locator('#view-home').is_visible() and pg.url == URL.rstrip('/') + '/c/phones-accessories.html', pg.url)
 
     # header compaction on scroll
     pg.evaluate('window.scrollTo(0, 400)'); pg.wait_for_timeout(200)
@@ -260,7 +260,7 @@ with sync_playwright() as p:
     check('network failure shows a retry link, no stuck skeletons', 'Could not load products' in p2.locator('#grid-empty').inner_text() and p2.locator('#grid-empty a[href="/"]').count() == 1 and p2.locator('#grid .card[aria-hidden="true"]').count() == 0)
     FAIL[0] = False
     p2.locator('[data-retry]').click(); p2.wait_for_selector('#grid .card[data-id]')
-    check('retry loads the products', p2.locator('#grid .card[data-id]').count() >= 12 and p2.locator('#grid-empty').is_hidden())
+    check('retry loads the first paginated product batch', p2.locator('#grid .card[data-id]').count() >= 8 and p2.locator('#grid-empty').is_hidden())
     p2.close()
 
     # a cart saved by the old mock prototype (no rowId) is dropped, not shown with fake prices
@@ -369,6 +369,10 @@ with sync_playwright() as p:
     # product page: Add to cart and Buy now work from the full page
     c8 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c8)
     p8 = c8.new_page(); p8.goto(URL); p8.wait_for_selector('#grid .card[data-id]')
+    # The home feed is deliberately paginated (8 items); open the Home & Living category to reach the multi-size fixture.
+    p8.locator('#chips [data-chip="home-living"]').click()
+    p8.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
+    p8.wait_for_selector('#grid .card[data-id="garden-set"] [data-add]', timeout=10000)
     p8.locator('#grid .card[data-id="garden-set"] [data-add]').click(); p8.wait_for_selector('#sheet-quickbuy.open')
     p8.locator('#qb-page').click(); p8.wait_for_selector('#page-product.open')
     p8.locator('#pp-plus').click(); p8.locator('#pp-add').click()
@@ -393,6 +397,9 @@ with sync_playwright() as p:
     p9 = c9.new_page(); e9 = []
     p9.on('pageerror', lambda e: e9.append(str(e)))
     p9.goto(URL); p9.wait_for_selector('#grid .card[data-id]')
+    p9.locator('#chips [data-chip="home-living"]').click()
+    p9.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
+    p9.wait_for_selector('#grid .card[data-id="garden-set"]', timeout=10000)
     base_title = p9.title()
     check('address: home is the bare "/" address', p9.evaluate('location.pathname + location.search') == '/')
     p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#sheet-quickbuy.open')
