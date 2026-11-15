@@ -124,11 +124,16 @@ const tile = (o, i) => `<a class="tile" href="/services/${o.slug}.html"><span cl
 const hero = ({ eyebrow, h1, lead, priceHtml = '', cta = '', chips = [] }) => `<header class="hero"><p class="eyebrow">${esc(eyebrow)}</p><h1>${esc(h1)}</h1><p class="lead">${lead}</p>${priceHtml}${cta ? `<div class="cta">${cta}</div>` : ''}${chips.length ? `<ul class="chips">${chips.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}</header>`;
 
 const seoGuideTitle = value => {
-  const brand = ' | Stermont Arcade', max = 70;
+  const brand = ' | Stermont Arcade', max = 60;
   let base = String(value || '').replace(/\s+/g, ' ').trim();
   const room = max - brand.length;
   if (base.length > room) base = base.slice(0, room - 1).replace(/\s+\S*$/, '').replace(/[|,:;–-]+$/, '').trim() + '…';
   return base + brand;
+};
+const seoGuideDescription = value => {
+  let base = String(value || '').replace(/\s+/g, ' ').trim();
+  if (base.length > 155) base = base.slice(0, 154).replace(/\s+\S*$/, '').trim();
+  return base;
 };
 
 function head({ title, desc, url, extra = '' }) {
@@ -243,7 +248,7 @@ for (const g of data.guides) {
     { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: g.faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }
   ];
   const ask = wa(`Hello Stermont Arcade, I read your guide and would like a quote for ${s.name}. My location is: `);
-  let h = head({ title: seoGuideTitle(g.title), desc: g.desc, url, extra: jsonld.map(ld).join('') });
+  let h = head({ title: seoGuideTitle(g.title), desc: seoGuideDescription(g.desc), url, extra: jsonld.map(ld).join('') });
   h += `<nav class="crumbs"><a href="/">Home</a> / <a href="/services/">Services</a> / <a href="/services/guides/">Guides</a></nav>
 ${hero({
     eyebrow: 'Guide',
@@ -284,7 +289,7 @@ ${hero({ eyebrow: 'Guides', h1: 'Service guides for Nairobi and Kenya', lead: 'S
 <h2>All guides</h2><div class="grid">${data.guides.map(g => `<a href="/services/guides/${g.slug}.html">${esc(g.title)}<small>${esc(g.desc)}</small></a>`).join('')}</div>
 <h2>What the prices in our guides mean</h2><p>The price ranges in the guides are typical figures for Nairobi and Kenya, not fixed quotes. The final price depends on the size of the property, the materials or equipment needed, how easy the site is to reach and how many visits the job takes. We confirm the scope, availability and final quote with you before work begins, and you pay by M-Pesa.</p>
 <h2>Services these guides cover</h2><ul class="checks">${data.services.map(s => `<li><a href="/services/${s.slug}.html">${esc(s.name)}</a>: ${kes(s.priceMin)} to ${kes(s.priceMax)}${s.priceOpen ? '+' : ''}</li>`).join('')}</ul>
-${coverageBlock('Home services')}
+<h2>Local service and delivery guides</h2><p>Choose a city guide for local delivery expectations, pest-control inspection details and how to request a service quotation. We also accept enquiries from the other counties in Kenya; availability, travel and delivery timing are confirmed for the exact destination.</p><div class="grid"><a href="/services/guides/nairobi.html">Nairobi service and delivery guide</a><a href="/services/guides/mombasa.html">Mombasa service and delivery guide</a><a href="/services/guides/kisumu.html">Kisumu service and delivery guide</a><a href="/services/guides/nakuru.html">Nakuru service and delivery guide</a><a href="/services/guides/eldoret.html">Eldoret service and delivery guide</a></div>
 <p><a class="btn" href="${ask}">Get a quote on WhatsApp</a> <a class="btn alt" href="/services/">See all services</a></p>
 <a class="btn fab" href="${ask}">Get a quote</a>` + foot;
   write('guides/index.html', h);
@@ -360,6 +365,22 @@ ${pestCoverage({ name: 'Pest control' })}
 
 const urls = ['/services/', '/services/guides/', ...(pests.length ? ['/services/pests/', ...pests.map(p => `/services/pests/${p.slug}.html`)] : []), ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`)];
 write('sitemap-services.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n')}\n</urlset>\n`);
+
+// Keep the root sitemap complete as well as the dedicated services sitemap.
+// Only canonical service and guide URLs are included; redirect aliases are deliberately omitted.
+try {
+  const rootSitemap = path.join(dir, '..', 'sitemap.xml');
+  if (fs.existsSync(rootSitemap)) {
+    let xml = fs.readFileSync(rootSitemap, 'utf8');
+    const present = new Set([...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]));
+    const additions = urls.map(u => SITE + u).filter(u => !present.has(u));
+    if (additions.length) {
+      const entries = additions.map(u => `  <url><loc>${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n');
+      xml = xml.replace('</urlset>', entries + '\n</urlset>');
+      fs.writeFileSync(rootSitemap, xml);
+    }
+  }
+} catch (e) { console.log('root sitemap update skipped:', e.message); }
 write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
 
 // Owner rule: never publish the banned town name. Fail the build (so CI commits nothing) if any generated file has it.

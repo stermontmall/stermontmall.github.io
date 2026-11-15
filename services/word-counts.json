@@ -25,7 +25,12 @@
   "farm-spraying-guide-kenya": 641,
   "appliance-repair-or-replace-nairobi": 670,
   "deep-cleaning-checklist-nairobi": 626,
-  "water-heater-and-leak-repair-nairobi": 658
+  "water-heater-and-leak-repair-nairobi": 658,
+  "nairobi": 780,
+  "mombasa": 781,
+  "kisumu": 775,
+  "nakuru": 780,
+  "eldoret": 779
  },
  "pests": {
   "bed-bugs": 1145,

@@ -98,7 +98,9 @@ function buildCatalog(rows, cats, names) {
   });
   PRODUCTS = out; CATROWS = cats;
   const have = new Set(out.map(p => p.cat)), subHave = new Set(out.filter(p => p.sub).map(p => p.cat + '|' + p.sub));
-  CATS = cats.filter(c => !c.parent_id && !c.is_promo && have.has(c.slug)).sort((a, b) => a.sort_order - b.sort_order || a.id - b.id)
+  const navPriority = { 'pest-control-fumigation': 0, agrovet: 1, 'home-kitchen': 2, appliances: 3, 'home-appliances': 3, electronics: 4, 'phones-accessories': 5, 'tv-audio-video': 6, 'computers-accessories': 7 };
+  CATS = cats.filter(c => !c.parent_id && !c.is_promo && have.has(c.slug)).sort((a, b) =>
+    (navPriority[a.slug] ?? 99) - (navPriority[b.slug] ?? 99) || a.sort_order - b.sort_order || a.id - b.id)
     .map(c => ({ id: c.slug, name: c.name, icon: ICONS[c.slug] || '🛍️',
       subs: cats.filter(s => s.parent_id === c.id && subHave.has(c.slug + '|' + s.name)).sort((a, b) => a.sort_order - b.sort_order || a.id - b.id).map(s => s.name) }));
 }
@@ -412,7 +414,7 @@ function renderCategoriesView() {
   /* Rail icon: a real product photo of that category (emoji if none or it fails to load); Top Categories keeps its star. */
   const railIcon = (icon, img) => img ? `<span class="grid place-items-center overflow-hidden rounded-lg shrink-0" style="width:44px;height:44px;font-size:24px;line-height:1;background:#fff;border:1px solid #eee">${thumb({ img, emoji: icon })}</span>` : `<span style="font-size:26px;line-height:1">${icon}</span>`;
   const rail = (id, icon, name, img) => `<button class="cat-side" role="tab" data-side="${esc(id)}" aria-selected="${id === sideCat}" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 4px">${railIcon(icon, img)}<span>${esc(name)}</span></button>`;
-  const svcRail = `<a class="cat-side" href="/services/" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 4px;text-decoration:none;color:inherit"><span class="grid place-items-center overflow-hidden rounded-lg shrink-0" style="width:44px;height:44px;font-size:24px;line-height:1;background:#fff;border:1px solid #eee">${thumb({ img: SERVICE_TILE_PHOTO, emoji: '\u{1F6E0}\uFE0F' })}</span><span>Services</span></a>`;
+  const svcRail = `<a class="cat-side" href="/services/" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:14px 4px;text-decoration:none;color:inherit"><span class="grid place-items-center overflow-hidden rounded-lg shrink-0" style="width:44px;height:44px;font-size:24px;line-height:1;background:#fff;border:1px solid #eee">${thumb({ img: SERVICE_TILE_PHOTO, emoji: '\u{1F6E0}\uFE0F' })}</span><span>On-Site Services</span></a>`;
   $('#cat-side').innerHTML = rail('__top', '⭐', 'Top Categories') + svcRail + CATS.map(x => rail(x.id, x.icon, x.name, photoOf(x.id))).join('');
   if (!c) {
     $('#cat-main').innerHTML = `<div class="mb-3 font-semibold">Top Categories</div>

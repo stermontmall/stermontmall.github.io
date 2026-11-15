@@ -132,10 +132,11 @@ footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85
 .stk b{flex:1;min-width:0;font-size:.95rem;line-height:1.2;color:#5b21b6}.stk b small{display:block;color:#1f1b2e;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stk a{flex:none;text-decoration:none;font-weight:800;border-radius:10px;padding:.7rem .9rem;background:#15803d;color:#fff}.stk a.call{background:#fff;color:#6d28d9;border:2px solid #7c3aed;padding:.6rem .8rem}}`;
 
-const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '' }) => `<!doctype html>
+const categoryUrl = slug => slug === 'stermont-cars-for-sale' ? '/cars-for-sale.html' : ['fashion', 'mens-fashion'].includes(slug) ? '/fashion.html' : `/c/${encodeURIComponent(slug)}.html`;
+const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '', robots = 'index, follow, max-image-preview:large' }) => `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${SITE}${path}"><meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="${SITE}${path}"><meta name="robots" content="${esc(robots)}">
 <script>(function(){var q=new URLSearchParams(location.search);if(["search","sort","filter"].some(function(k){return q.has(k)})){var m=document.querySelector('meta[name="robots"]');if(m)m.setAttribute("content","noindex,follow");}})();</script>
 <meta property="og:type" content="${ogType}"><meta property="og:site_name" content="${BRAND}"><meta property="og:locale" content="en_KE">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${SITE}${path}">
@@ -176,7 +177,7 @@ rows.forEach(p => { if (p.variant_group && p.variant_label) (gmap[p.variant_grou
 const products = [], aliases = [], seenG = new Set();
 const inS = x => x.stock == null || Number(x.stock) > 0;
 // true when the name already ends with the variant label, or every word/number of the label is already in the name
-const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\\d+(?:\\.\\d+)?)\\s*(millilitres?|milliliters?|ml)\\b/g, '$1ml').replace(/(\\d+(?:\\.\\d+)?)\\s*(litres?|liters?|l)\\b/g, '$1l').replace(/(\\d+(?:\\.\\d+)?)\\s*(kilograms?|kg)\\b/g, '$1kg').replace(/(\\d+(?:\\.\\d+)?)\\s*(grams?|g)\\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
+const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\\d+(?:\\.\\d+)?)\s*(millilitres?|milliliters?|ml)\\b/g, '$1ml').replace(/(\\d+(?:\\.\\d+)?)\s*(litres?|liters?|l)\\b/g, '$1l').replace(/(\\d+(?:\\.\\d+)?)\s*(kilograms?|kg)\\b/g, '$1kg').replace(/(\\d+(?:\\.\\d+)?)\s*(grams?|g)\\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
 for (const p of rows) {
   const g = p.variant_group && p.variant_label ? gmap[p.variant_group] : null;
   if (g && g.length > 1) {
@@ -508,7 +509,7 @@ function productSiloHtml(p, cat, related) {
     <p>Browse the main category, compare related products and read practical guides before choosing.</p>
     <h3>Shop the main category</h3>
     <div class="silo-links"><a href="${hubUrl}">${esc(hub.name || cat.name)} in Kenya</a></div>
-    ${children.length ? `<h3>Related categories</h3><div class="silo-links">${children.map(slug => `<a href="/c/${encodeURIComponent(slug)}.html">${esc(byCat[slug].name)}</a>`).join('')}</div>` : ''}
+    ${children.length ? `<h3>Related categories</h3><div class="silo-links">${children.map(slug => `<a href="${categoryUrl(slug)}">${esc(byCat[slug].name)}</a>`).join('')}</div>` : ''}
     ${related.length ? `<h3>Related products</h3><div class="silo-products">${related.slice(0,6).map(x => `<a href="/p/${encodeURIComponent(sl(x.id))}.html">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div>` : ''}
     ${guides.length ? `<h3>Helpful guides</h3><ul class="silo-guides">${guides.map(([url,label]) => `<li><a href="${url}">${esc(label)}</a></li>`).join('')}</ul>` : ''}
   </section>`;
@@ -626,7 +627,7 @@ for (const p of products) {
         availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
         seller: { '@id': `${SITE}/#store` } } }))
   }) : '';
-  const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
+  const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}${categoryUrl(cat.slug)}`], [p.name, SITE + path]]) : '');
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
     const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${pdpVariantUrl(path, v.slug, p.slug)}`)}`;
     return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
@@ -645,7 +646,7 @@ for (const p of products) {
   const productDescription = catalogDescription.length >= 100 ? catalogDescription : [catalogDescription, detailFallback].filter(Boolean).join(' ');
   const buyerNotes = productBuyingNotes(p, cat);
   const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
-<div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.name)} - product photo" fetchpriority="high" loading="eager" decoding="async" width="720" height="720" data-fallbacks="${esc(JSON.stringify(img.slice(1)))}">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
+<div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.name)} - ${esc(cat?.name || "product")} in Kenya" fetchpriority="high" loading="eager" decoding="async" width="720" height="720" data-fallbacks="${esc(JSON.stringify(img.slice(1)))}">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
 <div><h1>${esc(h1)}</h1><p class="tagline" style="margin:.1rem 0 .6rem;color:#5b21b6;font-weight:600">${esc(tagline)}</p><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
 <p class="${inStock ? 'ok' : 'no'}">${inStock ? 'In stock' : 'Currently sold out'}</p>
 <p>Buy ${esc(p.name)} online in Kenya from ${BRAND}. Pay by M-Pesa and get delivery to all 47 counties.</p>
@@ -670,21 +671,27 @@ for (const a of aliases) {
 
 for (const [slug, c] of Object.entries(byCat)) {
   const path = `/c/${encodeURIComponent(slug)}.html`;
+  const canonicalPath = categoryUrl(slug);
+  const robots = c.items.length < 5 ? 'noindex, follow' : 'index, follow, max-image-preview:large';
+  const redirect = to => `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category moved | ${BRAND}</title><link rel="canonical" href="${SITE}${to}"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0; url=${to}"></head><body><p>This category has moved. <a href="${to}">Continue to the current category page</a>.</p><script>window.location.replace("${to}")</script></body></html>`;
+  if (slug === 'stermont-cars-for-sale') { writeFileSync(`.${path}`, redirect('/cars-for-sale.html')); continue; }
+  if (slug === 'mens-fashion') { writeFileSync(`.${path}`, redirect('/fashion.html')); continue; }
   const info = INFO[slug] || {};
-  const title = info.title || catTitle(c.name);   // seo-meta.mjs pattern, <= 60 chars (small categories are skipped by seo-kenya.mjs, so they must be right here)
-  const desc = info.desc || catDescription(c.name, slug);
+  const title = clip(info.title || catTitle(c.name), 60);
+  const desc = clip(info.desc || catDescription(c.name, slug), 155);
   const helpCta = isPest(slug) ? '<div class="box"><b>Need help choosing a pest-control product?</b><p>Tell us the pest, treatment site and pack size you are considering. We can help confirm the product listing, stock and delivery fee before you order.</p><a class="btn" href="https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent('Hello Stermont Arcade, please help me choose a ' + c.name.toLowerCase() + ' product. Please confirm its listed use, pack size, stock and delivery fee.') + '">Ask on WhatsApp</a></div>' : '';
   const serviceCrosslink = isPest(slug) ? '<div class="box"><b>Need professional pest-control help?</b><p>Read our service information for treatment options, inspection questions and how to request a quote.</p><a href="/services/">Explore pest-control services</a> · <a href="/services/pests/termites.html">Termite information</a> · <a href="/services/pests/bed-bugs.html">Bed bug information</a></div>' : '';
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
 <p>${esc(info.intro || 'Browse the products listed below and compare the exact model, pack size or variant before ordering.')}</p><p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or ask about pickup at Sarit Centre, Westlands. Delivery fees are confirmed before payment.</p>${helpCta}${serviceCrosslink}<ul class="g">${c.items.map(card).join('')}</ul>
-${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
+${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="${categoryUrl(k)}">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
 ${info.guide || ''}
 ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<div class="box"><b>${esc(q)}</b><p>${esc(a)}</p></div>`).join('') : ''}
 <p><a href="/c/">Browse all categories</a></p>`;
   const faqLd = info.faq ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: info.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
-  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]) }));
-  urls.push(path);
+  writeFileSync(`.${canonicalPath}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path: canonicalPath, body, robots, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + canonicalPath]]) }));
+  if (path !== canonicalPath) writeFileSync(`.${path}`, redirect(canonicalPath));
+  if (c.items.length >= 5) urls.push(canonicalPath);
 }
 
 // /c/ lists every category that has products, so Google and visitors can reach each category page from one place.
@@ -721,7 +728,7 @@ console.log(`[variant-name-audit] ${rows.filter(row => row.variant_group && row.
   const list = Object.values(groups).sort((a, b) => (a.slug ? 0 : 1) - (b.slug ? 0 : 1) || a.name.localeCompare(b.name));
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › All products</nav><h1>All products at ${BRAND}</h1>
 <p>${products.length} product${products.length === 1 ? '' : 's'} to order online in Kenya. Pay by M-Pesa, delivery to all 47 counties. Cannot see what you need? <a href="https://wa.me/${WHATSAPP}">Ask us on WhatsApp</a> and we will source it.</p>
-${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html">${esc(g.name)}</a>` : esc(g.name)}</h2><ul class="g">${g.items.slice(0, 3).map(card).join('')}</ul>${g.slug && g.items.length > 8 ? `<p><a href="/c/${encodeURIComponent(g.slug)}.html">View all ${g.items.length} ${esc(g.name)} products</a></p>` : ''}`).join('\n')}
+${list.map(g => `<h2>${g.slug ? `<a href="${categoryUrl(g.slug)}">${esc(g.name)}</a>` : esc(g.name)}</h2><ul class="g">${g.items.slice(0, 3).map(card).join('')}</ul>${g.slug && g.items.length > 8 ? `<p><a href="/c/${encodeURIComponent(g.slug)}.html">View all ${g.items.length} ${esc(g.name)} products</a></p>` : ''}`).join('\n')}
 <p><a href="/c/">Browse all categories</a></p>`;
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: `All products at ${BRAND}`, itemListElement: products.slice(0, 100).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   writeFileSync('products.html', shell({ title: `All Products | Buy Online in Kenya | ${BRAND}`, desc: `Browse every product at ${BRAND}: pest control, agrovet, appliances and more. Pay by M-Pesa, delivery to all 47 counties.`, path: '/products.html', body,
@@ -809,6 +816,25 @@ writeFileSync('product-names.json', JSON.stringify(NAMES));
 writeFileSync(STATE, JSON.stringify(next, null, 1));
 writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
   sitemapUrls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${next[u].lastmod}</lastmod></url>`).join('\n') + `\n</urlset>\n`);
+// Keep the main sitemap comprehensive while retaining the dedicated product sitemap.
+if (existsSync('sitemap.xml')) {
+  const current = readFileSync('sitemap.xml', 'utf8');
+  const keep = new Map();
+  for (const m of current.matchAll(/<url>([\s\S]*?)<\/url>/g)) {
+    const loc = (m[1].match(/<loc>([^<]+)<\/loc>/) || [])[1];
+    if (loc && !/\/(?:p|c)\//.test(new URL(loc).pathname) && !loc.endsWith('/products.html')) keep.set(loc, m[1]);
+  }
+  const todayRoot = new Date().toISOString().slice(0, 10);
+  const add = (url, lastmod = todayRoot) => keep.set(url, `<loc>${url}</loc><lastmod>${lastmod}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>`);
+  for (const u of ['/','/services/','/shipping.html','/products.html','/c/','/services/guides/','/cars-for-sale.html','/fashion.html']) add(SITE + u);
+  for (const u of sitemapUrls) add(SITE + u, next[u]?.lastmod || todayRoot);
+  for (const file of ['services/sitemap-services.xml','pest-control/sitemap.xml']) if (existsSync(file)) {
+    const serviceMap = readFileSync(file, 'utf8');
+    for (const m of serviceMap.matchAll(/<loc>([^<]+)<\/loc>/g)) add(m[1]);
+  }
+  const urlsOut = [...keep.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([url,inner])=>`<url>${inner}</url>`).join('\n');
+  writeFileSync('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlsOut}\n</urlset>\n`);
+}
 console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages.`);
 
 // Catalog rebuild trigger: publish the owner-approved Ocean Blue nitrile gloves listing (2026-11-05).

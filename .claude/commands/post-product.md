@@ -1,8 +1,8 @@
 ---
-description: Publish verified SterMont Arcade products using the live Supabase product-photo uploader. Requires exact product photos, current Kenyan pricing, 30% markup, stock 1000 and low-stock 20.
+description: Publish verified Stermont Arcade products using the live Supabase product-photo uploader. Requires exact product photos, current Kenyan pricing, 30% markup, stock 1000 and low-stock 20.
 ---
 
-# /post-product — SterMont Arcade product posting
+# /post-product — Stermont Arcade product posting
 
 Follow `CLAUDE.md`, `PUBLISHING.md` and the current Supabase `site_playbook`. The canonical rules in `PUBLISHING.md` take precedence over this checklist.
 
