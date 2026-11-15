@@ -76,3 +76,6 @@ Working branch: wip/seo-batch2-2026-11-15
 - Updated `mobile-shell/shell.test.py` only: assert the 8-item first page, scroll to trigger subsequent-page loading before checking database-name fallback, and assert the current `.photo-unavailable` fallback. No production storefront code changed.
 - Fix commit: `5f824ada30ceed54c4b63fbdf0904c5f90276d01`.
 - New follow-up PR and fresh GitHub Actions run are required. Do not start Batch 3 until the follow-up validation is green.
+
+- Follow-up run #282 (`43696263282`) exposed one further flaw in the first test correction: scrolling the long homepage fixture did not reliably intersect the pagination sentinel in Playwright. Replaced that timing-sensitive approach with a deterministic category-chip selection for the garden fixture, whose complete eight-item category page includes the test products; the test then returns to “For you” before continuing. This remains a test-only change.
+- Deterministic test correction commit: `9ea9dacd7f30ef0c000841c91668422b046d87a1`. Awaiting the next PR Actions run.
