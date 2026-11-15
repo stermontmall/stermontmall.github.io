@@ -367,11 +367,11 @@ try {
   const rootSitemap = path.join(dir, '..', 'sitemap.xml');
   if (fs.existsSync(rootSitemap)) {
     let xml = fs.readFileSync(rootSitemap, 'utf8');
-    const present = new Set([...xml.matchAll(/<loc>([^<]+)<\\/loc>/g)].map(m => m[1]));
+    const present = new Set([...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]));
     const additions = urls.map(u => SITE + u).filter(u => !present.has(u));
     if (additions.length) {
-      const entries = additions.map(u => `  <url><loc>${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\\n');
-      xml = xml.replace('</urlset>', entries + '\\n</urlset>');
+      const entries = additions.map(u => `  <url><loc>${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n');
+      xml = xml.replace('</urlset>', entries + '\n</urlset>');
       fs.writeFileSync(rootSitemap, xml);
     }
   }
