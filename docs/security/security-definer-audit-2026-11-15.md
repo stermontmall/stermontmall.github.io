@@ -41,7 +41,7 @@
 | `public.record_sale` | `p_ref text` | postgres | authenticated, postgres, service_role | Calls `is_staff`; reads `orders`, writes `sales_ledger`, updates `products`; admin order fulfilment/inventory. |
 | `public.restock_product` | `p_id text, p_qty integer, p_cost numeric, p_supplier text, p_date date` | postgres | authenticated, postgres, service_role | Calls `is_staff`; reads/updates `products`, inserts `stock_restocks`; admin stock receipt. |
 | `public.reverse_sale` | `p_ref text` | postgres | authenticated, postgres, service_role | Calls `is_staff`; reads/deletes `sales_ledger`, updates `products`; admin sale reversal. |
-| `public.rls_auto_enable` | `(no parameters)` | postgres | postgres, service_role | Event-trigger function using `pg_event_trigger_ddl_commands()`; enables RLS for new public tables. Check event-trigger catalogue for attachment. |
+| `public.rls_auto_enable` | `(no parameters)` | postgres | postgres, service_role | **Event trigger:** `ensure_rls` on `ddl_command_end`; enables RLS for new public tables. |
 | `public.track_order` | `p_ref text, p_phone text` | postgres | anon, authenticated, postgres, service_role | Reads `orders`; customer order tracking RPC, validates reference plus phone suffix. |
 | `pgbouncer.get_auth` | `p_usename text` | supabase_admin | pgbouncer, supabase_admin | Supabase-managed PgBouncer authentication hook; do not alter. |
 | `storage.protect_active_lifecycle_states` | `(no parameters)` | supabase_storage_admin | supabase_storage_admin | Supabase-managed Storage bucket lifecycle trigger; do not alter. |
@@ -72,7 +72,7 @@
 
 ### M-Pesa webhook distinction
 
-The catalog confirms `orders_verify_payment()` checks the persisted `mpesa_payments` row. It does not identify the Edge Function or external webhook request handler that writes that row. Before changing any grants or function definitions, inspect the deployed M-Pesa callback Edge Function and its service-role usage, then trace its write to `mpesa_payments`.
+**Live Edge Function inspection found that there is currently no active Daraja callback writer.** `mpesa-callback` (version 22, `verify_jwt=false`) explicitly acknowledges callbacks and records nothing; `stk-push` (version 22) and `stk-status` (version 19) return HTTP 410 because the Daraja STK prompt was removed on 2026-11-12. Therefore, no current M-Pesa webhook code path was found that calls a SECURITY DEFINER database function. `orders_verify_payment()` still remains an order-insert trigger that checks any matching row already present in `mpesa_payments`, but it is not the callback endpoint. Do not change it as part of this SEO PR. If M-Pesa callback processing is reintroduced later, review that new handler's database writes and test the full payment flow before tightening grants.
 
 ## Safe hardening plan — recommendations only, not executed
 
