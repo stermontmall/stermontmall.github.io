@@ -169,8 +169,8 @@
   /* special admin "categories": items that are out of stock, and items hidden from the shop, each get their own list */
   var CAT_OUT = '__out', CAT_HID = '__hid';
   function inCat(p, c) { return c === 'all' || (c === CAT_OUT ? p.stock <= 0 : c === CAT_HID ? !p.active : String(p.category_id) === c); }
-  /* Owner rule 2026-11-02: every NEW item gets +25% on the price (and previous price) typed in the admin; editing an existing item saves exactly what is typed, because its stored price already includes the 15% */
-  var MARKUP = 1.25; function up(n) { return Math.ceil(n * MARKUP); }
+  /* Owner rule 2026-11-15: every NEW item gets +30% on the source/cost price typed in the admin; editing an existing item saves exactly what is typed. */
+  var MARKUP = 1.30; function up(n) { return Math.ceil(n * MARKUP); }
   function discPct(p) { var o = Number(p.old_price), n = Number(p.price); return o > n && n >= 0 ? Math.max(1, Math.round((o - n) / o * 100)) : 0; }
   function priceHtml(p) {
     var d = discPct(p);
@@ -235,9 +235,9 @@
       unitHtml + '<div class="cx-pr"><div class="cx-pt">🏷️ Pricing</div>' +
       '<div class="cx-r3">' +
       '<div><label>Previous price</label><input class="cx-f" id="cx-old" type="number" min="0" inputmode="decimal" placeholder="optional" value="' + (edit && p.old_price ? p.old_price : '') + '"></div>' +
-      '<div><label>Selling price *</label><input class="cx-f" id="cx-price" type="number" min="0" inputmode="decimal" placeholder="Type the price" value="' + (edit ? p.price : '') + '"></div>' +
+      '<div><label>' + (edit ? 'Selling price *' : 'Source / cost price *') + '</label><input class="cx-f" id="cx-price" type="number" min="0" inputmode="decimal" placeholder="' + (edit ? 'Type selling price' : 'Type source / cost price') + '" value="' + (edit ? p.price : '') + '"></div>' +
       '<div><label>Discount %</label><input class="cx-f" id="cx-pct" type="number" min="0" max="95" step="any" inputmode="decimal" placeholder="auto"></div></div>' +
-      '<div class="meta" style="margin:.4rem 0 0">' + (edit ? '' : '<b>25% is added to the price and previous price you type when you publish, so customers pay 15% more than typed.</b> ') + 'Type the selling price yourself. Price Watch may update it later to follow market prices. Fill any two boxes and the third is worked out for you. Customers see the old price crossed out, the new price and the % off.</div>' +
+      '<div class="meta" style="margin:.4rem 0 0">' + (edit ? '' : '<b>30% markup is added to the source / cost price you type when publishing a new item. Existing item edits save the selling price exactly as entered.</b> ') + 'Type the selling price yourself. Price Watch may update it later to follow market prices. Fill any two boxes and the third is worked out for you. Customers see the old price crossed out, the new price and the % off.</div>' +
       '<div class="cx-quick" id="cx-quick"></div><div class="cx-pvc" id="cx-pvc"></div></div>' +
       '<div class="cx-r">' +
       '<div><label>' + (edit ? 'Pieces in stock' : 'Initial pieces') + '</label><input class="cx-f" id="cx-stock" type="number" min="0" inputmode="numeric" value="' + (edit ? p.stock : '') + '"></div>' +
