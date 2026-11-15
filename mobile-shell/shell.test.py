@@ -61,6 +61,7 @@ def on_rest(route):
 REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
 def mock_network(ctx):
     ctx.route('**/p/*.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=REAL))
+    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
     for host in ('https://www.googletagmanager.com/**', 'https://cdn.jsdelivr.net/**', 'https://www.google-analytics.com/**', 'https://*.google-analytics.com/**'):
@@ -90,15 +91,25 @@ with sync_playwright() as p:
     pg.wait_for_selector('#grid .card[data-id]')
     check('skeleton cards were shown while loading', pg.evaluate('window.__sawSkeleton'))
     n = pg.locator('#grid .card[data-id]').count()
-    check('products replace skeletons', pg.locator('#grid .card[aria-hidden="true"]').count() == 0 and n >= 12, n)
+    check('products replace skeletons (first paginated batch)', pg.locator('#grid .card[aria-hidden="true"]').count() == 0 and n >= 8, n)
     check('2-column grid', pg.evaluate("getComputedStyle(document.querySelector('#grid')).gridTemplateColumns.split(' ').length") == 2)
     check('discount badge renders, no invented star ratings', pg.locator('#grid .bg-sale').count() > 0 and pg.locator('#grid .stars').count() == 0)
     check('name comes from product-names.json when present', pg.locator('#grid .card[data-id="home-0"] p').first.inner_text() == 'Heavy-Duty Hot Plate Pro')
-    check('database name used when the heading file has no entry', 'Garden Hose Nozzle 1' in pg.locator('#grid').inner_text() or pg.locator('#grid .card[data-id^="outdoor-"]').count() >= 1)
-    check('real product photo is rendered', pg.locator('#grid .card[data-id="home-0"] img[src="https://img.test/ok.png"]').count() == 1)
+    check('real product photo is rendered', pg.locator('#grid .card[data-id="home-0"] img').evaluate_all("(els) => els.some(img => img.getAttribute('src') === 'https://img.test/ok.png' || img.getAttribute('data-src') === 'https://img.test/ok.png')"))
+    # Isolate the garden fixture category so its complete eight-item page is available without relying on scroll timing.
+    pg.locator('#chips [data-chip="garden-outdoors"]').click()
+    pg.wait_for_selector('#grid .card[data-id="outdoor-broken"]', timeout=10000)
+    check('database name used when the heading file has no entry', 'Garden Hose Nozzle 1' in pg.locator('#grid').inner_text())
     pg.wait_for_timeout(200)
-    check('broken photo falls back to the category emoji', pg.locator('#grid .card[data-id="outdoor-broken"] img').count() == 0 and '🛍️' in pg.locator('#grid .card[data-id="outdoor-broken"]').inner_text())
-    check('pack sizes fold into ONE card with a From price', pg.locator('#grid .card[data-id="garden-set"]').count() == 1 and 'From KSh 390' in pg.locator('#grid .card[data-id="garden-set"]').inner_text() and '4 sizes' in pg.locator('#grid .card[data-id="garden-set"]').inner_text())
+    check('broken photo falls back to the neutral unavailable-photo label', pg.locator('#grid .card[data-id="outdoor-broken"] img').count() == 0 and pg.locator('#grid .card[data-id="outdoor-broken"] .photo-unavailable').count() == 1)
+    pg.evaluate("document.querySelector('#chips [data-chip=\\\"home-living\\\"]').click()")
+    pg.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
+    pg.wait_for_function("document.querySelector('#grid .card[data-id=\\\"garden-set\\\"]')?.textContent.includes('4 sizes')", timeout=10000)
+    pack_card = pg.locator('#grid .card[data-id="garden-set"]')
+    check('pack sizes fold into ONE card with a From price', pack_card.count() == 1 and 'From KSh 390' in pack_card.inner_text() and '4 sizes' in pack_card.inner_text(), pack_card.inner_text() if pack_card.count() else 'card missing')
+    pg.locator('#chips [data-chip="all"]').click()
+    pg.wait_for_selector('#grid .card[data-id]')
+    pg.wait_for_timeout(300)
     check('sold-out product is hidden', pg.locator('#grid .card[data-id="home-soldout"]').count() == 0)
     check('chips come from the live categories (promo + empty ones left out)', pg.locator('#chips .chip').all_inner_texts() == ['For you', 'Phones & Accessories', 'Home & Kitchen', 'Outdoor & Garden', 'Home & Living'], pg.locator('#chips .chip').all_inner_texts())
     pg.screenshot(path=f'{OUT}/shot-home.png')
@@ -121,7 +132,11 @@ with sync_playwright() as p:
     check('Back closes quick buy and stays on page', pg.locator('#sheet-quickbuy.open').count() == 0 and pg.url == URL, pg.url)
     check('scroll unlocked after close', not pg.evaluate("document.body.classList.contains('no-scroll')"))
 
-    # multi-size product: the plus button asks for a size instead of silently adding the smallest
+    # multi-size product: select its top-level category because the home feed is paginated
+    pg.evaluate("document.querySelector('#chips [data-chip=\\\"home-living\\\"]').click()")
+    pg.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
+    pg.wait_for_selector('#grid .card[data-id="garden-set"] [data-add]', timeout=10000)
+    # the plus button asks for a size instead of silently adding the smallest
     pg.locator('#grid .card[data-id="garden-set"] [data-add]').click()
     check('plus on a multi-size card opens the size sheet', pg.locator('#sheet-quickbuy.open').count() == 1 and pg.locator('#bottom-nav [data-badge="cart"]').inner_text() == '1')
     check('sizes listed smallest price first', pg.locator('#qb-sizes .chip').all_inner_texts() == ['50 ml', '100 ml', '250 ml', '1 Litre'], pg.locator('#qb-sizes .chip').all_inner_texts())
@@ -147,6 +162,7 @@ with sync_playwright() as p:
     pg.go_back(); pg.wait_for_function("!document.querySelector('#page-product.open')", timeout=5000)
     check('Back from the product page returns to the sheet, still on the shell', pg.locator('#sheet-quickbuy.open').count() == 1 and pg.url == url_before, pg.url)
     pg.go_back(); pg.wait_for_timeout(350)
+    pg.locator('#chips [data-chip="all"]').click(); pg.wait_for_selector('#grid .card[data-id]'); pg.wait_for_timeout(300)
 
     # forward must not reopen a stale sheet with no data? (it has data in-session, so allowed); just ensure no errors
     # stacked overlays: filters, then back
@@ -173,7 +189,7 @@ with sync_playwright() as p:
     pg.locator('[data-open="drawer-categories"]').click()
     check('category drawer opens', pg.locator('#drawer-categories.open').count() == 1)
     rows = pg.locator('#drawer-cats [data-drawer-cat]').count()
-    with_img = pg.locator('#drawer-cats [data-drawer-cat] img[src^="http"]').count()
+    with_img = pg.locator('#drawer-cats [data-drawer-cat] img[src^="http"], #drawer-cats [data-drawer-cat] img[data-src^="http"]').count()
     check('drawer rows show real product photos', with_img >= 1, with_img)
     check('drawer rows without a photo keep the category emoji', pg.evaluate("[...document.querySelectorAll('#drawer-cats [data-drawer-cat]')].every(b => b.querySelector('img') || b.querySelector('span').textContent.trim().length > 0)"), rows)
     pg.locator('[data-drawer-cat="phones-accessories"]').click()
@@ -199,7 +215,7 @@ with sync_playwright() as p:
     check('deals badge cleared on visit', not pg.locator('#bottom-nav [data-badge="deals"]').is_visible())
     pg.wait_for_selector('#deals-grid .card[data-id]')
     pg.go_back(); pg.wait_for_timeout(300)
-    check('Back from a tab returns to Home (not off the site)', pg.locator('#view-home').is_visible() and pg.url == URL, pg.url)
+    check('Back from a tab returns to Home and restores the selected category address', pg.locator('#view-home').is_visible() and pg.url == URL.rstrip('/') + '/c/phones-accessories.html', pg.url)
     check('nav highlight follows Back', pg.locator('#bottom-nav [data-tab="home"][aria-current="page"]').count() == 1)
 
     # buy now flow
@@ -211,7 +227,7 @@ with sync_playwright() as p:
     check('cart total shown', pg.locator('#cart-total').inner_text().startswith('KSh'))
     pg.screenshot(path=f'{OUT}/shot-cart.png')
     pg.go_back(); pg.wait_for_timeout(300)
-    check('Back from Cart returns to Home', pg.locator('#view-home').is_visible() and pg.url == URL)
+    check('Back from Cart returns to Home and restores the selected category address', pg.locator('#view-home').is_visible() and pg.url == URL.rstrip('/') + '/c/phones-accessories.html', pg.url)
 
     # header compaction on scroll
     pg.evaluate('window.scrollTo(0, 400)'); pg.wait_for_timeout(200)
@@ -244,7 +260,7 @@ with sync_playwright() as p:
     check('network failure shows a retry link, no stuck skeletons', 'Could not load products' in p2.locator('#grid-empty').inner_text() and p2.locator('#grid-empty a[href="/"]').count() == 1 and p2.locator('#grid .card[aria-hidden="true"]').count() == 0)
     FAIL[0] = False
     p2.locator('[data-retry]').click(); p2.wait_for_selector('#grid .card[data-id]')
-    check('retry loads the products', p2.locator('#grid .card[data-id]').count() >= 12 and p2.locator('#grid-empty').is_hidden())
+    check('retry loads the first paginated product batch', p2.locator('#grid .card[data-id]').count() >= 8 and p2.locator('#grid-empty').is_hidden())
     p2.close()
 
     # a cart saved by the old mock prototype (no rowId) is dropped, not shown with fake prices
@@ -353,6 +369,10 @@ with sync_playwright() as p:
     # product page: Add to cart and Buy now work from the full page
     c8 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c8)
     p8 = c8.new_page(); p8.goto(URL); p8.wait_for_selector('#grid .card[data-id]')
+    # The home feed is deliberately paginated (8 items); open the Home & Living category to reach the multi-size fixture.
+    p8.locator('#chips [data-chip="home-living"]').click()
+    p8.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
+    p8.wait_for_selector('#grid .card[data-id="garden-set"] [data-add]', timeout=10000)
     p8.locator('#grid .card[data-id="garden-set"] [data-add]').click(); p8.wait_for_selector('#sheet-quickbuy.open')
     p8.locator('#qb-page').click(); p8.wait_for_selector('#page-product.open')
     p8.locator('#pp-plus').click(); p8.locator('#pp-add').click()
@@ -377,8 +397,11 @@ with sync_playwright() as p:
     p9 = c9.new_page(); e9 = []
     p9.on('pageerror', lambda e: e9.append(str(e)))
     p9.goto(URL); p9.wait_for_selector('#grid .card[data-id]')
+    p9.locator('#chips [data-chip="home-living"]').click()
+    p9.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
+    p9.wait_for_selector('#grid .card[data-id="garden-set"]', timeout=10000)
     base_title = p9.title()
-    check('address: home is the bare "/" address', p9.evaluate('location.pathname + location.search') == '/')
+    check('address: selected Home & Living category keeps its clean category address', p9.evaluate('location.pathname + location.search') == '/c/home-living.html', p9.url)
     p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#sheet-quickbuy.open')
     check('address: opening a product puts its own page address (/p/<slug>.html + size) in the address bar', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-50ml', p9.url)
     check('address: the address bar has no query string (no ?shell=1)', p9.evaluate('location.search') == '', p9.url)
@@ -390,7 +413,7 @@ with sync_playwright() as p:
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
     check('address: Back from the page returns to the sheet, address unchanged', p9.locator('#sheet-quickbuy.open').count() == 1 and p9.evaluate('location.hash') == '#garden-set-250ml')
     p9.go_back(); p9.wait_for_function("!document.querySelector('#sheet-quickbuy.open')")
-    check('address: closing the product restores "/" and the page title', p9.evaluate('location.pathname + location.search') == '/' and p9.title() == base_title, p9.url + ' | ' + p9.title())
+    check('address: closing the product restores the selected category address and title', p9.evaluate('location.pathname + location.search') == '/c/home-living.html' and p9.title() == base_title, p9.url + ' | ' + p9.title())
     p9.goto(f'{BASE}/?product=garden-set-250ml'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: opening the address shows that product page with that size', 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
     check('address: the address stays after load and the tab title shows the product', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml' and 'Garden Hose Connector Set' in p9.title())
@@ -472,10 +495,10 @@ with sync_playwright() as p:
     p12.goto(f'{BASE}/?cat=garden-outdoors'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
     check('shell address /?cat=<slug> still opens that category (only its products)', ids and all(i.startswith('outdoor-') for i in ids), ids)
-    check('shell address /?cat=<slug>: the address becomes / (no leftover ?cat=)', p12.evaluate('location.pathname + location.search') == '/', p12.url)
+    check('shell address /?cat=<slug>: the address becomes the clean /c/<slug>.html address (no leftover ?cat=)', p12.evaluate('location.pathname + location.search') == '/c/garden-outdoors.html', p12.url)
     p12.goto(f'{BASE}/?cat=kitchen-dining'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('shell address /?cat=<sub-category> opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname') == '/', ids)
+    check('shell address /?cat=<sub-category> opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname') == '/c/kitchen-dining.html', ids)
     p12.goto(f'{BASE}/?cat=no-such-category'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     check('shell address /?cat=<unknown> shows a notice and the normal home', 'no longer available' in p12.locator('#toast').inner_text(), p12.locator('#toast').inner_text())
     check('category pages: no page errors', not e12, e12[:3])
@@ -568,7 +591,16 @@ with sync_playwright() as p:
     c14.close()
 
     # a reload keeps the chosen category (it used to fall back to Home / "For you")
-    c15 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c15)
+    # The shell shows an open category as /c/<slug>.html (replaceState), so a reload asks the server for that generated page; on a phone its inline
+    # stm-early script sends it back to /?cat=<slug>. That script skips bots and "headless" browsers, so this context uses an ordinary phone user agent.
+    # A sub-category (garden-tools) has no generated page in the repo, so any /c/<slug>.html without a file is answered with the garden-outdoors page (same script).
+    c15 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True,
+                        user_agent='Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'); mock_network(c15)
+    def _c15_cat_page(rt):
+        m = _re.search(r'/c/([a-z0-9-]+)\.html', rt.request.url)
+        f = os.path.join(ROOT, 'c', (m.group(1) if m else '') + '.html')
+        rt.fulfill(status=200, content_type='text/html', body=open(f if os.path.exists(f) else os.path.join(ROOT, 'c', 'garden-outdoors.html'), encoding='utf-8').read())
+    c15.route('**/c/*.html*', _c15_cat_page)
     p15 = c15.new_page(); e15 = []; p15.on('pageerror', lambda e: e15.append(str(e)))
     p15.goto(URL); p15.wait_for_selector('#grid .card[data-id]')
     p15.locator('#chips [data-chip="phones-accessories"]').click(); p15.wait_for_timeout(600)
