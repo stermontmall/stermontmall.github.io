@@ -167,7 +167,8 @@ const transformedStorageUrl = (source, width) => {
   } catch { return source; }
 };
 let storageImageTransformsEnabled = false;
-const imageProbe = rawRows.flatMap(p => Array.isArray(p.images) ? p.images : []).find(u => typeof u === 'string' && u.includes('/storage/v1/object/public/'));
+const imageTransformsRequested = process.env.SUPABASE_IMAGE_TRANSFORMS === 'true';
+const imageProbe = imageTransformsRequested ? rawRows.flatMap(p => Array.isArray(p.images) ? p.images : []).find(u => typeof u === 'string' && u.includes('/storage/v1/object/public/')) : null;
 if (imageProbe) {
   try {
     const probe = await fetch(transformedStorageUrl(imageProbe, 720), { method: 'HEAD', headers: { Accept: 'image/webp,image/*;q=0.8' } });
@@ -176,6 +177,8 @@ if (imageProbe) {
   } catch {
     console.log('[image-optimization] Probe failed; retaining original image URLs.');
   }
+} else if (!imageTransformsRequested) {
+  console.log('[image-optimization] Transformations are opt-in to avoid unexpected Storage transformation charges; existing WebP/AVIF assets and intrinsic dimensions remain in use.');
 }
 const optimizedImageUrl = (source, width) => storageImageTransformsEnabled ? transformedStorageUrl(source, width) : source;
 const rows = rawRows;
