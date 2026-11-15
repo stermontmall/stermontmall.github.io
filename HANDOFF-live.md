@@ -88,3 +88,14 @@ Working branch: wip/seo-batch2-2026-11-15
 - Corrected the image assertion to accept the intended lazy `data-src` or loaded `src`. Category-scoped pack-size and add-button checks now trigger the chip selection, wait for the visible Home & Living heading and for the actual card/button, and include useful failure context. This is test-only; no storefront production code changed.
 - Latest test correction commit: `045ef7b614e604b01ea892b56bd3a8c4b07e0f50`. Fresh Actions run required.
 - PR #766 cannot be updated because it was merged on 2026-11-15 at `08:45:11Z` (merge commit `c943f91e5f5fa29740ef323d20df95f13ec6072e`). PR #769 is the only open PR and carries the validation-only follow-up against current `main`; keep it open until green, then it can be merged/closed as the sole follow-up. Batch 3 remains blocked.
+
+## Mobile-shell CI regression correction — 2026-11-15 (follow-up PR #769)
+- Re-inspected the exact failed `validate` job logs for run #286 (`43696563650`, job `132758315683`). The browser suite recorded failures for the lazy-loaded category drawer photo assertion, Back navigation after selecting a category, retry after simulated network failure, and garden-set pack-size/quick-buy tests. The final uncaught timeout was waiting for `#grid .card[data-id="garden-set"] [data-add]` in a fresh context whose default “For you” feed is paginated to 8 items.
+- Corrected only the browser regression fixture/assertions:
+  - Count a real drawer image whether it is already loaded in `src` or correctly deferred in `data-src`.
+  - Assert Back restores the previously selected Home category URL (`/c/phones-accessories.html`) while returning to the Home view; same for Back from Cart.
+  - Retry success checks the actual first page size (8+) rather than the obsolete 12+ assumption.
+  - Explicitly select Home & Living before garden-set pack-size/quick-buy tests in fresh contexts; update product URL expectations to the selected category URL and back.
+- This preserves the real product/category URL behaviour and the production lazy-image behaviour. No storefront runtime code, styles, cart, checkout, M-Pesa, or WhatsApp logic changed.
+- Fix commits: `5b11473f586a0c0a2d5ec8c48a4ab294758baaa9` and `2b8d78b07944f2e96cb33b11fe59ae04516efa54`.
+- Await the full PR #769 Actions quality gate before merge or Batch 3.
