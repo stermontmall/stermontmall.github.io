@@ -1683,7 +1683,7 @@ All three were created via add_draft_product with explicit 15% markup, uploaded 
 
 ## 2026-11-15 — Default product markup changed to 30%
 - Owner requested that 30% markup become the website-wide default for new product listings.
-- Updated the admin Catalog new-item flow in `catalog-v10.js`: new item price input is now labelled source/cost price; it adds 30% (rounds up to whole KSh). Editing an existing item still saves the entered selling price exactly.
+- Updated the admin Catalog new-item flow in `catalog-v10.js`: new item price input is now labelled source/cost price; it applies 30% rounded to two decimals and stores the entered source cost; editing an existing item still saves the entered selling price exactly.
 - Updated `admin-photo-ai.js` price guidance and the Supabase `ai-add-product` Edge Function to apply and report 30% for source-priced drafts. Edge Function deployed successfully as version 15.
 - Updated Supabase `public.add_draft_product`: its six-argument wrapper defaults to 30%; its seven-argument form accepts explicit 15–300% overrides without a conflicting default. Updated legacy `public.post_product` to 30%.
 - Updated `public.products_round_prices()` so exact 30% source-cost prices are preserved rather than altered by legacy charm-price rounding.
