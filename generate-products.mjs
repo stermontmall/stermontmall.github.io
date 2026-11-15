@@ -139,7 +139,7 @@ const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = ''
 <script>(function(){var q=new URLSearchParams(location.search);if(["search","sort","filter"].some(function(k){return q.has(k)})){var m=document.querySelector('meta[name="robots"]');if(m)m.setAttribute("content","noindex,follow");}})();</script>
 <meta property="og:type" content="${ogType}"><meta property="og:site_name" content="${BRAND}"><meta property="og:locale" content="en_KE">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${SITE}${path}">
-<meta property="og:image" content="${esc(og || SITE + '/logo.png')}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(og || SITE + '/logo.png')}">${extra}
+<meta property="og:image" content="${esc(og || SITE + '/logo.png')}"><meta property="og:image:alt" content="${esc(og ? title + ' product photo' : BRAND + ' logo')}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(og || SITE + '/logo.png')}"><meta name="twitter:image:alt" content="${esc(og ? title + ' product photo' : BRAND + ' logo')}">${extra}
 ${path.startsWith('/p/') && og ? '<link rel="preload" as="image" href="' + esc(og) + '" fetchpriority="high">' : ''}
 <meta name="theme-color" content="#7c3aed"><style>${CSS}</style>${ld || ''}</head><body>
 <header><a href="${SITE}/">${BRAND}</a></header><main>${body}</main>
@@ -473,7 +473,7 @@ rmSync('p', { recursive: true, force: true }); rmSync('c', { recursive: true, fo
 mkdirSync('p', { recursive: true }); mkdirSync('c', { recursive: true });
 const urls = [];
 
-const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(u)}" alt="${esc(p.name)}" width="160" height="150" loading="lazy" decoding="async">` : ''; };
+const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(u)}" alt="${esc(p.name)} product photo" width="160" height="150" loading="lazy" decoding="async">` : ''; };
 const card = p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 // Helpful, category-specific buying checks. Avoid inventing product specifications, certifications or warranty terms.
@@ -692,7 +692,7 @@ ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<
     writeFileSync(`.${oldPath}`, `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category moved | ${BRAND}</title><link rel="canonical" href="${destination}"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0; url=${legacyDestination}"></head><body><p>This category has moved. <a href="${legacyDestination}">Continue to Stermont Arcade</a>.</p><script>window.location.replace(${JSON.stringify(legacyDestination)})</script></body></html>`);
   }
   const robots = c.items.length < 5 ? 'noindex, follow' : 'index, follow, max-image-preview:large';
-  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, robots, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]) }));
+  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, robots, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], [c.name, SITE + path]]) }));
   urls.push(path);
 }
 
