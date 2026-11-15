@@ -131,8 +131,8 @@ const seoGuideTitle = value => {
   return base + brand;
 };
 const seoGuideDescription = value => {
-  let base = String(value || '').replace(/\\s+/g, ' ').trim();
-  if (base.length > 155) base = base.slice(0, 154).replace(/\\s+\\S*$/, '').trim();
+  let base = String(value || '').replace(/\s+/g, ' ').trim();
+  if (base.length > 155) base = base.slice(0, 154).replace(/\s+\S*$/, '').trim();
   return base;
 };
 
