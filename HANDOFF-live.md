@@ -79,3 +79,7 @@ Working branch: wip/seo-batch2-2026-11-15
 
 - Follow-up run #282 (`43696263282`) exposed one further flaw in the first test correction: scrolling the long homepage fixture did not reliably intersect the pagination sentinel in Playwright. Replaced that timing-sensitive approach with a deterministic category-chip selection for the garden fixture, whose complete eight-item category page includes the test products; the test then returns to “For you” before continuing. This remains a test-only change.
 - Deterministic test correction commit: `9ea9dacd7f30ef0c000841c91668422b046d87a1`. Awaiting the next PR Actions run.
+
+- Follow-up run #284 (`43696393998`) passed the corrected initial-page, database-name and unavailable-photo assertions, then exposed two additional stale assumptions in the test sequence: it checked the Home & Kitchen image while viewing the garden category, and checked/used the multi-size product from the paginated “For you” feed rather than its Home & Living category.
+- Reordered the image assertion to the Home & Kitchen/default view and explicitly selected Home & Living for pack-size assertions and multi-size interaction, restoring “For you” afterward so later tests retain their expected starting state. Test-only change; no storefront runtime changes.
+- Additional deterministic test fix commit: `66eb5e75af90c411a59b25a060c248a8ea3e851a`. Awaiting a fresh Actions run.
