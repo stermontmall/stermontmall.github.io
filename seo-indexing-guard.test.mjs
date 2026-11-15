@@ -9,7 +9,10 @@ const workflow = readFileSync('.github/workflows/product-pages.yml', 'utf8');
 // Every generated product/category page must retain a self-referencing canonical
 // and be indexable by default. Query refinements are handled separately.
 assert.match(generator, /<link rel="canonical" href="\$\{SITE\}\$\{path\}">/);
-assert.match(generator, /<meta name="robots" content="index, follow, max-image-preview:large">/);
+// The generator uses a shared template: verify its indexable default and that the
+// resulting robots meta tag is populated from that option (not a brittle literal).
+assert.ok(generator.includes("robots = 'index, follow, max-image-preview:large'"), 'generated pages must default to index, follow and large image previews');
+assert.ok(generator.includes('<meta name="robots" content="${esc(robots)}">'), 'generated pages must render the configured robots directive');
 assert.match(generator, /\["search","sort","filter"\]/);
 assert.match(generator, /noindex,follow/);
 
