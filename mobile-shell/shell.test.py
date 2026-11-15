@@ -495,10 +495,10 @@ with sync_playwright() as p:
     p12.goto(f'{BASE}/?cat=garden-outdoors'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
     check('shell address /?cat=<slug> still opens that category (only its products)', ids and all(i.startswith('outdoor-') for i in ids), ids)
-    check('shell address /?cat=<slug>: the address becomes / (no leftover ?cat=)', p12.evaluate('location.pathname + location.search') == '/', p12.url)
+    check('shell address /?cat=<slug>: the address becomes the clean /c/<slug>.html address (no leftover ?cat=)', p12.evaluate('location.pathname + location.search') == '/c/garden-outdoors.html', p12.url)
     p12.goto(f'{BASE}/?cat=kitchen-dining'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('shell address /?cat=<sub-category> opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname') == '/', ids)
+    check('shell address /?cat=<sub-category> opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname') == '/c/kitchen-dining.html', ids)
     p12.goto(f'{BASE}/?cat=no-such-category'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     check('shell address /?cat=<unknown> shows a notice and the normal home', 'no longer available' in p12.locator('#toast').inner_text(), p12.locator('#toast').inner_text())
     check('category pages: no page errors', not e12, e12[:3])
@@ -591,7 +591,16 @@ with sync_playwright() as p:
     c14.close()
 
     # a reload keeps the chosen category (it used to fall back to Home / "For you")
-    c15 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c15)
+    # The shell shows an open category as /c/<slug>.html (replaceState), so a reload asks the server for that generated page; on a phone its inline
+    # stm-early script sends it back to /?cat=<slug>. That script skips bots and "headless" browsers, so this context uses an ordinary phone user agent.
+    # A sub-category (garden-tools) has no generated page in the repo, so any /c/<slug>.html without a file is answered with the garden-outdoors page (same script).
+    c15 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True,
+                        user_agent='Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'); mock_network(c15)
+    def _c15_cat_page(rt):
+        m = _re.search(r'/c/([a-z0-9-]+)\.html', rt.request.url)
+        f = os.path.join(ROOT, 'c', (m.group(1) if m else '') + '.html')
+        rt.fulfill(status=200, content_type='text/html', body=open(f if os.path.exists(f) else os.path.join(ROOT, 'c', 'garden-outdoors.html'), encoding='utf-8').read())
+    c15.route('**/c/*.html*', _c15_cat_page)
     p15 = c15.new_page(); e15 = []; p15.on('pageerror', lambda e: e15.append(str(e)))
     p15.goto(URL); p15.wait_for_selector('#grid .card[data-id]')
     p15.locator('#chips [data-chip="phones-accessories"]').click(); p15.wait_for_timeout(600)
