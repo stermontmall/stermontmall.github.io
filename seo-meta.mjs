@@ -83,7 +83,7 @@ export function pdpH1(name, ctx = {}) {
 // One visible line under the H1 on the product page. Only facts that are true for every product (no price or quality superlatives):
 //   "M-Pesa checkout · Delivery to all 47 counties · Pickup at Sarit Centre, Nairobi"
 export function pdpTagline(ctx = {}) {
-  return 'M-Pesa checkout · Delivery to all 47 counties · Pickup at Sarit Centre, Westlands';
+  return 'M-Pesa checkout · Delivery to all 47 counties · Pickup at Sarit Centre, Nairobi';
 }
 
 // PDP meta title, max 60 characters. seo-catalog-guard.mjs enforces the same limit on every active database title.
@@ -118,7 +118,7 @@ export function pdpTitle(name, ctx = {}) {
 }
 
 // PDP meta description, max 155 characters.
-//   "Buy 100% genuine & high-potency <name> in Kenya at Stermont Arcade. Fast M-Pesa checkout, Sarit Centre Nairobi pickup, or countrywide delivery."
+//   "Buy 100% genuine & high-potency <name> in Kenya at Stermont Arcade. Fast M-Pesa checkout, Sarit Centre, Nairobi pickup, or countrywide delivery."
 export function pdpDescription(name, ctx = {}, productDescription = '') {
   const n = String(name || '').replace(/\s+/g, ' ').trim();
   // Prefer one factual, product-specific sentence from the catalogue over repeating the same generic snippet on every PDP.
@@ -149,8 +149,8 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
   const gen = isGenuine(ctx) ? `100% genuine & ${desc} ` : `${desc} `;
   const tiers = [
     `Buy ${gen}${n} in Kenya at ${STORE}. M-Pesa checkout, Nairobi pickup or delivery to all 47 counties.`,
-    `Buy ${gen}${n} in Kenya at ${STORE}. M-Pesa checkout, Sarit Centre Nairobi pickup, delivery to 47 counties.`,
-    `Buy ${gen}${n} in Kenya at ${STORE}. Fast M-Pesa checkout, Sarit Centre Nairobi pickup, or countrywide delivery.`,
+    `Buy ${gen}${n} in Kenya at ${STORE}. M-Pesa checkout, Sarit Centre, Nairobi pickup, delivery to 47 counties.`,
+    `Buy ${gen}${n} in Kenya at ${STORE}. Fast M-Pesa checkout, Sarit Centre, Nairobi pickup, or countrywide delivery.`,
     `Buy ${isGenuine(ctx) ? '100% genuine ' : ''}${n} in Kenya at ${STORE}. M-Pesa checkout, Nairobi pickup or delivery to all 47 counties.`,
     `Buy ${n} in Kenya at ${STORE}. M-Pesa checkout, Nairobi pickup or delivery to all 47 counties.`,
     `Buy ${n} in Kenya. M-Pesa checkout, Nairobi pickup, delivery to 47 counties.`
