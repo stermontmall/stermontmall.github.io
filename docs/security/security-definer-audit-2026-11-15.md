@@ -8,8 +8,8 @@
 
 ## Summary
 
-- 30 SECURITY DEFINER overload/function entries found across `public`, `pgbouncer`, `storage` and `vault`.
-- 24 entries are in the application `public` schema (including overloads); these are the primary review surface.
+- 31 SECURITY DEFINER overload/function entries found across `public`, `pgbouncer`, `storage` and `vault`.
+- 25 entries are in the application `public` schema (including overloads); these are the primary review surface.
 - Supabase-managed `pgbouncer`, `storage` and `vault` functions are listed for completeness and should not be altered by application migrations.
 - Security Advisor currently reports 7 anon-executable and 12 authenticated-executable findings. The flagged public RPCs are listed below.
 - No SQL changes were made by this report.
