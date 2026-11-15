@@ -10,13 +10,16 @@
 (function(){try{var path=location.pathname;var oldProduct=path.match(/^\/p\/([a-z0-9][a-z0-9-]*)\.htm$/i);if(oldProduct){location.replace('/p/'+oldProduct[1]+'.html'+(location.search||'')+(location.hash||''));return;}var m=path.match(/^\/(p|c)\/([a-z0-9][a-z0-9-]*)\.html$/i);if(!m)return;location.replace('/?'+(m[1]==='p'?'product':'cat')+'='+encodeURIComponent(m[2]));}catch(e){}})();</script>
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="/pages.css">
-<meta name="description" content="The page you are looking for does not exist. Browse Stermont Arcade for pest control, agrovet supplies and electronics in Kenya.">
+<meta name="description" content="The page you are looking for does not exist. Search Stermont Arcade or browse popular shopping categories across Kenya.">
+<style>.notfound-search{display:flex;gap:.55rem;max-width:560px;margin:1.25rem 0}.notfound-search input{min-width:0;flex:1;padding:.8rem 1rem;border:1px solid #d8d3e5;border-radius:12px;font:inherit}.notfound-search button{border:0;border-radius:12px;padding:.8rem 1.1rem;background:#7c3aed;color:#fff;font:600 1rem inherit}.popular-cats{display:flex;flex-wrap:wrap;gap:.55rem;padding:0;list-style:none}.popular-cats a{display:inline-block;padding:.55rem .85rem;border:1px solid #e6e1f5;border-radius:999px;text-decoration:none;background:#f8f5ff}</style>
 <!--stm-chrome--><style>header{min-height:52px;display:flex;align-items:center}body.stm-chrome .stk{bottom:calc(56px + env(safe-area-inset-bottom,0px));padding-bottom:.6rem}body.stm-chrome main{padding-bottom:9rem}body.stm-chrome footer{margin-bottom:5rem}</style></head>
 <body>
 <header><div class="wrap bar"><a class="logo" href="/"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#7c3aed"/><path d="M18 46V30a14 14 0 0 1 28 0v16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M26 46V31a6 6 0 0 1 12 0v15z" fill="#c8f31d"/></svg><span>Stermont <b>Arcade</b></span></a><a class="back" href="/">Back to shop</a></div></header>
 <main><div class="wrap">
 <h1>Page not found</h1>
-<p class="intro">Sorry, we could not find that page. It may have moved, or the product may no longer be available.</p>
+<p class="intro">Sorry, we could not find that page. It may have moved, or the product may no longer be available. Search the shop or browse a popular department below.</p>
+<form class="notfound-search" action="/" method="get" role="search"><label class="sr-only" for="notfound-q">Search products</label><input id="notfound-q" type="search" name="q" placeholder="Search products, brands or categories" autocomplete="off"><button type="submit">Search</button></form>
+<h2>Popular categories</h2><ul class="popular-cats"><li><a href="/c/pest-control-fumigation.html">Pest Control</a></li><li><a href="/c/agrovet.html">Agrovet</a></li><li><a href="/c/home-kitchen.html">Home &amp; Kitchen</a></li><li><a href="/c/phones-accessories.html">Electronics &amp; Phones</a></li><li><a href="/c/health-beauty.html">Health &amp; Beauty</a></li></ul>
 <p style="margin-top:1.4rem"><a class="btn btn-brand" href="/">Go to the shop</a> &nbsp; <a class="btn btn-wa" href="https://wa.me/254748888230?text=Hello%20Stermont%20Arcade%2C%20I%20could%20not%20find%20a%20product.">Ask us on WhatsApp</a></p>
 <h2>Helpful links</h2>
 <ul>
