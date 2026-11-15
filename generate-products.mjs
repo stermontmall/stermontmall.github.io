@@ -132,8 +132,8 @@ footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85
 .stk b{flex:1;min-width:0;font-size:.95rem;line-height:1.2;color:#5b21b6}.stk b small{display:block;color:#1f1b2e;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stk a{flex:none;text-decoration:none;font-weight:800;border-radius:10px;padding:.7rem .9rem;background:#15803d;color:#fff}.stk a.call{background:#fff;color:#6d28d9;border:2px solid #7c3aed;padding:.6rem .8rem}}`;
 
-const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '', robots = 'index, follow, max-image-preview:large' }) => `<!doctype html>
 const categoryUrl = slug => slug === 'stermont-cars-for-sale' ? '/cars-for-sale.html' : ['fashion', 'mens-fashion'].includes(slug) ? '/fashion.html' : `/c/${encodeURIComponent(slug)}.html`;
+const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '', robots = 'index, follow, max-image-preview:large' }) => `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${SITE}${path}"><meta name="robots" content="${esc(robots)}">
@@ -177,7 +177,7 @@ rows.forEach(p => { if (p.variant_group && p.variant_label) (gmap[p.variant_grou
 const products = [], aliases = [], seenG = new Set();
 const inS = x => x.stock == null || Number(x.stock) > 0;
 // true when the name already ends with the variant label, or every word/number of the label is already in the name
-const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\\d+(?:\\.\\d+)?)\\s*(millilitres?|milliliters?|ml)\\b/g, '$1ml').replace(/(\\d+(?:\\.\\d+)?)\\s*(litres?|liters?|l)\\b/g, '$1l').replace(/(\\d+(?:\\.\\d+)?)\\s*(kilograms?|kg)\\b/g, '$1kg').replace(/(\\d+(?:\\.\\d+)?)\\s*(grams?|g)\\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
+const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\\d+(?:\\.\\d+)?)\s*(millilitres?|milliliters?|ml)\\b/g, '$1ml').replace(/(\\d+(?:\\.\\d+)?)\s*(litres?|liters?|l)\\b/g, '$1l').replace(/(\\d+(?:\\.\\d+)?)\s*(kilograms?|kg)\\b/g, '$1kg').replace(/(\\d+(?:\\.\\d+)?)\s*(grams?|g)\\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
 for (const p of rows) {
   const g = p.variant_group && p.variant_label ? gmap[p.variant_group] : null;
   if (g && g.length > 1) {
@@ -819,9 +819,9 @@ writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<
 if (existsSync('sitemap.xml')) {
   const current = readFileSync('sitemap.xml', 'utf8');
   const keep = new Map();
-  for (const m of current.matchAll(/<url>([\\s\\S]*?)<\\/url>/g)) {
-    const loc = (m[1].match(/<loc>([^<]+)<\\/loc>/) || [])[1];
-    if (loc && !/\\/(?:p|c)\\//.test(new URL(loc).pathname) && !loc.endsWith('/products.html')) keep.set(loc, m[1]);
+  for (const m of current.matchAll(/<url>([\s\\S]*?)<\/url>/g)) {
+    const loc = (m[1].match(/<loc>([^<]+)<\/loc>/) || [])[1];
+    if (loc && !/\/(?:p|c)\//.test(new URL(loc).pathname) && !loc.endsWith('/products.html')) keep.set(loc, m[1]);
   }
   const todayRoot = new Date().toISOString().slice(0, 10);
   const add = (url, lastmod = todayRoot) => keep.set(url, `<loc>${url}</loc><lastmod>${lastmod}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>`);
@@ -829,10 +829,10 @@ if (existsSync('sitemap.xml')) {
   for (const u of sitemapUrls) add(SITE + u, next[u]?.lastmod || todayRoot);
   for (const file of ['services/sitemap-services.xml','pest-control/sitemap.xml']) if (existsSync(file)) {
     const serviceMap = readFileSync(file, 'utf8');
-    for (const m of serviceMap.matchAll(/<loc>([^<]+)<\\/loc>/g)) add(m[1]);
+    for (const m of serviceMap.matchAll(/<loc>([^<]+)<\/loc>/g)) add(m[1]);
   }
-  const urlsOut = [...keep.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([url,inner])=>`<url>${inner}</url>`).join('\\n');
-  writeFileSync('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\\n${urlsOut}\\n</urlset>\\n`);
+  const urlsOut = [...keep.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([url,inner])=>`<url>${inner}</url>`).join('\n');
+  writeFileSync('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\\n${urlsOut}\\n</urlset>\n`);
 }
 console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages.`);
 
