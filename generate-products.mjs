@@ -833,18 +833,21 @@ writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<
 // URLs with the exact set whose generated HTML exists in the current active catalogue.
 const SITEMAP_NS = 'http://www.sitemaps.org/schemas/sitemap/0.9';
 const previousSitemap = existsSync('sitemap.xml') ? readFileSync('sitemap.xml', 'utf8') : '';
-const staticEntries = [...previousSitemap.matchAll(/<url>\\s*<loc>(https:\\/\\/stermontarcade\\.co\\.ke[^<]*)<\\/loc>[\\s\\S]*?<\\/url>/g)]
+const staticEntries = [...previousSitemap.matchAll(/<url>[\s\S]*?<\/url>/g)]
   .map(m => m[0])
-  .filter(entry => !/<loc>https:\\/\\/stermontarcade\\.co\\.ke\\/(?:p|c)\\//.test(entry));
-const catalogEntries = sitemapUrls.map(u => `  <url><loc>${SITE}${u}</loc><lastmod>${next[u].lastmod}</lastmod></url>`);
+  .filter(entry => {
+    const loc = entry.match(/<loc>([^<]+)<\/loc>/)?.[1] || '';
+    return !loc.startsWith(SITE + '/p/') && !loc.startsWith(SITE + '/c/');
+  });
+const catalogEntries = sitemapUrls.map(u => '  <url><loc>' + SITE + u + '</loc><lastmod>' + next[u].lastmod + '</lastmod></url>');
 const entryMap = new Map();
 for (const entry of staticEntries) {
-  const loc = entry.match(/<loc>([^<]+)<\\/loc>/)?.[1];
+  const loc = entry.match(/<loc>([^<]+)<\/loc>/)?.[1];
   if (loc) entryMap.set(loc, entry);
 }
 for (let i = 0; i < sitemapUrls.length; i++) entryMap.set(SITE + sitemapUrls[i], catalogEntries[i]);
-writeFileSync('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\\n<urlset xmlns="${SITEMAP_NS}">\\n` +
-  [...entryMap.values()].join('\\n') + `\\n</urlset>\\n`);
+writeFileSync('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="' + SITEMAP_NS + '">\n' +
+  [...entryMap.values()].join('\n') + '\n</urlset>\n');
 
 // robots.txt is also emitted by the same deterministic build so its sitemap
 // discovery endpoints cannot drift away from the generated XML files.
@@ -864,7 +867,7 @@ writeFileSync('robots.txt', [
   'Sitemap: https://stermontarcade.co.ke/services/sitemap-services.xml',
   'Sitemap: https://stermontarcade.co.ke/pest-control/sitemap.xml',
   ''
-].join('\\n'));
+].join('\n'));
 console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages; refreshed primary and product sitemaps.`);
 
 // Catalog rebuild trigger: publish the owner-approved Ocean Blue nitrile gloves listing (2026-11-05).
