@@ -35,6 +35,7 @@ assert.match(generator, /startsWith\(SITE \+ '\/c\/'\)/);
 assert.match(generator, /aspect-ratio:1\/1/);
 // Supabase Storage image optimization is enabled only after a successful probe;
 // when unavailable, original image URLs must remain the safe fallback.
+assert.match(generator, /imageTransformsRequested = process\.env\.SUPABASE_IMAGE_TRANSFORMS === 'true'/);
 assert.match(generator, /storageImageTransformsEnabled = probe\.ok/);
 assert.match(generator, /optimizedImageUrl\(u, 320\)/);
 assert.match(generator, /optimizedImageUrl\(u, 900\)/);
