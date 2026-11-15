@@ -68,3 +68,34 @@ Working branch: wip/seo-batch2-2026-11-15
 1. Run GitHub Actions on the review PR and inspect every failing SEO/build/mobile-shell check.
 2. Review generated product/category output and schema validation before merge.
 3. Merge only after the owner reviews the PR and all required checks pass.
+
+## Batch 2 CI failure follow-up — 2026-11-15
+- Inspected failed GitHub Actions run #281 (`43695811898`), job `validate` (`132755961286`). The first failing step was `Run mobile shell browser regression suite`; all subsequent SEO/build checks were skipped because the job exited early.
+- Root cause was stale test assumptions, not a runtime storefront regression: test expected 12+ products in the initial viewport although the shell intentionally paginates 8 at a time; it checked later-page products before scrolling to trigger pagination; and it expected an old shopping-bag emoji fallback although current code intentionally renders an accessible `Photo unavailable` label after gallery fallback exhaustion.
+- PR #766 was already merged at `2026-11-15T08:45:11Z` (merge commit `c943f91e5f5fa29740ef323d20df95f13ec6072e`) before this correction could be added. A merged PR cannot be updated; this follow-up branch is therefore cut from the current `main` for a new review PR.
+- Updated `mobile-shell/shell.test.py` only: assert the 8-item first page, scroll to trigger subsequent-page loading before checking database-name fallback, and assert the current `.photo-unavailable` fallback. No production storefront code changed.
+- Fix commit: `5f824ada30ceed54c4b63fbdf0904c5f90276d01`.
+- New follow-up PR and fresh GitHub Actions run are required. Do not start Batch 3 until the follow-up validation is green.
+
+- Follow-up run #282 (`43696263282`) exposed one further flaw in the first test correction: scrolling the long homepage fixture did not reliably intersect the pagination sentinel in Playwright. Replaced that timing-sensitive approach with a deterministic category-chip selection for the garden fixture, whose complete eight-item category page includes the test products; the test then returns to “For you” before continuing. This remains a test-only change.
+- Deterministic test correction commit: `9ea9dacd7f30ef0c000841c91668422b046d87a1`. Awaiting the next PR Actions run.
+
+- Follow-up run #284 (`43696393998`) passed the corrected initial-page, database-name and unavailable-photo assertions, then exposed two additional stale assumptions in the test sequence: it checked the Home & Kitchen image while viewing the garden category, and checked/used the multi-size product from the paginated “For you” feed rather than its Home & Living category.
+- Reordered the image assertion to the Home & Kitchen/default view and explicitly selected Home & Living for pack-size assertions and multi-size interaction, restoring “For you” afterward so later tests retain their expected starting state. Test-only change; no storefront runtime changes.
+- Additional deterministic test fix commit: `66eb5e75af90c411a59b25a060c248a8ea3e851a`. Awaiting a fresh Actions run.
+
+- Follow-up run #284 (`43696393998`) exact log inspection: the mobile-shell test reported two assertions failing and then timed out trying to click the multi-size card's `[data-add]` button. The photo assertion incorrectly required `src` although below-the-fold product cards intentionally use `data-src` until the lazy-image observer loads them. The category test switched chips without waiting for the category refresh to complete, and the later click repeated the same race after browser-history navigation.
+- Corrected the image assertion to accept the intended lazy `data-src` or loaded `src`. Category-scoped pack-size and add-button checks now trigger the chip selection, wait for the visible Home & Living heading and for the actual card/button, and include useful failure context. This is test-only; no storefront production code changed.
+- Latest test correction commit: `045ef7b614e604b01ea892b56bd3a8c4b07e0f50`. Fresh Actions run required.
+- PR #766 cannot be updated because it was merged on 2026-11-15 at `08:45:11Z` (merge commit `c943f91e5f5fa29740ef323d20df95f13ec6072e`). PR #769 is the only open PR and carries the validation-only follow-up against current `main`; keep it open until green, then it can be merged/closed as the sole follow-up. Batch 3 remains blocked.
+
+## Mobile-shell CI regression correction — 2026-11-15 (follow-up PR #769)
+- Re-inspected the exact failed `validate` job logs for run #286 (`43696563650`, job `132758315683`). The browser suite recorded failures for the lazy-loaded category drawer photo assertion, Back navigation after selecting a category, retry after simulated network failure, and garden-set pack-size/quick-buy tests. The final uncaught timeout was waiting for `#grid .card[data-id="garden-set"] [data-add]` in a fresh context whose default “For you” feed is paginated to 8 items.
+- Corrected only the browser regression fixture/assertions:
+  - Count a real drawer image whether it is already loaded in `src` or correctly deferred in `data-src`.
+  - Assert Back restores the previously selected Home category URL (`/c/phones-accessories.html`) while returning to the Home view; same for Back from Cart.
+  - Retry success checks the actual first page size (8+) rather than the obsolete 12+ assumption.
+  - Explicitly select Home & Living before garden-set pack-size/quick-buy tests in fresh contexts; update product URL expectations to the selected category URL and back.
+- This preserves the real product/category URL behaviour and the production lazy-image behaviour. No storefront runtime code, styles, cart, checkout, M-Pesa, or WhatsApp logic changed.
+- Fix commits: `5b11473f586a0c0a2d5ec8c48a4ab294758baaa9` and `2b8d78b07944f2e96cb33b11fe59ae04516efa54`.
+- Await the full PR #769 Actions quality gate before merge or Batch 3.
