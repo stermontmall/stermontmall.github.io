@@ -674,6 +674,7 @@ for (const [slug, c] of Object.entries(byCat)) {
   const canonicalPath = categoryUrl(slug);
   const robots = c.items.length < 5 ? 'noindex, follow' : 'index, follow, max-image-preview:large';
   const redirect = to => `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category moved | ${BRAND}</title><link rel="canonical" href="${SITE}${to}"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0; url=${to}"></head><body><p>This category has moved. <a href="${to}">Continue to the current category page</a>.</p><script>window.location.replace("${to}")</script></body></html>`;
+  if (slug === 'stermont-cars-for-sale') { writeFileSync(`.${path}`, redirect('/cars-for-sale.html')); continue; }
   if (slug === 'mens-fashion') { writeFileSync(`.${path}`, redirect('/fashion.html')); continue; }
   const info = INFO[slug] || {};
   const title = clip(info.title || catTitle(c.name), 60);
