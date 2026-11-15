@@ -146,7 +146,7 @@ jobs:
         run: |
           git config user.name "bot"
           git config user.email "bot@users.noreply.github.com"
-          git add -A p c guides sitemap-products.xml sitemap-state.json sitemap.xml products.html merchant-feed.xml product-names.json index.html
+          git add -A p c guides sitemap-products.xml sitemap-state.json sitemap.xml robots.txt products.html merchant-feed.xml product-names.json index.html
           if git diff --cached --quiet; then
             echo "Nothing changed - no commit needed."
           else
@@ -165,7 +165,7 @@ jobs:
                 fi
                 while IFS= read -r path; do
                   case "$path" in
-                    p/*.html|c/*.html|guides/*.html|products.html|sitemap-products.xml|sitemap-state.json|sitemap.xml|merchant-feed.xml|product-names.json|index.html)
+                    p/*.html|c/*.html|guides/*.html|products.html|sitemap-products.xml|sitemap-state.json|sitemap.xml|robots.txt|merchant-feed.xml|product-names.json|index.html)
                       git checkout --theirs -- "$path"
                       git add -- "$path"
                       ;;
