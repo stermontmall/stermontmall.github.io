@@ -109,16 +109,17 @@ with sync_playwright() as p:
     check('cart badge shows 1 (header + nav)', pg.locator('#bottom-nav [data-badge="cart"]').inner_text() == '1' and pg.locator('#appbar [data-badge="cart"]').inner_text() == '1')
     check('deals badge = number of discounted products (not the old mock 5)', pg.locator('#bottom-nav [data-badge="deals"]').inner_text() == str(DEALS_EXPECTED), pg.locator('#bottom-nav [data-badge="deals"]').inner_text())
 
-    # quick buy + back button
+    # tapping a product opens the FULL product page at once (owner 2026-11-15), not the quick-buy sheet; Back closes it
     h0 = pg.evaluate('history.length')
     pg.locator('#grid .card[data-id]').nth(1).locator('p').first.click()
-    check('quick buy sheet opens', pg.locator('#sheet-quickbuy.open').count() == 1)
+    pg.wait_for_selector('#page-product.open', timeout=5000)
+    check('tapping a product opens the full product page (no quick-buy sheet, no second tap)', pg.locator('#page-product.open').count() == 1 and pg.locator('#sheet-quickbuy.open').count() == 0)
     check('opening pushed one history entry', pg.evaluate('history.length') == h0 + 1)
     check('body scroll locked', pg.evaluate("document.body.classList.contains('no-scroll')"))
-    pg.wait_for_timeout(450); pg.screenshot(path=f'{OUT}/shot-quickbuy.png')
+    pg.wait_for_timeout(450); pg.screenshot(path=f'{OUT}/shot-product-direct.png')
     pg.go_back()
     pg.wait_for_timeout(350)
-    check('Back closes quick buy and stays on page', pg.locator('#sheet-quickbuy.open').count() == 0 and pg.url == URL, pg.url)
+    check('Back closes the product page and stays on page', pg.locator('#page-product.open').count() == 0 and pg.locator('#sheet-quickbuy.open').count() == 0 and pg.url == URL, pg.url)
     check('scroll unlocked after close', not pg.evaluate("document.body.classList.contains('no-scroll')"))
 
     # multi-size product: the plus button asks for a size instead of silently adding the smallest
@@ -202,12 +203,13 @@ with sync_playwright() as p:
     check('Back from a tab returns to Home (not off the site)', pg.locator('#view-home').is_visible() and pg.url == URL, pg.url)
     check('nav highlight follows Back', pg.locator('#bottom-nav [data-tab="home"][aria-current="page"]').count() == 1)
 
-    # buy now flow
+    # buy now flow (from the full product page that a product tap opens)
     pg.locator('#grid .card[data-id]').first.locator('p').first.click()
-    pg.locator('#qb-plus').click()
-    pg.locator('#qb-buy').click()
+    pg.wait_for_selector('#page-product.open', timeout=5000); pg.wait_for_timeout(450)
+    pg.locator('#pp-plus').click()
+    pg.locator('#pp-buy').click()
     pg.wait_for_timeout(500)
-    check('Buy now closes sheet and opens Cart tab', pg.locator('#sheet-quickbuy.open').count() == 0 and pg.locator('#view-cart').is_visible())
+    check('Buy now closes the product page and opens Cart tab', pg.locator('#page-product.open').count() == 0 and pg.locator('#sheet-quickbuy.open').count() == 0 and pg.locator('#view-cart').is_visible())
     check('cart total shown', pg.locator('#cart-total').inner_text().startswith('KSh'))
     pg.screenshot(path=f'{OUT}/shot-cart.png')
     pg.go_back(); pg.wait_for_timeout(300)
@@ -234,7 +236,7 @@ with sync_playwright() as p:
     # the address to the shell root while preserving the current history state.
     pg.evaluate("history.replaceState(history.state, '', '/')")
     pg.reload(); pg.wait_for_selector('#grid .card[data-id]', timeout=15000)
-    check('reload while sheet open lands clean', pg.locator('#sheet-quickbuy.open').count() == 0)
+    check('reload while sheet open lands clean', pg.locator('#sheet-quickbuy.open').count() == 0 and pg.locator('#page-product.open').count() == 0)
     check('deals badge stays cleared after reload (nothing new since the visit to Deals)', pg.locator('#bottom-nav [data-badge="deals"]').is_hidden())
 
     # Supabase down: the grid offers a retry instead of hanging on skeletons, and recovers
@@ -379,17 +381,14 @@ with sync_playwright() as p:
     p9.goto(URL); p9.wait_for_selector('#grid .card[data-id]')
     base_title = p9.title()
     check('address: home is the bare "/" address', p9.evaluate('location.pathname + location.search') == '/')
-    p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#sheet-quickbuy.open')
-    check('address: opening a product puts its own page address (/p/<slug>.html + size) in the address bar', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-50ml', p9.url)
+    p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#page-product.open')
+    check('address: opening a product (tap on the card) shows the full page and puts its own page address (/p/<slug>.html + size) in the address bar', p9.locator('#sheet-quickbuy.open').count() == 0 and p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-50ml', p9.url)
     check('address: the address bar has no query string (no ?shell=1)', p9.evaluate('location.search') == '', p9.url)
     check('address: tab title shows the product', 'Garden Hose Connector Set' in p9.title() and p9.title().endswith('| Stermont Arcade'), p9.title())
-    p9.locator('#qb-sizes [data-size="250 ml"]').click()
+    p9.wait_for_timeout(450)
+    p9.locator('#pp-sizes [data-pp-size="250 ml"]').click()
     check('address: choosing another size updates the address (no extra history entry)', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml', p9.url)
-    p9.locator('#qb-page').click(); p9.wait_for_selector('#page-product.open')
-    check('address: the full product page keeps the same address', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml', p9.url)
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
-    check('address: Back from the page returns to the sheet, address unchanged', p9.locator('#sheet-quickbuy.open').count() == 1 and p9.evaluate('location.hash') == '#garden-set-250ml')
-    p9.go_back(); p9.wait_for_function("!document.querySelector('#sheet-quickbuy.open')")
     check('address: closing the product restores "/" and the page title', p9.evaluate('location.pathname + location.search') == '/' and p9.title() == base_title, p9.url + ' | ' + p9.title())
     p9.goto(f'{BASE}/?product=garden-set-250ml'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: opening the address shows that product page with that size', 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
