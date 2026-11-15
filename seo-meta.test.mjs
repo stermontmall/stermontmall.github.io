@@ -43,6 +43,7 @@ for (const name of names) for (const ctx of ctxs) {
 const specific = pdpDescription('Sample Product', { catSlug: 'smartphones' }, 'Designed for use on suitable surfaces. Check the label and follow the supplied instructions.');
 assert.ok(specific.length <= DESC_MAX && specific.includes('Designed for use'), `catalogue detail missing: ${specific}`);
 assert.ok(specific.includes('M-Pesa') && specific.includes('47 counties'), `Kenya purchase context missing: ${specific}`);
+assert.ok(!specific.includes('..'), `meta description has duplicate punctuation: ${specific}`);
 assert.notEqual(specific, pdpDescription('Sample Product', { catSlug: 'smartphones' }), 'product-specific copy should differ from generic fallback');
 n += 4;
 
