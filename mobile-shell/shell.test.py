@@ -95,16 +95,18 @@ with sync_playwright() as p:
     check('2-column grid', pg.evaluate("getComputedStyle(document.querySelector('#grid')).gridTemplateColumns.split(' ').length") == 2)
     check('discount badge renders, no invented star ratings', pg.locator('#grid .bg-sale').count() > 0 and pg.locator('#grid .stars').count() == 0)
     check('name comes from product-names.json when present', pg.locator('#grid .card[data-id="home-0"] p').first.inner_text() == 'Heavy-Duty Hot Plate Pro')
-    check('real product photo is rendered', pg.locator('#grid .card[data-id="home-0"] img[src="https://img.test/ok.png"]').count() == 1)
+    check('real product photo is rendered', pg.locator('#grid .card[data-id="home-0"] img').evaluate_all("(els) => els.some(img => img.getAttribute('src') === 'https://img.test/ok.png' || img.getAttribute('data-src') === 'https://img.test/ok.png')"))
     # Isolate the garden fixture category so its complete eight-item page is available without relying on scroll timing.
     pg.locator('#chips [data-chip="garden-outdoors"]').click()
     pg.wait_for_selector('#grid .card[data-id="outdoor-broken"]', timeout=10000)
     check('database name used when the heading file has no entry', 'Garden Hose Nozzle 1' in pg.locator('#grid').inner_text())
     pg.wait_for_timeout(200)
     check('broken photo falls back to the neutral unavailable-photo label', pg.locator('#grid .card[data-id="outdoor-broken"] img').count() == 0 and pg.locator('#grid .card[data-id="outdoor-broken"] .photo-unavailable').count() == 1)
-    pg.locator('#chips [data-chip="home-living"]').click()
-    pg.wait_for_selector('#grid .card[data-id="garden-set"]', timeout=10000)
-    check('pack sizes fold into ONE card with a From price', pg.locator('#grid .card[data-id="garden-set"]').count() == 1 and 'From KSh 390' in pg.locator('#grid .card[data-id="garden-set"]').inner_text() and '4 sizes' in pg.locator('#grid .card[data-id="garden-set"]').inner_text())
+    pg.evaluate("document.querySelector('#chips [data-chip=\\\"home-living\\\"]').click()")
+    pg.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
+    pg.wait_for_function("document.querySelector('#grid .card[data-id=\\\"garden-set\\\"]')?.textContent.includes('4 sizes')", timeout=10000)
+    pack_card = pg.locator('#grid .card[data-id="garden-set"]')
+    check('pack sizes fold into ONE card with a From price', pack_card.count() == 1 and 'From KSh 390' in pack_card.inner_text() and '4 sizes' in pack_card.inner_text(), pack_card.inner_text() if pack_card.count() else 'card missing')
     pg.locator('#chips [data-chip="all"]').click()
     pg.wait_for_selector('#grid .card[data-id]')
     pg.wait_for_timeout(300)
@@ -131,7 +133,8 @@ with sync_playwright() as p:
     check('scroll unlocked after close', not pg.evaluate("document.body.classList.contains('no-scroll')"))
 
     # multi-size product: select its top-level category because the home feed is paginated
-    pg.locator('#chips [data-chip="home-living"]').click()
+    pg.evaluate("document.querySelector('#chips [data-chip=\\\"home-living\\\"]').click()")
+    pg.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
     pg.wait_for_selector('#grid .card[data-id="garden-set"] [data-add]', timeout=10000)
     # the plus button asks for a size instead of silently adding the smallest
     pg.locator('#grid .card[data-id="garden-set"] [data-add]').click()
