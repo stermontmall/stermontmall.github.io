@@ -685,8 +685,11 @@ ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<
 <p><a href="/c/">Browse all categories</a></p>`;
   const faqLd = info.faq ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: info.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
   if (path !== oldPath) {
-    const destination = `${SITE}${path}`;
-    writeFileSync(`.${oldPath}`, `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category moved | ${BRAND}</title><link rel="canonical" href="${destination}"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0; url=${path}"></head><body><p>This category has moved. <a href="${path}">Continue to the current category page</a>.</p><script>window.location.replace(${JSON.stringify(path)})</script></body></html>`);
+    // These two old /c/ category URLs are intentionally retired to the main shop homepage.
+    // Keep their distinct root-level destination pages available, but do not leave duplicate legacy category URLs indexed.
+    const legacyDestination = ['stermont-cars-for-sale', 'mens-fashion'].includes(slug) ? '/' : path;
+    const destination = `${SITE}${legacyDestination}`;
+    writeFileSync(`.${oldPath}`, `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category moved | ${BRAND}</title><link rel="canonical" href="${destination}"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0; url=${legacyDestination}"></head><body><p>This category has moved. <a href="${legacyDestination}">Continue to Stermont Arcade</a>.</p><script>window.location.replace(${JSON.stringify(legacyDestination)})</script></body></html>`);
   }
   const robots = c.items.length < 5 ? 'noindex, follow' : 'index, follow, max-image-preview:large';
   writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, robots, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]) }));
