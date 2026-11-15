@@ -1,5 +1,5 @@
 /* Stermont Arcade · Catalog, Restock & Sales ledger module. Mount: STMCatalog.mount(containerEl)
-   No cost (COGS) or profit is shown or entered here. The selling price is typed by hand; Price Watch may update it later. */
+   New items take a source/cost price and apply 30%; existing-item edits save the selling price exactly. */
 (function () {
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
   var S = { cats: [], prods: [], st: {}, cat: 'all', q: '', range: 'all' }, root, D = document, view = function () { render(); };
@@ -170,7 +170,7 @@
   var CAT_OUT = '__out', CAT_HID = '__hid';
   function inCat(p, c) { return c === 'all' || (c === CAT_OUT ? p.stock <= 0 : c === CAT_HID ? !p.active : String(p.category_id) === c); }
   /* Owner rule 2026-11-15: every NEW item gets +30% on the source/cost price typed in the admin; editing an existing item saves exactly what is typed. */
-  var MARKUP = 1.30; function up(n) { return Math.ceil(n * MARKUP); }
+  var MARKUP = 1.30; function up(n) { return Math.round(Number(n) * MARKUP * 100) / 100; }
   function discPct(p) { var o = Number(p.old_price), n = Number(p.price); return o > n && n >= 0 ? Math.max(1, Math.round((o - n) / o * 100)) : 0; }
   function priceHtml(p) {
     var d = discPct(p);
@@ -269,7 +269,7 @@
         if (edit && stock !== p.stock) row.stock = stock;
         if (edit) return call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: row });
         var id = slug(name + (vl ? ' ' + vl : '')) || 'item', n = 2, base = id; while (S.prods.some(function (x) { return x.id === id; })) id = base + '-' + n++;
-        row.id = id; row.stock = stock; row.cost = 0;   /* cost is no longer tracked in the admin */
+        row.id = id; row.stock = stock; row.cost = price;   /* preserve source/cost so the database can verify the exact 30% markup */
         var first = tpl && !tpl.variant_label ? call('/rest/v1/products?id=eq.' + encodeURIComponent(tpl.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { variant_label: vl0, variant_group: grp } }) : Promise.resolve();
         return first.then(function () { return call('/rest/v1/products', { m: 'POST', h: { Prefer: 'return=minimal' }, body: row }); });
       }).catch(function (e) {
