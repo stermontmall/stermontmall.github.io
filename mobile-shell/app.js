@@ -98,7 +98,7 @@ function buildCatalog(rows, cats, names) {
   });
   PRODUCTS = out; CATROWS = cats;
   const have = new Set(out.map(p => p.cat)), subHave = new Set(out.filter(p => p.sub).map(p => p.cat + '|' + p.sub));
-  const navPriority = { 'pest-control-fumigation': 0, agrovet: 1, 'home-kitchen': 2, appliances: 3, 'phones-accessories': 4, 'tv-audio-video': 5, 'computers-accessories': 6 };
+  const navPriority = { 'pest-control-fumigation': 0, agrovet: 1, 'home-kitchen': 2, appliances: 3, 'home-appliances': 3, electronics: 4, 'phones-accessories': 5, 'tv-audio-video': 6, 'computers-accessories': 7 };
   CATS = cats.filter(c => !c.parent_id && !c.is_promo && have.has(c.slug)).sort((a, b) =>
     (navPriority[a.slug] ?? 99) - (navPriority[b.slug] ?? 99) || a.sort_order - b.sort_order || a.id - b.id)
     .map(c => ({ id: c.slug, name: c.name, icon: ICONS[c.slug] || '🛍️',
