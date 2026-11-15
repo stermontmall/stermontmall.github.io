@@ -819,7 +819,7 @@ writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<
 if (existsSync('sitemap.xml')) {
   const current = readFileSync('sitemap.xml', 'utf8');
   const keep = new Map();
-  for (const m of current.matchAll(/<url>([\s\\S]*?)<\/url>/g)) {
+  for (const m of current.matchAll(/<url>([\s\S]*?)<\/url>/g)) {
     const loc = (m[1].match(/<loc>([^<]+)<\/loc>/) || [])[1];
     if (loc && !/\/(?:p|c)\//.test(new URL(loc).pathname) && !loc.endsWith('/products.html')) keep.set(loc, m[1]);
   }
@@ -832,7 +832,7 @@ if (existsSync('sitemap.xml')) {
     for (const m of serviceMap.matchAll(/<loc>([^<]+)<\/loc>/g)) add(m[1]);
   }
   const urlsOut = [...keep.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([url,inner])=>`<url>${inner}</url>`).join('\n');
-  writeFileSync('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\\n${urlsOut}\\n</urlset>\n`);
+  writeFileSync('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlsOut}\n</urlset>\n`);
 }
 console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages.`);
 
