@@ -132,10 +132,10 @@ footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85
 .stk b{flex:1;min-width:0;font-size:.95rem;line-height:1.2;color:#5b21b6}.stk b small{display:block;color:#1f1b2e;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stk a{flex:none;text-decoration:none;font-weight:800;border-radius:10px;padding:.7rem .9rem;background:#15803d;color:#fff}.stk a.call{background:#fff;color:#6d28d9;border:2px solid #7c3aed;padding:.6rem .8rem}}`;
 
-const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '' }) => `<!doctype html>
+const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '', robots = 'index, follow, max-image-preview:large' }) => `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${SITE}${path}"><meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="${SITE}${path}"><meta name="robots" content="${esc(robots)}">
 <script>(function(){var q=new URLSearchParams(location.search);if(["search","sort","filter"].some(function(k){return q.has(k)})){var m=document.querySelector('meta[name="robots"]');if(m)m.setAttribute("content","noindex,follow");}})();</script>
 <meta property="og:type" content="${ogType}"><meta property="og:site_name" content="${BRAND}"><meta property="og:locale" content="en_KE">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${SITE}${path}">
@@ -669,7 +669,8 @@ for (const a of aliases) {
 }
 
 for (const [slug, c] of Object.entries(byCat)) {
-  const path = `/c/${encodeURIComponent(slug)}.html`;
+  const oldPath = `/c/${encodeURIComponent(slug)}.html`;
+  const path = slug === 'stermont-cars-for-sale' ? '/cars-for-sale.html' : slug === 'mens-fashion' ? '/fashion.html' : oldPath;
   const info = INFO[slug] || {};
   const title = info.title || catTitle(c.name);   // seo-meta.mjs pattern, <= 60 chars (small categories are skipped by seo-kenya.mjs, so they must be right here)
   const desc = info.desc || catDescription(c.name, slug);
@@ -683,7 +684,12 @@ ${info.guide || ''}
 ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<div class="box"><b>${esc(q)}</b><p>${esc(a)}</p></div>`).join('') : ''}
 <p><a href="/c/">Browse all categories</a></p>`;
   const faqLd = info.faq ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: info.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
-  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]) }));
+  if (path !== oldPath) {
+    const destination = `${SITE}${path}`;
+    writeFileSync(`.${oldPath}`, `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category moved | ${BRAND}</title><link rel="canonical" href="${destination}"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0; url=${path}"></head><body><p>This category has moved. <a href="${path}">Continue to the current category page</a>.</p><script>window.location.replace(${JSON.stringify(path)})</script></body></html>`);
+  }
+  const robots = c.items.length < 5 ? 'noindex, follow' : 'index, follow, max-image-preview:large';
+  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, robots, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]) }));
   urls.push(path);
 }
 
