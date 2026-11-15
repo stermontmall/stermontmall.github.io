@@ -151,7 +151,34 @@ ${path.startsWith('/p/') && og ? '<link rel="preload" as="image" href="' + esc(o
 const tidy = n => String(n).replace(/\s*\|.*$/, '').replace(/\s+/g, ' ').trim();
 // When a product has several pack sizes, the shared name must not end in one size (e.g. "... 1L" on the 50 ml page).
 const SIZE_END = /\s+\d+(?:\.\d+)?\s?(?:ml|l|ltr|litres?|liters?|g|kg)\s*$/i;
-const rows = (await getProducts()).filter(p => p && p.id && p.name).map(p => ({ ...p, name: tidy(p.name) }));
+const rawRows = (await getProducts()).filter(p => p && p.id && p.name).map(p => ({ ...p, name: tidy(p.name) }));
+
+// Use Supabase's image proxy only when this project confirms that transformations
+// are enabled. The HEAD probe is deliberately fail-open: free-tier/disabled
+// transformations leave every original photo URL untouched.
+const transformedStorageUrl = (source, width) => {
+  try {
+    const u = new URL(source);
+    if (u.origin !== SB || !u.pathname.includes('/storage/v1/object/public/')) return source;
+    u.pathname = u.pathname.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+    u.searchParams.set('width', String(width));
+    u.searchParams.set('quality', '75');
+    return u.toString();
+  } catch { return source; }
+};
+let storageImageTransformsEnabled = false;
+const imageProbe = rawRows.flatMap(p => Array.isArray(p.images) ? p.images : []).find(u => typeof u === 'string' && u.includes('/storage/v1/object/public/'));
+if (imageProbe) {
+  try {
+    const probe = await fetch(transformedStorageUrl(imageProbe, 720), { method: 'HEAD', headers: { Accept: 'image/webp,image/*;q=0.8' } });
+    storageImageTransformsEnabled = probe.ok && /^image\//i.test(probe.headers.get('content-type') || '');
+    console.log('[image-optimization] Supabase transformations ' + (storageImageTransformsEnabled ? 'enabled; resized images use automatic WebP negotiation.' : 'unavailable; retaining original image URLs.'));
+  } catch {
+    console.log('[image-optimization] Probe failed; retaining original image URLs.');
+  }
+}
+const optimizedImageUrl = (source, width) => storageImageTransformsEnabled ? transformedStorageUrl(source, width) : source;
+const rows = rawRows;
 // Approved customer reviews (public read). Failure or a missing table just means no review markup.
 async function getReviews() {
   try {
@@ -474,7 +501,7 @@ rmSync('p', { recursive: true, force: true }); rmSync('c', { recursive: true, fo
 mkdirSync('p', { recursive: true }); mkdirSync('c', { recursive: true });
 const urls = [];
 
-const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(u)}" alt="${esc(p.name)} product photo" width="160" height="150" loading="lazy" decoding="async">` : ''; };
+const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(optimizedImageUrl(u, 320))}" alt="${esc(p.alt_text || (p.name + ' product photo'))}" width="160" height="150" loading="lazy" decoding="async">` : ''; };
 const card = p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 // Helpful, category-specific buying checks. Avoid inventing product specifications, certifications or warranty terms.
@@ -583,7 +610,7 @@ function productBuyingNotes(p, cat) {
 
 const NAMES = {};   // product id -> the heading its page shows; the shop list reads this (product-names.json) so list, view and page always carry the same wording
 for (const p of products) {
-  const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
+  const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean).map(u => optimizedImageUrl(u, 900));
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
   const revs = reviewsFor(p), rLd = reviewLd(revs);
   // Meta title (max 60 chars) and description (max 155 chars) come from seo-meta.mjs: "[Original] <name> \u2013 Price in Kenya | Stermont Arcade".
