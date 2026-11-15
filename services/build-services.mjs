@@ -360,6 +360,22 @@ ${pestCoverage({ name: 'Pest control' })}
 
 const urls = ['/services/', '/services/guides/', ...(pests.length ? ['/services/pests/', ...pests.map(p => `/services/pests/${p.slug}.html`)] : []), ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`)];
 write('sitemap-services.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n')}\n</urlset>\n`);
+
+// Keep the root sitemap complete as well as the dedicated services sitemap.
+// Only canonical service and guide URLs are included; redirect aliases are deliberately omitted.
+try {
+  const rootSitemap = path.join(dir, '..', 'sitemap.xml');
+  if (fs.existsSync(rootSitemap)) {
+    let xml = fs.readFileSync(rootSitemap, 'utf8');
+    const present = new Set([...xml.matchAll(/<loc>([^<]+)<\\/loc>/g)].map(m => m[1]));
+    const additions = urls.map(u => SITE + u).filter(u => !present.has(u));
+    if (additions.length) {
+      const entries = additions.map(u => `  <url><loc>${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\\n');
+      xml = xml.replace('</urlset>', entries + '\\n</urlset>');
+      fs.writeFileSync(rootSitemap, xml);
+    }
+  }
+} catch (e) { console.log('root sitemap update skipped:', e.message); }
 write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
 
 // Owner rule: never publish the banned town name. Fail the build (so CI commits nothing) if any generated file has it.
