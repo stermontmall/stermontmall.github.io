@@ -68,3 +68,10 @@ Working branch: wip/seo-batch2-2026-11-15
 1. Run GitHub Actions on the review PR and inspect every failing SEO/build/mobile-shell check.
 2. Review generated product/category output and schema validation before merge.
 3. Merge only after the owner reviews the PR and all required checks pass.
+
+## Batch 2 validation failure and correction — 2026-11-15
+- GitHub Actions run #281 (run ID `43695811898`) failed in the mobile-shell browser regression step before any SEO/build checks could run.
+- Log diagnosis: test assumptions were stale relative to the current storefront. The app intentionally loads a paginated first batch of 8 (not 12+), lazy-loads further products on scroll, and uses a neutral `Photo unavailable` label after the image fallback list is exhausted (not the old shopping-bag emoji).
+- Corrected `mobile-shell/shell.test.py` to assert the current 8-item first page, scroll to trigger the next page before checking database-name fallback, and assert the current `.photo-unavailable` fallback. No storefront runtime behavior was changed for this test-only correction.
+- Fix commit: `3fc174ad2f5e502627bca5cb0a669e61a4ac2177` — align mobile-shell regression tests with paginated feed and neutral photo fallback.
+- New GitHub Actions run is pending/expected from the PR branch push; do not merge or start Batch 3 until the run is green.
