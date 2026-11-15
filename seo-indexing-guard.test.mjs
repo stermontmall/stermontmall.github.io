@@ -33,6 +33,12 @@ assert.match(generator, /startsWith\(SITE \+ '\/p\/'\)/);
 assert.match(generator, /startsWith\(SITE \+ '\/c\/'\)/);
 // Product hero/card images reserve a square box to reduce layout shift.
 assert.match(generator, /aspect-ratio:1\/1/);
+// Supabase Storage image optimization is enabled only after a successful probe;
+// when unavailable, original image URLs must remain the safe fallback.
+assert.match(generator, /storageImageTransformsEnabled = probe\.ok/);
+assert.match(generator, /optimizedImageUrl\(u, 320\)/);
+assert.match(generator, /optimizedImageUrl\(u, 900\)/);
+assert.match(generator, /quality', '75'/);
 
 // Ensure this protection test remains part of the production page-build gate.
 assert.match(workflow, /node seo-indexing-guard\.test\.mjs/);
