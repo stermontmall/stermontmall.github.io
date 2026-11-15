@@ -95,17 +95,19 @@ with sync_playwright() as p:
     check('2-column grid', pg.evaluate("getComputedStyle(document.querySelector('#grid')).gridTemplateColumns.split(' ').length") == 2)
     check('discount badge renders, no invented star ratings', pg.locator('#grid .bg-sale').count() > 0 and pg.locator('#grid .stars').count() == 0)
     check('name comes from product-names.json when present', pg.locator('#grid .card[data-id="home-0"] p').first.inner_text() == 'Heavy-Duty Hot Plate Pro')
+    check('real product photo is rendered', pg.locator('#grid .card[data-id="home-0"] img[src="https://img.test/ok.png"]').count() == 1)
     # Isolate the garden fixture category so its complete eight-item page is available without relying on scroll timing.
     pg.locator('#chips [data-chip="garden-outdoors"]').click()
     pg.wait_for_selector('#grid .card[data-id="outdoor-broken"]', timeout=10000)
     check('database name used when the heading file has no entry', 'Garden Hose Nozzle 1' in pg.locator('#grid').inner_text())
-    check('real product photo is rendered', pg.locator('#grid .card[data-id="home-0"] img[src="https://img.test/ok.png"]').count() == 1)
     pg.wait_for_timeout(200)
     check('broken photo falls back to the neutral unavailable-photo label', pg.locator('#grid .card[data-id="outdoor-broken"] img').count() == 0 and pg.locator('#grid .card[data-id="outdoor-broken"] .photo-unavailable').count() == 1)
+    pg.locator('#chips [data-chip="home-living"]').click()
+    pg.wait_for_selector('#grid .card[data-id="garden-set"]', timeout=10000)
+    check('pack sizes fold into ONE card with a From price', pg.locator('#grid .card[data-id="garden-set"]').count() == 1 and 'From KSh 390' in pg.locator('#grid .card[data-id="garden-set"]').inner_text() and '4 sizes' in pg.locator('#grid .card[data-id="garden-set"]').inner_text())
     pg.locator('#chips [data-chip="all"]').click()
     pg.wait_for_selector('#grid .card[data-id]')
     pg.wait_for_timeout(300)
-    check('pack sizes fold into ONE card with a From price', pg.locator('#grid .card[data-id="garden-set"]').count() == 1 and 'From KSh 390' in pg.locator('#grid .card[data-id="garden-set"]').inner_text() and '4 sizes' in pg.locator('#grid .card[data-id="garden-set"]').inner_text())
     check('sold-out product is hidden', pg.locator('#grid .card[data-id="home-soldout"]').count() == 0)
     check('chips come from the live categories (promo + empty ones left out)', pg.locator('#chips .chip').all_inner_texts() == ['For you', 'Phones & Accessories', 'Home & Kitchen', 'Outdoor & Garden', 'Home & Living'], pg.locator('#chips .chip').all_inner_texts())
     pg.screenshot(path=f'{OUT}/shot-home.png')
@@ -128,7 +130,10 @@ with sync_playwright() as p:
     check('Back closes quick buy and stays on page', pg.locator('#sheet-quickbuy.open').count() == 0 and pg.url == URL, pg.url)
     check('scroll unlocked after close', not pg.evaluate("document.body.classList.contains('no-scroll')"))
 
-    # multi-size product: the plus button asks for a size instead of silently adding the smallest
+    # multi-size product: select its top-level category because the home feed is paginated
+    pg.locator('#chips [data-chip="home-living"]').click()
+    pg.wait_for_selector('#grid .card[data-id="garden-set"] [data-add]', timeout=10000)
+    # the plus button asks for a size instead of silently adding the smallest
     pg.locator('#grid .card[data-id="garden-set"] [data-add]').click()
     check('plus on a multi-size card opens the size sheet', pg.locator('#sheet-quickbuy.open').count() == 1 and pg.locator('#bottom-nav [data-badge="cart"]').inner_text() == '1')
     check('sizes listed smallest price first', pg.locator('#qb-sizes .chip').all_inner_texts() == ['50 ml', '100 ml', '250 ml', '1 Litre'], pg.locator('#qb-sizes .chip').all_inner_texts())
@@ -154,6 +159,7 @@ with sync_playwright() as p:
     pg.go_back(); pg.wait_for_function("!document.querySelector('#page-product.open')", timeout=5000)
     check('Back from the product page returns to the sheet, still on the shell', pg.locator('#sheet-quickbuy.open').count() == 1 and pg.url == url_before, pg.url)
     pg.go_back(); pg.wait_for_timeout(350)
+    pg.locator('#chips [data-chip="all"]').click(); pg.wait_for_selector('#grid .card[data-id]'); pg.wait_for_timeout(300)
 
     # forward must not reopen a stale sheet with no data? (it has data in-session, so allowed); just ensure no errors
     # stacked overlays: filters, then back
