@@ -661,7 +661,7 @@ ${seoBoxes}
 ${buyerNotes}
 ${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
 ${productSiloHtml(p, cat, related)}
-<div class="stk" role="complementary" aria-label="Order this product"><a class="call" href="${esc(inStock ? stickyWa : ask)}">Order via WhatsApp</a><a href="${esc(cartUrl)}">Add to Cart / Pay with M-Pesa</a></div>;
+<div class="stk" role="complementary" aria-label="Order this product"><a class="call" href="${esc(inStock ? stickyWa : ask)}">Order via WhatsApp</a><a href="${esc(cartUrl)}">Add to Cart / Pay with M-Pesa</a></div>`;
   writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld, ogType: 'product', extra: `<meta name="stm-id" content="${esc(p.id)}"><meta name="stm-seo" content="v2"><meta property="product:price:amount" content="${Math.round(Number(p.price) || 0)}"><meta property="product:price:currency" content="KES"><meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` }));
   urls.push(path);
 }

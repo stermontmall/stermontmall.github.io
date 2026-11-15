@@ -4,6 +4,15 @@ Date: 2026-11-15 (Africa/Nairobi)
 Repository: stermontmall/stermontmall.github.io
 Working branch: wip/seo-batch2-2026-11-15
 
+## 2026-11-15 13:50 (Africa/Nairobi) — PR #776 `validate` job fix (branch `feat/final-cro-trust-service-pages`)
+Failing step in the SEO pull request quality gate (run 43703801865, read with `gh run view 43703801865 --log-failed`): "Run mobile shell browser regression suite" (`python3 mobile-shell/shell.test.py`), 2 FAIL lines then `TimeoutError ... waiting for locator("#grid .card[data-id]")` at line 598. The same failure reproduces on a clean `main` checkout, so it was not caused by the PR's one-line `app.js` change.
+- Done: `mobile-shell/shell.test.py` — the tests were stale against two owner-approved behaviours already in `app.js` / the early script: (1) the shell address after `/?cat=<slug>` is the clean `/c/<slug>.html` (catUrl, owner 2026-11-09), not `/`; (2) a phone reloading that address is sent back to `/?cat=<slug>` by the `stm-early` script, which skips bot and "headless" user agents, so the reload test now uses an ordinary phone user agent and serves a generated category page for every `/c/<slug>.html`. Result locally: 171/171 pass (only the sandbox's blocked outbound image requests, `ERR_TUNNEL_CONNECTION_FAILED`, had to be ignored in a throwaway copy that was not committed).
+- Done: `generate-products.mjs` line 664 — missing closing backtick on the product-page `body` template (introduced in `763e406`, already on `main`), `node --check generate-products.mjs` failed with `SyntaxError: Unexpected token '{'`. Fixed.
+- Done: `mombasa.html` — broken internal link `/c/home-living.html` (no such page) now points to `/c/home-kitchen.html`; `node link-check.mjs` reports 0 problems.
+- Not changed: `mobile-shell/app.js` (the PR's `if (!RESTORE_CAT) refreshGrid();` stays as is; reverting it made no difference), so no `?v=` bump was needed.
+- Next: watch the next CI run on PR #776. Steps that need the live catalogue could not run here (no DNS in the sandbox): `node generate-products.mjs`, `seo-kenya.mjs`, `seo-overrides.mjs`, `seo-titles.mjs`, `seo-safe-meta.mjs`, `seo-shell-redirect.mjs`, `node seo-check.mjs > seo-pr-report.md`. Re-run command: `gh run list --workflow seo-pr-quality.yml --limit 3` then `gh run view <id> --log-failed`.
+- Note for the owner: `shell.test.py` still has "category redirect removed" checks that pass only because headless Chromium is exempt from the early redirect; they contradict the 2026-11-08 decision to bring the phone redirect back.
+
 ## Done
 - Created a clean working branch from `main`; the earlier branch `wip/technical-seo-kenya-2026-11` is 100 commits ahead of main and contains unrelated changes, so it will not be merged or deployed.
 - Audited the canonical domain, homepage metadata/schema, robots.txt, sitemap.xml, product/category generator, services generator/data, service hub, shipping page, service guide index and current navigation script.
