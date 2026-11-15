@@ -307,7 +307,7 @@ try {
     let sm = sm0.replace(/[ \t]*<url>[\s\S]*?<\/url>\n?/g, blk => ((blk.match(/<loc>([^<]+)<\/loc>/) || [])[1] || '').startsWith(P) ? '' : blk);
     const blk = e => `  <url>\n    <loc>${e.loc}</loc>\n    <lastmod>${e.mod}</lastmod>\n    <changefreq>${e.loc === P ? 'weekly' : 'daily'}</changefreq>\n    <priority>${e.loc === P ? '0.6' : '0.7'}</priority>\n  </url>\n`;
     const serviceXml = existsSync('services/sitemap-services.xml') ? readFileSync('services/sitemap-services.xml', 'utf8') : '';
-    const serviceUrls = [...serviceXml.matchAll(/<loc>(https:\/\/stermontarcade\\.co\\.ke\/[^<]+)<\/loc>/g)].map(m => ({ loc: m[1], mod: today }));
+    const serviceUrls = [...serviceXml.matchAll(/<loc>(https:\/\/stermontarcade\.co\.ke\/[^<]+)<\/loc>/g)].map(m => ({ loc: m[1], mod: today }));
     const staticUrls = ['/shipping.html', '/cars-for-sale.html', '/fashion.html'].map(path => ({ loc: SITE + path, mod: today }));
     const existing = new Set([...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]));
     const combined = [...sitemapEntries, ...serviceUrls, ...staticUrls].filter(e => !existing.has(e.loc));
