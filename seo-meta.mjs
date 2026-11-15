@@ -81,7 +81,7 @@ export function pdpH1(name, ctx = {}) {
 }
 
 // One visible line under the H1 on the product page. Only facts that are true for every product (no price or quality superlatives):
-//   "M-Pesa checkout · Delivery to all 47 counties · Pickup at Sarit Centre, Westlands"
+//   "M-Pesa checkout · Delivery to all 47 counties · Pickup at Sarit Centre, Nairobi"
 export function pdpTagline(ctx = {}) {
   return 'M-Pesa checkout · Delivery to all 47 counties · Pickup at Sarit Centre, Westlands';
 }
@@ -118,7 +118,7 @@ export function pdpTitle(name, ctx = {}) {
 }
 
 // PDP meta description, max 155 characters.
-//   "Buy 100% genuine & high-potency <name> in Kenya at Stermont Arcade. Fast M-Pesa checkout, Sarit Centre Westlands pickup, or countrywide delivery."
+//   "Buy 100% genuine & high-potency <name> in Kenya at Stermont Arcade. Fast M-Pesa checkout, Sarit Centre Nairobi pickup, or countrywide delivery."
 export function pdpDescription(name, ctx = {}, productDescription = '') {
   const n = String(name || '').replace(/\s+/g, ' ').trim();
   // Prefer one factual, product-specific sentence from the catalogue over repeating the same generic snippet on every PDP.
@@ -134,7 +134,7 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
   const sentences = (source.match(/[^.!?]+[.!?](?=\s|$)/g) || []).map(s => s.trim());
   const fact = sentences.find(s => s.length >= 28 && s.length <= 260 && !/^buy\b/i.test(s)) || '';
   const prefix = `Buy ${n} in Kenya: `;
-  const suffix = '. Pay by M-Pesa; delivery to 47 counties.';
+  const suffix = '. M-Pesa; Nairobi pickup, delivery to 47 counties.';
   const room = DESC_MAX - prefix.length - suffix.length;
   // Never cut a factual sentence in the middle. A clipped fragment can produce broken snippets
   // (for example, ending a storage specification with an ellipsis). Use the Kenya-specific fallback
@@ -148,12 +148,12 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
   const desc = DESCRIPTOR[productType(ctx.catSlug)];
   const gen = isGenuine(ctx) ? `100% genuine & ${desc} ` : `${desc} `;
   const tiers = [
-    `Buy ${gen}${n} in Kenya at ${STORE}. M-Pesa checkout, Westlands pickup or delivery to all 47 counties.`,
-    `Buy ${gen}${n} in Kenya at ${STORE}. M-Pesa checkout, Sarit Centre Westlands pickup, delivery to 47 counties.`,
-    `Buy ${gen}${n} in Kenya at ${STORE}. Fast M-Pesa checkout, Sarit Centre Westlands pickup, or countrywide delivery.`,
-    `Buy ${isGenuine(ctx) ? '100% genuine ' : ''}${n} in Kenya at ${STORE}. M-Pesa checkout, Westlands pickup or delivery to all 47 counties.`,
-    `Buy ${n} in Kenya at ${STORE}. M-Pesa checkout, Westlands pickup or delivery to all 47 counties.`,
-    `Buy ${n} in Kenya. M-Pesa checkout, Westlands pickup, delivery to 47 counties.`
+    `Buy ${gen}${n} in Kenya at ${STORE}. M-Pesa checkout, Nairobi pickup or delivery to all 47 counties.`,
+    `Buy ${gen}${n} in Kenya at ${STORE}. M-Pesa checkout, Sarit Centre Nairobi pickup, delivery to 47 counties.`,
+    `Buy ${gen}${n} in Kenya at ${STORE}. Fast M-Pesa checkout, Sarit Centre Nairobi pickup, or countrywide delivery.`,
+    `Buy ${isGenuine(ctx) ? '100% genuine ' : ''}${n} in Kenya at ${STORE}. M-Pesa checkout, Nairobi pickup or delivery to all 47 counties.`,
+    `Buy ${n} in Kenya at ${STORE}. M-Pesa checkout, Nairobi pickup or delivery to all 47 counties.`,
+    `Buy ${n} in Kenya. M-Pesa checkout, Nairobi pickup, delivery to 47 counties.`
   ];
   const hit = tiers.find(t => t.length <= DESC_MAX);
   return hit || clip(`Buy ${n} in Kenya. M-Pesa checkout, pickup or delivery to 47 counties.`, DESC_MAX);
@@ -184,7 +184,7 @@ export function catDescription(catName, catSlug) {
   const registrationNote = ['crop-insecticides', 'bed-bug-killers', 'adjuvants-growth-regulators'].includes(catSlug)
     ? ' Check each product label and PCPB registration.'
     : '';
-  const base = `Browse ${c} online in Kenya. Compare listed product details and current prices.${registrationNote} Pay by M-Pesa; delivery to all 47 counties.`;
+  const base = `Browse ${c} online in Kenya. Compare listed product details and current prices.${registrationNote} M-Pesa; Nairobi pickup, delivery to all 47 counties.`;
   return base.length <= DESC_MAX ? base : clip(base, DESC_MAX);
 }
 
