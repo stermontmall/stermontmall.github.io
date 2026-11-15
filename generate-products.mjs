@@ -668,12 +668,12 @@ for (const a of aliases) {
   writeFileSync(fileOf(from), `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Redirecting\u2026</title><link rel="canonical" href="${to}"><meta http-equiv="refresh" content="0;url=${to}"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><p>This product moved. <a href="${to}">Continue to the product page</a>.</p></body></html>`);
 }
 
+const categoryPath = slug => slug === 'stermont-cars-for-sale' ? '/cars-for-sale.html' : slug === 'mens-fashion' ? '/fashion.html' : `/c/${encodeURIComponent(slug)}.html`;
 for (const [slug, c] of Object.entries(byCat)) {
-  const path = `/c/${encodeURIComponent(slug)}.html`;
+  const legacyPath = `/c/${encodeURIComponent(slug)}.html`;
+  const path = categoryPath(slug);
   const robots = c.items.length < 5 ? 'noindex, follow' : 'index, follow, max-image-preview:large';
   const redirect = to => `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category moved | ${BRAND}</title><link rel="canonical" href="${SITE}${to}"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0; url=${to}"></head><body><p>This category has moved. <a href="${to}">Continue to the current category page</a>.</p><script>window.location.replace("${to}")</script></body></html>`;
-  if (slug === 'stermont-cars-for-sale') { writeFileSync(`.${path}`, redirect('/cars-for-sale.html')); continue; }
-  if (slug === 'mens-fashion') { writeFileSync(`.${path}`, redirect('/fashion.html')); continue; }
   const info = INFO[slug] || {};
   const title = info.title || catTitle(c.name);   // seo-meta.mjs pattern, <= 60 chars (small categories are skipped by seo-kenya.mjs, so they must be right here)
   const desc = info.desc || catDescription(c.name, slug);
@@ -688,6 +688,7 @@ ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<
 <p><a href="/c/">Browse all categories</a></p>`;
   const faqLd = info.faq ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: info.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
   writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], ['All categories', SITE + '/c/'], [c.name, SITE + path]]), robots }));
+  if (legacyPath !== path) writeFileSync(`.${legacyPath}`, redirect(path));
   urls.push(path);
 }
 
