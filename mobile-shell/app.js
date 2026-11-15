@@ -679,7 +679,8 @@ function updateCartLine() {
   store.set({ cart: next });
   editingCartKey = '';
   toast('Cart item updated');
-  closeTop();
+  // Let goTab close the product overlay and switch tabs in one history transition.
+  // Calling closeTop first races a second history traversal and can leave the customer on the product page.
   goTab('cart');
   return true;
 }
