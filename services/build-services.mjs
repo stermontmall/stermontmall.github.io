@@ -358,7 +358,9 @@ ${pestCoverage({ name: 'Pest control' })}
   write('pests-data.json', JSON.stringify({ published: data.published, pests: pests.map(p => ({ name: p.name, slug: p.slug, group: p.group, varieties: p.varieties.map(v => v.n) })) }, null, 1) + '\n');
 }
 
-const urls = ['/services/', '/services/guides/', ...(pests.length ? ['/services/pests/', ...pests.map(p => `/services/pests/${p.slug}.html`)] : []), ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`)];
+// These five locally tailored city guides are maintained as static editorial pages alongside generated service guides.
+const CITY_GUIDES = ['nairobi', 'mombasa', 'kisumu', 'nakuru', 'eldoret'].map(city => `/services/guides/${city}.html`);
+const urls = ['/services/', '/services/guides/', ...(pests.length ? ['/services/pests/', ...pests.map(p => `/services/pests/${p.slug}.html`)] : []), ...data.services.map(s => `/services/${s.slug}.html`), ...data.guides.map(g => `/services/guides/${g.slug}.html`), ...CITY_GUIDES];
 write('sitemap-services.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
 
