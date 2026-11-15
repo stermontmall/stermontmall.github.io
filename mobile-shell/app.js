@@ -134,7 +134,12 @@ async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min 
   if (sort === 'low') r.sort((a, b) => a.price - b.price);
   else if (sort === 'high') r.sort((a, b) => b.price - a.price);
   else if (sort === 'disc') r.sort((a, b) => discOf(b) - discOf(a));
-  else r.sort((a, b) => b.featured - a.featured);               // recommended: featured first, then the catalog order (sort is stable)
+  else {
+    // Stable homepage recommendation order: owner-priority departments first, with featured listings first inside each department.
+    // This is a merchandising order, not a claim about verified sales volume.
+    const priority = { 'pest-control-fumigation': 0, agrovet: 1, appliances: 2, 'home-kitchen': 2, 'phones-accessories': 3, 'tv-audio-video': 3 };
+    r.sort((a, b) => (priority[a.cat] ?? 99) - (priority[b.cat] ?? 99) || b.featured - a.featured);
+  }
   return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size };
 }
 
@@ -674,7 +679,8 @@ function updateCartLine() {
   store.set({ cart: next });
   editingCartKey = '';
   toast('Cart item updated');
-  closeTop();
+  // Let goTab close the product overlay and switch tabs in one history transition.
+  // Calling closeTop first races a second history traversal and can leave the customer on the product page.
   goTab('cart');
   return true;
 }
@@ -894,8 +900,8 @@ if (Q_DEEP && !DEEP && !CAT_DEEP) { store.set({ q: Q_DEEP }); $('#search').value
 const RESTORE_CAT = !DEEP && !CAT_DEEP && !Q_DEEP && !CART_DEEP.length && SAVED_CAT;   // a reload keeps the chosen category (checked against the live categories once they load)
 if (RESTORE_CAT) store.set({ chip: SAVED_CAT.chip, sub: SAVED_CAT.sub });
 if (DEEP) quickDeepLink(DEEP);   // product link: start the one-product fast path BEFORE the full catalog request below, so it is first in line
-syncFilterUI(); refreshGrid(); // Category rails and the drawer are rendered after the live catalogue arrives below; avoid building empty hidden views during first paint.
+syncFilterUI(); refreshGrid(); // Start a product request immediately; loadPage's request token discards this Home result if category restoration starts a newer request.
 if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
 if (CART_DEEP.length) toast('Loading shared cart...');
-loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) { store.set({ sub: '' }); refreshGrid(); } else $('#grid-title').textContent = store.get().sub || t.name; } } renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); syncProductMeta(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) { if (deepOpen) refreshDeep(); else openDeepLink(DEEP); } else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
+loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) store.set({ sub: '' }); $('#grid-title').textContent = store.get().sub || t.name; refreshGrid(); } } renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); syncProductMeta(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) { if (deepOpen) refreshDeep(); else openDeepLink(DEEP); } else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
 })();
