@@ -134,7 +134,12 @@ async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min 
   if (sort === 'low') r.sort((a, b) => a.price - b.price);
   else if (sort === 'high') r.sort((a, b) => b.price - a.price);
   else if (sort === 'disc') r.sort((a, b) => discOf(b) - discOf(a));
-  else r.sort((a, b) => b.featured - a.featured);               // recommended: featured first, then the catalog order (sort is stable)
+  else {
+    // Stable homepage recommendation order: owner-priority departments first, with featured listings first inside each department.
+    // This is a merchandising order, not a claim about verified sales volume.
+    const priority = { 'pest-control-fumigation': 0, agrovet: 1, appliances: 2, 'home-kitchen': 2, 'phones-accessories': 3, 'tv-audio-video': 3 };
+    r.sort((a, b) => (priority[a.cat] ?? 99) - (priority[b.cat] ?? 99) || b.featured - a.featured);
+  }
   return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size };
 }
 
