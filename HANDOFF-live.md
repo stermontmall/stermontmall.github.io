@@ -99,3 +99,7 @@ Working branch: wip/seo-batch2-2026-11-15
 - This preserves the real product/category URL behaviour and the production lazy-image behaviour. No storefront runtime code, styles, cart, checkout, M-Pesa, or WhatsApp logic changed.
 - Fix commits: `5b11473f586a0c0a2d5ec8c48a4ab294758baaa9` and `2b8d78b07944f2e96cb33b11fe59ae04516efa54`.
 - Await the full PR #769 Actions quality gate before merge or Batch 3.
+
+- Follow-up Actions run #291 (`43697107784`, job `132760027416`) passed all browser checks through retry loading and tab reload/SEO-head checks, then timed out at `shell.test.py:390` waiting for the Cart view after changing an existing cart pack size. This exposed a real navigation race in `updateCartLine()`: it called `closeTop()` and immediately `goTab('cart')`, initiating two competing browser-history traversals.
+- Fixed the underlying mobile-shell behaviour in `mobile-shell/app.js`: cart pack edits now call `goTab('cart')` once, allowing its existing `closeAllThen` flow to close the product overlay and switch tabs in one history transition. This is a runtime bug fix, not a weakened assertion.
+- Fix commit: `8cd9c1f6b4d049eb170df6c752a9d0249dbdb3a0`. Await the new full quality-gate run on PR #769; Batch 3 remains blocked.
