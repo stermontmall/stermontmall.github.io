@@ -120,12 +120,12 @@ const CSS = `*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,-app
 a{color:#6d28d9}header{background:#7c3aed;color:#fff;padding:.8rem 1rem}header a{color:#fff;text-decoration:none;font-weight:800;font-size:1.15rem}
 main{max-width:920px;margin:0 auto;padding:1rem}nav.bc{font-size:.85rem;color:#6b6b80;margin:.3rem 0 1rem}
 .pg{display:grid;gap:1.2rem}@media(min-width:720px){.pg{grid-template-columns:1fr 1fr}}
-.pg img{width:100%;height:auto;max-height:480px;object-fit:contain;background:#fff;border:1px solid #e6e1f5;border-radius:14px}
+.pg img{width:100%;height:auto;aspect-ratio:1/1;max-height:480px;object-fit:contain;background:#fff;border:1px solid #e6e1f5;border-radius:14px}
 h1{font-size:1.5rem;line-height:1.25;margin:.2rem 0 .6rem}.pr{font-size:1.7rem;font-weight:800;color:#5b21b6}.pr s{font-size:1rem;font-weight:500;color:#6b6b80}
 .ok{color:#15803d;font-weight:700}.no{color:#b91c1c;font-weight:700}.btn{display:block;text-align:center;background:#15803d;color:#fff;text-decoration:none;font-weight:800;padding:.85rem;border-radius:12px;margin:.8rem 0 .4rem}
 .btn.alt{background:#fff;color:#6d28d9;border:2px solid #7c3aed}.btn.ask{margin:.2rem 0 .8rem;font-size:1.02rem;box-shadow:0 2px 8px rgba(22,163,74,.3)}.box{background:#fff;border:1px solid #e6e1f5;border-radius:14px;padding:.9rem 1rem;margin:1rem 0}
 .desc{white-space:pre-line}.product-description-section{margin:1.1rem 0 0;padding:1rem 1.05rem;background:#fbfaff;border:1px solid #e8e1f5;border-left:4px solid #7c3aed;border-radius:12px}.product-description-section h3{margin:0 0 .55rem;color:#4c1d95;font-size:1.05rem;font-weight:800;line-height:1.35}.product-description-section p{margin:.35rem 0 .65rem;color:#373248;line-height:1.7}.product-description-section ul{margin:.35rem 0 .5rem;padding-left:1.25rem;list-style:disc}.product-description-section li{padding:.15rem 0 .3rem;line-height:1.6}.product-description-section:first-of-type{margin-top:.6rem}ul.g{list-style:none;padding:0;display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
-ul.g img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:.5rem}ul.g li{background:#fff;border:1px solid #e6e1f5;border-radius:12px;padding:.7rem}ul.g a{text-decoration:none;font-weight:600;color:#1f1b2e}ul.g span{display:block;color:#5b21b6;font-weight:800}
+ul.g img{display:block;width:100%;height:150px;aspect-ratio:1/1;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:.5rem}ul.g li{background:#fff;border:1px solid #e6e1f5;border-radius:12px;padding:.7rem}ul.g a{text-decoration:none;font-weight:600;color:#1f1b2e}ul.g span{display:block;color:#5b21b6;font-weight:800}
 .product-silo{margin:2rem 0;padding:1.2rem;background:#f7f9fc;border:1px solid #e3e8ef;border-radius:14px}.product-silo h2{margin:.1rem 0 .6rem;font-size:1.25rem}.product-silo h3{margin:1rem 0 .45rem;font-size:1rem}.product-silo p{color:#596579;margin:.35rem 0 .7rem}.silo-links{display:flex;flex-wrap:wrap;gap:.55rem}.silo-links a{display:inline-block;padding:.5rem .75rem;background:#fff;border:1px solid #dce3ec;border-radius:8px;text-decoration:none}.silo-products{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.65rem}.silo-products a{display:block;padding:.7rem;background:#fff;border:1px solid #e1e6ed;border-radius:8px;text-decoration:none;font-weight:600}.silo-products small{display:block;color:#5b21b6;margin-top:.25rem}.silo-guides{padding-left:1.2rem;line-height:1.9}.silo-guides a{font-weight:600} 
 footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85rem;border-top:1px solid #e6e1f5}
 .trustline{font-size:.9rem;line-height:1.65;font-weight:700;color:#166534;background:#f0fdf4;border-color:#bbf7d0}.stk{display:none}
@@ -827,7 +827,45 @@ writeFileSync('product-names.json', JSON.stringify(NAMES));
 writeFileSync(STATE, JSON.stringify(next, null, 1));
 writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
   sitemapUrls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${next[u].lastmod}</lastmod></url>`).join('\n') + `\n</urlset>\n`);
-console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages.`);
+
+// Rebuild the primary sitemap on every catalogue build. Keep the hand-maintained
+// blog, guide, service and static-page entries, but replace any old product/category
+// URLs with the exact set whose generated HTML exists in the current active catalogue.
+const SITEMAP_NS = 'http://www.sitemaps.org/schemas/sitemap/0.9';
+const previousSitemap = existsSync('sitemap.xml') ? readFileSync('sitemap.xml', 'utf8') : '';
+const staticEntries = [...previousSitemap.matchAll(/<url>\\s*<loc>(https:\\/\\/stermontarcade\\.co\\.ke[^<]*)<\\/loc>[\\s\\S]*?<\\/url>/g)]
+  .map(m => m[0])
+  .filter(entry => !/<loc>https:\\/\\/stermontarcade\\.co\\.ke\\/(?:p|c)\\//.test(entry));
+const catalogEntries = sitemapUrls.map(u => `  <url><loc>${SITE}${u}</loc><lastmod>${next[u].lastmod}</lastmod></url>`);
+const entryMap = new Map();
+for (const entry of staticEntries) {
+  const loc = entry.match(/<loc>([^<]+)<\\/loc>/)?.[1];
+  if (loc) entryMap.set(loc, entry);
+}
+for (let i = 0; i < sitemapUrls.length; i++) entryMap.set(SITE + sitemapUrls[i], catalogEntries[i]);
+writeFileSync('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\\n<urlset xmlns="${SITEMAP_NS}">\\n` +
+  [...entryMap.values()].join('\\n') + `\\n</urlset>\\n`);
+
+// robots.txt is also emitted by the same deterministic build so its sitemap
+// discovery endpoints cannot drift away from the generated XML files.
+writeFileSync('robots.txt', [
+  'User-agent: *',
+  'Allow: /',
+  '',
+  '# Keep storefront pages, category hubs, product photos, CSS and JavaScript crawlable.',
+  '# Search/sort/filter query URLs are handled with noindex,follow in generated page HTML.',
+  '# Do not block those parameters: crawlers must be able to see the noindex directive.',
+  'Disallow: /admin.html',
+  'Disallow: /account.html',
+  '',
+  'Sitemap: https://stermontarcade.co.ke/sitemap.xml',
+  'Sitemap: https://stermontarcade.co.ke/sitemap-products.xml',
+  'Sitemap: https://stermontarcade.co.ke/sitemap-images.xml',
+  'Sitemap: https://stermontarcade.co.ke/services/sitemap-services.xml',
+  'Sitemap: https://stermontarcade.co.ke/pest-control/sitemap.xml',
+  ''
+].join('\\n'));
+console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages; refreshed primary and product sitemaps.`);
 
 // Catalog rebuild trigger: publish the owner-approved Ocean Blue nitrile gloves listing (2026-11-05).
 
