@@ -29,8 +29,8 @@ assert.match(generator, /previousSitemap\.matchAll\(\/<url>/);
 assert.match(generator, /sitemapUrls\.map\(u =>/);
 assert.match(generator, /writeFileSync\('sitemap\.xml'/);
 assert.match(generator, /writeFileSync\('robots\.txt'/);
-assert.match(generator, /startsWith\(SITE \+ '\/p\/'\)/);
-assert.match(generator, /startsWith\(SITE \+ '\/c\/'\)/);
+assert.ok(generator.includes("startsWith(SITE + '/p/')"));
+assert.ok(generator.includes("startsWith(SITE + '/c/')"));
 // Product hero/card images reserve a square box to reduce layout shift.
 assert.match(generator, /aspect-ratio:1\/1/);
 // Supabase Storage image optimization is enabled only after a successful probe;
