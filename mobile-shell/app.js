@@ -562,7 +562,7 @@ function renderProductDescription(target, source) {
     const specs = isList && section.title === 'Specifications & details' ? parseSpecs(bullets) : null;
     const steps = !isList && section.title === 'How to use' ? splitSteps(section.body) : null;
     if (faq) {
-      faq.forEach((item, k) => { const d = el('details', null, 'pc-q'); if (k === 0) d.open = true; d.appendChild(el('summary', item.q)); d.appendChild(el('p', item.a)); card.appendChild(d); });
+      faq.forEach(item => { const d = el('details', null, 'pc-q'); d.open = true; d.appendChild(el('summary', item.q)); d.appendChild(el('p', item.a)); card.appendChild(d); });   // every answer is shown already open (owner 2026-11-15): nothing needs a tap to read
     } else if (specs) {
       const t = el('table', null, 'pc-spec'), tb = el('tbody'); specs.forEach(([k, v]) => { const tr = el('tr'); const th = el('th', k); th.scope = 'row'; tr.append(th, el('td', v)); tb.appendChild(tr); }); t.appendChild(tb); card.appendChild(t);
     } else if (steps) {
@@ -685,6 +685,15 @@ function openQuickBuy(id) {
   const p = feed.items.get(id); if (!p) return;
   editingCartKey = '';
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
+}
+/* Tapping a product card opens its FULL product page straight away, with the whole description already showing (owner 2026-11-15: no extra tap on
+   "See full product details"). The quick-buy sheet above is still used by the + button on a card with several pack sizes (to pick the size first).
+   To undo: make the card tap in section 11 call openQuickBuy again. */
+function openProductDirect(id) {
+  const p = feed.items.get(id); if (!p) return;
+  editingCartKey = '';
+  qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = '';
+  openProductPage();
 }
 function openDeepLink(slug) {   // the full product page for a /?product=<slug> address (any pack size's slug works)
   const hit = x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug);   // /p/<id>.html pages are named by the row id, which differs from the slug on some products
@@ -854,7 +863,7 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-cat-all]'))) return selectCategory(el.dataset.catAll);
   if ((el = t.closest('[data-cat]'))) return selectCategory(el.dataset.cat, el.dataset.sub);
   if ((el = t.closest('[data-drawer-cat]'))) { const id = el.dataset.drawerCat; return closeAllThen(() => selectCategory(id)); }
-  if ((el = t.closest('.card[data-id]'))) return openQuickBuy(el.dataset.id);
+  if ((el = t.closest('.card[data-id]'))) return openProductDirect(el.dataset.id);   // the whole product page, description open (was openQuickBuy: a sheet with a "See full product details" link)
 });
 document.addEventListener('error', e => {
   const img = e.target;
