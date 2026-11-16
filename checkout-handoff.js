@@ -8,7 +8,10 @@
    fail or hang, and then the checkout gave up even though the products are fine. If the cart cards are still missing about
    2.5 s after the page loads, this script repeats the lookup (short timeout, up to 5 tries, inside the same 15 s window) and
    adds the same hidden cards, so checkout.html's own poll finds them and opens normally. Cards that already exist are never
-   touched, so it cannot double up the cart. Everything is wrapped in try/catch and can never block checkout. */
+   touched, so it cannot double up the cart. Everything is wrapped in try/catch and can never block checkout.
+
+   WHATSAPP FALLBACK (Batch 2): the "Order on WhatsApp" button now pre-fills the cart items saved in stm_handoff (name, pack size, quantity, price when known)
+   and asks for the delivery location (Nairobi dispatch, Sarit Centre pickup by appointment, or upcountry county). */
 (function () {
   try {
     var root = document.documentElement;
@@ -63,6 +66,24 @@
       })();
     } catch (e) {}
 
+    /* ---- pre-filled WhatsApp order message built from the saved cart (never throws) ---- */
+    function orderMessage() {
+      var lines = ['Hello Stermont Arcade, my checkout did not load. I would like to place this order:', ''];
+      try {
+        var saved = JSON.parse(localStorage.getItem('stm_handoff') || 'null');
+        if (Array.isArray(saved)) saved.slice(0, 20).forEach(function (i) {
+          if (!i) return;
+          var qty = Math.max(1, Math.round(Number(i.qty || i.quantity)) || 1), size = i.size || i.variant || i.label || '', price = Number(i.price);
+          var line = '- ' + String(i.name || i.rowId || 'Item').slice(0, 120) + (size ? ' (' + String(size).slice(0, 40) + ')' : '') + ' x ' + qty;
+          if (price > 0) line += ' - KSh ' + Math.round(price).toLocaleString('en-KE') + ' each';
+          if (/^[a-z0-9][a-z0-9-]{0,120}$/i.test(String(i.rowId || ''))) line += '\n  https://stermontarcade.co.ke/p/' + encodeURIComponent(String(i.rowId)) + '.html';
+          lines.push(line);
+        });
+      } catch (e) {}
+      lines.push('', 'Delivery: please confirm which applies - Nairobi dispatch, Sarit Centre pickup (confirmed orders, by appointment), or upcountry delivery (my county: ____).');
+      return lines.join('\n');
+    }
+
     /* ---- failsafe: lift the cover and show a message if checkout still has not opened ---- */
     setTimeout(function () {
       try {
@@ -94,7 +115,7 @@
           location.replace('/');
         };
         var wa = document.createElement('a');
-        wa.href = 'https://wa.me/254748888230?text=' + encodeURIComponent('Hello Stermont Arcade, my checkout did not load. I would like to place an order.');
+        wa.href = 'https://wa.me/254748888230?text=' + encodeURIComponent(orderMessage());
         wa.target = '_blank'; wa.rel = 'noopener'; wa.textContent = 'Order on WhatsApp';
         wa.style.cssText = 'display:block;margin:8px 0;padding:14px;border-radius:12px;font:700 16px system-ui,sans-serif;text-align:center;text-decoration:none;background:#25d366;color:#fff';
         card.appendChild(h); card.appendChild(p); card.appendChild(again); card.appendChild(back); card.appendChild(wa);

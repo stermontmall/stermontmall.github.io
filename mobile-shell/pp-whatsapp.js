@@ -3,7 +3,8 @@
      1. a green "Ask about this item on WhatsApp" button at the top of Product details, and
      2. a round WhatsApp button next to Add to cart / Buy now in the bottom bar,
    and the same "Ask on WhatsApp" link under the quick-buy sheet's details (#sheet-quickbuy).
-   The message names the product, the selected pack size, the price and the shell link (/?product=<slug>), and it updates when the pack size changes.
+   The message names the product, the selected pack size, the quantity, the price (KES) and the shell link (/?product=<slug>), then asks where to deliver
+   (Nairobi dispatch, Sarit Centre pickup for confirmed orders by appointment, or upcountry county). It updates when the pack size or quantity changes.
    Reads only the page's own text, so it does not depend on app.js internals. The floating chat button (wa-float.js) is hidden while a product page is open (body.no-scroll),
    which is why the product view had no WhatsApp button at all.
    Loaded from index.html after app.js. To undo: delete the <script src="/mobile-shell/pp-whatsapp.js"> line in index.html. */
@@ -29,8 +30,15 @@
       return a;
     }
     function wa(text) { return 'https://wa.me/' + NUMBER + '?text=' + encodeURIComponent(text); }
-    function msg(name, size, price, url) {
-      return 'Hello Stermont Arcade, I would like to ask about this item: ' + (name || 'a product') + (size ? ' (' + size + ')' : '') + (price ? ' - ' + price : '') + (url ? '\n' + url : '');
+    // One-tap order message: product, pack size, quantity, price in KES, product URL, then a delivery-location prompt.
+    function msg(name, size, qty, price, url) {
+      var lines = ['Hello Stermont Arcade, I would like to order this item:', '', 'Product: ' + (name || 'a product')];
+      if (size) lines.push('Pack size: ' + size);
+      lines.push('Quantity: ' + (qty && /^\d+$/.test(qty) ? qty : '1'));
+      if (price) lines.push('Price (each): ' + price);
+      if (url) lines.push('Link: ' + url);
+      lines.push('', 'Delivery: please confirm which applies - Nairobi dispatch, Sarit Centre pickup (confirmed orders, by appointment), or upcountry delivery (my county: ____).');
+      return lines.join('\n');
     }
 
     var page = $('#page-product'), desc = $('#pp-desc');
@@ -60,13 +68,13 @@
           var sel = $('#pp-sizes [aria-selected="true"]'), size = sel ? (sel.getAttribute('data-pp-size') || txt(sel)) : '';
           var slug = slugFromPath(location.pathname) || new URLSearchParams(location.search).get('product') || '';
           if (location.hash.length > 1 && OK.test(location.hash.slice(1))) slug = location.hash.slice(1);   // a pack size slug is as good as the product slug
-          var h = wa(msg(txt($('#pp-name')), size, txt($('#pp-price')), shellUrl(slug)));
+          var h = wa(msg(txt($('#pp-name')), size, txt($('#pp-qty')), txt($('#pp-price')), shellUrl(slug)));
           if (bodyBtn) bodyBtn.href = h; if (roundBtn) roundBtn.href = h;
         }
         if (qbBtn) {
           var qsel = $('#qb-sizes [aria-selected="true"]'), qsize = qsel ? (qsel.getAttribute('data-qb-size') || qsel.getAttribute('data-pp-size') || txt(qsel)) : '';
           var pg = $('#qb-page'), qslug = pg ? slugFromPath(pg.getAttribute('href')) : '';
-          qbBtn.href = wa(msg(txt($('#qb-name')), qsize, txt($('#qb-price')), shellUrl(qslug)));
+          qbBtn.href = wa(msg(txt($('#qb-name')), qsize, txt($('#qb-qty')), txt($('#qb-price')), shellUrl(qslug)));
         }
       } catch (e) {}
     }
