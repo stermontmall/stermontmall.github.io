@@ -764,13 +764,13 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
   const HOME = 'index.html';
   if (existsSync(HOME)) {
     const html = readFileSync(HOME, 'utf8');
-    const match = html.match(/(<ul id="grid"[^>]*>)[\\s\\S]*?(<\\/ul>)/);
+    const match = html.match(/(<ul id="grid"[^>]*>)[\s\S]*?(<\/ul>)/);
     if (!match) throw new Error('Homepage product grid #grid was not found; refusing to skip SSR fallback generation.');
     const seen = new Set(), picks = [];
     for (const p of products) {
       const category = p.categories?.slug;
       if (!category || seen.has(category) || !inS(p) || !(Number(p.price) > 0)) continue;
-      const image = (p.images || []).find(u => typeof u === 'string' && /^https:\\/\\//i.test(u));
+      const image = (p.images || []).find(u => typeof u === 'string' && /^https:\/\//i.test(u));
       if (!image) continue;
       seen.add(category);
       picks.push({ name: p.name, price: p.price, stock: p.stock, image, href: `/p/${encodeURIComponent(sl(p.id))}.html`, category });
