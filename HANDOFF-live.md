@@ -120,3 +120,7 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Not verified: cart button on a real phone (cart markup and `fmt` signature assumed).
 - Not changed: stray /p/ URLs in `sitemap.xml`, `seo-kenya.mjs` thin guides, footer link mismatch (`/returns-warranty.html` vs `/returns.html`) — still open.
 - Next: `python3 mobile-shell/shell.test.py 2>&1 | grep -v ERR_TUNNEL | grep FAIL`, open a PR, run CI. Not merged.
+
+## 2026-11-16 11:00 (Africa/Nairobi) — shell.test.py 174/175 explained (branch `wip/sitemap-wa-prompts-2026-11-16`)
+- The single failure is `FAIL no console/page errors`: its only errors are `net::ERR_TUNNEL_CONNECTION_FAILED`, the sandbox blocking outbound image requests. No assertion touches the new cart WhatsApp button; all cart/checkout tests pass. No code change needed; CI (with network) is the real check.
+- Next: PR against `main`, watch `gh run list --limit 3`. Not merged.
