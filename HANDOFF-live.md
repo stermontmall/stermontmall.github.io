@@ -129,3 +129,25 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Drafted, NOT applied: category `meta_title`/`meta_description` backfill for 66 active categories (script kept in the Claude session scratchpad, awaiting owner OK on examples).
 - Finding: `merchant-feed.xml` already exists (1463 items = active products; 80 inactive drafts excluded). Gaps: no `g:google_product_category`, no `g:shipping`, no gtin/mpn (identifier_exists=no).
 - Next: owner approves category examples -> apply -> rebuild product pages (`gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`).
+
+## 2026-11-16 11:40 (Africa/Nairobi) — Task start: category meta backfill + merchant feed upgrade (branch `wip-category-seo-backfill`)
+- Scope: "66 active categories" = categories with active products plus their ancestors (60 direct + 6 parents); 92 categories in total; 0 categories have a hand-written meta_description today. Backfill only fills NULL/blank values, never overwrites.
+- In progress: write `supabase/sql/category_meta_description_backfill.sql` (grouped Kenyan buyer-intent templates, <=155 chars), dry-run length check via execute_sql, apply as migration `category_meta_description_backfill`, then dispatch product-pages workflow.
+- Next after that: separate branch `wip-merchant-feed-upgrade` from main for `merchant-feed.xml` (google_product_category, gtin/mpn, KE shipping, CI XML check). Generator is `generate-products.mjs` (feed block ~line 779), not the XML file.
+- Re-run to rebuild pages: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`
+
+## 2026-11-16 11:55 (Africa/Nairobi) — Category meta backfill APPLIED (branch `wip-category-seo-backfill`)
+- Done: migration `20261116082753 category_meta_description_backfill` applied to Supabase (source `supabase/sql/category_meta_description_backfill.sql`). 66 of 66 active categories filled (max 151 chars, no double spaces); 0 hand-written values existed, none overwritten. Groups: pest control, agrovet, electronics/appliances, home & kitchen, motorcycle, cars, car parts, fashion/beauty/shoes, safety/PPE, general.
+- Done: sample live-generated check pending the rebuild below.
+- Next: dispatch product-pages workflow (`gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`), confirm `/c/pest-control-fumigation.html` shows the new description, then start merchant feed branch `wip-merchant-feed-upgrade`.
+
+## 2026-11-16 12:20 (Africa/Nairobi) — Merchant feed upgrade started (branch `wip-merchant-feed-upgrade`, cut from main)
+- Plan: new module `merchant-feed.mjs` (item builder, used by `generate-products.mjs`), `google-product-categories.json` (slug -> Google taxonomy id + path, built by `scripts/build-google-category-map.mjs` from Google's taxonomy-with-ids.en-US.txt, snapshot 2019-07-10 from github.com/jmagnusson/google-taxonomy), `merchant-feed.config.json` (Kenya shipping), `merchant-feed.test.mjs`, `check-merchant-feed.mjs` (xmllint + rules), CI step in `seo-pr-quality.yml`.
+- Facts: 1463 active products, 0 with gtin, 0 with mpn today, so every item stays `identifier_exists=no` until identifiers are filled. No flat delivery fee exists on the site (fee depends on location/weight), so `g:shipping` price is config-driven and NOT invented.
+- Taxonomy file for re-run: `git clone --depth 1 https://github.com/jmagnusson/google-taxonomy` then `node scripts/build-google-category-map.mjs <path>/taxonomy-with-ids.en-US.txt`.
+
+## 2026-11-16 12:50 (Africa/Nairobi) — Merchant feed PR ready (branch `wip-merchant-feed-upgrade`)
+- Done: `merchant-feed.mjs` + `google-product-categories.json` (90 slugs -> verified Google IDs; `others`/`kili-featured` intentionally unmapped), `merchant-feed.config.json`, generator wired, `merchant-feed.test.mjs` (11 tests pass), `check-merchant-feed.mjs` (xmllint + strict rules), CI steps in `seo-pr-quality.yml` (`validate` job, after the live-catalogue build). Verified locally by running the real `generate-products.mjs` in a scratch copy with a mocked catalogue; `xmllint` OK; strict check OK.
+- Decisions to confirm with owner: (1) `g:shipping` is NOT emitted until `shipping.price_kes` is set in `merchant-feed.config.json` (fees vary by location/size; none invented); (2) 32 active `stermont-cars-for-sale` items are excluded from the feed (vehicle listings are not eligible for ordinary Merchant listings; edit `exclude_categories` to revert).
+- Facts: 0 of 1463 active products have gtin/mpn, so all items stay `identifier_exists=no` until the columns are filled.
+- Next: open PR, watch `SEO pull request quality gate` (`gh run list --workflow seo-pr-quality.yml --limit 3`), merge only when green, then dispatch product-pages workflow and run `node check-merchant-feed.mjs --strict` on the regenerated file.
