@@ -20,7 +20,6 @@ import { productIdentifiers } from './seo-product-identifiers.mjs';
 import { productDescriptionHtml } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
 import { renderHomeGridFallback } from './home-grid-ssr.mjs';
-import { renderHomeGridFallback } from './home-grid-ssr.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
