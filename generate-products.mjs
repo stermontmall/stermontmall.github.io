@@ -807,7 +807,7 @@ try {
 }
 // Only advertise URLs whose generated HTML exists. Prevent stale/missing product or category files
 // from entering Google's sitemap (a missing file otherwise gets an empty hash and still gets listed).
-const sitemapUrls = urls.filter(u => existsSync(u.endsWith('/') ? `.${u}index.html` : fileOf(u)) && (!/^\\/p\\/[^/]+\\.html$/.test(u) || sitemapEligibleProductPaths.has(u)));
+const sitemapUrls = urls.filter(u => existsSync(u.endsWith('/') ? `.${u}index.html` : fileOf(u)) && (!/^\/p\/[^/]+\.html$/.test(u) || sitemapEligibleProductPaths.has(u)));
 const next = {};
 for (const u of sitemapUrls) {
   const file = u.endsWith('/') ? `.${u}index.html` : fileOf(u);
