@@ -11,10 +11,10 @@ const rows = [
 
 const html = renderHomeGridFallback(rows, { limit: 8 });
 assert.equal((html.match(/ssr-product-card/g) || []).length, 2, 'only positive-stock products with safe local product URLs render');
-assert.match(html, /href="\\/p\\/spray-1\\.html"/);
+assert.match(html, /href="\/p\/spray-1\.html"/);
 assert.match(html, /Sprayer &amp; &lt;Nozzle&gt;/, 'product text is HTML-escaped');
 assert.match(html, /KSh 1,250/);
 assert.doesNotMatch(html, /Sold Out Item|Unknown Stock Item|Unsafe Link/);
-assert.doesNotMatch(html, /images\\.example\\/sold/);
+assert.doesNotMatch(html, /images\.example\/sold/);
 assert.equal(renderHomeGridFallback(rows, { limit: 0 }), '');
 console.log('OK: homepage SSR grid eligibility, safe links, escaping, prices and limit');
