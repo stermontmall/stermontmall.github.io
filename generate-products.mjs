@@ -20,6 +20,7 @@ import { productIdentifiers } from './seo-product-identifiers.mjs';
 import { productDescriptionHtml } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
 import { renderHomeGridFallback } from './home-grid-ssr.mjs';
+import { renderHomeGridFallback } from './home-grid-ssr.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -170,7 +171,7 @@ const reviewLd = list => list.length ? {
 const gmap = {};
 rows.forEach(p => { if (p.variant_group && p.variant_label) (gmap[p.variant_group] = gmap[p.variant_group] || []).push(p); });
 const products = [], aliases = [], seenG = new Set();
-const inS = x => x.stock == null || Number(x.stock) > 0;
+const inS = x => Number(x.stock) > 0;
 // true when the name already ends with the variant label, or every word/number of the label is already in the name
 const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\\d+(?:\\.\\d+)?)\\s*(millilitres?|milliliters?|ml)\\b/g, '$1ml').replace(/(\\d+(?:\\.\\d+)?)\\s*(litres?|liters?|l)\\b/g, '$1l').replace(/(\\d+(?:\\.\\d+)?)\\s*(kilograms?|kg)\\b/g, '$1kg').replace(/(\\d+(?:\\.\\d+)?)\\s*(grams?|g)\\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
 for (const p of rows) {
@@ -756,6 +757,32 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
   }
   writeFileSync('merchant-feed.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0"><channel><title>${BRAND}</title><link>${SITE}/</link><description>${BRAND} product feed</description>\n${feed.join('\n')}\n</channel></rss>\n`);
   console.log(`Merchant feed: ${feed.length} items.`);
+}
+
+// Build-time homepage product fallback: Googlebot and no-JS visitors receive product links immediately.
+// The mobile shell continues to own filtering, sorting, pagination and the hydrated catalogue.
+{
+  const HOME = 'index.html';
+  if (existsSync(HOME)) {
+    const html = readFileSync(HOME, 'utf8');
+    const match = html.match(/(<ul id="grid"[^>]*>)[\\s\\S]*?(<\\/ul>)/);
+    if (!match) throw new Error('Homepage product grid #grid was not found; refusing to skip SSR fallback generation.');
+    const seen = new Set(), picks = [];
+    for (const p of products) {
+      const category = p.categories?.slug;
+      if (!category || seen.has(category) || !inS(p) || !(Number(p.price) > 0)) continue;
+      const image = (p.images || []).find(u => typeof u === 'string' && /^https:\\/\\//i.test(u));
+      if (!image) continue;
+      seen.add(category);
+      picks.push({ name: p.name, price: p.price, stock: p.stock, image, href: `/p/${encodeURIComponent(sl(p.id))}.html`, category });
+    }
+    picks.sort((a, b) => (b.category === 'pest-control-fumigation') - (a.category === 'pest-control-fumigation'));
+    const cards = renderHomeGridFallback(picks, { limit: 8 });
+    if (!cards) throw new Error('No positive-stock, priced, image-backed products are available for the homepage fallback.');
+    const updated = html.replace(match[0], match[1] + cards + match[2]);
+    if (updated !== html) writeFileSync(HOME, updated);
+    console.log(`Homepage SSR fallback: ${Math.min(picks.length, 8)} crawlable product cards.`);
+  }
 }
 
 // Homepage: the storefront loads its products with JavaScript, so give crawlers plain links to every category and a spread of products.
