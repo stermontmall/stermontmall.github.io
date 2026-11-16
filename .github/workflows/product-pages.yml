@@ -102,6 +102,9 @@ jobs:
       - name: Test the product page guard
         run: node check-product-pages.test.mjs
 
+      - name: Test homepage server-rendered product cards
+        run: node home-grid-ssr.test.mjs
+
       - name: Build pages and sitemap from the live catalog
         run: node generate-products.mjs
 

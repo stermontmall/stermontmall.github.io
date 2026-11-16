@@ -5,9 +5,11 @@ from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root: the shell reads /product-names.json
 OUT = tempfile.gettempdir()
-H = functools.partial(http.server.SimpleHTTPRequestHandler, directory=ROOT)
-H.log_message = lambda *a, **k: None
-srv = socketserver.TCPServer(('127.0.0.1', 0), H); port = srv.server_address[1]
+class QuietHandler(http.server.SimpleHTTPRequestHandler):
+    """Serves the repo root without an access-log line per request (those lines buried the real FAIL lines in CI output)."""
+    def __init__(self, *args, **kwargs): super().__init__(*args, directory=ROOT, **kwargs)
+    def log_message(self, *args, **kwargs): pass
+srv = socketserver.TCPServer(('127.0.0.1', 0), QuietHandler); port = srv.server_address[1]
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 URL = f'http://127.0.0.1:{port}/'
 
@@ -78,6 +80,16 @@ def check(name, cond, extra=''):
 
 with sync_playwright() as p:
     b = p.chromium.launch()
+    # Initial HTML must contain crawlable product links before the mobile-shell JS hydrates the grid.
+    # This protects search discovery while leaving the live JS grid responsible for filtering and pagination.
+    c0 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True)
+    mock_network(c0)
+    c0.route('**/mobile-shell/app.js*', lambda rt: rt.fulfill(status=200, content_type='application/javascript', body=''))
+    p0 = c0.new_page(); p0.goto(URL, wait_until='domcontentloaded')
+    check('server-rendered home grid exposes crawlable product links before hydration', p0.locator('#grid a[href^="/p/"]').count() >= 6, p0.locator('#grid a[href^="/p/"]').count())
+    check('initial empty-state message stays hidden before hydration', p0.locator('#grid-empty').is_hidden())
+    c0.close()
+
     ctx = b.new_context(viewport={'width': 390, 'height': 780}, device_scale_factor=2, is_mobile=True, has_touch=True)
     mock_network(ctx)
     pg = ctx.new_page()
@@ -85,10 +97,23 @@ with sync_playwright() as p:
     pg.on('pageerror', lambda e: errors.append(str(e)))
     pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and 'broken.jpg' not in (m.location or {}).get('url', '') else None)   # the aborted photo is the fixture's deliberate failure
     pg.add_init_script("window.__sawSkeleton = false; new MutationObserver(() => { if (document.querySelector('#grid .card[aria-hidden=\"true\"]')) window.__sawSkeleton = true; }).observe(document, { childList: true, subtree: true });")
-    pg.goto(URL)
+    # Park (do not sleep on) the FIRST live catalogue request so the pre-hydration assertion is deterministic.
+    # The old handler called time.sleep() inside the synchronous route callback, which froze Playwright's event loop: goto() could not
+    # return until the response had already been served, so the shell could replace the SSR cards before they were counted.
+    # A parked request leaves the shell waiting on the network while the test thread stays free. times=1 means every later request
+    # (and every other test on this page) falls through to mock_network's normal handler; the shell fetches the catalogue only once per load.
+    parked = []
+    pg.route('**/rest/v1/rpc/get_store_catalog*', lambda route: parked.append(route), times=1)
+    pg.goto(URL, wait_until='domcontentloaded')
+    for _ in range(200):   # up to ~10 s for the shell to ask for the catalogue; it is then held, so no hydration can have happened yet
+        if parked: break
+        pg.wait_for_timeout(50)
 
-    # skeletons then products
+    # Keep the server-rendered cards in place until the first live catalogue response arrives.
+    check('SSR fallback cards remain visible while the live catalogue is loading', pg.locator('#grid .ssr-product-card').count() >= 6, pg.locator('#grid .ssr-product-card').count())
+    if parked: on_rest(parked.pop(0))   # release the held catalogue response: hydration may proceed now
     pg.wait_for_selector('#grid .card[data-id]')
+    check('live catalogue replaces SSR fallback cards after hydration', pg.locator('#grid .ssr-product-card').count() == 0)
     check('skeleton cards were shown while loading', pg.evaluate('window.__sawSkeleton'))
     n = pg.locator('#grid .card[data-id]').count()
     check('products replace skeletons (first paginated batch)', pg.locator('#grid .card[aria-hidden="true"]').count() == 0 and n >= 8, n)

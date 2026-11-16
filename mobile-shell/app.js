@@ -354,7 +354,13 @@ function query() {
 }
 async function loadPage(reset) {
   if (feed.loading && !reset) return;
-  if (reset) { feed.page = 1; feed.hasMore = true; feed.token++; grid.innerHTML = ''; $('#grid-empty').hidden = true; }
+  if (reset) {
+    feed.page = 1; feed.hasMore = true; feed.token++;
+    const q = query();
+    const keepSSR = q.cat === 'all' && !q.sub && !q.q && q.sort === 'rec' && !q.disc && !q.min && !q.max && grid.querySelector('.ssr-product-card');
+    if (!keepSSR) grid.innerHTML = ''; // preserve crawlable cards for the default home view until the live response succeeds
+    $('#grid-empty').hidden = true;
+  }
   if (!feed.hasMore) return;
   const token = feed.token; feed.loading = true;
   grid.insertAdjacentHTML('beforeend', skeletons(reset ? 6 : 4));
@@ -368,6 +374,7 @@ async function loadPage(reset) {
   if (token !== feed.token) return;            // a newer query started: drop this stale answer
   const { items, hasMore } = res;
   $$('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
+  $$('.ssr-product-card', grid).forEach(n => n.remove()); // live cards replace the build-time fallback only after a successful response
   items.forEach(p => feed.items.set(p.id, p));
   const categoryView = query().cat !== 'all';
   grid.insertAdjacentHTML('beforeend', items.map((p, i) => cardHTML(p, categoryView && feed.page === 1 && i === 0)).join(''));

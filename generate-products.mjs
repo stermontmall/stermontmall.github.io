@@ -19,6 +19,7 @@ import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadW
 import { productIdentifiers } from './seo-product-identifiers.mjs';
 import { productDescriptionHtml } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
+import { renderHomeGridFallback } from './home-grid-ssr.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -49,12 +50,7 @@ const STORE_LD = {
     postalCode: '00800',
     addressCountry: 'KE'
   },
-  openingHoursSpecification: {
-    '@type': 'OpeningHoursSpecification',
-    dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
-    opens: '08:00',
-    closes: '20:00'
-  },
+  description: 'Sarit Centre, Westlands is a coordination and order-pickup point for confirmed orders by appointment; contact Stermont Arcade before visiting.',
   areaServed: [{ '@type': 'City', name: 'Nairobi' }, { '@type': 'Country', name: 'Kenya' }],
   paymentAccepted: 'M-Pesa',
   currenciesAccepted: 'KES'
@@ -174,7 +170,7 @@ const reviewLd = list => list.length ? {
 const gmap = {};
 rows.forEach(p => { if (p.variant_group && p.variant_label) (gmap[p.variant_group] = gmap[p.variant_group] || []).push(p); });
 const products = [], aliases = [], seenG = new Set();
-const inS = x => x.stock == null || Number(x.stock) > 0;
+const inS = x => Number(x.stock) > 0;
 // true when the name already ends with the variant label, or every word/number of the label is already in the name
 const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\\d+(?:\\.\\d+)?)\\s*(millilitres?|milliliters?|ml)\\b/g, '$1ml').replace(/(\\d+(?:\\.\\d+)?)\\s*(litres?|liters?|l)\\b/g, '$1l').replace(/(\\d+(?:\\.\\d+)?)\\s*(kilograms?|kg)\\b/g, '$1kg').replace(/(\\d+(?:\\.\\d+)?)\\s*(grams?|g)\\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
 for (const p of rows) {
@@ -581,9 +577,11 @@ function productBuyingNotes(p, cat) {
 }
 
 const NAMES = {};   // product id -> the heading its page shows; the shop list reads this (product-names.json) so list, view and page always carry the same wording
+const sitemapEligibleProductPaths = new Set(); // only explicitly in-stock product pages enter the product sitemap
 for (const p of products) {
   const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
+  if (Number(p.stock) > 0) sitemapEligibleProductPaths.add(path);
   const revs = reviewsFor(p), rLd = reviewLd(revs);
   // Meta title (max 60 chars) and description (max 155 chars) come from seo-meta.mjs: "[Original] <name> \u2013 Price in Kenya | Stermont Arcade".
   // "Original / genuine" is only claimed for known brands and farm inputs; the price stays in the Product schema and on the page.
@@ -642,7 +640,7 @@ for (const p of products) {
       : `Check the product details, exact model or size and the manufacturer's instructions before use. Confirm that it suits your intended setup and any accessories or compatibility requirements. <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> if you need help checking a detail.`;
   const seoBoxes = `${hd.uses ? `<div class="box"><h2 style="margin-top:0">${esc(hd.uses)}</h2><p>${usesTxt}</p></div>` : ''}
 <div class="box"><h2 style="margin-top:0">${esc(hd.price)}</h2><p>${nameE} costs <b>${priceTxt}</b> at ${BRAND}${inStock ? ' and is in stock' : ', but is currently sold out, so ask us when it is back'}. Add it to your cart, pay by M-Pesa and enter the M-Pesa code from your SMS, or <a href="${esc(inStock ? wa : ask)}" rel="noopener">order on WhatsApp</a>. Buying in bulk? Message us for a quote.</p></div>
-<div class="box"><h2 style="margin-top:0">${esc(hd.delivery)}</h2><p>Orders to Nairobi usually arrive the same day or the next day, and the other counties usually within 1 to 3 days. We confirm the delivery fee for your location before you pay. Prefer store pickup? Collect at The Sarit Centre, Karuna Road, Westlands, open daily 8 AM to 8 PM, and confirm stock on WhatsApp first. See <a href="/shipping.html">shipping</a> and <a href="/nairobi.html">Nairobi delivery and pickup</a>.</p></div>`;
+<div class="box"><h2 style="margin-top:0">${esc(hd.delivery)}</h2><p>Orders to Nairobi usually arrive the same day or the next day, and the other counties usually within 1 to 3 days. We confirm the delivery fee for your location before you pay. Prefer store pickup? Collect at The Sarit Centre, Karuna Road, Westlands, available for confirmed orders by appointment; contact us before visiting. See <a href="/shipping.html">shipping</a> and <a href="/nairobi.html">Nairobi delivery and pickup</a>.</p></div>`;
   const catalogDescription = String(p.description || '').trim();
   const detailFallback = 'This listing is for ' + p.name + ' in the ' + (cat?.name || 'Stermont Arcade') + ' category. Check the exact model, pack size or variant and the specifications shown on this page before ordering. If a detail is not listed, contact Stermont Arcade to confirm it. Current availability and delivery charges are confirmed before payment.';
   const productDescription = catalogDescription.length >= 100 ? catalogDescription : [catalogDescription, detailFallback].filter(Boolean).join(' ');
@@ -760,6 +758,32 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
   console.log(`Merchant feed: ${feed.length} items.`);
 }
 
+// Build-time homepage product fallback: Googlebot and no-JS visitors receive product links immediately.
+// The mobile shell continues to own filtering, sorting, pagination and the hydrated catalogue.
+{
+  const HOME = 'index.html';
+  if (existsSync(HOME)) {
+    const html = readFileSync(HOME, 'utf8');
+    const match = html.match(/(<ul id="grid"[^>]*>)[\s\S]*?(<\/ul>)/);
+    if (!match) throw new Error('Homepage product grid #grid was not found; refusing to skip SSR fallback generation.');
+    const seen = new Set(), picks = [];
+    for (const p of products) {
+      const category = p.categories?.slug;
+      if (!category || seen.has(category) || !inS(p) || !(Number(p.price) > 0)) continue;
+      const image = (p.images || []).find(u => typeof u === 'string' && /^https:\/\//i.test(u));
+      if (!image) continue;
+      seen.add(category);
+      picks.push({ name: p.name, price: p.price, stock: p.stock, image, href: `/p/${encodeURIComponent(sl(p.id))}.html`, category });
+    }
+    picks.sort((a, b) => (b.category === 'pest-control-fumigation') - (a.category === 'pest-control-fumigation'));
+    const cards = renderHomeGridFallback(picks, { limit: 8 });
+    if (!cards) throw new Error('No positive-stock, priced, image-backed products are available for the homepage fallback.');
+    const updated = html.replace(match[0], match[1] + cards + match[2]);
+    if (updated !== html) writeFileSync(HOME, updated);
+    console.log(`Homepage SSR fallback: ${Math.min(picks.length, 8)} crawlable product cards.`);
+  }
+}
+
 // Homepage: the storefront loads its products with JavaScript, so give crawlers plain links to every category and a spread of products.
 // Only the part between the two markers in index.html is rewritten on each build.
 {
@@ -795,6 +819,45 @@ ${B}`;
   } else console.log('Homepage markers not found - skipped homepage links.');
 }
 
+// Server-render a small set of positive-stock product links inside the home grid.
+// mobile-shell/app.js replaces these cards during hydration; without JS they remain crawlable links.
+{
+  const HOME = 'index.html';
+  const OPEN = '<ul id="grid" class="grid grid-cols-2 gap-2 px-2">';
+  if (existsSync(HOME)) {
+    const current = readFileSync(HOME, 'utf8');
+    const start = current.indexOf(OPEN), close = start < 0 ? -1 : current.indexOf('</ul>', start);
+    if (start >= 0 && close >= 0) {
+      const buckets = new Map();
+      for (const p of products) {
+        if (!(Number(p.stock) > 0) || !(Number(p.price) > 0) || !(p.images || []).some(u => /^https:\/\//i.test(String(u)))) continue;
+        const key = p.categories?.slug || '_';
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(p);
+      }
+      const priority = ['pest-control-fumigation', 'crop-insecticides', 'sprayers-equipment', 'poultry-dairy-equipment', 'farm-garden-tools', 'veterinary-drugs', 'animal-feeds', 'fertilizers'];
+      const order = [...priority, ...[...buckets.keys()].filter(k => !priority.includes(k)).sort()];
+      const picked = [];
+      for (const key of order) {
+        const p = buckets.get(key)?.shift();
+        if (p) picked.push(p);
+        if (picked.length >= 8) break;
+      }
+      while (picked.length < 8) {
+        const bucket = [...buckets.values()].find(items => items.length);
+        if (!bucket) break;
+        picked.push(bucket.shift());
+      }
+      const cards = renderHomeGridFallback(picked.map(p => ({
+        id: p.id, name: p.name, price: p.price, stock: p.stock, image: p.images?.[0], href: `/p/${encodeURIComponent(sl(p.id))}.html`
+      })), { limit: 8 });
+      const updated = current.slice(0, start) + OPEN + cards + current.slice(close);
+      if (updated !== current) writeFileSync(HOME, updated);
+      console.log(`Homepage SSR grid: ${picked.length} positive-stock product links.`);
+    } else console.log('Homepage grid marker not found - skipped SSR product cards.');
+  }
+}
+
 // lastmod only moves when a page's content really changed. Google ignores sitemaps whose dates change on every build.
 const today = new Date().toISOString().slice(0, 10);
 const STATE = 'sitemap-state.json';
@@ -810,7 +873,7 @@ try {
 }
 // Only advertise URLs whose generated HTML exists. Prevent stale/missing product or category files
 // from entering Google's sitemap (a missing file otherwise gets an empty hash and still gets listed).
-const sitemapUrls = urls.filter(u => existsSync(u.endsWith('/') ? `.${u}index.html` : fileOf(u)));
+const sitemapUrls = urls.filter(u => existsSync(u.endsWith('/') ? `.${u}index.html` : fileOf(u)) && (!/^\/p\/[^/]+\.html$/.test(u) || sitemapEligibleProductPaths.has(u)));
 const next = {};
 for (const u of sitemapUrls) {
   const file = u.endsWith('/') ? `.${u}index.html` : fileOf(u);
