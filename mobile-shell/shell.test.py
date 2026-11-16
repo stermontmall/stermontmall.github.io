@@ -97,8 +97,10 @@ with sync_playwright() as p:
     pg.add_init_script("window.__sawSkeleton = false; new MutationObserver(() => { if (document.querySelector('#grid .card[aria-hidden=\"true\"]')) window.__sawSkeleton = true; }).observe(document, { childList: true, subtree: true });")
     pg.goto(URL)
 
-    # skeletons then products
+    # Keep the server-rendered cards in place until the first live catalogue response arrives.
+    check('SSR fallback cards remain visible while the live catalogue is loading', pg.locator('#grid .ssr-product-card').count() >= 6, pg.locator('#grid .ssr-product-card').count())
     pg.wait_for_selector('#grid .card[data-id]')
+    check('live catalogue replaces SSR fallback cards after hydration', pg.locator('#grid .ssr-product-card').count() == 0)
     check('skeleton cards were shown while loading', pg.evaluate('window.__sawSkeleton'))
     n = pg.locator('#grid .card[data-id]').count()
     check('products replace skeletons (first paginated batch)', pg.locator('#grid .card[aria-hidden="true"]').count() == 0 and n >= 8, n)
