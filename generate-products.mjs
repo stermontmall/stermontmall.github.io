@@ -809,7 +809,7 @@ ${B}`;
         if (!buckets.has(key)) buckets.set(key, []);
         buckets.get(key).push(p);
       }
-      const priority = ['pest-control-fumigation', 'agrovet', 'agrochemicals', 'fumigation-chemicals', 'bed-bug-killers', 'cockroach-ant-killers', 'rodent-control', 'farm-garden-tools'];
+      const priority = ['pest-control-fumigation', 'crop-insecticides', 'sprayers-equipment', 'poultry-dairy-equipment', 'farm-garden-tools', 'veterinary-drugs', 'animal-feeds', 'fertilizers'];
       const order = [...priority, ...[...buckets.keys()].filter(k => !priority.includes(k)).sort()];
       const picked = [];
       for (const key of order) {
