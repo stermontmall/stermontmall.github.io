@@ -95,6 +95,9 @@ with sync_playwright() as p:
     pg.on('pageerror', lambda e: errors.append(str(e)))
     pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and 'broken.jpg' not in (m.location or {}).get('url', '') else None)   # the aborted photo is the fixture's deliberate failure
     pg.add_init_script("window.__sawSkeleton = false; new MutationObserver(() => { if (document.querySelector('#grid .card[aria-hidden=\"true\"]')) window.__sawSkeleton = true; }).observe(document, { childList: true, subtree: true });")
+    # Hold the live catalogue response so this pre-hydration assertion is deterministic.
+    # The page-level route overrides mock_network's context route for this request only.
+    pg.route('**/rest/v1/rpc/get_store_catalog*', lambda route: (time.sleep(2), on_rest(route)))
     pg.goto(URL, wait_until='domcontentloaded')
 
     # Keep the server-rendered cards in place until the first live catalogue response arrives.
