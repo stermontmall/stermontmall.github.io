@@ -30,6 +30,8 @@ on:
 
 permissions:
   contents: read
+  # TEMPORARY (remove before merging PR #785): lets the failure-report step post the failing output as a PR comment.
+  pull-requests: write
 
 concurrency:
   group: seo-pr-quality-${{ github.event.pull_request.number || github.ref }}
@@ -38,6 +40,10 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        # Explicit bash gives -eo pipefail, so `cmd | tee log` still fails the step when cmd fails.
+        shell: bash
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -46,59 +52,79 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
+      # Every step below tees its output to $RUNNER_TEMP/ci-logs/NN-*.log.
+      # If a step fails, the last 80 lines of the newest log are redacted, then written to the job summary,
+      # raised as an annotation and posted as a PR comment (see "Report failing step output").
+      - name: Prepare failure log directory
+        run: mkdir -p "$RUNNER_TEMP/ci-logs"
       - name: Install Playwright Chromium
         run: |
-          python -m pip install --upgrade pip playwright
-          python -m playwright install --with-deps chromium
+          {
+            python -m pip install --upgrade pip playwright
+            python -m playwright install --with-deps chromium
+          } 2>&1 | tee "$RUNNER_TEMP/ci-logs/01-playwright-install.log"
       # Exercise the mobile shell with harmless fixtures, not live catalogue data.
       # Keep this check alongside the existing product and SEO quality gates.
       # Reset per-test tab state when asserting the default landing view.
       - name: Nothing may go through /classic.html (guard)
-        run: node no-classic-hop.test.mjs
+        run: node no-classic-hop.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02-no-classic-hop.log"
       - name: Test server-rendered homepage product cards
-        run: node home-grid-ssr.test.mjs
+        run: node home-grid-ssr.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-home-grid-ssr.log"
       - name: Run mobile shell browser regression suite
-        run: python3 mobile-shell/shell.test.py
+        run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
       - name: Broken and placeholder links (link-check.mjs)
-        run: node link-check.mjs
+        run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/05-link-check.log"
       - name: Test homepage server-rendered product cards
-        run: node home-grid-ssr.test.mjs
+        run: node home-grid-ssr.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/06-home-grid-ssr-again.log"
       - name: Check JavaScript syntax
         run: |
-          node --check seo-check.mjs
-          node --check data-health.mjs
-          node --check blog-write.mjs
-          node --check generate-products.mjs
-          node --check kili-pages.js
-          node --check recent-orders.js
-          node --check product-content.test.mjs
-          node --check seo-meta.mjs
+          {
+            node --check seo-check.mjs
+            node --check data-health.mjs
+            node --check blog-write.mjs
+            node --check generate-products.mjs
+            node --check kili-pages.js
+            node --check recent-orders.js
+            node --check product-content.test.mjs
+            node --check seo-meta.mjs
+          } 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-syntax.log"
       - name: Test product category and safety enrichment
-        run: node seo-product-extras.test.mjs
+        run: node seo-product-extras.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/08-product-extras.log"
       - name: Test product and category SEO metadata
-        run: node seo-meta.test.mjs
+        run: node seo-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/09-seo-meta.log"
       - name: Test allowlisted ordinary-product meta descriptions
-        run: node seo-safe-meta.test.mjs
+        run: node seo-safe-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/10-seo-safe-meta.log"
       - name: Test safe consumer-guide meta descriptions
-        run: node seo-safe-blog-meta.test.mjs
+        run: node seo-safe-blog-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/11-seo-safe-blog-meta.log"
       - name: Test hand-written product content
-        run: node product-content.test.mjs
+        run: node product-content.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/12-product-content.log"
       - name: Normalize blog titles and rebuild blog index and sitemap
         run: |
-          node seo-blog-titles.mjs
-          node blog-build.mjs
-          node seo-safe-blog-meta.mjs
+          {
+            node seo-blog-titles.mjs
+            node blog-build.mjs
+            node seo-safe-blog-meta.mjs
+          } 2>&1 | tee "$RUNNER_TEMP/ci-logs/13-blog-build.log"
       - name: Build product and category pages from the live public catalogue
-        run: node generate-products.mjs
+        run: node generate-products.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/14-generate-products.log"
       - name: Apply the same SEO enrichment passes used by production
         run: |
-          node seo-kenya.mjs
-          node seo-overrides.mjs
-          node seo-titles.mjs
-          node seo-safe-meta.mjs
-          node seo-shell-redirect.mjs
+          {
+            node seo-kenya.mjs
+            node seo-overrides.mjs
+            node seo-titles.mjs
+            node seo-safe-meta.mjs
+            node seo-shell-redirect.mjs
+          } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
       - name: Run full on-page SEO audit against production-equivalent generated pages
-        run: node seo-check.mjs > seo-pr-report.md
+        run: |
+          log="$RUNNER_TEMP/ci-logs/16-seo-check.log"
+          if ! node seo-check.mjs > seo-pr-report.md 2> "$log"; then
+            rc=$?
+            cat "$log" >&2
+            { echo "--- last 80 lines of seo-pr-report.md ---"; tail -n 80 seo-pr-report.md; } | tee -a "$log"
+            exit "$rc"
+          fi
       - name: Add audit summary
         if: always()
         run: |
@@ -111,3 +137,65 @@ jobs:
           name: seo-pr-audit-report
           path: seo-pr-report.md
           if-no-files-found: ignore
+      - name: Report failing step output
+        if: failure()
+        env:
+          # Present only so the redaction below can strip the token's value if it ever appears in output.
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          log=$(ls "$RUNNER_TEMP"/ci-logs/*.log 2>/dev/null | sort | tail -n 1 || true)
+          tail_file="$RUNNER_TEMP/failure-tail.txt"
+          : > "$tail_file"
+          if [ -n "$log" ] && [ -s "$log" ]; then
+            # Last 80 lines, with ANSI colours removed and secrets/tokens redacted before anything is published.
+            python3 - "$log" "$tail_file" <<'PY'
+          import os, re, sys
+          src, dst = sys.argv[1], sys.argv[2]
+          lines = open(src, errors="replace").read().splitlines()[-80:]
+          text = "\n".join(lines)
+          text = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", text)
+          # 1) the literal value of any secret-looking environment variable
+          for name, value in os.environ.items():
+              if len(value) >= 6 and re.search(r"TOKEN|SECRET|PASSWORD|PASSWD|KEY|CREDENTIAL|AUTH|SIGNATURE", name, re.I):
+                  text = text.replace(value, "[REDACTED]")
+          # 2) common token shapes and NAME=value / NAME: value assignments
+          patterns = [
+              (r"gh[pousr]_[A-Za-z0-9]{20,}", "[REDACTED]"),
+              (r"github_pat_[A-Za-z0-9_]{20,}", "[REDACTED]"),
+              (r"sb_secret_[A-Za-z0-9_-]+", "[REDACTED]"),
+              (r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]*", "[REDACTED]"),
+              (r"\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]+", r"\1 [REDACTED]"),
+              (r"((?:TOKEN|SECRET|PASSWORD|PASSWD|API_?KEY|AUTHORIZATION|PRIVATE_?KEY|ACCESS_?KEY)[A-Za-z0-9_]*\s*[=:]\s*)\S+", r"\1[REDACTED]"),
+          ]
+          for pattern, repl in patterns:
+              text = re.sub(pattern, repl, text, flags=re.I)
+          open(dst, "w").write(text + "\n")
+          PY
+          fi
+          {
+            echo "### SEO quality gate failed: last 80 lines of the failing step output (redacted)"
+            echo
+            echo "Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID (run #$GITHUB_RUN_NUMBER), commit $GITHUB_SHA"
+            if [ -s "$tail_file" ]; then
+              echo "Log: $(basename "$log")"
+              echo
+              echo '```'
+              cat "$tail_file"
+              echo '```'
+            else
+              echo
+              echo "No captured step output (the failure happened before the first logged step)."
+            fi
+          } > "$RUNNER_TEMP/failure.md"
+          cat "$RUNNER_TEMP/failure.md" >> "$GITHUB_STEP_SUMMARY"
+          if [ -s "$tail_file" ]; then
+            msg=$(tail -n 20 "$tail_file" | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
+            echo "::error title=Failing step output ($(basename "$log"))::$msg"
+          fi
+      # TEMPORARY (remove before merging PR #785, together with the pull-requests: write permission above).
+      - name: Post failing output to the pull request
+        if: failure() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/failure.md" || true
