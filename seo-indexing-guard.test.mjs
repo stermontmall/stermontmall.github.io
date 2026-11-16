@@ -23,6 +23,23 @@ assert.match(robots, /^Allow: \/$/m);
 assert.doesNotMatch(robots, /^Disallow: \/(p|c|blog|guides)\//m);
 assert.match(robots, /^Sitemap: https:\/\/stermontarcade\.co\.ke\/sitemap\.xml$/m);
 assert.match(robots, /^Sitemap: https:\/\/stermontarcade\.co\.ke\/sitemap-products\.xml$/m);
+// The build must rebuild the root sitemap from current active catalogue page outputs,
+// preserving editorial URLs while replacing stale product/category URLs.
+assert.match(generator, /previousSitemap\.matchAll\(\/<url>/);
+assert.match(generator, /sitemapUrls\.map\(u =>/);
+assert.match(generator, /writeFileSync\('sitemap\.xml'/);
+assert.match(generator, /writeFileSync\('robots\.txt'/);
+assert.ok(generator.includes("startsWith(SITE + '/p/')"));
+assert.ok(generator.includes("startsWith(SITE + '/c/')"));
+// Product hero/card images reserve a square box to reduce layout shift.
+assert.match(generator, /aspect-ratio:1\/1/);
+// Supabase Storage image optimization is enabled only after a successful probe;
+// when unavailable, original image URLs must remain the safe fallback.
+assert.match(generator, /imageTransformsRequested = process\.env\.SUPABASE_IMAGE_TRANSFORMS === 'true'/);
+assert.match(generator, /storageImageTransformsEnabled = probe\.ok/);
+assert.match(generator, /optimizedImageUrl\(u, 320\)/);
+assert.match(generator, /optimizedImageUrl\(u, 900\)/);
+assert.match(generator, /quality', '75'/);
 
 // Ensure this protection test remains part of the production page-build gate.
 assert.match(workflow, /node seo-indexing-guard\.test\.mjs/);

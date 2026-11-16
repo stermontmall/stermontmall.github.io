@@ -74,8 +74,9 @@ const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.imag
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
-  const cols = ['id,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
+  const cols = ['id,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
+                'id,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
                 'id,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
                 'id,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
                 'id,name,price,old_price,unit,stock,images,description,categories(name,slug)',
@@ -115,12 +116,12 @@ const CSS = `*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,-app
 a{color:#6d28d9}header{background:#7c3aed;color:#fff;padding:.8rem 1rem}header a{color:#fff;text-decoration:none;font-weight:800;font-size:1.15rem}
 main{max-width:920px;margin:0 auto;padding:1rem}nav.bc{font-size:.85rem;color:#6b6b80;margin:.3rem 0 1rem}
 .pg{display:grid;gap:1.2rem}@media(min-width:720px){.pg{grid-template-columns:1fr 1fr}}
-.pg img{width:100%;height:auto;max-height:480px;object-fit:contain;background:#fff;border:1px solid #e6e1f5;border-radius:14px}
+.pg img{width:100%;height:auto;aspect-ratio:1/1;max-height:480px;object-fit:contain;background:#fff;border:1px solid #e6e1f5;border-radius:14px}
 h1{font-size:1.5rem;line-height:1.25;margin:.2rem 0 .6rem}.pr{font-size:1.7rem;font-weight:800;color:#5b21b6}.pr s{font-size:1rem;font-weight:500;color:#6b6b80}
 .ok{color:#15803d;font-weight:700}.no{color:#b91c1c;font-weight:700}.btn{display:block;text-align:center;background:#15803d;color:#fff;text-decoration:none;font-weight:800;padding:.85rem;border-radius:12px;margin:.8rem 0 .4rem}
 .btn.alt{background:#fff;color:#6d28d9;border:2px solid #7c3aed}.btn.ask{margin:.2rem 0 .8rem;font-size:1.02rem;box-shadow:0 2px 8px rgba(22,163,74,.3)}.box{background:#fff;border:1px solid #e6e1f5;border-radius:14px;padding:.9rem 1rem;margin:1rem 0}
 .desc{white-space:pre-line}.product-description-section{margin:1.1rem 0 0;padding:1rem 1.05rem;background:#fbfaff;border:1px solid #e8e1f5;border-left:4px solid #7c3aed;border-radius:12px}.product-description-section h3{margin:0 0 .55rem;color:#4c1d95;font-size:1.05rem;font-weight:800;line-height:1.35}.product-description-section p{margin:.35rem 0 .65rem;color:#373248;line-height:1.7}.product-description-section ul{margin:.35rem 0 .5rem;padding-left:1.25rem;list-style:disc}.product-description-section li{padding:.15rem 0 .3rem;line-height:1.6}.product-description-section:first-of-type{margin-top:.6rem}ul.g{list-style:none;padding:0;display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
-ul.g img{display:block;width:100%;height:150px;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:.5rem}ul.g li{background:#fff;border:1px solid #e6e1f5;border-radius:12px;padding:.7rem}ul.g a{text-decoration:none;font-weight:600;color:#1f1b2e}ul.g span{display:block;color:#5b21b6;font-weight:800}
+ul.g img{display:block;width:100%;height:150px;aspect-ratio:1/1;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:.5rem}ul.g li{background:#fff;border:1px solid #e6e1f5;border-radius:12px;padding:.7rem}ul.g a{text-decoration:none;font-weight:600;color:#1f1b2e}ul.g span{display:block;color:#5b21b6;font-weight:800}
 .product-silo{margin:2rem 0;padding:1.2rem;background:#f7f9fc;border:1px solid #e3e8ef;border-radius:14px}.product-silo h2{margin:.1rem 0 .6rem;font-size:1.25rem}.product-silo h3{margin:1rem 0 .45rem;font-size:1rem}.product-silo p{color:#596579;margin:.35rem 0 .7rem}.silo-links{display:flex;flex-wrap:wrap;gap:.55rem}.silo-links a{display:inline-block;padding:.5rem .75rem;background:#fff;border:1px solid #dce3ec;border-radius:8px;text-decoration:none}.silo-products{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.65rem}.silo-products a{display:block;padding:.7rem;background:#fff;border:1px solid #e1e6ed;border-radius:8px;text-decoration:none;font-weight:600}.silo-products small{display:block;color:#5b21b6;margin-top:.25rem}.silo-guides{padding-left:1.2rem;line-height:1.9}.silo-guides a{font-weight:600} 
 footer{max-width:920px;margin:2rem auto;padding:1rem;color:#6b6b80;font-size:.85rem;border-top:1px solid #e6e1f5}
 .trustline{font-size:.9rem;line-height:1.65;font-weight:700;color:#166534;background:#f0fdf4;border-color:#bbf7d0}.stk{display:none}
@@ -146,7 +147,37 @@ ${path.startsWith('/p/') && og ? '<link rel="preload" as="image" href="' + esc(o
 const tidy = n => String(n).replace(/\s*\|.*$/, '').replace(/\s+/g, ' ').trim();
 // When a product has several pack sizes, the shared name must not end in one size (e.g. "... 1L" on the 50 ml page).
 const SIZE_END = /\s+\d+(?:\.\d+)?\s?(?:ml|l|ltr|litres?|liters?|g|kg)\s*$/i;
-const rows = (await getProducts()).filter(p => p && p.id && p.name).map(p => ({ ...p, name: tidy(p.name) }));
+const rawRows = (await getProducts()).filter(p => p && p.id && p.name).map(p => ({ ...p, name: tidy(p.name) }));
+
+// Use Supabase's image proxy only when this project confirms that transformations
+// are enabled. The HEAD probe is deliberately fail-open: free-tier/disabled
+// transformations leave every original photo URL untouched.
+const transformedStorageUrl = (source, width) => {
+  try {
+    const u = new URL(source);
+    if (u.origin !== SB || !u.pathname.includes('/storage/v1/object/public/')) return source;
+    u.pathname = u.pathname.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+    u.searchParams.set('width', String(width));
+    u.searchParams.set('quality', '75');
+    return u.toString();
+  } catch { return source; }
+};
+let storageImageTransformsEnabled = false;
+const imageTransformsRequested = process.env.SUPABASE_IMAGE_TRANSFORMS === 'true';
+const imageProbe = imageTransformsRequested ? rawRows.flatMap(p => Array.isArray(p.images) ? p.images : []).find(u => typeof u === 'string' && u.includes('/storage/v1/object/public/')) : null;
+if (imageProbe) {
+  try {
+    const probe = await fetch(transformedStorageUrl(imageProbe, 720), { method: 'HEAD', headers: { Accept: 'image/webp,image/*;q=0.8' } });
+    storageImageTransformsEnabled = probe.ok && /^image\//i.test(probe.headers.get('content-type') || '');
+    console.log('[image-optimization] Supabase transformations ' + (storageImageTransformsEnabled ? 'enabled; resized images use automatic WebP negotiation.' : 'unavailable; retaining original image URLs.'));
+  } catch {
+    console.log('[image-optimization] Probe failed; retaining original image URLs.');
+  }
+} else if (!imageTransformsRequested) {
+  console.log('[image-optimization] Transformations are opt-in to avoid unexpected Storage transformation charges; existing WebP/AVIF assets and intrinsic dimensions remain in use.');
+}
+const optimizedImageUrl = (source, width) => storageImageTransformsEnabled ? transformedStorageUrl(source, width) : source;
+const rows = rawRows;
 // Approved customer reviews (public read). Failure or a missing table just means no review markup.
 async function getReviews() {
   try {
@@ -469,7 +500,7 @@ rmSync('p', { recursive: true, force: true }); rmSync('c', { recursive: true, fo
 mkdirSync('p', { recursive: true }); mkdirSync('c', { recursive: true });
 const urls = [];
 
-const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(u)}" alt="${esc(p.name)} product photo" width="160" height="150" loading="lazy" decoding="async">` : ''; };
+const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(optimizedImageUrl(u, 320))}" alt="${esc(p.alt_text || (p.name + ' product photo'))}" width="160" height="150" loading="lazy" decoding="async">` : ''; };
 const card = p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 // Helpful, category-specific buying checks. Avoid inventing product specifications, certifications or warranty terms.
@@ -579,7 +610,7 @@ function productBuyingNotes(p, cat) {
 const NAMES = {};   // product id -> the heading its page shows; the shop list reads this (product-names.json) so list, view and page always carry the same wording
 const sitemapEligibleProductPaths = new Set(); // only explicitly in-stock product pages enter the product sitemap
 for (const p of products) {
-  const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean);
+  const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean).map(u => optimizedImageUrl(u, 900));
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
   if (Number(p.stock) > 0) sitemapEligibleProductPaths.add(path);
   const revs = reviewsFor(p), rLd = reviewLd(revs);
@@ -587,7 +618,11 @@ for (const p of products) {
   // "Original / genuine" is only claimed for known brands and farm inputs; the price stays in the Product schema and on the page.
   const ctx = { brand: brandOf(p.name), catSlug: cat?.slug };
   const approvedName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
-  const title = pdpTitle(p.name, ctx), desc = pdpDescription(p.name, ctx, p.description), h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
+  const generatedTitle = pdpTitle(p.name, ctx);
+  const generatedDescription = pdpDescription(p.name, ctx, p.description);
+  const title = String(p.meta_title || p.seo_title || generatedTitle).trim();
+  const desc = String(p.meta_description || generatedDescription).trim();
+  const h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
   NAMES[p.id] = h1;
   // Pack-size aliases must keep their own approved SEO name; copying the group heading
   // made 100 ml / 250 ml links display the 1 litre heading in the mobile catalogue.
@@ -646,7 +681,7 @@ for (const p of products) {
   const productDescription = catalogDescription.length >= 100 ? catalogDescription : [catalogDescription, detailFallback].filter(Boolean).join(' ');
   const buyerNotes = productBuyingNotes(p, cat);
   const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
-<div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.name)} - product photo" fetchpriority="high" loading="eager" decoding="async" width="720" height="720" data-fallbacks="${esc(JSON.stringify(img.slice(1)))}">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
+<div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.alt_text || (p.name + ' - product photo'))}" fetchpriority="high" loading="eager" decoding="async" width="720" height="720" data-fallbacks="${esc(JSON.stringify(img.slice(1)))}">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
 <div><h1>${esc(h1)}</h1><p class="tagline" style="margin:.1rem 0 .6rem;color:#5b21b6;font-weight:600">${esc(tagline)}</p><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
 <p class="${inStock ? 'ok' : 'no'}">${inStock ? 'In stock' : 'Currently sold out'}</p>
 <p>Buy ${esc(p.name)} online in Kenya from ${BRAND}. Pay by M-Pesa and get delivery to all 47 counties.</p>
@@ -673,13 +708,14 @@ for (const [slug, c] of Object.entries(byCat)) {
   const oldPath = `/c/${encodeURIComponent(slug)}.html`;
   const path = slug === 'stermont-cars-for-sale' ? '/cars-for-sale.html' : slug === 'mens-fashion' ? '/fashion.html' : oldPath;
   const info = INFO[slug] || {};
-  const title = info.title || catTitle(c.name);   // seo-meta.mjs pattern, <= 60 chars (small categories are skipped by seo-kenya.mjs, so they must be right here)
-  const desc = info.desc || catDescription(c.name, slug);
+  const title = info.title || c.meta_title || catTitle(c.name);   // approved category metadata takes precedence over generated fallback
+  const desc = info.desc || c.meta_description || catDescription(c.name, slug);
+  const categoryIntro = info.intro || c.description || 'Browse the products listed below and compare the exact model, pack size or variant before ordering.';
   const helpCta = isPest(slug) ? '<div class="box"><b>Need help choosing a pest-control product?</b><p>Tell us the pest, treatment site and pack size you are considering. We can help confirm the product listing, stock and delivery fee before you order.</p><a class="btn" href="https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent('Hello Stermont Arcade, please help me choose a ' + c.name.toLowerCase() + ' product. Please confirm its listed use, pack size, stock and delivery fee.') + '">Ask on WhatsApp</a></div>' : '';
   const serviceCrosslink = isPest(slug) ? '<div class="box"><b>Need professional pest-control help?</b><p>Read our service information for treatment options, inspection questions and how to request a quote.</p><a href="/services/">Explore pest-control services</a> · <a href="/services/pests/termites.html">Termite information</a> · <a href="/services/pests/bed-bugs.html">Bed bug information</a></div>' : '';
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
-<p>${esc(info.intro || 'Browse the products listed below and compare the exact model, pack size or variant before ordering.')}</p><p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or ask about pickup at Sarit Centre, Westlands. Delivery fees are confirmed before payment.</p>${helpCta}${serviceCrosslink}<ul class="g">${c.items.map(card).join('')}</ul>
+<p>${esc(categoryIntro)}</p><p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or ask about pickup at Sarit Centre, Westlands. Delivery fees are confirmed before payment.</p>${helpCta}${serviceCrosslink}<ul class="g">${c.items.map(card).join('')}</ul>
 ${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
 ${info.guide || ''}
 ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<div class="box"><b>${esc(q)}</b><p>${esc(a)}</p></div>`).join('') : ''}
@@ -884,7 +920,48 @@ writeFileSync('product-names.json', JSON.stringify(NAMES));
 writeFileSync(STATE, JSON.stringify(next, null, 1));
 writeFileSync('sitemap-products.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
   sitemapUrls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${next[u].lastmod}</lastmod></url>`).join('\n') + `\n</urlset>\n`);
-console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages.`);
+
+// Rebuild the primary sitemap on every catalogue build. Keep the hand-maintained
+// blog, guide, service and static-page entries, but replace any old product/category
+// URLs with the exact set whose generated HTML exists in the current active catalogue.
+const SITEMAP_NS = 'http://www.sitemaps.org/schemas/sitemap/0.9';
+const previousSitemap = existsSync('sitemap.xml') ? readFileSync('sitemap.xml', 'utf8') : '';
+const staticEntries = [...previousSitemap.matchAll(/<url>[\s\S]*?<\/url>/g)]
+  .map(m => m[0])
+  .filter(entry => {
+    const loc = entry.match(/<loc>([^<]+)<\/loc>/)?.[1] || '';
+    return !loc.startsWith(SITE + '/p/') && !loc.startsWith(SITE + '/c/');
+  });
+const catalogEntries = sitemapUrls.map(u => '  <url><loc>' + SITE + u + '</loc><lastmod>' + next[u].lastmod + '</lastmod></url>');
+const entryMap = new Map();
+for (const entry of staticEntries) {
+  const loc = entry.match(/<loc>([^<]+)<\/loc>/)?.[1];
+  if (loc) entryMap.set(loc, entry);
+}
+for (let i = 0; i < sitemapUrls.length; i++) entryMap.set(SITE + sitemapUrls[i], catalogEntries[i]);
+writeFileSync('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="' + SITEMAP_NS + '">\n' +
+  [...entryMap.values()].join('\n') + '\n</urlset>\n');
+
+// robots.txt is also emitted by the same deterministic build so its sitemap
+// discovery endpoints cannot drift away from the generated XML files.
+writeFileSync('robots.txt', [
+  'User-agent: *',
+  'Allow: /',
+  '',
+  '# Keep storefront pages, category hubs, product photos, CSS and JavaScript crawlable.',
+  '# Search/sort/filter query URLs are handled with noindex,follow in generated page HTML.',
+  '# Do not block those parameters: crawlers must be able to see the noindex directive.',
+  'Disallow: /admin.html',
+  'Disallow: /account.html',
+  '',
+  'Sitemap: https://stermontarcade.co.ke/sitemap.xml',
+  'Sitemap: https://stermontarcade.co.ke/sitemap-products.xml',
+  'Sitemap: https://stermontarcade.co.ke/sitemap-images.xml',
+  'Sitemap: https://stermontarcade.co.ke/services/sitemap-services.xml',
+  'Sitemap: https://stermontarcade.co.ke/pest-control/sitemap.xml',
+  ''
+].join('\n'));
+console.log(`Built ${products.length} product pages and ${Object.keys(byCat).length} category pages; refreshed primary and product sitemaps.`);
 
 // Catalog rebuild trigger: publish the owner-approved Ocean Blue nitrile gloves listing (2026-11-05).
 

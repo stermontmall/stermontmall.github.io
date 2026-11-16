@@ -112,3 +112,8 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Follow-up Actions run #291 (`43697107784`, job `132760027416`) passed all browser checks through retry loading and tab reload/SEO-head checks, then timed out at `shell.test.py:390` waiting for the Cart view after changing an existing cart pack size. This exposed a real navigation race in `updateCartLine()`: it called `closeTop()` and immediately `goTab('cart')`, initiating two competing browser-history traversals.
 - Fixed the underlying mobile-shell behaviour in `mobile-shell/app.js`: cart pack edits now call `goTab('cart')` once, allowing its existing `closeAllThen` flow to close the product overlay and switch tabs in one history transition. This is a runtime bug fix, not a weakened assertion.
 - Fix commit: `8cd9c1f6b4d049eb170df6c752a9d0249dbdb3a0`. Await the new full quality-gate run on PR #769; Batch 3 remains blocked.
+
+## 2026-11-16 11:20 (Africa/Nairobi) — PR #784 pre-merge cleanups (branch `feat/kenya-programmatic-seo-foundation`)
+- Done (Supabase, owner-approved): `products.meta_description` trimmed on 226 rows (leading/trailing whitespace only); verified 0 rows with line breaks, double spaces or edge whitespace; 1543 non-null, max length 155. Categories have no `meta_description` values.
+- Done: `CLAUDE.md` documents the approved SEO columns and the `robots.txt` step in `product-pages.yml`.
+- Next: wait for CI on the final commit, then merge PR #784, then open an isolated Security PR (`add_draft_product` anon/PUBLIC revoke; review `is_staff` and search paths). Not touching checkout/order/M-Pesa functions.
