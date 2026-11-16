@@ -112,3 +112,11 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Follow-up Actions run #291 (`43697107784`, job `132760027416`) passed all browser checks through retry loading and tab reload/SEO-head checks, then timed out at `shell.test.py:390` waiting for the Cart view after changing an existing cart pack size. This exposed a real navigation race in `updateCartLine()`: it called `closeTop()` and immediately `goTab('cart')`, initiating two competing browser-history traversals.
 - Fixed the underlying mobile-shell behaviour in `mobile-shell/app.js`: cart pack edits now call `goTab('cart')` once, allowing its existing `closeAllThen` flow to close the product overlay and switch tabs in one history transition. This is a runtime bug fix, not a weakened assertion.
 - Fix commit: `8cd9c1f6b4d049eb170df6c752a9d0249dbdb3a0`. Await the new full quality-gate run on PR #769; Batch 3 remains blocked.
+
+## 2026-11-16 10:50 (Africa/Nairobi) — sitemap thin-category filter + WhatsApp order prompts (branch `wip/sitemap-wa-prompts-2026-11-16`)
+- Done: `generate-products.mjs` — categories with <5 products or <3 in stock are kept out of `sitemap-products.xml` (`noindexPaths`); static product-page WhatsApp messages now carry quantity and the delivery prompt (`orderMsg`, `DELIVERY_PROMPT`).
+- Done: `mobile-shell/app.js` — new cart "Order on WhatsApp" button after `#checkout` (inside the main IIFE); `index.html` cache `?v=39` -> `?v=40`.
+- Tests: check-product-pages, seo-indexing-guard, seo-meta, no-classic-hop, category-hubs pass. `python3 mobile-shell/shell.test.py` 174/175 (sandbox image requests blocked); the one failure is not yet identified or compared with unpatched code.
+- Not verified: cart button on a real phone (cart markup and `fmt` signature assumed).
+- Not changed: stray /p/ URLs in `sitemap.xml`, `seo-kenya.mjs` thin guides, footer link mismatch (`/returns-warranty.html` vs `/returns.html`) — still open.
+- Next: `python3 mobile-shell/shell.test.py 2>&1 | grep -v ERR_TUNNEL | grep FAIL`, open a PR, run CI. Not merged.
