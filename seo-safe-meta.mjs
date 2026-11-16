@@ -47,7 +47,7 @@ export const SAFE_META = Object.freeze({
   'ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd.html': {
     id: 'ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd',
     description: 'ECOMAX 2.1-channel multimedia speakers with Bluetooth, USB/SD and remote. Review the Kenya listing and checkout using M-Pesa.'
-  }
+  },
   'itel-smartphone.html': {
     id: 'itel-smartphone',
     description: 'Itel Smartphone listing in Kenya. Review the available model details, current price and delivery options on Stermont Arcade; checkout with M-Pesa.'
