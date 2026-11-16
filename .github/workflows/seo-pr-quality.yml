@@ -89,6 +89,8 @@ jobs:
         run: node seo-product-extras.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/08-product-extras.log"
       - name: Test product and category SEO metadata
         run: node seo-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/09-seo-meta.log"
+      - name: Test category meta descriptions survive the Kenya SEO pass
+        run: node seo-kenya-category-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/09b-seo-kenya-category-meta.log"
       - name: Test allowlisted ordinary-product meta descriptions
         run: node seo-safe-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/10-seo-safe-meta.log"
       - name: Test safe consumer-guide meta descriptions

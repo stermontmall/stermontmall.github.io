@@ -9,7 +9,7 @@
 //    category pages (no network, no database), plus /guides/ index and the /guides/ entries in sitemap.xml.
 // Safe by design: every file is wrapped in try/catch, a bad page is skipped, the script never exits with an error.
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'node:fs';
-import { catTitle, catDescription } from './seo-meta.mjs';
+import { catTitle } from './seo-meta.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const WA = 'https://wa.me/254748888230';
@@ -188,16 +188,17 @@ if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.h
     const label = h1.replace(/\s+in Kenya$/i, '');
     const min = items[0].price, max = items[items.length - 1].price;
     cats.push({ slug, label, h1, items, min, max, sw: SW[slug] || '' });
-    // category title + description: seo-meta.mjs pattern, built from the category name shown in the breadcrumb ("Home › <name>")
+    // category title: seo-meta.mjs pattern, built from the category name shown in the breadcrumb ("Home › <name>").
+    // The category DESCRIPTION is deliberately NOT rewritten here: generate-products.mjs already chose it with the right precedence
+    // (hand-written INFO text, then categories.meta_description from the database, then the generic catDescription() fallback), so
+    // re-deriving it from catDescription() only threw away the database copy (fixed 2026-11-16). Where the generator fell back to
+    // catDescription(), the page is unchanged. Test: seo-kenya-category-meta.test.mjs.
     const cn = unesc(((h.match(/<nav class="bc"><a [^>]*>Home<\/a> › ([^<]*)<\/nav>/) || [])[1] || '').trim());
     if (cn) {
-      const ct = esc(catTitle(cn)), cd = esc(catDescription(cn, slug));
+      const ct = esc(catTitle(cn));
       h = h.replace(/<title>[\s\S]*?<\/title>/, () => `<title>${ct}</title>`)
-        .replace(/(<meta name="description" content=")[^"]*(">)/, (m, a, b) => a + cd + b)
         .replace(/(<meta property="og:title" content=")[^"]*(">)/, (m, a, b) => a + ct + b)
-        .replace(/(<meta property="og:description" content=")[^"]*(">)/, (m, a, b) => a + cd + b)
-        .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, (m, a, b) => a + ct + b)
-        .replace(/(<meta name="twitter:description" content=")[^"]*(">)/, (m, a, b) => a + cd + b);
+        .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, (m, a, b) => a + ct + b);
       cDone++;
     }
     if (!h.includes('/guides/cheapest-'))
