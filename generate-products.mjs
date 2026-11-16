@@ -804,7 +804,7 @@ ${B}`;
     if (start >= 0 && close >= 0) {
       const buckets = new Map();
       for (const p of products) {
-        if (!(Number(p.stock) > 0) || !(Number(p.price) > 0) || !(p.images || []).some(u => /^https:\\/\\//i.test(String(u)))) continue;
+        if (!(Number(p.stock) > 0) || !(Number(p.price) > 0) || !(p.images || []).some(u => /^https:\/\//i.test(String(u)))) continue;
         const key = p.categories?.slug || '_';
         if (!buckets.has(key)) buckets.set(key, []);
         buckets.get(key).push(p);
