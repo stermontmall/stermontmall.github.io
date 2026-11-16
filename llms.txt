@@ -44,6 +44,7 @@
 - [Shop Farm & Garden Tools Online in Kenya](https://stermontarcade.co.ke/c/farm-garden-tools.html): Browse Farm & Garden Tools online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Clothing & Fashion Online in Kenya](https://stermontarcade.co.ke/c/fashion.html): Browse Clothing & Fashion online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Fertilizers Online in Kenya](https://stermontarcade.co.ke/c/fertilizers.html): Browse Fertilizers online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
+- [Shop Fish Farming Online in Kenya](https://stermontarcade.co.ke/c/fish-farming.html): Browse Fish Farming online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Buy Fogging & ULV Machines Online in Kenya](https://stermontarcade.co.ke/c/fogging-ulv-machines.html): Browse Fogging & ULV Machines online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Fridges & Freezers Online in Kenya](https://stermontarcade.co.ke/c/fridges-freezers.html): Browse Fridges & Freezers online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Fumigation Chemicals Online in Kenya](https://stermontarcade.co.ke/c/fumigation-chemicals.html): Browse Fumigation Chemicals online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
@@ -167,6 +168,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 1404 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 1407 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
