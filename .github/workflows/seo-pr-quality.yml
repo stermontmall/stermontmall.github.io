@@ -61,6 +61,8 @@ jobs:
         run: python3 mobile-shell/shell.test.py
       - name: Broken and placeholder links (link-check.mjs)
         run: node link-check.mjs
+      - name: Test homepage server-rendered product cards
+        run: node home-grid-ssr.test.mjs
       - name: Check JavaScript syntax
         run: |
           node --check seo-check.mjs
