@@ -78,6 +78,16 @@ def check(name, cond, extra=''):
 
 with sync_playwright() as p:
     b = p.chromium.launch()
+    # Initial HTML must contain crawlable product links before the mobile-shell JS hydrates the grid.
+    # This protects search discovery while leaving the live JS grid responsible for filtering and pagination.
+    c0 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True)
+    mock_network(c0)
+    c0.route('**/mobile-shell/app.js*', lambda rt: rt.fulfill(status=200, content_type='application/javascript', body=''))
+    p0 = c0.new_page(); p0.goto(URL, wait_until='domcontentloaded')
+    check('server-rendered home grid exposes crawlable product links before hydration', p0.locator('#grid a[href^="/p/"]').count() >= 6, p0.locator('#grid a[href^="/p/"]').count())
+    check('initial empty-state message stays hidden before hydration', p0.locator('#grid-empty').is_hidden())
+    c0.close()
+
     ctx = b.new_context(viewport={'width': 390, 'height': 780}, device_scale_factor=2, is_mobile=True, has_touch=True)
     mock_network(ctx)
     pg = ctx.new_page()
