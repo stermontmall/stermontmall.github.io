@@ -120,7 +120,9 @@ const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
 const thumb = (p, eager = false) => {
   const photos = [...new Set([p.img, ...(Array.isArray(p.photos) ? p.photos : [])].filter(u => typeof u === 'string' && u.trim()))];
   if (!photos.length) return '<span class="photo-unavailable" role="img" aria-label="Product photo unavailable" style="display:grid;place-items:center;width:100%;height:100%;padding:8px;color:#64748b;background:#f8fafc;font:12px/1.4 system-ui;text-align:center">Photo unavailable</span>';
-  const source = eager ? `src="${esc(photos[0])}" fetchpriority="high" loading="eager"` : `data-src="${esc(photos[0])}" loading="lazy"`;
+  // Use a real src on every product image. The old data-src + custom IntersectionObserver path
+  // could leave cards blank on some mobile-shell render/restore paths; native lazy loading is enough.
+  const source = eager ? `src="${esc(photos[0])}" fetchpriority="high" loading="eager"` : `src="${esc(photos[0])}" loading="lazy"`;
   return `<img ${source} alt="${esc(p.name)} product photo" decoding="async" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
 };
 
