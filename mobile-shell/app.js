@@ -373,8 +373,8 @@ async function loadPage(reset) {
   }
   if (token !== feed.token) return;            // a newer query started: drop this stale answer
   const { items, hasMore } = res;
-  $('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
-  $('.ssr-product-card', grid).forEach(n => n.remove()); // live cards replace the build-time fallback only after a successful response
+  $$('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
+  $$('.ssr-product-card', grid).forEach(n => n.remove()); // live cards replace the build-time fallback only after a successful response
   items.forEach(p => feed.items.set(p.id, p));
   const categoryView = query().cat !== 'all';
   grid.insertAdjacentHTML('beforeend', items.map((p, i) => cardHTML(p, categoryView && feed.page === 1 && i === 0)).join(''));
