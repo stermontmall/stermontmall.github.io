@@ -17,6 +17,7 @@ import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node
 import { createHash } from 'node:crypto';
 import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
+import { feedExcluded, feedCategoryXml, feedIdentifierXml, feedShippingXml } from './merchant-feed.mjs';   // Merchant Center rules for Kenya
 import { productDescriptionHtml } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
 import { renderHomeGridFallback } from './home-grid-ssr.mjs';
@@ -781,6 +782,7 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
   const feed = [];
   for (const p of rows) {
     const imgs = (p.images || []).filter(Boolean); if (!imgs.length || !(Number(p.price) > 0)) continue;
+    if (feedExcluded(p.categories?.slug)) continue;
     const grouped = p.variant_group && p.variant_label && gmap[p.variant_group]?.length > 1;
     const title = clip(grouped ? `${p.name.replace(SIZE_END, '') || p.name} ${p.variant_label}` : p.name, 150);
     const page = `${SITE}/p/${encodeURIComponent(sl(pageOf[p.id] || p.id))}.html`;
@@ -788,7 +790,7 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
     feed.push(`<item><g:id>${esc(p.id)}</g:id><title>${esc(title)}</title><description>${esc(clip(p.description, 4000) || `${title} available at ${BRAND}, Kenya. Pay by M-Pesa, delivery to all 47 counties.`)}</description>
 <link>${esc(page)}</link><g:image_link>${esc(imgs[0])}</g:image_link>${imgs.slice(1, 10).map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('')}
 <g:availability>${inS(p) ? 'in_stock' : 'out_of_stock'}</g:availability>${old > price ? `<g:price>${old} KES</g:price><g:sale_price>${price} KES</g:sale_price>` : `<g:price>${price} KES</g:price>`}
-<g:brand>${esc(brandOf(p.name))}</g:brand><g:condition>new</g:condition><g:identifier_exists>no</g:identifier_exists>${p.categories?.name ? `<g:product_type>${esc(p.categories.name)}</g:product_type>` : ''}${grouped ? `<g:item_group_id>${esc(p.variant_group)}</g:item_group_id>` : ''}</item>`);
+<g:brand>${esc(brandOf(p.name))}</g:brand><g:condition>new</g:condition>${feedIdentifierXml(p)}${feedCategoryXml(p.categories?.slug)}${p.categories?.name ? `<g:product_type>${esc(p.categories.name)}</g:product_type>` : ''}${grouped ? `<g:item_group_id>${esc(p.variant_group)}</g:item_group_id>` : ''}${feedShippingXml()}</item>`);
   }
   writeFileSync('merchant-feed.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0"><channel><title>${BRAND}</title><link>${SITE}/</link><description>${BRAND} product feed</description>\n${feed.join('\n')}\n</channel></rss>\n`);
   console.log(`Merchant feed: ${feed.length} items.`);

@@ -1,0 +1,13 @@
+{
+  "_note": "Kenya settings for merchant-feed.xml. shipping.price_kes is intentionally null: delivery fees depend on location and item size (see shipping.html), so no flat fee is invented. Set it to a number (KES) to emit <g:shipping> on every item; leave it null to rely on the Merchant Center Kenya shipping service.",
+  "shipping": {
+    "country": "KE",
+    "service": "Standard delivery",
+    "price_kes": null,
+    "min_handling_time": 0,
+    "max_handling_time": 1,
+    "min_transit_time": 1,
+    "max_transit_time": 3
+  },
+  "exclude_categories": ["stermont-cars-for-sale"]
+}

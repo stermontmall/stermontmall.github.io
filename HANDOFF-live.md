@@ -129,3 +129,14 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Drafted, NOT applied: category `meta_title`/`meta_description` backfill for 66 active categories (script kept in the Claude session scratchpad, awaiting owner OK on examples).
 - Finding: `merchant-feed.xml` already exists (1463 items = active products; 80 inactive drafts excluded). Gaps: no `g:google_product_category`, no `g:shipping`, no gtin/mpn (identifier_exists=no).
 - Next: owner approves category examples -> apply -> rebuild product pages (`gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`).
+
+## 2026-11-16 11:40 (Africa/Nairobi) — Task start: category meta backfill + merchant feed upgrade (branch `wip-category-seo-backfill`)
+- Scope: "66 active categories" = categories with active products plus their ancestors (60 direct + 6 parents); 92 categories in total; 0 categories have a hand-written meta_description today. Backfill only fills NULL/blank values, never overwrites.
+- In progress: write `supabase/sql/category_meta_description_backfill.sql` (grouped Kenyan buyer-intent templates, <=155 chars), dry-run length check via execute_sql, apply as migration `category_meta_description_backfill`, then dispatch product-pages workflow.
+- Next after that: separate branch `wip-merchant-feed-upgrade` from main for `merchant-feed.xml` (google_product_category, gtin/mpn, KE shipping, CI XML check). Generator is `generate-products.mjs` (feed block ~line 779), not the XML file.
+- Re-run to rebuild pages: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`
+
+## 2026-11-16 11:55 (Africa/Nairobi) — Category meta backfill APPLIED (branch `wip-category-seo-backfill`)
+- Done: migration `20261116082753 category_meta_description_backfill` applied to Supabase (source `supabase/sql/category_meta_description_backfill.sql`). 66 of 66 active categories filled (max 151 chars, no double spaces); 0 hand-written values existed, none overwritten. Groups: pest control, agrovet, electronics/appliances, home & kitchen, motorcycle, cars, car parts, fashion/beauty/shoes, safety/PPE, general.
+- Done: sample live-generated check pending the rebuild below.
+- Next: dispatch product-pages workflow (`gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`), confirm `/c/pest-control-fumigation.html` shows the new description, then start merchant feed branch `wip-merchant-feed-upgrade`.

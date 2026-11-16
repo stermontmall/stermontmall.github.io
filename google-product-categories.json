@@ -1,0 +1,362 @@
+{
+ "pest-control-fumigation": {
+  "id": 728,
+  "path": "Home & Garden > Household Supplies > Pest Control"
+ },
+ "bed-bug-killers": {
+  "id": 2869,
+  "path": "Home & Garden > Household Supplies > Pest Control > Pesticides"
+ },
+ "cockroach-ant-killers": {
+  "id": 2869,
+  "path": "Home & Garden > Household Supplies > Pest Control > Pesticides"
+ },
+ "mosquito-fly-control": {
+  "id": 2869,
+  "path": "Home & Garden > Household Supplies > Pest Control > Pesticides"
+ },
+ "rodent-control": {
+  "id": 2869,
+  "path": "Home & Garden > Household Supplies > Pest Control > Pesticides"
+ },
+ "termite-control": {
+  "id": 2869,
+  "path": "Home & Garden > Household Supplies > Pest Control > Pesticides"
+ },
+ "fumigation-chemicals": {
+  "id": 2869,
+  "path": "Home & Garden > Household Supplies > Pest Control > Pesticides"
+ },
+ "sprayers-equipment": {
+  "id": 1967,
+  "path": "Home & Garden > Lawn & Garden > Gardening > Gardening Tools > Lawn & Garden Sprayers"
+ },
+ "fogging-ulv-machines": {
+  "id": 728,
+  "path": "Home & Garden > Household Supplies > Pest Control"
+ },
+ "insect-light-traps-uv-lamps": {
+  "id": 2631,
+  "path": "Home & Garden > Household Supplies > Pest Control > Pest Control Traps"
+ },
+ "pest-monitoring-inspection-tools": {
+  "id": 728,
+  "path": "Home & Garden > Household Supplies > Pest Control"
+ },
+ "agrovet": {
+  "id": 112,
+  "path": "Business & Industrial > Agriculture"
+ },
+ "animal-feeds": {
+  "id": 505821,
+  "path": "Business & Industrial > Agriculture > Animal Husbandry > Livestock Feed"
+ },
+ "veterinary-drugs": {
+  "id": 6991,
+  "path": "Business & Industrial > Agriculture > Animal Husbandry"
+ },
+ "seeds-seedlings": {
+  "id": 2802,
+  "path": "Home & Garden > Plants > Seeds"
+ },
+ "fertilizers": {
+  "id": 113,
+  "path": "Home & Garden > Lawn & Garden > Gardening > Fertilizers"
+ },
+ "agrochemicals": {
+  "id": 112,
+  "path": "Business & Industrial > Agriculture"
+ },
+ "herbicides": {
+  "id": 3103,
+  "path": "Home & Garden > Lawn & Garden > Gardening > Herbicides"
+ },
+ "fungicides": {
+  "id": 112,
+  "path": "Business & Industrial > Agriculture"
+ },
+ "crop-insecticides": {
+  "id": 2869,
+  "path": "Home & Garden > Household Supplies > Pest Control > Pesticides"
+ },
+ "adjuvants-growth-regulators": {
+  "id": 112,
+  "path": "Business & Industrial > Agriculture"
+ },
+ "poultry-dairy-equipment": {
+  "id": 6991,
+  "path": "Business & Industrial > Agriculture > Animal Husbandry"
+ },
+ "water-tanks-irrigation": {
+  "id": 3568,
+  "path": "Home & Garden > Lawn & Garden > Watering & Irrigation"
+ },
+ "beekeeping": {
+  "id": 6991,
+  "path": "Business & Industrial > Agriculture > Animal Husbandry"
+ },
+ "fish-farming": {
+  "id": 6991,
+  "path": "Business & Industrial > Agriculture > Animal Husbandry"
+ },
+ "disinfectants-hygiene": {
+  "id": 6474,
+  "path": "Home & Garden > Household Supplies > Household Cleaning Supplies > Household Cleaning Products > Household Disinfectants"
+ },
+ "farm-garden-tools": {
+  "id": 3173,
+  "path": "Home & Garden > Lawn & Garden > Gardening > Gardening Tools"
+ },
+ "phones-accessories": {
+  "id": 222,
+  "path": "Electronics"
+ },
+ "phones-tablets": {
+  "id": 267,
+  "path": "Electronics > Communications > Telephony > Mobile Phones"
+ },
+ "phone-accessories": {
+  "id": 264,
+  "path": "Electronics > Communications > Telephony > Mobile Phone Accessories"
+ },
+ "refurbished-phones": {
+  "id": 267,
+  "path": "Electronics > Communications > Telephony > Mobile Phones"
+ },
+ "earphones-headset": {
+  "id": 505771,
+  "path": "Electronics > Audio > Audio Components > Headphones & Headsets"
+ },
+ "tv-audio-video": {
+  "id": 222,
+  "path": "Electronics"
+ },
+ "tvs-audio": {
+  "id": 222,
+  "path": "Electronics"
+ },
+ "televisions": {
+  "id": 404,
+  "path": "Electronics > Video > Televisions"
+ },
+ "home-theatre": {
+  "id": 252,
+  "path": "Electronics > Audio > Audio Players & Recorders > Home Theater Systems"
+ },
+ "bluetooth-speakers": {
+  "id": 249,
+  "path": "Electronics > Audio > Audio Components > Speakers"
+ },
+ "woofers": {
+  "id": 249,
+  "path": "Electronics > Audio > Audio Components > Speakers"
+ },
+ "tv-mounts-accessories": {
+  "id": 4458,
+  "path": "Electronics > Video > Video Accessories > Television Parts & Accessories > TV & Monitor Mounts"
+ },
+ "music-audio": {
+  "id": 223,
+  "path": "Electronics > Audio"
+ },
+ "computers-accessories": {
+  "id": 278,
+  "path": "Electronics > Computers"
+ },
+ "computing": {
+  "id": 278,
+  "path": "Electronics > Computers"
+ },
+ "gaming": {
+  "id": 1294,
+  "path": "Electronics > Video Game Consoles"
+ },
+ "cameras-photography": {
+  "id": 142,
+  "path": "Cameras & Optics > Cameras"
+ },
+ "printers-office-machines": {
+  "id": 345,
+  "path": "Electronics > Print, Copy, Scan & Fax"
+ },
+ "networking-smart-home": {
+  "id": 342,
+  "path": "Electronics > Networking"
+ },
+ "security-cctv": {
+  "id": 362,
+  "path": "Cameras & Optics > Cameras > Surveillance Cameras"
+ },
+ "solar-power": {
+  "id": 127,
+  "path": "Hardware > Power & Electrical Supplies"
+ },
+ "electrical-lighting": {
+  "id": 594,
+  "path": "Home & Garden > Lighting"
+ },
+ "appliances": {
+  "id": 604,
+  "path": "Home & Garden > Household Appliances"
+ },
+ "washing-machines": {
+  "id": 2549,
+  "path": "Home & Garden > Household Appliances > Laundry Appliances > Washing Machines"
+ },
+ "fridges-freezers": {
+  "id": 686,
+  "path": "Home & Garden > Kitchen & Dining > Kitchen Appliances > Refrigerators"
+ },
+ "home-kitchen": {
+  "id": 536,
+  "path": "Home & Garden"
+ },
+ "home-office": {
+  "id": 6362,
+  "path": "Furniture > Office Furniture"
+ },
+ "kitchen-dining": {
+  "id": 638,
+  "path": "Home & Garden > Kitchen & Dining"
+ },
+ "furniture": {
+  "id": 436,
+  "path": "Furniture"
+ },
+ "bedding-decor": {
+  "id": 4171,
+  "path": "Home & Garden > Linens & Bedding"
+ },
+ "cleaning-laundry": {
+  "id": 623,
+  "path": "Home & Garden > Household Supplies > Household Cleaning Supplies"
+ },
+ "home-storage": {
+  "id": 636,
+  "path": "Home & Garden > Household Supplies > Storage & Organization"
+ },
+ "garden-outdoors": {
+  "id": 689,
+  "path": "Home & Garden > Lawn & Garden"
+ },
+ "building-hardware": {
+  "id": 632,
+  "path": "Hardware"
+ },
+ "tools-machinery": {
+  "id": 1167,
+  "path": "Hardware > Tools"
+ },
+ "supermarket": {
+  "id": 412,
+  "path": "Food, Beverages & Tobacco"
+ },
+ "fashion": {
+  "id": 1604,
+  "path": "Apparel & Accessories > Clothing"
+ },
+ "mens-fashion": {
+  "id": 1604,
+  "path": "Apparel & Accessories > Clothing"
+ },
+ "womens-fashion": {
+  "id": 1604,
+  "path": "Apparel & Accessories > Clothing"
+ },
+ "kids-fashion": {
+  "id": 1604,
+  "path": "Apparel & Accessories > Clothing"
+ },
+ "shoes": {
+  "id": 187,
+  "path": "Apparel & Accessories > Shoes"
+ },
+ "mens-sneakers": {
+  "id": 187,
+  "path": "Apparel & Accessories > Shoes"
+ },
+ "womens-sneakers": {
+  "id": 187,
+  "path": "Apparel & Accessories > Shoes"
+ },
+ "ladies-sandals": {
+  "id": 187,
+  "path": "Apparel & Accessories > Shoes"
+ },
+ "bags": {
+  "id": 5181,
+  "path": "Luggage & Bags"
+ },
+ "watches-jewellery": {
+  "id": 188,
+  "path": "Apparel & Accessories > Jewelry"
+ },
+ "health-beauty": {
+  "id": 469,
+  "path": "Health & Beauty"
+ },
+ "medical-supplies": {
+  "id": 491,
+  "path": "Health & Beauty > Health Care"
+ },
+ "baby-products": {
+  "id": 537,
+  "path": "Baby & Toddler"
+ },
+ "toys-games": {
+  "id": 1239,
+  "path": "Toys & Games"
+ },
+ "wedding-events": {
+  "id": 5709,
+  "path": "Arts & Entertainment > Party & Celebration"
+ },
+ "gifts-printing": {
+  "id": 2559,
+  "path": "Arts & Entertainment > Party & Celebration > Gift Giving"
+ },
+ "sporting-goods-fitness": {
+  "id": 988,
+  "path": "Sporting Goods"
+ },
+ "books-stationery": {
+  "id": 922,
+  "path": "Office Supplies"
+ },
+ "school-office-supplies": {
+  "id": 922,
+  "path": "Office Supplies"
+ },
+ "pet-supplies": {
+  "id": 2,
+  "path": "Animals & Pet Supplies > Pet Supplies"
+ },
+ "packaging-shop-supplies": {
+  "id": 111,
+  "path": "Business & Industrial"
+ },
+ "protective-wear-safety": {
+  "id": 2047,
+  "path": "Business & Industrial > Work Safety Protective Gear"
+ },
+ "automotive": {
+  "id": 888,
+  "path": "Vehicles & Parts"
+ },
+ "car-accessories-parts": {
+  "id": 5613,
+  "path": "Vehicles & Parts > Vehicle Parts & Accessories"
+ },
+ "motorcycle-accessories": {
+  "id": 899,
+  "path": "Vehicles & Parts > Vehicle Parts & Accessories > Motor Vehicle Parts"
+ },
+ "motorcycle-spare-parts": {
+  "id": 899,
+  "path": "Vehicles & Parts > Vehicle Parts & Accessories > Motor Vehicle Parts"
+ },
+ "stermont-cars-for-sale": {
+  "id": 916,
+  "path": "Vehicles & Parts > Vehicles > Motor Vehicles > Cars, Trucks & Vans"
+ }
+}
