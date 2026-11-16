@@ -122,3 +122,10 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Done: PR #784 merged to `main` (merge commit `b5364c7`) after CI run on `c872be7` passed.
 - Done: isolated Security PR with `supabase/sql/security_revoke_add_draft_product_public.sql` (revoke execute on the seven-argument `add_draft_product` from PUBLIC, anon, authenticated) and `docs/security/security-definer-followup-2026-11-16.md`. NOT applied to the database.
 - Next: owner reviews the PR; apply the SQL as a migration only after approval; then verify `proacl`. Do not touch checkout, order or M-Pesa functions.
+
+## 2026-11-16 12:30 (Africa/Nairobi) — Security PR #793 applied+merged; #784 deploy checked; category SEO backfill drafted (not applied)
+- Done: migration `revoke_add_draft_product_public_anon_authenticated` applied in Supabase; `add_draft_product` (7 args) ACL is now postgres + service_role only; check_voucher, track_order, recent_purchases, rate_order_*, is_staff unchanged. PR #793 merged (`ffc10f2`).
+- Done: merge `b5364c7` of PR #784: Build product pages, Workflow guard, Daily SEO check, SEO auto index all succeeded; its own "pages build and deployment" was cancelled because newer commits superseded it; later deploy `9ecc4b9` (descendant) succeeded.
+- Drafted, NOT applied: category `meta_title`/`meta_description` backfill for 66 active categories (script kept in the Claude session scratchpad, awaiting owner OK on examples).
+- Finding: `merchant-feed.xml` already exists (1463 items = active products; 80 inactive drafts excluded). Gaps: no `g:google_product_category`, no `g:shipping`, no gtin/mpn (identifier_exists=no).
+- Next: owner approves category examples -> apply -> rebuild product pages (`gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`).
