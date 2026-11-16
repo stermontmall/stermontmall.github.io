@@ -117,3 +117,8 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Done (Supabase, owner-approved): `products.meta_description` trimmed on 226 rows (leading/trailing whitespace only); verified 0 rows with line breaks, double spaces or edge whitespace; 1543 non-null, max length 155. Categories have no `meta_description` values.
 - Done: `CLAUDE.md` documents the approved SEO columns and the `robots.txt` step in `product-pages.yml`.
 - Next: wait for CI on the final commit, then merge PR #784, then open an isolated Security PR (`add_draft_product` anon/PUBLIC revoke; review `is_staff` and search paths). Not touching checkout/order/M-Pesa functions.
+
+## 2026-11-16 12:00 (Africa/Nairobi) — PR #784 merged; Security PR opened (branch `security/revoke-add-draft-product-public`)
+- Done: PR #784 merged to `main` (merge commit `b5364c7`) after CI run on `c872be7` passed.
+- Done: isolated Security PR with `supabase/sql/security_revoke_add_draft_product_public.sql` (revoke execute on the seven-argument `add_draft_product` from PUBLIC, anon, authenticated) and `docs/security/security-definer-followup-2026-11-16.md`. NOT applied to the database.
+- Next: owner reviews the PR; apply the SQL as a migration only after approval; then verify `proacl`. Do not touch checkout, order or M-Pesa functions.
