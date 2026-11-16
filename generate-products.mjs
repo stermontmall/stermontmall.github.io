@@ -19,6 +19,7 @@ import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadW
 import { productIdentifiers } from './seo-product-identifiers.mjs';
 import { productDescriptionHtml } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
+import { renderHomeGridFallback } from './home-grid-ssr.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -790,6 +791,45 @@ ${B}`;
     if (out !== cur) writeFileSync(HOME, out);
     console.log(`Homepage links: ${catsAll.length} categories, ${Math.min(picks.length, 12)} products.`);
   } else console.log('Homepage markers not found - skipped homepage links.');
+}
+
+// Server-render a small set of positive-stock product links inside the home grid.
+// mobile-shell/app.js replaces these cards during hydration; without JS they remain crawlable links.
+{
+  const HOME = 'index.html';
+  const OPEN = '<ul id="grid" class="grid grid-cols-2 gap-2 px-2">';
+  if (existsSync(HOME)) {
+    const current = readFileSync(HOME, 'utf8');
+    const start = current.indexOf(OPEN), close = start < 0 ? -1 : current.indexOf('</ul>', start);
+    if (start >= 0 && close >= 0) {
+      const buckets = new Map();
+      for (const p of products) {
+        if (!(Number(p.stock) > 0) || !(Number(p.price) > 0) || !(p.images || []).some(u => /^https:\\/\\//i.test(String(u)))) continue;
+        const key = p.categories?.slug || '_';
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(p);
+      }
+      const priority = ['pest-control-fumigation', 'agrovet', 'agrochemicals', 'fumigation-chemicals', 'bed-bug-killers', 'cockroach-ant-killers', 'rodent-control', 'farm-garden-tools'];
+      const order = [...priority, ...[...buckets.keys()].filter(k => !priority.includes(k)).sort()];
+      const picked = [];
+      for (const key of order) {
+        const p = buckets.get(key)?.shift();
+        if (p) picked.push(p);
+        if (picked.length >= 8) break;
+      }
+      while (picked.length < 8) {
+        const bucket = [...buckets.values()].find(items => items.length);
+        if (!bucket) break;
+        picked.push(bucket.shift());
+      }
+      const cards = renderHomeGridFallback(picked.map(p => ({
+        id: p.id, name: p.name, price: p.price, stock: p.stock, image: p.images?.[0], href: `/p/${encodeURIComponent(sl(p.id))}.html`
+      })), { limit: 8 });
+      const updated = current.slice(0, start) + OPEN + cards + current.slice(close);
+      if (updated !== current) writeFileSync(HOME, updated);
+      console.log(`Homepage SSR grid: ${picked.length} positive-stock product links.`);
+    } else console.log('Homepage grid marker not found - skipped SSR product cards.');
+  }
 }
 
 // lastmod only moves when a page's content really changed. Google ignores sitemaps whose dates change on every build.
