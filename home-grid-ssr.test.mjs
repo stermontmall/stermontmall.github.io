@@ -10,7 +10,7 @@ const rows = [
 ];
 const html = renderHomeGridFallback(rows, { limit: 8 });
 assert.equal((html.match(/ssr-product-card/g) || []).length, 2);
-assert.match(html, /href="\\/p\\/spray-1\\.html"/);
+assert.match(html, /href="\/p\/spray-1\.html"/);
 assert.match(html, /Sprayer &amp; &lt;Nozzle&gt;/);
 assert.match(html, /KSh 1,250/);
 assert.doesNotMatch(html, /Sold Out Item|Unknown Stock Item|Unsafe Link/);
