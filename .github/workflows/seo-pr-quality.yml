@@ -51,8 +51,9 @@ jobs:
         with:
           python-version: '3.12'
       # Every step below tees its output to $RUNNER_TEMP/ci-logs/NN-*.log.
-      # If a step fails, the last 80 lines of the newest log are redacted and written to the job summary
-      # and an error annotation (see "Report failing step output").
+      # If a step fails, every line matching FAIL or Error (with its line number) and the last 80 lines
+      # of the newest log are redacted and written to the job summary and an error annotation
+      # (see "Report failing step output").
       - name: Prepare failure log directory
         run: mkdir -p "$RUNNER_TEMP/ci-logs"
       - name: Install Playwright Chromium
@@ -141,19 +142,19 @@ jobs:
         run: |
           log=$(ls "$RUNNER_TEMP"/ci-logs/*.log 2>/dev/null | sort | tail -n 1 || true)
           tail_file="$RUNNER_TEMP/failure-tail.txt"
+          hits_file="$RUNNER_TEMP/failure-hits.txt"
           : > "$tail_file"
+          : > "$hits_file"
           if [ -n "$log" ] && [ -s "$log" ]; then
-            # Last 80 lines, with ANSI colours removed and secrets/tokens redacted before anything is published.
-            python3 - "$log" "$tail_file" <<'PY'
+            # Every FAIL/Error line (searched in the WHOLE log, so test-server access lines cannot push it out of view)
+            # plus the last 80 lines, with ANSI colours removed and secrets/tokens redacted before anything is published.
+            python3 - "$log" "$tail_file" "$hits_file" <<'PY'
           import os, re, sys
-          src, dst = sys.argv[1], sys.argv[2]
-          lines = open(src, errors="replace").read().splitlines()[-80:]
-          text = "\n".join(lines)
-          text = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", text)
+          src, tail_dst, hits_dst = sys.argv[1], sys.argv[2], sys.argv[3]
+          ansi = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
+          lines = [ansi.sub("", l) for l in open(src, errors="replace").read().splitlines()]
           # 1) the literal value of any secret-looking environment variable
-          for name, value in os.environ.items():
-              if len(value) >= 6 and re.search(r"TOKEN|SECRET|PASSWORD|PASSWD|KEY|CREDENTIAL|AUTH|SIGNATURE", name, re.I):
-                  text = text.replace(value, "[REDACTED]")
+          secret_values = [v for n, v in os.environ.items() if len(v) >= 6 and re.search(r"TOKEN|SECRET|PASSWORD|PASSWD|KEY|CREDENTIAL|AUTH|SIGNATURE", n, re.I)]
           # 2) common token shapes and NAME=value / NAME: value assignments
           patterns = [
               (r"gh[pousr]_[A-Za-z0-9]{20,}", "[REDACTED]"),
@@ -163,17 +164,35 @@ jobs:
               (r"\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]+", r"\1 [REDACTED]"),
               (r"((?:TOKEN|SECRET|PASSWORD|PASSWD|API_?KEY|AUTHORIZATION|PRIVATE_?KEY|ACCESS_?KEY)[A-Za-z0-9_]*\s*[=:]\s*)\S+", r"\1[REDACTED]"),
           ]
-          for pattern, repl in patterns:
-              text = re.sub(pattern, repl, text, flags=re.I)
-          open(dst, "w").write(text + "\n")
+          def redact(text):
+              for value in secret_values:
+                  text = text.replace(value, "[REDACTED]")
+              for pattern, repl in patterns:
+                  text = re.sub(pattern, repl, text, flags=re.I)
+              return text
+          hits = ["%d: %s" % (i, l) for i, l in enumerate(lines, 1) if re.search(r"FAIL|Error", l)]
+          if len(hits) > 120:
+              hits = hits[:60] + ["... %d more matching lines omitted ..." % (len(hits) - 120)] + hits[-60:]
+          open(tail_dst, "w").write(redact("\n".join(lines[-80:])) + "\n")
+          open(hits_dst, "w").write(redact("\n".join(hits)) + "\n" if hits else "")
           PY
           fi
           {
-            echo "### SEO quality gate failed: last 80 lines of the failing step output (redacted)"
+            echo "### SEO quality gate failed: failing step output (redacted)"
             echo
             echo "Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID (run #$GITHUB_RUN_NUMBER), commit $GITHUB_SHA"
             if [ -s "$tail_file" ]; then
               echo "Log: $(basename "$log")"
+              echo
+              if [ -s "$hits_file" ]; then
+                echo "#### Lines matching FAIL or Error (with line numbers)"
+                echo
+                echo '```'
+                cat "$hits_file"
+                echo '```'
+                echo
+              fi
+              echo "#### Last 80 lines"
               echo
               echo '```'
               cat "$tail_file"
@@ -183,7 +202,11 @@ jobs:
               echo "No captured step output (the failure happened before the first logged step)."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-          if [ -s "$tail_file" ]; then
+          # The annotation shows the first FAIL/Error lines when there are any, else the last lines of the log.
+          if [ -s "$hits_file" ]; then
+            msg=$(head -n 20 "$hits_file" | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
+            echo "::error title=Failing step output: FAIL/Error lines ($(basename "$log"))::$msg"
+          elif [ -s "$tail_file" ]; then
             msg=$(tail -n 20 "$tail_file" | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
             echo "::error title=Failing step output ($(basename "$log"))::$msg"
           fi
