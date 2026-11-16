@@ -95,7 +95,7 @@ with sync_playwright() as p:
     pg.on('pageerror', lambda e: errors.append(str(e)))
     pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and 'broken.jpg' not in (m.location or {}).get('url', '') else None)   # the aborted photo is the fixture's deliberate failure
     pg.add_init_script("window.__sawSkeleton = false; new MutationObserver(() => { if (document.querySelector('#grid .card[aria-hidden=\"true\"]')) window.__sawSkeleton = true; }).observe(document, { childList: true, subtree: true });")
-    pg.goto(URL)
+    pg.goto(URL, wait_until='domcontentloaded')
 
     # Keep the server-rendered cards in place until the first live catalogue response arrives.
     check('SSR fallback cards remain visible while the live catalogue is loading', pg.locator('#grid .ssr-product-card').count() >= 6, pg.locator('#grid .ssr-product-card').count())
