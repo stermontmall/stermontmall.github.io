@@ -30,8 +30,6 @@ on:
 
 permissions:
   contents: read
-  # TEMPORARY (remove before merging PR #785): lets the failure-report step post the failing output as a PR comment.
-  pull-requests: write
 
 concurrency:
   group: seo-pr-quality-${{ github.event.pull_request.number || github.ref }}
@@ -53,8 +51,8 @@ jobs:
         with:
           python-version: '3.12'
       # Every step below tees its output to $RUNNER_TEMP/ci-logs/NN-*.log.
-      # If a step fails, the last 80 lines of the newest log are redacted, then written to the job summary,
-      # raised as an annotation and posted as a PR comment (see "Report failing step output").
+      # If a step fails, the last 80 lines of the newest log are redacted and written to the job summary
+      # and an error annotation (see "Report failing step output").
       - name: Prepare failure log directory
         run: mkdir -p "$RUNNER_TEMP/ci-logs"
       - name: Install Playwright Chromium
@@ -74,8 +72,6 @@ jobs:
         run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
       - name: Broken and placeholder links (link-check.mjs)
         run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/05-link-check.log"
-      - name: Test homepage server-rendered product cards
-        run: node home-grid-ssr.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/06-home-grid-ssr-again.log"
       - name: Check JavaScript syntax
         run: |
           {
@@ -186,16 +182,8 @@ jobs:
               echo
               echo "No captured step output (the failure happened before the first logged step)."
             fi
-          } > "$RUNNER_TEMP/failure.md"
-          cat "$RUNNER_TEMP/failure.md" >> "$GITHUB_STEP_SUMMARY"
+          } >> "$GITHUB_STEP_SUMMARY"
           if [ -s "$tail_file" ]; then
             msg=$(tail -n 20 "$tail_file" | sed -e 's/%/%25/g' -e 's/\r//g' | awk 'BEGIN{ORS="%0A"}{print}')
             echo "::error title=Failing step output ($(basename "$log"))::$msg"
           fi
-      # TEMPORARY (remove before merging PR #785, together with the pull-requests: write permission above).
-      - name: Post failing output to the pull request
-        if: failure() && github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/failure.md" || true
