@@ -911,4 +911,25 @@ syncFilterUI(); refreshGrid(); // Start a product request immediately; loadPage'
 if (START_TAB !== 'home') showTab(START_TAB);   // a reload on Categories / Deals / Cart / Account stays there (the Home grid still loads underneath)
 if (CART_DEEP.length) toast('Loading shared cart...');
 loadCatalog().then(() => { if (RESTORE_CAT) { const t = CATS.find(c => c.id === store.get().chip); if (!t) { store.set({ chip: 'all', sub: '' }); refreshGrid(); } else { if (store.get().sub && !t.subs.includes(store.get().sub)) store.set({ sub: '' }); $('#grid-title').textContent = store.get().sub || t.name; refreshGrid(); } } renderChips(); renderCategoriesView(); renderDrawer(); syncDealsBadge(); syncProductMeta(); if (CART_DEEP.length) applySharedCart(CART_DEEP); if (DEEP) { if (deepOpen) refreshDeep(); else openDeepLink(DEEP); } else if (CAT_DEEP) openCatLink(CAT_DEEP); }).catch(() => {});   // categories and the Deals badge appear once the data is in
+/* Cart: one-tap WhatsApp order with the cart lines, KSh total and delivery prompt. */
+{
+  const co = $('#checkout');
+  if (co && !$('#cart-wa')) {
+    const a = document.createElement('a');
+    a.id = 'cart-wa'; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Order on WhatsApp';
+    a.href = 'https://wa.me/254748888230';
+    a.style.cssText = 'display:block;margin-top:8px;padding:12px;border-radius:12px;text-align:center;font-weight:700;background:#0f7a37;color:#fff;text-decoration:none';
+    a.addEventListener('click', () => {
+      const cart = store.get().cart || [];
+      if (!cart.length) return;
+      const total = cart.reduce((s, i) => s + Number(i.price) * Number(i.qty), 0);
+      const lines = ['Hello Stermont Arcade, I would like to order:', '',
+        ...cart.map(i => `- ${i.name}${i.size ? ' (' + i.size + ')' : ''} x ${i.qty} @ KSh ${fmt(i.price)}`),
+        '', `Total (excl. delivery): KSh ${fmt(total)}`, '',
+        'Delivery: please confirm which applies - Nairobi dispatch, Sarit Centre pickup (confirmed orders, by appointment), or upcountry delivery (my county: ____).'];
+      a.href = 'https://wa.me/254748888230?text=' + encodeURIComponent(lines.join('\n'));
+    });
+    co.insertAdjacentElement('afterend', a);
+  }
+}
 })();

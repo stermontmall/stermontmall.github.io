@@ -26,6 +26,8 @@ const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
 const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
 const WHATSAPP = '254748888230';
 const BRAND = 'Stermont Arcade';
+const DELIVERY_PROMPT = 'Delivery: please confirm which applies - Nairobi dispatch, Sarit Centre pickup (confirmed orders, by appointment), or upcountry delivery (my county: ____).';
+const orderMsg = (name, pack, price, url, qty = 1) => [`Hello ${BRAND}, I want to order:`, '', `Product: ${name}`, ...(pack ? [`Pack size: ${pack}`] : []), `Quantity: ${qty}`, `Price (each): KES ${Math.round(Number(price) || 0).toLocaleString('en-KE')}`, `Link: ${url}`, '', DELIVERY_PROMPT].join('\n');
 // Hand-written, model-specific buying guidance. Only add entries after checking the live catalogue description.
 const PRODUCT_CONTENT = existsSync('product-content.json') ? JSON.parse(readFileSync('product-content.json', 'utf8')) : {};
 // Real product brand for Google. Add more brands here any time; if none matches, the store name is used.
@@ -468,6 +470,7 @@ const crumbLd = items => jsonLd({ '@context': 'https://schema.org', '@type': 'Br
 rmSync('p', { recursive: true, force: true }); rmSync('c', { recursive: true, force: true });
 mkdirSync('p', { recursive: true }); mkdirSync('c', { recursive: true });
 const urls = [];
+const noindexPaths = new Set();   // thin category pages stay out of sitemap-products.xml
 
 const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(u)}" alt="${esc(p.name)} product photo" width="160" height="150" loading="lazy" decoding="async">` : ''; };
 const card = p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
@@ -602,9 +605,9 @@ for (const p of products) {
     if (i < 0 || list.length < 2) return list.filter(x => x.id !== p.id).slice(0, 6);
     return Array.from({ length: Math.min(6, list.length - 1) }, (_, k) => list[(i + 1 + k) % list.length]);
   })();
-  const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} (${money(p.price)}) ${SITE}${path}`)}`;
+  const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(orderMsg(p.name, p.variants ? '' : (p.unit || ''), p.price, SITE + path))}`;
   const packLabel = p.unit || (p.variants?.length ? p.variants.map(v => v.variant_label).join(', ') : 'confirm pack size');
-  const stickyWa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order ${p.name}. Pack size: ${packLabel}. Price: KES ${Math.round(Number(p.price) || 0).toLocaleString('en-KE')}. Please confirm availability and delivery.`)}`;
+  const stickyWa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(orderMsg(p.name, p.variants ? `please confirm (${packLabel})` : packLabel, p.price, SITE + path))}`;
   const cartUrl = `/?product=${encodeURIComponent(sl(p.id))}`;
   const askLines = [`Hello ${BRAND}, I would like to enquire about this item:`, '', `Product: ${p.name}`, `Price: ${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ' / ' + p.unit : ''}`,
     ...(p.variants ? [`Sizes: ${p.variants.map(v => v.variant_label).join(', ')}`] : []), `Availability: ${inStock ? 'In stock' : 'Currently sold out'}`, ...(cat ? [`Category: ${cat.name}`] : []), `Ref: ${p.id}`, `Link: ${SITE}${path}`, '', 'Please confirm availability and the delivery fee to my location.'];
@@ -629,7 +632,7 @@ for (const p of products) {
   }) : '';
   const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
-    const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${pdpVariantUrl(path, v.slug, p.slug)}`)}`;
+    const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(orderMsg(p.name, v.variant_label, v.price, pdpVariantUrl(path, v.slug, p.slug)))}`;
     return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
   // Local-utility sections (H2s): what it is used for, price and M-Pesa ordering, delivery and Sarit Centre pickup. Facts match shipping.html and nairobi.html.
   const nameE = esc(p.name), priceTxt = `${p.variants ? 'from ' : ''}${money(p.price)}${p.unit ? ' / ' + esc(p.unit) : ''}`;
@@ -693,6 +696,7 @@ ${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<
     writeFileSync(`.${oldPath}`, `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category moved | ${BRAND}</title><link rel="canonical" href="${destination}"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0; url=${legacyDestination}"></head><body><p>This category has moved. <a href="${legacyDestination}">Continue to Stermont Arcade</a>.</p><script>window.location.replace(${JSON.stringify(legacyDestination)})</script></body></html>`);
   }
   const robots = c.items.length < 5 ? 'noindex, follow' : 'index, follow, max-image-preview:large';
+  if (c.items.length < 5 || c.items.filter(inS).length < 3) noindexPaths.add(path);
   writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, robots, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], [c.name, SITE + path]]) }));
   urls.push(path);
 }
@@ -873,7 +877,7 @@ try {
 }
 // Only advertise URLs whose generated HTML exists. Prevent stale/missing product or category files
 // from entering Google's sitemap (a missing file otherwise gets an empty hash and still gets listed).
-const sitemapUrls = urls.filter(u => existsSync(u.endsWith('/') ? `.${u}index.html` : fileOf(u)) && (!/^\/p\/[^/]+\.html$/.test(u) || sitemapEligibleProductPaths.has(u)));
+const sitemapUrls = urls.filter(u => existsSync(u.endsWith('/') ? `.${u}index.html` : fileOf(u)) && !noindexPaths.has(u) && (!/^\/p\/[^/]+\.html$/.test(u) || sitemapEligibleProductPaths.has(u)));
 const next = {};
 for (const u of sitemapUrls) {
   const file = u.endsWith('/') ? `.${u}index.html` : fileOf(u);
