@@ -5,10 +5,10 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp
 export function renderHomeGridFallback(products, { limit = 8 } = {}) {
   if (!Array.isArray(products) || !Number.isInteger(limit) || limit < 1) return '';
   return products
-    .filter(p => p && p.name && Number(p.stock) > 0 && Number(p.price) > 0 && /^\\/p\\/[a-z0-9][a-z0-9-]*\\.html$/.test(String(p.href || '')))
+    .filter(p => p && p.name && Number(p.stock) > 0 && Number(p.price) > 0 && /^\/p\/[a-z0-9][a-z0-9-]*\.html$/.test(String(p.href || '')))
     .slice(0, limit)
     .map(p => {
-      const image = typeof p.image === 'string' && /^https:\\/\\//i.test(p.image)
+      const image = typeof p.image === 'string' && /^https:\/\//i.test(p.image)
         ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff">`
         : '<span class="text-sm text-mute">Product details</span>';
       const price = Math.round(Number(p.price)).toLocaleString('en-KE');
@@ -16,5 +16,5 @@ export function renderHomeGridFallback(products, { limit = 8 } = {}) {
         <div class="relative aspect-square grid place-items-center" style="background:#fff;overflow:hidden">${image}</div>
         <div class="p-2"><p class="text-xs leading-4 line-clamp-2 min-h-8">${esc(p.name)}</p><p class="mt-1"><span class="text-sale font-bold text-sm">KSh ${price}</span></p></div>
       </a></li>`;
-    }).join('\\n');
+    }).join('\n');
 }
