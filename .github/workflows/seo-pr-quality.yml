@@ -23,6 +23,12 @@ on:
       - 'services/**'
       - 'pest-control/**'
       - 'link-check.mjs'
+      - 'merchant-feed.mjs'
+      - 'merchant-feed.test.mjs'
+      - 'merchant-feed.config.json'
+      - 'check-merchant-feed.mjs'
+      - 'google-product-categories.json'
+      - 'scripts/build-google-category-map.mjs'
       - 'mobile-shell/**'
       - '*.html'
       - '.github/workflows/**'
@@ -84,9 +90,13 @@ jobs:
             node --check recent-orders.js
             node --check product-content.test.mjs
             node --check seo-meta.mjs
+            node --check merchant-feed.mjs
+            node --check check-merchant-feed.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-syntax.log"
       - name: Test product category and safety enrichment
         run: node seo-product-extras.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/08-product-extras.log"
+      - name: Test Google Merchant Center feed rules (Kenya)
+        run: node merchant-feed.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/08b-merchant-feed-test.log"
       - name: Test product and category SEO metadata
         run: node seo-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/09-seo-meta.log"
       - name: Test allowlisted ordinary-product meta descriptions
@@ -104,6 +114,8 @@ jobs:
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/13-blog-build.log"
       - name: Build product and category pages from the live public catalogue
         run: node generate-products.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/14-generate-products.log"
+      - name: Validate generated merchant-feed.xml (XML syntax and Google Merchant Center rules)
+        run: node check-merchant-feed.mjs --strict 2>&1 | tee "$RUNNER_TEMP/ci-logs/14b-merchant-feed-check.log"
       - name: Apply the same SEO enrichment passes used by production
         run: |
           {
