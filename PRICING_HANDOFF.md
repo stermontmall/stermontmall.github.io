@@ -491,7 +491,7 @@ SQL: `supabase/sql/pricing-batch-005.sql` (guarded, review branch only; not appl
 | Syngenta skipped | 4 |
 | Existing product prices prepared for update | 3 |
 | New verified pack variants prepared | 3 |
-| Needs manual check / unchanged | 92 |
+| Needs manual check / unchanged | 93 |
 
 Syngenta products skipped untouched: Cruiser 350FS 5L, Daconil 720SC 500ml, Dithane Mancozeb 1kg, and Dual Gold 960EC 5L. Danadim Progress 400EC 1L is FMC/Cheminova-branded, not Syngenta, and remains eligible for pricing research.
 
@@ -532,7 +532,7 @@ SQL: `supabase/sql/pricing-batch-006.sql` (guarded updates + idempotent inserts;
 | Syngenta skipped | 1 |
 | Price updates prepared | 7 |
 | New pack variants | 0 |
-| Needs manual price check / unchanged | 79 |
+| Needs manual price check / unchanged | 80 |
 
 Syngenta exclusion: Engeo 247SC 250ml. Danadim Progress is FMC/Cheminova (not Syngenta) and remains eligible; Funginil is Osho / Jiangsu Xinhe (not Syngenta) but requires a separate Kenya regulatory-status check.
 
@@ -885,7 +885,7 @@ Samsung A06, A07 5G and A17 5G use exact RAM/storage/network configurations from
 |---|---:|
 | Products scanned | 100 |
 | Syngenta products skipped | 8 |
-| Existing products with price updates | 13 |
+| Existing products with price updates | 12 |
 | New pack variants | 0 |
 | Needs manual price check / unchanged | 92 |
 
@@ -898,7 +898,7 @@ Samsung A06, A07 5G and A17 5G use exact RAM/storage/network configurations from
 | Spirometer 500SC | 100ml | 1,317.50 [RETAIL-ESTIMATE] | 30% | 1,700 | 1,550 (Agropests, AgriGuard, Kuza) | https://agropests.com/products/spirometer-500-sc-100ml; https://agriguardagrovet.co.ke/; https://kuzaagrochem.com/products/spirometer-100ml-840 |
 | Taurus 500SP | 1kg | 4,462.50 [RETAIL-ESTIMATE] | 30% | 5,800 | 5,250–6,400 | https://www.mtolori.com/product/details/taurus-500sp-1kg-2274; https://agriguardagrovet.co.ke/product/taurus-500-sp/ |
 | Systema 50EC | 1L | 2,550 [RETAIL-ESTIMATE] | 30% | 3,300 | 3,000–3,250 | https://agropests.com/products/systema-50-ec-1-l; https://kuzaagrochem.com/products/systema-50ec-1l |
-| Samsung 43U8000F TV | 43 inch | 32,215 [RETAIL-ESTIMATE] | 25% | 40,250 | 37,900–42,100 | https://www.samsungbrandstore.co.ke/category/4k-uhd-led-tvs; https://www.kenyatronics.com/view-product/samsung-43-inch-4k-smart-tv-43u8000f-2025-model; https://dealerstore.co.ke/product/samsung-43-43u8000f-crystal-uhd-4k-smart-tv/; https://nairobitvshop.co.ke/product/samsung-43-inch-u8000f-4k-smart-tv-2025/; https://www.jumia.co.ke/samsung-43u8000fu-43-inch-smart-crystal-uhd-led-tv-2025-325467119.html |
+
 | Symnet 50-mesh insect net | 3m × 50m roll | 12,750 [RETAIL-ESTIMATE] | 30% | 16,600 | 15,000 | https://www.symnet.co.ke/solutions/insect-nets |
 
 All five use [RETAIL-ESTIMATE] baselines (lowest reliable in-stock Kenyan retail × 0.85), not wholesale quotes. Prices are rounded to nearest KSh50. Existing-price reductions are justified by multiple comparable listings showing current price >25% above market average: Spirometer 500SC 100ml (KSh1,550 at Agropests, AgriGuard and Kuza; new KSh1,700), Taurus 500SP 1kg (M-Tolori KSh5,250 and AgriGuard KSh6,400; new KSh5,800), and Systema 50EC 1L (Agropests KSh3,000 and Kuza KSh3,250; new KSh3,300). Samsung 43U8000F is increased from KSh39,099 to KSh41,900 based on lowest Samsung Brandstore KSh37,900 and several other in-stock exact-model listings around KSh38,900–KSh42,100; formula price is within 10% of market average. Symnet 50-mesh 3m × 50m roll is increased from KSh15,499 to KSh16,600 using Symnet's own exact-size in-stock KSh15,000 listing as the retail baseline (retail estimate × 0.85). This puts Stermont 10.7% above that one supplier's retail price, below the 15% alert threshold; one source only, so this is a single-observation baseline rather than a competitor average.
@@ -1135,17 +1135,18 @@ SQL record: supabase/sql/pricing-batch-018.sql (no-op audit record; no product d
 | Active catalogue records scanned | 1,647 |
 | Inactive catalogue records scanned | 85 |
 | **Total catalogue records scanned** | **1,732** |
-| Syngenta products excluded (active + inactive) | 61 |
-| Active non-Syngenta products eligible for pricing review | 1,587 |
-| Existing product price updates prepared in guarded SQL | 201 |
-| New pack variants prepared in guarded SQL | 25 |
-| Active non-Syngenta products left unchanged / needing manual price verification | 1,386 |
+| Syngenta products excluded (active + inactive) | 62 |
+| Active non-Syngenta products eligible for pricing review | 1,586 |
+| Existing product price updates prepared in guarded SQL | 207 |
+| New pack variants prepared in guarded SQL | 28 |
+| Active non-Syngenta products needing manual price verification / unchanged | 1,376 |
+| Active non-Syngenta products verified already at correct formula price | 3 |
 | Inactive non-Syngenta products retained unchanged | 84 |
 
-The 201 price changes cover 201 unique existing product IDs. A duplicate AICO sprayer update in Batch 2 was removed from the earlier SQL block so the later broader-search recheck is the single effective price update for that product. All 201 current-price guards were checked against Supabase and matched the captured current prices. All 25 new variant IDs were checked and do not already exist. New pack variants are staged as inserts; they are not live yet.
+The 207 prepared price updates cover 207 unique active product IDs after removing the duplicate Samsung 43U8000F row from Batch 14; that TV update is assigned to Batch 13. The 28 new pack variants have unique IDs checked against the catalogue. All updates are protected by expected-current-price guards; new variants use idempotent inserts. These are staged branch changes, not production writes.
 
-**Branch status:** all 18 batch SQL files and this handoff are committed to pricing/non-syngenta-market-review-20261117, based on main. No merge to main has been performed. Existing product URLs/slugs are unchanged. No production database prices or storefront pages have been changed.
+**Branch status:** all 18 batch SQL files and this handoff are committed to `pricing/non-syngenta-market-review-20261117`, based on `main`. No merge to `main` has been performed. Existing product URLs/slugs are preserved. No production database prices or storefront pages have been changed.
 
-**SEO/schema status:** the product-page generator on this branch now emits KES Product Offer pricing from catalogue records, stock availability and a one-year priceValidUntil. The sitemap generator updates lastmod when generated product HTML changes. The SQL catalogue changes are staged only; therefore the actual generated product JSON-LD and sitemap timestamps are not yet synced to the proposed prices. After reviewing/merging and applying the SQL changes, run the product-page build and deployment, then verify representative Product JSON-LD prices and sitemap lastmod values before declaring the live site synced.
+**SEO/schema status:** the branch's product generator is expected to emit KES Product Offer pricing, stock availability and a one-year `priceValidUntil`, and update sitemap `lastmod` when generated product HTML changes. However, catalogue SQL remains staged only. The generated live product JSON-LD and sitemap timestamps are therefore **not yet synced to these proposed prices**. After review/merge and execution of the SQL, run the product-page build and deployment, then verify representative Product JSON-LD prices and sitemap `lastmod` values before declaring the live site synced.
 
-**Deployment safety:** guarded SQL files require each existing record to still have its captured expected price and active status. Each new variant insert uses its own stable ID and ON CONFLICT (id) DO NOTHING; review the generated descriptions and add exact pack photos before public release. Supplier baselines marked [RETAIL-ESTIMATE] are the lowest matched Kenyan retail price × 0.85; no such baseline is represented as a supplier wholesale quotation.
+**Deployment safety:** guarded SQL requires each existing product to still match its captured expected price and active status. Each new variant insert uses a stable ID and `ON CONFLICT (id) DO NOTHING`. Review new pack descriptions and add exact pack photos before public release. Supplier baselines labelled [RETAIL-ESTIMATE] are the lowest matched Kenyan retail price × 0.85; they are not wholesale quotations.
