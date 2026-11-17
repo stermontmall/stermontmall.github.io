@@ -4,66 +4,67 @@ Read `CLAUDE.md` first: it holds the full repository rules (product posting, han
 
 ## AUTONOMOUS BULK PRODUCT PUBLISHING RULE (ZERO-PROMPT DEFAULT)
 
-**PRECEDENCE (owner, 2026-11-18): this rule overrides the older 2026-11-14 master prompt in `CLAUDE.md`.** Where they differ, this rule always wins: the **4-tier markup (rounded to nearest KSh 50)** replaces `cost * 1.30`, and **800+ word SEO descriptions** replace the 600–900 word range. Its programmatic image verification (D2 below) also replaces the visual-inspection step in "Product posting" item 3 of `CLAUDE.md` for bulk posting.
+**Owner-approved canonical rule, 2026-11-18.** This section supersedes all older or conflicting bulk-publishing, pricing, inventory, image, and SEO instructions in this repository. It applies to every category on `stermontarcade.co.ke`.
 
-Trigger: whenever the owner says **"post products"** or names a **Category** (with or without a product list, up to 50+ items at once), execute this entire pipeline automatically from start to finish **without stopping to ask any questions, confirmations, or clarifications** until the eligible products are verified and published live.
+### 1. ZERO-QUESTION AUTONOMY & PRE-ANSWERED EDGE CASES
+Trigger: whenever the owner says **"Post [N] items on [Category]"**, execute continuously until the requested count is live. Do not ask clarifying questions or pause for confirmation. Do not create or publish anything unless a posting request is actually made.
 
-Role: act as an Autonomous Senior E-Commerce Merchandiser, Kenyan Market Pricing Analyst, Technical SEO Copywriter, and Full-Stack Developer for `stermontarcade.co.ke` (Stermont Arcade — Nairobi & all 47 counties in Kenya).
+- **Duplicates:** Before each insert, check existing `products` in Supabase using normalized product name, active ingredient/model, and pack size. Skip exact duplicates and continue discovering unique candidates until the requested count is reached.
+- **Category mapping:** Resolve the exact Supabase `category_id`. If a subcategory is absent, use the closest existing parent category. Never leave `category_id` null.
+- **Variants:** Use the existing `ProductGroup`/variant architecture when supported. Otherwise create distinct SKUs and pack-size slugs (for example `product-name-500ml`) following the current `main` generator pattern.
+- **Currency/tax:** All prices are KES/KSh inclusive of applicable local taxes. Never use USD, ZAR, or NGN.
+- **Missing price/image:** If no verifiable Kenyan price or no clean, downloadable, valid image can be sourced after checking trusted sources, skip that candidate and find another. Do not publish a placeholder or cracked image.
+- **Completion:** Continue until [N] unique, eligible products are live. If genuinely impossible after reasonable source discovery, report the exact blocker and count; never fabricate products, prices, images, compliance status, or completion.
+- **Git/deployment:** Commit to `main` if permitted. If branch protection requires a PR, create a branch, run and verify the build/checks, and provide one ready-to-merge PR link at the end. Never stop mid-batch for routine decisions.
 
-### MANDATORY EXECUTION RULES FOR ALL BULK PRODUCT POSTING
+### 2. CONTINUOUS MICRO-BATCH LOOP
+Process in internal batches of five, end-to-end:
+`discover unique Kenyan products/packs -> verify Kenyan source price -> calculate markup/floors -> download and validate image -> upload with add_product_photo -> write 800+ word SEO guide -> upsert Supabase active=true -> rebuild product pages and sitemap.xml -> checkpoint HANDOFF-live.md`.
+Immediately continue to the next micro-batch. Save a checkpoint after each batch and whenever blocked.
 
-#### A. Anti-Hanging Micro-Batch Loop (50+ Products Support)
-- Never process 50+ products in one giant loop. Process in **micro-batches of 5 products** end-to-end (research -> pack variants -> price -> download/verify/upload image -> write 800+ word SEO copy -> upsert Supabase -> trigger build/sitemap update -> log checkpoint in `HANDOFF-live.md`) and immediately advance to the next 5 products until 100% of the batch is complete.
-- Do NOT pause between micro-batches to ask for permission.
+### 3. TRUSTED KENYAN PHYSICAL-STORE SOURCE DIRECTORY
+Use legitimate Kenyan businesses with physical Kenyan/Nairobi presence as price/specification sources, preferring wholesale/distributor prices and exact pack/model matches. Record the exact store name and source URL in `HANDOFF-live.md` for every product.
 
-#### B. Category Discovery & Pack-Size Expansion
-- If the owner provides only a **Category Name** (e.g., `"Post 50 products in Sprayers & Equipment"`), research top-selling, high-demand products in Kenya for that category that are not yet in our active Supabase catalogue or are missing standard commercial pack sizes.
-- Automatically create separate product/pack variants for all standard Kenyan commercial pack sizes/models (e.g., `28ml`, `50ml`, `100ml`, `250ml`, `500ml`, `1L`, `5L`, `20L`, `100g`, `1kg`, `25kg`, or standard equipment capacities) matching our exact database schema (`products` + grouped variants where applicable).
+- **Pest control, agrochemicals, agrovets, seeds, fertilizers, livestock:** Osho Chemical Industries (Nairobi Industrial Area), Murphy Chemicals E.A. (Nairobi), Amiran Kenya (North Airport Rd, Nairobi), Twiga Chemical Industries (Nairobi), Lachlan Kenya (Nairobi), Ultravetis East Africa (Nairobi), Cooper K-Brands (Nairobi), Farmers Trend Kenya (Nairobi/Thika), Mkulima Young, Agriflora Kenya, Farmbiza Kenya, and established Nairobi agrovet/pest-control distributors (Industrial Area/CBD/Westlands).
+- **Hardware, sprayers, tanks, irrigation, tools, solar, automotive:** Davis & Shirtliff (Nairobi Industrial Area/Westlands), Randolf Hardware, Buildmart Kenya, Metro Hardware, Chhani's, Karibu Hardware, Epicenter Africa, SunCulture, and AutoXpress Kenya branches.
+- **Supermarkets, household, kitchen, pet, health/beauty, baby, cleaning:** Carrefour Kenya, Naivas, Quickmart, and Chandarana Foodplus branches.
+- **Electronics, appliances, phones, computing, office:** Hotpoint Appliances Kenya (Sarit Centre/Industrial Area), Ramtons Kenya, Opalnet, authorized Luthuli/Moi Avenue distributors, Avechi Kenya, Phoneplace Kenya, Saruk Digital Solutions, and Text Book Centre.
+- **Security/CCTV:** verified Hikvision and Dahua authorized Nairobi distributors (CBD/Westlands/Industrial Area).
+- **Fashion, shoes, watches, sports:** verified Nairobi retail stores and official Kenyan brand outlets (Sarit Centre/Westlands/CBD).
+- For any category not explicitly listed, identify reputable Kenyan physical retailers/distributors relevant to that category; verify the physical-store presence and exact listing rather than assuming it.
 
-#### C. Kenyan Market Pricing, Markup Tiers & Stock Defaults
-1. **Syngenta Exclusion:** Leave existing Syngenta pricing untouched unless the owner explicitly provides a fixed price.
-2. **Kenyan Supplier Baseline Research:** Search reliable Kenyan agrovets, hardware stores, distributors, and local marketplaces (prioritizing Nairobi wholesale/distributor prices in KES). Deduplicate copied generic listings. If only retail prices exist online, use `lowest_reputable_Nairobi_retail * 0.85` as `[RETAIL-ESTIMATE]`. If no verifiable price exists online, keep `active = false` and log `[NEEDS MANUAL PRICE]` in `HANDOFF-live.md`.
-3. **4-Tier Markup Formula (Applied to Verified Baseline Cost in KES):**
-   - Baseline **below KSh 20,000** → `Baseline * 1.30` (+30%)
-   - Baseline **KSh 20,000 – 39,999** → `Baseline * 1.25` (+25%)
-   - Baseline **KSh 40,000 – 60,000** → `Baseline * 1.20` (+20%)
-   - Baseline **above KSh 60,000** → `Baseline * 1.175` (+17.5%)
-   - **Minimum Profit Floor:** Never set a price yielding less than 15% net margin above verified baseline.
-   - **Clean Kenyan Rounding:** Round all final retail prices to the nearest **KSh 50**.
-4. **Mandatory Inventory Defaults (Every New Product & Pack):**
-   - **Items in Stock (`stock_quantity`):** `1000` pieces
-   - **Low Stock Alert (`low_stock_threshold`):** `20` pieces
+### 4. PRICING: FOUR-TIER MARKUP & PROFIT FLOORS
+1. **Syngenta exclusion:** Do not change Syngenta pricing unless explicitly instructed.
+2. **Baseline cost (KES):** lowest reliable Kenyan wholesale/distributor price from the source directory. If only reputable Nairobi retail prices are published, use `retail price * 0.85` as the estimated baseline and label it clearly in the handoff. Never invent a price.
+3. **Markup:** baseline below KSh 20,000: +30% (`baseline * 1.30`); KSh 20,000–39,999: +25% (`* 1.25`); KSh 40,000–60,000 inclusive: +20% (`* 1.20`); above KSh 60,000: +17.5% (`* 1.175`).
+4. **Guardrails:** final price must also satisfy at least a 15% net margin above baseline; round to nearest KSh 50; storefront price floor is KSh 200 per product/variant. Apply the higher price where the markup formula and 15% floor differ.
+5. Record baseline, source, markup tier, rounding, and final KES price.
 
-#### D. Zero-Cracking Image Sourcing & Safe Supabase Upload
-- **Never hotlink external URLs** directly into `products.images` (external links break/crack over time). Never use watermarked, blurry, or wrong-pack-size photos.
-- Search manufacturer sites and clean listings for exact-match, high-resolution packshots (`>= 600x600px` preferred, clean background).
-- Upload directly into Supabase storage using our secure database helper **`add_product_photo`**.
-- **Strict Activation Gate:** Only set `active = true` (live) if a product has: (1) a verified price, (2) an image that passes the D2 programmatic checks and is hosted in our Supabase storage bucket, and (3) zero PCPB regulatory blocks. Otherwise keep `active = false` and add it to the manual phone-upload queue in `HANDOFF-live.md`.
+### 5. INVENTORY DEFAULTS
+Every new product and pack variant: stock quantity 1000; low-stock threshold 20. In the current database schema these fields are `products.stock` (default 1000) and `products.low_at` (default 20), equivalent to the requested `stock_quantity` and `low_stock_threshold` concepts. Do not add duplicate columns unless the schema is deliberately migrated and all application code is updated.
 
-#### D2. Programmatic Image Verification for Live Publishing (owner-approved 2026-11-18)
-Sandbox sessions cannot inspect images by eye. A product may be set `active = true` automatically when its image passes ALL of these programmatic checks:
-- (a) sourced from a reputable manufacturer/supplier product page that matches the exact product name and pack size;
-- (b) HTTP 200 status;
-- (c) valid image MIME type (`image/jpeg`, `image/png`, `image/webp`);
-- (d) dimensions `>= 500x500px` and file size `> 15KB`;
-- (e) uploaded cleanly into Supabase via `add_product_photo` (stored object exists and `products.images` references it).
-Keep `active = false` only if no verified image is found, or the item is on the PCPB regulatory HOLD list. Record in `HANDOFF-live.md` which checks were actually performed for each product; never report a check as passed that was not run.
+### 6. IMAGE UPLOAD — ZERO CRACKING
+- Find a clean, high-resolution image matching the exact product/model and pack size; no watermarks, blurry thumbnails, or generic substitutes.
+- Download locally and verify HTTP 200, MIME type exactly one of `image/jpeg`, `image/png`, `image/webp`, intact dimensions at least 500x500, and file size greater than 15 KB.
+- Upload image bytes to Supabase Storage using `add_product_photo`; never hotlink an external URL.
+- Confirm the stored object exists and `products.images` references it before activation. Record only checks actually performed.
+- Activate only when price, image, and regulatory gates all pass.
 
-#### E. PCPB & Kenyan Regulatory Compliance Guard
-- Always cross-check `HANDOFF-live.md` and `docs/photo-upload-queue-2026-11-18.md` before activating any agrochemical or pest-control product.
-- Never activate withdrawn active ingredients (e.g., Acephate) or publish restricted ingredients (Chlorpyrifos, Imidacloprid, 2,4-D Amine, Mancozeb) without label-accurate Kenyan restrictions.
-- Never invent pesticide dilution rates; always direct buyers to follow the exact PCPB-approved product label and required PPE.
+### 7. KENYAN REGULATORY / PCPB SAFETY
+Before agrochemical/pest-control activation, cross-check `HANDOFF-live.md` and `docs/photo-upload-queue-2026-11-18.md`. Never publish withdrawn actives (including Acephate). Do not publish restricted actives (including Chlorpyrifos, Imidacloprid, 2,4-D Amine, Mancozeb) without label-accurate Kenyan restrictions and confirmation of applicable authorization. Never invent pesticide dilution rates; defer to the exact Kenyan-approved label and PPE directions. If regulatory status is uncertain, skip/hold and find a compliant alternative.
 
-#### F. 800+ Word High-Ranking Google Kenya (`Google.co.ke`) SEO Structure
-Every published product must include a **unique, non-templated 800+ word SEO product guide** tailored to Kenyan buyers containing:
-1. **SEO Meta Title (55–60 chars):** `[Exact Product Name + Pack Size] Price in Kenya | Stermont Arcade`
-2. **SEO Meta Description (145–155 chars):** Exact KSh price, pack size, M-Pesa checkout, pickup at Sarit Centre Westlands Nairobi, and delivery across all 47 counties.
-3. **Opening Hook & Overview (100+ words):** Clear problem-solution summary for Kenyan homes, farms, hotels, or businesses.
-4. **Key Features, Technical Specifications & Pack Details (150+ words):** Scannable bullets covering brand, exact pack size/dimensions, active ingredient/specs, formulation/build quality, and shelf life/warranty.
-5. **Practical Applications & Step-by-Step Usage Guide in Kenya (200+ words):** Real Kenyan use cases and safe step-by-step handling/application instructions.
-6. **Buying & Pack-Size Comparison Guide (150+ words):** Helps buyers compare pack sizes or alternatives, including 2–3 natural internal links to relevant categories, buying guides, or `/services/` pages on `stermontarcade.co.ke`.
-7. **Kenyan Ordering, Pickup & Delivery Block (80+ words):** Fast M-Pesa checkout, pickup at Sarit Centre (Westlands, Nairobi), delivery to all 47 counties, and WhatsApp support (`+254 748 888 230`).
-8. **4 Buyer-Focused FAQs (150+ words):** Synced 1:1 with `FAQPage` JSON-LD alongside valid `Product` / `ProductGroup` JSON-LD (`priceCurrency: "KES"`, exact numeric `price`, `https://schema.org`, and 1-year `priceValidUntil`).
+### 8. UNIQUE 800+ WORD GOOGLE.CO.KE SEO & STRUCTURED DATA
+Every published item needs a unique, factual, non-templated guide of at least 800 words for Kenyan buyers:
+- Meta title target 55–60 characters: `[Exact Product Name + Pack Size] Price in Kenya | Stermont Arcade` (fit the limit without truncation or misleading wording).
+- Meta description target 145–155 characters, including exact KSh price, pack size, M-Pesa checkout, Sarit Centre/Westlands Nairobi pickup, and delivery across all 47 counties.
+- Opening overview: 100+ words.
+- Features, technical specifications, and pack details: 150+ words; only verified brand, pack, dimensions, active ingredient/specifications, formulation/build quality, shelf-life/warranty details.
+- Practical Kenyan applications and safe usage guidance: 200+ words. Do not invent efficacy claims, directions, or chemical rates.
+- Buying/pack comparison: 150+ words, with 2–3 natural internal links to relevant Stermont categories, guides, or `/services/` pages.
+- Kenya ordering/pickup/delivery: 80+ words; M-Pesa, pickup at Sarit Centre (Westlands, Nairobi), delivery to all 47 counties, WhatsApp `+254 748 888 230`.
+- Four buyer-focused FAQs totaling at least 150 words, synced one-to-one with FAQPage JSON-LD. Include valid Product/ProductGroup JSON-LD with `https://schema.org`, `priceCurrency: "KES"`, exact numeric price, and a one-year `priceValidUntil`. Do not claim rich-result eligibility or guaranteed rankings.
 
-#### G. Final Live Build & Verification
-- Run/trigger the static product-page and `sitemap.xml` rebuild so all newly published products appear live on `stermontarcade.co.ke` with updated `<lastmod>` timestamps, and output a single final summary table showing published products, pack variants, prices, and any items queued for manual review.
+### 9. FINAL LIVE SYNC & REPORT
+Set `active=true` only after all gates pass. Rebuild product pages and `sitemap.xml`; verify the live URLs and sitemap entries; checkpoint `HANDOFF-live.md`. At completion provide one concise table:
+`Product Name | Pack Size | Baseline Cost (KES) | Final Price (KES) | Nairobi Source Store | Live URL`.
+Include any skipped/held candidates and blockers separately.
