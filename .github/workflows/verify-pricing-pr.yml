@@ -33,9 +33,11 @@ jobs:
       - name: Fetch main baseline
         run: |
           git fetch --no-tags origin main
-          git show df17473e0701363312387b6fac6ef336788c9299:sitemap.xml > /tmp/main-sitemap.xml
+          BASELINE="$(git merge-base origin/main HEAD)"
+          echo "Using pre-merge baseline: $BASELINE"
+          git show "$BASELINE:sitemap.xml" > /tmp/main-sitemap.xml
           mkdir -p /tmp/main-pages
-          git archive df17473e0701363312387b6fac6ef336788c9299 p | tar -x -C /tmp/main-pages
+          git archive "$BASELINE" p | tar -x -C /tmp/main-pages
 
       - name: Generate product pages and sitemaps
         run: node generate-products.mjs
