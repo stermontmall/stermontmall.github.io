@@ -352,7 +352,7 @@ Scanned the next 100 active catalogue records (alphabetical order, offset 200). 
 | Syngenta skipped | 11 |
 | Verified supplier/retail-benchmark price updates prepared | 11 |
 | Remaining manual checks | 78 |
-| New pack variants | 6 |
+| New pack variants | 0 |
 
 ## Batch 3 pricing updates
 
@@ -1138,7 +1138,7 @@ SQL record: supabase/sql/pricing-batch-018.sql (no-op audit record; no product d
 | Syngenta products excluded (active + inactive) | 62 |
 | Active non-Syngenta products eligible for pricing review | 1,586 |
 | Existing product price updates prepared in guarded SQL | 207 |
-| New pack variants prepared in guarded SQL | 28 |
+| New pack variants prepared in guarded SQL | 25 |
 | Active non-Syngenta products needing manual price verification / unchanged | 1,376 |
 | Active non-Syngenta products verified already at correct formula price | 3 |
 | Inactive non-Syngenta products retained unchanged | 84 |
@@ -1147,7 +1147,7 @@ The 207 prepared price updates cover 207 unique active product IDs after removin
 
 **Branch status:** all 18 batch SQL files and this handoff are committed to `pricing/non-syngenta-market-review-20261117`, based on `main`. No merge to `main` has been performed. Existing product URLs/slugs are preserved. No production database prices or storefront pages have been changed.
 
-**SEO/schema status:** the branch's product generator is expected to emit KES Product Offer pricing, stock availability and a one-year `priceValidUntil`, and update sitemap `lastmod` when generated product HTML changes. However, catalogue SQL remains staged only. The generated live product JSON-LD and sitemap timestamps are therefore **not yet synced to these proposed prices**. After review/merge and execution of the SQL, run the product-page build and deployment, then verify representative Product JSON-LD prices and sitemap `lastmod` values before declaring the live site synced.
+**SEO/schema status:** the branch's product generator is confirmed to emit `priceCurrency: KES`, a numeric Product Offer `price`, stock-based `https://schema.org/InStock` / `OutOfStock` availability, and a `priceValidUntil` one year from generation. Product sitemap `<lastmod>` values are refreshed when generated product HTML changes. However, catalogue SQL remains staged only. The generated live product JSON-LD and sitemap timestamps are therefore **not yet synced to these proposed prices**. After review/merge and execution of the SQL, run the product-page build and deployment, then verify representative Product JSON-LD prices and sitemap `lastmod` values before declaring the live site synced.
 
 **Deployment safety:** guarded SQL requires each existing product to still match its captured expected price and active status. Each new variant insert uses a stable ID and `ON CONFLICT (id) DO NOTHING`. Review new pack descriptions and add exact pack photos before public release. Supplier baselines labelled [RETAIL-ESTIMATE] are the lowest matched Kenyan retail price × 0.85; they are not wholesale quotations.
 
