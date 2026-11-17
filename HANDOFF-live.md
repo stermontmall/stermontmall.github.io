@@ -1,3 +1,14 @@
+## 2026-11-18 — Pricing source refinements
+- Updated exact retail baselines to the lowest currently visible reputable Nairobi retail listings where available:
+  - Air Chopper 7.5% SC 30ml: Imagine Care KSh 999 (baseline KSh 849.15; final KSh 1,100).
+  - Air Chopper 7.5% SC 100ml: Imagine Care KSh 1,499 (baseline KSh 1,274.15; final KSh 1,650).
+  - Air Chopper 7.5% SC 15ml three-pack: Imagine Care KSh 799 (baseline KSh 679.15; final KSh 900).
+  - Hafeton 100 SC 100ml: Imagine Care KSh 999 (baseline KSh 849.15; final KSh 1,100); PCPB public-health registration remains unconfirmed.
+  - Sevin Dudu Dust 200g: Naivas Online KSh 160 (baseline KSh 136; final KSh 200).
+- The database cost and final retail values, and the matching product-description price calculations, were updated to these references. The 20-row price audit was rerun after the updates.
+
+---
+
 ## 2026-11-18 — PCPB register verification correction
 - Rechecked the current official PCPB public-health register: https://www.pcpb.go.ke/public-health/ . It confirms the current entries for SCUD 5% WP (PCPB(CR)1808), NAVIGATOR 100 SC (PCPB(CR)1268), KILEX 0.5 GEL (PCPB(CR)2393), AIR CHOPPER 7.5% SC (PCPB(CR)1648), HYGIENIC 7.5% SC (PCPB(CR)1648-P(i)), MENDE MO FIRE (PCPB(CR)1810), PUNISHER 8.5% TA (PCPB(CR)1774), OSEFIN 7.5 WP (PCPB(CR)1394), SEVIN DUDU DUST (PCPB(CR)0828), and DRAGON 5% WP (PCPB(CR)1807).
 - A matching HAFETON 100 SC entry and a matching PARETO ROACH SPRAY entry were **not located** in the current public-health register during this check. Previous registration numbers recorded for those two products are unverified and have been removed from the ledger. Keep both products inactive until PCPB confirms their current registration and permitted public-health uses.
