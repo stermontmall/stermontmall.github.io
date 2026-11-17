@@ -1,3 +1,4 @@
+// 2026-11-18: rebuild product pages after normalising Fumigation Chemicals descriptions and product FAQ structured data.
 // Rebuild requested 2026-11-17: publish the new editorial introductions for all indexable category pages.
 // Rebuild requested 2026-11-17: publish corrected unique product SEO titles and descriptions from Supabase.
 // Rebuild requested 2026-11-11: publish newly verified Ramtons appliance listings and refreshed product prices/photos.
@@ -19,7 +20,7 @@ import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node
 import { createHash } from 'node:crypto';
 import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
-import { productDescriptionHtml } from './product-description-html.mjs';
+import { productDescriptionHtml, extractProductFaq } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
 import { buildCategoryIntro, buildCategoryFaq } from './category-editorial.mjs';
 import { renderHomeGridFallback } from './home-grid-ssr.mjs';
@@ -670,7 +671,9 @@ for (const p of products) {
         availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
         seller: { '@id': `${SITE}/#store` } } }))
   }) : '';
-  const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');
+  const productFaq = extractProductFaq(p.description);
+  const productFaqLd = productFaq.length === 4 ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: productFaq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
+  const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '') + productFaqLd;
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
     const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${pdpVariantUrl(path, v.slug, p.slug)}`)}`;
     return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
