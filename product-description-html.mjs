@@ -7,8 +7,8 @@
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const inline = s => esc(s)
-  .replace(/\\[([^\\]]+)\\]\\((?:https?:\\/\\/stermontarcade\\.co\\.ke)?(\\/[^)\\s]*)\\)/g, '<a href="$2">$1</a>')
-  .replace(/\\*\\*([^*]+)\\*\\*/g, '<strong>$1</strong>');
+  .replace(/\[([^\]]+)\]\((?:https?:\/\/stermontarcade\.co\.ke)?(\/[^)\s]*)\)/g, '<a href="$2">$1</a>')
+  .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
 // Only explicit uppercase section labels match. Never ordinary words such as "used", "order" or "safety" inside sentences.
 const LABELS = [
@@ -64,7 +64,8 @@ function renderBody(body, heading) {
   const blocks = body.split(/\n{2,}/).map(x => x.trim()).filter(Boolean);
   return blocks.flatMap(block => block.split(/\n+/).map(x => x.trim()).filter(Boolean).flatMap(line => {
     if (/^[-–•●▪]\s*/.test(line)) return ['<ul><li>' + inline(line.replace(/^[-–•●▪]\s*/, '')) + '</li></ul>'];
-    const sentences = line.match(/[^.!?]+(?:[.!?]+|$)/g) || [line];
+    // A Markdown link such as (https://stermontarcade.co.ke/...) must stay in one piece; its dots are not sentence ends.
+    const sentences = line.match(/(?:\[[^\]]*\]\([^)]*\)|[^.!?])+(?:[.!?]+|$)/g) || [line];
     const paras = [];
     for (let i = 0; i < sentences.length; i += 3) paras.push('<p>' + inline(sentences.slice(i, i + 3).join(' ').trim()) + '</p>');
     return paras;
@@ -100,30 +101,43 @@ function normalizeMarkdownHeading(value) {
   return value;
 }
 
+// The seven canonical storefront titles, as the catalogue drafts write them.
+const KNOWN_TITLES = [
+  'Product overview', 'Technical specifications & pack details', 'Where & how to use in Kenya',
+  'Safety, storage & handling guidelines', 'Buying & pack-size guide', 'Delivery across Kenya & Nairobi pickup',
+  'Frequently asked questions'
+].map(t => [t, normalizeMarkdownHeading(t)]);
+
 function splitInlineMarkdownHeadings(source) {
   let text = source;
   // Product overview headings were followed immediately by the product name and opening sentence.
   text = text.replace(/##\s+Product overview\s+(.{1,120}?\s+is\s+)/gi,
     (_m, opening) => '\n## Product Overview & Key Benefits\n\n' + opening);
+  // The canonical titles are known exactly, so split them without depending on the next sentence's first word.
+  for (const [title, canonical] of KNOWN_TITLES) {
+    const known = new RegExp('##\\s+' + title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\w])\\s*', 'gi');
+    text = text.replace(known, () => '\n## ' + canonical + '\n');
+  }
   // Earlier catalogue drafts placed each section title and its first sentence on the same line.
   // Split only at known sentence-opening cues; retain every original word and map the title to a canonical section.
   const cues = '(?:The|This|PCPB|Agropests|Imagine Care|Cheapthings|Farm Rescue|Naivas|Jumia|Osho|PPCK|Customers|Shoppers|People|Before|Check|Confirm|Compare|Browse|Read|Follow|Always|Ask|Use|Do|Keep|If|Once|For|One|A larger|A smaller|A small|A product|A 20|A 100|The current|M-Pesa|WhatsApp|Sarit|Delivery)';
   const re = new RegExp('##\\s+([^\\n]{3,110}?)\\s+(' + cues + ')\\b', 'g');
-  text = text.replace(re, (_m, title, start) => {
+  const canonicalTitles = new Set(KNOWN_TITLES.map(([, canonical]) => canonical));
+  // A line that is already a canonical title is left alone, otherwise the "Use" in "Where & How to Use in Kenya" reads as a cue.
+  return text.split('\n').map(line => canonicalTitles.has(line.replace(/^##\s+/, '').trim()) ? line : line.replace(re, (_m, title, start) => {
     const canonical = normalizeMarkdownHeading(title);
     return '\n## ' + canonical + '\n' + start;
-  });
-  return text;
+  })).join('\n');
 }
 
 export function productDescriptionHtml(source) {
   // Remove generic buying-guide boilerplate; retain the product-specific copy.
-  const raw = String(source || '')
+  let raw = String(source || '')
     // Decode stored escaped line breaks; split inline Markdown headings into renderer section boundaries.
     .replace(/\\r\\n|\\n|\\r/g, '\n')
     .replace(/^#[^#\n]*##[ \t]*/i, '## ')
     .replace(/[ \t]+##[ \t]+/g, '\n\n## ')
-    .replace(/[ \t]+###[ \t]+([^#\n]+)/g, '\nQ: $1\n')
+    .replace(/[ \t]+###[ \t]+/g, '\nQ: ')
     .replace(/\*\*([^*]+)\*\*/g, '$1')
     .replace(/\bundefined\b/gi, '')
     .replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '')
