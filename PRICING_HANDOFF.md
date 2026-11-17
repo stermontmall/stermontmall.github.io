@@ -887,7 +887,7 @@ Samsung A06, A07 5G and A17 5G use exact RAM/storage/network configurations from
 | Syngenta products skipped | 8 |
 | Existing products with price updates | 12 |
 | New pack variants | 0 |
-| Needs manual price check / unchanged | 92 |
+| Needs manual price check / unchanged | 80 |
 
 **Syngenta exclusions (untouched):** Syngenta Tatua Rat & Mice Poison Blocks; Tatua Advion Cockroach Gel 30g; Tatua Advion 4 × 30g; Tatua Demand 10CS 25ml; Tatua Klerat 100g; Tatua Zyrox Fly Bait 500g; Tervigo 020SC 5L; Thiovit Jet 1kg. PCPB and vendor/brand references confirm Syngenta ownership/registration. Tihan OD175 is Bayer, Taurus 500SP is Greenlife, and Thunder OD145 is Bayer, so those are not excluded.
 
@@ -901,7 +901,7 @@ Samsung A06, A07 5G and A17 5G use exact RAM/storage/network configurations from
 
 | Symnet 50-mesh insect net | 3m × 50m roll | 12,750 [RETAIL-ESTIMATE] | 30% | 16,600 | 15,000 | https://www.symnet.co.ke/solutions/insect-nets |
 
-All five use [RETAIL-ESTIMATE] baselines (lowest reliable in-stock Kenyan retail × 0.85), not wholesale quotes. Prices are rounded to nearest KSh50. Existing-price reductions are justified by multiple comparable listings showing current price >25% above market average: Spirometer 500SC 100ml (KSh1,550 at Agropests, AgriGuard and Kuza; new KSh1,700), Taurus 500SP 1kg (M-Tolori KSh5,250 and AgriGuard KSh6,400; new KSh5,800), and Systema 50EC 1L (Agropests KSh3,000 and Kuza KSh3,250; new KSh3,300). Samsung 43U8000F is increased from KSh39,099 to KSh41,900 based on lowest Samsung Brandstore KSh37,900 and several other in-stock exact-model listings around KSh38,900–KSh42,100; formula price is within 10% of market average. Symnet 50-mesh 3m × 50m roll is increased from KSh15,499 to KSh16,600 using Symnet's own exact-size in-stock KSh15,000 listing as the retail baseline (retail estimate × 0.85). This puts Stermont 10.7% above that one supplier's retail price, below the 15% alert threshold; one source only, so this is a single-observation baseline rather than a competitor average.
+All four use [RETAIL-ESTIMATE] baselines (lowest reliable in-stock Kenyan retail × 0.85), not wholesale quotes. Prices are rounded to nearest KSh50. Existing-price reductions are justified by multiple comparable listings showing current price >25% above market average: Spirometer 500SC 100ml (KSh1,550 at Agropests, AgriGuard and Kuza; new KSh1,700), Taurus 500SP 1kg (M-Tolori KSh5,250 and AgriGuard KSh6,400; new KSh5,800), and Systema 50EC 1L (Agropests KSh3,000 and Kuza KSh3,250; new KSh3,300). Samsung 43U8000F is assigned to Batch 13 and is not counted again here. Symnet 50-mesh 3m × 50m roll is increased from KSh15,499 to KSh16,600 using Symnet's own exact-size in-stock KSh15,000 listing as the retail baseline (retail estimate × 0.85). This puts Stermont 10.7% above that one supplier's retail price, below the 15% alert threshold; one source only, so this is a single-observation baseline rather than a competitor average.
 
 ## Verified / unchanged and manual checks
 
