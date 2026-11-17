@@ -33,3 +33,25 @@ begin
 end
 $pricing$;
 commit;
+
+
+-- Batch 2 broader-search recheck addendum (2026-11-17). Estimated baselines are Kenyan retail prices less 15% where indicated in PRICING_HANDOFF.md.
+do $pricing$
+declare r record; affected integer;
+begin
+ for r in select * from (values
+('algreen-hynitro-42-high-nitrogen-foliar-fertilizer-1l',699.00::numeric,750.00::numeric),
+('algreen-planta-p-liquid-foliar-fertilizer-1l',999.00::numeric,1050.00::numeric),
+('algreen-supa-k-high-potassium-foliar-fertilizer-1l',599.00::numeric,650.00::numeric),
+('agromaster-16-10-22-controlled-release-fertilizer-25kg',4299.00::numeric,4650.00::numeric),
+('aico-japan-ac767-4-25l-4-stroke-petrol-knapsack-sprayer',24700.00::numeric,20450.00::numeric),
+('alonze-50-ec-miticide-1l',14399.00::numeric,8750.00::numeric),
+('alonze-50ec-abamectin-insecticide-1-litre',11499.00::numeric,8750.00::numeric)
+ ) as v(product_id,expected_price,new_price)
+ loop
+  update public.products set price=r.new_price where id=r.product_id and active=true and price=r.expected_price;
+  get diagnostics affected=row_count;
+  if affected<>1 then raise exception 'Batch 2 recheck guard failed for % (expected %, changed %)',r.product_id,r.expected_price,affected; end if;
+ end loop;
+end
+$pricing$;
