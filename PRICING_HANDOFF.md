@@ -13,8 +13,8 @@ Scope: non-Syngenta catalogue only. Product names/IDs/prices were read from `pub
 |---|---:|
 | Products scanned | 100 |
 | Syngenta products skipped | 0 |
-| Products with verified supplier price and price update prepared | 23 |
-| Verified products already at the rounded markup price (no change needed) | 3 |
+| Products with verified supplier price and price update prepared | 22 |
+| Verified products already at the rounded markup price (no change needed) | 4 |
 | Products flagged [NEEDS MANUAL PRICE CHECK] after recheck | 74 |
 | New pack variants added | 0 |
 
@@ -40,9 +40,9 @@ Scope: non-Syngenta catalogue only. Product names/IDs/prices were read from `pub
 | 64-Egg Automatic Incubator with Digital Controls | piece | 12,000 | 30% | 15,600 | https://mkulimajovial.co.ke/product-category/poultry/incubators/ |
 | 64-Egg Incubator WQ JF-64, 220V or 12V, Auto Turning | piece | 14,700 | 30% | 19,100 | https://www.myagrovet.co.ke/products.php?id=5988 |
 | 528-Egg Commercial Automatic Incubator | piece | 55,000 | 20% | 66,000 | https://ecochickspoultry.com/ |
-| 1056-Egg Fully Automatic Commercial Incubator | piece | 65,000 | 17.5% | 76,400 | https://ecochickspoultry.com/ |
+| 1056-Egg Fully Automatic Commercial Incubator | piece | 65,000 | 17.5% | 76,500 | https://ecochickspoultry.com/ |
 | Abalone 18EC Insecticide 50ml | 50ml bottle | 145 | 30% | 200 | https://www.farmrescue.co.ke/product/abalone-18-ec |
-| Accent 600SC Insecticide 50ml | 50ml bottle | 485 | 30% | 650 | https://www.farmrescue.co.ke/product/accent-600sc |
+
 | 4pcs Sticky Ribbon Fly Catcher Trap | pack of 4 | 450 | 30% | 600 | https://www.jumia.co.ke/green-sticky-ribbon-fly-catcher-trap-pack-of-4-132038852.html |
 
 ## Verified — no price change required
@@ -50,6 +50,7 @@ Scope: non-Syngenta catalogue only. Product names/IDs/prices were read from `pub
 | Product Name | Supplier Price (KES) | Markup Tier | Correct Rounded Price (KES) | Current Website Price (KES) | Source |
 |---|---:|---:|---:|---:|---|
 | 13cm Air Stone for Fish Ponds | 2,000 | 30% | 2,600 | 2,600 | https://shop.mft.co.ke/air-stones-x-13cm |
+| Accent 600SC Insecticide 50ml | 485 | 30% | 650 | 650 | https://www.farmrescue.co.ke/product/accent-600sc |
 
 ## [NEEDS MANUAL PRICE CHECK]
 
@@ -169,8 +170,8 @@ Batch order: next 100 active products alphabetically by product name and ID (off
 |---|---:|
 | Products scanned | 100 |
 | Syngenta products skipped | 15 |
-| Products with verified in-stock supplier price and price update prepared (after recheck) | 15 |
-| Products flagged [NEEDS MANUAL PRICE CHECK] after recheck | 70 |
+| Products with verified in-stock supplier price and price update prepared (after recheck) | 14 |
+| Products flagged [NEEDS MANUAL PRICE CHECK] after recheck | 71 |
 | New pack variants added | 0 |
 
 **Syngenta exclusions:** Actara 25 WG Insecticide 8g; Actara 25WG Insecticide 40g; Actellic 25EC Insecticide; Actellic 300 CS Public Health Insecticide 833ml; Actellic 50EC Insecticide; Actellic 50EC Insecticide; Actellic 50EC Insecticide; Actellic 50EC Insecticide; Actellic Gold Dust; Actellic Gold Dust; Actellic Gold Dust; Actellic Gold Dust 200g; Actellic Gold Dust 50g; Actellic Super Dust 50g; Agral 90 Non-Ionic Spray Adjuvant 1L. Agita is not counted as Syngenta: Kenya PCPB identifies Elanco Animal Health as its manufacturer/registrant. Agil is ADAMA-branded, not Syngenta.
@@ -184,7 +185,6 @@ Batch order: next 100 active products alphabetically by product name and ID (off
 | Agromectin 18 EC Insecticide 50ml | 50ml bottle | 220 | 30% | 300 | https://www.farmrescue.co.ke/product/agromectin-insecticide |
 | AgroZ Bag Plus Hermetic Grain Storage Bag 100kg | piece | 290 | 30% | 400 | https://agropests.com/products/agrozr-bag-plus-hermetic-storage-bag-100kgs |
 | AICO 0.5HP Deep Well Submersible Pump 80m Head | piece | 18,500 | 30% | 24,050 | https://www.logike.co.ke/product/AICO-Japan-0-5HP-80-Meters-Deep-Well-Electric-Submersible-Pump/96872817 |
-| Aico Japan AC767-4 25L 4-Stroke Petrol Knapsack Sprayer | 1 unit | 22,000 | 25% | 27,500 | https://www.jumia.co.ke/aico-ac767-4-petrol-knapsack-sprayer-25l-4-stroke-knapsack-sprayer-agricultural-sprayer-327885947.html |
 | AILYONS 2 in 1 Blender with Grinder, 1.6L, 4 Speed Control, Safety Lock | 1 blender with grinder jar (1.6 L) | 1,460 | 30% | 1,900 | https://www.jumia.co.ke/ailyons-tyb-205-pro-2-in-1-blender-grinder-1.6l-350w-4-speed-control-pulse-safety-lock-black-328896946.html |
 | Albafas 10% Albendazole Drench | — | 880 | 30% | 1,150 | https://prd.erp.agribora.com/input/agrochemicals/pesticides/albafas-10-1l-ktrmr |
 
@@ -274,7 +274,7 @@ No new variants were added. AgriGuard's Agrimec 18EC listing identifies 50ml, 10
 
 ## Files
 
-- `supabase/sql/pricing-batch-002.sql` — guarded SQL price changes for the 8 updated products.
+- `supabase/sql/pricing-batch-002.sql` — guarded SQL price changes for the 14 updated products.
 - `PRICING_HANDOFF.md` — this batch log.
 
 **Live status:** SQL is committed to the review branch only. It has not been applied to Supabase or the live storefront. Existing product IDs, slugs and URLs remain unchanged.
@@ -1150,3 +1150,31 @@ The 207 prepared price updates cover 207 unique active product IDs after removin
 **SEO/schema status:** the branch's product generator is expected to emit KES Product Offer pricing, stock availability and a one-year `priceValidUntil`, and update sitemap `lastmod` when generated product HTML changes. However, catalogue SQL remains staged only. The generated live product JSON-LD and sitemap timestamps are therefore **not yet synced to these proposed prices**. After review/merge and execution of the SQL, run the product-page build and deployment, then verify representative Product JSON-LD prices and sitemap `lastmod` values before declaring the live site synced.
 
 **Deployment safety:** guarded SQL requires each existing product to still match its captured expected price and active status. Each new variant insert uses a stable ID and `ON CONFLICT (id) DO NOTHING`. Review new pack descriptions and add exact pack photos before public release. Supplier baselines labelled [RETAIL-ESTIMATE] are the lowest matched Kenyan retail price × 0.85; they are not wholesale quotations.
+
+
+## Final reconciliation and profit-floor check
+
+The SQL files contain **204 actual price changes** across 204 unique existing product records; one no-op Accent 600SC line was removed from the SQL and moved to the verified-no-change list. The 1056-egg incubator price was raised from KSh76,400 to KSh76,500: at a KSh65,000 baseline, KSh76,400 produces a 14.92% gross margin, just below the strict 15% floor. KSh76,500 clears the 15% floor after KSh50 rounding. The 110m solar pump at KSh98,000 has a 15.00% gross margin on its KSh83,300 baseline.
+
+Weighted by the staged markup tiers, the estimated average gross margin across the 204 existing-product price changes is approximately **22.7%** before payment fees, delivery, tax treatment and operating expenses. This is a gross margin calculation, not net profit. The 17.5% markup tier mathematically gives about 14.9% gross margin before rounding, so the strict 15% floor is enforced by rounding up where needed.
+
+| Batch SQL | Actual existing-product price changes | New pack variants |
+|---|---:|---:|
+| 001 | 22 | 0 |
+| 002 | 14 | 0 |
+| 003 | 11 | 0 |
+| 004 | 41 | 0 |
+| 005 | 12 | 0 |
+| 006 | 3 | 3 |
+| 007 | 7 | 0 |
+| 008 | 8 | 7 |
+| 009 | 7 | 0 |
+| 010 | 6 | 2 |
+| 011 | 6 | 6 |
+| 012 | 10 | 4 |
+| 013 | 7 | 3 |
+| 014 | 12 | 0 |
+| 015 | 14 | 0 |
+| 016 | 15 | 0 |
+| 017 | 9 | 0 |
+| **Total** | **204** | **25** |
