@@ -210,7 +210,7 @@ export function productDescriptionHtml(source) {
   for (let i = sections.length - 1; i >= 0; i--) if (sections[i]._boundary) sections.splice(i, 1);
 
   // Hide editorial/operational metadata (supplier-cost arithmetic and draft status) from customer-facing product pages.
-  const internalHeading = /(?:source price|baseline calculation|pricing calculation|sourcing notes|listing status|draft status|supplier cost|margin calculation|source url)/i;
+  const internalHeading = /(?:source price|baseline|pricing calculation|price and pack-size comparison|price and stermont calculation|sourcing notes|listing status|draft status|supplier cost|margin calculation|source url)/i;
   for (let i = sections.length - 1; i >= 0; i--) {
     if (internalHeading.test(sections[i].rawHeading || sections[i].heading)) sections.splice(i, 1);
   }
