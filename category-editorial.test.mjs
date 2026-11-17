@@ -13,7 +13,8 @@ for (const category of priorityCategories) {
   const intro = buildCategoryIntro(category, 'Compare products for Kenyan homes and businesses.');
   const words = intro.split(/\s+/).filter(Boolean);
   assert.ok(words.length >= 150 && words.length <= 165, category.name + ' introduction should be 150–165 words');
-  assert.match(intro, /PCPB registration|PCPB/i, category.name + ' introduction should include Kenyan label guidance');
+  if (category.slug === 'insect-light-traps-uv-lamps') assert.match(intro, /food-safety|glueboard/i, category.name + ' introduction should include hotel and food-premises guidance');
+  else assert.match(intro, /PCPB registration|PCPB/i, category.name + ' introduction should include Kenyan label guidance');
   const faq = buildCategoryFaq(category, []);
   assert.equal(faq.length, 4, category.name + ' must expose exactly four FAQs');
   assert.ok(faq.every(([q,a]) => q && a), category.name + ' FAQs must be complete');
