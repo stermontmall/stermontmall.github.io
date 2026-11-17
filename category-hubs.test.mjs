@@ -15,6 +15,8 @@ const output = applyCategoryHubs(input);
 assert.deepEqual(output.fashion.items, [a, b]);
 assert.deepEqual(output['phones-accessories'].items, [c]);
 assert.deepEqual(output['tvs-audio'].items, [a, b]);
+assert.equal(output['tvs-audio'].description, 'TV and sound equipment in Kenya.');
+assert.equal(output['tvs-audio'].meta_title, 'TVs & Audio in Kenya');
 assert.deepEqual(output['tv-audio-video'].items, [a, b]);
 assert.deepEqual(output['computers-accessories'].items, [c]);
 assert.equal(output['home-kitchen'], undefined);
