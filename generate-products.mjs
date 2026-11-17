@@ -62,6 +62,8 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
 const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; };
 const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
+// Offer validity is one year from the generated page date; prices are read directly from the current catalogue record.
+const priceValidUntil = () => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); };
 
 
 
@@ -653,8 +655,8 @@ for (const p of products) {
     '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.id), category: cat?.name,
     brand: { '@type': 'Brand', name: brandOf(p.name) }, ...productIdentifiers(p),
-    offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: String(Math.round(Number(p.price) || 0)),
-      availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
+    offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: Number(Math.round(Number(p.price) || 0)),
+      availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
       seller: { '@id': `${SITE}/#store` } },
     ...rLd
   });
@@ -663,8 +665,8 @@ for (const p of products) {
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, category: cat?.name, brand: { '@type': 'Brand', name: brandOf(p.name) }, ...rLd,
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label, ...productIdentifiers(v),
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
-      offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: String(Math.round(Number(v.price) || 0)),
-        availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
+      offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: Number(Math.round(Number(v.price) || 0)),
+        availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
         seller: { '@id': `${SITE}/#store` } } }))
   }) : '';
   const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '');

@@ -1,0 +1,170 @@
+name: Verify pricing catalogue PR
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-pricing-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify-pricing:
+    if: github.event.pull_request.head.ref == 'pricing/non-syngenta-market-review-20261117' && github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out the PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch main baseline
+        run: |
+          git fetch --no-tags origin main
+          git show origin/main:sitemap.xml > /tmp/main-sitemap.xml
+
+      - name: Generate product pages and sitemaps
+        run: node generate-products.mjs
+
+      - name: Verify all 230 affected product pages and sitemap
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { execFileSync } from 'node:child_process';
+
+          const fail = message => { console.error('FAIL:', message); process.exitCode = 1; };
+          const pass = message => console.log('PASS:', message);
+          const sqlDir = 'supabase/sql';
+          const sqlFiles = fs.readdirSync(sqlDir).filter(name => /^pricing-batch-\d+\.sql$/.test(name));
+          const updatedIds = new Set();
+          const insertedIds = new Set();
+
+          for (const name of sqlFiles) {
+            const sql = fs.readFileSync(path.join(sqlDir, name), 'utf8');
+            // Guarded price rows use (product_id, expected_price, new_price[, new_cost]).
+            for (const match of sql.matchAll(/\('([^']+)',\s*[\d.]+::numeric,\s*[\d.]+::numeric/g)) {
+              updatedIds.add(match[1]);
+            }
+            // Each new pack is a single-row INSERT with its product id as the first value.
+            for (const match of sql.matchAll(/insert\s+into\s+public\.products[\s\S]*?values\s*\(\s*'([^']+)'/gi)) {
+              insertedIds.add(match[1]);
+            }
+          }
+
+          if (updatedIds.size !== 205) fail(`Expected 205 unique repriced product IDs; found ${updatedIds.size}`);
+          else pass('205 unique existing product IDs extracted from guarded pricing SQL');
+          if (insertedIds.size !== 25) fail(`Expected 25 new pack IDs; found ${insertedIds.size}`);
+          else pass('25 new pack IDs extracted from product INSERT SQL');
+
+          const overlap = [...updatedIds].filter(id => insertedIds.has(id));
+          if (overlap.length) fail(`IDs appear as both updates and inserts: ${overlap.join(', ')}`);
+
+          const htmlFiles = fs.readdirSync('p').filter(name => name.endsWith('.html'));
+          const pagesById = new Map();
+          for (const file of htmlFiles) {
+            const html = fs.readFileSync(path.join('p', file), 'utf8');
+            const id = html.match(/<meta\s+name="stm-id"\s+content="([^"]+)"/i)?.[1];
+            if (id) pagesById.set(id, { file, html });
+          }
+
+          const expectedIds = [...updatedIds, ...insertedIds];
+          if (expectedIds.length !== 230) fail(`Expected 230 total affected IDs; found ${expectedIds.length}`);
+          let cleanPages = 0;
+          const expectedValidity = new Date();
+          expectedValidity.setUTCFullYear(expectedValidity.getUTCFullYear() + 1);
+          const expectedValidityDate = expectedValidity.toISOString().slice(0, 10);
+
+          for (const id of expectedIds) {
+            const page = pagesById.get(id);
+            if (!page) { fail(`Missing generated page for product ID ${id}`); continue; }
+            const scripts = [...page.html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi)];
+            let product = null;
+            for (const script of scripts) {
+              try {
+                const data = JSON.parse(script[1]);
+                const candidates = Array.isArray(data) ? data : [data];
+                product = candidates.find(item => item?.['@type'] === 'Product' && String(item.sku) === id) || product;
+              } catch {}
+            }
+            if (!product) { fail(`No valid JSON-LD Product schema with matching SKU for ${id}`); continue; }
+            const offer = Array.isArray(product.offers) ? product.offers[0] : product.offers;
+            if (!offer || offer.priceCurrency !== 'KES') { fail(`Wrong/missing KES Offer currency for ${id}`); continue; }
+            if (typeof offer.price !== 'number' || !Number.isFinite(offer.price) || offer.price <= 0) { fail(`Offer price is not a positive JSON number for ${id}`); continue; }
+            if (offer.availability !== 'https://schema.org/InStock') { fail(`Offer is not InStock for ${id}`); continue; }
+            if (offer.priceValidUntil !== expectedValidityDate) { fail(`priceValidUntil for ${id} is ${offer.priceValidUntil}; expected ${expectedValidityDate}`); continue; }
+            cleanPages++;
+          }
+          if (cleanPages === 230 && process.exitCode !== 1) pass('All 230 affected pages have valid Product JSON-LD, KES numeric offers, InStock and one-year price validity');
+          else fail(`Only ${cleanPages}/230 affected pages passed schema checks`);
+
+          const site = 'https://stermontarcade.co.ke';
+          const parseSitemap = xml => new Map([...xml.matchAll(/<url>[\s\S]*?<loc>([^<]+)<\/loc>[\s\S]*?<lastmod>([^<]+)<\/lastmod>[\s\S]*?<\/url>/g)].map(m => [m[1], m[2]]));
+          const oldXml = fs.readFileSync('/tmp/main-sitemap.xml', 'utf8');
+          const newXml = fs.readFileSync('sitemap.xml', 'utf8');
+          const oldMap = parseSitemap(oldXml);
+          const newMap = parseSitemap(newXml);
+          if (!newMap.size) fail('Generated sitemap.xml contains no URL/lastmod entries');
+
+          const missingOld = [...oldMap.keys()].filter(url => !newMap.has(url));
+          if (missingOld.length) fail(`${missingOld.length} existing main product/static URLs disappeared from sitemap.xml: ${missingOld.slice(0, 10).join(', ')}`);
+          else pass(`All ${oldMap.size} existing main sitemap URLs remain present`);
+
+          const changedFiles = new Set(execFileSync('git', ['diff', '--name-only', 'origin/main', '--', 'p'], { encoding: 'utf8' }).trim().split('\n').filter(Boolean));
+          const today = new Date().toISOString().slice(0, 10);
+          let lastmodErrors = 0;
+          for (const [url, lastmod] of newMap) {
+            const relative = url.startsWith(site) ? url.slice(site.length) : null;
+            if (!relative) continue;
+            const file = relative.endsWith('/') ? relative.slice(1) + 'index.html' : relative.slice(1);
+            const isChanged = changedFiles.has(file);
+            const previous = oldMap.get(url);
+            if (!previous) {
+              if (lastmod !== today) { fail(`New URL has unexpected lastmod ${lastmod}: ${url}`); lastmodErrors++; }
+            } else if (isChanged && lastmod === previous) {
+              fail(`Changed page did not receive a new lastmod: ${url}`); lastmodErrors++;
+            } else if (!isChanged && lastmod !== previous) {
+              fail(`Unchanged page lastmod was modified: ${url}`); lastmodErrors++;
+            }
+          }
+          if (!lastmodErrors) pass('sitemap.xml lastmod changes are limited to changed pages; new URLs carry today’s date');
+
+          const newPackUrls = [...insertedIds].map(id => {
+            const page = pagesById.get(id);
+            return page ? `${site}/p/${page.file}` : null;
+          }).filter(Boolean);
+          const missingNewPacks = newPackUrls.filter(url => !newMap.has(url));
+          if (newPackUrls.length !== 25 || missingNewPacks.length) fail(`New pack sitemap coverage failed: ${newPackUrls.length}/25 resolved, ${missingNewPacks.length} missing`);
+          else pass('All 25 new pack URLs are present in sitemap.xml');
+
+          if (process.exitCode === 1) process.exit(1);
+          console.log('SUMMARY: PASS — all 230 affected product pages and sitemap checks are clean.');
+          NODE
+
+      - name: Write verification summary
+        if: success()
+        run: |
+          {
+            echo "## Pricing PR verification: PASS"
+            echo "- 205 existing product pages checked"
+            echo "- 25 new pack pages checked"
+            echo "- 230 valid Product JSON-LD offers: KES, numeric price, InStock, one-year priceValidUntil"
+            echo "- Existing main sitemap URLs preserved"
+            echo "- All 25 new pack URLs included"
+            echo "- sitemap.xml lastmod changed only for changed pages"
+            echo ""
+            echo "This workflow only builds and verifies. It does not publish, deploy, push, or merge."
+          } >> "$GITHUB_STEP_SUMMARY"
