@@ -103,15 +103,15 @@ function normalizeMarkdownHeading(value) {
 function splitInlineMarkdownHeadings(source) {
   let text = source;
   // Product overview headings were followed immediately by the product name and opening sentence.
-  text = text.replace(/##\\s+Product overview\\s+(.{1,120}?\\s+is\\s+)/gi,
-    (_m, opening) => '\\n## Product Overview & Key Benefits\\n\\n' + opening);
+  text = text.replace(/##\s+Product overview\s+(.{1,120}?\s+is\s+)/gi,
+    (_m, opening) => '\n## Product Overview & Key Benefits\n\n' + opening);
   // Earlier catalogue drafts placed each section title and its first sentence on the same line.
   // Split only at known sentence-opening cues; retain every original word and map the title to a canonical section.
   const cues = '(?:The|This|PCPB|Agropests|Imagine Care|Cheapthings|Farm Rescue|Naivas|Jumia|Osho|PPCK|Customers|Shoppers|People|Before|Check|Confirm|Use|Do|Keep|If|Once|For|One|A larger|A smaller|A small|A product|A 20|A 100|The current)';
-  const re = new RegExp('##\\\\s+([^\\\\n]{3,110}?)\\\\s+(' + cues + ')\\\\b', 'g');
+  const re = new RegExp('##\\s+([^\\n]{3,110}?)\\s+(' + cues + ')\\b', 'g');
   text = text.replace(re, (_m, title, start) => {
     const canonical = normalizeMarkdownHeading(title);
-    return '\\n## ' + canonical + '\\n' + start;
+    return '\n## ' + canonical + '\n' + start;
   });
   return text;
 }
