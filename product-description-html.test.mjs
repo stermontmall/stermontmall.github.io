@@ -74,3 +74,19 @@ ok(productFaq[0].q === 'What pack size is listed?' && productFaq[0].a === 'This 
 ok(/<a href="\/c\/fumigation-chemicals\.html">fumigation chemicals<\/a>/.test(markdownHtml), 'internal Markdown links render as safe links');
 const longParagraph = productDescriptionHtml('PRODUCT OVERVIEW\nOne sentence. Two sentences. Three sentences. Four sentences. Five sentences. Six sentences. Seven sentences.');
 ok((longParagraph.match(/<p>/g) || []).length >= 3, 'long text is split into paragraphs of at most three sentences');
+
+
+// Inline legacy Markdown headings are split into canonical storefront sections.
+const inlineGuide = '## Product overview Navigator 100SC 20ml is a public-health product. ## Product identity and technical details The supplier identifies the 20ml pack. ## Registered target pests and use context PCPB register details must be checked. ## Safety and label compliance Follow the exact label and PPE requirements. ## Pack-size comparison and buying decisions Compare exact packs and browse [pest control services](/services/). ## Ordering, pickup and delivery M-Pesa checkout and pickup coordination are available. ## Frequently asked questions\nQ: What pack is this? This is the 20ml pack.\nQ: What should I verify? Confirm the label.\nQ: How can I pay? Use M-Pesa checkout.\nQ: Where is pickup? Sarit Centre Westlands, Nairobi.';
+const inlineRendered = productDescriptionHtml(inlineGuide);
+assert.deepEqual(heads(inlineRendered), [
+  'Product Overview & Key Benefits',
+  'Technical Specifications & Pack Details',
+  'Where & How to Use in Kenya',
+  'Safety, Storage & Handling Guidelines',
+  'Buying & Pack-Size Guide',
+  'Delivery across Kenya & Nairobi Pickup',
+  'Frequently Asked Questions'
+]); n++;
+assert.equal(extractProductFaq(inlineGuide).length, 4); n++;
+ok(/<a href="\/services\/">pest control services<\/a>/.test(inlineRendered), 'service links survive the formatted buying section');
