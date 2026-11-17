@@ -27,7 +27,7 @@ export function applyCategoryHubs(byCat) {
         if (!items.includes(product)) items.push(product);
       }
     }
-    if (items.length) result[slug] = { name: hub.name, items };
+    if (items.length) result[slug] = { ...(result[slug] || {}), name: hub.name, items };
   }
   return result;
 }
