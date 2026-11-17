@@ -6,6 +6,20 @@ NOTHING here has been visually checked. No image has been uploaded, attached or 
 
 Upload on phone: `/admin.html` AI product photo uploader. After the photo is stored, look at it, then set `active = true`.
 
+## HOLD: PCPB regulatory flags (check BEFORE uploading a photo or activating)
+Source: HapaKenya report of the Ministry/PCPB pesticide review, 2025-06-23 (hapakenya.com/2025/06/23/kenya-bans-77-harmful-pesticides-restricts-202-halts-imports-of-151-others-pending-assessment). It is a 2025 news report, not the PCPB register; the decisions may have changed since (it said the 151 products under review were due a decision by December 2025). Confirm each one on the PCPB registered-products list or with PCPB before activating.
+
+| slug | active ingredient (from our listing) | status in that report | action |
+|---|---|---|---|
+| xpand-max-92-sg-insecticide-100g | acephate 92% | acephate listed as WITHDRAWN from the Kenyan market | do not upload or activate unless PCPB confirms it is currently registered |
+| pyrinex-chlorpyrifos-insecticide-250ml | chlorpyrifos | restricted for use as a termiticide only | do not sell as a crop insecticide; confirm the registered use |
+| metro-imidacloprid-insecticide-25ml | imidacloprid | restricted to non-open-field use | confirm registered use before activating |
+| confidor-wg-70-insecticide-15g | imidacloprid (Confidor WG 70; our listing says to verify the active) | imidacloprid restricted to non-open-field use | confirm registered use before activating |
+| 2-4-d-hai-amine-herbicide-20l | 2,4-D amine | restricted, not for use in coffee | keep the coffee exclusion in the description |
+| agrithane-mancozeb-fungicide-100g, dithane-mancozeb-fungicide-500g, riomax-72wp-fungicide-2-5kg | mancozeb | reviewed, decision was pending | check the current status |
+
+Other products have "not stated" ingredients, so they cannot be screened until the label is read. Also confirm every product has a current PCPB(CR) registration number on the label (Kenyan law requires it; unregistered look-alike brands are being seized).
+
 ## A. Rentokil Lumnia glueboards (do first: Batch 2 SEO guide `rentokil-lumnia-compact-glueboard-price-kenya.html` targets these)
 Category fixed 2026-11-18: all three now `category_id = 90` (Insect Light Traps & UV Lamps), still `active=false`, 0 images.
 
@@ -75,6 +89,6 @@ Source leads (not verified as the right packshot):
 | potasun-50ec-herbicide-1l | Potasun 50EC Herbicide 1L | 1 L | not stated | M-Tolori |
 
 ## Suggested upload order
-1. The 3 Lumnia boards (SEO win), then the brand clusters that share a pack look: Dudufix 20ml + 500ml, Alpha Kill + Alpha Tata, Dithane + Agrithane (mancozeb).
-2. Remaining insecticides, fungicides, then herbicides.
+1. The 3 Lumnia boards (SEO win), then the brand clusters that share a pack look: Dudufix 20ml + 500ml, Alpha Kill + Alpha Tata (not the flagged ones above).
+2. Remaining insecticides, fungicides, then herbicides, skipping the HOLD items until PCPB status is confirmed.
 3. Pyagro 4 last-but-checked: needs the real label, not a vendor logo.
