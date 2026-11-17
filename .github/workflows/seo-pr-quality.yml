@@ -6,6 +6,8 @@ on:
     paths:
       - 'seo-*.mjs'
       - 'generate-products.mjs'
+      - 'category-intros.mjs'
+      - 'category-filters.js'
       - 'home-grid-ssr.mjs'
       - 'home-grid-ssr.test.mjs'
       - 'kili-pages.js'
@@ -80,6 +82,8 @@ jobs:
             node --check data-health.mjs
             node --check blog-write.mjs
             node --check generate-products.mjs
+            node --check category-intros.mjs
+            node --check category-filters.js
             node --check kili-pages.js
             node --check recent-orders.js
             node --check product-content.test.mjs

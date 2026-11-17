@@ -22,6 +22,8 @@ on:
       - 'seo-description-layout.mjs'
       - 'seo-indexing-guard.test.mjs'
       - 'category-hubs.mjs'
+      - 'category-intros.mjs'
+      - 'category-filters.js'
       - 'category-hubs.test.mjs'
       - 'seo-catalog-guard.mjs'
       - 'seo-catalog-guard.test.mjs'
