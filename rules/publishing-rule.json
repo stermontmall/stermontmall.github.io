@@ -1,0 +1,28 @@
+{
+  "rule_key": "autonomous_bulk_product_publishing",
+  "owner_approved_at": "2026-11-18",
+  "image_activation": {
+    "human_visual_inspection_required": false,
+    "source_requirement": "Legitimate Kenyan supplier/manufacturer product page whose title or URL explicitly matches exact product name/model and pack size.",
+    "technical_checks": {
+      "http_status": 200,
+      "mime_types": [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ],
+      "minimum_dimensions_px": [
+        500,
+        500
+      ],
+      "minimum_file_size_bytes_exclusive": 15000
+    },
+    "upload_function": "add_product_photo",
+    "storage_verification": "Storage object exists and exact stored URL is referenced in products.images.",
+    "activation": "Set active=true immediately after source identity, technical image, storage reference, price, SEO and regulatory gates pass.",
+    "upload_success_alone_is_sufficient": false,
+    "missing_or_mismatched_image": "Keep inactive; do not use generic substitutes."
+  },
+  "regulatory_gate": "PCPB registration, registered use, exact product identity and label restrictions remain mandatory; this image rule does not waive regulatory checks.",
+  "scud_exception": "Keep SCUD 5 WP variants inactive until 50g/kg versus 50g/L concentration discrepancy is resolved from the physical Kenyan label."
+}
