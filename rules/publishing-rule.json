@@ -27,7 +27,7 @@
   "scud_exception": "Keep SCUD 5 WP variants inactive until 50g/kg versus 50g/L concentration discrepancy is resolved from the physical Kenyan label.",
   "description_formatting": {
     "renderer": "product-description-html.mjs",
-    "storage_format": "Plain text with explicit section labels or Markdown ## headings; never raw HTML.",
+    "storage_format": "Plain text/Markdown; canonical ## headings on their own lines; never raw HTML",
     "paragraph_max_sentences": 3,
     "required_sections": [
       "Product Overview & Key Benefits",
@@ -38,9 +38,22 @@
       "Delivery across Kenya & Nairobi Pickup",
       "Frequently Asked Questions (exactly 4 Q&As)"
     ],
-    "faq_jsonld": "Each of the four rendered Q&As must synchronise 1:1 with FAQPage JSON-LD when emitted.",
+    "faq_jsonld": "Exactly four detailed buyer Q&As, separately rendered and synchronised 1:1 with Product FAQPage JSON-LD.",
     "internal_links_per_guide": "2-3 natural relevant links to category or /services/ pages",
     "safety": "Never invent product facts, pesticide rates, registered uses, warranty, PPE or handling directions; use verified label/source facts only.",
-    "word_count": "800+ words where supported by verified facts; do not pad or fabricate."
+    "word_count": "800+ useful words where supported by verified sources; never pad or fabricate.",
+    "canonical_section_labels": [
+      "Product Overview & Key Benefits",
+      "Technical Specifications & Pack Details",
+      "Where & How to Use in Kenya",
+      "Safety, Storage & Handling Guidelines",
+      "Buying & Pack-Size Guide",
+      "Delivery across Kenya & Nairobi Pickup",
+      "Frequently Asked Questions (exactly 4 detailed buyer Q&As)"
+    ],
+    "bullet_lists": "Use real bullet lists for verified specifications and checklists.",
+    "internal_links": "2–3 relevant links to category pages, commercial buying guides, or /services/ pages.",
+    "delivery_details": "M-Pesa checkout, Sarit Centre Westlands pickup coordination, delivery across all 47 counties subject to courier and stock coverage, WhatsApp +254 748 888 230.",
+    "chemical_safety": "Never invent dilution rates, approved uses, PPE, label instructions, registration, efficacy, warranty or safety claims."
   }
 }
