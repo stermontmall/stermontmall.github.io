@@ -439,3 +439,43 @@ Batch consists predominantly of Bajaj Boxer BM100/BM150 spare parts. The officia
 Items with calculated prices below their current storefront prices were not reduced under the profit-protection guardrail. Some low-cost exact parts are already priced at or above their calculated amount; those remain unchanged. The official Bajaj listing is not proof of stock for every individual item, so confirm stock before any eventual production application. No new variants were created. Existing slugs and URLs preserved.
 
 SQL: `supabase/sql/pricing-batch-004.sql` (guarded, branch only; not production).
+
+
+---
+
+# Batch 5 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta skipped | 0 |
+| Price updates prepared | 12 |
+| Newly added pack variants | 0 |
+| Needs manual price check / unchanged | 88 |
+
+## Prepared updates
+
+| Product | Pack | Baseline Cost (KES) | Markup Tier | New Price (KES) | Competitor Retail (KES) | Source Reference |
+|---|---|---:|---:|---:|---:|---|
+| belt-480sc-insecticide-50ml | Current pack | 1,143.25 [RETAIL-ESTIMATE] | 30% | 1,500 | 1,345 (market avg 1,345) | https://www.farmrescue.co.ke/product/belt-480-sc |
+| belt-480sc-insecticide-1l | Current pack | 22,792.75 [RETAIL-ESTIMATE] | 25% | 28,500 | 26,815 (market avg 26,815) | https://www.farmrescue.co.ke/product/belt-480-sc |
+| bugati-500-sc-fungicide-50ml | Current pack | 1,274.15 [RETAIL-ESTIMATE] | 30% | 1,650 | 1,499 (market avg 1,499) | https://imaginecare.co.ke/product/bugati-500sc-50ml/; https://cheapthings.co.ke/product/bugati-500sc-50ml/ |
+| boma-rhodes-1kg | Current pack | 1,530 [RETAIL-ESTIMATE] | 30% | 2,000 | 1,800 (market avg 1,883) | https://dawnfarmers.com/shop/crop-production-crop-production/seeds-fertilizers-crop-production-crop-production/seeds-seeds-fertilizers-crop-production-crop-production/boma-rhodes-1kg/; https://agrijibu.co.ke/boma-rhodes-1kg/; https://kuzaagrochem.com/products/boma-rhodes-1kg-679 |
+| bromarat-0-005-rb-rodent-bait-25-g | Current pack | 849.15 [RETAIL-ESTIMATE] | 30% | 1,100 | 999 (market avg 999) | https://imaginecare.co.ke/shop/?orderby=date&product_count=100&product_order=asc&product_orderby=name&product_view=list&v=518f4a738816 |
+| bromarat-0-005-rb-rodent-bait-100-g | Current pack | 1,274.15 [RETAIL-ESTIMATE] | 30% | 1,650 | 1,499 (market avg 1,499) | https://imaginecare.co.ke/shop/?orderby=date&product_count=100&product_order=asc&product_orderby=name&product_view=list&v=518f4a738816 |
+| basf-goliath-cockroach-gel-bait-35g | Current pack | 7,208 [RETAIL-ESTIMATE] | 30% | 9,350 | 8,480 (market avg 9,630) | https://mtolori.com/product/details/goliath-gel-35g-1403; https://chemsasa.co.ke/product/goliath-cockroach-gel-35grams/; https://procapital.co.ke/agrochemicals/insecticides/goliath-gel-35g/; https://imaginecare.co.ke/product-category/fipronil/; https://agropests.com/products/goliath-gel-35g; https://www.bioderma.co.ke/product/cockroach-goliath-gel-35g/ |
+| celebrat-a27-wireless-headphones | Current pack | 2,167.5 [RETAIL-ESTIMATE] | 30% | 2,800 | 2,550 (market avg 2,675) | https://crosstech.ke/products/celebrat-headphones-a27; https://www.jumia.co.ke/celebrat-celebrat-a27-wireless-headphones-bluetooth-5.3-40mm-driver-black-153762367.html; https://zentechelectronics.com/products/celebrat-a27-headphones |
+| celebrat-a35-wireless-headphones | Current pack | 1,870 [RETAIL-ESTIMATE] | 30% | 2,450 | 2,200 (market avg 2,216.5) | https://crosstech.ke/products/celebrat-wireless-headphones-a35; https://www.jumia.co.ke/celebrat/ |
+| celebrat-a41-active-noise-cancelling-headphones | Current pack | 2,975 [RETAIL-ESTIMATE] | 30% | 3,850 | 3,500 (market avg 3,574.5) | https://crosstech.ke/product-tags/headphones; https://www.jumia.co.ke/electronics-over-ear-headphones/celebrat/ |
+| celebrat-w25-wireless-earbuds | Current pack | 1,270.75 [RETAIL-ESTIMATE] | 30% | 1,650 | 1,495 (market avg 1,622.5) | https://celebrat.co.ke/; https://crosstech.ke/product-tags/bluetooth-wireless |
+| celebrat-w61-wireless-earbuds | Current pack | 1,530 [RETAIL-ESTIMATE] | 30% | 2,000 | 1,800 (market avg 2,000) | https://celebrat.co.ke/; https://crosstech.ke/product-tags/bluetooth-wireless |
+
+The Goliath 35g reduction is supported by multiple separate Kenyan retailers (M-Tolori, Chemsasa, Pro-Capital, Imagine Care, Agropests and Bioderma); current KSh13,650 is materially above their market range, while the formula-derived KSh9,350 remains close to the market average. Celebrat A27/A35/A41 and W25/W61 reductions are supported by multiple local retailer/official store observations; existing prices exceeded the comparable-market average by more than 25%, meeting the explicit reduction exception. Other increases follow the 30%/25% tiers on 85% of the lowest matched retail listing.
+
+Belt 480SC product pages list 50ml, 250ml and 1L; the existing catalogue already has 50ml, 250ml and 1L, so no additional pack was needed. Bugati 500SC supplier pages list 50ml, 100ml, 250ml, 500ml and 1L, but 100ml/250ml/500ml listings found were marked out of stock and the 1L price is not an exact in-stock supplier quote for this batch; no new pack variant was added. Bedlam's 15ml/50ml/100ml/1L variants already exist in the catalogue.
+
+## Needs Manual Check
+
+Remaining Batch 5 items include Bat CRP repellent variants, Bat repellent powder, Baraki 10g/100g/1kg, Velum Prime 40ml, Baygon aerosol, Bazooka and Beanpro, Bedlam variants where supplier prices were inconsistent or stock uncertain, bee equipment, Bestox, Betacyde, Betafos, BF150 fogger, Bigo, Billionaire, BioDistinction, Bipronex, BlackEarth, Blue-Touch glue traps, Booster, door sealer, Bradley, 10 motor-vehicle adverts, bug-related products not priced to exact pack, Burdizzo, seeds, calf equipment, irrigation hose, Catchmaster traps/UV unit, and Celebrat models without reliable matching multi-retailer data. These remain unchanged.
+
+SQL: `supabase/sql/pricing-batch-005.sql` (guarded, review branch only; not applied to production). Existing product slugs/URLs preserved.
