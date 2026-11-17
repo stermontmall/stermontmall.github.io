@@ -828,9 +828,9 @@ The four Ramtons reductions are supported by multiple exact-model retail observa
 |---|---:|
 | Products scanned | 100 |
 | Syngenta products skipped | 8 |
-| Existing product prices updated | 0 |
+| Existing product prices updated | 7 |
 | New pack variants prepared | 3 |
-| Needs manual price check / unchanged | 92 |
+| Needs manual price check / unchanged | 85 |
 
 **Syngenta exclusions (untouched):** Revus 250SC 1L and 100ml; Ridomil Gold MZ 68WG 1kg, 250g and 50g; Score 250EC 20ml and 1L; Servian 75WG 50g. These are confirmed by Syngenta's Kenya product catalogue and/or Syngenta vendor branding. Ransom 600WP is a Greenlife Crop Protection product, not Syngenta; Ranger 480EC is a Greenlife product, and Real IPM lines are not Syngenta.
 
@@ -860,3 +860,18 @@ All three are [RETAIL-ESTIMATE] baselines (exact in-stock Kenyan retail × 0.85)
 All other non-Syngenta products in this 100-row segment remain unchanged pending exact pack/stock confirmation, including household appliances, vehicle sourcing advert, Ranger 480EC 1L, Ransom 30g (verified and already near formula price), Raptor 50ml/100ml, Rashnik blender, rat traps and baits, Real IPM Mazao products, Rebune 20W lamp, rechargeable mosquito rackets, Red Top fly trap, Redmi earbuds, footwear, PPE vest, Reliable Amito 100g/250g, Rentokil glueboards, mosquito mesh, Resolve 6 dust, egg tray, Rimeta Gold, tomato seeds, Riomax, Roch microwave, rodent baits, Rootex, Urea, Russell IPM glue rolls, Ryobi sprayers, aerosol dispenser, SAAF packs, basil seeds, salinomycin feed additive, Samsung devices, SanDisk drive, maize seeds, Score (excluded), poultry nipple, Segatron, Selecta sprayers, screen repair tape, sorghum seeds, Sevin dust, tracksuits, UV tubes, livestock tags, Shenke mats, Shotgun, pepper seeds, Skilltech mount, Skipper, Skyworth TV, household drinkware, snail control, snake tongs, soil tester, wasp traps, Solo sprayers, Solubor and all other remaining rows not listed above.
 
 No additional packs were created except the three Ransom sizes with explicit in-stock prices. Existing slugs/canonical URLs are preserved. SQL: `supabase/sql/pricing-batch-013.sql` (review branch only; not applied to production). Product JSON-LD and sitemap files need the product build after SQL application; the generator sets KES offer price from catalogue data, includes one-year priceValidUntil and updates per-URL sitemap lastmod on changed generated HTML.
+
+
+## Additional Batch 13 price updates — Samsung, Seed Co and Rootex
+
+| Product | Pack | Baseline (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Sources |
+|---|---|---:|---:|---:|---:|---|
+| samsung-galaxy-a06-4gb-ram-plus-64gb-4gb-plus-64gb | Current pack | 12,409.15 [RETAIL-ESTIMATE] | 30% | 16,150 | 14,599 (avg 15,500) | https://www.jumia.co.ke/mlp-samsung-store/; https://mobix.co.ke/product-category/affordable-samsung-phones-pricing-kenya/; https://www.samsungbrandstore.co.ke/category/galaxy-a-series |
+| samsung-galaxy-a07-5g-4gb-128gb-20261108 | Current pack | 19,131.8 [RETAIL-ESTIMATE] | 30% | 24,850 | 22,508 (avg 22,553.5) | https://www.jumia.co.ke/mlp-samsung-store/; https://www.jumia.co.ke/samsung/ |
+| samsung-galaxy-a17-5g-4gb-128gb-20261108 | Current pack | 19,131.8 [RETAIL-ESTIMATE] | 30% | 24,850 | 22,508 (avg 22,553.5) | https://www.jumia.co.ke/mlp-samsung-store/; https://www.jumia.co.ke/samsung/ |
+| samsung-galaxy-a26-5g-8gb-256gb-20261108 | Current pack | 30,600 [RETAIL-ESTIMATE] | 25% | 38,250 | 36,000 (avg 36,000) | https://infinitetech.co.ke/samsung-galaxy-a-series-price-tracker-kenya-october-2026/ |
+| samsung-43u8000f-crystal-uhd-4k-smart-tv-43-inch | Current pack | 32,215 [RETAIL-ESTIMATE] | 25% | 40,250 | 37,900 (avg 40,600) | https://www.samsungbrandstore.co.ke/category/4k-uhd-led-tvs; https://hisenseke.co.ke/product/samsung-43-inch-4k-hdr-smart-led-tv/; https://megastorekenya.co.ke/product/samsung-43u8000-43-inch-u8000-series-crystal-uhd-4k-smart-tv |
+| sc-duma-43-hybrid-maize-seeds-2kg | Current pack | 765 [RETAIL-ESTIMATE] | 30% | 1,000 | 900 (avg 900) | https://agrijibu.co.ke/brand/seed-co/ |
+| rootex-6-rooting-hormone-50-g | Current pack | 442 [RETAIL-ESTIMATE] | 30% | 550 | 520 (avg 690) | https://mtolori.com/product/details/rootex-50gm-302; https://agriguardagrovet.co.ke/product/rootex-6dp-organic-50g/; https://www.jumia.co.ke/osho-rootex-6dp-rooting-hormone-powder-50grams-166739929.html |
+
+Samsung A06, A07 5G and A17 5G use exact RAM/storage/network configurations from Jumia's Samsung Official Store and Kenyan retailer listings. Samsung A26 5G 8GB/256GB uses the October 2026 Kenya model-specific price tracker. Samsung 43U8000F is benchmarked against Samsung Brandstore, a Kenyan retailer with stock, and Mega Store. Rootex 6 50g is repriced to KSh550 using M-Tolori KSh520, AgriGuard KSh600 and the in-stock Jumia listing; the current KSh1,099 is more than 25% above the market average. SC Duma 43 2kg is a small formula-based increase from AgriJibu's KSh900 listing.
