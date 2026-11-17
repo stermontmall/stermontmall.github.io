@@ -63,9 +63,13 @@ jobs:
             for (const match of sql.matchAll(/\('([^']+)',\s*[\d.]+::numeric,\s*[\d.]+::numeric/g)) {
               updatedIds.add(match[1]);
             }
-            // Each new pack is a single-row INSERT with its product id as the first value.
-            for (const match of sql.matchAll(/insert\s+into\s+public\.products[\s\S]*?values\s*\(\s*'([^']+)'/gi)) {
-              insertedIds.add(match[1]);
+            // Parse all product rows in each INSERT block, not only the first pack.
+            for (const insert of sql.matchAll(/insert\s+into\s+public\.products\b[\s\S]*?\bvalues\b([\s\S]*?)(?=\n(?:on\s+conflict|commit\s*;|do\s+\$|insert\s+into|update\s+public\.products)|$)/gi)) {
+              for (const row of insert[1].matchAll(/\(\s*'([^']+)'/g)) insertedIds.add(row[1]);
+            }
+            // Include the one guarded single-row UPDATE outside a VALUES table.
+            for (const match of sql.matchAll(/update\s+public\.products\s+set\s+price\s*=\s*[\d.]+(?:\s*,\s*cost\s*=\s*[\d.]+)?\s+where\s+id\s*=\s*'([^']+)'/gi)) {
+              updatedIds.add(match[1]);
             }
           }
 
