@@ -6,6 +6,9 @@
 // Descriptions without labels render exactly as before (overview + details paragraphs); no heading is ever guessed from ordinary words.
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const inline = s => esc(s)
+  .replace(/\\[([^\\]]+)\\]\\((?:https?:\\/\\/stermontarcade\\.co\\.ke)?(\\/[^)\\s]*)\\)/g, '<a href="$2">$1</a>')
+  .replace(/\\*\\*([^*]+)\\*\\*/g, '<strong>$1</strong>');
 
 // Only explicit uppercase section labels match. Never ordinary words such as "used", "order" or "safety" inside sentences.
 const LABELS = [
@@ -64,6 +67,22 @@ function renderBody(body, heading) {
       ? '<ul><li>' + esc(line.replace(/^[-–•●▪]\s*/, '')) + '</li></ul>'
       : '<p>' + esc(line) + '</p>'
   ).join('');
+}
+
+// Extract exactly four authored buyer Q&As for product FAQPage JSON-LD. No answers are invented.
+export function extractProductFaq(source) {
+  const raw = String(source || '').replace(/\\r\\n|\\n|\\r/g, '\n')
+    .replace(/^#[^#\\n]*##[ \\t]*/i, '## ')
+    .replace(/[ \\t]+##[ \\t]+/g, '\n\n## ')
+    .replace(/[ \\t]+###[ \\t]+/g, '\nQ: ');
+  const start = raw.search(/(?:##\\s*)?(?:FREQUENTLY ASKED QUESTIONS|FAQS?)\\b/i);
+  if (start < 0) return [];
+  const body = raw.slice(start).replace(/^(?:##\\s*)?(?:FREQUENTLY ASKED QUESTIONS|FAQS?)\\b:?/i, '');
+  const matches = [...body.matchAll(/Q:\\s*(.+?\\?)\\s*([\\s\\S]*?)(?=\\nQ:\\s*|$)/gi)];
+  const pairs = matches.map(m => ({ q: m[1].trim(), a: m[2].replace(/^[-–•\\s]+/, '').trim() })).filter(x => x.q && x.a);
+  if (pairs.length === 4) return pairs;
+  const legacy = splitFaq(body);
+  return legacy && legacy.length === 4 ? legacy : [];
 }
 
 export function productDescriptionHtml(source) {
