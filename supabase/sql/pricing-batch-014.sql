@@ -29,7 +29,6 @@ begin
 ('spirometer-500sc-insecticide-100ml',1950.00::numeric,1700.00::numeric,1317.50::numeric),
 ('taurus-500sp-insecticide-1kg',8000.00::numeric,5800.00::numeric,4462.50::numeric),
 ('systema-50ec-insecticide-1-litre',4350.00::numeric,3300.00::numeric,2550.00::numeric),
-('samsung-43u8000f-crystal-uhd-4k-smart-tv-43-inch',39099.00::numeric,40250.00::numeric,32215.00::numeric),
 ('symnet-50-mesh-anti-insect-net-3m-x-50m-roll',15499.00::numeric,16600.00::numeric,12750.00::numeric)
  ) as v(product_id,expected_price,new_price,new_cost)
  loop
