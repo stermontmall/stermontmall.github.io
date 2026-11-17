@@ -42,6 +42,9 @@ export function splitFaq(body) {
 }
 
 function renderBody(body, heading) {
+  if (/^Product Overview & Key Benefits$/i.test(heading)) {
+    body = String(body || '').replace(/^\\s*&\\s*Key Benefits\\b[\\s:—-]*/i, '').replace(/^\\s*Product Overview\\s*&\\s*Key Benefits\\b[\\s:—-]*/i, '');
+  }
   if (heading.toLowerCase().includes('frequently asked questions') || heading.toLowerCase() === 'faqs') {
     const qLines = body.split(/\n+/).map(x => x.trim()).filter(Boolean);
     const marked = qLines.filter(x => /^Q:\s*/i.test(x));
@@ -65,7 +68,7 @@ function renderBody(body, heading) {
   return blocks.flatMap(block => block.split(/\n+/).map(x => x.trim()).filter(Boolean).flatMap(line => {
     if (/^[-–•●▪]\s*/.test(line)) return ['<ul><li>' + inline(line.replace(/^[-–•●▪]\s*/, '')) + '</li></ul>'];
     // A Markdown link such as (https://stermontarcade.co.ke/...) must stay in one piece; its dots are not sentence ends.
-    const sentences = line.match(/(?:\[[^\]]*\]\([^)]*\)|[^.!?])+(?:[.!?]+|$)/g) || [line];
+    const sentences = line.match(/(?:\[[^\]]*\]\([^)]*\)|[^.!?]|\.(?=\d)|(?<=\d)\.)+(?:[.!?]+|$)/g) || [line];
     const paras = [];
     for (let i = 0; i < sentences.length; i += 3) paras.push('<p>' + inline(sentences.slice(i, i + 3).join(' ').trim()) + '</p>');
     return paras;
@@ -154,7 +157,7 @@ export function productDescriptionHtml(source) {
   while ((mh = markdownHeading.exec(raw))) hits.push({ start: mh.index, end: markdownHeading.lastIndex, heading: normalizeMarkdownHeading(mh[1].trim()), rawHeading: mh[1].trim() });
   for (const [heading, re] of LABELS) {
     re.lastIndex = 0; let m;
-    while ((m = re.exec(raw))) hits.push({ start: m.index, end: re.lastIndex, heading });
+    while ((m = re.exec(raw))) hits.push({ start: m.index, end: re.lastIndex, heading: normalizeMarkdownHeading(heading) });
   }
   hits.sort((a, b) => a.start - b.start);
 
