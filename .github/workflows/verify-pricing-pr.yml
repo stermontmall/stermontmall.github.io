@@ -77,7 +77,7 @@ jobs:
           const productsBySku = new Map();
           for (const file of htmlFiles) {
             const html = fs.readFileSync(path.join('p', file), 'utf8');
-            const scripts = [...html.matchAll(/<script\\s+type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/gi)];
+            const scripts = [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi)];
             for (const script of scripts) {
               try {
                 const data = JSON.parse(script[1]);
@@ -125,7 +125,7 @@ jobs:
           else fail(`Only ${cleanProducts}/230 affected products passed schema checks`);
 
           const site = 'https://stermontarcade.co.ke';
-          const parseSitemap = xml => new Map([...xml.matchAll(/<url>[\\s\\S]*?<loc>([^<]+)<\\/loc>[\\s\\S]*?<lastmod>([^<]+)<\\/lastmod>[\\s\\S]*?<\\/url>/g)].map(m => [m[1], m[2]]));
+          const parseSitemap = xml => new Map([...xml.matchAll(/<url>[\s\S]*?<loc>([^<]+)<\/loc>[\s\S]*?<lastmod>([^<]+)<\/lastmod>[\s\S]*?<\/url>/g)].map(m => [m[1], m[2]]));
           const oldXml = fs.readFileSync('/tmp/main-sitemap.xml', 'utf8');
           const newXml = fs.readFileSync('sitemap.xml', 'utf8');
           const oldMap = parseSitemap(oldXml);
