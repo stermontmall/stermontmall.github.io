@@ -1,0 +1,98 @@
+<!-- Reusable category-page buying tools for Stermont Arcade.
+     Render the category intro as 130-170 words of unique, category-specific copy.
+     Product cards should carry data-name and data-price attributes.
+     FAQ answers must match the visible questions and the FAQPage JSON-LD generated server-side. -->
+<style>
+.category-intro{max-width:78ch;line-height:1.7}
+.category-tools{display:grid;grid-template-columns:2fr 1fr 1fr;gap:.65rem;margin:1.25rem 0;padding:1rem;border:1px solid #e6e1f5;border-radius:12px;background:#fff}
+.category-tools label{display:grid;gap:.3rem;font-weight:700;font-size:.85rem}
+.category-tools input,.category-tools select{width:100%;min-width:0;padding:.7rem;border:1px solid #cfc7df;border-radius:8px;font:inherit}
+.category-result-count{color:#625b70;font-size:.9rem;margin:.35rem 0 .75rem}
+.category-faq details{padding:.85rem 0;border-bottom:1px solid #e6e1f5}
+.category-faq summary{cursor:pointer;font-weight:750}
+.category-faq p{margin:.45rem 0;line-height:1.65}
+@media(max-width:620px){.category-tools{grid-template-columns:1fr 1fr}.category-tools label:first-child{grid-column:1/-1}}
+</style>
+
+<section class="category-intro">
+  <h2>Buying guide</h2>
+  <p>[Write 130–170 original words for this category. Explain what belongs in the category, the common Kenyan buyer use cases, how to compare product specifications and pack sizes, and any label, compatibility or safety checks. Avoid repeating this copy verbatim on other categories.]</p>
+</section>
+
+<section class="category-tools" aria-label="Quick product filters">
+  <label>Search this category
+    <input id="category-search" type="search" placeholder="Search products" autocomplete="off">
+  </label>
+  <label>Price range
+    <select id="category-price">
+      <option value="all">All prices</option>
+      <option value="under1000">Under KSh 1,000</option>
+      <option value="1000-5000">KSh 1,000–5,000</option>
+      <option value="5000plus">Over KSh 5,000</option>
+    </select>
+  </label>
+  <label>Sort by
+    <select id="category-sort">
+      <option value="default">Recommended</option>
+      <option value="low">Price: low to high</option>
+      <option value="high">Price: high to low</option>
+    </select>
+  </label>
+</section>
+<p class="category-result-count" id="category-result-count" aria-live="polite"></p>
+
+<!-- Example product list: add data-name and data-price to each generated product card. -->
+<ul class="g" id="category-products">
+  <li data-name="example product" data-price="999">...</li>
+</ul>
+
+<section class="category-faq">
+  <h2>Frequently asked questions</h2>
+  <details><summary>Which product should I choose?</summary><p>Answer with guidance specific to this category and the actual catalogue.</p></details>
+  <details><summary>How do I compare pack sizes or specifications?</summary><p>Explain the specifications customers should check before ordering.</p></details>
+  <details><summary>How much does delivery cost?</summary><p>Explain that delivery is confirmed for the customer's location before payment.</p></details>
+  <details><summary>How can I confirm compatibility or approved use?</summary><p>Direct customers to the exact product label, manufacturer instructions or a qualified professional where appropriate.</p></details>
+</section>
+
+<script>
+(function () {
+  var list = document.getElementById('category-products');
+  if (!list) return;
+  var cards = Array.prototype.slice.call(list.querySelectorAll('li[data-price]'));
+  var search = document.getElementById('category-search');
+  var price = document.getElementById('category-price');
+  var sort = document.getElementById('category-sort');
+  var count = document.getElementById('category-result-count');
+
+  function applyFilters() {
+    var query = (search.value || '').toLowerCase().trim();
+    var range = price.value;
+    cards.forEach(function (card) {
+      var name = (card.getAttribute('data-name') || card.textContent).toLowerCase();
+      var amount = Number(card.getAttribute('data-price') || 0);
+      var matchesName = !query || name.indexOf(query) !== -1;
+      var matchesPrice = range === 'all' ||
+        (range === 'under1000' && amount < 1000) ||
+        (range === '1000-5000' && amount >= 1000 && amount <= 5000) ||
+        (range === '5000plus' && amount > 5000);
+      card.hidden = !(matchesName && matchesPrice);
+    });
+
+    var visible = cards.filter(function (card) { return !card.hidden; });
+    if (sort.value === 'low' || sort.value === 'high') {
+      visible.sort(function (a, b) {
+        var delta = Number(a.dataset.price) - Number(b.dataset.price);
+        return sort.value === 'low' ? delta : -delta;
+      }).forEach(function (card) { list.appendChild(card); });
+    } else {
+      cards.forEach(function (card) { list.appendChild(card); });
+    }
+    count.textContent = visible.length + ' of ' + cards.length + ' products shown';
+  }
+
+  search.addEventListener('input', applyFilters);
+  price.addEventListener('change', applyFilters);
+  sort.addEventListener('change', applyFilters);
+  applyFilters();
+})();
+</script>
