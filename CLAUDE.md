@@ -116,3 +116,15 @@ Required buyer-guide sections, in this order where relevant:
 7. Frequently Asked Questions (exactly four buyer Q&As for product guides; each question and answer must be separately rendered and synchronised 1:1 with Product FAQPage JSON-LD when FAQ structured data is emitted).
 
 Use only verified product-specific facts. Keep any additional source, pricing, registration, listing-status or disclaimer notes under clearly named subsections. Do not fabricate content or pad word counts: the 800+ word target applies to complete, useful, verified buyer guides, and unresolved facts must be stated as unverified rather than guessed. Preserve exact pack-size identity for every SKU.
+
+
+### PRODUCT DESCRIPTION SECTION LABELS — CANONICAL STOREFRONT FORMAT
+Every product description must use these exact canonical section headings (store as Markdown `## Heading` on their own line, followed by a blank line; renderer outputs styled `<h3>`):
+1. Product Overview & Key Benefits
+2. Technical Specifications & Pack Details
+3. Where & How to Use in Kenya
+4. Safety, Storage & Handling Guidelines (include PPE and storage only from the actual product label / authoritative source)
+5. Buying & Pack-Size Guide (include 2–3 relevant internal links to category pages, relevant commercial buying guides, or /services/ pages)
+6. Delivery across Kenya & Nairobi Pickup (M-Pesa checkout, Sarit Centre Westlands pickup coordination, 47-county delivery subject to courier/stock coverage, WhatsApp +254 748 888 230)
+7. Frequently Asked Questions (exactly four detailed buyer Q&As, separately authored and synchronised 1:1 with Product FAQPage JSON-LD)
+Use paragraphs of no more than 2–3 sentences and real bullet lists for verified specifications/checklists. The renderer also normalises legacy inline Markdown headings, but new content must put each canonical heading on its own line. Maintain 800+ useful words only where supported by verified sources; never pad or invent chemical dilution rates, approved uses, PPE, label instructions, registration, efficacy, warranty or safety claims. Never publish a one-wall-of-text description.
