@@ -74,12 +74,12 @@ function renderBody(body, heading) {
 
 function normalizeMarkdownHeading(value) {
   const h = value.toLowerCase().replace(/[&]/g, 'and').replace(/\s+/g, ' ').trim();
-  if (/^(product overview|overview|product summary)$/.test(h)) return 'Product Overview & Key Benefits';
+  if (/^(product overview|overview|product summary|key features|key benefits|key features and benefits)$/.test(h)) return 'Product Overview & Key Benefits';
   if (/(technical|specification|identity|formulation|pack details|exact pack|product details)/.test(h)) return 'Technical Specifications & Pack Details';
-  if (/(where|target pests|application|uses|use in kenya|registered target)/.test(h)) return 'Where & How to Use in Kenya';
-  if (/(safety|storage|handling|before purchasing|label compliance)/.test(h)) return 'Safety, Storage & Handling Guidelines';
-  if (/(buying|pack.size|price comparison|compare|before you buy)/.test(h)) return 'Buying & Pack-Size Guide';
-  if (/(ordering|delivery|pickup)/.test(h)) return 'Delivery across Kenya & Nairobi Pickup';
+  if (/(where|target pests|application|uses|use in kenya|registered target|how to use|before you start)/.test(h)) return 'Where & How to Use in Kenya';
+  if (/(safety|storage|handling|before purchasing|label compliance|precautions)/.test(h)) return 'Safety, Storage & Handling Guidelines';
+  if (/(buying|pack.size|price comparison|compare|before you buy|source price)/.test(h)) return 'Buying & Pack-Size Guide';
+  if (/(ordering|delivery|pickup|order)/.test(h)) return 'Delivery across Kenya & Nairobi Pickup';
   if (/(frequently asked questions|^faqs?$)/.test(h)) return 'Frequently Asked Questions';
   return value;
 }
@@ -106,7 +106,7 @@ export function productDescriptionHtml(source) {
   while ((mh = markdownHeading.exec(raw))) hits.push({ start: mh.index, end: markdownHeading.lastIndex, heading: normalizeMarkdownHeading(mh[1].trim()) });
   for (const [heading, re] of LABELS) {
     re.lastIndex = 0; let m;
-    while ((m = re.exec(raw))) hits.push({ start: m.index, end: re.lastIndex, heading });
+    while ((m = re.exec(raw))) hits.push({ start: m.index, end: re.lastIndex, heading: normalizeMarkdownHeading(heading) });
   }
   hits.sort((a, b) => a.start - b.start);
 
@@ -165,6 +165,11 @@ export function productDescriptionHtml(source) {
     const prev = merged.find(x => x.heading === s.heading);
     if (prev) prev.body += ' ' + s.body; else merged.push({ ...s });
   }
+  const sectionOrder = ['Product Overview & Key Benefits', 'Technical Specifications & Pack Details', 'Where & How to Use in Kenya', 'Safety, Storage & Handling Guidelines', 'Buying & Pack-Size Guide', 'Delivery across Kenya & Nairobi Pickup', 'Frequently Asked Questions'];
+  merged.sort((a, b) => {
+    const ai = sectionOrder.indexOf(a.heading), bi = sectionOrder.indexOf(b.heading);
+    return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+  });
   return merged.map(x =>
     '<section class="product-description-section"><h3>' + esc(x.heading) + '</h3>' + renderBody(x.body.trim(), x.heading) + '</section>'
   ).join('');
