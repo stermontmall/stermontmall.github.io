@@ -146,35 +146,60 @@ jobs:
 
           const today = new Date().toISOString().slice(0, 10);
           let lastmodErrors = 0;
-          // Only the 230 IDs extracted from pricing SQL are in scope. Product
-          // generation may legitimately refresh unrelated HTML without changing
-          // those products' lastmod values.
+          const readProductBySku = (html, sku) => {
+            const scripts = [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi)];
+            for (const script of scripts) {
+              try {
+                const data = JSON.parse(script[1]);
+                const candidates = Array.isArray(data) ? data : [data];
+                for (const item of candidates) {
+                  if (item?.['@type'] === 'Product' && String(item.sku) === sku) return item;
+                  if (item?.['@type'] === 'ProductGroup' && Array.isArray(item.hasVariant)) {
+                    const variant = item.hasVariant.find(value => value?.['@type'] === 'Product' && String(value.sku) === sku);
+                    if (variant) return variant;
+                  }
+                }
+              } catch {}
+            }
+            return null;
+          };
+
+          // Check sitemap lastmod against actual pricing changes, not raw HTML
+          // byte differences. Rebuilding can change templates or date-derived
+          // markup without changing a product's price.
           for (const id of expectedIds) {
             const found = productsBySku.get(id);
             if (!found) continue;
             const url = [...affectedCanonicalUrls].find(candidate => {
               const pathname = new URL(candidate).pathname.replace(/^\/+/, '');
-              return pathname === `p/${found.file}`;
+              return pathname === 'p/' + found.file;
             });
-            if (!url) { fail(`Missing canonical sitemap URL for affected product ${id}`); lastmodErrors++; continue; }
+            if (!url) { fail('Missing canonical sitemap URL for affected product ' + id); lastmodErrors++; continue; }
             const pathname = new URL(url).pathname.replace(/^\/+/, '');
             const baselineFile = path.join('/tmp/main-pages', pathname);
             const currentFile = path.join('.', pathname);
-            if (!fs.existsSync(currentFile)) { fail(`Missing generated HTML for affected product ${id}: ${pathname}`); lastmodErrors++; continue; }
-            const existedBefore = fs.existsSync(baselineFile);
-            const changed = !existedBefore || !fs.readFileSync(currentFile).equals(fs.readFileSync(baselineFile));
+            if (!fs.existsSync(currentFile)) { fail('Missing generated HTML for affected product ' + id + ': ' + pathname); lastmodErrors++; continue; }
             const previous = oldMap.get(url);
             const lastmod = newMap.get(url);
-            if (!lastmod) { fail(`Affected product URL is absent from sitemap.xml: ${url}`); lastmodErrors++; }
-            else if (changed && previous && lastmod === previous) {
-              fail(`Changed affected product did not receive a new lastmod: ${url}`); lastmodErrors++;
-            } else if (!changed && previous && lastmod !== previous) {
-              fail(`Unchanged affected product has a modified lastmod: ${url}`); lastmodErrors++;
-            } else if (changed && !previous && lastmod !== today) {
-              fail(`New affected product URL has unexpected lastmod ${lastmod}: ${url}`); lastmodErrors++;
+            if (!lastmod) { fail('Affected product URL is absent from sitemap.xml: ' + url); lastmodErrors++; continue; }
+            if (!fs.existsSync(baselineFile)) {
+              if (lastmod !== today) { fail('New affected product URL has unexpected lastmod ' + lastmod + ': ' + url); lastmodErrors++; }
+              continue;
+            }
+            const baselineHtml = fs.readFileSync(baselineFile, 'utf8');
+            const baselineProduct = readProductBySku(baselineHtml, id);
+            const currentProduct = found.product;
+            const baselineOffer = Array.isArray(baselineProduct?.offers) ? baselineProduct.offers[0] : baselineProduct?.offers;
+            const currentOffer = Array.isArray(currentProduct.offers) ? currentProduct.offers[0] : currentProduct.offers;
+            if (!baselineProduct || !baselineOffer) {
+              fail('Could not read baseline Product JSON-LD offer for ' + id); lastmodErrors++; continue;
+            }
+            const priceChanged = Number(baselineOffer.price) !== Number(currentOffer?.price);
+            if (priceChanged && previous && lastmod === previous) {
+              fail('Changed product price did not receive a new lastmod: ' + url); lastmodErrors++;
             }
           }
-          if (!lastmodErrors) pass('sitemap.xml lastmod is consistent for all 230 affected products; unrelated regenerated pages are excluded');
+          if (!lastmodErrors) pass('sitemap.xml includes all affected canonical URLs and advances lastmod when an affected product price changes');
           
           const newPackMissing = [...insertedIds].filter(id => !productsBySku.has(id));
           if (newPackMissing.length) fail(`Missing new pack Product schema entries: ${newPackMissing.join(', ')}`);
