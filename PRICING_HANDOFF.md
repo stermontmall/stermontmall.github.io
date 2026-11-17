@@ -169,8 +169,8 @@ Batch order: next 100 active products alphabetically by product name and ID (off
 |---|---:|
 | Products scanned | 100 |
 | Syngenta products skipped | 15 |
-| Products with verified in-stock supplier price and price update prepared | 8 |
-| Products flagged [NEEDS MANUAL PRICE CHECK] | 77 |
+| Products with verified in-stock supplier price and price update prepared (after recheck) | 15 |
+| Products flagged [NEEDS MANUAL PRICE CHECK] after recheck | 70 |
 | New pack variants added | 0 |
 
 **Syngenta exclusions:** Actara 25 WG Insecticide 8g; Actara 25WG Insecticide 40g; Actellic 25EC Insecticide; Actellic 300 CS Public Health Insecticide 833ml; Actellic 50EC Insecticide; Actellic 50EC Insecticide; Actellic 50EC Insecticide; Actellic 50EC Insecticide; Actellic Gold Dust; Actellic Gold Dust; Actellic Gold Dust; Actellic Gold Dust 200g; Actellic Gold Dust 50g; Actellic Super Dust 50g; Agral 90 Non-Ionic Spray Adjuvant 1L. Agita is not counted as Syngenta: Kenya PCPB identifies Elanco Animal Health as its manufacturer/registrant. Agil is ADAMA-branded, not Syngenta.
@@ -217,7 +217,7 @@ Batch order: next 100 active products alphabetically by product name and ID (off
 - [NEEDS MANUAL PRICE CHECK] **Agro-Lambda 5EC Insecticide** (ID: `agro-lambda-5ec-insecticide-100-ml`; current KSh 599) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
 - [NEEDS MANUAL PRICE CHECK] **Agro-Lambda 5EC Insecticide** (ID: `agro-lambda-5ec-insecticide-250-ml`; current KSh 1,050) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
 - [NEEDS MANUAL PRICE CHECK] **Agrochemical Protective Spray Suit** (ID: `agrochemical-protective-spray-suit`; current KSh 2,600) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
-- [NEEDS MANUAL PRICE CHECK] **Agromaster 16-10-22 Controlled Release Fertilizer 25kg** (ID: `agromaster-16-10-22-controlled-release-fertilizer-25kg`; current KSh 4,299) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [RECHECKED — PRICE UPDATE PREPARED] **Agromaster 16-10-22 Controlled Release Fertilizer 25kg** (ID: `agromaster-16-10-22-controlled-release-fertilizer-25kg`;  current KSh 4,299) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
 - [NEEDS MANUAL PRICE CHECK] **AgroZ Black and White Silage Bag 350–400kg** (ID: `agroz-black-and-white-silage-bag-350-400kg`; current KSh 1,599) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
 - [NEEDS MANUAL PRICE CHECK] **AgroZ Silage Bag 1.0m x 2.5m** (ID: `agroz-silage-bag-1-0m-x-2-5m`; current KSh 1,495) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
 - [NEEDS MANUAL PRICE CHECK] **AgroZ Silage Storage Bag 1m x 2.5m** (ID: `agroz-silage-storage-bag-1m-x-2-5m`; current KSh 1,499) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
