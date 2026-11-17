@@ -337,7 +337,7 @@ Re-searched the 77 initially flagged records using brand/core product/pack-size 
 
 Algreen Bonzin is listed in a price range KSh370–1,170, but the 1L variant price is not unambiguously separated in the listing, so its current price remains unchanged and flagged. Hynitro 42 1L, Planta-P 1L and Supa-K 1L are separately priced by AgriJibu. The AICO AC767-4 is listed by MyAgrovet and several Jumia sellers at KSh18,500–21,000; the lowest matching retail listing was used for the retail-minus-15% estimate. Agroduka confirms Alonze 50EC 1L in stock at KSh7,930.
 
-**Batch 2 revised counts:** 100 scanned; 15 Syngenta exclusions; 15 price updates prepared in total (8 initial + 7 recheck); 70 still needing manual price checks; 0 new pack variants. No live database prices were changed.
+**Batch 2 revised counts:** 100 scanned; 15 Syngenta exclusions; 14 unique price updates prepared (7 initial + 7 recheck, with the AICO sprayer counted once at its rechecked price); 71 still needing manual price checks; 0 new pack variants. No live database prices were changed.
 
 
 ---
@@ -1137,13 +1137,13 @@ SQL record: supabase/sql/pricing-batch-018.sql (no-op audit record; no product d
 | **Total catalogue records scanned** | **1,732** |
 | Syngenta products excluded (active + inactive) | 62 |
 | Active non-Syngenta products eligible for pricing review | 1,586 |
-| Existing product price updates prepared in guarded SQL | 207 |
+| Existing product price updates prepared in guarded SQL | 205 |
 | New pack variants prepared in guarded SQL | 25 |
-| Active non-Syngenta products needing manual price verification / unchanged | 1,376 |
-| Active non-Syngenta products verified already at correct formula price | 3 |
+| Active non-Syngenta products needing manual price verification / unchanged | 1,377 |
+| Active non-Syngenta products verified already at correct formula price | 4 |
 | Inactive non-Syngenta products retained unchanged | 84 |
 
-The 207 prepared price updates cover 207 unique active product IDs after removing the duplicate Samsung 43U8000F row from Batch 14; that TV update is assigned to Batch 13. The 28 new pack variants have unique IDs checked against the catalogue. All updates are protected by expected-current-price guards; new variants use idempotent inserts. These are staged branch changes, not production writes.
+The 205 prepared price updates cover 205 unique active product IDs after removing the duplicate Samsung 43U8000F row from Batch 14; that TV update is assigned to Batch 13. The 28 new pack variants have unique IDs checked against the catalogue. All updates are protected by expected-current-price guards; new variants use idempotent inserts. These are staged branch changes, not production writes.
 
 **Branch status:** all 18 batch SQL files and this handoff are committed to `pricing/non-syngenta-market-review-20261117`, based on `main`. No merge to `main` has been performed. Existing product URLs/slugs are preserved. No production database prices or storefront pages have been changed.
 
