@@ -1065,3 +1065,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-13: trigger static product-page and sitemap rebuild after 15 agricultural machinery products were activated with verified Storage photos.
 
 // 2026-11-16: rebuild after adding 30 new photo-backed water-pump and irrigation listings.
+
+// Rebuild 2026-11-17: refresh generated product pages after owner-approved 30% market-reference price updates.
