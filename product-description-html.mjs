@@ -150,7 +150,7 @@ export function productDescriptionHtml(source) {
   // Markdown H2 headings are section boundaries too. H3 FAQ questions are retained as Q: lines.
   const markdownHeading = /^##\s+(.+?)\s*$/gm;
   let mh;
-  while ((mh = markdownHeading.exec(raw))) hits.push({ start: mh.index, end: markdownHeading.lastIndex, heading: normalizeMarkdownHeading(mh[1].trim()) });
+  while ((mh = markdownHeading.exec(raw))) hits.push({ start: mh.index, end: markdownHeading.lastIndex, heading: normalizeMarkdownHeading(mh[1].trim()), rawHeading: mh[1].trim() });
   for (const [heading, re] of LABELS) {
     re.lastIndex = 0; let m;
     while ((m = re.exec(raw))) hits.push({ start: m.index, end: re.lastIndex, heading });
@@ -200,16 +200,19 @@ export function productDescriptionHtml(source) {
   for (const h of hits) {
     if (h.start < cursor) continue;
     const body = raw.slice(cursor, h.start).trim();
-    if (body) sections.push({ heading: current, body });
+    if (body) sections.push({ heading: current, rawHeading: sections.length ? sections[sections.length - 1].rawHeading : '', body });
     current = h.heading; cursor = h.end;
+    sections.push({ _boundary: true, rawHeading: h.rawHeading || '', heading: h.heading });
   }
   const tail = raw.slice(cursor).trim();
-  if (tail) sections.push({ heading: current, body: tail });
+  if (tail) sections.push({ heading: current, rawHeading: sections.filter(x => x._boundary).slice(-1)[0]?.rawHeading || '', body: tail });
+  // Convert heading-boundary markers into the body section that follows them.
+  for (let i = sections.length - 1; i >= 0; i--) if (sections[i]._boundary) sections.splice(i, 1);
 
   // Hide editorial/operational metadata (supplier-cost arithmetic and draft status) from customer-facing product pages.
   const internalHeading = /(?:source price|baseline calculation|pricing calculation|sourcing notes|listing status|draft status|supplier cost|margin calculation|source url)/i;
   for (let i = sections.length - 1; i >= 0; i--) {
-    if (internalHeading.test(sections[i].heading)) sections.splice(i, 1);
+    if (internalHeading.test(sections[i].rawHeading || sections[i].heading)) sections.splice(i, 1);
   }
 
   // The same label twice in one description becomes one section.
