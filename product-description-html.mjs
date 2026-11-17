@@ -120,7 +120,7 @@ function splitInlineMarkdownHeadings(source) {
   }
   // Earlier catalogue drafts placed each section title and its first sentence on the same line.
   // Split only at known sentence-opening cues; retain every original word and map the title to a canonical section.
-  const cues = '(?:The|This|PCPB|Agropests|Imagine Care|Cheapthings|Farm Rescue|Farm|Naivas|Jumia|Osho|PPCK|AgriGuard|M-Tolori|Customers|Shoppers|People|Before|Check|Confirm|Compare|Browse|Read|Follow|Always|Ask|Use|Do|Keep|If|Once|For|One|An|A larger|A smaller|A small|A product|A 20|A 100|A separate|A retailer|The current|M-Pesa|WhatsApp|Sarit|Delivery)';
+  const cues = '(?:The|This|PCPB|Agropests|Imagine Care|Cheapthings|Farm Rescue|Farm|Naivas|Jumia|Osho|PPCK|AgriGuard|M-Tolori|Customers|Shoppers|People|Before|Check|Confirm|Compare|Browse|Read|Follow|Always|Ask|Use|Do|Keep|If|Once|For|One|An|A larger|A smaller|A small|A product|A 20|A 100|A separate|A retailer|A|An|It|Our|Stermont|The current|M-Pesa|WhatsApp|Sarit|Delivery)';
   const re = new RegExp('##\\s+([^\\n]{3,110}?)\\s+(' + cues + ')\\b', 'g');
   const canonicalTitles = new Set(KNOWN_TITLES.map(([, canonical]) => canonical));
   // A line that is already a canonical title is left alone, otherwise the "Use" in "Where & How to Use in Kenya" reads as a cue.
