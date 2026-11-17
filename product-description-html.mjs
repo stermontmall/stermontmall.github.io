@@ -39,7 +39,16 @@ export function splitFaq(body) {
 }
 
 function renderBody(body, heading) {
-  if (heading === 'Frequently asked questions') {
+  if (heading.toLowerCase().includes('frequently asked questions') || heading.toLowerCase() === 'faqs') {
+    const qLines = body.split(/\\n+/).map(x => x.trim()).filter(Boolean);
+    const marked = qLines.filter(x => /^Q:\\s*/i.test(x));
+    if (marked.length) return marked.map((q, i) => {
+      const rest = q.replace(/^Q:\\s*/i, '');
+      const split = rest.match(/^(.+?\\?)\\s+(.+)$/);
+      const question = split ? split[1] : rest;
+      const answer = split ? split[2] : (qLines.slice(qLines.indexOf(q) + 1).find(x => !/^Q:/i.test(x)) || '');
+      return '<p><strong>' + esc(question) + '</strong></p>' + (answer ? '<p>' + esc(answer) + '</p>' : '');
+    }).join('');
     const faq = splitFaq(body);
     if (faq) return faq.map(i => '<p><strong>' + esc(i.q) + '</strong><br>' + esc(i.a) + '</p>').join('');
   }
@@ -60,9 +69,12 @@ function renderBody(body, heading) {
 export function productDescriptionHtml(source) {
   // Remove generic buying-guide boilerplate; retain the product-specific copy.
   const raw = String(source || '')
-    // Older car records stored escaped newline characters (\\n) instead of real line breaks.
-    // Decode them before heading detection so vehicle section labels become real headings.
+    // Decode escaped line breaks and normalise inline Markdown headings from catalogue drafts.
     .replace(/\\r\\n|\\n|\\r/g, '\n')
+    .replace(/^#[^#\\n]*##[ \\t]*/i, '## ')
+    .replace(/[ \\t]+##[ \\t]+/g, '\n\n## ')
+    .replace(/[ \\t]+###[ \\t]+([^#\\n]+)/g, '\nQ: $1\n')
+    .replace(/\\*\\*([^*]+)\\*\\*/g, '$1')
     .replace(/\bundefined\b/gi, '')
     .replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '')
     .replace(/\s*PRODUCT BUYING GUIDE:[\s\S]*$/i, '')
@@ -70,6 +82,10 @@ export function productDescriptionHtml(source) {
   if (!raw) return '<p>Product information will be updated shortly.</p>';
 
   const hits = [];
+  // Markdown H2 headings are section boundaries too. H3 FAQ questions are retained as Q: lines.
+  const markdownHeading = /^##\\s+(.+?)\\s*$/gm;
+  let mh;
+  while ((mh = markdownHeading.exec(raw))) hits.push({ start: mh.index, end: markdownHeading.lastIndex, heading: mh[1].trim() });
   for (const [heading, re] of LABELS) {
     re.lastIndex = 0; let m;
     while ((m = re.exec(raw))) hits.push({ start: m.index, end: re.lastIndex, heading });
