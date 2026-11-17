@@ -342,3 +342,15 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Final verification: Supabase confirms 20 target rows, 10 active and 10 inactive (unchanged), all 20 with four FAQ markers and Markdown section boundaries. The canonical publishing rule and config both contain the description-formatting policy.
 - Latest follow-up commits: renderer normalisation/export repair `3aa6f379`, legacy-heading compatibility `1e339a82`, Markdown/FAQ tests `96185dc6`, corrected test expectations `aa91418b`; final handoff checkpoint follows.
 - `product-pages.yml` listens for pushes to `generate-products.mjs`, `product-description-html.mjs`, and its test file. The push therefore triggers a build; the GitHub connector only exposes PR-associated runs here, so a green run and deployed sitemap/product HTML have not been independently confirmed.
+
+
+## 2026-11-18 — Canonical product-description sections and inline-heading repair
+- Audited the exact 20 Fumigation Chemicals SKUs from the prior category-37 batch. A whitespace-token SQL count confirms the descriptions are already 1,096–1,401 words each (all exceed 800 words); they are not currently 350–486 words. All 20 retain four authored Q: FAQ entries. No extra chemical copy or dilution instructions were added merely to inflate length.
+- Root cause: many stored Markdown headings were inline with the first sentence (e.g. `## Product overview Product Name is...`), so the renderer's line-based H2 parser did not recognise the section boundary.
+- Updated `product-description-html.mjs` to split these legacy inline heading patterns at known sentence starts, map recognised heading topics into the seven canonical styled H3 sections, retain the source text, and keep paragraph splitting to at most three sentences. Added handling for common buyer, supplier, PCPB, PPE/safety, and fulfilment opening phrases.
+- Added regression tests for inline legacy Markdown headings, canonical section order, internal service links and four FAQ extraction. `.github/workflows/product-pages.yml` includes `node product-description-html.test.mjs` and listens for renderer/test/generator pushes.
+- Confirmed `generate-products.mjs` imports `extractProductFaq` and appends Product `FAQPage` JSON-LD only when exactly four Q&A pairs are parsed.
+- Added the exact seven canonical labels and future-writing constraints to `AGENTS.md`, `CLAUDE.md`, and `rules/publishing-rule.json`; updated Supabase `publishing_rules` JSON config and `publishing_rule_configs` rulebook.
+- Requested table `public.store_publishing_rules` does not exist in this Supabase project. Canonical tables updated instead; do not create a duplicate table without an explicit schema migration decision.
+- Commits for this formatting pass: renderer `27132f89`, corrected parser `7b6de780`, permanent rule files `534aa429`, `76ed6226`, `716e73b2`, regression tests `460695bd`, additional start cues `4ff9ef59`, delivery cue `00a4b5de`.
+- Pushes to renderer/test files trigger the product-pages workflow. Verify the Actions run and live generated HTML before claiming deployment is complete; connector does not expose a manual workflow-dispatch action.
