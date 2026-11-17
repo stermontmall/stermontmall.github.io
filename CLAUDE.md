@@ -62,18 +62,18 @@ Always source baseline prices and specifications from legitimate Kenyan business
 - *Log the exact Nairobi physical store name/URL in `HANDOFF-live.md` for every product as our backup sourcing reference.*
 
 #### 4. EXACT PRICING, 4-TIER MARKUP & PROFIT FLOORS
-1. **Syngenta Exclusion:** Skip Syngenta pricing changes unless explicitly instructed.
-2. **Baseline Cost (KES):** Lowest reliable Kenyan wholesale/distributor price from the physical-store directory above (or `lowest_reputable_Nairobi_retail * 0.85` when only retail prices are listed online).
-3. **4-Tier Markup Formula:**
-   - Baseline **below KSh 20,000** → **+30%** (`Baseline * 1.30`)
-   - Baseline **KSh 20,000 – 39,999** → **+25%** (`Baseline * 1.25`)
-   - Baseline **KSh 40,000 – 60,000** → **+20%** (`Baseline * 1.20`)
-   - Baseline **above KSh 60,000** → **+17.5%** (`Baseline * 1.175`)
-4. **Mandatory Guardrails:**
-   - **Minimum Net Margin Floor:** Never set a price yielding less than **15% net margin** above baseline.
-   - **Rounding:** Round final retail prices to the nearest **KSh 50**.
-   - **Minimum Storefront Retail Price Floor:** Every product and pack variant must be at least **KSh 200** (if `< 200`, set to `200`).
-
+1. **Syngenta Exclusion:** Skip every Syngenta product for new pricing and leave all existing Syngenta prices/costs untouched unless the owner explicitly instructs otherwise.
+2. **Baseline Cost Source (KES):** Use the lowest reliable Kenyan wholesale/distributor price from a trusted Nairobi physical-store/distributor in the directory above. If only reputable Nairobi retail prices are listed online and no wholesale/distributor price is available, calculate baseline cost as `lowest_reputable_Nairobi_retail * 0.85`. Record the exact source store and URL.
+3. **All Four Markup Tiers (applied to the verified baseline cost in KES):**
+   - Baseline **below KSh 20,000**: final pre-rounding price = `Baseline * 1.30` (**+30%**).
+   - Baseline **KSh 20,000 through KSh 39,999 inclusive**: final pre-rounding price = `Baseline * 1.25` (**+25%**).
+   - Baseline **KSh 40,000 through KSh 60,000 inclusive**: final pre-rounding price = `Baseline * 1.20` (**+20%**).
+   - Baseline **above KSh 60,000**: final pre-rounding price = `Baseline * 1.175` (**+17.5%**).
+4. **Mandatory Profit Guardrails & Rounding:**
+   - **Minimum Net Margin Floor:** The final retail price must never yield less than **15% net margin above the verified baseline cost**. If the tier result would violate this floor, raise the price enough to satisfy the 15% floor before rounding.
+   - **Clean Kenyan Rounding:** Round every final retail price to the **nearest KSh 50**.
+   - **Minimum Storefront Price Floor:** Every product and every pack variant must have a final retail price of at least **KSh 200**. If the rounded result is below KSh 200, set the final price to **KSh 200**.
+   - **Order of operations:** verify baseline in KES -> select exactly one tier using the baseline boundaries above -> apply the tier multiplier -> enforce the 15% minimum margin -> round to nearest KSh 50 -> enforce the KSh 200 minimum storefront price.
 #### 5. MANDATORY INVENTORY DEFAULTS
 - **Stock (`products.stock`):** `1000` pieces on every new product and pack variant.
 - **Low-stock alert (`products.low_at`):** `20` pieces on every new product and pack variant.
