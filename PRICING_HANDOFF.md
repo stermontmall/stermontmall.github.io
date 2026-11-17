@@ -375,3 +375,67 @@ Baseline values below use the lowest matching Kenyan retail price less 15% where
 No competitor price alert was triggered in the results returned: calculated prices were not more than 15% above multiple reputable, exact-pack competitors. No new pack variants were added. Other Batch 3 records remain flagged for manual checks where the results were not exact enough or did not expose a reliable price.
 
 SQL: `supabase/sql/pricing-batch-003.sql` (guarded, review branch only). Existing IDs, slugs and URLs preserved. No live prices changed.
+
+
+---
+
+# Batch 4 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta skipped | 0 |
+| Price updates prepared | 41 |
+| No-change / below-current-price candidates retained | 0 |
+| New pack variants | 0 |
+| Needs manual price check | 59 |
+
+Batch consists predominantly of Bajaj Boxer BM100/BM150 spare parts. The official Bajaj East Africa spares catalogue is used as the primary Kenya market price reference; exact BM models and part identities were matched. FDR Auto Garage listings provide secondary Nairobi retail checks for several of the same part numbers. As no public wholesale rates were explicitly identified, the baseline is the published retail price × 0.85, then 30% markup, rounded to KSh50. This is labelled [RETAIL-ESTIMATE], not wholesale. 
+
+| Product / Part | Pack Size | Supplier/retail reference (KES) | Markup Tier | New Price (KES) | Competitor Retail (KES) | Source Reference |
+|---|---|---:|---:|---:|---:|---|
+| CDI Ignitor Assembly BM100 | 1 piece / exact model part | 2,200 retail; baseline 1,870 [RETAIL-ESTIMATE] | 30% | 2,450 | 2,200 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Lever Complete Assembly BM100 | 1 piece / exact model part | 750 retail; baseline 637.5 [RETAIL-ESTIMATE] | 30% | 850 | 750 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Front Wheel Bearing 6200 | 1 piece / exact model part | 399 retail; baseline 339.15 [RETAIL-ESTIMATE] | 30% | 450 | 399 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Fuel Tank Cap BM100 | 1 piece / exact model part | 650 retail; baseline 552.5 [RETAIL-ESTIMATE] | 30% | 700 | 650 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Oil Filter Cap | 1 piece / exact model part | 300 retail; baseline 255 [RETAIL-ESTIMATE] | 30% | 350 | 300 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Chain Tensioner | 1 piece / exact model part | 800 retail; baseline 680 [RETAIL-ESTIMATE] | 30% | 900 | 800 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Chain Sprocket Kit BM100 KS | 1 piece / exact model part | 2,850 retail; baseline 2,422.5 [RETAIL-ESTIMATE] | 30% | 3,150 | 2,850 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Chain Guide Kit BM100 KS | 1 piece / exact model part | 350 retail; baseline 297.5 [RETAIL-ESTIMATE] | 30% | 400 | 350 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Rotor Assembly BM100 KS | 1 piece / exact model part | 3,500 retail; baseline 2,975 [RETAIL-ESTIMATE] | 30% | 3,850 | 3,500 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Capacitor BM100 Old | 1 piece / exact model part | 299 retail; baseline 254.15 [RETAIL-ESTIMATE] | 30% | 300 | 299 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Cylinder Head BM100 Old | 1 piece / exact model part | 6,100 retail; baseline 5,185 [RETAIL-ESTIMATE] | 30% | 6,750 | 6,100 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Gear Shift Drum Stopper | 1 piece / exact model part | 250 retail; baseline 212.5 [RETAIL-ESTIMATE] | 30% | 300 | 250 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Rear Drum Brake Assembly | 1 piece / exact model part | 3,650 retail; baseline 3,102.5 [RETAIL-ESTIMATE] | 30% | 4,050 | 3,650 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Rear Sprocket Bearing 6004 | 1 piece / exact model part | 450 retail; baseline 382.5 [RETAIL-ESTIMATE] | 30% | 500 | 450 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Shock Damper BM100 | 1 piece / exact model part | 500 retail; baseline 425 [RETAIL-ESTIMATE] | 30% | 550 | 500 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Crankshaft Assembly BM150 5 Gear | 1 piece / exact model part | 6,199 retail; baseline 5,269.15 [RETAIL-ESTIMATE] | 30% | 6,850 | 6,199 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| 2nd Gear Drive | 1 piece / exact model part | 950 retail; baseline 807.5 [RETAIL-ESTIMATE] | 30% | 1,050 | 950 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| 4th Gear Drive | 1 piece / exact model part | 850 retail; baseline 722.5 [RETAIL-ESTIMATE] | 30% | 900 | 850 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Side Stand | 1 piece / exact model part | 300 retail; baseline 255 [RETAIL-ESTIMATE] | 30% | 350 | 300 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Headlamp Assembly | 1 piece / exact model part | 300 retail; baseline 255 [RETAIL-ESTIMATE] | 30% | 350 | 300 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Camshaft Assembly BM150 | 1 piece / exact model part | 1,150 retail; baseline 977.5 [RETAIL-ESTIMATE] | 30% | 1,650 | 1,150 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Carburettor Assembly BM150 | 1 piece / exact model part | 5,500 retail; baseline 4,675 [RETAIL-ESTIMATE] | 30% | 6,100 | 5,500 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Chain Sprocket Drive Kit BM150 | 1 piece / exact model part | 3,199 retail; baseline 2,719.15 [RETAIL-ESTIMATE] | 30% | 3,550 | 3,199 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Clutch Cable BM150 | 1 piece / exact model part | 400 retail; baseline 340 [RETAIL-ESTIMATE] | 30% | 450 | 400 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Crankcase LH BM150 | 1 piece / exact model part | 7,800 retail; baseline 6,630 [RETAIL-ESTIMATE] | 30% | 8,600 | 7,800 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Crankshaft BM150 | 1 piece / exact model part | 5,500 retail; baseline 4,675 [RETAIL-ESTIMATE] | 30% | 6,100 | 5,500 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Exhaust Assembly BM150 | 1 piece / exact model part | 12,000 retail; baseline 10,200 [RETAIL-ESTIMATE] | 30% | 13,300 | 12,000 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Front Fork Holder Assembly | 1 piece / exact model part | 1,950 retail; baseline 1,657.5 [RETAIL-ESTIMATE] | 30% | 2,150 | 1,950 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Front Wheel Axle | 1 piece / exact model part | 300 retail; baseline 255 [RETAIL-ESTIMATE] | 30% | 350 | 300 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Fuel Level Sensor BM150 | 1 piece / exact model part | 1,199 retail; baseline 1,019.15 [RETAIL-ESTIMATE] | 30% | 1,200 | 1,199 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Fuel Tap Assembly | 1 piece / exact model part | 450 retail; baseline 382.5 [RETAIL-ESTIMATE] | 30% | 500 | 450 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Headlamp Cowling 52PF1827 | 1 piece / exact model part | 1,899 retail; baseline 1,614.15 [RETAIL-ESTIMATE] | 30% | 2,100 | 1,899 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Left Handlebar Control Switch | 1 piece / exact model part | 350 retail; baseline 297.5 [RETAIL-ESTIMATE] | 30% | 400 | 350 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Lock Kit BM150 | 1 piece / exact model part | 1,950 retail; baseline 1,657.5 [RETAIL-ESTIMATE] | 30% | 2,150 | 1,950 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Oil Filter Cap with O-Ring | 1 piece / exact model part | 300 retail; baseline 255 [RETAIL-ESTIMATE] | 30% | 350 | 300 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Piston Assembly BM150 | 1 piece / exact model part | 1,500 retail; baseline 1,275 [RETAIL-ESTIMATE] | 30% | 1,650 | 1,500 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Timing Chain BM150 | 1 piece / exact model part | 700 retail; baseline 595 [RETAIL-ESTIMATE] | 30% | 750 | 700 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Wiring Harness BM150 | 1 piece / exact model part | 2,999 retail; baseline 2,549.15 [RETAIL-ESTIMATE] | 30% | 3,200 | 2,999 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Mesh Oil Filter | 1 piece / exact model part | 250 retail; baseline 212.5 [RETAIL-ESTIMATE] | 30% | 300 | 250 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Piston Rings 36PF0116 | 1 piece / exact model part | 650 retail; baseline 552.5 [RETAIL-ESTIMATE] | 30% | 700 | 650 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| Handle Holder Set | 1 piece / exact model part | 600 retail; baseline 510 [RETAIL-ESTIMATE] | 30% | 650 | 600 | https://bajajeastafrica.com/spares/; https://fdrautogarage.co.ke/product-category/auto-parts/ |
+
+Items with calculated prices below their current storefront prices were not reduced under the profit-protection guardrail. Some low-cost exact parts are already priced at or above their calculated amount; those remain unchanged. The official Bajaj listing is not proof of stock for every individual item, so confirm stock before any eventual production application. No new variants were created. Existing slugs and URLs preserved.
+
+SQL: `supabase/sql/pricing-batch-004.sql` (guarded, branch only; not production).
