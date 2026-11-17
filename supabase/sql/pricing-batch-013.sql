@@ -33,4 +33,26 @@ ARRAY['Ransom 600 WP 250g','Ransom 600 WP 250g Kenya','Ransom fungicide price in
 ARRAY['Ransom 600 WP 1kg','Ransom 600 WP 1kg Kenya','Ransom fungicide price in Kenya','Ransom 600WP Kenya'],
 'in_stock')
 on conflict (id) do nothing;
+
+
+-- Batch 13 additional verified price updates (manufacturer/official retailer and in-stock Kenyan listings).
+do $pricing$
+declare r record; affected integer;
+begin
+ for r in select * from (values
+('samsung-galaxy-a06-4gb-ram-plus-64gb-4gb-plus-64gb',13799.00::numeric,16150.00::numeric,12409.15::numeric),
+('samsung-galaxy-a07-5g-4gb-128gb-20261108',22900.00::numeric,24850.00::numeric,19131.80::numeric),
+('samsung-galaxy-a17-5g-4gb-128gb-20261108',22499.00::numeric,24850.00::numeric,19131.80::numeric),
+('samsung-galaxy-a26-5g-8gb-256gb-20261108',26800.00::numeric,38250.00::numeric,30600.00::numeric),
+('samsung-43u8000f-crystal-uhd-4k-smart-tv-43-inch',39099.00::numeric,40250.00::numeric,32215.00::numeric),
+('sc-duma-43-hybrid-maize-seeds-2kg',999.00::numeric,1000.00::numeric,765.00::numeric),
+('rootex-6-rooting-hormone-50-g',1099.00::numeric,550.00::numeric,442.00::numeric)
+ ) as v(product_id,expected_price,new_price,new_cost)
+ loop
+  update public.products set price=r.new_price,cost=r.new_cost where id=r.product_id and active=true and price=r.expected_price;
+  get diagnostics affected=row_count;
+  if affected<>1 then raise exception 'Batch 13 price guard failed for % (expected %, changed %)',r.product_id,r.expected_price,affected; end if;
+ end loop;
+end
+$pricing$;
 commit;
