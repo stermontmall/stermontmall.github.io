@@ -1075,3 +1075,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // Rebuild 2026-11-17: refresh generated product pages after owner-approved 30% market-reference price updates.
 
 // Rebuild 2026-11-17: refresh product-page safety sections and complete catalogue SEO metadata after the Supabase-wide safety/SEO audit.
+
+// 2026-11-17: rebuild all product detail pages and product sitemap after expanding nine thin descriptions and correcting their unique SEO titles and snippets.
