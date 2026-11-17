@@ -64,7 +64,7 @@ jobs:
             for (const match of sql.matchAll(/\(\s*'([^']+)'\s*,\s*[\d.]+::numeric\s*,\s*[\d.]+::numeric/g)) {
               updatedIds.add(match[1]);
             }
-            for (const match of sql.matchAll(/update\s+public\.products\s+set\s+price\s*=\s*[\d.]+\s+where\s+id\s*=\s*'([^']+)'/gi)) {
+            for (const match of sql.matchAll(/update\s+public\.products\s+set\s+price\s*=\s*[\d.]+(?:\s*,\s*cost\s*=\s*[\d.]+)?\s+where\s+id\s*=\s*'([^']+)'/gi)) {
               updatedIds.add(match[1]);
             }
             // Parse every row in each idempotent INSERT. Descriptions can
