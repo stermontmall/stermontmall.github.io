@@ -72,6 +72,22 @@ function renderBody(body, heading) {
 }
 
 
+// Extract exactly four authored buyer Q&As for product FAQPage JSON-LD.
+export function extractProductFaq(source) {
+  const raw = String(source || '').replace(/\\r\\n|\\n|\\r/g, '\n')
+    .replace(/^#[^#\n]*##[ \t]*/i, '## ')
+    .replace(/[ \t]+##[ \t]+/g, '\n\n## ')
+    .replace(/[ \t]+###[ \t]+/g, '\nQ: ');
+  const start = raw.search(/(?:##\s*)?(?:FREQUENTLY ASKED QUESTIONS|FAQS?)\b/i);
+  if (start < 0) return [];
+  let body = raw.slice(start).replace(/^(?:##\s*)?(?:FREQUENTLY ASKED QUESTIONS|FAQS?)\b:?/i, '');
+  const nextSection = body.search(/\n##\s+/);
+  if (nextSection >= 0) body = body.slice(0, nextSection);
+  const matches = [...body.matchAll(/Q:\s*(.+?\?)\s*([\s\S]*?)(?=\nQ:\s*|$)/gi)];
+  const pairs = matches.map(m => ({ q: m[1].trim(), a: m[2].trim() })).filter(x => x.q && x.a);
+  return pairs.length === 4 ? pairs : [];
+}
+
 function normalizeMarkdownHeading(value) {
   const h = value.toLowerCase().replace(/[&]/g, 'and').replace(/\s+/g, ' ').trim();
   if (/^(product overview|overview|product summary|key features|key benefits|key features and benefits)$/.test(h)) return 'Product Overview & Key Benefits';
@@ -87,12 +103,12 @@ function normalizeMarkdownHeading(value) {
 export function productDescriptionHtml(source) {
   // Remove generic buying-guide boilerplate; retain the product-specific copy.
   const raw = String(source || '')
-    // Decode escaped line breaks and normalise inline Markdown headings from catalogue drafts.
+    // Decode stored escaped line breaks; split inline Markdown headings into renderer section boundaries.
     .replace(/\\r\\n|\\n|\\r/g, '\n')
-    .replace(/^#[^#\\n]*##[ \\t]*/i, '## ')
-    .replace(/[ \\t]+##[ \\t]+/g, '\n\n## ')
-    .replace(/[ \\t]+###[ \\t]+([^#\\n]+)/g, '\nQ: $1\n')
-    .replace(/\\*\\*([^*]+)\\*\\*/g, '$1')
+    .replace(/^#[^#\n]*##[ \t]*/i, '## ')
+    .replace(/[ \t]+##[ \t]+/g, '\n\n## ')
+    .replace(/[ \t]+###[ \t]+([^#\n]+)/g, '\nQ: $1\n')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
     .replace(/\bundefined\b/gi, '')
     .replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '')
     .replace(/\s*PRODUCT BUYING GUIDE:[\s\S]*$/i, '')
@@ -101,7 +117,7 @@ export function productDescriptionHtml(source) {
 
   const hits = [];
   // Markdown H2 headings are section boundaries too. H3 FAQ questions are retained as Q: lines.
-  const markdownHeading = /^##\\s+(.+?)\\s*$/gm;
+  const markdownHeading = /^##\s+(.+?)\s*$/gm;
   let mh;
   while ((mh = markdownHeading.exec(raw))) hits.push({ start: mh.index, end: markdownHeading.lastIndex, heading: normalizeMarkdownHeading(mh[1].trim()) });
   for (const [heading, re] of LABELS) {
