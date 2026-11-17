@@ -354,3 +354,12 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Requested table `public.store_publishing_rules` does not exist in this Supabase project. Canonical tables updated instead; do not create a duplicate table without an explicit schema migration decision.
 - Commits for this formatting pass: renderer `27132f89`, corrected parser `7b6de780`, permanent rule files `534aa429`, `76ed6226`, `716e73b2`, regression tests `460695bd`, additional start cues `4ff9ef59`, delivery cue `00a4b5de`.
 - Pushes to renderer/test files trigger the product-pages workflow. Verify the Actions run and live generated HTML before claiming deployment is complete; connector does not expose a manual workflow-dispatch action.
+
+
+## 2026-11-18 — Follow-up: category 37 heading coverage and internal copy suppression
+- Rechecked all 20 exact product IDs in Supabase: 20 rows, 10 active and 10 inactive; descriptions contain 1,096–1,401 whitespace-separated tokens, and all 20 have exactly four Q: FAQ markers. No artificial text expansion was needed; the requested 800-word threshold is already exceeded.
+- Renderer now maps the observed heading variants across all 20 descriptions (product identity/pack, registered target/use context, label/safety, buying/pack comparisons, ordering/delivery, FAQs) into the seven canonical section headings. Additional common first-sentence cues are recognised when headings and prose share a line.
+- Customer-facing renderer suppresses internal supplier-price/baseline/markup calculation sections and internal “Listing status” draft notes. This avoids exposing sourcing arithmetic or unpublished operational notes on live product pages; the stored product-specific facts and FAQ answers remain intact.
+- Added a regression test covering inline headings, all seven canonical headings, four FAQs, internal pricing/status suppression and service links.
+- Latest renderer commits: `6f06db92` (initial internal-section filtering), `47afa2b5` (retain source heading for filtering), `09f6f000` (suppress price calculations), `ebd5bc34` (expanded title mapping), `021bd0f3` (additional section-opening cues). Latest test commit: `56e0b6b3`.
+- The renderer and test pushes trigger `.github/workflows/product-pages.yml`. The available GitHub connection returned no commit status and does not expose manual workflow dispatch; therefore the automated build and live deployment still need a successful Actions run and generated-page inspection before being called complete.
