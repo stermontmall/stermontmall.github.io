@@ -19,6 +19,7 @@ import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadW
 import { productIdentifiers } from './seo-product-identifiers.mjs';
 import { productDescriptionHtml } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
+import { CATEGORY_INTROS, CATEGORY_FAQS } from './category-intros.mjs';
 import { renderHomeGridFallback } from './home-grid-ssr.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
@@ -710,7 +711,8 @@ for (const [slug, c] of Object.entries(byCat)) {
   const info = INFO[slug] || {};
   const title = info.title || c.meta_title || catTitle(c.name);   // approved category metadata takes precedence over generated fallback
   const desc = info.desc || c.meta_description || catDescription(c.name, slug);
-  const categoryIntro = info.intro || c.description || 'Browse the products listed below and compare the exact model, pack size or variant before ordering.';
+  const categoryIntro = CATEGORY_INTROS[slug] || info.intro || c.description || 'Browse the products listed below and compare the exact model, pack size or variant before ordering.';
+  const categoryFaqs = CATEGORY_FAQS[slug] || info.faq || [];
   const helpCta = isPest(slug) ? '<div class="box"><b>Need help choosing a pest-control product?</b><p>Tell us the pest, treatment site and pack size you are considering. We can help confirm the product listing, stock and delivery fee before you order.</p><a class="btn" href="https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent('Hello Stermont Arcade, please help me choose a ' + c.name.toLowerCase() + ' product. Please confirm its listed use, pack size, stock and delivery fee.') + '">Ask on WhatsApp</a></div>' : '';
   const serviceCrosslink = isPest(slug) ? '<div class="box"><b>Need professional pest-control help?</b><p>Read our service information for treatment options, inspection questions and how to request a quote.</p><a href="/services/">Explore pest-control services</a> · <a href="/services/pests/termites.html">Termite information</a> · <a href="/services/pests/bed-bugs.html">Bed bug information</a></div>' : '';
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
@@ -718,9 +720,9 @@ for (const [slug, c] of Object.entries(byCat)) {
 <p>${esc(categoryIntro)}</p><style>.category-filters{display:grid;grid-template-columns:1fr;gap:.4rem;margin:1rem 0;padding:1rem;background:#f5f3ff;border:1px solid #e6e1f5;border-radius:12px}.category-filters label{font-size:.88rem;font-weight:700}.category-filters input,.category-filters select{width:100%;min-height:42px;padding:.55rem .7rem;border:1px solid #cfc7e5;border-radius:8px;background:#fff;color:#1f1b2e;font:inherit}.category-filters #category-count{margin:.2rem 0 0;color:#5b556b;font-size:.88rem}.category-faq details{border:1px solid #e6e1f5;border-radius:10px;padding:.8rem 1rem;margin:.65rem 0;background:#fff}.category-faq summary{font-weight:700;cursor:pointer}.category-faq details p{margin:.55rem 0 0}@media(min-width:650px){.category-filters{grid-template-columns:1.4fr 1fr 1fr 1fr;align-items:end}.category-filters #category-count{grid-column:1/-1}}</style><p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or ask about pickup at Sarit Centre, Westlands. Delivery fees are confirmed before payment.</p>${helpCta}${serviceCrosslink}<div class="category-filters" role="search" aria-label="Filter category products"><label for="category-search">Search products</label><input id="category-search" type="search" placeholder="Search by product name or pack size"><label for="category-max-price">Maximum price (KSh)</label><input id="category-max-price" type="number" min="0" inputmode="numeric" placeholder="Any price"><label for="category-sort">Sort products</label><select id="category-sort"><option value="recommended">Recommended</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select><p id="category-count" aria-live="polite">${c.items.length} products</p></div><ul class="g" id="category-products">${c.items.map(card).join('')}</ul><script src="/category-filters.js" defer></script>
 ${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
 ${info.guide || ''}
-${info.faq ? '<section class="category-faq"><h2>Frequently asked questions</h2>' + info.faq.slice(0, 4).map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('') + '</section>' : ''}
+${categoryFaqs.length ? '<section class="category-faq"><h2>Frequently asked questions</h2>' + categoryFaqs.slice(0, 4).map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('') + '</section>' : ''}
 <p><a href="/c/">Browse all categories</a></p>`;
-  const faqLd = info.faq ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: info.faq.slice(0, 4).map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
+  const faqLd = categoryFaqs.length ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: categoryFaqs.slice(0, 4).map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
   if (path !== oldPath) {
     // These two old /c/ category URLs are intentionally retired to the main shop homepage.
     // Keep their distinct root-level destination pages available, but do not leave duplicate legacy category URLs indexed.
