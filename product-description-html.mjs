@@ -91,6 +91,7 @@ export function extractProductFaq(source) {
 
 function normalizeMarkdownHeading(value) {
   const h = value.toLowerCase().replace(/[&]/g, 'and').replace(/\s+/g, ' ').trim();
+  if (/(source price|baseline calculation|pricing calculation|exact price and|price and (?:baseline|pack|stermont)|price comparison|sourcing notes)/.test(h)) return 'Internal pricing metadata';
   if (/(product overview|overview|key features|key benefits|product summary)/.test(h)) return 'Product Overview & Key Benefits';
   if (/(technical|specification|identity|formulation|pack details|exact pack|product details|product information|pack contents|variant identity|confirmed pack|exact size)/.test(h)) return 'Technical Specifications & Pack Details';
   if (/(where|target pests|registered|application|uses|use in kenya|pest-control context|public-health purpose|intended buyer|supplier-described public-health|what the product is listed for)/.test(h)) return 'Where & How to Use in Kenya';
@@ -210,7 +211,7 @@ export function productDescriptionHtml(source) {
   for (let i = sections.length - 1; i >= 0; i--) if (sections[i]._boundary) sections.splice(i, 1);
 
   // Hide editorial/operational metadata (supplier-cost arithmetic and draft status) from customer-facing product pages.
-  const internalHeading = /(?:source price|baseline|pricing calculation|price and|price comparison|exact price|sourcing notes|listing status|draft status|supplier cost|margin calculation|source url)/i;
+  const internalHeading = /(?:internal pricing metadata|source price|baseline|pricing calculation|price and|price comparison|exact price|sourcing notes|listing status|draft status|supplier cost|margin calculation|source url)/i;
   for (let i = sections.length - 1; i >= 0; i--) {
     if (internalHeading.test(sections[i].rawHeading || sections[i].heading)) sections.splice(i, 1);
   }
