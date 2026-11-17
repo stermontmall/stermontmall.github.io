@@ -4,7 +4,25 @@ Date: 2026-11-15 (Africa/Nairobi)
 Repository: stermontmall/stermontmall.github.io
 Working branch: wip/seo-batch2-2026-11-15
 
-## 2026-11-18 (later session) — SESSION STATE (newest; supersedes the entries below where they differ)
+## 2026-11-18 (queue + PCPB HOLD) — SESSION STATE (newest; supersedes the entries below where they differ)
+### PCPB HOLD — DO NOT ACTIVATE these 8 products without PCPB verification
+They are all `active=false` today. Keep them that way until the current PCPB registration status and the registered crop use are confirmed (PCPB register or PCPB directly), and the label photo is checked.
+- `xpand-max-92-sg-insecticide-100g` — ACEPHATE 92%. Acephate was listed as WITHDRAWN from the Kenyan market in the 2025 Ministry/PCPB pesticide review. Do not sell unless PCPB confirms it is currently registered.
+- `pyrinex-chlorpyrifos-insecticide-250ml` — CHLORPYRIFOS. Restricted to use as a termiticide; do not market as a crop insecticide.
+- `metro-imidacloprid-insecticide-25ml` and `confidor-wg-70-insecticide-15g` — IMIDACLOPRID. Restricted to non-open-field use.
+- `2-4-d-hai-amine-herbicide-20l` — 2,4-D AMINE. Restricted: not for use in coffee (keep that exclusion in the description).
+- `agrithane-mancozeb-fungicide-100g`, `dithane-mancozeb-fungicide-500g`, `riomax-72wp-fungicide-2-5kg` — MANCOZEB. Reviewed, decision was pending in the 2025 report; check the current status.
+- Evidence limit: this comes from a HapaKenya news report dated 2025-06-23 (hapakenya.com/2025/06/23/kenya-bans-77-harmful-pesticides-restricts-202-halts-imports-of-151-others-pending-assessment), not from the PCPB register. A decision on 151 products under review was expected by December 2025, so statuses may have changed. Also confirm every pesticide label shows a PCPB(CR) registration number. The 26 agrochemicals whose active ingredient is "not stated" in our data cannot be screened until the label is read. Do not bulk-activate agrochemicals.
+- Details and the same list: `docs/packshot-checklist-2026-11-18.md` (HOLD section) and `docs/photo-upload-queue-2026-11-18.md`.
+### Lumnia confirmed
+- Re-queried Supabase 2026-11-18: the three Lumnia 10-pack glueboards (`rentokil-lumnia-compact-white-glueboard-10pack`, `rentokil-lumnia-slim-black-glueboard-10pack`, `rentokil-lumnia-slim-white-glueboard-10pack`) have `category_id = 90` (Insect Light Traps & UV Lamps), `active=false`, 0 images. They are #1-3 in the upload queue.
+### Photo-upload queue (owner uploads on phone via `/admin.html`)
+- `docs/photo-upload-queue-2026-11-18.md` is the authoritative order and supersedes the "Suggested upload order" in the packshot checklist: Tier 0 Lumnia (3) -> Tier 1 pest control and pest-proofing (11) -> Tier 2 the 33 unflagged agrochemicals (grouped) -> Tier 3 other farm/agrovet (11) -> Tier 4 general (8) -> 8 HOLD items last and only after PCPB verification. Tier order is a judgment, not sales data.
+- Still true: nothing has been uploaded, attached or activated; no image has been visually checked by Claude. Activate each product only after a person has looked at the stored image.
+### Email check
+- Re-queried 2026-11-18: no order newer than STM-JJ6WZ2; `email_log` unchanged (ids 7-9). Owner is about to place a test order and will send the STM-XXXXXX reference. Then run the two queries in the 00:50 entry below.
+
+## 2026-11-18 (later session) — SESSION STATE (supersedes the entries below where they differ)
 ### Test order / email check — still NOT VERIFIED
 - Queried live Supabase (DB clock 2026-11-17 21:43Z = 00:43 EAT 2026-11-18). No order newer than STM-JJ6WZ2 (paid, 2026-11-17 09:56Z) and STM-GY2KML (declined, 09:47Z). Newest `email_log` rows are still ids 7-9 (STM-JJ6WZ2: packed, out_for_delivery, delivered; request_ids 2775-2777).
 - `net._http_response` latest rows 2774-2779 all status 200, but all are from 10:47Z-16:20Z, i.e. BEFORE the lockdown migration (21:32Z). Rows 2778-2779 (16:19-16:20Z) have no matching `email_log` row. So there is no post-lockdown evidence either way; the trigger path has not been exercised since the revoke.
