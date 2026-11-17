@@ -20,4 +20,23 @@ begin
  end loop;
 end
 $pricing$;
+
+-- Additional verified Batch 14 pricing updates from the supplier/competitor research log.
+do $pricing$
+declare r record; affected integer;
+begin
+ for r in select * from (values
+('spirometer-500sc-insecticide-100ml',1950.00::numeric,1700.00::numeric,1317.50::numeric),
+('taurus-500sp-insecticide-1kg',8000.00::numeric,5800.00::numeric,4462.50::numeric),
+('systema-50ec-insecticide-1-litre',4350.00::numeric,3300.00::numeric,2550.00::numeric),
+('samsung-43u8000f-crystal-uhd-4k-smart-tv-43-inch',39099.00::numeric,40250.00::numeric,32215.00::numeric),
+('symnet-50-mesh-anti-insect-net-3m-x-50m-roll',15499.00::numeric,16600.00::numeric,12750.00::numeric)
+ ) as v(product_id,expected_price,new_price,new_cost)
+ loop
+  update public.products set price=r.new_price,cost=r.new_cost where id=r.product_id and active=true and price=r.expected_price;
+  get diagnostics affected=row_count;
+  if affected<>1 then raise exception 'Batch 14 additional guard failed for % (expected %, changed %)',r.product_id,r.expected_price,affected; end if;
+ end loop;
+end
+$pricing$;
 commit;
