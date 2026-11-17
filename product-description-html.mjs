@@ -74,7 +74,7 @@ function renderBody(body, heading) {
 
 // Extract exactly four authored buyer Q&As for product FAQPage JSON-LD.
 export function extractProductFaq(source) {
-  const raw = String(source || '').replace(/\\r\\n|\\n|\\r/g, '\n')
+  let raw = String(source || '').replace(/\\r\\n|\\n|\\r/g, '\n')
     .replace(/^#[^#\n]*##[ \t]*/i, '## ')
     .replace(/[ \t]+##[ \t]+/g, '\n\n## ')
     .replace(/[ \t]+###[ \t]+/g, '\nQ: ');
@@ -90,14 +90,30 @@ export function extractProductFaq(source) {
 
 function normalizeMarkdownHeading(value) {
   const h = value.toLowerCase().replace(/[&]/g, 'and').replace(/\s+/g, ' ').trim();
-  if (/^(product overview|overview|product summary|key features|key benefits|key features and benefits)$/.test(h)) return 'Product Overview & Key Benefits';
-  if (/(technical|specification|identity|formulation|pack details|exact pack|product details)/.test(h)) return 'Technical Specifications & Pack Details';
-  if (/(where|target pests|application|uses|use in kenya|registered target|how to use|before you start)/.test(h)) return 'Where & How to Use in Kenya';
-  if (/(safety|storage|handling|before purchasing|label compliance|precautions)/.test(h)) return 'Safety, Storage & Handling Guidelines';
-  if (/(buying|pack.size|price comparison|compare|before you buy|source price)/.test(h)) return 'Buying & Pack-Size Guide';
+  if (/(product overview|overview|key features|key benefits|product summary)/.test(h)) return 'Product Overview & Key Benefits';
+  if (/(technical|specification|identity|formulation|pack details|exact pack|product details|product information)/.test(h)) return 'Technical Specifications & Pack Details';
+  if (/(where|target pests|registered|application|uses|use in kenya|pest-control context|intended buyer|supplier-described public-health)/.test(h)) return 'Where & How to Use in Kenya';
+  if (/(safety|storage|handling|before purchasing|label|regulatory|precaution|ppe)/.test(h)) return 'Safety, Storage & Handling Guidelines';
+  if (/(buying|pack.size|price|comparison|compare|choosing|purchase|source price|value)/.test(h)) return 'Buying & Pack-Size Guide';
   if (/(ordering|delivery|pickup|order)/.test(h)) return 'Delivery across Kenya & Nairobi Pickup';
   if (/(frequently asked questions|^faqs?$)/.test(h)) return 'Frequently Asked Questions';
   return value;
+}
+
+function splitInlineMarkdownHeadings(source) {
+  let text = source;
+  // Product overview headings were followed immediately by the product name and opening sentence.
+  text = text.replace(/##\\s+Product overview\\s+(.{1,120}?\\s+is\\s+)/gi,
+    (_m, opening) => '\\n## Product Overview & Key Benefits\\n\\n' + opening);
+  // Earlier catalogue drafts placed each section title and its first sentence on the same line.
+  // Split only at known sentence-opening cues; retain every original word and map the title to a canonical section.
+  const cues = '(?:The|This|PCPB|Agropests|Imagine Care|Cheapthings|Farm Rescue|Naivas|Jumia|Osho|PPCK|Customers|Shoppers|People|Before|Check|Confirm|Use|Do|Keep|If|Once|For|One|A larger|A smaller|A small|A product|A 20|A 100|The current)';
+  const re = new RegExp('##\\\\s+([^\\\\n]{3,110}?)\\\\s+(' + cues + ')\\\\b', 'g');
+  text = text.replace(re, (_m, title, start) => {
+    const canonical = normalizeMarkdownHeading(title);
+    return '\\n## ' + canonical + '\\n' + start;
+  });
+  return text;
 }
 
 export function productDescriptionHtml(source) {
@@ -113,6 +129,7 @@ export function productDescriptionHtml(source) {
     .replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '')
     .replace(/\s*PRODUCT BUYING GUIDE:[\s\S]*$/i, '')
     .trim();
+  raw = splitInlineMarkdownHeadings(raw);
   if (!raw) return '<p>Product information will be updated shortly.</p>';
 
   const hits = [];
