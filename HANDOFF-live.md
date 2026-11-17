@@ -373,3 +373,6 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - The 10 inactive records remain inactive; their descriptions are still stored and will use the same renderer when later activated. No chemical rates or label directions were invented.
 - Supabase audit remains: 20 product records, 10 active + 10 inactive, 1,096–1,401 whitespace-separated words per description, exactly four Q: FAQ markers each. The original claim that these were 350–486 words was inaccurate; they already exceeded the 800-word target, so no filler was added.
 - Canonical permanent section labels remain in `AGENTS.md`, `CLAUDE.md`, `rules/publishing-rule.json`, and Supabase `publishing_rules` / `publishing_rule_configs`. `public.store_publishing_rules` is not present in this project.
+
+- GitHub Pages deployment for the generated catalogue + handoff commit completed successfully: [deployment run #44203622491](https://github.com/stermontmall/stermontmall.github.io/actions/runs/44203622491). The generated product HTML and sitemap are now published through GitHub Pages.
+- Final parser edge-case commits included `418434cd` (overview-prefix + comparison-heading fix) and `bc653a71` (regression coverage); the successful product-pages run #44203479444 generated commit `07b383a2`.
