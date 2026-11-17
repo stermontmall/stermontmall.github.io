@@ -9,7 +9,7 @@ const input = {
   'televisions': { name: 'Televisions', items: [a] },
   'bluetooth-speakers': { name: 'Bluetooth Speakers', items: [b] },
   'computing': { name: 'Computing', items: [c] },
-  'tvs-audio': { name: 'TVs & Audio', items: [a] }
+  'tvs-audio': { name: 'TVs & Audio', description: 'TV and sound equipment in Kenya.', meta_title: 'TVs & Audio in Kenya', items: [a] }
 };
 const output = applyCategoryHubs(input);
 assert.deepEqual(output.fashion.items, [a, b]);
