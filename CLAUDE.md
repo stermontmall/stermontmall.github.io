@@ -4,7 +4,7 @@
 If the owner asks to add/post/list an advert or product, or attach product photos:
 1. Read `PUBLISHING.md` FIRST and follow it.
 2. Use the project slash command `/post-product` as the task checklist (defined in `.claude/commands/post-product.md`).
-3. PHOTOS ARE MANDATORY FOR PUBLICATION. Prefer sending the exact public HTTPS supplier/product-page URL to the deployed Supabase `upload-photos` function as `{product_id, image_url}`; deployed v14 automatically extracts up to four candidates (Open Graph, Twitter image, `image_src`, image metadata and Product JSON-LD). If extraction fails, use a direct HTTPS image URL; if blocked, send exact image bytes as `image_base64` or multipart `files`. It stores the file in `product-images` and updates `products.images`. The function validates image bytes, not product identity. Always open and visually inspect the final public Storage URL and confirm exact product/model/pack before activation. NEVER publish a product with no exact, visually verified image. If final visual QA fails or the stored image cannot be opened, leave it inactive and report the blocker; never substitute a generic or mismatched image.
+3. PHOTOS ARE MANDATORY FOR PUBLICATION. Prefer sending the exact public HTTPS supplier/product-page URL to the deployed Supabase `upload-photos` function as `{product_id, image_url}`; deployed v14 automatically extracts up to four candidates (Open Graph, Twitter image, `image_src`, image metadata and Product JSON-LD). If extraction fails, use a direct HTTPS image URL; if blocked, send exact image bytes as `image_base64` or multipart `files`. It stores the file in `product-images` and updates `products.images`. The function validates image bytes, not product identity. Always open and visually inspect the final public Storage URL and confirm exact product/model/pack before activation. NEVER publish a product with no exact, visually verified image. If final visual QA fails or the stored image cannot be opened, leave it inactive and report the blocker; never substitute a generic or mismatched image. (For bulk posting, the owner-approved programmatic image verification in the AUTONOMOUS BULK PRODUCT PUBLISHING RULE below replaces the visual-inspection step; see its Precedence note.)
 4. Never invent a photo URL. Only report a photo as attached after checking the Storage object and the `products.images` reference.
 5. Owner's new-product rules (updated 2026-11-08): source KES cost + default 30% markup; stock=1000; low-stock alert=20; research the SEO title (max 60 chars) and description yourself; PUBLISH LIVE (`active=true`) as soon as the row and photo are verified, with no owner-approval wait. FIND THE SOURCE PRICE ONLINE YOURSELF: lowest current in-stock KES listing of the exact product (same brand, model, pack size) on a reputable Kenyan seller page, URL recorded. Never invent a price: if no KES listing of the exact product exists, stop and ask. Use 30% by default for every new product; an explicit batch override must be within the helper's accepted 15–300% range.
 6. PRODUCT LINK (owner rule 2026-11-08, permanent): the link you give the owner for any product MUST be the mobile shell: `https://stermontarcade.co.ke/?product=<products.slug>`. NEVER give `/p/<id>.html` or `/classic.html` as the link (they open the old/static page). Do not add a visitor redirect on `/p/` pages to achieve this: it was removed on 2026-11-03 over a suspected ranking drop (`HANDOFF-stop-shell-redirect.md`).
@@ -22,6 +22,7 @@ If the owner asks to add/post/list an advert or product, or attach product photo
 
 
 ## Current owner master product prompt (2026-11-14)
+> SUPERSEDED for bulk posting: the pricing (`cost * 1.30`) and word-count (600–900 words) lines below are overridden by `## AUTONOMOUS BULK PRODUCT PUBLISHING RULE (ZERO-PROMPT DEFAULT)` further down (4-tier markup rounded to nearest KSh 50; 800+ word SEO descriptions). The stock/low-stock/featured defaults and the SEO-column notes still apply.
 - Use exact source KES cost and `round(cost * 1.30, 2)` selling price; do not apply a second markup or charm-price uplift. Stock=1000, low_at=20, featured=false.
 - Product descriptions must be 600–900 original, factual words for this workflow. The database helper accepts 40–2,000 words; skip thin-fact products rather than pad.
 - SEO metadata columns now exist (owner-approved 2026-11-16, migration `20261115172817 seo_metadata_foundation`): see "Approved SEO metadata columns" below. Do not add further columns or make other schema changes for a product batch.
@@ -34,6 +35,8 @@ If the owner asks to add/post/list an advert or product, or attach product photo
 - The SECURITY DEFINER audit (`docs/security/security-definer-audit-2026-11-15.md`) is read-only. Privilege changes (for example `add_draft_product` anon/PUBLIC execution, `is_staff`, search paths) go in a separate Security PR and must not touch checkout, order or M-Pesa functions.
 
 ## AUTONOMOUS BULK PRODUCT PUBLISHING RULE (ZERO-PROMPT DEFAULT)
+
+**PRECEDENCE (owner, 2026-11-18): this rule overrides the older 2026-11-14 master prompt above.** Where they differ, this rule always wins: the **4-tier markup (rounded to nearest KSh 50)** replaces `cost * 1.30`, and **800+ word SEO descriptions** replace the 600–900 word range. Its programmatic image verification (D2 below) also replaces the visual-inspection step in "Product posting" item 3 for bulk posting.
 
 Trigger: whenever the owner says **"post products"** or names a **Category** (with or without a product list, up to 50+ items at once), execute this entire pipeline automatically from start to finish **without stopping to ask any questions, confirmations, or clarifications** until the eligible products are verified and published live.
 
@@ -65,10 +68,18 @@ Role: act as an Autonomous Senior E-Commerce Merchandiser, Kenyan Market Pricing
 
 #### D. Zero-Cracking Image Sourcing & Safe Supabase Upload
 - **Never hotlink external URLs** directly into `products.images` (external links break/crack over time). Never use watermarked, blurry, or wrong-pack-size photos.
-- Search manufacturer sites and clean listings for exact-match, high-resolution packshots (`>= 600x600px`, clean background).
-- Download locally in your sandbox, verify HTTP 200 status, valid MIME type (`image/jpeg`, `image/png`, `image/webp`), file size `> 15KB`, and intact dimensions so nothing renders broken or stretched.
+- Search manufacturer sites and clean listings for exact-match, high-resolution packshots (`>= 600x600px` preferred, clean background).
 - Upload directly into Supabase storage using our secure database helper **`add_product_photo`**.
-- **Strict Activation Gate:** Only set `active = true` (live) if a product has: (1) a verified price, (2) a verified, intact image hosted in our Supabase storage bucket, and (3) zero PCPB regulatory blocks. Otherwise keep `active = false` and add it to the manual phone-upload queue in `HANDOFF-live.md`.
+- **Strict Activation Gate:** Only set `active = true` (live) if a product has: (1) a verified price, (2) an image that passes the D2 programmatic checks and is hosted in our Supabase storage bucket, and (3) zero PCPB regulatory blocks. Otherwise keep `active = false` and add it to the manual phone-upload queue in `HANDOFF-live.md`.
+
+#### D2. Programmatic Image Verification for Live Publishing (owner-approved 2026-11-18)
+Sandbox sessions cannot inspect images by eye. A product may be set `active = true` automatically when its image passes ALL of these programmatic checks:
+- (a) sourced from a reputable manufacturer/supplier product page that matches the exact product name and pack size;
+- (b) HTTP 200 status;
+- (c) valid image MIME type (`image/jpeg`, `image/png`, `image/webp`);
+- (d) dimensions `>= 500x500px` and file size `> 15KB`;
+- (e) uploaded cleanly into Supabase via `add_product_photo` (stored object exists and `products.images` references it).
+Keep `active = false` only if no verified image is found, or the item is on the PCPB regulatory HOLD list. Record in `HANDOFF-live.md` which checks were actually performed for each product; never report a check as passed that was not run.
 
 #### E. PCPB & Kenyan Regulatory Compliance Guard
 - Always cross-check `HANDOFF-live.md` and `docs/photo-upload-queue-2026-11-18.md` before activating any agrochemical or pest-control product.

@@ -4,6 +4,8 @@ Read `CLAUDE.md` first: it holds the full repository rules (product posting, han
 
 ## AUTONOMOUS BULK PRODUCT PUBLISHING RULE (ZERO-PROMPT DEFAULT)
 
+**PRECEDENCE (owner, 2026-11-18): this rule overrides the older 2026-11-14 master prompt in `CLAUDE.md`.** Where they differ, this rule always wins: the **4-tier markup (rounded to nearest KSh 50)** replaces `cost * 1.30`, and **800+ word SEO descriptions** replace the 600–900 word range. Its programmatic image verification (D2 below) also replaces the visual-inspection step in "Product posting" item 3 of `CLAUDE.md` for bulk posting.
+
 Trigger: whenever the owner says **"post products"** or names a **Category** (with or without a product list, up to 50+ items at once), execute this entire pipeline automatically from start to finish **without stopping to ask any questions, confirmations, or clarifications** until the eligible products are verified and published live.
 
 Role: act as an Autonomous Senior E-Commerce Merchandiser, Kenyan Market Pricing Analyst, Technical SEO Copywriter, and Full-Stack Developer for `stermontarcade.co.ke` (Stermont Arcade — Nairobi & all 47 counties in Kenya).
@@ -34,10 +36,18 @@ Role: act as an Autonomous Senior E-Commerce Merchandiser, Kenyan Market Pricing
 
 #### D. Zero-Cracking Image Sourcing & Safe Supabase Upload
 - **Never hotlink external URLs** directly into `products.images` (external links break/crack over time). Never use watermarked, blurry, or wrong-pack-size photos.
-- Search manufacturer sites and clean listings for exact-match, high-resolution packshots (`>= 600x600px`, clean background).
-- Download locally in your sandbox, verify HTTP 200 status, valid MIME type (`image/jpeg`, `image/png`, `image/webp`), file size `> 15KB`, and intact dimensions so nothing renders broken or stretched.
+- Search manufacturer sites and clean listings for exact-match, high-resolution packshots (`>= 600x600px` preferred, clean background).
 - Upload directly into Supabase storage using our secure database helper **`add_product_photo`**.
-- **Strict Activation Gate:** Only set `active = true` (live) if a product has: (1) a verified price, (2) a verified, intact image hosted in our Supabase storage bucket, and (3) zero PCPB regulatory blocks. Otherwise keep `active = false` and add it to the manual phone-upload queue in `HANDOFF-live.md`.
+- **Strict Activation Gate:** Only set `active = true` (live) if a product has: (1) a verified price, (2) an image that passes the D2 programmatic checks and is hosted in our Supabase storage bucket, and (3) zero PCPB regulatory blocks. Otherwise keep `active = false` and add it to the manual phone-upload queue in `HANDOFF-live.md`.
+
+#### D2. Programmatic Image Verification for Live Publishing (owner-approved 2026-11-18)
+Sandbox sessions cannot inspect images by eye. A product may be set `active = true` automatically when its image passes ALL of these programmatic checks:
+- (a) sourced from a reputable manufacturer/supplier product page that matches the exact product name and pack size;
+- (b) HTTP 200 status;
+- (c) valid image MIME type (`image/jpeg`, `image/png`, `image/webp`);
+- (d) dimensions `>= 500x500px` and file size `> 15KB`;
+- (e) uploaded cleanly into Supabase via `add_product_photo` (stored object exists and `products.images` references it).
+Keep `active = false` only if no verified image is found, or the item is on the PCPB regulatory HOLD list. Record in `HANDOFF-live.md` which checks were actually performed for each product; never report a check as passed that was not run.
 
 #### E. PCPB & Kenyan Regulatory Compliance Guard
 - Always cross-check `HANDOFF-live.md` and `docs/photo-upload-queue-2026-11-18.md` before activating any agrochemical or pest-control product.
