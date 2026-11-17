@@ -53,7 +53,7 @@ function renderBody(body, heading) {
       return '<p><strong>' + inline(question) + '</strong></p>' + (answer ? '<p>' + inline(answer) + '</p>' : '');
     }).join('');
     const faq = splitFaq(body);
-    if (faq) return faq.map(i => '<p><strong>' + inline(i.q) + '</strong></p><p>' + inline(i.a) + '</p>').join('');
+    if (faq) return faq.map(i => '<p><strong>' + inline(i.q) + '</strong><br>' + inline(i.a) + '</p>').join('');
   }
   const startsWithBullet = /^\s*[•●▪]/.test(body);
   const pieces = body.split(/\s*[•●▪]\s*/).map(x => x.trim()).filter(Boolean);
@@ -122,7 +122,7 @@ export function productDescriptionHtml(source) {
   while ((mh = markdownHeading.exec(raw))) hits.push({ start: mh.index, end: markdownHeading.lastIndex, heading: normalizeMarkdownHeading(mh[1].trim()) });
   for (const [heading, re] of LABELS) {
     re.lastIndex = 0; let m;
-    while ((m = re.exec(raw))) hits.push({ start: m.index, end: re.lastIndex, heading: normalizeMarkdownHeading(heading) });
+    while ((m = re.exec(raw))) hits.push({ start: m.index, end: re.lastIndex, heading });
   }
   hits.sort((a, b) => a.start - b.start);
 
