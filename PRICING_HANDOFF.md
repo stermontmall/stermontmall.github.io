@@ -278,3 +278,42 @@ No new variants were added. AgriGuard's Agrimec 18EC listing identifies 50ml, 10
 - `PRICING_HANDOFF.md` — this batch log.
 
 **Live status:** SQL is committed to the review branch only. It has not been applied to Supabase or the live storefront. Existing product IDs, slugs and URLs remain unchanged.
+
+
+---
+
+# Batch 1 — broader search recheck (2026-11-17)
+
+Reprocessed the 87 initially flagged records using short brand/core-name/pack queries, active ingredient queries where relevant, and Kenyan supplier/site searches. Search found 12 usable exact or close model/pack price references, including the 2 products below already matching their formula. These are price references, not supplier invoices. Where only a retail listing was available, estimated baseline = lowest matched Kenyan retail listing × 0.85 as instructed. Factory rates are identified separately.
+
+## Recheck results
+
+| Product ID | Baseline cost (KES) and method | Markup | Calculated retail (KES) | Competitor retail (KES) | Alert | Sources |
+|---|---:|---:|---:|---:|---|---|
+| 1-5kg-poultry-feeder-anti-scatter-ring | 119 (estimated retail less 15%) | 30% | 150 | 140 |  | https://www.ecochickspoultry.com/product-category/chicken-feeders/; https://www.fugaequipment.co.ke/feeders-drinkers-prices-kenya.html |
+| 10-litre-poultry-drinker-uv-resistant-stands-or-hangs | 484.5 (estimated retail less 15%) | 30% | 650 | 570 |  | https://mkulimajovial.co.ke/product-category/poultry/manual-drinkers/; https://www.myagrovet.co.ke/products.php?id=5709 |
+| 10-pack-6l-poultry-drinkers-uv-resistant-tehno-mss | 4,165 (estimated retail less 15%) | 30% | 5,400 | 4,900 |  | https://myagrovet.com/product/professional-6l-poultry-water-system-10-pack-uv-resistant-set; https://www.myagrovet.co.ke/products.php?cid=443&producer=82 |
+| 11l-plastic-poultry-drinker-with-red-base | 1,045.5 (estimated retail less 15%) | 30% | 1,350 | 1,230 |  | https://ecochickspoultry.com/product-category/chicken-drinkers/ |
+| 12v-dc-solar-surface-water-pump-25m-head | 8,330 (estimated retail less 15%) | 30% | 10,850 | 9,800 |  | https://juvalinnovations.co.ke/product/12v-dc-solar-surface-water-pump-25m-head/; https://metroequipment.co.ke/product/12v-dc-solar-surface-water-pump-25m-head/ |
+| 14-inch-heavy-duty-leather-welding-gloves-inner-lining | 382.5 (estimated retail less 15%) | 30% | 500 | 450 |  | https://www.nairobisafetyshop.org/product-category/ppe/ |
+| 2-stripes-reflective-vest-aa12 | 170 (estimated retail less 15%) | 30% | 200 | 200 |  | https://www.nairobisafetyshop.org/product-category/ppe/ |
+| 20-litre-poultry-bucket-with-automatic-cup-drinkers | 1,020 (estimated retail less 15%) | 30% | 1,350 | 1,200 |  | https://ecochickspoultry.com/product-category/chicken-drinkers/ |
+| 3-in-1-soil-tester-moisture-light-and-ph-no-battery-needed | 1,870 (estimated retail less 15%) | 30% | 2,450 | 2,200 |  | https://myagrovet.com/product/3-in-1-soil-ph-meter-moisturelightph-tester; https://www.myagrovet.co.ke/products.php?id=4983 |
+| 110m-submersible-dc-solar-water-pump-with-1100w-panel-kit | 83,300 (estimated retail less 15%) | 17.5% | 98,000 | 98,000 |  | https://juvalinnovations.co.ke/product/110m-submersible-dc-solar-water-pump-with-1100w-solar-panel-kit/; https://powerport.co.ke/product-category/water-pumps/solar-pumps/ |
+| 50-uv-shade-net-4m-x-50m-roll | 15,000 (published factory rate) | 30% | 19,500 | 18,000 |  | https://www.symnet.co.ke/solutions/agro-shade-nets; https://www.shadenets.co.ke/ |
+| 0-5-l-rabbit-water-bottle-with-stainless-steel-nipple | 400 (retail less 15%) | 30% | 520 | 490 | No change | https://myagrovet.com/product/premium-500ml-leak-proof-rabbit-water-bottle-with-steel-nipple; https://www.myagrovet.co.ke/products.php?id=5961 |
+| 4-stripped-orange-reflective-vest | 255 (retail less 15%) | 30% | 350 | 300 | No change | https://www.nairobisafetyshop.org/product-category/ppe/ |
+
+## Newly prepared changes
+
+11 more Batch 1 prices are now included in the guarded `pricing-batch-001.sql` script. Two additional products already match the formula and remain unchanged. No verified exact pack-size additions were found in this recheck. Existing slugs/URLs are unchanged.
+
+## Still requiring manual verification
+
+The other initially flagged Batch 1 products remain marked `[NEEDS MANUAL PRICE CHECK]` because no reliable exact model/pack supplier listing was found. This includes products where online results were only generic, unmatched capacity/specification, import estimates, unverified seller listings, or non-comparable models. The 87 original flags are not being silently cleared.
+
+## Important market comparison note
+
+The exact 1.5kg feeder is listed at KSh 140 by Fuga and KSh 180 by Ecochicks; its formula price is KSh 150 using a retail-minus-15% estimate. The 10L poultry drinker is listed at KSh 570 by Mkulima Jovial, KSh 700 by Ecochicks and KSh 750 by MyAgrovet; formula price KSh 650. The 50% shade-net 4m × 50m factory rate is KSh 15,000 at Symnet, with a KSh 18,000 retail comparison at Shadenets; formula price KSh 19,500. These calculated prices do not exceed the 15% alert threshold against multiple comparable retailers in the results found.
+
+**Live status:** The guarded SQL remains a branch artifact. No production prices were changed by this recheck.
