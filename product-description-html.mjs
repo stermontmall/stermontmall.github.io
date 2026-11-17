@@ -43,7 +43,7 @@ export function splitFaq(body) {
 
 function renderBody(body, heading) {
   if (/^Product Overview & Key Benefits$/i.test(heading)) {
-    body = String(body || '').replace(/^\\s*&\\s*Key Benefits\\b[\\s:—-]*/i, '').replace(/^\\s*Product Overview\\s*&\\s*Key Benefits\\b[\\s:—-]*/i, '');
+    body = String(body || '').replace(/^\s*&\\s*Key Benefits\\b[\s:—-]*/i, '').replace(/^\s*Product Overview\\s*&\\s*Key Benefits\\b[\s:—-]*/i, '');
   }
   if (heading.toLowerCase().includes('frequently asked questions') || heading.toLowerCase() === 'faqs') {
     const qLines = body.split(/\n+/).map(x => x.trim()).filter(Boolean);
