@@ -137,7 +137,7 @@ body{background:#faf8ff}
 #appbar>.relative{background:transparent}
 .brand-logo{display:flex;align-items:center;gap:5px;flex:0 0 auto;min-width:88px;text-decoration:none;color:var(--brand-purple);font-size:14px;font-weight:850;letter-spacing:-.65px;white-space:nowrap}
 .brand-logo img{width:31px;height:31px;object-fit:contain}
-.brand-logo span{background:linear-gradient(100deg,#4c1d95 10%,#7c3aed 58%,#15803d 100%);background-clip:text;-webkit-background-clip:text;color:transparent}
+.brand-logo span{display:flex;flex-direction:column;line-height:1;background:linear-gradient(100deg,#4c1d95 10%,#7c3aed 58%,#15803d 100%);background-clip:text;-webkit-background-clip:text;color:transparent}.brand-logo b{font-size:13px;font-weight:850}.brand-logo small{margin-top:3px;font-size:8px;font-weight:900;letter-spacing:2.1px;color:#15803d}
 #search{background:#f4efff;border:1px solid #e7ddf7}
 #search:focus{background:#fff;border-color:#a78bfa}
 #appbar .icon-btn{color:#4c1d95}
@@ -177,7 +177,7 @@ body{background:#faf8ff}
 <!-- ===== Header / app bar (sticky) ===== -->
 <header id="appbar" class="sticky top-0 z-30 bg-white shadow-sm" style="padding-top:env(safe-area-inset-top)">
   <div class="relative z-10 bg-white flex items-center gap-1 px-2 h-bar">
-    <a class="brand-logo" href="/" aria-label="Stermont Arcade home"><img src="/brand-mark.svg" alt="" width="32" height="32"><span>Stermont</span></a><button class="icon-btn" data-open="drawer-categories" aria-label="All categories"><svg class="w-6 h-6"><use href="#i-menu"/></svg></button>
+    <a class="brand-logo" href="/" aria-label="Stermont Arcade home"><img src="/brand-mark.svg" alt="" width="32" height="32"><span><b>Stermont</b><small>ARCADE</small></span></a><button class="icon-btn" data-open="drawer-categories" aria-label="All categories"><svg class="w-6 h-6"><use href="#i-menu"/></svg></button>
     <form id="search-form" role="search" class="relative flex-1">
       <input id="search" name="q" type="search" aria-label="Search the shop" enterkeyhint="search" autocomplete="off" placeholder="Search pest control, agrovet, phones..." class="w-full h-9 pl-9 pr-3 rounded-full bg-gray-100 text-sm outline-none focus:ring-2 focus:ring-brand/40 transition-[height] duration-200">
       <button type="submit" class="sr-only" aria-label="Submit search">Search</button>
