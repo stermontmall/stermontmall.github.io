@@ -963,3 +963,39 @@ All baselines are [RETAIL-ESTIMATE] (lowest matched in-stock Kenyan retail × 0.
 - Other unchanged products include Trevin Dudu Dust, Triger 5EC, Trinity Gold sizes not repriced, Tronic models not listed above, Tsavo seeds, Turbo sprayer, TVS items without exact references, Twigalaxyl, Twigamectin, TYMX speaker, Ullman mirror, smart watch, ultrasonic repeller, universal fly glue boards, UV tubes and lamps, UV-treated bird net, Uvuko sprayer, V-Multinor, Vanguard, Vaultex respirator, and remaining catalogue rows in this segment.
 
 No new pack variants were created. Existing product URLs/slugs are preserved. SQL: `supabase/sql/pricing-batch-015.sql` (guarded review-branch changes only; not applied to production). Product JSON-LD and sitemap refresh require applying catalogue SQL and running the product build. The generator uses the catalogue price for KES Product Offer schema, sets availability and one-year `priceValidUntil`, and updates sitemap `lastmod` when generated product HTML changes.
+
+
+---
+
+# Batch 14 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta skipped | 8 |
+| Price updates prepared | 8 |
+| New pack variants | 0 |
+| Needs manual price check / unchanged | 84 |
+
+Syngenta exclusions left untouched: Tatua Rat and Mice Poison Blocks; Tatua Advion 30g; Tatua Advion 4×30g; Tatua Demand 10CS 25ml; Tatua Klerat 100g; Tatua Zyrox 500g; Tervigo 020SC 5L; and Thiovit Jet Sulphur 1kg.
+
+## Price updates
+
+| Product | Pack | Baseline Cost (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Source Reference |
+|---|---|---:|---:|---:|---:|---|
+| tecno-camon-50-pro-8gb-256gb-20261108 | Existing pack | 35,700 [RETAIL-ESTIMATE] | 25% | 44,650 | 42,000 (avg 42,866) | https://www.phonetronicskenya.co.ke/brands/tecno-mobile; https://www.jumia.co.ke/tecno-official-store/; https://orifon.co.ke/brand/tecno/ (ex VAT) |
+| tecno-camon-50-8gb-256gb-20261108 | Existing pack | 28,050 [RETAIL-ESTIMATE] | 25% | 35,050 | 33,000 (avg 33,666) | https://www.phonetronicskenya.co.ke/brands/tecno-mobile; https://www.jumia.co.ke/tecno-official-store/; https://orifon.co.ke/brand/tecno/ (ex VAT) |
+| tecno-pop-20-4gb-64gb-20261108 | Existing pack | 12,579.15 [RETAIL-ESTIMATE] | 30% | 16,350 | 14,799 (avg 14,900) | https://www.kilimall.co.ke/store/TECNO-Official-Store; https://www.phonetronicskenya.co.ke/brands/tecno-mobile; https://orifon.co.ke/brand/tecno/ (ex VAT) |
+| tecno-spark-50-4g-4gb-128gb-20261108 | Existing pack | 15,809.15 [RETAIL-ESTIMATE] | 30% | 20,550 | 18,599 (avg 19,049) | https://www.kilimall.co.ke/store/TECNO-Official-Store; https://www.phonetronicskenya.co.ke/brands/tecno-mobile; https://orifon.co.ke/brand/tecno/ (ex VAT) |
+| tecno-spark-50-4g-8gb-256gb-20261108 | Existing pack | 19,550 [RETAIL-ESTIMATE] | 30% | 25,400 | 23,000 (avg 23,499) | https://www.phonetronicskenya.co.ke/brands/tecno-mobile; https://www.kilimall.co.ke/store/TECNO-Official-Store |
+| tecno-spark-50-pro-8gb-256gb-20261108 | Existing pack | 21,674.15 [RETAIL-ESTIMATE] | 25% | 27,100 | 25,499 (avg 25,499) | https://www.kilimall.co.ke/store/TECNO-Official-Store; https://www.phonetronicskenya.co.ke/brands/tecno-mobile |
+| tehno-mss-g010-10-litre-poultry-drinker | Existing pack | 637.5 [RETAIL-ESTIMATE] | 30% | 850 | 750 (avg 750) | https://www.myagrovet.co.ke/products.php?id=5709 |
+| total-twp215002-2hp-1500w-centrifugal-water-pump | Existing pack | 18,954.15 [RETAIL-ESTIMATE] | 30% | 24,650 | 22,299 (avg 22,649) | https://www.digitalstore.co.ke/products/total-twp215002-2hp-1500w-centrifugal-water-pump; https://shopit.co.ke/total-twp215002-2hp-centrifugal-water-pump |
+
+The six Tecno handset updates use exact storage/RAM models from the TECNO Official Store on Kilimall and Phonetronics Kenya. Orifon Nairobi prices are shown ex-VAT and were not used as the lowest baseline where an inc-VAT price was available. The Total TWP215002 pump update is based on two Kenyan retail listings for the same 2HP model. Tehno Mss G010 10L drinker is priced from MyAgrovet's exact model G010 at KSh750.
+
+## Needs Manual Price Check
+
+Other poultry drinkers/feeders remain unchanged where the calculated price would require a reduction that fails the 25%-above-average rule, or where only one exact supplier price was found and the existing price is already above the formula result. This includes Tehno Mss 1.5kg feeder duplicates, 6L/8L/9L drinkers, 9kg feeder, W6 6kg feeder/set of 10, rabbit drinkers, A42 nipple set, cow anti-kick bar, automatic bell drinker, and other models without a comparable second retailer. Remaining products include sprayers, pumps, PPE, seeds, household products and chemicals without exact current price/stock evidence. Tecno Spark Go 3 4GB/64GB remains manual because a reliable current exact-model Kenya price was not found. TCL 75C6K is retained because its current price is within the observed market range.
+
+SQL: `supabase/sql/pricing-batch-014.sql` (guarded, review branch only; not production). Existing slugs/URLs preserved.
