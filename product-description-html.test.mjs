@@ -1,6 +1,6 @@
 // Run: node product-description-html.test.mjs
 import assert from 'node:assert/strict';
-import { productDescriptionHtml, splitFaq } from './product-description-html.mjs';
+import { productDescriptionHtml, splitFaq, extractProductFaq } from './product-description-html.mjs';
 let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; };
 const heads = h => [...h.matchAll(/<h3>(.*?)<\/h3>/g)].map(m => m[1].replace(/&amp;/g, '&'));
 
@@ -54,3 +54,23 @@ const safetyUse = productDescriptionHtml('PRODUCT OVERVIEW\nA public-health prod
 assert.deepEqual(heads(safetyUse), ['Product overview', 'Safety information', 'Storage & handling']); n++;
 
 console.log(`product-description-html: ${n} checks passed`);
+
+
+// Markdown-formatted catalogue drafts are normalised into the seven storefront sections and four Q&As.
+const markdownGuide = '# Sample Insecticide — Price in Kenya ## Product overview A concise overview. A second sentence. ## Technical specifications & pack details • Brand: Sample • Pack size: 100 ml ## Where & how to use in Kenya Use only for a verified label-approved purpose. ## Safety, storage & handling guidelines Follow the current label and store securely. ## Buying & pack-size guide Compare the exact pack. Browse [fumigation chemicals](https://stermontarcade.co.ke/c/fumigation-chemicals.html). ## Delivery across Kenya & Nairobi pickup Pay by M-Pesa and confirm delivery. ## Frequently asked questions ### What pack size is listed? This listing is for 100 ml. ### What should I check before use? Read the approved product label. ### Can I pay by M-Pesa? Yes, use the site checkout. ### Where is pickup coordinated? Sarit Centre, Westlands, Nairobi.';
+const markdownHtml = productDescriptionHtml(markdownGuide);
+assert.deepEqual(heads(markdownHtml), [
+  'Product Overview &amp; Key Benefits',
+  'Technical Specifications &amp; Pack Details',
+  'Where &amp; How to Use in Kenya',
+  'Safety, Storage &amp; Handling Guidelines',
+  'Buying &amp; Pack-Size Guide',
+  'Delivery across Kenya &amp; Nairobi Pickup',
+  'Frequently Asked Questions'
+]); n++;
+const productFaq = extractProductFaq(markdownGuide);
+assert.equal(productFaq.length, 4); n++;
+ok(productFaq[0].q === 'What pack size is listed?' && productFaq[0].a === 'This listing is for 100 ml.', 'four authored FAQ pairs are extracted for JSON-LD');
+ok(/<a href="\/c\/fumigation-chemicals\.html">fumigation chemicals<\/a>/.test(markdownHtml), 'internal Markdown links render as safe links');
+const longParagraph = productDescriptionHtml('PRODUCT OVERVIEW\nOne sentence. Two sentences. Three sentences. Four sentences. Five sentences. Six sentences. Seven sentences.');
+ok((longParagraph.match(/<p>/g) || []).length >= 3, 'long text is split into paragraphs of at most three sentences');
