@@ -363,3 +363,13 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Added a regression test covering inline headings, all seven canonical headings, four FAQs, internal pricing/status suppression and service links.
 - Latest renderer commits: `6f06db92` (initial internal-section filtering), `47afa2b5` (retain source heading for filtering), `09f6f000` (suppress price calculations), `ebd5bc34` (expanded title mapping), `021bd0f3` (additional section-opening cues). Latest test commit: `56e0b6b3`.
 - The renderer and test pushes trigger `.github/workflows/product-pages.yml`. The available GitHub connection returned no commit status and does not expose manual workflow dispatch; therefore the automated build and live deployment still need a successful Actions run and generated-page inspection before being called complete.
+
+
+## 2026-11-18 — Final verification: Fumigation Chemicals descriptions
+- Corrected two last renderer edge cases found by inspecting generated HTML: the Product Overview heading no longer leaves a duplicate “& Key Benefits” paragraph, and comparison headings beginning with product names (e.g. Air Chopper) now map into the Buying & Pack-Size Guide section.
+- Latest product-pages workflow run: [Build product pages #44203479444](https://github.com/stermontmall/stermontmall.github.io/actions/runs/44203479444) — completed successfully. The product-description renderer tests, all other workflow tests, live catalogue generation, sitemap generation, save/push step, active-product page guard, and IndexNow submission step all completed successfully.
+- Generated page/sitemap commit: `07b383a236970505be7860c5be826462d5328560`.
+- Inspected all 10 active category-37 product HTML pages. Each has all seven canonical H3 sections, exactly one FAQPage JSON-LD block, no duplicate overview title text, and no visible supplier-price/baseline/markup calculations or internal listing-status notes.
+- The 10 inactive records remain inactive; their descriptions are still stored and will use the same renderer when later activated. No chemical rates or label directions were invented.
+- Supabase audit remains: 20 product records, 10 active + 10 inactive, 1,096–1,401 whitespace-separated words per description, exactly four Q: FAQ markers each. The original claim that these were 350–486 words was inaccurate; they already exceeded the 800-word target, so no filler was added.
+- Canonical permanent section labels remain in `AGENTS.md`, `CLAUDE.md`, `rules/publishing-rule.json`, and Supabase `publishing_rules` / `publishing_rule_configs`. `public.store_publishing_rules` is not present in this project.
