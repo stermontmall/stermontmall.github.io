@@ -4,6 +4,13 @@ Date: 2026-11-15 (Africa/Nairobi)
 Repository: stermontmall/stermontmall.github.io
 Working branch: wip/seo-batch2-2026-11-15
 
+## 2026-11-18 00:40 (Africa/Nairobi) — Security PR: lock down `stm_send_email` (branch `wip-security-revoke-send-email`)
+- Done: read-only review. `public.stm_send_email(text,text,text,text,text,text)` is SECURITY DEFINER, ungated, does an outbound HTTP POST, and is executable by PUBLIC/anon/authenticated, so anyone could send email as the store. Only the `orders_send_emails` trigger calls it (as owner postgres). The five staff RPCs (`record_sale`, `reverse_sale`, `restock_product`, `record_loss`, `admin_list_accounts`) all check `is_staff()` inside, so no change needed.
+- Added `supabase/sql/security_revoke_send_email_public.sql` (revoke from public, anon, authenticated; keep service_role; verify and rollback lines included) and `docs/security/security-definer-followup-2026-11-18.md`. NOT applied to the live database.
+- Not touched: `stm_order_email_trg()` (order function, not exploitable as an RPC), checkout/order/voucher/tracking/review/M-Pesa/card functions.
+- Next: owner reviews the PR; after merge apply the SQL file as a migration, run the verify query, place one test order and confirm a new `email_log` row plus the "received" email. Rollback: the `grant ... to anon, authenticated` line in the SQL file.
+- Blocked / dashboard only: Supabase Auth "Leaked password protection" is off; enable it in the Supabase dashboard (not a migration).
+
 ## 2026-11-15 13:50 (Africa/Nairobi) — PR #776 `validate` job fix (branch `feat/final-cro-trust-service-pages`)
 Failing step in the SEO pull request quality gate (run 43703801865, read with `gh run view 43703801865 --log-failed`): "Run mobile shell browser regression suite" (`python3 mobile-shell/shell.test.py`), 2 FAIL lines then `TimeoutError ... waiting for locator("#grid .card[data-id]")` at line 598. The same failure reproduces on a clean `main` checkout, so it was not caused by the PR's one-line `app.js` change.
 - Done: `mobile-shell/shell.test.py` — the tests were stale against two owner-approved behaviours already in `app.js` / the early script: (1) the shell address after `/?cat=<slug>` is the clean `/c/<slug>.html` (catUrl, owner 2026-11-09), not `/`; (2) a phone reloading that address is sent back to `/?cat=<slug>` by the `stm-early` script, which skips bot and "headless" user agents, so the reload test now uses an ordinary phone user agent and serves a generated category page for every `/c/<slug>.html`. Result locally: 171/171 pass (only the sandbox's blocked outbound image requests, `ERR_TUNNEL_CONNECTION_FAILED`, had to be ignored in a throwaway copy that was not committed).
