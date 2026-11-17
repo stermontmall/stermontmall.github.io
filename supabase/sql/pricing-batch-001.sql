@@ -17,9 +17,8 @@ begin
       ('64-egg-automatic-incubator-with-digital-controls', 16900.00::numeric, 15600.00::numeric),
       ('64-egg-incubator-wq-jf-64-220v-or-12v-auto-turning', 19110.00::numeric, 19100.00::numeric),
       ('528-egg-commercial-automatic-incubator', 71500.00::numeric, 66000.00::numeric),
-      ('1056-egg-fully-automatic-commercial-incubator', 104000.00::numeric, 76400.00::numeric),
+      ('1056-egg-fully-automatic-commercial-incubator', 104000.00::numeric, 76500.00::numeric),
       ('abalone-18ec-insecticide-50ml', 199.00::numeric, 200.00::numeric),
-      ('accent-600sc-insecticide-50ml', 650.00::numeric, 650.00::numeric),
       ('4pcs-sticky-ribbon-fly-catcher-trap', 599.00::numeric, 600.00::numeric)
     ) as v(product_id, expected_price, new_price)
   loop
