@@ -108,7 +108,7 @@ jobs:
           const d = new Date(); d.setFullYear(d.getFullYear() + 1);
           const expectedValidUntil = d.toISOString().slice(0,10);
           const sitemap = readFileSync('sitemap-products.xml','utf8');
-          const sitemapEntries = new Map([...sitemap.matchAll(/<url>\s*<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>\s*<\/url>/g)].map(m => [m[1],m[2]]);
+          const sitemapEntries = new Map([...sitemap.matchAll(/<url>\s*<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>\s*<\/url>/g)].map(m => [m[1],m[2]]));
           const files = readdirSync('p').filter(x => x.endsWith('.html'));
           for (const file of files) {
             const html = readFileSync('p/' + file,'utf8');
