@@ -171,11 +171,11 @@ jobs:
             const found = productsBySku.get(id);
             if (!found) continue;
             const url = [...affectedCanonicalUrls].find(candidate => {
-              const pathname = new URL(candidate).pathname.replace(/^\/+/, '');
+              const pathname = new URL(candidate).pathname.slice(1);
               return pathname === 'p/' + found.file;
             });
             if (!url) { fail('Missing canonical sitemap URL for affected product ' + id); lastmodErrors++; continue; }
-            const pathname = new URL(url).pathname.replace(/^\/+/, '');
+            const pathname = new URL(url).pathname.slice(1);
             const baselineFile = path.join('/tmp/main-pages', pathname);
             const currentFile = path.join('.', pathname);
             if (!fs.existsSync(currentFile)) { fail('Missing generated HTML for affected product ' + id + ': ' + pathname); lastmodErrors++; continue; }
