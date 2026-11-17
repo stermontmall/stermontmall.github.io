@@ -318,3 +318,5 @@ jobs:
 # 2026-11-12: rebuild active mosquito door-screen catalogue entries.
 
 # 2026-11-12: rebuild mosquito door-screen pages after replacing size-matched product photos.
+
+# 2026-11-17: rebuild product pages after correcting Rentokil Lumnia Compact glueboard variant descriptions and SEO metadata in Supabase.
