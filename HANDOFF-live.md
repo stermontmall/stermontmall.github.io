@@ -1,3 +1,86 @@
+## 2026-11-18 — Fumigation Chemicals batch 20: 20 complete draft records
+
+### Final batch result
+- Category: `Fumigation Chemicals`, category_id `37`.
+- Created **20 new product records**. Category now has **33 total products: 13 existing live products + 20 new inactive drafts**.
+- No existing product was edited. No Syngenta product was added or repriced.
+- Every new record has `stock=1000`, `low_at=20`, `active=false`, a unique pack-specific name/unit, an original description over 800 words, SEO title, meta description, keywords and alt text.
+- All 20 baseline costs were verified from an exact-pack Kenyan retail listing and set to 85% of that retail price. All baselines fall below KSh 20,000, so the +30% tier applies. Final prices were rounded to the nearest KSh 50 and checked against the KSh 200 floor and 15% minimum margin floor.
+- Final Supabase audit passed: 20/20 in category 37; correct stock defaults; all inactive; all descriptions >=800 words; SEO title <=60 characters; meta description <=155 characters; every price meets the margin floor, KSh 200 floor, nearest-KSh-50 rounding and the applicable 30% tier calculation.
+- **Images:** 12 product image uploads succeeded and 8 could not be fetched. The upload function checks/downloads image bytes and stores them; it does **not** verify that the photo depicts the exact product/pack. No visual exact-pack QA was available, so all 20 remain inactive. Do not activate solely because the upload endpoint returned `ok:true`.
+- Before activation, visually check all 12 stored images against the exact pack size and label; replace or attach exact images for the 8 missing-photo SKUs; refresh source prices/availability; confirm the physical Kenyan label and PCPB use restrictions.
+
+### Product and pricing ledger
+Retail source prices below are KSh. Baseline = retail x 0.85. Final price = baseline x 1.30, rounded to nearest KSh 50 and then floored at KSh 200.
+
+| Product / exact pack | Retail source (KES) | Baseline cost | Final price | PCPB register | Image |
+|---|---:|---:|---:|---|---|
+| SCUD 5 WP 20g | 899 | 764.15 | 1,000 | PCPB(CR)1808 | Uploaded; visual QA pending |
+| Navigator 100SC 20ml | 200 | 170.00 | 200 | PCPB(CR)1268 | Uploaded; visual QA pending |
+| Hygienic 7.5% SC 100ml | 480 | 408.00 | 550 | PCPB(CR)1648-P(i) | Uploaded; visual QA pending |
+| Air Chopper 7.5% SC 15ml | 150 | 127.50 | 200 | PCPB(CR)1648 | Uploaded; visual QA pending |
+| Kilex 0.5 Gel 5g | 800 | 680.00 | 900 | PCPB(CR)2393 | Not uploaded (Jiji/Jumia HTTP 403) |
+| Mende Mo Fire 5g | 99 | 84.15 | 200 | PCPB(CR)1810 | Uploaded; visual QA pending |
+| Punisher 8.5% TA 20g | 270 | 229.50 | 300 | PCPB(CR)1774 | Uploaded; visual QA pending |
+| Hafeton 100 SC 100ml | 999 | 849.15 | 1,100 | PCPB(CR)1932 | Not uploaded (Jumia HTTP 403) |
+| Punisher 8.5% TA 500g | 5,775 | 4,908.75 | 6,400 | PCPB(CR)1774 | Uploaded; visual QA pending |
+| SCUD 5 WP 100g | 1,699 | 1,444.15 | 1,900 | PCPB(CR)1808 | Uploaded; visual QA pending |
+| Air Chopper 7.5% SC 30ml | 999 | 849.15 | 1,100 | PCPB(CR)1648 | Uploaded; visual QA pending |
+| Air Chopper 7.5% SC 100ml | 1,499 | 1,274.15 | 1,650 | PCPB(CR)1648 | Not uploaded (Jumia HTTP 403) |
+| Hafeton 100 SC 1L | 5,999 | 5,099.15 | 6,650 | PCPB(CR)1932 | Uploaded; visual QA pending |
+| Mende Mo Fire 250g | 2,505 | 2,129.25 | 2,750 | PCPB(CR)1810 | Uploaded; visual QA pending |
+| Air Chopper 7.5% SC 15ml 3-pack | 799 | 679.15 | 900 | PCPB(CR)1648 | Not uploaded (Jumia HTTP 403) |
+| Hygienic 7.5% SC 20ml | 999 | 849.15 | 1,100 | PCPB(CR)1648-P(i) | Not uploaded (Jumia HTTP 403) |
+| Osefin 7.5 WP 200g | 699 | 594.15 | 750 | PCPB(CR)1394 | Not uploaded (Imagine Care HTTP 403) |
+| Sevin Dudu Dust 200g | 160 | 136.00 | 200 | PCPB(CR)0828 | Uploaded; visual QA pending |
+| Osefin 7.5 WP 100g | 499 | 424.15 | 550 | PCPB(CR)1394 | Not uploaded (Imagine Care HTTP 403) |
+| Pareto Roach Spray 1L | 1,310 | 1,113.50 | 1,450 | PCPB(CR)1953 | Not uploaded (marketplace timeout; refresh price before activation) |
+
+### Supplier price source URLs
+- SCUD 5 WP 20g — Cheapthings: https://cheapthings.co.ke/product/scud-5-wp-20g/
+- Navigator 100SC 20ml — Agropests: https://agropests.com/products/navigator-100sc-20ml
+- Hygienic 7.5% SC 100ml — Agropests: https://agropests.com/products/hygienic-75percent-sc-100ml
+- Air Chopper 7.5% SC 15ml — AgriGuard: https://agriguardagrovet.co.ke/product/air-chopper-7-5-sc/
+- Kilex 0.5 Gel 5g — AECARE Agrochemicals Jiji listing: https://jiji.co.ke/nairobi-central/household-chemicals/kilex-0-5-cockroach-gel-insecticide-5-grams-uPEdUCz5kxXEpHNk2nA0Y86R.html
+- Mende Mo Fire 5g — Jumia: https://www.jumia.co.ke/generic-mende-mo-fire-5g-250719335.html
+- Punisher 8.5% TA 20g and 500g — Farm Rescue: https://www.farmrescue.co.ke/product/punisher-85-ta-tablet
+- Hafeton 100 SC 100ml — Imagine Care listing: https://imaginecare.co.ke/product-tag/pests/
+- SCUD 5 WP 100g — Cheapthings: https://cheapthings.co.ke/product/scud-5-wp-100g/
+- Air Chopper 7.5% SC 30ml — Imagine Care: https://imaginecare.co.ke/pest-control/flea-control/
+- Air Chopper 7.5% SC 100ml and 15ml three-pack — Imagine Care: https://imaginecare.co.ke/product-category/bed-bug-solutions/
+- Hafeton 100 SC 1L — Cheapthings: https://cheapthings.co.ke/product/hafeton-100-sc-1l/
+- Mende Mo Fire 250g — Kilimall: https://www.kilimall.co.ke/listing/1001224794-Mende-Mo-Fire-250g
+- Hygienic 7.5% SC 20ml — Jumia: https://www.jumia.co.ke/generic-hygienic-7.5-sc-20ml-315503845.html
+- Osefin 7.5 WP 100g and 200g — Imagine Care listing: https://imaginecare.co.ke/shop/page/17/?product-page=lesawkbcl&product_count=60&product_orderby=popularity&product_view=list
+- Sevin Dudu Dust 200g — Naivas Online: https://www.naivas.online/sevin-dudu-dust-200g
+- Pareto Roach Spray 1L — Kilimo Buz / PPCK listing: https://asdspmarketinfo.kilimo.go.ke/product-detail/441 (exact 1L price shown; listing is older, refresh before activation)
+
+### Stored image URLs (upload succeeded; not yet visually verified)
+- Air Chopper 7.5% SC 15ml: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/air-chopper-7-5-sc-15ml.jpg
+- Air Chopper 7.5% SC 30ml: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/air-chopper-7-5-sc-30ml.png
+- Hafeton 100 SC 1L: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/hafeton-100-sc-1l.png
+- Hygienic 7.5% SC 100ml: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/hygienic-7-5-sc-100ml.png
+- Mende Mo Fire 250g: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/mende-mo-fire-250g.webp
+- Mende Mo Fire 5g: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/mende-mo-fire-5g.png
+- Navigator 100SC 20ml: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/navigator-100sc-20ml.png
+- Punisher 8.5% TA 20g: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/punisher-8-5-ta-20g.jpg
+- Punisher 8.5% TA 500g: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/punisher-8-5-ta-500g.jpg
+- SCUD 5 WP 100g: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/scud-5-wp-100g.png
+- SCUD 5 WP 20g: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/scud-5-wp-20g.png
+- Sevin Dudu Dust 200g: https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/sevin-dudu-dust-200g.jpg
+
+### Remaining first-five candidate
+- DRAGON 5 WP: PCPB(CR)1807 appears in the public-health register and Osho confirms 20g and 100g packs, but its official product page still gives a combined KSh 102–475 range. No exact pack-specific price was found from a reliable current Kenyan listing. No Dragon product was created and no price was inferred. Resume by finding an exact 20g or 100g price; keep this outside the completed 20 until verified.
+
+### Next actions
+1. Manually verify the 12 stored images against the exact pack size and visible label; do not activate based on HTTP 200 alone.
+2. Find direct image URLs or alternative suppliers for the 8 missing-photo products.
+3. Refresh Pareto 1L price and all other supplier stock/price checks before any activation.
+4. Verify the physical product label and PCPB registration/use for each pack, especially exact pack and site restrictions.
+5. Activate only after the exact pack photo and regulatory checks pass.
+
+---
+
 ## 2026-11-18 — Fumigation Chemicals batch 20 (owner-approved draft fallback)
 ### Execution rule for this batch
 - Do not abort the full run because one candidate has a price range or an unverified image. Continue to the next candidate. Create a product only after an exact pack-size KES price is evidenced. If exact pack price is unresolved, record the candidate as blocked and continue; never infer a price from the range endpoints.
