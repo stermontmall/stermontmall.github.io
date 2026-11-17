@@ -1143,7 +1143,7 @@ SQL record: supabase/sql/pricing-batch-018.sql (no-op audit record; no product d
 | Active non-Syngenta products verified already at correct formula price | 4 |
 | Inactive non-Syngenta products retained unchanged | 84 |
 
-The 205 prepared price updates cover 205 unique active product IDs after removing the duplicate Samsung 43U8000F row from Batch 14; that TV update is assigned to Batch 13. The 28 new pack variants have unique IDs checked against the catalogue. All updates are protected by expected-current-price guards; new variants use idempotent inserts. These are staged branch changes, not production writes.
+The 205 prepared price updates cover 205 unique active product IDs after removing the duplicate Samsung 43U8000F row from Batch 14; that TV update is assigned to Batch 13. The 25 new pack variants have unique IDs checked against the catalogue. All updates are protected by expected-current-price guards; new variants use idempotent inserts. These are staged branch changes, not production writes.
 
 **Branch status:** all 18 batch SQL files and this handoff are committed to `pricing/non-syngenta-market-review-20261117`, based on `main`. No merge to `main` has been performed. Existing product URLs/slugs are preserved. No production database prices or storefront pages have been changed.
 
@@ -1154,9 +1154,9 @@ The 205 prepared price updates cover 205 unique active product IDs after removin
 
 ## Final reconciliation and profit-floor check
 
-The SQL files contain **204 actual price changes** across 204 unique existing product records; one no-op Accent 600SC line was removed from the SQL and moved to the verified-no-change list. The 1056-egg incubator price was raised from KSh76,400 to KSh76,500: at a KSh65,000 baseline, KSh76,400 produces a 14.92% gross margin, just below the strict 15% floor. KSh76,500 clears the 15% floor after KSh50 rounding. The 110m solar pump at KSh98,000 has a 15.00% gross margin on its KSh83,300 baseline.
+The SQL files contain **205 actual price changes** across 205 unique existing product records; one no-op Accent 600SC line was removed from the SQL and moved to the verified-no-change list. The 1056-egg incubator price was raised from KSh76,400 to KSh76,500: at a KSh65,000 baseline, KSh76,400 produces a 14.92% gross margin, just below the strict 15% floor. KSh76,500 clears the 15% floor after KSh50 rounding. The 110m solar pump at KSh98,000 has a 15.00% gross margin on its KSh83,300 baseline.
 
-Weighted by the staged markup tiers, the estimated average gross margin across the 204 existing-product price changes is approximately **22.7%** before payment fees, delivery, tax treatment and operating expenses. This is a gross margin calculation, not net profit. The 17.5% markup tier mathematically gives about 14.9% gross margin before rounding, so the strict 15% floor is enforced by rounding up where needed.
+Weighted by the staged markup tiers, the estimated average gross margin across the 205 existing-product price changes is approximately **22.7%** before payment fees, delivery, tax treatment and operating expenses. This is a gross margin calculation, not net profit. The 17.5% markup tier mathematically gives about 14.9% gross margin before rounding, so the strict 15% floor is enforced by rounding up where needed.
 
 | Batch SQL | Actual existing-product price changes | New pack variants |
 |---|---:|---:|
