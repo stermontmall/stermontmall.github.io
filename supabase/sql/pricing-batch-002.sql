@@ -14,7 +14,6 @@ begin
       ('agromectin-18-ec-insecticide-50ml', 299.00::numeric, 300.00::numeric),
       ('agroz-bag-plus-hermetic-grain-storage-bag-100kg', 350.00::numeric, 400.00::numeric),
       ('aico-0-5hp-deep-well-submersible-pump-80m-head', 19498.70::numeric, 24050.00::numeric),
-      ('aico-japan-ac767-4-25l-4-stroke-petrol-knapsack-sprayer', 24700.00::numeric, 27500.00::numeric),
       ('ailyons-2-in-1-blender-with-grinder-1-6l-4-speed-safety-lock', 1399.00::numeric, 1900.00::numeric),
       ('albafas-10-albendazole-drench-1-litre', 1050.00::numeric, 1150.00::numeric)
     ) as v(product_id, expected_price, new_price)
