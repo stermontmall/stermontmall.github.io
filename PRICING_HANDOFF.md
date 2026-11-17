@@ -818,3 +818,45 @@ No additional variants were created beyond the four above. Existing product slug
 The four Ramtons reductions are supported by multiple exact-model retail observations and the existing price is more than 25% above the market average. PH1 and Promax are increases using exact pack listings. All six changes have expected-price guards and update the estimated cost baseline in the same SQL transaction.
 
 **Corrected Syngenta count:** Quadris 50WG 20g is also a Syngenta product and is included in the 4-SKU exclusion total; it remains untouched.
+
+
+---
+
+# Batch 13 — products 1201–1300 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta products skipped | 8 |
+| Existing product prices updated | 0 |
+| New pack variants prepared | 3 |
+| Needs manual price check / unchanged | 92 |
+
+**Syngenta exclusions (untouched):** Revus 250SC 1L and 100ml; Ridomil Gold MZ 68WG 1kg, 250g and 50g; Score 250EC 20ml and 1L; Servian 75WG 50g. These are confirmed by Syngenta's Kenya product catalogue and/or Syngenta vendor branding. Ransom 600WP is a Greenlife Crop Protection product, not Syngenta; Ranger 480EC is a Greenlife product, and Real IPM lines are not Syngenta.
+
+## New pack variants prepared — Ransom 600WP
+
+| Product | Pack | Supplier retail (KES) | Baseline (KES) | Markup | New website price (KES) | Competitor retail (KES) | Source |
+|---|---|---:|---:|---:|---:|---:|---|
+| Ransom 600 WP Fungicide | 100g | 475 | 403.75 | 30% | 525 | 475 | https://www.farmrescue.co.ke/product/ransom-600-wp |
+| Ransom 600 WP Fungicide | 250g | 880 | 748.00 | 30% | 950 | 880 | https://www.farmrescue.co.ke/product/ransom-600-wp |
+| Ransom 600 WP Fungicide | 1kg | 3,245 | 2,758.25 | 30% | 3,600 | 3,245 | https://www.farmrescue.co.ke/product/ransom-600-wp |
+
+All three are [RETAIL-ESTIMATE] baselines (exact in-stock Kenyan retail × 0.85), not wholesale quotes. Formula outputs are rounded to KSh50. The existing 30g product remains at KSh150; Farm Rescue lists it at KSh145, and the formula-derived price rounds to KSh150. The 30g listing is attached to a shared Ransom variant group without changing its slug. New variants have blank image arrays until exact pack photos can be obtained; no wrong-size product image is reused.
+
+## Verified / unchanged observations
+
+- Raptor 1.92EC 50ml: M-Tolori KSh250; current KSh350. Single supplier observation only; no reduction without a defensible multi-retailer market average.
+- Raptor 1.92EC 100ml: M-Tolori KSh460; current KSh599. Single supplier observation only; unchanged.
+- Mazao Campaign 1L: Agroduka KSh12,000 in stock vs current KSh15,600; one exact supplier observation, so unchanged.
+- Mazao Regain 1L: Agroduka KSh1,800 in stock vs current KSh2,350; one exact supplier observation, so unchanged.
+- Mazao Sustain 1L: Agroduka KSh2,400 in stock vs current KSh3,150; one exact supplier observation, so unchanged.
+- Rebune 20W insect killer: Homelux KSh5,200 listing is backordered, so not used as an in-stock baseline.
+- Urea 46% N 50kg: Mkulima Supply Store KSh3,500, FarmShield KSh4,800, Dawn Farmers KSh5,400; current KSh4,450 is within the observed market range and not >25% above the average. Formula would be lower than current, so retain the existing price under the reduction guard.
+- Ranger 480EC pack range is listed by Chemsasa, but the returned page does not unambiguously map prices to exact packs; do not add speculative pack variants.
+
+## Needs Manual Price Check / unchanged
+
+All other non-Syngenta products in this 100-row segment remain unchanged pending exact pack/stock confirmation, including household appliances, vehicle sourcing advert, Ranger 480EC 1L, Ransom 30g (verified and already near formula price), Raptor 50ml/100ml, Rashnik blender, rat traps and baits, Real IPM Mazao products, Rebune 20W lamp, rechargeable mosquito rackets, Red Top fly trap, Redmi earbuds, footwear, PPE vest, Reliable Amito 100g/250g, Rentokil glueboards, mosquito mesh, Resolve 6 dust, egg tray, Rimeta Gold, tomato seeds, Riomax, Roch microwave, rodent baits, Rootex, Urea, Russell IPM glue rolls, Ryobi sprayers, aerosol dispenser, SAAF packs, basil seeds, salinomycin feed additive, Samsung devices, SanDisk drive, maize seeds, Score (excluded), poultry nipple, Segatron, Selecta sprayers, screen repair tape, sorghum seeds, Sevin dust, tracksuits, UV tubes, livestock tags, Shenke mats, Shotgun, pepper seeds, Skilltech mount, Skipper, Skyworth TV, household drinkware, snail control, snake tongs, soil tester, wasp traps, Solo sprayers, Solubor and all other remaining rows not listed above.
+
+No additional packs were created except the three Ransom sizes with explicit in-stock prices. Existing slugs/canonical URLs are preserved. SQL: `supabase/sql/pricing-batch-013.sql` (review branch only; not applied to production). Product JSON-LD and sitemap files need the product build after SQL application; the generator sets KES offer price from catalogue data, includes one-year priceValidUntil and updates per-URL sitemap lastmod on changed generated HTML.
