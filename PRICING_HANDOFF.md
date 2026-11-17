@@ -338,3 +338,40 @@ Re-searched the 77 initially flagged records using brand/core product/pack-size 
 Algreen Bonzin is listed in a price range KSh370–1,170, but the 1L variant price is not unambiguously separated in the listing, so its current price remains unchanged and flagged. Hynitro 42 1L, Planta-P 1L and Supa-K 1L are separately priced by AgriJibu. The AICO AC767-4 is listed by MyAgrovet and several Jumia sellers at KSh18,500–21,000; the lowest matching retail listing was used for the retail-minus-15% estimate. Agroduka confirms Alonze 50EC 1L in stock at KSh7,930.
 
 **Batch 2 revised counts:** 100 scanned; 15 Syngenta exclusions; 15 price updates prepared in total (8 initial + 7 recheck); 70 still needing manual price checks; 0 new pack variants. No live database prices were changed.
+
+
+---
+
+# Batch 3 — 2026-11-17
+
+Scanned the next 100 active catalogue records (alphabetical order, offset 200). Syngenta products excluded: Amistar 250 SC 5L, Amistar Top 325 SC 5L, Amistar Xtra 280 SC 5L, Alto 100 SL 250ml, Ampligo 150 ZC (1L, 100ml, 250ml, 50ml), Apron Star 42 WS (10g, 1kg), and Artea 330 EC 5L. The exclusion count is 11.
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta skipped | 11 |
+| Verified supplier/retail-benchmark price updates prepared | 11 |
+| Remaining manual checks | 78 |
+| New pack variants | 0 |
+
+## Batch 3 pricing updates
+
+Baseline values below use the lowest matching Kenyan retail price less 15% where no wholesale price was published. They are estimates, not supplier quotes.
+
+| Product ID | Baseline (KES) and method | Markup | Calculated retail (KES) | Competitor retail (KES) | Competitor check | Sources |
+|---|---:|---:|---:|---:|---|---|
+| aliette-wg80-systemic-fungicide-1kg | 4,233 (AgriJibu retail KSh4,980 less 15%) | 30% | 5,500 | 4,980 | No alert: under 15% vs lowest listed competitor | https://agrijibu.co.ke/aliette-wg80/; https://dawnfarmers.com/shop/crop-production/fungicides/aliette-wg80-1kg/; https://agroduka.ke/aliette-wg80-1kg/ |
+| alpha-king-10-ec-insecticide-50ml | 131.75 (Farm Rescue in-stock retail KSh155 less 15%) | 30% | 150 | 155 | No alert: under 15% vs lowest listed competitor | https://www.farmrescue.co.ke/product/alpha-king-10-ec |
+| alpha-king-insecticide-1l | 1,921 (Farm Rescue in-stock retail KSh2,260 less 15%) | 30% | 2,500 | 2,260 | No alert: under 15% vs lowest listed competitor | https://www.farmrescue.co.ke/product/alpha-king-10-ec |
+| aluminium-milking-can-20l | 7,225 (Mkulima Jovial retail KSh8,500 less 15%) | 30% | 9,400 | 8,500 | No alert: under 15% vs lowest listed competitor | https://mkulimajovial.co.ke/price-list/ |
+| amimax-720-wp-fungicide-1kg | 1,500.25 (AgriJibu retail KSh1,765 less 15%) | 30% | 1,950 | 1,765 | No alert: under 15% vs lowest listed competitor | https://agrijibu.co.ke/brand/amiran-kenya-limited/ |
+| aminika-wh403-hybrid-maize-seeds-2kg | 680 (AgriJibu retail KSh800 less 15%) | 30% | 900 | 800 | No alert: under 15% vs lowest listed competitor | https://agrijibu.co.ke/seeds/cereals-seeds/maize-seeds/; https://westernseedcompany.com/home/shop |
+| aminika-wh504-hybrid-maize-seeds-2kg | 680 (AgriJibu retail KSh800 less 15%) | 30% | 900 | 800 | No alert: under 15% vs lowest listed competitor | https://agrijibu.co.ke/seeds/cereals-seeds/maize-seeds/; https://westernseedcompany.com/home/shop |
+| aminika-wh507-hybrid-maize-seeds-2kg | 697 (Western Seed retail KSh820 less 15%) | 30% | 900 | 820 | No alert: under 15% vs lowest listed competitor | https://westernseedcompany.com/home/shop; https://agrijibu.co.ke/seeds/cereals-seeds/maize-seeds/ |
+| aminika-wh508-hybrid-maize-seeds-2kg | 697 (Western Seed retail KSh820 less 15%) | 30% | 900 | 820 | No alert: under 15% vs lowest listed competitor | https://westernseedcompany.com/home/shop; https://agrijibu.co.ke/seeds/cereals-seeds/maize-seeds/ |
+| ampia-gas-brooder | 6,375 (Mkulima/Masters/Mwamu retail KSh7,500 less 15%) | 30% | 8,300 | 7,500 | No alert: under 15% vs lowest listed competitor | https://mkulimajovial.co.ke/product/gas-warmer-chicken-brooders/; https://www.mastershardwares.co.ke/product/ampia-gas-brooder; https://mwamupoultry.co.ke/shop/?filter_cat=255 |
+| ariane-ec-herbicide-1l | 3,689 (AgriJibu in-stock retail KSh4,340 less 15%) | 30% | 4,800 | 4,340 | No alert: under 15% vs lowest listed competitor | https://agrijibu.co.ke/ariane-ec-1l/ |
+
+No competitor price alert was triggered in the results returned: calculated prices were not more than 15% above multiple reputable, exact-pack competitors. No new pack variants were added. Other Batch 3 records remain flagged for manual checks where the results were not exact enough or did not expose a reliable price.
+
+SQL: `supabase/sql/pricing-batch-003.sql` (guarded, review branch only). Existing IDs, slugs and URLs preserved. No live prices changed.
