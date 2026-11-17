@@ -532,7 +532,7 @@ SQL: `supabase/sql/pricing-batch-006.sql` (guarded updates + idempotent inserts;
 | Syngenta skipped | 1 |
 | Price updates prepared | 7 |
 | New pack variants | 0 |
-| Needs manual price check / unchanged | 92 |
+| Needs manual price check / unchanged | 79 |
 
 Syngenta exclusion: Engeo 247SC 250ml. Danadim Progress is FMC/Cheminova (not Syngenta) and remains eligible; Funginil is Osho / Jiangsu Xinhe (not Syngenta) but requires a separate Kenya regulatory-status check.
 
@@ -885,7 +885,7 @@ Samsung A06, A07 5G and A17 5G use exact RAM/storage/network configurations from
 |---|---:|
 | Products scanned | 100 |
 | Syngenta products skipped | 8 |
-| Existing products with price updates | 5 |
+| Existing products with price updates | 13 |
 | New pack variants | 0 |
 | Needs manual price check / unchanged | 92 |
 
@@ -898,7 +898,7 @@ Samsung A06, A07 5G and A17 5G use exact RAM/storage/network configurations from
 | Spirometer 500SC | 100ml | 1,317.50 [RETAIL-ESTIMATE] | 30% | 1,700 | 1,550 (Agropests, AgriGuard, Kuza) | https://agropests.com/products/spirometer-500-sc-100ml; https://agriguardagrovet.co.ke/; https://kuzaagrochem.com/products/spirometer-100ml-840 |
 | Taurus 500SP | 1kg | 4,462.50 [RETAIL-ESTIMATE] | 30% | 5,800 | 5,250–6,400 | https://www.mtolori.com/product/details/taurus-500sp-1kg-2274; https://agriguardagrovet.co.ke/product/taurus-500-sp/ |
 | Systema 50EC | 1L | 2,550 [RETAIL-ESTIMATE] | 30% | 3,300 | 3,000–3,250 | https://agropests.com/products/systema-50-ec-1-l; https://kuzaagrochem.com/products/systema-50ec-1l |
-| Samsung 43U8000F TV | 43 inch | 32,215 [RETAIL-ESTIMATE] | 30% | 41,900 | 37,900–42,100 | https://www.samsungbrandstore.co.ke/category/4k-uhd-led-tvs; https://www.kenyatronics.com/view-product/samsung-43-inch-4k-smart-tv-43u8000f-2025-model; https://dealerstore.co.ke/product/samsung-43-43u8000f-crystal-uhd-4k-smart-tv/; https://nairobitvshop.co.ke/product/samsung-43-inch-u8000f-4k-smart-tv-2025/; https://www.jumia.co.ke/samsung-43u8000fu-43-inch-smart-crystal-uhd-led-tv-2025-325467119.html |
+| Samsung 43U8000F TV | 43 inch | 32,215 [RETAIL-ESTIMATE] | 25% | 40,250 | 37,900–42,100 | https://www.samsungbrandstore.co.ke/category/4k-uhd-led-tvs; https://www.kenyatronics.com/view-product/samsung-43-inch-4k-smart-tv-43u8000f-2025-model; https://dealerstore.co.ke/product/samsung-43-43u8000f-crystal-uhd-4k-smart-tv/; https://nairobitvshop.co.ke/product/samsung-43-inch-u8000f-4k-smart-tv-2025/; https://www.jumia.co.ke/samsung-43u8000fu-43-inch-smart-crystal-uhd-led-tv-2025-325467119.html |
 | Symnet 50-mesh insect net | 3m × 50m roll | 12,750 [RETAIL-ESTIMATE] | 30% | 16,600 | 15,000 | https://www.symnet.co.ke/solutions/insect-nets |
 
 All five use [RETAIL-ESTIMATE] baselines (lowest reliable in-stock Kenyan retail × 0.85), not wholesale quotes. Prices are rounded to nearest KSh50. Existing-price reductions are justified by multiple comparable listings showing current price >25% above market average: Spirometer 500SC 100ml (KSh1,550 at Agropests, AgriGuard and Kuza; new KSh1,700), Taurus 500SP 1kg (M-Tolori KSh5,250 and AgriGuard KSh6,400; new KSh5,800), and Systema 50EC 1L (Agropests KSh3,000 and Kuza KSh3,250; new KSh3,300). Samsung 43U8000F is increased from KSh39,099 to KSh41,900 based on lowest Samsung Brandstore KSh37,900 and several other in-stock exact-model listings around KSh38,900–KSh42,100; formula price is within 10% of market average. Symnet 50-mesh 3m × 50m roll is increased from KSh15,499 to KSh16,600 using Symnet's own exact-size in-stock KSh15,000 listing as the retail baseline (retail estimate × 0.85). This puts Stermont 10.7% above that one supplier's retail price, below the 15% alert threshold; one source only, so this is a single-observation baseline rather than a competitor average.
@@ -967,19 +967,11 @@ No new pack variants were created. Existing product URLs/slugs are preserved. SQ
 
 ---
 
-# Batch 14 — 2026-11-17
-
-| Measure | Count |
-|---|---:|
-| Products scanned | 100 |
-| Syngenta skipped | 8 |
-| Price updates prepared | 8 |
-| New pack variants | 0 |
-| Needs manual price check / unchanged | 84 |
+### Additional Batch 14 pricing research — 8 further products
 
 Syngenta exclusions left untouched: Tatua Rat and Mice Poison Blocks; Tatua Advion 30g; Tatua Advion 4×30g; Tatua Demand 10CS 25ml; Tatua Klerat 100g; Tatua Zyrox 500g; Tervigo 020SC 5L; and Thiovit Jet Sulphur 1kg.
 
-## Price updates
+#### Additional prepared price updates
 
 | Product | Pack | Baseline Cost (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Source Reference |
 |---|---|---:|---:|---:|---:|---|
