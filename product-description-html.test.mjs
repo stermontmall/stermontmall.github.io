@@ -91,3 +91,19 @@ assert.deepEqual(heads(inlineRendered), [
 ]); n++;
 assert.equal(extractProductFaq(inlineGuide).length, 4); n++;
 ok(/<a href="\/services\/">pest control services<\/a>/.test(inlineRendered), 'service links survive the formatted buying section');
+
+
+// Product guide titles followed by prose on the same line become canonical H3s; internal supplier-price arithmetic is hidden.
+const inlinePriceGuide = '## Product overview Navigator 100SC 20ml is a registered product. ## Product identity and pack size The pack is 20ml. ## Registered public-health use PCPB lists the registered domestic public-health uses. ## Exact source price and baseline calculation Imagine Care lists the supplier price and store markup calculation. ## Safety and regulatory checks Follow the exact Kenyan label. ## Buying Navigator 100SC 20ml in Kenya Shoppers should confirm the exact pack and invoice. ## Ordering, pickup and delivery M-Pesa checkout and delivery details are available. ## Frequently asked questions\nQ: What pack is this? It is 20ml.\nQ: What should I check? Confirm the original label.\nQ: How can I pay? Use M-Pesa checkout.\nQ: Where is pickup? Sarit Centre Westlands, Nairobi. ## Listing status This is an internal draft note.';
+const inlinePriceHtml = productDescriptionHtml(inlinePriceGuide);
+assert.deepEqual(heads(inlinePriceHtml), [
+  'Product Overview & Key Benefits',
+  'Technical Specifications & Pack Details',
+  'Where & How to Use in Kenya',
+  'Safety, Storage & Handling Guidelines',
+  'Buying & Pack-Size Guide',
+  'Delivery across Kenya & Nairobi Pickup',
+  'Frequently Asked Questions'
+]); n++;
+ok(!/supplier price|markup calculation|internal draft note/i.test(inlinePriceHtml), 'supplier pricing arithmetic and listing status never render to buyers');
+assert.equal(extractProductFaq(inlinePriceGuide).length, 4); n++;
