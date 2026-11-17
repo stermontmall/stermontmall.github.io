@@ -25,4 +25,22 @@ begin
  end loop;
 end
 $pricing$;
+
+
+do $pricing$
+declare r record; affected integer;
+begin
+ for r in select * from (values
+('von-vgs161hsk-1600w-handheld-garment-steamer',5199.00::numeric,3850.00::numeric,2965.65::numeric),
+('von-vms-206dgk-20l-digital-solo-microwave',8499.00::numeric,8850.00::numeric,6795.75::numeric),
+('von-vpc613xmk-6l-electric-pressure-cooker',9999.00::numeric,11050.00::numeric,8495.75::numeric),
+('wq-528-egg-incubator-auto-45-degree-turning-led-displays',63700.00::numeric,66300.00::numeric,55250.00::numeric)
+ ) as v(product_id,expected_price,new_price,new_cost)
+ loop
+  update public.products set price=r.new_price,cost=r.new_cost where id=r.product_id and active=true and price=r.expected_price;
+  get diagnostics affected=row_count;
+  if affected<>1 then raise exception 'Batch 16 additional guard failed for % (expected %, changed %)',r.product_id,r.expected_price,affected; end if;
+ end loop;
+end
+$pricing$;
 commit;
