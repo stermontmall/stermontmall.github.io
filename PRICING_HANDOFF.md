@@ -155,3 +155,126 @@ No new pack variants were added in Batch 1. Abasi 5 EC manufacturer literature l
 - Do not run this SQL against production until the branch review confirms all supplier prices, pack matches and guards.
 - No live database prices, stock, product IDs, slugs, URLs or images were changed by this branch commit.
 - Continue with Batch 2 using the next 100 active catalogue products after the Batch 1 sort order.
+
+
+---
+
+# Batch 2 — 2026-11-17
+
+Batch order: next 100 active products alphabetically by product name and ID (offset 100 from the Batch 1 query).
+
+## Batch 2 summary
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta products skipped | 15 |
+| Products with verified in-stock supplier price and price update prepared | 8 |
+| Products flagged [NEEDS MANUAL PRICE CHECK] | 77 |
+| New pack variants added | 0 |
+
+**Syngenta exclusions:** Actara 25 WG Insecticide 8g; Actara 25WG Insecticide 40g; Actellic 25EC Insecticide; Actellic 300 CS Public Health Insecticide 833ml; Actellic 50EC Insecticide; Actellic 50EC Insecticide; Actellic 50EC Insecticide; Actellic 50EC Insecticide; Actellic Gold Dust; Actellic Gold Dust; Actellic Gold Dust; Actellic Gold Dust 200g; Actellic Gold Dust 50g; Actellic Super Dust 50g; Agral 90 Non-Ionic Spray Adjuvant 1L. Agita is not counted as Syngenta: Kenya PCPB identifies Elanco Animal Health as its manufacturer/registrant. Agil is ADAMA-branded, not Syngenta.
+
+## Batch 2 prepared price updates
+
+| Product Name | Pack Size | Supplier Price (KES) | Markup Tier | New Website Price (KES) | Source Reference |
+|---|---|---:|---:|---:|---|
+| Acetak Top 700WG Insecticide 5g | 5g sachet | 100 | 30% | 150 | https://agropests.com/products/acetak-top-700wg-5g |
+| Acrobat 69% WG Fungicide 1kg | 1kg pack | 3,430 | 30% | 4,450 | https://agroduka.ke/acrobat-69-wg-1kg/ |
+| Agromectin 18 EC Insecticide 50ml | 50ml bottle | 220 | 30% | 300 | https://www.farmrescue.co.ke/product/agromectin-insecticide |
+| AgroZ Bag Plus Hermetic Grain Storage Bag 100kg | piece | 290 | 30% | 400 | https://agropests.com/products/agrozr-bag-plus-hermetic-storage-bag-100kgs |
+| AICO 0.5HP Deep Well Submersible Pump 80m Head | piece | 18,500 | 30% | 24,050 | https://www.logike.co.ke/product/AICO-Japan-0-5HP-80-Meters-Deep-Well-Electric-Submersible-Pump/96872817 |
+| Aico Japan AC767-4 25L 4-Stroke Petrol Knapsack Sprayer | 1 unit | 22,000 | 25% | 27,500 | https://www.jumia.co.ke/aico-ac767-4-petrol-knapsack-sprayer-25l-4-stroke-knapsack-sprayer-agricultural-sprayer-327885947.html |
+| AILYONS 2 in 1 Blender with Grinder, 1.6L, 4 Speed Control, Safety Lock | 1 blender with grinder jar (1.6 L) | 1,460 | 30% | 1,900 | https://www.jumia.co.ke/ailyons-tyb-205-pro-2-in-1-blender-grinder-1.6l-350w-4-speed-control-pulse-safety-lock-black-328896946.html |
+| Albafas 10% Albendazole Drench | — | 880 | 30% | 1,150 | https://prd.erp.agribora.com/input/agrochemicals/pesticides/albafas-10-1l-ktrmr |
+
+## [NEEDS MANUAL PRICE CHECK]
+
+- [NEEDS MANUAL PRICE CHECK] **ACE Fusion Safety Shoes** (ID: `ace-fusion-safety-shoes`; current KSh 2,999) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **ACE Mamba High-Ankle Safety Shoes – Blue** (ID: `ace-mamba-high-ankle-safety-shoes-blue`; current KSh 3,299) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **ACE Mamba Warehouse Safety Boots – Blue/Black** (ID: `ace-mamba-warehouse-safety-boots-blue-black`; current KSh 3,500) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **ACE Tsavo Steel-Toe Safety Gumboots – Black** (ID: `ace-tsavo-steel-toe-safety-gumboots-black`; current KSh 1,299) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **ACE Wolverine Safety Shoes** (ID: `ace-wolverine-safety-shoes`; current KSh 3,299) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Acetak Top 700WG Insecticide 25g** (ID: `acetak-top-700wg-insecticide-25g`; current KSh 450) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Acetak Top 700WG Insecticide 50g** (ID: `acetak-top-700wg-insecticide-50g`; current KSh 750) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Acetastar 46EC Insecticide 100ml** (ID: `acetastar-46ec-insecticide-100ml`; current KSh 399) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Acetastar 46EC Insecticide 1L** (ID: `acetastar-46ec-insecticide-1l`; current KSh 3,199) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Acetastar 46EC Insecticide 50ml** (ID: `acetastar-46ec-insecticide-50ml`; current KSh 250) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Adidas Runfalcon 3.0 Men's Black Running Sneakers** (ID: `adidas-runfalcon-30-black-mens-sneakers-20261108`; current KSh 5,499) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Advance In-Ground Termite Monitoring Station** (ID: `advance-termite-monitoring-bait-station-20261108`; current KSh 2,200) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AEROBS AB-HP20 7.5HP High Pressure Petrol Water Pump – 2-Inch** (ID: `aerobs-ab-hp20-7-5hp-high-pressure-petrol-water-pump-2-inch`; current KSh 29,898.7) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **African Daisy Mixed Colours Flower Seeds** (ID: `african-daisy-mixed-colours-flower-seeds`; current KSh 455) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agil 100 EC Herbicide 1 Litre** (ID: `agil-100-ec-herbicide-1-litre`; current KSh 5,250) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agita 10 WG Fly Bait 80g** (ID: `agita-10-wg-fly-bait-80g`; current KSh 5,250) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agita 1GB Fly Bait** (ID: `agita-1gb-fly-bait-100-g`; current KSh 2,150) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agita 1GB Fly Bait** (ID: `agita-1gb-fly-bait-20g`; current KSh 299) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agita 1GB Fly Bait** (ID: `agita-1gb-fly-bait-400-g`; current KSh 11,299) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agrimec 018EC Insecticide 100ml** (ID: `agrimec-018ec-insecticide-100ml`; current KSh 1,399) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agripack 600-27A Hybrid Maize Seeds** (ID: `agripack-600-27a-hybrid-maize-seeds`; current KSh 899) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agripack Maize 5117 Seeds** (ID: `agripack-maize-5117-seeds`; current KSh 899) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agriwin 72WP Fungicide 500g** (ID: `agriwin-72wp-fungicide-500g`; current KSh 1,150) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agro-Lambda 5EC Insecticide** (ID: `agro-lambda-5ec-insecticide-1-litre`; current KSh 2,950) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agro-Lambda 5EC Insecticide** (ID: `agro-lambda-5ec-insecticide-100-ml`; current KSh 599) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agro-Lambda 5EC Insecticide** (ID: `agro-lambda-5ec-insecticide-250-ml`; current KSh 1,050) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agrochemical Protective Spray Suit** (ID: `agrochemical-protective-spray-suit`; current KSh 2,600) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agromaster 16-10-22 Controlled Release Fertilizer 25kg** (ID: `agromaster-16-10-22-controlled-release-fertilizer-25kg`; current KSh 4,299) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AgroZ Black and White Silage Bag 350–400kg** (ID: `agroz-black-and-white-silage-bag-350-400kg`; current KSh 1,599) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AgroZ Silage Bag 1.0m x 2.5m** (ID: `agroz-silage-bag-1-0m-x-2-5m`; current KSh 1,495) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AgroZ Silage Storage Bag 1m x 2.5m** (ID: `agroz-silage-storage-bag-1m-x-2-5m`; current KSh 1,499) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agvanta 500 SC Fungicide 1 litre** (ID: `agvanta-500-sc-fungicide-1-litre`; current KSh 10,000) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agvanta 500 SC Fungicide 100ml** (ID: `agvanta-500-sc-fungicide-100ml`; current KSh 1,299) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agvanta 500 SC Fungicide 250ml** (ID: `agvanta-500-sc-fungicide-250ml`; current KSh 2,750) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agvanta 500 SC Fungicide 500ml** (ID: `agvanta-500-sc-fungicide-500ml`; current KSh 5,150) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Agvanta 500 SC Fungicide 50ml** (ID: `agvanta-500-sc-fungicide-50ml`; current KSh 750) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Aico 0.5HP Booster Water Pump – 30 Metres Head** (ID: `aico-0-5hp-booster-water-pump-30-metres-head`; current KSh 9,750) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AICO 10HP 4-Inch Diesel Water Pump | Heavy Duty** (ID: `aico-10hp-4-inch-diesel-water-pump-heavy-duty`; current KSh 77,998.7) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AICO 16HP Diesel High Pressure Water Pump – 3 Inch** (ID: `aico-16hp-diesel-high-pressure-water-pump-3-inch`; current KSh 82,940) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Aico 1HP Booster Water Pump** (ID: `aico-1hp-booster-water-pump`; current KSh 11,050) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AICO 1HP Deep Well Submersible Pump 150m Head** (ID: `aico-1hp-deep-well-submersible-pump-150m-head`; current KSh 23,398.7) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Aico 1HP Shallow Well Submersible Water Pump** (ID: `aico-1hp-shallow-well-submersible-water-pump`; current KSh 17,160) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AICO 2-Inch Diesel High-Pressure Water Pump 90m Head** (ID: `aico-2-inch-diesel-high-pressure-water-pump-90m-head`; current KSh 68,898.7) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Aico 2HP Centrifugal Booster Water Pump** (ID: `aico-2hp-centrifugal-booster-water-pump`; current KSh 23,400) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AICO 2HP Deep Well Submersible Pump 210m Head** (ID: `aico-2hp-deep-well-submersible-pump-210m-head`; current KSh 31,198.7) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AICO 3-Inch Petrol Sewage Pump 25mm Solids** (ID: `aico-3-inch-petrol-sewage-pump-25mm-solids`; current KSh 41,598.7) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AICO 3HP DW3000 Deep Borehole Submersible Pump 220m** (ID: `aico-3hp-dw3000-deep-borehole-submersible-pump-220m`; current KSh 36,398.7) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AICO 4HP 3-Phase Deep Well Submersible Pump 224m** (ID: `aico-4hp-3-phase-deep-well-submersible-pump-224m`; current KSh 49,398.7) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AICO 5.5HP 3-Phase Deep Well Submersible Pump 256m** (ID: `aico-5-5hp-3-phase-deep-well-submersible-pump-256m`; current KSh 77,998.7) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Aico AC-5L 5-Litre Manual Pressure Sprayer** (ID: `aico-ac-5l-5-litre-manual-pressure-sprayer`; current KSh 2,299) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Aico Japan 60L 7.5HP Trolley Agricultural Sprayer** (ID: `aico-japan-60l-7-5hp-trolley-agricultural-sprayer`; current KSh 67,600) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Aico Japan AC-8L 8L Shoulder Strap Manual Pressure Sprayer** (ID: `aico-japan-ac-8l-8l-shoulder-strap-manual-pressure-sprayer`; current KSh 3,350) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Aico Japan AC1609 160L 8HP Petrol Trolley Sprayer** (ID: `aico-japan-ac1609-160l-8hp-petrol-trolley-sprayer`; current KSh 90,999) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Aico Japan AC840PS 8HP Petrol Trolley Sprayer with Hose Reel** (ID: `aico-japan-ac840ps-8hp-petrol-trolley-sprayer-with-hose-reel`; current KSh 35,099) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AICO Japan ADP50 8HP 2-Inch Diesel Water Pump** (ID: `aico-japan-adp50-8hp-2-inch-diesel-water-pump`; current KSh 40,950) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS 2-Burner Table-Top Gas Cooker with 6kg Regulator, 1.5m Pipe and Clips** (ID: `ailyons-2-burner-table-top-gas-cooker-with-6kg-regulator-1-5m-pipe-and-clips`; current KSh 1,899) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS 2.0L Electric Kettle, Glossy Black with Red Accents** (ID: `ailyons-2-0l-electric-kettle-glossy-black-with-red-accents`; current KSh 799) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS 2.2L Electric Kettle, Luxury Dark Purple** (ID: `ailyons-2-2l-electric-kettle-luxury-dark-purple`; current KSh 1,099) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS 2L Stainless Steel Electric Kettle 1500W, Auto Shut-Off** (ID: `ailyons-2l-stainless-steel-electric-kettle-1500w-auto-shut-off`; current KSh 540.5) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS 5L Electric Pressure Cooker, 900W, 10 Preset Menus** (ID: `ailyons-5l-electric-pressure-cooker-900w-10-preset-menus`; current KSh 4,799) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS 6L Digital Electric Pressure Cooker with Rice, Soup, Beef, Chicken and Porridge Presets** (ID: `ailyons-6l-electric-pressure-cooker-digital`; current KSh 5,499) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS AFK-111 Hot & Normal Water Dispenser With Cabinet** (ID: `ailyons-afk-111-hot-normal-water-dispenser-with-cabinet`; current KSh 5,175) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS AFK-112 Three-Tap Hot Cold Normal Water Dispenser** (ID: `ailyons-afk-112-three-tap-hot-cold-normal-water-dispenser`; current KSh 6,450) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS Double Burner Glass Top Gas Cooker with Free 6kg Regulator, Gas Pipe and Clips, 1 Year Warranty** (ID: `ailyons-double-burner-glass-gas-cooker-regulator-pipe`; current KSh 2,399) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS FK-0301 2L Stainless Steel Electric Kettle 1500W** (ID: `ailyons-fk-0301-2l-stainless-steel-electric-kettle-1500w`; current KSh 540.5) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS FS-1801K 18-Inch 60W Standing Fan Black** (ID: `ailyons-fs-1801k-18-inch-60w-standing-fan-black`; current KSh 2,988.85) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS HD-198A White & Blue Electric Dry Iron** (ID: `ailyons-hd-198a-white-blue-electric-dry-iron`; current KSh 1,022.35) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **AILYONS HD-199A 1000W Electric Dry Iron Silver & Black** (ID: `ailyons-hd-199a-1000w-electric-dry-iron-silver-black`; current KSh 805) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Air Chopper 7.5SC Insecticide** (ID: `air-chopper-7-5sc-insecticide-1-litre`; current KSh 8,599) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Air Chopper 7.5SC Insecticide** (ID: `air-chopper-7-5sc-insecticide-100-ml`; current KSh 1,200) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Air Chopper 7.5SC Insecticide** (ID: `air-chopper-7-5sc-insecticide-15-ml-3-pk`; current KSh 899) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Air Chopper 7.5SC Insecticide** (ID: `air-chopper-7-5sc-insecticide-250-ml`; current KSh 3,050) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Airofog U260 Professional ULV Cold Fogger** (ID: `airofog-u260-ulv-cold-fogger-20261108`; current KSh 165,000) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Albafas 10% Albendazole Drench** (ID: `albafas-10-albendazole-drench-120-ml`; current KSh 199) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Albafas 10% Albendazole Drench** (ID: `albafas-10-albendazole-drench-40-ml`; current KSh 150) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Albafas 10% Albendazole Drench** (ID: `albafas-10-albendazole-drench-5-litres`; current KSh 4,450) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+- [NEEDS MANUAL PRICE CHECK] **Albafas 10% Albendazole Drench** (ID: `albafas-10-albendazole-drench-500-ml`; current KSh 599) — no exact, verified in-stock supplier price confirmed for this pack/model in Batch 2.
+
+## Pack-size review
+
+No new variants were added. AgriGuard's Agrimec 18EC listing identifies 50ml, 100ml, 250ml and 1L pack options and shows a 1L price of KSh 2,350, but the source did not explicitly confirm current stock for the 1L option. The missing 1L variant is therefore held for manual stock verification; no speculative listing was created.
+
+## Files
+
+- `supabase/sql/pricing-batch-002.sql` — guarded SQL price changes for the 8 updated products.
+- `PRICING_HANDOFF.md` — this batch log.
+
+**Live status:** SQL is committed to the review branch only. It has not been applied to Supabase or the live storefront. Existing product IDs, slugs and URLs remain unchanged.
