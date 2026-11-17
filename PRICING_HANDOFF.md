@@ -1018,9 +1018,9 @@ Logike lists the exact TR20-2 model in stock at KSh11,500. Baseline is KSh9,775 
 |---|---:|
 | Products scanned | 100 |
 | Syngenta products skipped | 1 |
-| Existing product prices updated | 11 |
+| Existing product prices updated | 15 |
 | New pack variants | 0 |
-| Needs manual price check / unchanged | 88 |
+| Needs manual price check / unchanged | 84 |
 
 **Syngenta exclusion (untouched):** Voliam Targo 063SC Insecticide 100ml. Syngenta brand/vendor confirmation is explicit in the AgriJibu and Agroduka listings.
 
@@ -1104,3 +1104,15 @@ All baselines are [RETAIL-ESTIMATE] (lowest current Kenyan retail × 0.85), not 
 - Xiaomi TV sticks, kettles, pressure cooker, rice cooker, reading light, portable blender and air purifier remain unchanged where the observed retailer price is tax-exclusive, stock is unclear, or no comparable in-stock listing supports a safe adjustment.
 
 No new pack variants were added. Existing slugs/canonical URLs are preserved. SQL: `supabase/sql/pricing-batch-017.sql` (guarded review-branch update only; not applied to production). The product generator is set up to emit KES Product Offer price, availability and one-year `priceValidUntil`; run product build after applying the catalogue SQL to refresh generated JSON-LD and sitemap `lastmod` values.
+
+
+### Additional Batch 16 exact-model price updates
+
+| Product | Pack/model | Baseline (KES) | Markup | New Price (KES) | Competitor retail (KES) | Sources |
+|---|---|---:|---:|---:|---:|---|
+| VON VGS161HSK 1600W Garment Steamer | VGS161HSK | 2,965.65 [RETAIL-ESTIMATE] | 30% | 3,850 | 3,489–3,995 (average ~3,868) | https://www.digitalstore.co.ke/products/von-vgs161hsk-1600w-handheld-garment-steamer-fast-efficient-fabric-steaming-for-home-use; https://www.hotpoint.co.ke/catalogue/von-vgs161hsk-handheld-garment-steamer-non-foldable-steam-head-1600w/; https://www.carrefour.ke/mafken/en/garment-steamers/von-gmnt-steamr-vgs161hsk-1600w-blk/p/238462; https://tabarakelectronics.co.ke/product/von-hand-held-garment-steamer-1600w-black-vgs161hsk/ |
+| VON VMS-206DGK 20L Digital Microwave | VMS-206DGK | 6,795.75 [RETAIL-ESTIMATE] | 30% | 8,850 | 7,995–8,995 | https://von.co.ke/shop/kitchen-essentials/microwave; https://www.hotpoint.co.ke/catalogue/von-vms-206dgk-digital-solo-microwave-oven-20l-sand-black/; https://crosstech.ke/products/von-20l-digital-microwave-vms-206dgk |
+| VON VPC613XMK 6L Pressure Cooker | VPC613XMK | 8,495.75 [RETAIL-ESTIMATE] | 30% | 11,050 | 9,995 | https://von.co.ke/shop/kitchen-essentials/cooking-baking-and-more; https://www.hotpoint.co.ke/catalogue/category/cooking/ |
+| WQ 528-Egg Automatic Incubator | 528 eggs | 55,250 [RETAIL-ESTIMATE] | 20% | 66,300 | 65,000 | https://mkulimajovial.co.ke/product-category/poultry/incubators/ |
+
+The VON steamer price is reduced because the current KSh5,199 is more than 25% above multiple exact-model Kenya listings (Digital Store, Hotpoint, Carrefour and Tabarak). VMS-206DGK, VPC613XMK and WQ 528 incubator are increased to the calculated tier price using current exact-model Kenyan retail observations.
