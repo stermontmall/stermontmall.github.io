@@ -757,3 +757,48 @@ Farm Rescue lists all sizes below in stock with exact pack prices. Baseline = su
 | Oshothane 80 WP Fungicide | 5kg | 5,740 | 4,879 | 30% | 6,350 | https://www.farmrescue.co.ke/product/oshothane-80-wp |
 
 The new Oshothane pack rows use the existing category, stock default (1,000), low-stock alert (20), featured flag, KES prices, metadata, and a shared variant group. Existing 50g product slug is preserved and joined to the new pack selector. No other variants were created without a precise pack price and stock confirmation.
+
+
+---
+
+# Batch 12 — products 1101–1200 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta excluded | 3 |
+| Existing products with price updates | 4 |
+| New pack variants prepared | 4 |
+| Remaining manual price check / unchanged | 93 |
+
+**Syngenta exclusions (untouched):** Pirimor 50WG 1kg, Primagram Gold 660SC 5L, and Quadris 50WG 1kg. PCPB/Syngenta references confirm the relevant brand/manufacturer. Radiant 120SC is a Dow/Corteva product, Prequel 720WP is sold by Osho and is not treated as Syngenta, and Previcur Energy is Bayer.
+
+## Existing product price updates
+
+| Product | Pack | Baseline (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Sources |
+|---|---|---:|---:|---:|---:|---|
+| Pioneer 30G19 2kg | 2kg / 25L | 722.50 [RETAIL-ESTIMATE] (lowest retail 850) | 30% | 950 | 900–1,000 | https://www.mtolori.com/product/details/maize-pioneer-30g19-2kg-3647; https://www.melagri.com/products/pioneer-30-g19-hybrid-maize-seeds--gq5eaisrGjR5uY4uTo5n; https://agrijibu.co.ke/brand/pioneer-seeds/; https://agropests.com/products/pioneer-30-g19-maize-2-kg |
+| Pioneer P2848W 2kg | 2kg / 25L | 722.50 [RETAIL-ESTIMATE] (lowest retail 850) | 30% | 950 | 900–950 | https://mtolori.com/product/details/maize-pioneer-p2848w-2kg-2416; https://www.melagri.com/brands/corteva-agroscience; https://agrijibu.co.ke/pioneer-p2848w-maize-seeds-2kg/; https://agropests.com/products/pioneer-p2848w-maize-2kg |
+| Pioneer P3812W 2kg | 2kg / 25L | 722.50 [RETAIL-ESTIMATE] (lowest retail 850) | 30% | 950 | 900–1,000 | https://www.mtolori.com/shop/details/1/products?page=16; https://www.melagri.com/brands/corteva-agroscience; https://agrijibu.co.ke/brand/pioneer-seeds/ |
+| Premier 767 25L 2-stroke | 2kg / 25L | 11,899.15 [RETAIL-ESTIMATE] (lowest retail 13,999) | 30% | 15,450 | 13,999–15,000 | https://kitalisuppliersltd.com/products/premier-engine-sprayer-model-767-%E2%80%93-25l-heavy-duty-two-stroke-knapsack-sprayer; https://deveronig.co.ke/product/premier-engine-sprayer-model-767-25l-2-stroke-petrol-knapsack-sprayer-for-farming-ksh-14499/; https://www.myagrovet.co.ke/products.php?id=7513; https://njunexpowertools.co.ke/product-category/agricultural-appliances/ |
+
+These are [RETAIL-ESTIMATE] baselines (lowest matched in-stock retail × 0.85), not wholesale quotations. Pioneer seed current prices exceeded multiple comparable supplier observations by more than 25%; new prices are based on the lowest listed 2kg price KSh850, baseline KSh722.50, 30% markup and KSh50 rounding. Premier 767 25L 2-stroke has four distinct Kenyan listings from KSh13,999 to KSh15,000; baseline KSh11,899.15, 30% markup, rounded to KSh15,450. Its current KSh19,500 is more than 25% above the comparable market average. The new prices retain the required profit floor and are within approximately 10% of the comparable prices.
+
+## New pack variants prepared
+
+| Product | Pack | Baseline (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Sources |
+|---|---|---:|---:|---:|---:|---|
+| Premise 200 SC Termiticide | 250ml | 5,014.15 [RETAIL-ESTIMATE] | 30% | 6,500 | 5,899 | https://imaginecare.co.ke/product/premise-200-sc-250-ml/; https://agriguardagrovet.co.ke/product/premise-200-sc/; https://agropests.com/products/premise-200-sc-termiticide-250ml; https://www.nunuza.shop/products/premise-200sc-insecticide-termicide-250ml-2dTDAjsENgsbgy381E7GQf |
+| Prequel 720 WP Fungicide | 120g | 280.50 [RETAIL-ESTIMATE] | 30% | 350 | 330 | https://www.farmrescue.co.ke/product/prequel-720-wp |
+| Prequel 720 WP Fungicide | 500g | 1,156 [RETAIL-ESTIMATE] | 30% | 1,500 | 1,360 | https://www.farmrescue.co.ke/product/prequel-720-wp |
+| Prequel 720 WP Fungicide | 1kg | 2,256.75 [RETAIL-ESTIMATE] | 30% | 2,950 | 2,655 | https://www.farmrescue.co.ke/product/prequel-720-wp |
+
+Premise 200SC 250ml is confirmed in stock at multiple Kenyan suppliers; lowest reliable current listing KSh5,899 from Imagine Care (143 ratings), with AgriGuard KSh6,500, Agropests KSh6,900 and Nunuza KSh6,500. Retail-estimate baseline KSh5,014.15 × 1.30 = KSh6,518, rounded KSh6,500. New pack is grouped with existing Premise 50ml and 1L variants. The image field is intentionally empty rather than reusing a photo of the wrong bottle size.
+
+Prequel 720WP packs 120g, 500g and 1kg are explicitly listed in stock by Farm Rescue at KSh330, KSh1,360 and KSh2,655. Formula-derived prices are KSh350, KSh1,500 and KSh2,950 respectively. The existing 40g listing is attached to a shared variant group; its slug remains unchanged. The new pack image fields are empty until exact pack photos are available.
+
+## Needs Manual Price Check / unchanged
+
+The remaining non-Syngenta products in rows 1101–1200 stay unchanged pending reliable exact-match data: Piano F1 spinach seed 5g, Pirimor (excluded), PPE overalls, Plant Soul Zinc Phosphite, plastic poultry mesh (single independent price observation; duplicate listings are not treated as separate sources), gel syringe plunger, POCO phones, Polti Cimex Eradicator, Polyfeed 1kg, Polysil 25ml, Popvet dewormer, portable thermal fogger, Bluetooth speaker, poultry dust, Power King extension cable, power tiller, Powermate water pump (single reliable listing), Premier pump models other than the specifically benchmarked 10HP 100m 3-phase unit, Premier 767 4-stroke, Premise 1L and 50ml (no reduction justified by the multi-retailer average), Prequel 40g (existing pack already close to formula), Previcur Energy, professional grafting kit, Promax variants, Protecta Micro bait station, footwear, Punisher products, PVC apron and wire mesh, Pyramid Trek repellent, Quadris (excluded), rabbit drinking pipe, Radiant 120SC, radish seeds, Rafiki fly/rattrap products, magnetic mosquito screen, insect mesh, Raid liquid/refills, Ralon, Ramtons appliances where only one exact current price or insufficient same-model comparisons were found, and all other rows in this batch not listed in the price-update tables.
+
+No additional variants were created beyond the four above. Existing product slugs/canonical URLs are preserved. Price updates and inserts are guarded SQL in `supabase/sql/pricing-batch-012.sql`; they are review-branch changes only and are not live until the SQL is applied. The product generator includes KES Offer schema and one-year `priceValidUntil`, and sitemap hash logic updates `lastmod` only when the generated product HTML changes; rebuild after applying the SQL to sync JSON-LD and sitemap files.
