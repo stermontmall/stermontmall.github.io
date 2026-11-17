@@ -556,3 +556,55 @@ The FUGO feed reductions are supported by current manufacturer (Unga Farm Care),
 - Remaining items not updated because no exact in-stock Kenyan quote was found, the product specification did not match, or the formula price would require a reduction not permitted by the 25%-over-average guardrail. This includes Easygro products, Eazole, ECOMAX speakers, Econo rat stations, ED21 fly catcher, electric appliances, fertilizers without comparable exact stock, sprayers, household insecticides, other seeds, pesticide brands/pack sizes without current stock confirmation, FUGO Layer Compleat Meal (formula target below current but current not >25% above average), and livestock accessories.
 
 No verified new pack sizes with exact current in-stock prices were confirmed for the other Batch 7 products. SQL: `supabase/sql/pricing-batch-007.sql` (guarded, review branch only; not applied to production). Existing slugs/URLs preserved.
+
+
+---
+
+# Batch 8 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta skipped | 1 |
+| Existing product prices prepared for update | 8 |
+| New verified pack variants prepared | 7 |
+| Needs manual price check / unchanged | 91 |
+
+Syngenta exclusion: Icon 10CS mosquito insecticide. No other products in this batch were identified as Syngenta by brand/manufacturer.
+
+## Existing product price updates
+
+| Product | Pack | Baseline Cost (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Source Reference |
+|---|---|---:|---:|---:|---:|---|
+| gearlock-turbo-250-wp-fungicide-1kg | Existing pack | 2,677.5 [RETAIL-ESTIMATE] | 30% | 3,500 | 3,150 (avg 3,385) | https://agroduka.ke/gearlock-turbo-250wp-1kg/; https://mtolori.com/product/details/gearlock-turbo-25-wp-1kg-17710933; https://agropests.com/products/gearlock-turbo-250-wp-1-kg; https://dawnfarmers.com/shop/crop-production/fungicides/gearlock-turbo-250wp-1kg/ |
+| gradometer-480ec-termiticide-1-litre | Existing pack | 1,870 [RETAIL-ESTIMATE] | 30% | 2,450 | 2,200 (avg 2,227.5) | https://dawnfarmers.com/shop/crop-production/termiticides/gradometer-480ec-1-litre/; https://agrijibu.co.ke/gradometor-480ec/ |
+| gradometor-480ec-termiticide-100ml | Existing pack | 297.5 [RETAIL-ESTIMATE] | 30% | 400 | 350 (avg 350) | https://agriguardagrovet.co.ke/product-category/termiticides/; https://agrijibu.co.ke/gradometor-480ec/ |
+| guardian-bait-station-translucent-cover | Existing pack | 2,548.3 [RETAIL-ESTIMATE] | 30% | 3,300 | 2,998 (avg 3,249) | https://www.myagrovet.co.ke/products.php?id=5991; https://www.jumia.co.ke/catalog/?q=guardian+rodent+bait+station; https://www.kenagrosuppliers.co.ke/ |
+| hisense-43a6qken-4k-uhd-smart-tv-with-tv-guard-and-wall-mount-43-inch | Existing pack | 25,491.5 [RETAIL-ESTIMATE] | 30% | 33,150 | 29,990 (avg 31,745) | https://hisense.co.ke/; https://www.hotpoint.co.ke/; https://www.circuit.co.ke/ |
+| hisense-55a6qken-4k-uhd-smart-tv-with-tv-guard-and-wall-mount-55-inch | Existing pack | 36,465 [RETAIL-ESTIMATE] | 25% | 45,600 | 42,900 (avg 43,700) | https://hisense.co.ke/; https://www.hotpoint.co.ke/; https://www.circuit.co.ke/ |
+| hisense-ref205dr-double-door-fridge-with-water-dispenser-205-litres | Existing pack | 32,129.15 [RETAIL-ESTIMATE] | 25% | 40,150 | 37,799 (avg 37,899) | https://www.hisensekenya.com/product/hisense-fridge-205-liters-grey; https://www.pricekenya.co.ke/c/refrigerators |
+| haier-90l-single-door-direct-cool-fridge-black-90-litres | Existing pack | 17,786.25 [RETAIL-ESTIMATE] | 30% | 23,100 | 20,925 (avg 20,925) | https://haier.co.ke/product-category/fridge/ |
+
+Gearlock Turbo 1kg is reduced because the existing KSh4,399 price is more than 25% above the average of Agroduka, M-Tolori, Agropests and Dawn Farmers (roughly KSh3,385); the formula-derived KSh3,500 is close to the market average. The other changes are increases from the exact matched in-stock listings and apply the 30% tier.
+
+## Newly added pack variants
+
+| Product | Pack | Lowest retail (KES) | Baseline (KES) | Markup | New price (KES) | Source |
+|---|---|---:|---:|---:|---:|---|
+| Golden Leaf Organosilicone Spray Adjuvant 25ml | 25ml bottle | 120 | 102 | 30% | 150 | https://mtolori.com/shop/details/29/products?page=156 |
+| Golden Leaf Organosilicone Spray Adjuvant 50ml | 50ml bottle | 170 | 144.5 | 30% | 200 | https://mtolori.com/shop/details/29/products?page=156 |
+| Golden Leaf Organosilicone Spray Adjuvant 100ml | 100ml bottle | 400 | 340 | 30% | 450 | https://mtolori.com/shop/details/29/products?page=156 |
+| Golden Leaf Organosilicone Spray Adjuvant 250ml | 250ml bottle | 690 | 586.5 | 30% | 750 | https://mtolori.com/shop/details/29/products?page=156 |
+| Gradometor 480EC Termiticide 50ml | 50ml bottle | 200 | 170 | 30% | 200 | https://agriguardagrovet.co.ke/product-category/termiticides/ |
+| Gradometor 480EC Termiticide 500ml | 500ml bottle | 1,350 | 1,147.5 | 30% | 1,500 | https://agriguardagrovet.co.ke/product-category/termiticides/ |
+| Gradometor 480EC Termiticide 5L | 5L bottle | 11,500 | 9,775 | 30% | 12,700 | https://agriguardagrovet.co.ke/product-category/termiticides/ |
+
+Golden Leaf 1L already existed. M-Tolori's current Kenya list confirms 25ml KSh120, 50ml KSh170, 100ml KSh400, 250ml KSh690 and 1L KSh2,670; new 25ml/50ml/100ml/250ml pack rows are prepared. Golden Leaf 500ml and 20L sizes are listed by suppliers but no exact price was confirmed in this search, so they were not created.
+
+Gradometor supplier listings confirm 50ml, 100ml, 250ml, 500ml, 1L, 5L and 20L packs. Existing 100ml, 250ml and 1L products remain; 50ml, 500ml and 5L are prepared using exact in-stock Kenya prices from AgriGuard. The existing 100ml/250ml/1L rows and new pack rows are grouped under one variant selector. The 20L price was not confirmed, so it is not added.
+
+## Needs Manual Check
+
+Remaining Batch 8 products not changed include GAUN imported livestock hardware where exact Kenyan stock pricing was not confirmed; foggers and Goizper sprayer; home appliances and electronics lacking model-exact current listings; other seeds without two matching supplier observations; Greenlife Farmchance (only one in-stock KSh14,000 source, so the current KSh18,200 is not reduced without the 25%-above-average test); Green Cop packs; Greenberg sprayers; Guardian alternatives where not exact; Hisense and Honda models without verified exact prices; PPE; bed bug products; Impact Dermi roller trap (calculated target below current, but current price is not >25% above multi-retailer average); and other unverified items. Golden Leaf 1L current price is retained because its formula target is below current and current is not >25% above the market average.
+
+SQL: `supabase/sql/pricing-batch-008.sql` (guarded updates and inserts; review branch only, not production). All original slugs are preserved; newly added variants receive new stable slugs.
