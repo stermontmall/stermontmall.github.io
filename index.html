@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>
-  <meta name="theme-color" content="#7c3aed">
+  <meta name="theme-color" content="#4c1d95">
   <title>Stermont Arcade | Pest Control &amp; Online Shopping Kenya</title>
   <meta name="description" content="Shop pest control products and agrovet supplies in Kenya. Request fumigation, termite, rodent, bed bug and CCTV services. M-Pesa and nationwide delivery.">
   <meta name="author" content="Stermont Arcade"> <!-- updated -->
@@ -12,10 +12,10 @@
   <link rel="alternate" hreflang="en-ke" href="https://stermontarcade.co.ke/">
   <link rel="alternate" hreflang="x-default" href="https://stermontarcade.co.ke/">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
-  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="icon" type="image/svg+xml" href="/brand-mark.svg">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <meta property="og:image" content="https://stermontarcade.co.ke/logo.png">
+  <meta property="og:image" content="https://stermontarcade.co.ke/brand-lockup.svg">
   <link rel="canonical" href="https://stermontarcade.co.ke/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Stermont Arcade | Pest Control &amp; Online Shopping Kenya">
@@ -27,7 +27,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Stermont Arcade | Pest Control &amp; Online Shopping Kenya">
   <meta name="twitter:description" content="Shop pest control products and agrovet supplies in Kenya. Request fumigation, termite, rodent, bed bug and CCTV services. M-Pesa and nationwide delivery.">
-  <meta name="twitter:image" content="https://stermontarcade.co.ke/logo.png">
+  <meta name="twitter:image" content="https://stermontarcade.co.ke/brand-lockup.svg">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -35,7 +35,7 @@
     "@id": "https://stermontarcade.co.ke/#org",
     "name": "Stermont Arcade",
     "url": "https://stermontarcade.co.ke/",
-    "logo": "https://stermontarcade.co.ke/logo.png",
+    "logo": "https://stermontarcade.co.ke/brand-lockup.svg",
     "telephone": "+254748888230",
     "email": "support@stermontarcade.co.ke",
     "address": {
@@ -130,7 +130,30 @@
       });
     } catch (e) {}
   })();
-  </script></head>
+  </script><style id="stermont-brand-refresh">
+:root{--brand-purple:#4c1d95;--brand-violet:#7c3aed;--brand-green:#16a34a;--brand-orange:#f97316;--brand-soft:#f5f0ff;--page:#faf8ff}
+body{background:#faf8ff}
+#appbar{background:linear-gradient(105deg,#fff 0%,#fbf8ff 62%,#f0fdf4 100%);border-bottom:1px solid #e9ddfb;box-shadow:0 3px 14px rgba(76,29,149,.08)}
+#appbar>.relative{background:transparent}
+.brand-logo{display:flex;align-items:center;gap:5px;flex:0 0 auto;min-width:88px;text-decoration:none;color:var(--brand-purple);font-size:14px;font-weight:850;letter-spacing:-.65px;white-space:nowrap}
+.brand-logo img{width:31px;height:31px;object-fit:contain}
+.brand-logo span{background:linear-gradient(100deg,#4c1d95 10%,#7c3aed 58%,#15803d 100%);background-clip:text;-webkit-background-clip:text;color:transparent}
+#search{background:#f4efff;border:1px solid #e7ddf7}
+#search:focus{background:#fff;border-color:#a78bfa}
+#appbar .icon-btn{color:#4c1d95}
+#appbar .icon-btn:focus-visible{outline:2px solid #a78bfa;outline-offset:2px}
+#chips-wrap{background:#fff}
+#chips .chip[aria-selected=true]{background:linear-gradient(100deg,#5b21b6,#7c3aed);box-shadow:0 2px 7px rgba(91,33,182,.2)}
+.text-sale{color:#ea580c!important}
+.bg-sale{background-color:#f97316!important}
+.border-sale{border-color:#f97316!important}
+.bg-brand{background-color:#5b21b6!important}
+.text-brand{color:#5b21b6}
+.bg-brand-soft{background-color:#f3eefe}
+.card{border:1px solid #eee8f7;box-shadow:0 2px 7px rgba(56,30,92,.055)}
+#bottom-nav{border-top:1px solid #e9ddfb;box-shadow:0 -3px 14px rgba(76,29,149,.05)}
+@media(min-width:520px){.brand-logo{min-width:112px;font-size:16px}.brand-logo img{width:35px;height:35px}}
+</style></head>
 <body class="min-h-dvh">
 <!-- The primary page heading is visible in the home view below. -->
 
@@ -154,7 +177,7 @@
 <!-- ===== Header / app bar (sticky) ===== -->
 <header id="appbar" class="sticky top-0 z-30 bg-white shadow-sm" style="padding-top:env(safe-area-inset-top)">
   <div class="relative z-10 bg-white flex items-center gap-1 px-2 h-bar">
-    <button class="icon-btn" data-open="drawer-categories" aria-label="All categories"><svg class="w-6 h-6"><use href="#i-menu"/></svg></button>
+    <a class="brand-logo" href="/" aria-label="Stermont Arcade home"><img src="/brand-mark.svg" alt="" width="32" height="32"><span>Stermont</span></a><button class="icon-btn" data-open="drawer-categories" aria-label="All categories"><svg class="w-6 h-6"><use href="#i-menu"/></svg></button>
     <form id="search-form" role="search" class="relative flex-1">
       <input id="search" name="q" type="search" aria-label="Search the shop" enterkeyhint="search" autocomplete="off" placeholder="Search pest control, agrovet, phones..." class="w-full h-9 pl-9 pr-3 rounded-full bg-gray-100 text-sm outline-none focus:ring-2 focus:ring-brand/40 transition-[height] duration-200">
       <button type="submit" class="sr-only" aria-label="Submit search">Search</button>
