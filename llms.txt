@@ -63,6 +63,7 @@
 - [Motorcycle Spare Parts in Kenya](https://stermontarcade.co.ke/c/motorcycle-spare-parts.html): Shop motorcycle spare parts in Kenya for Bajaj Boxer and other listed models. Check model, engine variant and part fitment before ordering.
 - [Shop Pest Control & Fumigation in Kenya](https://stermontarcade.co.ke/c/pest-control-fumigation.html): Browse Pest Control & Fumigation online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Pest Monitoring & Inspection Tools in Kenya](https://stermontarcade.co.ke/c/pest-monitoring-inspection-tools.html): Browse Pest Monitoring & Inspection Tools online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47…
+- [Shop Pet Supplies Online in Kenya](https://stermontarcade.co.ke/c/pet-supplies.html): Browse Pet Supplies online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Phone Accessories Online in Kenya](https://stermontarcade.co.ke/c/phone-accessories.html): Browse Phone Accessories online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Phones & Accessories Online in Kenya](https://stermontarcade.co.ke/c/phones-accessories.html): Browse Phones & Accessories online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Phones & Tablets Online in Kenya](https://stermontarcade.co.ke/c/phones-tablets.html): Browse Phones & Tablets online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
@@ -168,6 +169,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 1485 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 1563 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
