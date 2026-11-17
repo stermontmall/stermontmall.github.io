@@ -1116,3 +1116,44 @@ No new pack variants were added. Existing slugs/canonical URLs are preserved. SQ
 | WQ 528-Egg Automatic Incubator | 528 eggs | 55,250 [RETAIL-ESTIMATE] | 20% | 66,300 | 65,000 | https://mkulimajovial.co.ke/product-category/poultry/incubators/ |
 
 The VON steamer price is reduced because the current KSh5,199 is more than 25% above multiple exact-model Kenya listings (Digital Store, Hotpoint, Carrefour and Tabarak). VMS-206DGK, VPC613XMK and WQ 528 incubator are increased to the calculated tier price using current exact-model Kenyan retail observations.
+
+
+---
+
+# Batch 18 — inactive catalogue records — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Inactive products scanned | 85 |
+| Syngenta excluded | 1 |
+| Inactive non-Syngenta records retained unchanged | 84 |
+| Price updates | 0 |
+| New pack variants | 0 |
+
+**Syngenta exclusion:** Apron Star 42WS Seed Dressing 10g — left untouched. The other 84 products are already inactive and therefore are not purchasable storefront listings; they were not repriced or reactivated. Their existing IDs, slugs and prices are preserved. No market-price update is applied to discontinued, archived or otherwise inactive listings without an explicit reactivation decision.
+
+SQL record: supabase/sql/pricing-batch-018.sql (no-op audit record; no product data changed).
+
+---
+
+# Final catalogue coverage summary
+
+| Measure | Total |
+|---|---:|
+| Active catalogue records scanned | 1,647 |
+| Inactive catalogue records scanned | 85 |
+| **Total catalogue records scanned** | **1,732** |
+| Syngenta products excluded (active + inactive) | 61 |
+| Active non-Syngenta products eligible for pricing review | 1,587 |
+| Existing product price updates prepared in guarded SQL | 201 |
+| New pack variants prepared in guarded SQL | 25 |
+| Active non-Syngenta products left unchanged / needing manual price verification | 1,386 |
+| Inactive non-Syngenta products retained unchanged | 84 |
+
+The 201 price changes cover 201 unique existing product IDs. A duplicate AICO sprayer update in Batch 2 was removed from the earlier SQL block so the later broader-search recheck is the single effective price update for that product. All 201 current-price guards were checked against Supabase and matched the captured current prices. All 25 new variant IDs were checked and do not already exist. New pack variants are staged as inserts; they are not live yet.
+
+**Branch status:** all 18 batch SQL files and this handoff are committed to pricing/non-syngenta-market-review-20261117, based on main. No merge to main has been performed. Existing product URLs/slugs are unchanged. No production database prices or storefront pages have been changed.
+
+**SEO/schema status:** the product-page generator on this branch now emits KES Product Offer pricing from catalogue records, stock availability and a one-year priceValidUntil. The sitemap generator updates lastmod when generated product HTML changes. The SQL catalogue changes are staged only; therefore the actual generated product JSON-LD and sitemap timestamps are not yet synced to the proposed prices. After reviewing/merging and applying the SQL changes, run the product-page build and deployment, then verify representative Product JSON-LD prices and sitemap lastmod values before declaring the live site synced.
+
+**Deployment safety:** guarded SQL files require each existing record to still have its captured expected price and active status. Each new variant insert uses its own stable ID and ON CONFLICT (id) DO NOTHING; review the generated descriptions and add exact pack photos before public release. Supplier baselines marked [RETAIL-ESTIMATE] are the lowest matched Kenyan retail price × 0.85; no such baseline is represented as a supplier wholesale quotation.
