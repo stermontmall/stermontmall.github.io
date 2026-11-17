@@ -915,3 +915,51 @@ All five use [RETAIL-ESTIMATE] baselines (lowest reliable in-stock Kenyan retail
 No new pack sizes were added: supplier pages for Sulban, Stopdew, Taurus, Solubor and Spirometer list further packs, but exact in-stock prices were unavailable or variants were out of stock. Do not create pack variants based on size-only evidence. Existing slugs/canonical URLs remain unchanged.
 
 **SQL:** `supabase/sql/pricing-batch-014.sql` — guarded branch-only updates, not applied to production. Product JSON-LD and sitemap refresh require applying catalogue SQL and running the product build; the generator reads KES prices from product records, includes availability and one-year `priceValidUntil`, and updates sitemap `lastmod` for generated pages whose HTML changes.
+
+
+---
+
+# Batch 15 — products 1401–1500 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta products skipped | 0 |
+| Existing products with price updates prepared | 14 |
+| New pack variants | 0 |
+| Needs manual price check / unchanged | 86 |
+
+No Syngenta product lines were identified in this batch. Trinity Gold 452WP is Greenlife; Trustmate is Greenlife; the Tronic units are locally distributed electrical insect killers; TVS items are motorcycle spare parts.
+
+## Prepared price updates
+
+| Product | Pack / model | Baseline (KES) | Markup Tier | New Website Price (KES) | Competitor Retail (KES) | Sources |
+|---|---|---:|---:|---:|---:|---|
+| trinity-gold-452wp-fungicide-5kg | exact catalogue pack/model | 7,301.5 [RETAIL-ESTIMATE] (lowest 8,590) | 30% | 9,500 | 9,499–10,635 | https://agropests.com/products/trinity-gold-452wp-5kg; https://imaginecare.co.ke/product-tag/trinity-gold-452wp/; https://www.farmrescue.co.ke/product/trinity-gold-452-wp |
+| tronic-ik-7011-10-10w-uv-a-insect-killer | exact catalogue pack/model | 3,187.5 [RETAIL-ESTIMATE] (lowest 3,750) | 30% | 4,150 | 3,750–3,800 | https://www.tronic.co.ke/products/tronic-insect-killer-10w-1-tube; https://shopit.co.ke/insect-killers/ |
+| tronic-ik-7011-15-15w-uv-a-insect-killer | exact catalogue pack/model | 3,485 [RETAIL-ESTIMATE] (lowest 4,100) | 30% | 4,550 | 3,800 ex-VAT / 4,100 Tronic | https://www.tronic.co.ke/collections/insect-killer; https://shopit.co.ke/insect-killers/ |
+| tronic-ik-7039-20-20w-eco-friendly-insect-killer | exact catalogue pack/model | 4,335 [RETAIL-ESTIMATE] (lowest 5,100) | 30% | 5,650 | 5,100 | https://www.tronic.co.ke/collections/insect-killer |
+| tronic-ik-ga80-80w-commercial-insect-killer | exact catalogue pack/model | 25,474.5 [RETAIL-ESTIMATE] (lowest 29,970) | 25% | 31,850 | 29,970 | https://www.tronic.co.ke/collections/insect-killer |
+| tronic-ik-gc20-20w-insect-killer | exact catalogue pack/model | 8,070.75 [RETAIL-ESTIMATE] (lowest 9,495) | 30% | 10,500 | 9,495 | https://www.tronic.co.ke/collections/insect-killer |
+| tronic-ik-gc30-30w-insect-killer | exact catalogue pack/model | 7,650 [RETAIL-ESTIMATE] (lowest 9,000) | 30% | 9,950 | 9,000 | https://www.tronic.co.ke/collections/insect-killer |
+| tronic-ik-gc40-40w-insect-killer | exact catalogue pack/model | 10,480.5 [RETAIL-ESTIMATE] (lowest 12,330) | 30% | 13,650 | 12,330 | https://www.tronic.co.ke/collections/insect-killer |
+| uv-stabilised-hdpe-insect-net-3m-x-50m | exact catalogue pack/model | 12,750 [RETAIL-ESTIMATE] (lowest 15,000) | 30% | 16,600 | 15,000 | https://www.symnet.co.ke/solutions/insect-nets; https://shop.irrihub.com/products/pro-insect-net |
+| tvs-hlx-100cc-chain-and-sprocket-kit-n8320100 | exact catalogue pack/model | 2,124.15 [RETAIL-ESTIMATE] (lowest 2,499) | 30% | 2,750 | 2,499 | https://fdrautogarage.co.ke/product/tvs-hlx-100cc-chain-sprocket-kit-drive-set-n8320100/ |
+| tvs-hlx-150-4gear-chain-sprocket-kit-szn6320660-fresh | exact catalogue pack/model | 2,612.9 [RETAIL-ESTIMATE] (lowest 3,074) | 30% | 3,400 | 3,074 | https://cargen.com/product/chain-sprocket-kit-2/ |
+| tvs-hlx-150-clutch-assembly-primary-gear-2060t132-fresh-20261108 | exact catalogue pack/model | 2,082.5 [RETAIL-ESTIMATE] (lowest 2,450) | 30% | 2,700 | 2,450 | https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| tvs-hlx-150-clutch-boss-hub-disc-2061t131-fresh-20261108 | exact catalogue pack/model | 850 [RETAIL-ESTIMATE] (lowest 1,000) | 30% | 1,100 | 1,000 | https://fdrautogarage.co.ke/product-category/auto-parts/ |
+| tvs-hlx-125-150-clutch-bearing-6201-420602000-fresh-20261108 | exact catalogue pack/model | 340 [RETAIL-ESTIMATE] (lowest 400) | 30% | 450 | 400 | https://fdrautogarage.co.ke/product-category/auto-parts/ |
+
+All baselines are [RETAIL-ESTIMATE] (lowest matched in-stock Kenyan retail × 0.85), not wholesale quotes. Formula prices rounded to nearest KSh50. Trinity Gold 5kg current KSh13,299 is >25% above the three observed market prices (Agropests KSh8,590, Imagine Care KSh9,499 and Farm Rescue KSh10,635); formula baseline KSh7,301.50 × 1.30 = KSh9,492, rounded KSh9,500. Tronic 10W, 15W, IK7039-20, GA80, GC20, GC30 and GC40 prices use the manufacturer shop's exact model price list and 85% retail-estimate baseline; 80W GA80 uses the 25% tier because baseline exceeds KSh20,000. The 36W and 7071-10 models were not reduced because their current prices are not >25% above the observed comparison average. UV insect net 3m × 50m roll is supported by Symnet and IrriHub exact-size listings at KSh15,000; current KSh19,500 was >25% above the market average, so it is reduced to formula-derived KSh16,600. TVS items with exact part/model references were priced from FDR Auto Garage or Car & General references; where the current price was below formula-derived retail, prices are increased to the calculated amount.
+
+## Needs Manual Price Check / unchanged
+
+- Trinity Gold 50g/100g/250g/500g/1kg: current prices compared with Farm Rescue and Imagine Care; current values are not >25% above the market average or are below the formula, so no reductions.
+- Trustmate 250EC 5L: Agroduka KSh18,000 in stock vs current KSh22,500. Only one exact in-stock source; not >25% above market by a multiple-retailer average, so unchanged.
+- Tronic IK7011-36 and IK7071-10: current prices exceed one or two references, but do not breach the >25% reduction threshold; unchanged. IKGP02 not priced in the returned official price list.
+- TVS HLX parts without exact part-number/model matches (cables, carburettor parts, seals, piston rings, cylinder blocks, bearings, etc.) remain unchanged; do not infer interchangeability across HLX100/125/150 or Ocelot versions.
+- VectorFog BY100/BY200/C100/C150+/C20/DC20/H100SF/H200SF foggers: no reliable current Kenyan exact-model in-stock prices returned; unchanged.
+- Undertaker 480EC 1L and 50ml: AgriGuard prices KSh2,200 and KSh200 respectively, but no second exact in-stock comparable seller in this search set; unchanged.
+- Other unchanged products include Trevin Dudu Dust, Triger 5EC, Trinity Gold sizes not repriced, Tronic models not listed above, Tsavo seeds, Turbo sprayer, TVS items without exact references, Twigalaxyl, Twigamectin, TYMX speaker, Ullman mirror, smart watch, ultrasonic repeller, universal fly glue boards, UV tubes and lamps, UV-treated bird net, Uvuko sprayer, V-Multinor, Vanguard, Vaultex respirator, and remaining catalogue rows in this segment.
+
+No new pack variants were created. Existing product URLs/slugs are preserved. SQL: `supabase/sql/pricing-batch-015.sql` (guarded review-branch changes only; not applied to production). Product JSON-LD and sitemap refresh require applying catalogue SQL and running the product build. The generator uses the catalogue price for KES Product Offer schema, sets availability and one-year `priceValidUntil`, and updates sitemap `lastmod` when generated product HTML changes.
