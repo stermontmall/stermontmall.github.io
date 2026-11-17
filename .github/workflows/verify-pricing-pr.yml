@@ -191,7 +191,15 @@ jobs:
             const currentProduct = found.product;
             const baselineOffer = Array.isArray(baselineProduct?.offers) ? baselineProduct.offers[0] : baselineProduct?.offers;
             const currentOffer = Array.isArray(currentProduct.offers) ? currentProduct.offers[0] : currentProduct.offers;
-            if (!baselineProduct || !baselineOffer) {
+            if (!baselineProduct) {
+              if (previous && lastmod === previous) {
+                fail('New product variant did not receive a new lastmod: ' + url); lastmodErrors++;
+              } else if (!previous && lastmod !== today) {
+                fail('New product URL has unexpected lastmod ' + lastmod + ': ' + url); lastmodErrors++;
+              }
+              continue;
+            }
+            if (!baselineOffer) {
               fail('Could not read baseline Product JSON-LD offer for ' + id); lastmodErrors++; continue;
             }
             const priceChanged = Number(baselineOffer.price) !== Number(currentOffer?.price);
