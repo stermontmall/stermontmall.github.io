@@ -28,4 +28,16 @@ begin
  end loop;
 end
 $pricing$;
+
+-- Additional exact-model Turbo TR20 listing, in stock at Logike Kenya.
+do $pricing$
+declare affected integer;
+begin
+ update public.products set price=12700.00,cost=9775.00
+ where id='turbo-tr20-20l-2-in-1-manual-and-battery-knapsack-sprayer'
+   and active=true and price=10150.00;
+ get diagnostics affected=row_count;
+ if affected<>1 then raise exception 'Batch 15 Turbo TR20 guard failed (expected 10150, changed %)',affected; end if;
+end
+$pricing$;
 commit;
