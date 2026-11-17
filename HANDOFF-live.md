@@ -1,3 +1,21 @@
+## 2026-11-18 — Fumigation Chemicals batch 20 (owner-approved draft fallback)
+### Execution rule for this batch
+- Do not abort the full run because one candidate has a price range or an unverified image. Continue to the next candidate. Create a product only after an exact pack-size KES price is evidenced. If exact pack price is unresolved, record the candidate as blocked and continue; never infer a price from the range endpoints.
+- For every exact-price item, create the full 800+ word unique product guide and Supabase record with the four-tier baseline pricing, stock=1000 and low_at=20. If the exact-pack image is not verified, keep active=false and log the product here. Only activate after exact packshot QA and PCPB registration/use checks. The upload function verifies file bytes, not product identity.
+- No Syngenta items. Do not alter existing products.
+### Created drafts — category_id 37
+- `scud-5-wp-20g`: source listing KSh 899, Cheapthings (Mfangano Street, Nairobi), https://cheapthings.co.ke/product/scud-5-wp-20g/. Retail-only baseline = 899 * 0.85 = KSh 764.15; 30% tier; final price KSh 1,000 (nearest KSh 50). Description 1,386 words. Stock 1,000; low_at 20; active=false. Photo uploader accepted the exact supplier product page and stored https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/scud-5-wp-20g.png; final visual exact-pack QA pending. PCPB public-health register shows SCUD 5% WP PCPB(CR)1808; verify label/pack before activation.
+- `navigator-100sc-20ml`: source listing KSh 200, Agropests, Mang Building, Haile Selassie Ave, Nairobi, https://agropests.com/products/navigator-100sc-20ml. Retail-only baseline = 200 * 0.85 = KSh 170; 30% tier; pre-round KSh 221; final price KSh 200 after nearest-KSh-50 rounding and KSh 200 floor. Description 1,299 words. Stock 1,000; low_at 20; active=false. Photo uploader accepted the exact supplier product page and stored https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/navigator-100sc-20ml.png; final visual exact-pack QA pending. PCPB public-health register shows NAVIGATOR 100 SC PCPB(CR)1268; verify label/pack before activation. Do not publish a mixing rate: retailer pages conflict.
+### Initial candidates not yet created
+- DRAGON 5 WP: Osho official page confirms 20g and 100g packs but shows only KSh 102–475 combined range; exact pack price not established. PCPB register shows PCPB(CR)1807. Continue searching pack-specific price; do not estimate.
+- KILEX 0.5 GEL: Osho official page confirms 5g and 30g but shows KSh 278–946 combined range. Jumia 5g listing found at KSh 900 but marked out of stock. PCPB register shows PCPB(CR)2393. Continue searching for an exact in-stock pack price.
+- PARETO ROACH SPRAY: PPCK confirms 125ml, 250ml, 500ml and 1L; exact 1L KSh 1,310 found on Kilimo Buz but listing is stale (crawled ~4 months ago). PPCK official page still displays only a combined KSh 200–1,310 range. Find a current exact pack price before creating.
+### Progress
+- Two draft product rows created; two exact-pack product-page photo uploads succeeded at HTTP 200, but visual packshot inspection and PCPB label confirmation are still pending. No product activated or published. No existing product modified.
+- Continue with exact-price, current, non-Syngenta candidates until 20 unique pack listings are saved; log each SKU, baseline, final price, supplier URL, image status and regulatory status here.
+
+---
+
 # Live handoff — technical SEO
 
 Date: 2026-11-15 (Africa/Nairobi)
