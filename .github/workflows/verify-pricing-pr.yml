@@ -59,17 +59,24 @@ jobs:
 
           for (const name of sqlFiles) {
             const sql = fs.readFileSync(path.join(sqlDir, name), 'utf8');
-            // Guarded price rows use (product_id, expected_price, new_price[, new_cost]).
-            for (const match of sql.matchAll(/\('([^']+)',\s*[\d.]+::numeric,\s*[\d.]+::numeric/g)) {
+            // Guarded price rows use VALUES tuples. Later batches may also
+            // use a standalone guarded UPDATE instead of a VALUES loop.
+            for (const match of sql.matchAll(/\(\s*'([^']+)'\s*,\s*[\d.]+::numeric\s*,\s*[\d.]+::numeric/g)) {
               updatedIds.add(match[1]);
             }
-            // Parse all product rows in each INSERT block, not only the first pack.
-            for (const insert of sql.matchAll(/insert\s+into\s+public\.products\b[\s\S]*?\bvalues\b([\s\S]*?)(?=\n(?:on\s+conflict|commit\s*;|do\s+\$|insert\s+into|update\s+public\.products)|$)/gi)) {
-              for (const row of insert[1].matchAll(/\(\s*'([^']+)'/g)) insertedIds.add(row[1]);
-            }
-            // Include the one guarded single-row UPDATE outside a VALUES table.
-            for (const match of sql.matchAll(/update\s+public\.products\s+set\s+price\s*=\s*[\d.]+(?:\s*,\s*cost\s*=\s*[\d.]+)?\s+where\s+id\s*=\s*'([^']+)'/gi)) {
+            for (const match of sql.matchAll(/update\s+public\.products\s+set\s+price\s*=\s*[\d.]+\s+where\s+id\s*=\s*'([^']+)'/gi)) {
               updatedIds.add(match[1]);
+            }
+            // Parse every row in each idempotent INSERT. Descriptions can
+            // contain semicolons, so stop at ON CONFLICT rather than ';'.
+            for (const insert of sql.matchAll(/insert\s+into\s+public\.products\b/gi)) {
+              const tail = sql.slice(insert.index);
+              const conflictAt = tail.search(/on\s+conflict\s*\(id\)\s*do\s+nothing/i);
+              const statement = conflictAt < 0 ? tail : tail.slice(0, conflictAt);
+              const valuesAt = statement.search(/\bvalues\b/i);
+              if (valuesAt < 0) continue;
+              const values = statement.slice(valuesAt + 6);
+              for (const row of values.matchAll(/\(\s*'([^']+)'/g)) insertedIds.add(row[1]);
             }
           }
 
