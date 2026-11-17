@@ -623,7 +623,10 @@ for (const p of products) {
   const generatedTitle = pdpTitle(p.name, ctx);
   const generatedDescription = pdpDescription(p.name, ctx, p.description);
   const title = String(p.meta_title || p.seo_title || generatedTitle).trim();
-  const desc = String(p.meta_description || generatedDescription).trim();
+  // Prefer stored snippets only when they are complete sentences. Legacy imports often stored 155-character cut-offs or visible section labels.
+  const storedDescription = String(p.meta_description || '').trim();
+  const storedDescriptionIsClean = storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\\bPRODUCT\\s+(?:OVERVIEW|SUMMARY)\\b/i.test(storedDescription);
+  const desc = storedDescriptionIsClean ? storedDescription : generatedDescription;
   const h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
   NAMES[p.id] = h1;
   // Pack-size aliases must keep their own approved SEO name; copying the group heading
@@ -1077,3 +1080,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // Rebuild 2026-11-17: refresh product-page safety sections and complete catalogue SEO metadata after the Supabase-wide safety/SEO audit.
 
 // 2026-11-17: rebuild all product detail pages and product sitemap after expanding nine thin descriptions and correcting their unique SEO titles and snippets.
+
+// 2026-11-17: rebuild after correcting legacy truncated/heading-prefixed product meta descriptions.
