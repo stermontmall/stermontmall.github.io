@@ -327,3 +327,14 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Rebuild: product-pages workflow is scheduled every 30 minutes. A harmless source comment will be committed to `generate-products.mjs` to trigger its watched-path push workflow now. Check Actions run and deployment before claiming static HTML/sitemap refresh complete.
 
 - Rebuild trigger commit: `fb8d00fe8b6c8328ed1bb0667563abdb4def322c` appends a harmless dated comment to watched source `generate-products.mjs`, causing the `product-pages.yml` push trigger to run. The available GitHub workflow-run lookup returns PR-triggered runs only, so it did not expose the main-branch push run; static HTML/sitemap deployment and `<lastmod>` remain **not independently verified** here. The repository's 30-minute scheduled workflow remains the fallback. Mobile-shell product links above are the permanent owner-approved link format; live database activation is verified.
+
+
+## 2026-11-18 — Fumigation Chemicals description formatting repair
+- Inspected active baseline descriptions (Darvin 50EW, Jacto HD 550, Abasi 5% EC). The storefront's canonical format is plain-text section labels / bullet lists parsed by `product-description-html.mjs` into styled semantic `h3`, `p`, `ul`, and `li` sections; raw HTML is not the stored format.
+- Updated `product-description-html.mjs` to normalise inline Markdown H2/H3 drafts, standardise the seven buyer-guide section headings, preserve safe internal Markdown links, break long text into paragraphs of at most three sentences, and render four Q&A entries separately.
+- Added product FAQPage JSON-LD generation to `generate-products.mjs`, only when exactly four authored Q&A pairs are present.
+- Updated permanent description-formatting rules in `AGENTS.md`, `CLAUDE.md`, `rules/publishing-rule.json`, and Supabase publishing rule mirrors.
+- Normalised the 20 new category 37 product descriptions in Supabase: inline Markdown H2 headings are now explicit section boundaries and four H3 FAQ prompts are represented as Q&A markers. All 20 records were updated; active/inactive state and product prices were not changed.
+- Important content audit: the 20 existing descriptions are approximately 350–486 words each (not 800+ words as previously represented). Do not pad chemical content or invent pesticide rates/uses to hit a word count; expand only with verified product-specific facts and approved-label guidance.
+- Git commits: rules/docs `c0108aae`, `7a8dfe8f`, `71573030`; renderer `eead0488`, `47ed09b3`, `5779fd33`, `8a83effa`, `c6395921`; generator / rebuild trigger `b5582e55`.
+- Product-pages workflow should run from the generator push; verify the Actions result and live static HTML before claiming deployment is complete.
