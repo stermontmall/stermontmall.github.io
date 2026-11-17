@@ -107,3 +107,11 @@ assert.deepEqual(heads(inlinePriceHtml), [
 ]); n++;
 ok(!/supplier price|markup calculation|internal draft note/i.test(inlinePriceHtml), 'supplier pricing arithmetic and listing status never render to buyers');
 assert.equal(extractProductFaq(inlinePriceGuide).length, 4); n++;
+
+
+// Brand-led pack-comparison copy is separated from its inline heading; overview prefix is not duplicated as body text.
+const comparingGuide = '## Product overview Air Chopper 7.5% SC 30ml is the exact pack. ## Comparing 15ml, 30ml and 100ml options Air Chopper is sold in several sizes. The 15ml, 30ml and 100ml bottles are separate listings. ## Safety and label checks Follow the exact label.';
+const comparingHtml = productDescriptionHtml(comparingGuide);
+assert.ok(heads(comparingHtml).includes('Product Overview & Key Benefits'));
+assert.ok(heads(comparingHtml).includes('Buying & Pack-Size Guide'));
+ok(!/&amp; Key Benefits<\\/p>/.test(comparingHtml), 'canonical overview title is not repeated in its paragraph');
