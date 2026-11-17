@@ -59,13 +59,14 @@ console.log(`product-description-html: ${n} checks passed`);
 // Markdown-formatted catalogue drafts are normalised into the seven storefront sections and four Q&As.
 const markdownGuide = '# Sample Insecticide — Price in Kenya ## Product overview A concise overview. A second sentence. ## Technical specifications & pack details • Brand: Sample • Pack size: 100 ml ## Where & how to use in Kenya Use only for a verified label-approved purpose. ## Safety, storage & handling guidelines Follow the current label and store securely. ## Buying & pack-size guide Compare the exact pack. Browse [fumigation chemicals](https://stermontarcade.co.ke/c/fumigation-chemicals.html). ## Delivery across Kenya & Nairobi pickup Pay by M-Pesa and confirm delivery. ## Frequently asked questions ### What pack size is listed? This listing is for 100 ml. ### What should I check before use? Read the approved product label. ### Can I pay by M-Pesa? Yes, use the site checkout. ### Where is pickup coordinated? Sarit Centre, Westlands, Nairobi.';
 const markdownHtml = productDescriptionHtml(markdownGuide);
+// heads() decodes &amp; to &, so every expectation uses a plain ampersand.
 assert.deepEqual(heads(markdownHtml), [
   'Product Overview & Key Benefits',
   'Technical Specifications & Pack Details',
-  'Where &amp; How to Use in Kenya',
+  'Where & How to Use in Kenya',
   'Safety, Storage & Handling Guidelines',
   'Buying & Pack-Size Guide',
-  'Delivery across Kenya &amp; Nairobi Pickup',
+  'Delivery across Kenya & Nairobi Pickup',
   'Frequently Asked Questions'
 ]); n++;
 const productFaq = extractProductFaq(markdownGuide);
