@@ -488,12 +488,12 @@ SQL: `supabase/sql/pricing-batch-005.sql` (guarded, review branch only; not appl
 | Measure | Count |
 |---|---:|
 | Products scanned | 100 |
-| Syngenta skipped | 5 |
+| Syngenta skipped | 4 |
 | Existing product prices prepared for update | 3 |
 | New verified pack variants prepared | 3 |
 | Needs manual check / unchanged | 92 |
 
-Syngenta products skipped untouched: Cruiser 350FS 5L, Daconil 720SC 500ml, Danadim Progress 400EC 1L, Dithane Mancozeb 1kg, and Dual Gold 960EC 5L.
+Syngenta products skipped untouched: Cruiser 350FS 5L, Daconil 720SC 500ml, Dithane Mancozeb 1kg, and Dual Gold 960EC 5L. Danadim Progress 400EC 1L is FMC/Cheminova-branded, not Syngenta, and remains eligible for pricing research.
 
 ## Price updates
 
@@ -517,6 +517,6 @@ Supplier pages confirm Chariot 500SC standard sizes 50ml, 100ml, 250ml, 500ml an
 
 ## Needs Manual Check
 
-Remaining Batch 6 products (90 records after Syngenta exclusion and 3 price changes) are unchanged where no exact, reliable supplier price was confirmed or where the formula target would require a price reduction that fails the 25%-over-market-average exception. This includes PPE, chick feeders, seeds, Dursban, Climb, Closer, cocopeat, cage traps, Combat products, Commander 1L (formula target lower than current but current not >25% over market average), Companion, Compliant, Confidor, beekeeping tools, honey sieve, dairy products, CoverMax, Cropgrow, monitoring traps, insect light traps, pumps other than the Daichi model where engine specs were not exact, herbicides/fungicides without comparable current listings, and the remaining seed and PPE catalogue entries.
+Remaining Batch 6 products (93 records after 4 Syngenta exclusions and 3 price changes) are unchanged where no exact, reliable supplier price was confirmed or where the formula target would require a price reduction that fails the 25%-over-market-average exception. This includes PPE, chick feeders, seeds, Dursban, Climb, Closer, cocopeat, cage traps, Combat products, Commander 1L (formula target lower than current but current not >25% over market average), Companion, Compliant, Confidor, beekeeping tools, honey sieve, dairy products, CoverMax, Cropgrow, monitoring traps, insect light traps, pumps other than the Daichi model where engine specs were not exact, herbicides/fungicides without comparable current listings, and the remaining seed and PPE catalogue entries.
 
 SQL: `supabase/sql/pricing-batch-006.sql` (guarded updates + idempotent inserts; review branch only, not production). Existing product IDs, slugs and URLs remain unchanged; new variants have new stable IDs/slugs.
