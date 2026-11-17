@@ -258,7 +258,7 @@ products.forEach(p => { if (sl(p.id) !== p.id) aliases.push({ id: p.id, to: p.id
 }
 const fileOf = path => `.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m));
 const rawByCat = {};
-products.forEach(p => { const s = p.categories?.slug; if (s) (rawByCat[s] = rawByCat[s] || { name: p.categories.name, items: [] }).items.push(p); });
+products.forEach(p => { const s = p.categories?.slug; if (s) { const category = rawByCat[s] || { name: p.categories.name, description: p.categories.description, meta_title: p.categories.meta_title, meta_description: p.categories.meta_description, items: [] }; category.items.push(p); rawByCat[s] = category; } });
 const byCat = applyCategoryHubs(rawByCat);
 
 // Extra search-friendly text for category pages. Categories not listed here still get a normal page.
