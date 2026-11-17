@@ -608,3 +608,40 @@ Gradometor supplier listings confirm 50ml, 100ml, 250ml, 500ml, 1L, 5L and 20L p
 Remaining Batch 8 products not changed include GAUN imported livestock hardware where exact Kenyan stock pricing was not confirmed; foggers and Goizper sprayer; home appliances and electronics lacking model-exact current listings; other seeds without two matching supplier observations; Greenlife Farmchance (only one in-stock KSh14,000 source, so the current KSh18,200 is not reduced without the 25%-above-average test); Green Cop packs; Greenberg sprayers; Guardian alternatives where not exact; Hisense and Honda models without verified exact prices; PPE; bed bug products; Impact Dermi roller trap (calculated target below current, but current price is not >25% above multi-retailer average); and other unverified items. Golden Leaf 1L current price is retained because its formula target is below current and current is not >25% above the market average.
 
 SQL: `supabase/sql/pricing-batch-008.sql` (guarded updates and inserts; review branch only, not production). All original slugs are preserved; newly added variants receive new stable slugs.
+
+
+---
+
+# Batch 9 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta skipped | 2 |
+| Price updates prepared | 7 |
+| New pack variants | 0 |
+| Needs manual price check / unchanged | 91 |
+
+Syngenta exclusions: Karate Zeon 5CS 100ml and 1L. K-Othrine is Bayer, Infinito is Bayer, and Katerina/Kenthalonil are not Syngenta; they are not excluded by brand. Katerina 720SC and Kenthalonil 720SC remain under a separate chlorothalonil regulatory check before any price update.
+
+## Price updates
+
+| Product | Pack | Baseline Cost (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Source Reference |
+|---|---|---:|---:|---:|---:|---|
+| infinix-smart-20-4gb-64gb-20261108 | Existing pack | 12,546 [RETAIL-ESTIMATE] | 30% | 16,300 | 14,760 (avg 16,100) | https://www.jumia.co.ke/mlp-infinix-official-store/; https://acecore.co.ke/shop-phones; https://megastorekenya.co.ke/shop?brand=Infinix; https://silecommunications.com/product-category/infinix-mobile/ |
+| infinix-hot-70-4gb-128gb-20261108 | Existing pack | 16,150 [RETAIL-ESTIMATE] | 30% | 21,000 | 19,000 (avg 20,323) | https://mobilehub.co.ke/product/infinix-hot-70?storage=4GB; https://www.priceinkenya.com/product/114082-infinix-hot-70; https://www.acecore.co.ke/shop-phones; https://www.jumia.co.ke/mlp-infinix-official-store/ |
+| infinix-note-50-pro-8gb-256gb-20261108 | Existing pack | 25,075 [RETAIL-ESTIMATE] | 25% | 31,350 | 29,500 (avg 30,333) | https://www.phonetronicskenya.co.ke/categories/infinix; https://www.priceinkenya.com/price-list/phones/infinix; https://www.jumbomart.co.ke/categories/infinix-phones |
+| integra-organo-silicone-spray-adjuvant-1l | Existing pack | 2,762.5 [RETAIL-ESTIMATE] | 30% | 3,600 | 3,250 (avg 3,275) | https://mtolori.com/product/details/integra-1ltr; https://agrijibu.co.ke/integra/ |
+| kenpoly-4-litre-poultry-drinker | Existing pack | 297.5 [RETAIL-ESTIMATE] | 30% | 400 | 350 (avg 350) | https://www.myagrovet.co.ke/products.php?id=6997; https://ecochicks.co.ke/cat/poultry-equipment |
+| kenpoly-4l-poultry-drinker-with-water-level-window | Existing pack | 297.5 [RETAIL-ESTIMATE] | 30% | 400 | 350 (avg 350) | https://myagrovet.com/product/large-4l-anti-spill-poultry-water-dispenser-all-birds; https://ecochicks.co.ke/cat/poultry-equipment |
+| kato-germany-3-inch-7-5hp-petrol-water-pump | Existing pack | 15,300 [RETAIL-ESTIMATE] | 30% | 19,900 | 18,000 (avg 18,497.5) | https://juvalinnovations.co.ke/product/kato-germany-3-inch-petrol-water-pump/; https://colcalmachinery.co.ke/product-category/water-irrigation-equipment/petrol-water-pumps/ |
+
+The Kato Germany 3-inch 7.5HP pump price reduction is permitted because the current KSh23,400 is more than 25% above the average of two comparable Kenyan listings (Juval KSh18,000; Colcal KSh18,995). The other changes are formula-derived increases or small corrections based on current in-stock Kenyan listings. The 4L Kenpoly drinker variants were reduced because the current prices were materially above the same exact Kenpoly 4L product listings at KSh350; the new KSh400 retains the 30% markup over the 85%-of-retail baseline.
+
+The Infinix Smart 20 4GB/128GB listing was researched but not repriced: its calculated KSh15,800 is below the current KSh16,700, and the current price is not more than 25% above the multi-retailer average. It remains unchanged under the profit floor rule.
+
+## Needs Manual Check / Regulatory
+
+Remaining products are unchanged where no exact current Kenyan in-stock match was confirmed, or where the calculated price would require a reduction that does not meet the 25%-above-market-average exception. This includes Infinito 500ml/1L (current formula target below current but current not >25% above average), PPE, INGCO/Jacto sprayers and parts, pumps with non-matching engine/model specs, seeds without current multi-supplier checks, Katerina 720SC and Kenthalonil 720SC (chlorothalonil registration review), K-Othrine, household products, beekeeping equipment, and other hardware/electronics without a reliable exact match.
+
+SQL: `supabase/sql/pricing-batch-009.sql` (guarded; review branch only, not applied to production). Existing slugs/URLs preserved.
