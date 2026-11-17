@@ -21,3 +21,11 @@ The existing `generate-products.mjs` KES pricing implementation and one-year `pr
 1. Merge PR #866 into `main` after its complete validation check is green.
 2. Submit the site's `sitemap.xml` in Google Search Console and monitor sitemap processing and indexing coverage.
 3. Start Batch 3: build high-intent Nairobi and county-level local service pages, then continue reviewing and updating the remaining catalogue pricing for the Kenyan market.
+
+
+## Remaining catalogue pricing template — 2026-11-18
+
+- Exported 1,378 active catalogue products after excluding the 205 existing-product price updates and 25 new pack variants in the initial pricing batch, plus products explicitly marked `excluded_syngenta`.
+- Product_ID uses the catalogue product ID. SKU is blank because the live products table has no SKU field. Pack_Size uses the product variant label where present, otherwise the catalogue unit.
+- Current_Website_Price_KES is the current active catalogue price. Supplier_Wholesale_Price_KES and Calculated_New_Price_KES are intentionally blank because no verified Kenyan supplier quotes are recorded for these remaining products.
+- No catalogue prices were changed or published by this export. This CSV is a review template only.
