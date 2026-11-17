@@ -532,7 +532,7 @@ SQL: `supabase/sql/pricing-batch-006.sql` (guarded updates + idempotent inserts;
 | Syngenta skipped | 1 |
 | Price updates prepared | 7 |
 | New pack variants | 0 |
-| Needs manual price check / unchanged | 80 |
+| Needs manual price check / unchanged | 92 |
 
 Syngenta exclusion: Engeo 247SC 250ml. Danadim Progress is FMC/Cheminova (not Syngenta) and remains eligible; Funginil is Osho / Jiangsu Xinhe (not Syngenta) but requires a separate Kenya regulatory-status check.
 
