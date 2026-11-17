@@ -76,6 +76,8 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           {
+            node --check category-editorial.mjs
+            node --check generate-products.mjs
             node --check seo-check.mjs
             node --check data-health.mjs
             node --check blog-write.mjs
@@ -85,6 +87,8 @@ jobs:
             node --check product-content.test.mjs
             node --check seo-meta.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-syntax.log"
+      - name: Test category buying introductions and FAQ consistency
+        run: node category-editorial.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-category-editorial.log"
       - name: Test product category and safety enrichment
         run: node seo-product-extras.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/08-product-extras.log"
       - name: Test product and category SEO metadata
