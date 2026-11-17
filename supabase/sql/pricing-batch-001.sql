@@ -37,3 +37,29 @@ begin
 end
 $pricing$;
 commit;
+
+
+-- Batch 1 re-research addendum (2026-11-17). Guarded updates; estimated baselines are retail less 15% where stated in PRICING_HANDOFF.md.
+do $pricing$
+declare r record; affected integer;
+begin
+ for r in select * from (values
+('1-5kg-poultry-feeder-anti-scatter-ring',199.00::numeric,150.00::numeric),
+('10-litre-poultry-drinker-uv-resistant-stands-or-hangs',975.00::numeric,650.00::numeric),
+('10-pack-6l-poultry-drinkers-uv-resistant-tehno-mss',6370.00::numeric,5400.00::numeric),
+('11l-plastic-poultry-drinker-with-red-base',1150.00::numeric,1350.00::numeric),
+('12v-dc-solar-surface-water-pump-25m-head',12740.00::numeric,10850.00::numeric),
+('14-inch-heavy-duty-leather-welding-gloves-inner-lining',550.00::numeric,500.00::numeric),
+('2-stripes-reflective-vest-aa12',250.00::numeric,200.00::numeric),
+('20-litre-poultry-bucket-with-automatic-cup-drinkers',1699.00::numeric,1350.00::numeric),
+('3-in-1-soil-tester-moisture-light-and-ph-no-battery-needed',2860.00::numeric,2450.00::numeric),
+('110m-submersible-dc-solar-water-pump-with-1100w-panel-kit',127400.00::numeric,98000.00::numeric),
+('50-uv-shade-net-4m-x-50m-roll',15999.00::numeric,19500.00::numeric)
+ ) as v(product_id,expected_price,new_price)
+ loop
+  update public.products set price=r.new_price where id=r.product_id and active=true and price=r.expected_price;
+  get diagnostics affected=row_count;
+  if affected<>1 then raise exception 'Batch 1 recheck guard failed for % (expected %, changed %)',r.product_id,r.expected_price,affected; end if;
+ end loop;
+end
+$pricing$;
