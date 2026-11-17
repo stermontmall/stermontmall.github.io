@@ -352,7 +352,7 @@ Scanned the next 100 active catalogue records (alphabetical order, offset 200). 
 | Syngenta skipped | 11 |
 | Verified supplier/retail-benchmark price updates prepared | 11 |
 | Remaining manual checks | 78 |
-| New pack variants | 0 |
+| New pack variants | 6 |
 
 ## Batch 3 pricing updates
 
@@ -698,9 +698,9 @@ SQL: `supabase/sql/pricing-batch-010.sql` (guarded updates and idempotent insert
 |---|---:|
 | Products scanned | 100 |
 | Syngenta products skipped | 3 |
-| Price updates prepared | 2 |
+| Price updates prepared | 6 |
 | New pack variants | 0 |
-| Needs manual price check / unchanged | 95 |
+| Needs manual price check / unchanged | 91 |
 
 **Syngenta exclusions:** Orondis Ultra 28SC 25ml, Orondis Ultra 280SC 100ml, and Ortiva 250SC 20ml. These are left untouched.
 
@@ -727,6 +727,33 @@ Both are [RETAIL-ESTIMATE] baselines, not wholesale quotes. Omron M1 Basic lowes
 
 All other non-Syngenta records in this batch remain unchanged pending exact-pack supplier verification, including moth traps, DIY fly screens, mouse/rat traps, Multi NPK 13-2-44, Murtano, spray gun atomizer, Nativo SC, Navigator, Neemazal, Neocidol, Nexal, footwear, Nilzan Plus, Nivea items, teat dip cup, Nordox packs, Novital drinkers, respirator, NPK 23:23:0, Nunix appliances, Nutrifol, nitrile gloves, Odyssey seeds, Olvet drench, Omex Calmax, Omnia potassium nitrate, Oppo phones, Optimizer, Oraimo electronics/accessories, Oreganum seeds, Philips starter/tubes, Termidor where exact comparison/stock is inconsistent, Orvego, Osefin, Osho Bio Magic, Bio-Nematon, Osho bucket sprayers, Halt Neo, Nimbecidine, Oshothane, watches, Ozoneem, Pali, Panthenon, pantry moth trap, Papaya/Parsley seeds, Pearl, Pegasus packs, Pentagon, Pestman gel, Pestoptek stations, maize sheller, thermal fogger, PH1 seeds and other remaining catalogue records from this 100-row segment.
 
-No pack variants were added: supplier pages list multiple Nimbecidine/Bio-Nematon sizes, but do not expose reliable exact prices for every pack; we will not insert unpriced variants. Existing slugs/canonical URLs preserved.
+Nimbecidine/Bio-Nematon sizes are not added because pack-specific exact prices were not exposed. Oshothane variants are added in the research addendum below. Existing slugs/canonical URLs preserved.
 
 **SQL:** `supabase/sql/pricing-batch-011.sql` — guarded review-branch update, not applied to production. The product page generator has Product Offer KES pricing, availability, one-year priceValidUntil and hash-based per-URL sitemap lastmod generation; run the product build after applying catalogue SQL to refresh JSON-LD and sitemap files.
+
+
+## Batch 11 pricing and pack-size research addendum
+
+Four additional prices are now included in the guarded Batch 11 SQL:
+
+| Product | Pack | Baseline Cost (KES) | Markup Tier | New Website Price (KES) | Competitor Retail (KES) | Source Reference |
+|---|---|---:|---:|---:|---:|---|
+| OPPO A5 Pro 4G 8GB/256GB | 1 piece | 23,375 [RETAIL-ESTIMATE] | 25% | 29,200 | 27,500–27,700 (avg 27,600) | https://smartlinkelectronics.co.ke/shop?brand=oppo&category=phones; https://www.phonetronicskenya.co.ke/search?query=oppo+a5+pro |
+| Oraimo BoomPop Lite OHP-317 | 1 piece | 2,550 [RETAIL-ESTIMATE] | 30% | 3,300 | 3,000–3,500 (avg 3,166) | https://phonekenya.co.ke/brand/oraimo; https://www.sialophones.com/oraimo; https://goldec.co.ke/brand/oraimo |
+| Oraimo Watch 5 Lite OSW-804 | 1 piece | 2,125 [RETAIL-ESTIMATE] | 30% | 2,750 | 2,500 | https://www.sialophones.com/oraimo |
+| Oshothane 80 WP | 50g | 76.50 [RETAIL-ESTIMATE] | 30% | 100 | 90 | https://www.farmrescue.co.ke/product/oshothane-80-wp |
+
+### Six additional Oshothane pack variants
+
+Farm Rescue lists all sizes below in stock with exact pack prices. Baseline = supplier retail × 0.85.
+
+| Product | Pack | Supplier Price (KES) | Baseline (KES) | Markup | New Price (KES) | Source |
+|---|---|---:|---:|---:|---:|---|
+| Oshothane 80 WP Fungicide | 100g | 150 | 127.50 | 30% | 150 | https://www.farmrescue.co.ke/product/oshothane-80-wp |
+| Oshothane 80 WP Fungicide | 200g | 265 | 225.25 | 30% | 300 | https://www.farmrescue.co.ke/product/oshothane-80-wp |
+| Oshothane 80 WP Fungicide | 500g | 595 | 505.75 | 30% | 650 | https://www.farmrescue.co.ke/product/oshothane-80-wp |
+| Oshothane 80 WP Fungicide | 1kg | 1,180 | 1,003 | 30% | 1,300 | https://www.farmrescue.co.ke/product/oshothane-80-wp |
+| Oshothane 80 WP Fungicide | 2.5kg | 2,915 | 2,477.75 | 30% | 3,200 | https://www.farmrescue.co.ke/product/oshothane-80-wp |
+| Oshothane 80 WP Fungicide | 5kg | 5,740 | 4,879 | 30% | 6,350 | https://www.farmrescue.co.ke/product/oshothane-80-wp |
+
+The new Oshothane pack rows use the existing category, stock default (1,000), low-stock alert (20), featured flag, KES prices, metadata, and a shared variant group. Existing 50g product slug is preserved and joined to the new pack selector. No other variants were created without a precise pack price and stock confirmation.
