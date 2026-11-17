@@ -501,7 +501,7 @@ mkdirSync('p', { recursive: true }); mkdirSync('c', { recursive: true });
 const urls = [];
 
 const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(optimizedImageUrl(u, 320))}" alt="${esc(p.alt_text || (p.name + ' product photo'))}" width="160" height="150" loading="lazy" decoding="async">` : ''; };
-const card = p => `<li data-name="${esc(p.name)}" data-price="${Math.max(0, Number(p.price) || 0)}"><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
+const card = p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 // Helpful, category-specific buying checks. Avoid inventing product specifications, certifications or warranty terms.
 function productSiloHtml(p, cat, related) {
@@ -680,15 +680,45 @@ for (const p of products) {
   const detailFallback = 'This listing is for ' + p.name + ' in the ' + (cat?.name || 'Stermont Arcade') + ' category. Check the exact model, pack size or variant and the specifications shown on this page before ordering. If a detail is not listed, contact Stermont Arcade to confirm it. Current availability and delivery charges are confirmed before payment.';
   const productDescription = catalogDescription.length >= 100 ? catalogDescription : [catalogDescription, detailFallback].filter(Boolean).join(' ');
   const buyerNotes = productBuyingNotes(p, cat);
-  const categoryFaqHtml = info.faq ? '<section class="category-faq"><h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => '<details><summary>' + esc(q) + '</summary><p>' + esc(a) + '</p></details>').join('') + '</section>' : '';
-  const categoryTools = '<style>.category-tools{display:grid;grid-template-columns:2fr 1fr 1fr;gap:.65rem;margin:1.1rem 0;padding:1rem;border:1px solid #e6e1f5;border-radius:12px;background:#fff}.category-tools label{display:grid;gap:.3rem;font-weight:700;font-size:.85rem}.category-tools input,.category-tools select{width:100%;min-width:0;padding:.7rem;border:1px solid #cfc7df;border-radius:8px;font:inherit}.category-result-count{color:#625b70;font-size:.9rem;margin:.35rem 0 .75rem}.category-faq details{padding:.85rem 0;border-bottom:1px solid #e6e1f5}.category-faq summary{cursor:pointer;font-weight:750}.category-faq p{margin:.45rem 0;line-height:1.65}@media(max-width:620px){.category-tools{grid-template-columns:1fr 1fr}.category-tools label:first-child{grid-column:1/-1}}</style><section class="category-tools" aria-label="Quick product filters"><label>Search products<input id="category-search" type="search" placeholder="Search this category" autocomplete="off"></label><label>Price range<select id="category-price"><option value="all">All prices</option><option value="under1000">Under KSh 1,000</option><option value="1000-5000">KSh 1,000–5,000</option><option value="5000plus">Over KSh 5,000</option></select></label><label>Sort by<select id="category-sort"><option value="default">Recommended</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></label></section><p class="category-result-count" id="category-result-count" aria-live="polite"></p>';
-  const categoryFilterScript = '<script>(function(){var list=document.getElementById("category-products");if(!list)return;var cards=Array.prototype.slice.call(list.querySelectorAll("li[data-price]"));var search=document.getElementById("category-search"),price=document.getElementById("category-price"),sort=document.getElementById("category-sort"),count=document.getElementById("category-result-count");if(!search||!price||!sort||!count)return;function apply(){var q=(search.value||"").toLowerCase().trim(),range=price.value;cards.forEach(function(card){var name=(card.getAttribute("data-name")||card.textContent).toLowerCase(),amount=Number(card.getAttribute("data-price")||0),matchName=!q||name.indexOf(q)!==-1,matchPrice=range==="all"||(range==="under1000"&&amount<1000)||(range==="1000-5000"&&amount>=1000&&amount<=5000)||(range==="5000plus"&&amount>5000);card.hidden=!(matchName&&matchPrice)});var visible=cards.filter(function(card){return !card.hidden});if(sort.value==="low"||sort.value==="high"){visible.sort(function(a,b){var d=Number(a.dataset.price)-Number(b.dataset.price);return sort.value==="low"?d:-d}).forEach(function(card){list.appendChild(card)})}else{cards.forEach(function(card){list.appendChild(card)})}count.textContent=visible.length+" of "+cards.length+" products shown"}search.addEventListener("input",apply);price.addEventListener("change",apply);sort.addEventListener("change",apply);apply()})();</script>';
+  const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
+<div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.alt_text || (p.name + ' - product photo'))}" fetchpriority="high" loading="eager" decoding="async" width="720" height="720" data-fallbacks="${esc(JSON.stringify(img.slice(1)))}">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
+<div><h1>${esc(h1)}</h1><p class="tagline" style="margin:.1rem 0 .6rem;color:#5b21b6;font-weight:600">${esc(tagline)}</p><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
+<p class="${inStock ? 'ok' : 'no'}">${inStock ? 'In stock' : 'Currently sold out'}</p>
+<p>Buy ${esc(p.name)} online in Kenya from ${BRAND}. Pay by M-Pesa and get delivery to all 47 counties.</p>
+<a class="btn" href="${esc(wa)}">Order on WhatsApp</a><a class="btn alt" href="${esc(cartUrl)}">Add to Cart / Pay with M-Pesa</a>
+<div class="box trustline" aria-label="Shopping and delivery assurances">✓ Instant M-Pesa Checkout • ✓ Coordinated via Westlands Office • ✓ Same-Day Nairobi Delivery &amp; Sarit Centre Pickup • ✓ 47-County Shipping</div></div></div>
+${sizeBox}
+${`<div class="box product-description"><h2 style="margin-top:0">About ${esc(p.name)}</h2>${productDescriptionHtml(productDescription)}</div>`}
+${productContentHtml(p)}
+${seoBoxes}
+${buyerNotes}
+${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
+${productSiloHtml(p, cat, related)}
+<div class="stk" role="complementary" aria-label="Order this product"><a class="call" href="${esc(inStock ? stickyWa : ask)}">Order via WhatsApp</a><a href="${esc(cartUrl)}">Add to Cart / Pay with M-Pesa</a></div>`;
+  writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld, ogType: 'product', extra: `<meta name="stm-id" content="${esc(p.id)}"><meta name="stm-seo" content="v2"><meta property="product:price:amount" content="${Math.round(Number(p.price) || 0)}"><meta property="product:price:currency" content="KES"><meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` }));
+  urls.push(path);
+}
+
+for (const a of aliases) {
+  const from = `/p/${encodeURIComponent(a.id)}.html`, to = `${SITE}/p/${encodeURIComponent(sl(a.to))}.html`;
+  writeFileSync(fileOf(from), `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Redirecting\u2026</title><link rel="canonical" href="${to}"><meta http-equiv="refresh" content="0;url=${to}"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><p>This product moved. <a href="${to}">Continue to the product page</a>.</p></body></html>`);
+}
+
+for (const [slug, c] of Object.entries(byCat)) {
+  const oldPath = `/c/${encodeURIComponent(slug)}.html`;
+  const path = slug === 'stermont-cars-for-sale' ? '/cars-for-sale.html' : slug === 'mens-fashion' ? '/fashion.html' : oldPath;
+  const info = INFO[slug] || {};
+  const title = info.title || c.meta_title || catTitle(c.name);   // approved category metadata takes precedence over generated fallback
+  const desc = info.desc || c.meta_description || catDescription(c.name, slug);
+  const categoryIntro = info.intro || c.description || 'Browse the products listed below and compare the exact model, pack size or variant before ordering.';
+  const helpCta = isPest(slug) ? '<div class="box"><b>Need help choosing a pest-control product?</b><p>Tell us the pest, treatment site and pack size you are considering. We can help confirm the product listing, stock and delivery fee before you order.</p><a class="btn" href="https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent('Hello Stermont Arcade, please help me choose a ' + c.name.toLowerCase() + ' product. Please confirm its listed use, pack size, stock and delivery fee.') + '">Ask on WhatsApp</a></div>' : '';
+  const serviceCrosslink = isPest(slug) ? '<div class="box"><b>Need professional pest-control help?</b><p>Read our service information for treatment options, inspection questions and how to request a quote.</p><a href="/services/">Explore pest-control services</a> · <a href="/services/pests/termites.html">Termite information</a> · <a href="/services/pests/bed-bugs.html">Bed bug information</a></div>' : '';
+  const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
-<p>${esc(categoryIntro)}</p>${categoryTools}<p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or ask about pickup at Sarit Centre, Westlands. Delivery fees are confirmed before payment.</p>${helpCta}${serviceCrosslink}<ul class="g" id="category-products">${c.items.map(card).join('')}</ul>
-${categoryFilterScript}
+<p>${esc(categoryIntro)}</p><p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or ask about pickup at Sarit Centre, Westlands. Delivery fees are confirmed before payment.</p>${helpCta}${serviceCrosslink}<ul class="g">${c.items.map(card).join('')}</ul>
 ${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
 ${info.guide || ''}
-${categoryFaqHtml}
+${info.faq ? '<h2>Frequently asked questions</h2>' + info.faq.map(([q, a]) => `<div class="box"><b>${esc(q)}</b><p>${esc(a)}</p></div>`).join('') : ''}
 <p><a href="/c/">Browse all categories</a></p>`;
   const faqLd = info.faq ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: info.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
   if (path !== oldPath) {
