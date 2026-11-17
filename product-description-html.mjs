@@ -93,7 +93,7 @@ function normalizeMarkdownHeading(value) {
   const h = value.toLowerCase().replace(/[&]/g, 'and').replace(/\s+/g, ' ').trim();
   if (/(source price|baseline calculation|pricing calculation|exact price and|price and (?:baseline|pack|stermont)|price comparison|sourcing notes)/.test(h)) return 'Internal pricing metadata';
   if (/(product overview|overview|key features|key benefits|product summary)/.test(h)) return 'Product Overview & Key Benefits';
-  if (/(technical|specification|identity|formulation|pack details|exact pack|product details|product information|pack contents|variant identity|confirmed pack|exact size)/.test(h)) return 'Technical Specifications & Pack Details';
+  if (/(technical|specification|identity|formulation|pack details|exact pack|product details|product information|pack contents|pack information|product and pack|variant identity|confirmed pack|exact size)/.test(h)) return 'Technical Specifications & Pack Details';
   if (/(where|target pests|registered|application|uses|use in kenya|pest-control context|public-health purpose|intended buyer|supplier-described public-health|what the product is listed for)/.test(h)) return 'Where & How to Use in Kenya';
   if (/(safety|storage|handling|before purchasing|label|regulatory|precaution|ppe|restriction)/.test(h)) return 'Safety, Storage & Handling Guidelines';
   if (/(buying|pack.size|pack format|pack capacities|price|comparison|compare|choosing|purchase|source price|baseline|value|why .* pack)/.test(h)) return 'Buying & Pack-Size Guide';
