@@ -71,6 +71,19 @@ function renderBody(body, heading) {
   })).join('');
 }
 
+
+function normalizeMarkdownHeading(value) {
+  const h = value.toLowerCase().replace(/[&]/g, 'and').replace(/\s+/g, ' ').trim();
+  if (/^(product overview|overview|product summary)$/.test(h)) return 'Product Overview & Key Benefits';
+  if (/(technical|specification|identity|formulation|pack details|exact pack|product details)/.test(h)) return 'Technical Specifications & Pack Details';
+  if (/(where|target pests|application|uses|use in kenya|registered target)/.test(h)) return 'Where & How to Use in Kenya';
+  if (/(safety|storage|handling|before purchasing|label compliance)/.test(h)) return 'Safety, Storage & Handling Guidelines';
+  if (/(buying|pack.size|price comparison|compare|before you buy)/.test(h)) return 'Buying & Pack-Size Guide';
+  if (/(ordering|delivery|pickup)/.test(h)) return 'Delivery across Kenya & Nairobi Pickup';
+  if (/(frequently asked questions|^faqs?$)/.test(h)) return 'Frequently Asked Questions';
+  return value;
+}
+
 export function productDescriptionHtml(source) {
   // Remove generic buying-guide boilerplate; retain the product-specific copy.
   const raw = String(source || '')
@@ -90,7 +103,7 @@ export function productDescriptionHtml(source) {
   // Markdown H2 headings are section boundaries too. H3 FAQ questions are retained as Q: lines.
   const markdownHeading = /^##\\s+(.+?)\\s*$/gm;
   let mh;
-  while ((mh = markdownHeading.exec(raw))) hits.push({ start: mh.index, end: markdownHeading.lastIndex, heading: mh[1].trim() });
+  while ((mh = markdownHeading.exec(raw))) hits.push({ start: mh.index, end: markdownHeading.lastIndex, heading: normalizeMarkdownHeading(mh[1].trim()) });
   for (const [heading, re] of LABELS) {
     re.lastIndex = 0; let m;
     while ((m = re.exec(raw))) hits.push({ start: m.index, end: re.lastIndex, heading });
