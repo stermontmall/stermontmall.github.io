@@ -1086,3 +1086,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-17: regenerate all product pages after completing 13 additional thin product descriptions and unique snippets.
 
 // 2026-11-17: rebuild after repairing catalogue-wide product meta descriptions and pack-specific snippets.
+
+// 2026-11-17: rebuild catalogue pages after extending all active product descriptions previously below 80 words and repairing nine truncated snippets.
