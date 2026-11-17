@@ -317,3 +317,24 @@ The other initially flagged Batch 1 products remain marked `[NEEDS MANUAL PRICE 
 The exact 1.5kg feeder is listed at KSh 140 by Fuga and KSh 180 by Ecochicks; its formula price is KSh 150 using a retail-minus-15% estimate. The 10L poultry drinker is listed at KSh 570 by Mkulima Jovial, KSh 700 by Ecochicks and KSh 750 by MyAgrovet; formula price KSh 650. The 50% shade-net 4m × 50m factory rate is KSh 15,000 at Symnet, with a KSh 18,000 retail comparison at Shadenets; formula price KSh 19,500. These calculated prices do not exceed the 15% alert threshold against multiple comparable retailers in the results found.
 
 **Live status:** The guarded SQL remains a branch artifact. No production prices were changed by this recheck.
+
+
+---
+
+# Batch 2 — broader search recheck (2026-11-17)
+
+Re-searched the 77 initially flagged records using brand/core product/pack-size and active-ingredient queries across Kenyan supplier sites. Seven catalogue rows now have usable matching references and guarded price updates. No new pack variants were created; ALONZE 50EC supplier pages confirm 25ml, 50ml, 100ml, 250ml and 1L options, all of which are already represented in the existing catalogue, but only 1L had a clear, in-stock price in the pages returned.
+
+| Product ID | Baseline (KES) and method | Markup | Calculated retail (KES) | Competitor retail (KES) | Competitor check | Sources |
+|---|---:|---:|---:|---:|---|---|
+| algreen-hynitro-42-high-nitrogen-foliar-fertilizer-1l | 587.35 (AgriJibu retail KSh691 less 15%) | 30% | 750 | 691 | No alert: below 15% threshold | https://agrijibu.co.ke/crop-production/fertilizers/foliar-fertilizer/ |
+| algreen-planta-p-liquid-foliar-fertilizer-1l | 807.5 (AgriJibu retail KSh950 less 15%) | 30% | 1,050 | 950 | No alert: below 15% threshold | https://agrijibu.co.ke/crop-production/fertilizers/foliar-fertilizer/ |
+| algreen-supa-k-high-potassium-foliar-fertilizer-1l | 518.5 (AgriJibu retail KSh610 less 15%) | 30% | 650 | 610 | No alert: below 15% threshold | https://agrijibu.co.ke/crop-production/fertilizers/foliar-fertilizer/ |
+| agromaster-16-10-22-controlled-release-fertilizer-25kg | 3,570 (AgriJibu retail KSh4,200 less 15%) | 30% | 4,650 | 4,200 | No alert: below 15% threshold | https://agrijibu.co.ke/crop-production/fertilizers/ |
+| aico-japan-ac767-4-25l-4-stroke-petrol-knapsack-sprayer | 15,725 (lowest matched retail KSh18,500 less 15%) | 30% | 20,450 | 18,500 | No alert: below 15% threshold | https://myagrovet.com/product/professional-25cc-motorized-backpack-sprayer-4-stroke-engine; https://www.jumia.co.ke/aico-petrol-knapsack-sprayer-ac767-4.-25l-knapsack-sprayer-327588025.html; https://www.myagrovet.co.ke/products.php?id=7501 |
+| alonze-50-ec-miticide-1l | 6,740.5 (Agroduka in-stock retail KSh7,930 less 15%) | 30% | 8,750 | 7,930 | No alert: below 15% threshold | https://agroduka.ke/alonze-50ec/ |
+| alonze-50ec-abamectin-insecticide-1-litre | 6,740.5 (Agroduka in-stock retail KSh7,930 less 15%) | 30% | 8,750 | 7,930 | No alert: below 15% threshold | https://agroduka.ke/alonze-50ec/ |
+
+Algreen Bonzin is listed in a price range KSh370–1,170, but the 1L variant price is not unambiguously separated in the listing, so its current price remains unchanged and flagged. Hynitro 42 1L, Planta-P 1L and Supa-K 1L are separately priced by AgriJibu. The AICO AC767-4 is listed by MyAgrovet and several Jumia sellers at KSh18,500–21,000; the lowest matching retail listing was used for the retail-minus-15% estimate. Agroduka confirms Alonze 50EC 1L in stock at KSh7,930.
+
+**Batch 2 revised counts:** 100 scanned; 15 Syngenta exclusions; 15 price updates prepared in total (8 initial + 7 recheck); 70 still needing manual price checks; 0 new pack variants. No live database prices were changed.
