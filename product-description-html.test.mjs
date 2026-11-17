@@ -115,3 +115,21 @@ const comparingHtml = productDescriptionHtml(comparingGuide);
 assert.ok(heads(comparingHtml).includes('Product Overview & Key Benefits'));
 assert.ok(heads(comparingHtml).includes('Buying & Pack-Size Guide'));
 ok(!/&amp; Key Benefits<\\/p>/.test(comparingHtml), 'canonical overview title is not repeated in its paragraph');
+
+
+// Legacy uppercase labels also render with the canonical storefront section names.
+const legacyLabels = productDescriptionHtml('PRODUCT OVERVIEW\nA product summary. SPECIFICATIONS\nBrand: Example. APPLICATION & USE\nCheck the approved label. SAFETY INFORMATION\nFollow label precautions. BUYING GUIDE\nCompare the exact pack. ORDERING & DELIVERY\nUse M-Pesa checkout. FAQS\nQ: What is this? An example. Q: What size? A pack. Q: How to pay? M-Pesa. Q: Where pickup? Sarit Centre.');
+assert.deepEqual(heads(legacyLabels), [
+  'Product Overview & Key Benefits',
+  'Technical Specifications & Pack Details',
+  'Where & How to Use in Kenya',
+  'Safety, Storage & Handling Guidelines',
+  'Buying & Pack-Size Guide',
+  'Delivery across Kenya & Nairobi Pickup',
+  'Frequently Asked Questions'
+]); n++;
+
+// Decimal concentrations and percentages must not be split into separate sentences/paragraphs.
+const decimalGuide = productDescriptionHtml('PRODUCT OVERVIEW\nAir Chopper 7.5% SC contains 0.5 g/L of an ingredient. The pack is 15ml. Follow the approved label.');
+ok(/Air Chopper 7\\.5% SC contains 0\\.5 g\\/L/.test(decimalGuide), 'decimal concentrations remain intact in rendered paragraphs');
+ok(!/<p>&amp; Key Benefits<\\/p>/.test(comparingHtml), 'overview suffix is not repeated as body text');
