@@ -688,3 +688,45 @@ Mel-Agri's current Norbrook Kenya catalogue shows Levafas Diamond 125ml (KSh380)
 Remaining Batch 10 products unchanged where no exact current price was verified or the formula price would require an impermissible reduction. This includes vehicle sourcing adverts, PPE, livestock premix and supplements, longray foggers, household appliances and personal care, Lynfield traps, fertilizers, Matco pack sizes where formula target is below current but current is not sufficiently overpriced, Mavuno Bora bags, MaxGuard moth traps, Maxigrow, Maxim excluded as Syngenta, Mchwatox, Milano pumps, other fungicides and insecticides, men’s fashion, Metro 200SC, Milestone, milk strip cup, mini feed crusher, rodent baits, MOP fertilizer, mosquito consumables and Mospilan.
 
 SQL: `supabase/sql/pricing-batch-010.sql` (guarded updates and idempotent inserts; review branch only, not production). Existing slugs/URLs preserved.
+
+
+---
+
+# Batch 11 — products 1001–1100 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta products skipped | 3 |
+| Price updates prepared | 2 |
+| New pack variants | 0 |
+| Needs manual price check / unchanged | 95 |
+
+**Syngenta exclusions:** Orondis Ultra 28SC 25ml, Orondis Ultra 280SC 100ml, and Ortiva 250SC 20ml. These are left untouched.
+
+## Price updates prepared
+
+| Product | Pack Size | Supplier Baseline (KES) | Markup Tier | New Website Price (KES) | Competitor Retail (KES) | Source Reference |
+|---|---|---:|---:|---:|---:|---|
+| omron-m1-basic-automatic-upper-arm-blood-pressure-monitor-22-32-cm-cuf | exact listed pack | 3,570 [RETAIL-ESTIMATE] | 30% | 4,650 | 4,200 (multi-retailer avg 4,600) | https://comfyshc.com/product/omron-m1-basic-blood-pressure-monitorwith-warranty/; https://medpoint.co.ke/product/omron-m1-basic-blood-pressure-monitor/; https://hinatapharmacy.co.ke/products/omron-blood-pressure-machine-m-1 |
+| norbrook-milking-salve-100-g | exact listed pack | 102 [RETAIL-ESTIMATE] | 30% | 150 | 120 (multi-retailer avg 135) | https://mtolori.com/product/details/milking-salve-100gms-norbrook-3570; https://www.melagri.com/brands/norbrook-kenya-limited |
+
+Both are [RETAIL-ESTIMATE] baselines, not wholesale quotes. Omron M1 Basic lowest in-stock Nairobi listing is KSh4,200, with Medpoint Nairobi KSh4,500 and Hinata Pharmacy KSh5,100; average KSh4,600. Baseline KSh3,570 × 1.30 = KSh4,641, rounded to KSh4,650. Existing KSh6,499 was over 25% above the multi-retailer average. Norbrook Milking Salve 100g lowest comparable Kenyan price KSh120 at M-Tolori, with Mel-Agri KSh150 in stock; baseline KSh102 × 1.30 = KSh132.60, rounded KSh150. Existing KSh450 was materially more than 25% above the multi-retailer average. Both new prices retain at least the 15% profit floor and are close to the observed retail market.
+
+## Other checked / unchanged
+
+- Termidor 96SC 1L: current KSh20,850; listings include M-Tolori KSh15,500, Farm Rescue KSh16,025, Cheapthings KSh19,500, Jumia KSh24,000 and FarmShield KSh28,899. Existing price is not >25% above the comparable-market average; do not reduce. Termidor 200ml has inconsistent seller pricing and is retained.
+- Osho Hillor HR14: Osho direct KSh14,116 and Agroduka KSh15,448 in stock; current KSh18,399 is close to the >25% reduction boundary but not over the market average threshold, so unchanged.
+- Osho Deluxe Bucket Sprayer: Osho direct KSh9,366 and Agroduka KSh10,250; current KSh12,199 does not exceed the average by >25%, so unchanged.
+- Omex Calmax 1L: M-Tolori KSh1,060; only one exact current listing, so unchanged.
+- Ozoneem 1% EC 1L: Agroduka KSh37,020 in stock (minimum quantity 4); no second comparable independent listing, so unchanged.
+- Nimbecidine 1L and Bio-Nematon 1L pack selectors display broad price ranges; no pack-specific exact price is safely extractable, so unchanged.
+- Omnia Potassium Nitrate 13:0:46 25kg: M-Tolori KSh7,760; insufficient independent exact-pack evidence to change current price.
+
+## Needs Manual Price Check
+
+All other non-Syngenta records in this batch remain unchanged pending exact-pack supplier verification, including moth traps, DIY fly screens, mouse/rat traps, Multi NPK 13-2-44, Murtano, spray gun atomizer, Nativo SC, Navigator, Neemazal, Neocidol, Nexal, footwear, Nilzan Plus, Nivea items, teat dip cup, Nordox packs, Novital drinkers, respirator, NPK 23:23:0, Nunix appliances, Nutrifol, nitrile gloves, Odyssey seeds, Olvet drench, Omex Calmax, Omnia potassium nitrate, Oppo phones, Optimizer, Oraimo electronics/accessories, Oreganum seeds, Philips starter/tubes, Termidor where exact comparison/stock is inconsistent, Orvego, Osefin, Osho Bio Magic, Bio-Nematon, Osho bucket sprayers, Halt Neo, Nimbecidine, Oshothane, watches, Ozoneem, Pali, Panthenon, pantry moth trap, Papaya/Parsley seeds, Pearl, Pegasus packs, Pentagon, Pestman gel, Pestoptek stations, maize sheller, thermal fogger, PH1 seeds and other remaining catalogue records from this 100-row segment.
+
+No pack variants were added: supplier pages list multiple Nimbecidine/Bio-Nematon sizes, but do not expose reliable exact prices for every pack; we will not insert unpriced variants. Existing slugs/canonical URLs preserved.
+
+**SQL:** `supabase/sql/pricing-batch-011.sql` — guarded review-branch update, not applied to production. The product page generator has Product Offer KES pricing, availability, one-year priceValidUntil and hash-based per-URL sitemap lastmod generation; run the product build after applying catalogue SQL to refresh JSON-LD and sitemap files.
