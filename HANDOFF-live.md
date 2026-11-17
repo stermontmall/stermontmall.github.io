@@ -1,3 +1,11 @@
+## 2026-11-18 — PCPB register verification correction
+- Rechecked the current official PCPB public-health register: https://www.pcpb.go.ke/public-health/ . It confirms the current entries for SCUD 5% WP (PCPB(CR)1808), NAVIGATOR 100 SC (PCPB(CR)1268), KILEX 0.5 GEL (PCPB(CR)2393), AIR CHOPPER 7.5% SC (PCPB(CR)1648), HYGIENIC 7.5% SC (PCPB(CR)1648-P(i)), MENDE MO FIRE (PCPB(CR)1810), PUNISHER 8.5% TA (PCPB(CR)1774), OSEFIN 7.5 WP (PCPB(CR)1394), SEVIN DUDU DUST (PCPB(CR)0828), and DRAGON 5% WP (PCPB(CR)1807).
+- A matching HAFETON 100 SC entry and a matching PARETO ROACH SPRAY entry were **not located** in the current public-health register during this check. Previous registration numbers recorded for those two products are unverified and have been removed from the ledger. Keep both products inactive until PCPB confirms their current registration and permitted public-health uses.
+- SCUD concentration discrepancy: retailer listing says deltamethrin 50 g/kg, while the current PCPB register displays 50 g/L. The physical Kenyan label must resolve this before activation or use. Both SCUD pack descriptions now flag the discrepancy.
+- These checks do not establish that a product is unregistered in every PCPB category; they establish only that a matching entry was not found in the current public-health list searched.
+
+---
+
 ## 2026-11-18 — Fumigation Chemicals batch 20: 20 complete draft records
 
 ### Final batch result
@@ -22,19 +30,19 @@ Retail source prices below are KSh. Baseline = retail x 0.85. Final price = base
 | Kilex 0.5 Gel 5g | 800 | 680.00 | 900 | PCPB(CR)2393 | Not uploaded (Jiji/Jumia HTTP 403) |
 | Mende Mo Fire 5g | 99 | 84.15 | 200 | PCPB(CR)1810 | Uploaded; visual QA pending |
 | Punisher 8.5% TA 20g | 270 | 229.50 | 300 | PCPB(CR)1774 | Uploaded; visual QA pending |
-| Hafeton 100 SC 100ml | 999 | 849.15 | 1,100 | PCPB(CR)1932 | Not uploaded (Jumia HTTP 403) |
+| Hafeton 100 SC 100ml | 999 | 849.15 | 1,100 | PCPB status unconfirmed in current PCPB public-health register | Not uploaded (Jumia HTTP 403) |
 | Punisher 8.5% TA 500g | 5,775 | 4,908.75 | 6,400 | PCPB(CR)1774 | Uploaded; visual QA pending |
 | SCUD 5 WP 100g | 1,699 | 1,444.15 | 1,900 | PCPB(CR)1808 | Uploaded; visual QA pending |
 | Air Chopper 7.5% SC 30ml | 999 | 849.15 | 1,100 | PCPB(CR)1648 | Uploaded; visual QA pending |
 | Air Chopper 7.5% SC 100ml | 1,499 | 1,274.15 | 1,650 | PCPB(CR)1648 | Not uploaded (Jumia HTTP 403) |
-| Hafeton 100 SC 1L | 5,999 | 5,099.15 | 6,650 | PCPB(CR)1932 | Uploaded; visual QA pending |
+| Hafeton 100 SC 1L | 5,999 | 5,099.15 | 6,650 | PCPB status unconfirmed in current PCPB public-health register | Uploaded; visual QA pending |
 | Mende Mo Fire 250g | 2,505 | 2,129.25 | 2,750 | PCPB(CR)1810 | Uploaded; visual QA pending |
 | Air Chopper 7.5% SC 15ml 3-pack | 799 | 679.15 | 900 | PCPB(CR)1648 | Not uploaded (Jumia HTTP 403) |
 | Hygienic 7.5% SC 20ml | 999 | 849.15 | 1,100 | PCPB(CR)1648-P(i) | Not uploaded (Jumia HTTP 403) |
 | Osefin 7.5 WP 200g | 699 | 594.15 | 750 | PCPB(CR)1394 | Not uploaded (Imagine Care HTTP 403) |
 | Sevin Dudu Dust 200g | 160 | 136.00 | 200 | PCPB(CR)0828 | Uploaded; visual QA pending |
 | Osefin 7.5 WP 100g | 499 | 424.15 | 550 | PCPB(CR)1394 | Not uploaded (Imagine Care HTTP 403) |
-| Pareto Roach Spray 1L | 1,310 | 1,113.50 | 1,450 | PCPB(CR)1953 | Not uploaded (marketplace timeout; refresh price before activation) |
+| Pareto Roach Spray 1L | 1,310 | 1,113.50 | 1,450 | PCPB status unconfirmed in current PCPB public-health register | Not uploaded (marketplace timeout; refresh price before activation) |
 
 ### Supplier price source URLs
 - SCUD 5 WP 20g — Cheapthings: https://cheapthings.co.ke/product/scud-5-wp-20g/
