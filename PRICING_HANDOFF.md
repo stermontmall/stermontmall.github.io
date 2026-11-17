@@ -875,3 +875,43 @@ No additional packs were created except the three Ransom sizes with explicit in-
 | rootex-6-rooting-hormone-50-g | Current pack | 442 [RETAIL-ESTIMATE] | 30% | 550 | 520 (avg 690) | https://mtolori.com/product/details/rootex-50gm-302; https://agriguardagrovet.co.ke/product/rootex-6dp-organic-50g/; https://www.jumia.co.ke/osho-rootex-6dp-rooting-hormone-powder-50grams-166739929.html |
 
 Samsung A06, A07 5G and A17 5G use exact RAM/storage/network configurations from Jumia's Samsung Official Store and Kenyan retailer listings. Samsung A26 5G 8GB/256GB uses the October 2026 Kenya model-specific price tracker. Samsung 43U8000F is benchmarked against Samsung Brandstore, a Kenyan retailer with stock, and Mega Store. Rootex 6 50g is repriced to KSh550 using M-Tolori KSh520, AgriGuard KSh600 and the in-stock Jumia listing; the current KSh1,099 is more than 25% above the market average. SC Duma 43 2kg is a small formula-based increase from AgriJibu's KSh900 listing.
+
+
+---
+
+# Batch 14 — products 1301–1400 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta products skipped | 8 |
+| Existing products with price updates | 5 |
+| New pack variants | 0 |
+| Needs manual price check / unchanged | 92 |
+
+**Syngenta exclusions (untouched):** Syngenta Tatua Rat & Mice Poison Blocks; Tatua Advion Cockroach Gel 30g; Tatua Advion 4 × 30g; Tatua Demand 10CS 25ml; Tatua Klerat 100g; Tatua Zyrox Fly Bait 500g; Tervigo 020SC 5L; Thiovit Jet 1kg. PCPB and vendor/brand references confirm Syngenta ownership/registration. Tihan OD175 is Bayer, Taurus 500SP is Greenlife, and Thunder OD145 is Bayer, so those are not excluded.
+
+## Prepared price updates
+
+| Product | Pack | Baseline (KES) | Markup | New Website Price (KES) | Competitor Retail (KES) | Sources |
+|---|---|---:|---:|---:|---:|---|
+| Spirometer 500SC | 100ml | 1,317.50 [RETAIL-ESTIMATE] | 30% | 1,700 | 1,550 (Agropests, AgriGuard, Kuza) | https://agropests.com/products/spirometer-500-sc-100ml; https://agriguardagrovet.co.ke/; https://kuzaagrochem.com/products/spirometer-100ml-840 |
+| Taurus 500SP | 1kg | 4,462.50 [RETAIL-ESTIMATE] | 30% | 5,800 | 5,250–6,400 | https://www.mtolori.com/product/details/taurus-500sp-1kg-2274; https://agriguardagrovet.co.ke/product/taurus-500-sp/ |
+| Systema 50EC | 1L | 2,550 [RETAIL-ESTIMATE] | 30% | 3,300 | 3,000–3,250 | https://agropests.com/products/systema-50-ec-1-l; https://kuzaagrochem.com/products/systema-50ec-1l |
+| Samsung 43U8000F TV | 43 inch | 32,215 [RETAIL-ESTIMATE] | 30% | 41,900 | 37,900–42,100 | https://www.samsungbrandstore.co.ke/category/4k-uhd-led-tvs; https://www.kenyatronics.com/view-product/samsung-43-inch-4k-smart-tv-43u8000f-2025-model; https://dealerstore.co.ke/product/samsung-43-43u8000f-crystal-uhd-4k-smart-tv/; https://nairobitvshop.co.ke/product/samsung-43-inch-u8000f-4k-smart-tv-2025/; https://www.jumia.co.ke/samsung-43u8000fu-43-inch-smart-crystal-uhd-led-tv-2025-325467119.html |
+| Symnet 50-mesh insect net | 3m × 50m roll | 12,750 [RETAIL-ESTIMATE] | 30% | 16,600 | 15,000 | https://www.symnet.co.ke/solutions/insect-nets |
+
+All five use [RETAIL-ESTIMATE] baselines (lowest reliable in-stock Kenyan retail × 0.85), not wholesale quotes. Prices are rounded to nearest KSh50. Existing-price reductions are justified by multiple comparable listings showing current price >25% above market average: Spirometer 500SC 100ml (KSh1,550 at Agropests, AgriGuard and Kuza; new KSh1,700), Taurus 500SP 1kg (M-Tolori KSh5,250 and AgriGuard KSh6,400; new KSh5,800), and Systema 50EC 1L (Agropests KSh3,000 and Kuza KSh3,250; new KSh3,300). Samsung 43U8000F is increased from KSh39,099 to KSh41,900 based on lowest Samsung Brandstore KSh37,900 and several other in-stock exact-model listings around KSh38,900–KSh42,100; formula price is within 10% of market average. Symnet 50-mesh 3m × 50m roll is increased from KSh15,499 to KSh16,600 using Symnet's own exact-size in-stock KSh15,000 listing as the retail baseline (retail estimate × 0.85). This puts Stermont 10.7% above that one supplier's retail price, below the 15% alert threshold; one source only, so this is a single-observation baseline rather than a competitor average.
+
+## Verified / unchanged and manual checks
+
+- Solubor 5kg: Agropests KSh3,200 in stock, but no second independent exact-pack current listing; no reduction under the multiple-comparator guard.
+- Sulban 48EC 1L: Agroduka KSh1,479 is out of stock; Jojemi shows a pack-price range but no exact 1L value. Retained.
+- Stopdew 250WP 1kg: AgriGuard KSh2,370; no second exact-pack current listing, so retained.
+- Tehno Mss drinker/feeder listings were compared with MyAgrovet, Mkulima Jovial and Fuga. Generic capacities and lookalike listings are not treated as exact same-brand/model observations. No speculative changes to 1.5L, 3L, 6L, 8L, 9L, 10L drinkers or 1.5kg/4kg/6kg/9kg/12kg feeders.
+- Solum H20, Solumest Iron EDDHA, Super Boron Extra, Super Gro, Super Nitro Humix: exact pack-level prices or independent in-stock comparisons are incomplete; unchanged.
+- Household Sonar appliances, STEM kits, pigeon spikes, milking bucket, secateurs, Stargem, safety boots, mosquito nets, Stop Vermin, Storm Block, Stuf-It mesh, Sulphate of Potash, sweep net, Symnet garden, Systema, UV tubes, Tajiri, Tatua (excluded), Taurus, TCL 75C6K, Tecamin, TECNO phones, Tecto, rabbit/poultry equipment, Tervigo/Thiovit (excluded), Thunder, Tihan, Token, Tolsen/Total pumps and sprayers, tomato/spinach seeds, and remaining items are unchanged where exact model/pack price evidence did not justify a safe change.
+
+No new pack sizes were added: supplier pages for Sulban, Stopdew, Taurus, Solubor and Spirometer list further packs, but exact in-stock prices were unavailable or variants were out of stock. Do not create pack variants based on size-only evidence. Existing slugs/canonical URLs remain unchanged.
+
+**SQL:** `supabase/sql/pricing-batch-014.sql` — guarded branch-only updates, not applied to production. Product JSON-LD and sitemap refresh require applying catalogue SQL and running the product build; the generator reads KES prices from product records, includes availability and one-year `priceValidUntil`, and updates sitemap `lastmod` for generated pages whose HTML changes.
