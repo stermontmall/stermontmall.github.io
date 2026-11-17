@@ -4,7 +4,21 @@ Date: 2026-11-15 (Africa/Nairobi)
 Repository: stermontmall/stermontmall.github.io
 Working branch: wip/seo-batch2-2026-11-15
 
-## 2026-11-18 00:50 (Africa/Nairobi) — SESSION STATE (newest; supersedes the entry below)
+## 2026-11-18 (later session) — SESSION STATE (newest; supersedes the entries below where they differ)
+### Test order / email check — still NOT VERIFIED
+- Queried live Supabase (DB clock 2026-11-17 21:43Z = 00:43 EAT 2026-11-18). No order newer than STM-JJ6WZ2 (paid, 2026-11-17 09:56Z) and STM-GY2KML (declined, 09:47Z). Newest `email_log` rows are still ids 7-9 (STM-JJ6WZ2: packed, out_for_delivery, delivered; request_ids 2775-2777).
+- `net._http_response` latest rows 2774-2779 all status 200, but all are from 10:47Z-16:20Z, i.e. BEFORE the lockdown migration (21:32Z). Rows 2778-2779 (16:19-16:20Z) have no matching `email_log` row. So there is no post-lockdown evidence either way; the trigger path has not been exercised since the revoke.
+- Next: owner places one test order and gives the STM-XXXXXX reference, then run the two queries in the 00:50 entry below (expect a "received" row and status 200).
+### Rentokil Lumnia category — FIXED
+- The three Lumnia 10-pack glueboards that had `category_id` NULL (compact-white `304857`, slim-black `305057`, slim-white `305056`) were set to `category_id = 90` (Insect Light Traps & UV Lamps) on 2026-11-18, the same category the two live Lumnia Compact Black board products already use. Verified by the UPDATE's RETURNING rows: category_id 90, active false, 0 images.
+- Still inactive with no photo. Activate only after a photo is stored and looked at.
+### Packshot checklist
+- Full grouped list of the 3 Lumnia boards + 41 agrochemicals (26 insecticides, 10 fungicides, 5 herbicides) with slugs, pack sizes and active ingredients: `docs/packshot-checklist-2026-11-18.md`.
+- Active ingredient is filled only where our own descriptions state it; 26 of the 44 say "not stated" and must be read from the label/PCPB register.
+- No packshot source was verified and no image was seen, uploaded or attached. Lumnia source leads (PestFix UK compact-board page) are leads only.
+- Priority: (1) the 3 Lumnia boards, (2) brand clusters Dudufix, Alpha, Dithane/Agrithane, (3) the rest of the agrochemicals, (4) the other 30 imageless products listed in the 00:50 entry.
+
+## 2026-11-18 00:50 (Africa/Nairobi) — SESSION STATE (supersedes the entries below)
 ### Done and verified
 - PR #868 merged 00:30. The SQL was NOT in effect after the owner ran it in the SQL Editor (verified: ACL still had PUBLIC/anon/authenticated), so it was applied as Supabase migration `security_revoke_send_email_public` at 21:32:08Z (00:32 EAT); it is recorded in `supabase_migrations`.
 - Verified green after applying: `proacl` of `public.stm_send_email(text,text,text,text,text,text)` is `{postgres=X/postgres,service_role=X/postgres}`; `has_function_privilege` false for anon and authenticated, true for service_role and postgres; no PUBLIC grant; Security Advisor anon-executable count 8 -> 7 and authenticated-executable 13 -> 12 (stm_send_email gone from both). Remaining advisor items are intentional/public by design (`check_voucher`, `track_order`, `rate_order_*`, `recent_purchases`, `is_staff`), staff-gated RPCs, `stm_order_email_trg` (left alone, order function), `stm_hx` search path, `pg_net` in public, and dashboard-only "Leaked password protection" off.
