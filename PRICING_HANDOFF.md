@@ -766,12 +766,12 @@ The new Oshothane pack rows use the existing category, stock default (1,000), lo
 | Measure | Count |
 |---|---:|
 | Products scanned | 100 |
-| Syngenta excluded | 3 |
-| Existing products with price updates | 4 |
+| Syngenta excluded | 4 |
+| Existing products with price updates | 10 |
 | New pack variants prepared | 4 |
-| Remaining manual price check / unchanged | 93 |
+| Remaining manual price check / unchanged | 86 |
 
-**Syngenta exclusions (untouched):** Pirimor 50WG 1kg, Primagram Gold 660SC 5L, and Quadris 50WG 1kg. PCPB/Syngenta references confirm the relevant brand/manufacturer. Radiant 120SC is a Dow/Corteva product, Prequel 720WP is sold by Osho and is not treated as Syngenta, and Previcur Energy is Bayer.
+**Syngenta exclusions (untouched):** Pirimor 50WG 1kg, Primagram Gold 660SC 5L, Quadris 50WG 1kg, and Quadris 50WG 20g. PCPB/Syngenta references confirm the relevant brand/manufacturer. Radiant 120SC is a Dow/Corteva product, Prequel 720WP is sold by Osho and is not treated as Syngenta, and Previcur Energy is Bayer.
 
 ## Existing product price updates
 
@@ -802,3 +802,19 @@ Prequel 720WP packs 120g, 500g and 1kg are explicitly listed in stock by Farm Re
 The remaining non-Syngenta products in rows 1101–1200 stay unchanged pending reliable exact-match data: Piano F1 spinach seed 5g, Pirimor (excluded), PPE overalls, Plant Soul Zinc Phosphite, plastic poultry mesh (single independent price observation; duplicate listings are not treated as separate sources), gel syringe plunger, POCO phones, Polti Cimex Eradicator, Polyfeed 1kg, Polysil 25ml, Popvet dewormer, portable thermal fogger, Bluetooth speaker, poultry dust, Power King extension cable, power tiller, Powermate water pump (single reliable listing), Premier pump models other than the specifically benchmarked 10HP 100m 3-phase unit, Premier 767 4-stroke, Premise 1L and 50ml (no reduction justified by the multi-retailer average), Prequel 40g (existing pack already close to formula), Previcur Energy, professional grafting kit, Promax variants, Protecta Micro bait station, footwear, Punisher products, PVC apron and wire mesh, Pyramid Trek repellent, Quadris (excluded), rabbit drinking pipe, Radiant 120SC, radish seeds, Rafiki fly/rattrap products, magnetic mosquito screen, insect mesh, Raid liquid/refills, Ralon, Ramtons appliances where only one exact current price or insufficient same-model comparisons were found, and all other rows in this batch not listed in the price-update tables.
 
 No additional variants were created beyond the four above. Existing product slugs/canonical URLs are preserved. Price updates and inserts are guarded SQL in `supabase/sql/pricing-batch-012.sql`; they are review-branch changes only and are not live until the SQL is applied. The product generator includes KES Offer schema and one-year `priceValidUntil`, and sitemap hash logic updates `lastmod` only when the generated product HTML changes; rebuild after applying the SQL to sync JSON-LD and sitemap files.
+
+
+### Additional Batch 12 price updates — broader model-specific research
+
+| Product | Pack | Baseline (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Sources |
+|---|---|---:|---:|---:|---:|---|
+| PH1 Maize Seeds | 2kg | 552.50 [RETAIL-ESTIMATE] | 30% | 700 | 650 | https://agrijibu.co.ke/seeds/cereals-seeds/page/2/ |
+| Promax 20EC Insecticide | 1L | 5,100 [RETAIL-ESTIMATE] | 30% | 6,650 | 6,000 | https://agropests.com/products/promax-20-ec-1-l |
+| Ramtons RM/399 Electric Kettle | 1.7L | 959.65 [RETAIL-ESTIMATE] | 30% | 1,250 | 1,129–2,350 (7 shops) | https://www.pricekenya.co.ke/p/ramtons-kettle-1-7l; https://dealmtaani.co.ke/home-appliances/small-appliances/kettles/ramtons-rm-399-corded-electric-kettle; https://www.carrefour.ke/mafken/en/small-appliances/n/c/clp_NFKEN4040000 |
+| Ramtons RM/458 Microwave | 20L | 6,799.15 [RETAIL-ESTIMATE] | 30% | 8,850 | 7,999–8,700 | https://www.ramtons.com/small-home-appliances; https://generationspace.co.ke/home-personal-electronics-deals/; https://www.jumia.co.ke/mlp-ramtons-official-store/ |
+| Ramtons RM/553 Wet & Dry Vacuum | 21L | 8,074.15 [RETAIL-ESTIMATE] | 30% | 10,500 | 9,499–13,199 | https://www.ramtons.com/small-home-appliances; https://www.jumia.co.ke/mlp-ramtons-official-store/; https://overtech.co.ke/store/ramtons/page/5/ |
+| Ramtons RM/580 Blender + Mill | 1.5L | 4,220.25 [RETAIL-ESTIMATE] | 30% | 5,500 | 4,965–7,749 | https://www.ramtons.com/small-home-appliances; https://www.carrefour.ke/mafken/en/small-appliances/n/c/clp_NFKEN4040000; https://denfatechelectronics.com/product-category/kitchen-home-appliances/; https://www.digitalstore.co.ke/collections/vendors?page=14&q=ramtons |
+
+The four Ramtons reductions are supported by multiple exact-model retail observations and the existing price is more than 25% above the market average. PH1 and Promax are increases using exact pack listings. All six changes have expected-price guards and update the estimated cost baseline in the same SQL transaction.
+
+**Corrected Syngenta count:** Quadris 50WG 20g is also a Syngenta product and is included in the 4-SKU exclusion total; it remains untouched.
