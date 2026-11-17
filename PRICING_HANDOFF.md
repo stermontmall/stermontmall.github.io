@@ -1174,7 +1174,10 @@ Weighted by the staged markup tiers, the estimated average gross margin across t
 | 012 | 10 | 4 |
 | 013 | 7 | 3 |
 | 014 | 12 | 0 |
-| 015 | 14 | 0 |
+| 015 | 15 | 0 |
 | 016 | 15 | 0 |
 | 017 | 9 | 0 |
-| **Total** | **204** | **25** |
+| **Total** | **205** | **25** |
+
+
+**Estimated average gross profit margin:** approximately 22.7% across the 205 staged existing-product price changes, weighted by the applied markup tiers and rounded prices. This is gross margin against the supplier/estimated baseline, before operating costs, payment fees, delivery, taxes and returns. The strict 15% margin floor was also checked for the 17.5%-markup tier: the 1056-egg incubator is rounded up to KSh76,500 to clear 15%; the 110m solar pump at KSh98,000 yields 15.0%.
