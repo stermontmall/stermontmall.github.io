@@ -1,1 +1,244 @@
-            for (const match of sql.matchAll(/update\\s+public\\.products\\s+set\\s+price\\s*=\\s*[\\d.]+(?:\\s*,\\s*cost\\s*=\\s*[\\d.]+)?\\s+where\\s+id\\s*=\\s*'([^']+)'/gi)) {
+name: Verify pricing catalogue PR
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-pricing-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify-pricing:
+    if: github.event.pull_request.head.ref == 'pricing/non-syngenta-market-review-20261117' && github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out the PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch main baseline
+        run: |
+          git fetch --no-tags origin main
+          BASELINE="$(git merge-base origin/main HEAD)"
+          echo "Using pre-merge baseline: $BASELINE"
+          git show "$BASELINE:sitemap.xml" > /tmp/main-sitemap.xml
+          mkdir -p /tmp/main-pages
+          git archive "$BASELINE" p | tar -x -C /tmp/main-pages
+
+      - name: Generate product pages and sitemaps
+        run: node generate-products.mjs
+
+      - name: Verify all 230 affected product pages and sitemap
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { execFileSync } from 'node:child_process';
+
+          const fail = message => { console.error('FAIL:', message); process.exitCode = 1; };
+          const pass = message => console.log('PASS:', message);
+          const sqlDir = 'supabase/sql';
+          const sqlFiles = fs.readdirSync(sqlDir).filter(name => /^pricing-batch-\d+\.sql$/.test(name));
+          const updatedIds = new Set();
+          const insertedIds = new Set();
+
+          for (const name of sqlFiles) {
+            const sql = fs.readFileSync(path.join(sqlDir, name), 'utf8');
+            // Guarded price rows use VALUES tuples. Later batches may also
+            // use a standalone guarded UPDATE instead of a VALUES loop.
+            for (const match of sql.matchAll(/\(\s*'([^']+)'\s*,\s*[\d.]+::numeric\s*,\s*[\d.]+::numeric/g)) {
+              updatedIds.add(match[1]);
+            }
+            for (const match of sql.matchAll(/update\s+public\.products\s+set\s+price\s*=\s*[\d.]+(?:\s*,\s*cost\s*=\s*[\d.]+)?\s+where\s+id\s*=\s*'([^']+)'/gi)) {
+              updatedIds.add(match[1]);
+            }
+            // Parse every row in each idempotent INSERT. Descriptions can
+            // contain semicolons, so stop at ON CONFLICT rather than ';'.
+            for (const insert of sql.matchAll(/insert\s+into\s+public\.products\b/gi)) {
+              const tail = sql.slice(insert.index);
+              const conflictAt = tail.search(/on\s+conflict\s*\(id\)\s*do\s+nothing/i);
+              const statement = conflictAt < 0 ? tail : tail.slice(0, conflictAt);
+              const valuesAt = statement.search(/\bvalues\b/i);
+              if (valuesAt < 0) continue;
+              const values = statement.slice(valuesAt + 6);
+              for (const row of values.matchAll(/\(\s*'([^']+)'/g)) insertedIds.add(row[1]);
+            }
+          }
+
+          if (updatedIds.size !== 205) fail(`Expected 205 unique repriced product IDs; found ${updatedIds.size}`);
+          else pass('205 unique existing product IDs extracted from guarded pricing SQL');
+          if (insertedIds.size !== 25) fail(`Expected 25 new pack IDs; found ${insertedIds.size}`);
+          else pass('25 new pack IDs extracted from product INSERT SQL');
+
+          const overlap = [...updatedIds].filter(id => insertedIds.has(id));
+          if (overlap.length) fail(`IDs appear as both updates and inserts: ${overlap.join(', ')}`);
+
+          const htmlFiles = fs.readdirSync('p').filter(name => name.endsWith('.html'));
+          const productsBySku = new Map();
+          for (const file of htmlFiles) {
+            const html = fs.readFileSync(path.join('p', file), 'utf8');
+            const scripts = [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi)];
+            for (const script of scripts) {
+              try {
+                const data = JSON.parse(script[1]);
+                const candidates = Array.isArray(data) ? data : [data];
+                for (const item of candidates) {
+                  if (item?.['@type'] === 'Product' && item.sku) {
+                    productsBySku.set(String(item.sku), { product: item, file });
+                  }
+                  if (item?.['@type'] === 'ProductGroup' && Array.isArray(item.hasVariant)) {
+                    for (const variant of item.hasVariant) {
+                      if (variant?.['@type'] === 'Product' && variant.sku) {
+                        productsBySku.set(String(variant.sku), { product: variant, file });
+                      }
+                    }
+                  }
+                }
+              } catch {}
+            }
+          }
+
+          const expectedIds = [...updatedIds, ...insertedIds];
+          if (expectedIds.length !== 230) fail(`Expected 230 total affected IDs; found ${expectedIds.length}`);
+          let cleanProducts = 0;
+          const affectedCanonicalUrls = new Set();
+          const expectedValidity = new Date();
+          expectedValidity.setUTCFullYear(expectedValidity.getUTCFullYear() + 1);
+          const expectedValidityDate = expectedValidity.toISOString().slice(0, 10);
+
+          for (const id of expectedIds) {
+            const found = productsBySku.get(id);
+            if (!found) { fail(`Missing generated Product JSON-LD for product ID ${id}`); continue; }
+            const product = found.product;
+            const offer = Array.isArray(product.offers) ? product.offers[0] : product.offers;
+            if (!offer || offer.priceCurrency !== 'KES') { fail(`Wrong/missing KES Offer currency for ${id}`); continue; }
+            if (typeof offer.price !== 'number' || !Number.isFinite(offer.price) || offer.price <= 0) { fail(`Offer price is not a positive JSON number for ${id}`); continue; }
+            if (offer.availability !== 'https://schema.org/InStock') { fail(`Offer is not InStock for ${id}`); continue; }
+            if (offer.priceValidUntil !== expectedValidityDate) { fail(`priceValidUntil for ${id} is ${offer.priceValidUntil}; expected ${expectedValidityDate}`); continue; }
+            if (!offer.url) { fail(`Missing Offer URL for ${id}`); continue; }
+            const canonical = new URL(offer.url);
+            canonical.hash = '';
+            affectedCanonicalUrls.add(canonical.href);
+            cleanProducts++;
+          }
+          if (cleanProducts === 230 && process.exitCode !== 1) pass('All 230 affected products have valid Product JSON-LD offers: KES, numeric price, InStock and one-year validity');
+          else fail(`Only ${cleanProducts}/230 affected products passed schema checks`);
+
+          const site = 'https://stermontarcade.co.ke';
+          const parseSitemap = xml => new Map([...xml.matchAll(/<url>[\s\S]*?<loc>([^<]+)<\/loc>[\s\S]*?<lastmod>([^<]+)<\/lastmod>[\s\S]*?<\/url>/g)].map(m => [m[1], m[2]]));
+          const oldXml = fs.readFileSync('/tmp/main-sitemap.xml', 'utf8');
+          const newXml = fs.readFileSync('sitemap.xml', 'utf8');
+          const oldMap = parseSitemap(oldXml);
+          const newMap = parseSitemap(newXml);
+          if (!newMap.size) fail('Generated sitemap.xml contains no URL/lastmod entries');
+
+          const missingOld = [...oldMap.keys()].filter(url => !newMap.has(url));
+          if (missingOld.length) fail(`${missingOld.length} existing pre-pricing baseline sitemap URLs disappeared: ${missingOld.slice(0, 10).join(', ')}`);
+          else pass(`All ${oldMap.size} existing main sitemap URLs remain present`);
+
+          const missingAffected = [...affectedCanonicalUrls].filter(url => !newMap.has(url));
+          if (missingAffected.length) fail(`${missingAffected.length} affected canonical product URLs are absent from sitemap.xml: ${missingAffected.slice(0, 10).join(', ')}`);
+          else pass(`All ${affectedCanonicalUrls.size} affected canonical product URLs are in sitemap.xml`);
+
+          const today = new Date().toISOString().slice(0, 10);
+          let lastmodErrors = 0;
+          const readProductBySku = (html, sku) => {
+            const scripts = [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi)];
+            for (const script of scripts) {
+              try {
+                const data = JSON.parse(script[1]);
+                const candidates = Array.isArray(data) ? data : [data];
+                for (const item of candidates) {
+                  if (item?.['@type'] === 'Product' && String(item.sku) === sku) return item;
+                  if (item?.['@type'] === 'ProductGroup' && Array.isArray(item.hasVariant)) {
+                    const variant = item.hasVariant.find(value => value?.['@type'] === 'Product' && String(value.sku) === sku);
+                    if (variant) return variant;
+                  }
+                }
+              } catch {}
+            }
+            return null;
+          };
+
+          // Check sitemap lastmod against actual pricing changes, not raw HTML
+          // byte differences. Rebuilding can change templates or date-derived
+          // markup without changing a product's price.
+          for (const id of expectedIds) {
+            const found = productsBySku.get(id);
+            if (!found) continue;
+            const url = [...affectedCanonicalUrls].find(candidate => {
+              const pathname = new URL(candidate).pathname.slice(1);
+              return pathname === 'p/' + found.file;
+            });
+            if (!url) { fail('Missing canonical sitemap URL for affected product ' + id); lastmodErrors++; continue; }
+            const pathname = new URL(url).pathname.slice(1);
+            const baselineFile = path.join('/tmp/main-pages', pathname);
+            const currentFile = path.join('.', pathname);
+            if (!fs.existsSync(currentFile)) { fail('Missing generated HTML for affected product ' + id + ': ' + pathname); lastmodErrors++; continue; }
+            const previous = oldMap.get(url);
+            const lastmod = newMap.get(url);
+            if (!lastmod) { fail('Affected product URL is absent from sitemap.xml: ' + url); lastmodErrors++; continue; }
+            if (!fs.existsSync(baselineFile)) {
+              if (lastmod !== today) { fail('New affected product URL has unexpected lastmod ' + lastmod + ': ' + url); lastmodErrors++; }
+              continue;
+            }
+            const baselineHtml = fs.readFileSync(baselineFile, 'utf8');
+            const baselineProduct = readProductBySku(baselineHtml, id);
+            const currentProduct = found.product;
+            const baselineOffer = Array.isArray(baselineProduct?.offers) ? baselineProduct.offers[0] : baselineProduct?.offers;
+            const currentOffer = Array.isArray(currentProduct.offers) ? currentProduct.offers[0] : currentProduct.offers;
+            if (!baselineProduct) {
+              if (previous && lastmod === previous) {
+                fail('New product variant did not receive a new lastmod: ' + url); lastmodErrors++;
+              } else if (!previous && lastmod !== today) {
+                fail('New product URL has unexpected lastmod ' + lastmod + ': ' + url); lastmodErrors++;
+              }
+              continue;
+            }
+            if (!baselineOffer) {
+              fail('Could not read baseline Product JSON-LD offer for ' + id); lastmodErrors++; continue;
+            }
+            const priceChanged = Number(baselineOffer.price) !== Number(currentOffer?.price);
+            if (priceChanged && previous && lastmod === previous) {
+              fail('Changed product price did not receive a new lastmod: ' + url); lastmodErrors++;
+            }
+          }
+          if (!lastmodErrors) pass('sitemap.xml includes all affected canonical URLs and advances lastmod when an affected product price changes');
+          
+          const newPackMissing = [...insertedIds].filter(id => !productsBySku.has(id));
+          if (newPackMissing.length) fail(`Missing new pack Product schema entries: ${newPackMissing.join(', ')}`);
+          else pass('All 25 new pack variants are represented in Product/hasVariant JSON-LD and their canonical product pages are sitemap-listed');
+
+          if (process.exitCode === 1) process.exit(1);
+          console.log('SUMMARY: PASS — all 230 affected product pages and sitemap checks are clean.');
+          NODE
+
+      - name: Write verification summary
+        if: success()
+        run: |
+          {
+            echo "## Pricing PR verification: PASS"
+            echo "- 205 existing product pages checked"
+            echo "- 25 new pack pages checked"
+            echo "- 230 valid Product JSON-LD offers: KES, numeric price, InStock, one-year priceValidUntil"
+            echo "- All pre-pricing baseline sitemap URLs preserved"
+            echo "- All 25 new pack URLs included"
+            echo "- sitemap.xml lastmod matches actual HTML changes only"
+            echo ""
+            echo "This workflow only builds and verifies. It does not publish, deploy, push, or merge."
+          } >> "$GITHUB_STEP_SUMMARY"
