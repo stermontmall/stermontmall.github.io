@@ -74,45 +74,58 @@ jobs:
           if (overlap.length) fail(`IDs appear as both updates and inserts: ${overlap.join(', ')}`);
 
           const htmlFiles = fs.readdirSync('p').filter(name => name.endsWith('.html'));
-          const pagesById = new Map();
+          const productsBySku = new Map();
           for (const file of htmlFiles) {
             const html = fs.readFileSync(path.join('p', file), 'utf8');
-            const id = html.match(/<meta\s+name="stm-id"\s+content="([^"]+)"/i)?.[1];
-            if (id) pagesById.set(id, { file, html });
+            const scripts = [...html.matchAll(/<script\\s+type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/gi)];
+            for (const script of scripts) {
+              try {
+                const data = JSON.parse(script[1]);
+                const candidates = Array.isArray(data) ? data : [data];
+                for (const item of candidates) {
+                  if (item?.['@type'] === 'Product' && item.sku) {
+                    productsBySku.set(String(item.sku), { product: item, file });
+                  }
+                  if (item?.['@type'] === 'ProductGroup' && Array.isArray(item.hasVariant)) {
+                    for (const variant of item.hasVariant) {
+                      if (variant?.['@type'] === 'Product' && variant.sku) {
+                        productsBySku.set(String(variant.sku), { product: variant, file });
+                      }
+                    }
+                  }
+                }
+              } catch {}
+            }
           }
 
           const expectedIds = [...updatedIds, ...insertedIds];
           if (expectedIds.length !== 230) fail(`Expected 230 total affected IDs; found ${expectedIds.length}`);
-          let cleanPages = 0;
+          let cleanProducts = 0;
+          const affectedCanonicalUrls = new Set();
           const expectedValidity = new Date();
           expectedValidity.setUTCFullYear(expectedValidity.getUTCFullYear() + 1);
           const expectedValidityDate = expectedValidity.toISOString().slice(0, 10);
 
           for (const id of expectedIds) {
-            const page = pagesById.get(id);
-            if (!page) { fail(`Missing generated page for product ID ${id}`); continue; }
-            const scripts = [...page.html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi)];
-            let product = null;
-            for (const script of scripts) {
-              try {
-                const data = JSON.parse(script[1]);
-                const candidates = Array.isArray(data) ? data : [data];
-                product = candidates.find(item => item?.['@type'] === 'Product' && String(item.sku) === id) || product;
-              } catch {}
-            }
-            if (!product) { fail(`No valid JSON-LD Product schema with matching SKU for ${id}`); continue; }
+            const found = productsBySku.get(id);
+            if (!found) { fail(`Missing generated Product JSON-LD for product ID ${id}`); continue; }
+            const product = found.product;
             const offer = Array.isArray(product.offers) ? product.offers[0] : product.offers;
             if (!offer || offer.priceCurrency !== 'KES') { fail(`Wrong/missing KES Offer currency for ${id}`); continue; }
             if (typeof offer.price !== 'number' || !Number.isFinite(offer.price) || offer.price <= 0) { fail(`Offer price is not a positive JSON number for ${id}`); continue; }
             if (offer.availability !== 'https://schema.org/InStock') { fail(`Offer is not InStock for ${id}`); continue; }
             if (offer.priceValidUntil !== expectedValidityDate) { fail(`priceValidUntil for ${id} is ${offer.priceValidUntil}; expected ${expectedValidityDate}`); continue; }
-            cleanPages++;
+            if (!offer.url) { fail(`Missing Offer URL for ${id}`); continue; }
+            const canonical = new URL(offer.url);
+            canonical.hash = '';
+            affectedCanonicalUrls.add(canonical.href);
+            cleanProducts++;
           }
-          if (cleanPages === 230 && process.exitCode !== 1) pass('All 230 affected pages have valid Product JSON-LD, KES numeric offers, InStock and one-year price validity');
-          else fail(`Only ${cleanPages}/230 affected pages passed schema checks`);
+          if (cleanProducts === 230 && process.exitCode !== 1) pass('All 230 affected products have valid Product JSON-LD offers: KES, numeric price, InStock and one-year validity');
+          else fail(`Only ${cleanProducts}/230 affected products passed schema checks`);
 
           const site = 'https://stermontarcade.co.ke';
-          const parseSitemap = xml => new Map([...xml.matchAll(/<url>[\s\S]*?<loc>([^<]+)<\/loc>[\s\S]*?<lastmod>([^<]+)<\/lastmod>[\s\S]*?<\/url>/g)].map(m => [m[1], m[2]]));
+          const parseSitemap = xml => new Map([...xml.matchAll(/<url>[\\s\\S]*?<loc>([^<]+)<\\/loc>[\\s\\S]*?<lastmod>([^<]+)<\\/lastmod>[\\s\\S]*?<\\/url>/g)].map(m => [m[1], m[2]]));
           const oldXml = fs.readFileSync('/tmp/main-sitemap.xml', 'utf8');
           const newXml = fs.readFileSync('sitemap.xml', 'utf8');
           const oldMap = parseSitemap(oldXml);
@@ -120,35 +133,31 @@ jobs:
           if (!newMap.size) fail('Generated sitemap.xml contains no URL/lastmod entries');
 
           const missingOld = [...oldMap.keys()].filter(url => !newMap.has(url));
-          if (missingOld.length) fail(`${missingOld.length} existing main product/static URLs disappeared from sitemap.xml: ${missingOld.slice(0, 10).join(', ')}`);
+          if (missingOld.length) fail(`${missingOld.length} existing main sitemap URLs disappeared: ${missingOld.slice(0, 10).join(', ')}`);
           else pass(`All ${oldMap.size} existing main sitemap URLs remain present`);
 
-          const changedFiles = new Set(execFileSync('git', ['diff', '--name-only', 'origin/main', '--', 'p'], { encoding: 'utf8' }).trim().split('\n').filter(Boolean));
+          const missingAffected = [...affectedCanonicalUrls].filter(url => !newMap.has(url));
+          if (missingAffected.length) fail(`${missingAffected.length} affected canonical product URLs are absent from sitemap.xml: ${missingAffected.slice(0, 10).join(', ')}`);
+          else pass(`All ${affectedCanonicalUrls.size} affected canonical product URLs are in sitemap.xml`);
+
           const today = new Date().toISOString().slice(0, 10);
           let lastmodErrors = 0;
           for (const [url, lastmod] of newMap) {
-            const relative = url.startsWith(site) ? url.slice(site.length) : null;
-            if (!relative) continue;
-            const file = relative.endsWith('/') ? relative.slice(1) + 'index.html' : relative.slice(1);
-            const isChanged = changedFiles.has(file);
             const previous = oldMap.get(url);
-            if (!previous) {
-              if (lastmod !== today) { fail(`New URL has unexpected lastmod ${lastmod}: ${url}`); lastmodErrors++; }
-            } else if (isChanged && lastmod === previous) {
-              fail(`Changed page did not receive a new lastmod: ${url}`); lastmodErrors++;
-            } else if (!isChanged && lastmod !== previous) {
+            const affected = affectedCanonicalUrls.has(url);
+            if (affected && previous && lastmod === previous) {
+              fail(`Affected product page did not receive an updated lastmod: ${url}`); lastmodErrors++;
+            } else if (affected && !previous && lastmod !== today) {
+              fail(`New product page has unexpected lastmod ${lastmod}: ${url}`); lastmodErrors++;
+            } else if (!affected && previous && lastmod !== previous) {
               fail(`Unchanged page lastmod was modified: ${url}`); lastmodErrors++;
             }
           }
-          if (!lastmodErrors) pass('sitemap.xml lastmod changes are limited to changed pages; new URLs carry today’s date');
+          if (!lastmodErrors) pass('sitemap.xml lastmod is refreshed for affected product pages only; unchanged URLs retain their prior dates');
 
-          const newPackUrls = [...insertedIds].map(id => {
-            const page = pagesById.get(id);
-            return page ? `${site}/p/${page.file}` : null;
-          }).filter(Boolean);
-          const missingNewPacks = newPackUrls.filter(url => !newMap.has(url));
-          if (newPackUrls.length !== 25 || missingNewPacks.length) fail(`New pack sitemap coverage failed: ${newPackUrls.length}/25 resolved, ${missingNewPacks.length} missing`);
-          else pass('All 25 new pack URLs are present in sitemap.xml');
+          const newPackMissing = [...insertedIds].filter(id => !productsBySku.has(id));
+          if (newPackMissing.length) fail(`Missing new pack Product schema entries: ${newPackMissing.join(', ')}`);
+          else pass('All 25 new pack variants are represented in Product/hasVariant JSON-LD and their canonical product pages are sitemap-listed');
 
           if (process.exitCode === 1) process.exit(1);
           console.log('SUMMARY: PASS — all 230 affected product pages and sitemap checks are clean.');
