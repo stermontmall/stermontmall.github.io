@@ -4,7 +4,7 @@ const category = { name: 'Fertilizers', items: [{name:'NPK fertilizer 25kg'},{na
 const intro = buildCategoryIntro(category, 'Compare fertilizer products for crop nutrition and soil management.');
 const faq = buildCategoryFaq(category, [['Which fertilizer should I choose?', 'Choose based on crop and soil needs.']]);
 const words = intro.split(/\s+/).filter(Boolean).length;
-assert.ok(words >= 130 && words <= 165, 'category intro should be 130–165 words');
+assert.ok(words >= 150 && words <= 165, 'category intro should be 150–165 words');
 assert.equal(faq.length, 4, 'every category must expose exactly four FAQs');
 assert.ok(faq.every(([q,a]) => q && a), 'FAQ questions and answers must be non-empty');
 console.log('Category editorial tests passed.');
