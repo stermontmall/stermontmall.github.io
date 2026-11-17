@@ -43,46 +43,32 @@ export function splitFaq(body) {
 
 function renderBody(body, heading) {
   if (heading.toLowerCase().includes('frequently asked questions') || heading.toLowerCase() === 'faqs') {
-    const qLines = body.split(/\\n+/).map(x => x.trim()).filter(Boolean);
-    const marked = qLines.filter(x => /^Q:\\s*/i.test(x));
-    if (marked.length) return marked.map((q, i) => {
-      const rest = q.replace(/^Q:\\s*/i, '');
-      const split = rest.match(/^(.+?\\?)\\s+(.+)$/);
+    const qLines = body.split(/\n+/).map(x => x.trim()).filter(Boolean);
+    const marked = qLines.filter(x => /^Q:\s*/i.test(x));
+    if (marked.length) return marked.map(q => {
+      const rest = q.replace(/^Q:\s*/i, '');
+      const split = rest.match(/^(.+?\?)\s+([\s\S]+)$/);
       const question = split ? split[1] : rest;
       const answer = split ? split[2] : (qLines.slice(qLines.indexOf(q) + 1).find(x => !/^Q:/i.test(x)) || '');
-      return '<p><strong>' + esc(question) + '</strong></p>' + (answer ? '<p>' + esc(answer) + '</p>' : '');
+      return '<p><strong>' + inline(question) + '</strong></p>' + (answer ? '<p>' + inline(answer) + '</p>' : '');
     }).join('');
     const faq = splitFaq(body);
-    if (faq) return faq.map(i => '<p><strong>' + esc(i.q) + '</strong><br>' + esc(i.a) + '</p>').join('');
+    if (faq) return faq.map(i => '<p><strong>' + inline(i.q) + '</strong></p><p>' + inline(i.a) + '</p>').join('');
   }
   const startsWithBullet = /^\s*[•●▪]/.test(body);
   const pieces = body.split(/\s*[•●▪]\s*/).map(x => x.trim()).filter(Boolean);
   if (pieces.length > 1 || (startsWithBullet && pieces.length)) {
-    // Text before the first bullet is an intro paragraph; when the body starts with a bullet there is no intro (the old code turned the first bullet into a paragraph).
     const lead = startsWithBullet ? '' : pieces.shift();
-    return (lead ? '<p>' + esc(lead) + '</p>' : '') + '<ul>' + pieces.map(x => '<li>' + esc(x.replace(/^[-–]\s*/, '')) + '</li>').join('') + '</ul>';
+    return (lead ? '<p>' + inline(lead) + '</p>' : '') + '<ul>' + pieces.map(x => '<li>' + inline(x.replace(/^[-–]\s*/, '')) + '</li>').join('') + '</ul>';
   }
-  return body.split(/\n+/).map(x => x.trim()).filter(Boolean).map(line =>
-    /^[-–•●▪]\s*/.test(line)
-      ? '<ul><li>' + esc(line.replace(/^[-–•●▪]\s*/, '')) + '</li></ul>'
-      : '<p>' + esc(line) + '</p>'
-  ).join('');
-}
-
-// Extract exactly four authored buyer Q&As for product FAQPage JSON-LD. No answers are invented.
-export function extractProductFaq(source) {
-  const raw = String(source || '').replace(/\\r\\n|\\n|\\r/g, '\n')
-    .replace(/^#[^#\\n]*##[ \\t]*/i, '## ')
-    .replace(/[ \\t]+##[ \\t]+/g, '\n\n## ')
-    .replace(/[ \\t]+###[ \\t]+/g, '\nQ: ');
-  const start = raw.search(/(?:##\\s*)?(?:FREQUENTLY ASKED QUESTIONS|FAQS?)\\b/i);
-  if (start < 0) return [];
-  const body = raw.slice(start).replace(/^(?:##\\s*)?(?:FREQUENTLY ASKED QUESTIONS|FAQS?)\\b:?/i, '');
-  const matches = [...body.matchAll(/Q:\\s*(.+?\\?)\\s*([\\s\\S]*?)(?=\\nQ:\\s*|$)/gi)];
-  const pairs = matches.map(m => ({ q: m[1].trim(), a: m[2].replace(/^[-–•\\s]+/, '').trim() })).filter(x => x.q && x.a);
-  if (pairs.length === 4) return pairs;
-  const legacy = splitFaq(body);
-  return legacy && legacy.length === 4 ? legacy : [];
+  const blocks = body.split(/\n{2,}/).map(x => x.trim()).filter(Boolean);
+  return blocks.flatMap(block => block.split(/\n+/).map(x => x.trim()).filter(Boolean).flatMap(line => {
+    if (/^[-–•●▪]\s*/.test(line)) return ['<ul><li>' + inline(line.replace(/^[-–•●▪]\s*/, '')) + '</li></ul>'];
+    const sentences = line.match(/[^.!?]+(?:[.!?]+|$)/g) || [line];
+    const paras = [];
+    for (let i = 0; i < sentences.length; i += 3) paras.push('<p>' + inline(sentences.slice(i, i + 3).join(' ').trim()) + '</p>');
+    return paras;
+  })).join('');
 }
 
 export function productDescriptionHtml(source) {
