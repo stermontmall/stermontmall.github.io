@@ -1082,3 +1082,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-17: rebuild all product detail pages and product sitemap after expanding nine thin descriptions and correcting their unique SEO titles and snippets.
 
 // 2026-11-17: rebuild after correcting legacy truncated/heading-prefixed product meta descriptions.
+
+// 2026-11-17: regenerate all product pages after completing 13 additional thin product descriptions and unique snippets.
