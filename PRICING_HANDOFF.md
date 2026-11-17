@@ -479,3 +479,44 @@ Belt 480SC product pages list 50ml, 250ml and 1L; the existing catalogue already
 Remaining Batch 5 items include Bat CRP repellent variants, Bat repellent powder, Baraki 10g/100g/1kg, Velum Prime 40ml, Baygon aerosol, Bazooka and Beanpro, Bedlam variants where supplier prices were inconsistent or stock uncertain, bee equipment, Bestox, Betacyde, Betafos, BF150 fogger, Bigo, Billionaire, BioDistinction, Bipronex, BlackEarth, Blue-Touch glue traps, Booster, door sealer, Bradley, 10 motor-vehicle adverts, bug-related products not priced to exact pack, Burdizzo, seeds, calf equipment, irrigation hose, Catchmaster traps/UV unit, and Celebrat models without reliable matching multi-retailer data. These remain unchanged.
 
 SQL: `supabase/sql/pricing-batch-005.sql` (guarded, review branch only; not applied to production). Existing product slugs/URLs preserved.
+
+
+---
+
+# Batch 6 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta skipped | 5 |
+| Existing product prices prepared for update | 3 |
+| New verified pack variants prepared | 3 |
+| Needs manual check / unchanged | 92 |
+
+Syngenta products skipped untouched: Cruiser 350FS 5L, Daconil 720SC 500ml, Danadim Progress 400EC 1L, Dithane Mancozeb 1kg, and Dual Gold 960EC 5L.
+
+## Price updates
+
+| Product | Pack | Baseline Cost (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Source Reference |
+|---|---|---:|---:|---:|---:|---|
+| chariot-500-sc-fungicide-1-litre | Existing pack | 1,683 [RETAIL-ESTIMATE] | 30% | 2,200 | 1,980 (avg 2,091.7) | https://agroduka.ke/index.php?dispatch=products.ut2_select_variation&product_id=826; https://dawnfarmers.com/shop/crop-production/fungicides/chariot-500sc/; https://www.farmrescue.co.ke/product/chariot-500-sc |
+| dap-18-46-0-fertilizer-50kg | Existing pack | 3,655 [RETAIL-ESTIMATE] | 30% | 4,750 | 4,300 (avg 5,917) | https://www.waingofarm.co.ke/shop/dap-planting-fertilizer-50kg; https://agrijibu.co.ke/crop-production/fertilizers/; https://www.farmrescue.co.ke/ |
+| dk777-hybrid-maize-seeds-2kg | Existing pack | 442 [RETAIL-ESTIMATE] | 30% | 600 | 520 (avg 760) | https://www.farmshieldkenya.co.ke/product/dk777-maize-seed-drought-tolerant-hybrid; https://agrijibu.co.ke/seeds/cereals-seeds/ |
+
+DAP 50kg is reduced only because the existing KSh7,650 price is more than 25% above the observed average of comparable Kenyan retail benchmarks; the lowest currently listed in-stock private-retailer price is KSh4,300. DK777 2kg is similarly reduced only because the existing price is materially above multiple Kenya market observations, including a current in-stock 2kg pack at KSh520 and AgriJibu at KSh1,000. Chariot 500SC 1L is reduced from KSh3,199 to KSh2,200 because multiple exact 1L Kenyan listings cluster around KSh1,870–2,395, with Agroduka showing KSh1,980 in stock. All use 85% of the lowest reliable retail as estimated baseline and the 30% markup, rounded to KSh50.
+
+## New pack variants
+
+| Product | Pack | Lowest supplier retail (KES) | Baseline (KES) | Markup | New price (KES) | Source |
+|---|---|---:|---:|---:|---:|---|
+| Chariot 500 SC Fungicide | 100ml | 310 | 263.50 | 30% | 350 | https://www.farmrescue.co.ke/product/chariot-500-sc |
+| Chariot 500 SC Fungicide | 250ml | 735 | 624.75 | 30% | 800 | https://www.farmrescue.co.ke/product/chariot-500-sc |
+| Commander 240EC Herbicide | 100ml | 400 | 340 | 30% | 450 | https://agropests.com/products/commander-240ec-100ml |
+
+Supplier pages confirm Chariot 500SC standard sizes 50ml, 100ml, 250ml, 500ml and 1L; 50ml and 1L already existed, 100ml and 250ml are prepared here, and 500ml remains manual because no exact in-stock price was verified. Commander 240EC has 100ml, 250ml, 500ml and 1L options; 1L already existed and 100ml is prepared here. Other missing sizes lack an exact verified in-stock price and are not created speculatively.
+
+## Needs Manual Check
+
+Remaining Batch 6 products (90 records after Syngenta exclusion and 3 price changes) are unchanged where no exact, reliable supplier price was confirmed or where the formula target would require a price reduction that fails the 25%-over-market-average exception. This includes PPE, chick feeders, seeds, Dursban, Climb, Closer, cocopeat, cage traps, Combat products, Commander 1L (formula target lower than current but current not >25% over market average), Companion, Compliant, Confidor, beekeeping tools, honey sieve, dairy products, CoverMax, Cropgrow, monitoring traps, insect light traps, pumps other than the Daichi model where engine specs were not exact, herbicides/fungicides without comparable current listings, and the remaining seed and PPE catalogue entries.
+
+SQL: `supabase/sql/pricing-batch-006.sql` (guarded updates + idempotent inserts; review branch only, not production). Existing product IDs, slugs and URLs remain unchanged; new variants have new stable IDs/slugs.
