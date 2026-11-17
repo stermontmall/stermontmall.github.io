@@ -1,13 +1,13 @@
 # Mobile shell: design tokens and rules
 
-Dense marketplace look: small type, tight gaps, white cards on a light-grey page, one brand colour, one "sale" colour.
+Dense marketplace look: small type, tight gaps, white cards on a light-grey page, royal-purple brand, emerald accent, orange sale colour.
 Tokens live in `tailwind.config.js` (names below) and `src.css` (component classes). Rebuild with `node mobile-shell/build-css.mjs`.
 
 ## Colour
 | Token | Value | Use |
 |---|---|---|
-| `brand` | `#7c3aed` (dark `#6d28d9`, soft `#f5f0ff`) | active nav, selected chip, primary buttons, links. Same as the site's `theme-color` |
-| `sale` | `#e11d48` | price, discount badge, cart/deals badge. Nothing else is red |
+| `brand` | `#5b21b6` (dark `#4c1d95`, soft `#f3eefe`) | active nav, selected chip, primary buttons, links. Same as the site's `theme-color` |
+| `sale` | `#f97316` | price, discount badge, cart/deals badge. Nothing else is red |
 | `star` | `#f59e0b` | rating stars (empty stars `#d1d5db`) |
 | `ink` / `mute` | `#1f2937` / `#6b7280` | primary / secondary text, inactive icons |
 | `line` | `#e5e7eb` | hairlines, sheet dividers |
