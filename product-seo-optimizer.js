@@ -18,11 +18,11 @@ canon=false,
 descriptionBlocks=Array.from(d.querySelectorAll('.product-description-section')),
 legacyDescription=d.querySelector('.desc'),
 descriptionText=descriptionBlocks.length?descriptionBlocks.map(x=>x.textContent||'').join(' '):(legacyDescription?legacyDescription.textContent||'':''),
-descriptionWords=(clean(descriptionText).match(/\\S+/g)||[]).length,
+descriptionWords=(clean(descriptionText).match(/\S+/g)||[]).length,
 descriptionSections=descriptionBlocks.length?descriptionBlocks.length:(legacyDescription?legacyDescription.querySelectorAll('h2,h3').length:0);
 try{canon=new URL(canonical,url).origin===SITE&&new URL(canonical,url).pathname===new URL(url).pathname;}catch(_){}
-var checks=[!!title.trim()&&title.trim().length<=60,!!desc.trim()&&desc.trim().length<=155,h1===1,canon,!/\\bnoindex\\b/i.test(robots),imgs.length>0&&alt===imgs.length,d.querySelectorAll('script[type="application/ld+json"]').length>=2,descriptionWords>=40,descriptionSections>=2];
-return{id:id,url:url,title:title.trim(),description:desc.trim(),h1:h1,images:imgs.length,alt:alt,score:Math.round(checks.filter(Boolean).length/checks.length*100),words:(clean((d.body||{}).textContent||'').match(/\\S+/g)||[]).length,descriptionWords:descriptionWords,descriptionSections:descriptionSections};
+var checks=[!!title.trim()&&title.trim().length<=60,!!desc.trim()&&desc.trim().length<=155,h1===1,canon,!/\bnoindex\b/i.test(robots),imgs.length>0&&alt===imgs.length,d.querySelectorAll('script[type="application/ld+json"]').length>=2,descriptionWords>=40,descriptionSections>=2];
+return{id:id,url:url,title:title.trim(),description:desc.trim(),h1:h1,images:imgs.length,alt:alt,score:Math.round(checks.filter(Boolean).length/checks.length*100),words:(clean((d.body||{}).textContent||'').match(/\S+/g)||[]).length,descriptionWords:descriptionWords,descriptionSections:descriptionSections};
 }
 function titleCandidate(name){var n=clean(name);if(!n)return '';var full=n+' – Price in Kenya';if(full.length<=60)return full;var short=n+' – Kenya';if(short.length<=60)return short;return n.length<=60?n:'';}
 function pageSlug(p,allIds,used){var s=String(p.slug||'').trim(),id=String(p.id);if(s&&s!==id&&/^[a-z0-9][a-z0-9-]*$/.test(s)&&!allIds.has(s)&&!used.has(s)){used.add(s);return s;}return id;}
