@@ -520,3 +520,39 @@ Supplier pages confirm Chariot 500SC standard sizes 50ml, 100ml, 250ml, 500ml an
 Remaining Batch 6 products (93 records after 4 Syngenta exclusions and 3 price changes) are unchanged where no exact, reliable supplier price was confirmed or where the formula target would require a price reduction that fails the 25%-over-market-average exception. This includes PPE, chick feeders, seeds, Dursban, Climb, Closer, cocopeat, cage traps, Combat products, Commander 1L (formula target lower than current but current not >25% over market average), Companion, Compliant, Confidor, beekeeping tools, honey sieve, dairy products, CoverMax, Cropgrow, monitoring traps, insect light traps, pumps other than the Daichi model where engine specs were not exact, herbicides/fungicides without comparable current listings, and the remaining seed and PPE catalogue entries.
 
 SQL: `supabase/sql/pricing-batch-006.sql` (guarded updates + idempotent inserts; review branch only, not production). Existing product IDs, slugs and URLs remain unchanged; new variants have new stable IDs/slugs.
+
+
+---
+
+# Batch 7 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta skipped | 1 |
+| Price updates prepared | 7 |
+| New pack variants | 0 |
+| Needs manual price check / unchanged | 92 |
+
+Syngenta exclusion: Engeo 247SC 250ml. Danadim Progress is FMC/Cheminova (not Syngenta) and remains eligible; Funginil is Osho / Jiangsu Xinhe (not Syngenta) but requires a separate Kenya regulatory-status check.
+
+## Price updates
+
+| Product | Pack | Baseline Cost (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Source Reference |
+|---|---|---:|---:|---:|---:|---|
+| fugo-chick-and-duckling-mash-50kg | Existing pack | 3,060 [RETAIL-ESTIMATE] | 30% | 4,000 | 3,600 (market avg 3,955) | https://ungafarmcare.com/; https://farmersbondealtd.co.ke/; https://agrijibu.co.ke/brand/fugo-feeds/ |
+| fugo-fast-gro-broiler-finisher-pellets-50kg | Existing pack | 2,975 [RETAIL-ESTIMATE] | 30% | 3,850 | 3,500 (market avg 4,105) | https://ungafarmcare.com/; https://agrijibu.co.ke/brand/fugo-feeds/; https://www.myagrovet.co.ke/poultry-feeds |
+| fugo-fast-gro-broiler-starter-crumbs-50kg | Existing pack | 3,145 [RETAIL-ESTIMATE] | 30% | 4,100 | 3,700 (market avg 4,168) | https://ungafarmcare.com/; https://farmersbondealtd.co.ke/; https://agrijibu.co.ke/brand/fugo-feeds/ |
+| fugo-grower-mash-50kg | Existing pack | 2,890 [RETAIL-ESTIMATE] | 30% | 3,750 | 3,400 (market avg 3,423) | https://agrijibu.co.ke/fugo-grower-mash-50kg/; https://kilimokona.co.ke/shop/livestock-feed/layer-feeds/fugo-grower-mash-50kg-2/; https://farmersbondealtd.co.ke/ |
+| evergrow-organic-fertilizer-50kg | Existing pack | 2,082.5 [RETAIL-ESTIMATE] | 30% | 2,700 | 2,450 (market avg 2,980) | https://mtolori.com/product/details/evergro-organic-50kgs-5173; https://simlaw.co.ke/product-details/1871/11020; https://agrijibu.co.ke/evergrow-organic-fertilizer-50kg/; https://agropests.com/products/evergrow-organic-fertilizer-npk-te-50-kg-1; https://shambamtaani.com/product/evergrow-organic-fertilizer-50-kg-100-organic-kebs-certified/ |
+| falcon-npk-17-17-17-fertilizer-50kg | Existing pack | 4,547.5 [RETAIL-ESTIMATE] | 30% | 5,900 | 5,350 (market avg 5,350) | https://agrijibu.co.ke/crop-production/fertilizers/top-dressing-fertilizers/ |
+| ear-tag-applicator | Existing pack | 1,432.25 [RETAIL-ESTIMATE] | 30% | 1,850 | 1,685 (market avg 1,742.5) | https://agrijibu.co.ke/; https://mkulimajovial.co.ke/price-list/ |
+
+The FUGO feed reductions are supported by current manufacturer (Unga Farm Care), AgriJibu and local dealer listings. Existing FUGO prices for chick mash, finisher pellets, starter crumbs and grower mash were over 25% above the average of comparable current listings, so the reduction exception is met. Evergrow 50kg has multiple in-stock Kenyan retail observations from M-Tolori, Simlaw, AgriJibu, Agropests and Shamba Mtaani; current KSh4,699 is more than 25% above the market average, so the formula price KSh2,700 is permitted. ETG M401 was not reduced because its current price is not 25% above the multi-retailer average. Falcon NPK 17:17:17 and the ear-tag applicator are price increases based on in-stock listings.
+
+## Regulatory/manual flags
+
+- [REGULATORY CHECK] Funginil 720SC 40ml: PCPB chlorothalonil review materials list Funginil among products subject to withdrawal/review; do not treat the current listing as verified for sale until the current 2025 PCPB register and any subsequent decisions are checked. Price unchanged.
+- Remaining items not updated because no exact in-stock Kenyan quote was found, the product specification did not match, or the formula price would require a reduction not permitted by the 25%-over-average guardrail. This includes Easygro products, Eazole, ECOMAX speakers, Econo rat stations, ED21 fly catcher, electric appliances, fertilizers without comparable exact stock, sprayers, household insecticides, other seeds, pesticide brands/pack sizes without current stock confirmation, FUGO Layer Compleat Meal (formula target below current but current not >25% above average), and livestock accessories.
+
+No verified new pack sizes with exact current in-stock prices were confirmed for the other Batch 7 products. SQL: `supabase/sql/pricing-batch-007.sql` (guarded, review branch only; not applied to production). Existing slugs/URLs preserved.
