@@ -33,7 +33,7 @@ jobs:
       - name: Fetch main baseline
         run: |
           git fetch --no-tags origin main
-          git show df17473e0701363312387b6fac6ef336788c9299:sitemap.xml > /tmp/main-sitemap.xml
+          git show df17473e0701363312387b6fac6ef336788c9299:sitemap.xml > /tmp/main-sitemap.xml\n          mkdir -p /tmp/main-pages\n          git archive df17473e0701363312387b6fac6ef336788c9299 p | tar -x -C /tmp/main-pages
 
       - name: Generate product pages and sitemaps
         run: node generate-products.mjs
@@ -144,16 +144,26 @@ jobs:
           let lastmodErrors = 0;
           for (const [url, lastmod] of newMap) {
             const previous = oldMap.get(url);
-            const affected = affectedCanonicalUrls.has(url);
-            if (affected && previous && lastmod === previous) {
-              fail(`Affected product page did not receive an updated lastmod: ${url}`); lastmodErrors++;
-            } else if (affected && !previous && lastmod !== today) {
-              fail(`New product page has unexpected lastmod ${lastmod}: ${url}`); lastmodErrors++;
-            } else if (!affected && previous && lastmod !== previous) {
-              fail(`Unchanged page lastmod was modified: ${url}`); lastmodErrors++;
+            const pathname = new URL(url).pathname.replace(/^\\/+/, '');
+            const isProductPage = pathname.startsWith('p/');
+            if (isProductPage) {
+              const baselineFile = path.join('/tmp/main-pages', pathname);
+              const currentFile = path.join('.', pathname);
+              const existsNow = fs.existsSync(currentFile);
+              const existedBefore = fs.existsSync(baselineFile);
+              const changed = existsNow && (!existedBefore || !fs.readFileSync(currentFile).equals(fs.readFileSync(baselineFile)));
+              if (changed && previous && lastmod === previous) {
+                fail(`Changed product HTML did not receive a new lastmod: ${url}`); lastmodErrors++;
+              } else if (!changed && previous && lastmod !== previous) {
+                fail(`Unchanged product HTML has a modified lastmod: ${url}`); lastmodErrors++;
+              } else if (changed && !previous && lastmod !== today) {
+                fail(`New product URL has unexpected lastmod ${lastmod}: ${url}`); lastmodErrors++;
+              }
+            } else if (previous && lastmod !== previous) {
+              fail(`Non-product URL lastmod changed unexpectedly: ${url}`); lastmodErrors++;
             }
           }
-          if (!lastmodErrors) pass('sitemap.xml lastmod is refreshed for affected product pages only; unchanged URLs retain their prior dates');
+          if (!lastmodErrors) pass('sitemap.xml lastmod matches actual product HTML changes; unchanged product and static URLs retain prior dates');
 
           const newPackMissing = [...insertedIds].filter(id => !productsBySku.has(id));
           if (newPackMissing.length) fail(`Missing new pack Product schema entries: ${newPackMissing.join(', ')}`);
@@ -173,7 +183,7 @@ jobs:
             echo "- 230 valid Product JSON-LD offers: KES, numeric price, InStock, one-year priceValidUntil"
             echo "- All pre-pricing baseline sitemap URLs preserved"
             echo "- All 25 new pack URLs included"
-            echo "- sitemap.xml lastmod changed only for changed pages"
+            echo "- sitemap.xml lastmod matches actual HTML changes only"
             echo ""
             echo "This workflow only builds and verifies. It does not publish, deploy, push, or merge."
           } >> "$GITHUB_STEP_SUMMARY"
