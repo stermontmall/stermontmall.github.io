@@ -645,3 +645,46 @@ The Infinix Smart 20 4GB/128GB listing was researched but not repriced: its calc
 Remaining products are unchanged where no exact current Kenyan in-stock match was confirmed, or where the calculated price would require a reduction that does not meet the 25%-above-market-average exception. This includes Infinito 500ml/1L (current formula target below current but current not >25% above average), PPE, INGCO/Jacto sprayers and parts, pumps with non-matching engine/model specs, seeds without current multi-supplier checks, Katerina 720SC and Kenthalonil 720SC (chlorothalonil registration review), K-Othrine, household products, beekeeping equipment, and other hardware/electronics without a reliable exact match.
 
 SQL: `supabase/sql/pricing-batch-009.sql` (guarded; review branch only, not applied to production). Existing slugs/URLs preserved.
+
+
+---
+
+# Batch 10 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta skipped | 3 |
+| Existing product prices prepared for update | 6 |
+| New pack variants prepared | 2 |
+| Needs manual price check / unchanged | 91 |
+
+Syngenta exclusions: Lumax 537.5SE Herbicide 5L, Maxim XL 035FS Seed Treatment 5L, and Miravis Duo 200SC 100ml.
+
+## Price updates
+
+| Product | Pack | Baseline Cost (KES) | Markup | New Price (KES) | Competitor Retail (KES) | Source Reference |
+|---|---|---:|---:|---:|---:|---|
+| levafas-diamond-fluke-and-worm-drench-1-litre | Existing pack | 1,445 [RETAIL-ESTIMATE] | 30% | 1,900 | 1,700 (avg 1,730) | https://www.melagri.com/brands/norbrook-kenya-limited; https://mtolori.com/product/details/levafas-diamond-1ltr-17867518 |
+| lg-lhd657-1000w-5-1-channel-home-theatre-system-1000w-5-1-ch | Existing pack | 33,149.15 [RETAIL-ESTIMATE] | 25% | 41,450 | 38,999 (avg 44,619.25) | https://www.pricekenya.co.ke/p/lg-home-theatre-lhd657; https://www.avechi.co.ke/product/lg-lhd657-5-1ch-1000w-home-theatre-system/; https://www.kenyatronics.com/view-product/lg-lhd657-dvd-home-theater-system-1000w-51ch-bluetooth; https://www.incountrydistribution.co.ke/product/lg-lhd657-1000w-5-1-home-theatre/ |
+| menno-florades-90sl-disinfectant-1l | Existing pack | 3,961 [RETAIL-ESTIMATE] | 30% | 5,150 | 4,660 (avg 4,660) | https://agriguardagrovet.co.ke/?action=yith-woocompare-add-product&id=1175 |
+| menno-florades-90sl-disinfectant-250ml | Existing pack | 1,062.5 [RETAIL-ESTIMATE] | 30% | 1,400 | 1,250 (avg 1,275) | https://agropests.com/products/menno-florades-90sl-250ml; https://agriguardagrovet.co.ke/?action=yith-woocompare-add-product&id=1175 |
+| matco-72wp-fungicide-1kg | Existing pack | 1,547 [RETAIL-ESTIMATE] | 30% | 2,000 | 1,820 (avg 2,075) | https://mtolori.com/shop/details/1/products?page=36; https://www.farmrescue.co.ke/product/matco-72-wp |
+| matco-72wp-fungicide-500g | Existing pack | 765 [RETAIL-ESTIMATE] | 30% | 1,000 | 900 (avg 1,088.75) | https://mtolori.com/shop/details/1/products?page=36; https://kuzaagrochem.com/products/matco-72wp-500g-624; https://agriguardagrovet.co.ke/product/matco-72-wp/; https://www.farmrescue.co.ke/product/matco-72-wp |
+
+The LG LHD657 1000W 5.1-channel home theatre update is based on four current Kenyan listings; KSh38,999 is the lowest. Levafas Diamond 1L is reduced because the current KSh2,450 is over 40% above the average of two current Kenyan listings (KSh1,700 and KSh1,760); formula price is KSh1,900. Matco 1kg and 500g are reduced because their current prices are more than 25% above multiple exact-pack listings. Menno Florades 1L and 250ml are increases using the verified AgriGuard/Agropests current retail listings.
+
+## New pack variants
+
+| Product | Pack | Lowest retail (KES) | Baseline (KES) | Markup | New price (KES) | Source |
+|---|---|---:|---:|---:|---:|---|
+| Levafas Diamond Fluke & Worm Drench 125ml | 125ml bottle | 380 | 323 | 30% | 400 | https://www.melagri.com/brands/norbrook-kenya-limited |
+| Levafas Diamond Fluke & Worm Drench 500ml | 500ml bottle | 1,000 | 850 | 30% | 1,100 | https://www.melagri.com/brands/norbrook-kenya-limited |
+
+Mel-Agri's current Norbrook Kenya catalogue shows Levafas Diamond 125ml (KSh380), 500ml (KSh1,000) and 1L (KSh1,700), all in stock. Existing 1L remains; new 125ml and 500ml variants are prepared. The three packs are grouped in a variant selector. No other pack additions were made because exact prices/stock could not be verified.
+
+## Needs Manual Check / Regulatory
+
+Remaining Batch 10 products unchanged where no exact current price was verified or the formula price would require an impermissible reduction. This includes vehicle sourcing adverts, PPE, livestock premix and supplements, longray foggers, household appliances and personal care, Lynfield traps, fertilizers, Matco pack sizes where formula target is below current but current is not sufficiently overpriced, Mavuno Bora bags, MaxGuard moth traps, Maxigrow, Maxim excluded as Syngenta, Mchwatox, Milano pumps, other fungicides and insecticides, men’s fashion, Metro 200SC, Milestone, milk strip cup, mini feed crusher, rodent baits, MOP fertilizer, mosquito consumables and Mospilan.
+
+SQL: `supabase/sql/pricing-batch-010.sql` (guarded updates and idempotent inserts; review branch only, not production). Existing slugs/URLs preserved.
