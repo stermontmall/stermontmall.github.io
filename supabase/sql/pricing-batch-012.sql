@@ -9,7 +9,13 @@ begin
 ('pioneer-30g19-hybrid-maize-seed-2kg',1300.00::numeric,950.00::numeric,722.50::numeric),
 ('pioneer-p2848w-hybrid-maize-seeds-2kg',1235.00::numeric,950.00::numeric,722.50::numeric),
 ('pioneer-p3812w-hybrid-maize-seeds-2kg',1300.00::numeric,950.00::numeric,722.50::numeric),
-('premier-767-25l-2-stroke-petrol-knapsack-sprayer',19500.00::numeric,15450.00::numeric,11899.15::numeric)
+('premier-767-25l-2-stroke-petrol-knapsack-sprayer',19500.00::numeric,15450.00::numeric,11899.15::numeric),
+('ph-1-maize-seeds-2kg',699.00::numeric,700.00::numeric,552.50::numeric),
+('promax-20ec-insecticide-1-litre',4350.00::numeric,6650.00::numeric,5100.00::numeric),
+('ramtons-rm-399-1-7l-corded-electric-kettle',3250.00::numeric,1250.00::numeric,959.65::numeric),
+('ramtons-rm-458-20l-digital-glass-door-microwave',11350.00::numeric,8850.00::numeric,6799.15::numeric),
+('ramtons-rm-553-21l-wet-and-dry-vacuum-cleaner',14299.00::numeric,10500.00::numeric,8074.15::numeric),
+('ramtons-rm-580-1-5l-blender-with-mill-500w',8150.00::numeric,5500.00::numeric,4220.25::numeric)
  ) as v(product_id,expected_price,new_price,new_cost)
  loop
   update public.products set price=r.new_price,cost=r.new_cost where id=r.product_id and active=true and price=r.expected_price;
