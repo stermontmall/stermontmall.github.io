@@ -92,10 +92,10 @@ export function extractProductFaq(source) {
 function normalizeMarkdownHeading(value) {
   const h = value.toLowerCase().replace(/[&]/g, 'and').replace(/\s+/g, ' ').trim();
   if (/(product overview|overview|key features|key benefits|product summary)/.test(h)) return 'Product Overview & Key Benefits';
-  if (/(technical|specification|identity|formulation|pack details|exact pack|product details|product information)/.test(h)) return 'Technical Specifications & Pack Details';
-  if (/(where|target pests|registered|application|uses|use in kenya|pest-control context|intended buyer|supplier-described public-health)/.test(h)) return 'Where & How to Use in Kenya';
+  if (/(technical|specification|identity|formulation|pack details|exact pack|product details|product information|pack contents)/.test(h)) return 'Technical Specifications & Pack Details';
+  if (/(where|target pests|registered|application|uses|use in kenya|pest-control context|public-health purpose|intended buyer|supplier-described public-health)/.test(h)) return 'Where & How to Use in Kenya';
   if (/(safety|storage|handling|before purchasing|label|regulatory|precaution|ppe)/.test(h)) return 'Safety, Storage & Handling Guidelines';
-  if (/(buying|pack.size|price|comparison|compare|choosing|purchase|source price|value)/.test(h)) return 'Buying & Pack-Size Guide';
+  if (/(buying|pack.size|price|comparison|compare|choosing|purchase|source price|baseline|value)/.test(h)) return 'Buying & Pack-Size Guide';
   if (/(ordering|delivery|pickup|order)/.test(h)) return 'Delivery across Kenya & Nairobi Pickup';
   if (/(frequently asked questions|^faqs?$)/.test(h)) return 'Frequently Asked Questions';
   return value;
@@ -120,7 +120,7 @@ function splitInlineMarkdownHeadings(source) {
   }
   // Earlier catalogue drafts placed each section title and its first sentence on the same line.
   // Split only at known sentence-opening cues; retain every original word and map the title to a canonical section.
-  const cues = '(?:The|This|PCPB|Agropests|Imagine Care|Cheapthings|Farm Rescue|Naivas|Jumia|Osho|PPCK|Customers|Shoppers|People|Before|Check|Confirm|Compare|Browse|Read|Follow|Always|Ask|Use|Do|Keep|If|Once|For|One|A larger|A smaller|A small|A product|A 20|A 100|The current|M-Pesa|WhatsApp|Sarit|Delivery)';
+  const cues = '(?:The|This|PCPB|Agropests|Imagine Care|Cheapthings|Farm Rescue|Farm|Naivas|Jumia|Osho|PPCK|AgriGuard|M-Tolori|Customers|Shoppers|People|Before|Check|Confirm|Compare|Browse|Read|Follow|Always|Ask|Use|Do|Keep|If|Once|For|One|An|A larger|A smaller|A small|A product|A 20|A 100|A separate|A retailer|The current|M-Pesa|WhatsApp|Sarit|Delivery)';
   const re = new RegExp('##\\s+([^\\n]{3,110}?)\\s+(' + cues + ')\\b', 'g');
   const canonicalTitles = new Set(KNOWN_TITLES.map(([, canonical]) => canonical));
   // A line that is already a canonical title is left alone, otherwise the "Use" in "Where & How to Use in Kenya" reads as a cue.
@@ -205,6 +205,12 @@ export function productDescriptionHtml(source) {
   }
   const tail = raw.slice(cursor).trim();
   if (tail) sections.push({ heading: current, body: tail });
+
+  // Hide editorial/operational metadata (supplier-cost arithmetic and draft status) from customer-facing product pages.
+  const internalHeading = /(?:source price|baseline calculation|pricing calculation|sourcing notes|listing status|draft status|supplier cost|margin calculation|source url)/i;
+  for (let i = sections.length - 1; i >= 0; i--) {
+    if (internalHeading.test(sections[i].heading)) sections.splice(i, 1);
+  }
 
   // The same label twice in one description becomes one section.
   const merged = [];
