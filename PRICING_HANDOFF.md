@@ -1057,3 +1057,50 @@ All baselines are [RETAIL-ESTIMATE] (lowest reliable Kenyan retail × 0.85), not
 - VectorFog H300SF/H400SF/H500SF/TU100N, VectorGel DH1, Vision Plus TV/fridge/microwave models without exact spec matches, Vitabor Gold, Vitra 40WG, Vondozeb, Weed-Out 480SL, Velcro mosquito net, WQ animal troughs, WQ water quality meters, WQ sprayers and remaining items stay unchanged pending exact current Kenyan supplier prices and stock verification.
 
 No new pack variants were added. Existing slugs/canonical URLs are preserved. SQL: `supabase/sql/pricing-batch-016.sql` (guarded review-branch updates only; not applied to production). Product JSON-LD and sitemap refresh require applying the catalogue SQL and running the product build; generator uses catalogue price for KES Offer schema, includes availability and one-year `priceValidUntil`, and updates sitemap `lastmod` on changed generated pages.
+
+
+---
+
+# Batch 17 — final products 1601–1647 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 47 |
+| Syngenta products skipped | 0 |
+| Existing product prices updated | 9 |
+| New pack variants | 0 |
+| Needs manual price check / unchanged | 38 |
+
+No Syngenta products were identified in this final segment. All listed Yara, Xiaomi, WQ, YAGO and Zagro products are non-Syngenta.
+
+## Prepared price updates
+
+| Product | Pack/model | Baseline (KES) | Markup Tier | New Website Price (KES) | Competitor Retail (KES) | Source |
+|---|---|---:|---:|---:|---:|---|
+| yaravita-crop-boost-foliar-fertilizer-1l | exact listed model/pack | 1,232.5 [RETAIL-ESTIMATE] (retail 1,450) | 30% | 1,600 | 1,450 | https://agropests.com/products/yaravita%20crop%20boost%201l |
+| yaravita-powerboost-foliar-fertilizer-1l | exact listed model/pack | 1,266.5 [RETAIL-ESTIMATE] (retail 1,490) | 30% | 1,650 | 1,490 | https://agropests.com/products/yaravita-power-boost-1l |
+| xiaomi-air-fryer-essential-6l | exact listed model/pack | 7,649.15 [RETAIL-ESTIMATE] (retail 8,999) | 30% | 9,950 | 8,999 | https://xiaomistorekenya.co.ke/product-category/appliances/fryer/; https://xiaomi-store.co.ke/product-category/kitchenappliances/air-fryers/ |
+| xiaomi-dual-zone-air-fryer-10l | exact listed model/pack | 15,299.15 [RETAIL-ESTIMATE] (retail 17,999) | 30% | 19,900 | 17,999 | https://xiaomistorekenya.co.ke/product-category/appliances/fryer/; https://xiaomi-store.co.ke/product-category/kitchenappliances/air-fryers/ |
+| xiaomi-smart-air-fryer-4-5l | exact listed model/pack | 10,624.15 [RETAIL-ESTIMATE] (retail 12,499) | 30% | 13,800 | 12,499 | https://xiaomistorekenya.co.ke/product-category/appliances/fryer/; https://xiaomistores.co.ke/category/smart-home/kitchen-appliances/ |
+| xiaomi-poco-c71-3gb-ram-plus-64gb-3gb-plus-64gb | exact listed model/pack | 11,474.15 [RETAIL-ESTIMATE] (retail 13,499) | 30% | 14,900 | 13,499 | https://xiaomistores.co.ke/product/poco-c71-3gb-64gb/; https://www.xiaomihomekenya.co.ke/products/poco-c71-3gb-64gb |
+| xiaomi-redmi-15c-8gb-ram-plus-256gb-8gb-plus-256gb | exact listed model/pack | 18,699.15 [RETAIL-ESTIMATE] (retail 21,999) | 30% | 24,300 | 21,999 | https://xiaomistorekenya.co.ke/product/redmi-15c-8gb-ram-256gb-storage/; https://xiaomistorekenya.co.ke/product-tag/redmi-15c/ |
+| xiaomi-electric-glass-kettle-1-7l | exact listed model/pack | 3,450 [RETAIL-ESTIMATE] (retail 4,059) | 30% | 4,500 | 4,059 | https://xiaomistores.co.ke/category/smart-home/kitchen-appliances/ |
+| xiaomi-electric-kettle-2-lite-1-5l | exact listed model/pack | 3,943.01 [RETAIL-ESTIMATE] (retail 4,638.84) | 30% | 5,150 | 4,638.84 | https://xiaomistores.co.ke/category/smart-home/kitchen-appliances/ |
+
+All baselines are [RETAIL-ESTIMATE] (lowest current Kenyan retail × 0.85), not wholesale quotations. Prices are rounded to nearest KSh50. YaraVita Crop Boost and PowerBoost 1L use Agropests in-stock prices KSh1,450 and KSh1,490 respectively. Xiaomi air fryers and phones use Xiaomi Kenya in-stock listings. Xiaomi glass kettle and Kettle 2 Lite prices shown by Xiaomi Store Kenya are VAT-exclusive; VAT was added before applying the 15% retail estimate and markup, giving retail comparators KSh4,059 and KSh4,638.84. No existing prices were reduced in this batch; all nine formula prices are above the current catalogue price.
+
+## Checked / unchanged and manual checks
+
+- YaraTera Calcinit 25kg: Kihysoco KSh3,500 in stock; Dawn Farmers KSh3,400 is marked sold out. Current KSh4,500 is not reduced based on one current source; no multi-retailer average to trigger the >25% reduction rule.
+- Xiaomi Redmi Note 15 Pro 4G 8GB/256GB: Xiaomi Store Kenya KSh36,999 in stock; market comparison indicates the current KSh36,999 is aligned. No change.
+- Xiaomi TV Stick 4K 2nd Gen: Xiaomi Store Kenya KSh7,799 VAT-exclusive (tax-inclusive KSh9,046.84) and Xiaomi Store reseller KSh7,199; current KSh8,299 is not >25% above the observed market and no reduction is justified.
+- Xiaomi Poco C71 official-store alternative from Xiaomi Home is sold out; in-stock Xiaomi Store Kenya price KSh13,499 used for the formula increase.
+- Xiaomi Redmi 15C 8GB/256GB: Xiaomi Store Kenya KSh21,999 in stock; current KSh20,899 was below the formula-derived KSh24,300.
+- Xiaomi Smart LED Bulb: two Kenyan Xiaomi retailers show KSh1,999; current KSh2,299 is only 15% above market, below the >25% reduction threshold.
+- Xiaomi Smart Air Purifier 4 Lite: lowest XiaomiHome KSh24,499 listing is sold out; no current in-stock exact price verified, so unchanged.
+- Xiaomi Body Composition Scale S400: observed prices KSh3,699–3,999; current KSh4,599 is not >25% above the multi-retailer average, so unchanged.
+- Yara DAP Chapa Meli 50kg, YaraSuna Organic 50kg, YaraTera Calcinit, Vitabor Gold, Vondozeb, Zagro Ultraxide, Zetanil, Zinbor, Zinc Gold, Zinc Sulphate and Zincabor remain unchanged where exact current in-stock pack pricing or multiple comparable supplier data was not confirmed.
+- WQ solar 56/104/128-egg incubators, wheelbarrow, watering cans, livestock balling gun and silicone teats remain unchanged because comparable listings differ by capacity, construction or specification. No missing pack variants were confirmed with exact supplier prices.
+- Xiaomi TV sticks, kettles, pressure cooker, rice cooker, reading light, portable blender and air purifier remain unchanged where the observed retailer price is tax-exclusive, stock is unclear, or no comparable in-stock listing supports a safe adjustment.
+
+No new pack variants were added. Existing slugs/canonical URLs are preserved. SQL: `supabase/sql/pricing-batch-017.sql` (guarded review-branch update only; not applied to production). The product generator is set up to emit KES Product Offer price, availability and one-year `priceValidUntil`; run product build after applying the catalogue SQL to refresh generated JSON-LD and sitemap `lastmod` values.
