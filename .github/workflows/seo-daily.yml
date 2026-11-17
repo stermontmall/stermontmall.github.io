@@ -43,7 +43,31 @@ jobs:
         run: node seo-meta.test.mjs
       - name: Test product description extraction against current and legacy layouts
         run: node seo-description-check.test.mjs
-      - name: Run technical SEO check
+      # Build the same catalogue output that customers and Google see before auditing it.
+      # Without this step, generated root-level category pages and current database SEO overrides
+      # are absent from the checkout, creating false missing-sitemap and duplicate-metadata alerts.
+      - name: Build product and category pages from the live catalogue
+        run: node generate-products.mjs
+      - name: Apply Kenya category titles, descriptions and guides
+        continue-on-error: true
+        run: node seo-kenya.mjs
+      - name: Apply approved SEO overrides
+        run: node seo-overrides.mjs
+      - name: Apply owner-approved product titles
+        continue-on-error: true
+        run: node seo-titles.mjs
+      - name: Apply allowlisted product meta descriptions
+        run: node seo-safe-meta.mjs
+      - name: Apply product description layout
+        continue-on-error: true
+        run: node seo-description-layout.mjs
+      - name: Fill related product links
+        continue-on-error: true
+        run: node seo-related-fill.mjs
+      - name: Apply crawler and phone routing rules
+        continue-on-error: true
+        run: node seo-shell-redirect.mjs
+      - name: Run technical SEO check against generated output
         run: node seo-check.mjs > seo-report.md
       - name: Publish the report as an issue
         env:
