@@ -925,9 +925,9 @@ No new pack sizes were added: supplier pages for Sulban, Stopdew, Taurus, Solubo
 |---|---:|
 | Products scanned | 100 |
 | Syngenta products skipped | 0 |
-| Existing products with price updates prepared | 14 |
+| Existing products with price updates prepared | 15 |
 | New pack variants | 0 |
-| Needs manual price check / unchanged | 86 |
+| Needs manual price check / unchanged | 85 |
 
 No Syngenta product lines were identified in this batch. Trinity Gold 452WP is Greenlife; Trustmate is Greenlife; the Tronic units are locally distributed electrical insect killers; TVS items are motorcycle spare parts.
 
@@ -999,3 +999,12 @@ The six Tecno handset updates use exact storage/RAM models from the TECNO Offici
 Other poultry drinkers/feeders remain unchanged where the calculated price would require a reduction that fails the 25%-above-average rule, or where only one exact supplier price was found and the existing price is already above the formula result. This includes Tehno Mss 1.5kg feeder duplicates, 6L/8L/9L drinkers, 9kg feeder, W6 6kg feeder/set of 10, rabbit drinkers, A42 nipple set, cow anti-kick bar, automatic bell drinker, and other models without a comparable second retailer. Remaining products include sprayers, pumps, PPE, seeds, household products and chemicals without exact current price/stock evidence. Tecno Spark Go 3 4GB/64GB remains manual because a reliable current exact-model Kenya price was not found. TCL 75C6K is retained because its current price is within the observed market range.
 
 SQL: `supabase/sql/pricing-batch-014.sql` (guarded, review branch only; not production). Existing slugs/URLs preserved.
+
+
+### Additional exact-model price update
+
+| Product | Pack / model | Baseline (KES) | Markup Tier | New Website Price (KES) | Competitor Retail (KES) | Source |
+|---|---|---:|---:|---:|---:|---|
+| Turbo TR20 20L 2-in-1 manual and battery knapsack sprayer | TR20-2 | 9,775 [RETAIL-ESTIMATE] | 30% | 12,700 | 11,500 | https://logike.co.ke/product_details/Turbo-20-Liters-2-in-1-Battery-and-Manual-Sprayer/73932373 |
+
+Logike lists the exact TR20-2 model in stock at KSh11,500. Baseline is KSh9,775 (retail × 0.85), and 30% markup rounds to KSh12,700.
