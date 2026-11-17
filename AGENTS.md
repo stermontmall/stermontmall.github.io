@@ -70,3 +70,18 @@ Write a **unique, non-templated 800+ word SEO product guide** for every item tai
 
 #### 9. FINAL LIVE SYNC & SINGLE SUMMARY TABLE
 - Set `active = true`, rebuild product pages and `sitemap.xml`, save progress in `HANDOFF-live.md`, and output one concise summary table showing `Product Name | Pack Size | Baseline Cost (KES) | Final Price (KES) | Nairobi Source Store | Live URL`.
+
+
+### 10. PRODUCT DESCRIPTION FORMATTING — STOREFRONT-NATIVE STRUCTURE
+Every product description must be authored in the storefront-native section format consumed by `product-description-html.mjs`; do not store raw HTML. Use explicit section headings on their own lines (or Markdown `##` headings, which the renderer normalizes), short paragraphs of no more than 2–3 sentences, blank-line spacing, and real bullet lists. The renderer outputs semantic `<h3>`, `<p>`, `<ul>`, and `<li>` elements with the site's styled section cards. Never submit one continuous wall of text.
+
+Required buyer-guide sections, in this order where relevant:
+1. Product Overview & Key Benefits (concise overview and scannable benefit bullets).
+2. Technical Specifications & Pack Details (brand, active ingredient/specifications, exact pack size, formulation/build, target pests/uses, and registration/warranty only when verified).
+3. Where & How to Use in Kenya (practical context and label-compliant steps; never invent pesticide rates or authorised uses).
+4. Safety, Storage & Handling Guidelines (PPE, storage, first aid and disposal only from authoritative label/regulatory guidance).
+5. Buying & Pack-Size Guide (pack comparison and 2–3 natural internal links to relevant category or `/services/` pages).
+6. Delivery across Kenya & Nairobi Pickup (M-Pesa checkout, pickup coordination at Sarit Centre Westlands, delivery across all 47 counties, WhatsApp +254 748 888 230; do not imply walk-in availability without confirmation).
+7. Frequently Asked Questions (exactly four buyer Q&As for product guides; each question and answer must be separately rendered and synchronised 1:1 with Product FAQPage JSON-LD when FAQ structured data is emitted).
+
+Use only verified product-specific facts. Keep any additional source, pricing, registration, listing-status or disclaimer notes under clearly named subsections. Do not fabricate content or pad word counts: the 800+ word target applies to complete, useful, verified buyer guides, and unresolved facts must be stated as unverified rather than guessed. Preserve exact pack-size identity for every SKU.
