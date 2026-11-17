@@ -1143,13 +1143,13 @@ SQL record: supabase/sql/pricing-batch-018.sql (no-op audit record; no product d
 | Active non-Syngenta products verified already at correct formula price | 4 |
 | Inactive non-Syngenta products retained unchanged | 84 |
 
-The 205 prepared price updates cover 205 unique active product IDs after removing the duplicate Samsung 43U8000F row from Batch 14; that TV update is assigned to Batch 13. The 25 new pack variants have unique IDs checked against the catalogue. All updates are protected by expected-current-price guards; new variants use idempotent inserts. These are staged branch changes, not production writes.
+The 205 prepared price updates cover 205 unique active product IDs after removing the duplicate Samsung 43U8000F row from Batch 14; that TV update is assigned to Batch 13. The 25 new pack variants have unique IDs checked against the catalogue. Their SQL inserts copy the existing family image array from the corresponding base pack rather than creating image-less product pages. All updates are protected by expected-current-price guards; new variants use idempotent inserts. These are staged branch changes, not production writes.
 
 **Branch status:** all 18 batch SQL files and this handoff are committed to `pricing/non-syngenta-market-review-20261117`, based on `main`. No merge to `main` has been performed. Existing product URLs/slugs are preserved. No production database prices or storefront pages have been changed.
 
 **SEO/schema status:** the branch's product generator is confirmed to emit `priceCurrency: KES`, a numeric Product Offer `price`, stock-based `https://schema.org/InStock` / `OutOfStock` availability, and a `priceValidUntil` one year from generation. Product sitemap `<lastmod>` values are refreshed when generated product HTML changes. However, catalogue SQL remains staged only. The generated live product JSON-LD and sitemap timestamps are therefore **not yet synced to these proposed prices**. After review/merge and execution of the SQL, run the product-page build and deployment, then verify representative Product JSON-LD prices and sitemap `lastmod` values before declaring the live site synced.
 
-**Deployment safety:** guarded SQL requires each existing product to still match its captured expected price and active status. Each new variant insert uses a stable ID and `ON CONFLICT (id) DO NOTHING`. Review new pack descriptions and add exact pack photos before public release. Supplier baselines labelled [RETAIL-ESTIMATE] are the lowest matched Kenyan retail price × 0.85; they are not wholesale quotations.
+**Deployment safety:** guarded SQL requires each existing product to still match its captured expected price and active status. Each new variant insert uses a stable ID and `ON CONFLICT (id) DO NOTHING`. New pack variants now inherit the existing parent product image (each of the 10 base products has one stored image); replace with pack-specific photos when available. Review descriptions before public release. Supplier baselines labelled [RETAIL-ESTIMATE] are the lowest matched Kenyan retail price × 0.85; they are not wholesale quotations.
 
 
 ## Final reconciliation and profit-floor check
