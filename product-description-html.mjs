@@ -96,7 +96,7 @@ function normalizeMarkdownHeading(value) {
   if (/(technical|specification|identity|formulation|pack details|exact pack|product details|product information|pack contents|pack information|product and pack|variant identity|confirmed pack|exact size)/.test(h)) return 'Technical Specifications & Pack Details';
   if (/(where|target pests|registered|application|uses|use in kenya|pest-control context|public-health purpose|intended buyer|supplier-described public-health|what the product is listed for)/.test(h)) return 'Where & How to Use in Kenya';
   if (/(safety|storage|handling|before purchasing|label|regulatory|precaution|ppe|restriction)/.test(h)) return 'Safety, Storage & Handling Guidelines';
-  if (/(buying|pack.size|pack format|pack capacities|price|comparison|compare|choosing|purchase|source price|baseline|value|why .* pack)/.test(h)) return 'Buying & Pack-Size Guide';
+  if (/(buying|pack.size|pack format|pack capacities|price|comparison|compare|comparing|choosing|purchase|source price|baseline|value|why .* pack)/.test(h)) return 'Buying & Pack-Size Guide';
   if (/(ordering|delivery|pickup|order)/.test(h)) return 'Delivery across Kenya & Nairobi Pickup';
   if (/(frequently asked questions|^faqs?$)/.test(h)) return 'Frequently Asked Questions';
   return value;
@@ -104,7 +104,7 @@ function normalizeMarkdownHeading(value) {
 
 // The seven canonical storefront titles, as the catalogue drafts write them.
 const KNOWN_TITLES = [
-  'Product overview', 'Technical specifications & pack details', 'Where & how to use in Kenya',
+  'Technical specifications & pack details', 'Where & how to use in Kenya',
   'Safety, storage & handling guidelines', 'Buying & pack-size guide', 'Delivery across Kenya & Nairobi pickup',
   'Frequently asked questions'
 ].map(t => [t, normalizeMarkdownHeading(t)]);
@@ -121,7 +121,7 @@ function splitInlineMarkdownHeadings(source) {
   }
   // Earlier catalogue drafts placed each section title and its first sentence on the same line.
   // Split only at known sentence-opening cues; retain every original word and map the title to a canonical section.
-  const cues = '(?:The|This|PCPB|Agropests|Imagine Care|Cheapthings|Farm Rescue|Farm|Naivas|Jumia|Osho|PPCK|AgriGuard|M-Tolori|Customers|Shoppers|People|Before|Check|Confirm|Compare|Browse|Read|Follow|Always|Ask|Use|Do|Keep|If|Once|For|One|An|A larger|A smaller|A small|A product|A 20|A 100|A separate|A retailer|A|An|It|Our|Stermont|The current|M-Pesa|WhatsApp|Sarit|Delivery)';
+  const cues = '(?:The|This|PCPB|Agropests|Imagine Care|Cheapthings|Farm Rescue|Farm|Naivas|Jumia|Osho|PPCK|AgriGuard|M-Tolori|Air Chopper|Hafeton|Navigator|Mende Mo Fire|Osefin|Sevin|SCUD|Punisher|Kilex|Hygienic|Pareto|Customers|Shoppers|People|Before|Check|Confirm|Compare|Browse|Read|Follow|Always|Ask|Use|Do|Keep|If|Once|For|One|An|A larger|A smaller|A small|A product|A 20|A 100|A separate|A retailer|A|An|It|Our|Stermont|The current|M-Pesa|WhatsApp|Sarit|Delivery)';
   const re = new RegExp('##\\s+([^\\n]{3,110}?)\\s+(' + cues + ')\\b', 'g');
   const canonicalTitles = new Set(KNOWN_TITLES.map(([, canonical]) => canonical));
   // A line that is already a canonical title is left alone, otherwise the "Use" in "Where & How to Use in Kenya" reads as a cue.
