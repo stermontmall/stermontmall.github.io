@@ -625,7 +625,7 @@ for (const p of products) {
   const title = String(p.meta_title || p.seo_title || generatedTitle).trim();
   // Prefer stored snippets only when they are complete sentences. Legacy imports often stored 155-character cut-offs or visible section labels.
   const storedDescription = String(p.meta_description || '').trim();
-  const storedDescriptionIsClean = storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\\bPRODUCT\\s+(?:OVERVIEW|SUMMARY)\\b/i.test(storedDescription);
+  const storedDescriptionIsClean = storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(storedDescription);
   const desc = storedDescriptionIsClean ? storedDescription : generatedDescription;
   const h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
   NAMES[p.id] = h1;
