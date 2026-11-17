@@ -12,7 +12,7 @@ export function buildCategoryIntro(category, baseIntro = '') {
   ];
   let text = opening || 'Browse the available ' + name.toLowerCase() + ' listings at Stermont Arcade.';
   for (const addition of additions) {
-    if (text.split(/\s+/).filter(Boolean).length >= 135) break;
+    if (text.split(/\s+/).filter(Boolean).length >= 150) break;
     text += ' ' + addition;
   }
   const words = text.split(/\s+/).filter(Boolean);
