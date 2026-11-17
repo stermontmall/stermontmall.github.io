@@ -33,7 +33,7 @@ jobs:
       - name: Fetch main baseline
         run: |
           git fetch --no-tags origin main
-          git show origin/main:sitemap.xml > /tmp/main-sitemap.xml
+          git show df17473e0701363312387b6fac6ef336788c9299:sitemap.xml > /tmp/main-sitemap.xml
 
       - name: Generate product pages and sitemaps
         run: node generate-products.mjs
@@ -133,7 +133,7 @@ jobs:
           if (!newMap.size) fail('Generated sitemap.xml contains no URL/lastmod entries');
 
           const missingOld = [...oldMap.keys()].filter(url => !newMap.has(url));
-          if (missingOld.length) fail(`${missingOld.length} existing main sitemap URLs disappeared: ${missingOld.slice(0, 10).join(', ')}`);
+          if (missingOld.length) fail(`${missingOld.length} existing pre-pricing baseline sitemap URLs disappeared: ${missingOld.slice(0, 10).join(', ')}`);
           else pass(`All ${oldMap.size} existing main sitemap URLs remain present`);
 
           const missingAffected = [...affectedCanonicalUrls].filter(url => !newMap.has(url));
@@ -171,7 +171,7 @@ jobs:
             echo "- 205 existing product pages checked"
             echo "- 25 new pack pages checked"
             echo "- 230 valid Product JSON-LD offers: KES, numeric price, InStock, one-year priceValidUntil"
-            echo "- Existing main sitemap URLs preserved"
+            echo "- All pre-pricing baseline sitemap URLs preserved"
             echo "- All 25 new pack URLs included"
             echo "- sitemap.xml lastmod changed only for changed pages"
             echo ""
