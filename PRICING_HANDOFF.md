@@ -1008,3 +1008,52 @@ SQL: `supabase/sql/pricing-batch-014.sql` (guarded, review branch only; not prod
 | Turbo TR20 20L 2-in-1 manual and battery knapsack sprayer | TR20-2 | 9,775 [RETAIL-ESTIMATE] | 30% | 12,700 | 11,500 | https://logike.co.ke/product_details/Turbo-20-Liters-2-in-1-Battery-and-Manual-Sprayer/73932373 |
 
 Logike lists the exact TR20-2 model in stock at KSh11,500. Baseline is KSh9,775 (retail × 0.85), and 30% markup rounds to KSh12,700.
+
+
+---
+
+# Batch 16 — products 1501–1600 — 2026-11-17
+
+| Measure | Count |
+|---|---:|
+| Products scanned | 100 |
+| Syngenta products skipped | 1 |
+| Existing product prices updated | 11 |
+| New pack variants | 0 |
+| Needs manual price check / unchanged | 88 |
+
+**Syngenta exclusion (untouched):** Voliam Targo 063SC Insecticide 100ml. Syngenta brand/vendor confirmation is explicit in the AgriJibu and Agroduka listings.
+
+## Prepared price updates
+
+| Product | Pack/model | Baseline (KES) | Markup | New Website Price (KES) | Competitor Retail / Average (KES) | Sources |
+|---|---|---:|---:|---:|---:|---|
+| vision-plus-vpwm12tt-12kg-twin-tub-washing-machine | exact model/pack | 26,345.75 [RETAIL-ESTIMATE] (retail 30,995) | 25% | 32,950 | 33,495 | https://visionplus.co.ke/; https://taelappliances.co.ke/brand/vision-plus/ |
+| vivo-v50-lite-4g-8gb-256gb-20261108 | exact model/pack | 29,325 [RETAIL-ESTIMATE] (retail 34,500) | 25% | 36,650 | 34,500 | https://infinitetech.co.ke/product/vivo-v50-lite-4g/; https://phonepointkenya.co.ke/product/vivo-v50lite-4g-8gb-256gb/ |
+| vitron-htc4300qfs-qled-android-smart-tv-with-wall-mount-43-inch | exact model/pack | 16,659.15 [RETAIL-ESTIMATE] (retail 19,599) | 30% | 21,650 | 20,700 | https://www.jumia.co.ke/htc4300qfs-43inch-qled-tv-bluetooth-enabled-full-hd-frameless-smart1yr-wrty-vitron-mpg9595722.html; https://www.jumia.co.ke/vitron-htc4300qfs-43-inch-tv-qled-full-hd-tv-frameless-digital-smart-android-tv-inbuilt-decoderbluetooth-enabled-tv-icast-screen-mirroringwifi-enabled-netflixyoutubeappstore-vitron43-tv-black-tv-guard-bracket-48093030.html; https://www.jumia.co.ke/vitron-htc4300qfs-43-inch-qled-tv-full-hd-tv-frameless-digital-smart-android-tv-bluetooth-enabled-wifi-enabled-netflix-youtube-icast-frameless-screen-vitron43-black-14-months-warranty-4-extra-gifts-328298174.html |
+| von-vadz0002k-portable-water-dispenser | exact model/pack | 722.5 [RETAIL-ESTIMATE] (retail 850) | 30% | 950 | 850 | https://von.co.ke/product/von-vadz0002k-portable-water-dispenser; https://hotpoint.co.ke/catalogue/von-vadz0002k-portable-water-dispenser/ |
+| von-vaf050dstk-5l-slim-digital-air-fryer | exact model/pack | 7,645.75 [RETAIL-ESTIMATE] (retail 8,995) | 30% | 9,950 | 8,995 | https://von.co.ke/shop/kitchen-essentials/cooking-baking-and-more; https://hotpoint.co.ke/catalogue/von-vaf050dstk-slim-digital-air-fryer-5l_/ |
+| von-vct-220dbcx-2-burner-gas-cooker | exact model/pack | 3,820.75 [RETAIL-ESTIMATE] (retail 4,495) | 30% | 4,950 | 4,595 | https://hotpoint.co.ke/catalogue/von-vct-220dbcx-cooker-2gas-direct-fire-dual-burners/; https://von.co.ke/ |
+| von-vft-42246-dmk-42-inch-tower-fan | exact model/pack | 11,045.75 [RETAIL-ESTIMATE] (retail 12,995) | 30% | 14,350 | 12,995 | https://www.hotpoint.co.ke/catalogue/von-vft-42246-dmk-42-tower-fan-black/ |
+| von-vkdg156smk-1-5l-digital-kettle | exact model/pack | 3,820.75 [RETAIL-ESTIMATE] (retail 4,495) | 30% | 4,950 | 4,495 | https://www.hotpoint.co.ke/catalogue/von-vkdg156smk-digital-kettle-1-5l-1800w-black/; https://von.co.ke/shop/kitchen-essentials/cooking-baking-and-more |
+| von-vms-206mmk-20l-solo-microwave | exact model/pack | 6,370.75 [RETAIL-ESTIMATE] (retail 7,495) | 30% | 8,300 | 7,745 | https://www.hotpoint.co.ke/catalogue/von-vms-206mmk-solo-microwave-oven-20l-black/; https://von.co.ke/shop/kitchen-essentials/microwave |
+| von-vrc5716nmx-5l-rice-cooker | exact model/pack | 3,395.75 [RETAIL-ESTIMATE] (retail 3,995) | 30% | 4,400 | 3,995 | https://www.hotpoint.co.ke/catalogue/von-vrc5716nmx-rice-cooker-5l-650w-stainless-steel/; https://von.co.ke/shop/kitchen-essentials/cooking-baking-and-more |
+| von-vsm211ax-2-slice-sandwich-maker | exact model/pack | 1,950.75 [RETAIL-ESTIMATE] (retail 2,295) | 30% | 2,550 | 2,345 | https://www.hotpoint.co.ke/catalogue/category/kitchen-small-home-appliances/kitchen-essentials/sandwich-makers/; https://gea.ke/product/von-vsm211ax-2-slice-sandwich-maker/ |
+
+All baselines are [RETAIL-ESTIMATE] (lowest reliable Kenyan retail × 0.85), not wholesale quotes. Price reductions: VON portable water dispenser VADZ0002K (current KSh1,150 vs official VON and Hotpoint KSh850; formula KSh950), VON VKDG156SMK kettle (current KSh5,850 vs VON/Hotpoint KSh4,495; formula KSh4,950), and VON VRC5716NMX rice cooker (current KSh5,199 vs VON/Hotpoint KSh3,995; formula KSh4,400). Each existing price was >25% above the same-model market observations, so reduction guard is satisfied. Price increases: Vision Plus 12kg twin tub washer, vivo V50 Lite 8/256GB, Vitron HTC4300QFS 43-inch QLED TV, VON VAF050DSTK 5L air fryer, VON VCT-220DBCX cooker, VON VFT-42246-DMK tower fan, VON VMS-206MMK microwave and VON VSM211AX sandwich maker. These follow the tier formula; prices are rounded to KSh50. The new prices are within approximately 10% of their observed market averages except the 42-inch tower fan, where only one exact supplier listing was found and the formula price is approximately 10.4% above it.
+
+## Checked / unchanged and manual checks
+
+- VON VAF080DSTK 8L air fryer: multiple listings include KSh9,300, KSh9,499, KSh9,995 and KSh10,389; current KSh10,999 is not >25% above the market average, so no reduction.
+- VON VPC613XMK 6L pressure cooker: Hotpoint KSh7,995, TechHub KSh9,900 and Tabarak KSh9,995; current KSh9,999 is close to market average and not >25% above it, so unchanged.
+- VON VMS-206DGK 20L digital microwave: current KSh8,499 compared with Hotpoint KSh9,995, VON KSh7,995 and Crosstech KSh7,499; no reduction justified by the multiple-source average.
+- VON VBP351NLW 350W blender: Hotpoint KSh3,495 and Naivas KSh4,725; current KSh4,550 is not >25% above market average; unchanged.
+- VON VBP501NLB 500W blender: Naivas KSh3,995; one comparable source, unchanged.
+- Vision Plus 220L fridge: Vision Plus official KSh39,995, TAEL KSh39,000 and Digital Store KSh34,790; current KSh41,399 is not >25% above the market average; unchanged.
+- WQ 1/2-inch 30m chicken wire: MyAgrovet exact WQ model KSh1,950; only one exact independent seller listing, so retained pending a second matching price. Width/model differences in generic mesh are not treated as exact matches.
+- WQ 3kg/6kg feeders, WQ drinkers, egg incubators and other poultry gear were compared with MyAgrovet, Mkulima Jovial, Fuga and EcoKuku. Similar-capacity generic feeders/drinkers are not assumed to be identical WQ models; no speculative reductions.
+- Wokin 573205 5L sprayer: exact-model listings range KSh2,050–2,850 (Kreatives, Benatech and VOH); current KSh2,399 is close to the observed average, unchanged. Wokin 573320 20L sprayer MyAgrovet KSh5,900 is the only exact model quote found; no reduction.
+- WQ 528 incubator: prices for 528-egg machines range KSh59,000–65,000, but build, turning, inverter and warranty configurations differ. Current price is close to market average; unchanged.
+- VectorFog H300SF/H400SF/H500SF/TU100N, VectorGel DH1, Vision Plus TV/fridge/microwave models without exact spec matches, Vitabor Gold, Vitra 40WG, Vondozeb, Weed-Out 480SL, Velcro mosquito net, WQ animal troughs, WQ water quality meters, WQ sprayers and remaining items stay unchanged pending exact current Kenyan supplier prices and stock verification.
+
+No new pack variants were added. Existing slugs/canonical URLs are preserved. SQL: `supabase/sql/pricing-batch-016.sql` (guarded review-branch updates only; not applied to production). Product JSON-LD and sitemap refresh require applying the catalogue SQL and running the product build; generator uses catalogue price for KES Offer schema, includes availability and one-year `priceValidUntil`, and updates sitemap `lastmod` on changed generated pages.
