@@ -6,28 +6,29 @@ const heads = h => [...h.matchAll(/<h3>(.*?)<\/h3>/g)].map(m => m[1].replace(/&a
 
 const advion = 'Tatua Advion is a ready-to-use gel bait. KEY FEATURES • Ready-to-use • No mixing needed SPECIFICATIONS • Brand: Tatua • Form: Gel WHERE IT HELPS Cockroaches hide in tight places. HOW TO USE IT Clean the area first. Apply small dots. BEFORE YOU START • Wipe the cupboards • Fix leaks SAFETY Read the label before use. STORAGE Keep in a cool, dry place. FREQUENTLY ASKED QUESTIONS Why a gel? Cockroaches eat it. It is neat. How much? Use small dots. ORDER Order online. PRODUCT BUYING GUIDE: generic filler that must be removed.';
 const out = productDescriptionHtml(advion);
-assert.deepEqual(heads(out), ['Product overview', 'Key features & benefits', 'Specifications & product details', 'Uses & applications', 'How to use', 'Before you start', 'Safety information', 'Storage & handling', 'Frequently asked questions', 'Ordering & delivery']); n++;
+// Legacy uppercase labels render under the canonical storefront headings; unlabelled opening text and non-canonical sections follow them.
+assert.deepEqual(heads(out), ['Product Overview & Key Benefits', 'Technical Specifications & Pack Details', 'Where & How to Use in Kenya', 'Safety, Storage & Handling Guidelines', 'Delivery across Kenya & Nairobi Pickup', 'Frequently Asked Questions', 'Product overview', 'How to use', 'Before you start']); n++;
 ok(!out.includes('Product information'), 'no generic repeated heading');
 ok(!/generic filler/.test(out), 'buying-guide boilerplate removed');
-ok(/<h3>Key features &amp; benefits<\/h3><ul><li>Ready-to-use<\/li><li>No mixing needed<\/li><\/ul>/.test(out), 'features are a list under their own heading');
-ok(/<h3>Safety information<\/h3><p>Read the label before use\.<\/p>/.test(out), 'safety text sits under Safety');
+ok(/<h3>Product Overview &amp; Key Benefits<\/h3><ul><li>Ready-to-use<\/li><li>No mixing needed<\/li><\/ul>/.test(out), 'features are a list under the canonical overview heading');
+ok(/<h3>Safety, Storage &amp; Handling Guidelines<\/h3><p>Read the label before use\.\s+Keep in a cool, dry place\.<\/p>/.test(out), 'safety and storage text sit under the canonical safety heading');
 ok(/<strong>Why a gel\?<\/strong><br>Cockroaches eat it\. It is neat\./.test(out), 'FAQ question and multi-sentence answer');
 ok(/<strong>How much\?<\/strong><br>Use small dots\./.test(out), 'second FAQ item');
 
 // New premium-format headings must become distinct semantic sections.
 const premium = productDescriptionHtml('PRODUCT OVERVIEW\nA product-specific opening. KEY FEATURES & BENEFITS\n• Confirmed feature: practical benefit. SPECIFICATIONS\n• Pack size: 500 ml. BUYING GUIDE\nChoose by the exact use case. IMPORTANT NOTES\nCheck the current label. ORDERING & DELIVERY\nAsk for current availability.');
-assert.deepEqual(heads(premium), ['Product overview', 'Key features & benefits', 'Specifications & product details', 'Buying guide', 'Important notes', 'Ordering & delivery']); n++;
+assert.deepEqual(heads(premium), ['Product Overview & Key Benefits', 'Technical Specifications & Pack Details', 'Buying & Pack-Size Guide', 'Delivery across Kenya & Nairobi Pickup', 'Important notes']); n++;
 
 // Car listings historically stored literal \n sequences; they must still create separate headings.
 const vehicle = productDescriptionHtml('IMPORTANT NOTES\n• Verify the vehicle.\n\nBUYING NOTES\n• Confirm charges.\n\nVEHICLE-SPECIFIC BUYING GUIDE\n\nInspect the exact model.\n\nVEHICLE ENQUIRY & NEXT STEPS\nRequest VIN and photos.');
-assert.deepEqual(heads(vehicle), ['Important notes', 'Buying notes', 'Buying guide', 'Vehicle enquiry & next steps']); n++;
-ok(/<h3>Buying guide<\/h3><p>Inspect the exact model\.<\/p>/.test(vehicle), 'vehicle buying guide is its own heading');
+assert.deepEqual(heads(vehicle), ['Buying & Pack-Size Guide', 'Important notes', 'Vehicle enquiry & next steps']); n++;
+ok(/<h3>Buying &amp; Pack-Size Guide<\/h3><ul><li>Confirm charges\. Inspect the exact model\.<\/li><\/ul>/.test(vehicle), 'vehicle buying notes and guide keep their text under the canonical buying heading');
 ok(/<h3>Vehicle enquiry &amp; next steps<\/h3><p>Request VIN and photos\.<\/p>/.test(vehicle), 'vehicle enquiry is its own heading');
 
 // Car content: escaped line breaks and vehicle headings must render as separate sections.
 const car = productDescriptionHtml('PRODUCT SUMMARY\nA buyer-facing introduction.\n\nIMPORTANT BUYING NOTES\nConfirm the current quote.\n\nVEHICLE-SPECIFIC BUYING GUIDE\nInspect the exact vehicle and compare its condition.\n\nVEHICLE ENQUIRY & NEXT STEPS\nRequest current photos and a written quotation.');
-assert.deepEqual(heads(car), ['Product overview', 'Buying notes', 'Buying guide', 'Vehicle enquiry & next steps']); n++;
-ok(/<h3>Buying guide<\/h3><p>Inspect the exact vehicle and compare its condition\.<\/p>/.test(car), 'car buying guide renders as a separate heading');
+assert.deepEqual(heads(car), ['Product Overview & Key Benefits', 'Buying & Pack-Size Guide', 'Vehicle enquiry & next steps']); n++;
+ok(/<h3>Buying &amp; Pack-Size Guide<\/h3><p>Confirm the current quote\.\s+Inspect the exact vehicle and compare its condition\.<\/p>/.test(car), 'car buying notes and guide keep their text under the canonical buying heading');
 ok(/<h3>Vehicle enquiry &amp; next steps<\/h3><p>Request current photos and a written quotation\.<\/p>/.test(car), 'car enquiry renders as a separate heading');
 
 // Unlabelled descriptions now receive useful subtitles, with every original sentence retained.
@@ -38,7 +39,7 @@ ok(plain.includes('20 litre capacity') && plain.includes('collection point') && 
 const shortPlain = productDescriptionHtml('Use it safely and order today. Storage is easy.');
 assert.deepEqual(heads(shortPlain), ['Product overview']); n++;
 // duplicate label merges, empty source falls back
-assert.deepEqual(heads(productDescriptionHtml('Intro. SAFETY Wear gloves. STORAGE Keep dry. SAFETY Wash hands.')), ['Product overview', 'Safety information', 'Storage & handling']); n++;
+assert.deepEqual(heads(productDescriptionHtml('Intro. SAFETY Wear gloves. STORAGE Keep dry. SAFETY Wash hands.')), ['Safety, Storage & Handling Guidelines', 'Product overview']); n++;
 ok(productDescriptionHtml('').includes('will be updated shortly'), 'empty fallback');
 // FAQ splitter refuses text that is not a clean Q&A list
 ok(splitFaq('Just one sentence.') === null && splitFaq('Only one? Yes.') === null, 'non-FAQ text is left alone');
@@ -46,12 +47,12 @@ ok(splitFaq('Just one sentence.') === null && splitFaq('Only one? Yes.') === nul
 
 // Safety headings used by crop-protection listings must remain whole section labels.
 const safetyHandling = productDescriptionHtml('PRODUCT OVERVIEW\nA crop-protection product. SAFETY AND RESPONSIBLE HANDLING\nRead the current label and wear the specified PPE. STORAGE AND DISPOSAL\nKeep in original packaging and dispose as directed.');
-assert.deepEqual(heads(safetyHandling), ['Product overview', 'Safety information', 'Storage & handling']); n++;
-ok(/<h3>Safety information<\/h3><p>Read the current label and wear the specified PPE\.<\/p>/.test(safetyHandling), 'responsible-handling heading does not leak into safety body');
-ok(/<h3>Storage &amp; handling<\/h3><p>Keep in original packaging and dispose as directed\.<\/p>/.test(safetyHandling), 'storage-and-disposal heading is preserved');
+assert.deepEqual(heads(safetyHandling), ['Product Overview & Key Benefits', 'Safety, Storage & Handling Guidelines']); n++;
+ok(/<h3>Safety, Storage &amp; Handling Guidelines<\/h3><p>Read the current label and wear the specified PPE\./.test(safetyHandling) && !/RESPONSIBLE HANDLING/i.test(safetyHandling), 'responsible-handling heading does not leak into safety body');
+ok(/Keep in original packaging and dispose as directed\.<\/p>/.test(safetyHandling) && !/STORAGE AND DISPOSAL/i.test(safetyHandling), 'storage-and-disposal text is kept under the canonical safety heading');
 
 const safetyUse = productDescriptionHtml('PRODUCT OVERVIEW\nA public-health product. SAFETY AND RESPONSIBLE USE\nRead the label before handling. STORAGE AND DISPOSAL\nStore securely in original packaging.');
-assert.deepEqual(heads(safetyUse), ['Product overview', 'Safety information', 'Storage & handling']); n++;
+assert.deepEqual(heads(safetyUse), ['Product Overview & Key Benefits', 'Safety, Storage & Handling Guidelines']); n++;
 
 console.log(`product-description-html: ${n} checks passed`);
 
@@ -114,7 +115,7 @@ const comparingGuide = '## Product overview Air Chopper 7.5% SC 30ml is the exac
 const comparingHtml = productDescriptionHtml(comparingGuide);
 assert.ok(heads(comparingHtml).includes('Product Overview & Key Benefits'));
 assert.ok(heads(comparingHtml).includes('Buying & Pack-Size Guide'));
-ok(!/&amp; Key Benefits<\\/p>/.test(comparingHtml), 'canonical overview title is not repeated in its paragraph');
+ok(!/&amp; Key Benefits<\/p>/.test(comparingHtml), 'canonical overview title is not repeated in its paragraph');
 
 
 // Legacy uppercase labels also render with the canonical storefront section names.
