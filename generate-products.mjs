@@ -674,6 +674,8 @@ for (const p of products) {
     '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, category: cat?.name, brand: { '@type': 'Brand', name: brandOf(p.name) }, ...rLd,
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label, ...productIdentifiers(v),
+      // Merchant Listings wants a description on every variant: use the pack's own text, else the product's, else the same generic line as the group.
+      description: clip(v.description, 500) || clip(p.description, 500) || `Buy ${p.name} – ${v.variant_label} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`,
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
       offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: Number(Math.round(Number(v.price) || 0)),
         availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), validFrom: offerValidFrom(v), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
