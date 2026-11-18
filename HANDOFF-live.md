@@ -376,3 +376,12 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 
 - GitHub Pages deployment for the generated catalogue + handoff commit completed successfully: [deployment run #44203622491](https://github.com/stermontmall/stermontmall.github.io/actions/runs/44203622491). The generated product HTML and sitemap are now published through GitHub Pages.
 - Final parser edge-case commits included `418434cd` (overview-prefix + comparison-heading fix) and `bc653a71` (regression coverage); the successful product-pages run #44203479444 generated commit `07b383a2`.
+
+
+## 2026-11-18 — Final continuation: canonical headings and label-safe formatting
+- Rechecked the exact 20 category-37 product IDs. Supabase reports 10 active and 10 inactive, each with four FAQ markers. Raw description counts are 1,096–1,401 words; after excluding the renderer-hidden internal pricing/baseline and listing-status sections, customer-facing content remains 940–1,355 words per product. All 20 already exceed 800 useful words; no filler or unsupported pesticide instructions were added.
+- Corrected the renderer so legacy uppercase labels (PRODUCT OVERVIEW, SPECIFICATIONS, APPLICATION & USE, SAFETY INFORMATION, BUYING GUIDE, ORDERING & DELIVERY, FAQS) map to the exact seven canonical H3 headings. Decimal concentrations such as 7.5% and 0.5 g/L are no longer split into separate sentences; duplicate overview-heading suffixes are stripped.
+- Added regression tests for legacy labels, decimal concentrations and overview suffix cleanup. Updated AGENTS.md and CLAUDE.md to list the seven exact visible labels without parenthetical text; aligned rules/publishing-rule.json and Supabase config to the exact label array and separate faq_count=4.
+- Supabase verification: `publishing_rules` stores all seven exact labels and faq_count=4; `publishing_rule_configs` stores the canonical heading correction. `public.store_publishing_rules` does not exist, so the existing canonical tables remain the source of truth.
+- Commits: renderer `f10dfce2`; regression tests `fc30d418`; AGENTS `4f1cea3e`; CLAUDE `617b387f`; JSON rule `45ee0b9a`; generator rebuild trigger `903622fe`.
+- A new push-triggered product-page rebuild has been requested by the generator commit. The earlier build/deploy runs #44203479444 and #44203622491 succeeded for the preceding renderer version; the new run for the decimal/legacy-label fixes has not yet been independently confirmed. Verify the next product-pages Actions run and generated HTML before declaring the latest repair live.
