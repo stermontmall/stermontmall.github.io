@@ -36,9 +36,9 @@
       "Safety, Storage & Handling Guidelines",
       "Buying & Pack-Size Guide",
       "Delivery across Kenya & Nairobi Pickup",
-      "Frequently Asked Questions (exactly 4 Q&As)"
+      "Frequently Asked Questions"
     ],
-    "faq_jsonld": "Exactly four detailed buyer Q&As, separately rendered and synchronised 1:1 with Product FAQPage JSON-LD.",
+    "faq_jsonld": "Exactly four detailed buyer Q&As under Frequently Asked Questions, synchronised 1:1 with product FAQPage JSON-LD.",
     "internal_links_per_guide": "2-3 natural relevant links to category or /services/ pages",
     "safety": "Never invent product facts, pesticide rates, registered uses, warranty, PPE or handling directions; use verified label/source facts only.",
     "word_count": "800+ useful words where supported by verified sources; never pad or fabricate.",
@@ -49,11 +49,12 @@
       "Safety, Storage & Handling Guidelines",
       "Buying & Pack-Size Guide",
       "Delivery across Kenya & Nairobi Pickup",
-      "Frequently Asked Questions (exactly 4 detailed buyer Q&As)"
+      "Frequently Asked Questions"
     ],
     "bullet_lists": "Use real bullet lists for verified specifications and checklists.",
     "internal_links": "2–3 relevant links to category pages, commercial buying guides, or /services/ pages.",
     "delivery_details": "M-Pesa checkout, Sarit Centre Westlands pickup coordination, delivery across all 47 counties subject to courier and stock coverage, WhatsApp +254 748 888 230.",
-    "chemical_safety": "Never invent dilution rates, approved uses, PPE, label instructions, registration, efficacy, warranty or safety claims."
+    "chemical_safety": "Never invent dilution rates, approved uses, PPE, label instructions, registration, efficacy, warranty or safety claims.",
+    "faq_count": 4
   }
 }
