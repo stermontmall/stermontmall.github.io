@@ -1,3 +1,11 @@
+## 2026-11-18 12:55 (Africa/Nairobi) — Merchant Listings warning: missing `validFrom` in `offers`
+- Done: found the only Product/ProductGroup offer builder: `generate-products.mjs` (single product offer ~line 661, pack-size offers ~line 671). `seo-titles.mjs`, `seo-extras.mjs` and `check-product-pages.mjs` do not build offers and need no change.
+- Done (branch `wip-offers-validfrom`): both offers now output `validFrom` (YYYY-MM-DD, from `updated_at` else `created_at`, invalid/missing falls back to `2026-01-01`, future dates capped at today); `created_at` added to every product column list. `products` has NO `updated_at` column (checked in Supabase 2026-11-18), so `created_at` is what is used today; if `updated_at` is ever added, add it to the column lists and it takes priority automatically.
+- Tested: `node --check generate-products.mjs`; `node --test check-product-pages.test.mjs seo-indexing-guard.test.mjs seo-titles.test.mjs seo-meta.test.mjs` (all pass); sample-row build in a scratch copy confirmed validFrom on single products and every pack-size variant; `check-product-pages.mjs` passes on that build. No workflow files touched.
+- Next: after merge to `main`, `product-pages.yml` rebuilds on the `generate-products.mjs` path trigger. Then in Search Console click "Validate fix" on the `validFrom` warning.
+
+---
+
 ## 2026-11-18 — Pricing source refinements
 - Updated exact retail baselines to the lowest currently visible reputable Nairobi retail listings where available:
   - Air Chopper 7.5% SC 30ml: Imagine Care KSh 999 (baseline KSh 849.15; final KSh 1,100).
