@@ -1,3 +1,11 @@
+## 2026-11-18 13:10 (Africa/Nairobi) - product-pages.yml build was red: product-description-html.test.mjs
+- Cause (not the validFrom change; the 03:14 scheduled run was red too): line 117 had `<\\/p>` (invalid regex flags, so the whole test file was a SyntaxError), and behind it 13 older assertions still expected the pre-canonical headings ("Key features & benefits", "Safety information" ...) while the renderer now outputs the canonical section names.
+- Done (branch `wip-fix-desc-test`): fixed the regex typo and updated those 13 assertions to the canonical headings, keeping every content-preservation check. All 12 test steps of product-pages.yml pass locally.
+- Worth a look by the owner: when a description has unlabelled opening text before the first label, the renderer puts it in a trailing "Product overview" section after the canonical ones (tests pin this current behaviour).
+- Next: dispatch product-pages.yml and confirm green, then Search Console "Validate fix" for `validFrom`.
+
+---
+
 ## 2026-11-18 12:55 (Africa/Nairobi) — Merchant Listings warning: missing `validFrom` in `offers`
 - Done: found the only Product/ProductGroup offer builder: `generate-products.mjs` (single product offer ~line 661, pack-size offers ~line 671). `seo-titles.mjs`, `seo-extras.mjs` and `check-product-pages.mjs` do not build offers and need no change.
 - Done (branch `wip-offers-validfrom`): both offers now output `validFrom` (YYYY-MM-DD, from `updated_at` else `created_at`, invalid/missing falls back to `2026-01-01`, future dates capped at today); `created_at` added to every product column list. `products` has NO `updated_at` column (checked in Supabase 2026-11-18), so `created_at` is what is used today; if `updated_at` is ever added, add it to the column lists and it takes priority automatically.
