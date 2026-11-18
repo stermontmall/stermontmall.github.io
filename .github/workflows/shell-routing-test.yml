@@ -1,0 +1,33 @@
+name: Shell routing regression tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'shell-chrome.js'
+      - 'seo-shell-chrome.mjs'
+      - 'seo-shell-chrome.test.mjs'
+      - 'seo-shell-redirect.mjs'
+      - '.github/workflows/shell-routing-test.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'shell-chrome.js'
+      - 'seo-shell-chrome.mjs'
+      - 'seo-shell-chrome.test.mjs'
+      - 'seo-shell-redirect.mjs'
+      - '.github/workflows/shell-routing-test.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  routing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - name: Verify canonical product/category pages never redirect into query-string shell routes
+        run: node seo-shell-chrome.test.mjs
