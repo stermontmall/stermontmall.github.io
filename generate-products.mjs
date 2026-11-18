@@ -67,6 +67,13 @@ const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return
 const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
 // Offer validity is one year from the generated page date; prices are read directly from the current catalogue record.
 const priceValidUntil = () => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); };
+// Offer start date (Merchant Listings "validFrom"): the record's updated_at, else created_at, as YYYY-MM-DD like priceValidUntil.
+// Missing, invalid or future values fall back to a safe date so every offer always carries a valid ISO-8601 validFrom.
+const VALID_FROM_FALLBACK = '2026-01-01';
+const offerValidFrom = r => {
+  const t = Date.parse((r && (r.updated_at || r.created_at)) || '');
+  return Number.isNaN(t) ? VALID_FROM_FALLBACK : new Date(Math.min(t, Date.now())).toISOString().slice(0, 10);
+};
 
 
 
@@ -81,13 +88,13 @@ const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.imag
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
-  const cols = ['id,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
-                'id,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
-                'id,name,price,old_price,unit,stock,images,description,categories(name,slug)',
-                'id,name,price,stock,images,description,categories(name,slug)'];
+  const cols = ['id,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
+                'id,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,created_at,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
+                'id,created_at,name,price,old_price,unit,stock,images,description,categories(name,slug)',
+                'id,created_at,name,price,stock,images,description,categories(name,slug)'];
   for (const c of cols) {
     const all = [];
     let offset = 0;
@@ -659,7 +666,7 @@ for (const p of products) {
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.id), category: cat?.name,
     brand: { '@type': 'Brand', name: brandOf(p.name) }, ...productIdentifiers(p),
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: Number(Math.round(Number(p.price) || 0)),
-      availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
+      availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), validFrom: offerValidFrom(p), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
       seller: { '@id': `${SITE}/#store` } },
     ...rLd
   });
@@ -669,7 +676,7 @@ for (const p of products) {
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label, ...productIdentifiers(v),
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
       offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: Number(Math.round(Number(v.price) || 0)),
-        availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
+        availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), validFrom: offerValidFrom(v), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
         seller: { '@id': `${SITE}/#store` } } }))
   }) : '';
   const productFaq = extractProductFaq(p.description);
