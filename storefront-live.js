@@ -6,6 +6,10 @@
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', D = document, WA = '254748888230';
   function money(n) { return 'KSh ' + Math.round(n).toLocaleString('en-KE'); }
   function mk(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  /* small copy of a product photo for cards (about 400 px instead of 1600 px): same file name under product-images/thumbs/.
+     Made by scripts/make-thumbs.mjs. If the small copy does not exist (yet) the full photo is shown, so nothing ever goes blank. */
+  function thumbUrl(u) { return typeof u === 'string' ? u.replace('/object/public/product-images/', '/object/public/product-images/thumbs/') : u; }
+  function smallSrc(img, full) { img.onerror = function () { img.onerror = null; img.src = full; }; img.src = thumbUrl(full); }
   /* discount helpers: a product has a deal when old_price (previous price) is higher than price (current price) */
   function disc(p) { var o = Number(p.old_price), n = Number(p.price); if (!(o > n) || !(n >= 0)) return null; return { was: o, now: n, pct: Math.max(1, Math.round((o - n) / o * 100)), save: o - n }; }
   function badge(d) { return mk('span', 'dbadge', '-' + d.pct + '%'); }
@@ -49,7 +53,7 @@
   function card(p) {
     var c = mk('div', 'pcard'), sold = p.stock <= 0; c.id = 'p-' + p.id; c._p = p; c.style.cursor = 'pointer';
     var img = mk('span', 'img'); img.style.position = 'relative';
-    if (p.images && p.images[0]) { var i = new Image(); i.src = p.images[0]; i.alt = p.name; i.width = i.height = 288; i.loading = 'lazy'; img.appendChild(i); }
+    if (p.images && p.images[0]) { var i = new Image(); smallSrc(i, p.images[0]); i.alt = p.name; i.width = i.height = 288; i.loading = 'lazy'; img.appendChild(i); }
     var d = disc(p); if (d) img.appendChild(badge(d));
     img.appendChild(heart(c.id));
     c.dataset.price = p.price; c.dataset.disc = d ? d.pct : 0; c.dataset.i = (card.n = (card.n || 0) + 1);
@@ -294,7 +298,7 @@
     var row = mk('div', 'drow');
     list.forEach(function (p) {
       var d = disc(p), t = mk('div', 'dtile'), im = mk('div', 'im');
-      if (p.images && p.images[0]) { var i = new Image(); i.src = p.images[0]; i.alt = p.name; i.loading = 'lazy'; im.appendChild(i); }
+      if (p.images && p.images[0]) { var i = new Image(); smallSrc(i, p.images[0]); i.alt = p.name; i.loading = 'lazy'; im.appendChild(i); }
       im.appendChild(badge(d)); t.appendChild(im);
       var x = mk('div', 't'), op = mk('div', 'op'); x.appendChild(mk('h3', '', p.name)); x.appendChild(mk('div', 'np', money(p.price)));
       op.appendChild(mk('s', '', money(d.was))); x.appendChild(op);
