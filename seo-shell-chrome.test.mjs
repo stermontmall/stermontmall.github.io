@@ -11,13 +11,10 @@ const stub = '<html><head><meta http-equiv="refresh" content="0;url=/p/a.html"><
 assert.equal(addChrome(stub), stub, 'redirect stub untouched');
 assert.equal(addChrome('<p>fragment</p>'), '<p>fragment</p>', 'non-page untouched');
 
-// Early inline script (/p/ and /c/ pages): added once, understands the old ?shell=1 links, and an older copy on an already-built page is replaced.
-const early = addChrome(page, true);
-assert.ok(early.includes(EARLY_MARK) && early.includes(EARLY), 'early script added');
-assert.ok(EARLY.includes('shell=1'), 'early script knows the old ?shell=1 links');
-assert.equal(early.split(EARLY_MARK).length - 1, 1, 'early script added exactly once');
-assert.equal(addChrome(early, true), early, 'early: idempotent');
-const oldEarly = early.replace(EARLY, '<script>/*old inline script*/</script>');
-assert.notEqual(oldEarly, early);
-assert.equal(addChrome(oldEarly, true), early, 'an older inline script on a built page is replaced by the current one');
+// No route-changing script may be emitted. Legacy scripts on previously generated pages are stripped by addChrome.
+assert.equal(EARLY, '', 'no early redirect script is configured');
+const legacy = page.replace('</head>', '<!--stm-early--><script>location.replace("/?product=x")</script></head>');
+const cleaned = addChrome(legacy, true);
+assert.ok(!cleaned.includes('stm-early') && !cleaned.includes('location.replace'), 'legacy early redirect is removed');
+assert.ok(cleaned.includes('rel="canonical"') === false, 'test fixture does not invent a canonical tag');
 console.log('seo-shell-chrome tests passed');
