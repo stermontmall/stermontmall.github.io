@@ -131,5 +131,5 @@ assert.deepEqual(heads(legacyLabels), [
 
 // Decimal concentrations and percentages must not be split into separate sentences/paragraphs.
 const decimalGuide = productDescriptionHtml('PRODUCT OVERVIEW\nAir Chopper 7.5% SC contains 0.5 g/L of an ingredient. The pack is 15ml. Follow the approved label.');
-ok(/Air Chopper 7\\.5% SC contains 0\\.5 g\\/L/.test(decimalGuide), 'decimal concentrations remain intact in rendered paragraphs');
+ok(/Air Chopper 7\.5% SC contains 0\.5 g\/L/.test(decimalGuide), 'decimal concentrations remain intact in rendered paragraphs');
 ok(!/<p>&amp; Key Benefits<\\/p>/.test(comparingHtml), 'overview suffix is not repeated as body text');
