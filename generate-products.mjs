@@ -1107,3 +1107,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-17: rebuild catalogue pages after extending all active product descriptions previously below 80 words and repairing nine truncated snippets.
 
 // 2026-11-18: trigger product-page and sitemap rebuild after automated image activation.
+
+// 2026-11-18: rebuild triggered after activating the final photo-backed pest-control product.
