@@ -1,3 +1,11 @@
+## 2026-11-18 13:40 (Africa/Nairobi) - Merchant Listings "Improve item appearance" warnings
+- Done (branch `wip-merchant-return-shipping`): pack-size variants in ProductGroup JSON-LD now carry `description` (pack's own text, else the product's, else a generic line). Before, all 125 variants had none (Search Console: "Missing field description", 17 items). All 12 test steps of product-pages.yml pass locally.
+- NOT changed, needs owner decisions (published policy does not state them, so nothing was invented): `returnMethod` and `returnFees` (returns.html gives a 48-hour window and replacement/M-Pesa refund but not how items come back or who pays return shipping), `handlingTime` (not stated), `shippingRate` (shipping.html: fee depends on location, confirmed before payment; no fixed rate). Once the owner gives the terms, add them to `RETURNS` / `SHIPPING` in generate-products.mjs.
+- NOT changed: `sku` length (256 products have ids over 50 chars and sku = product id; `verify-pricing-pr.yml` matches pages by sku, so changing it would break that check). `No global identifier` (25 items) needs real gtin/brand data. "Missing shippingDetails (1 item)": none found in the current generated pages (likely a stale crawl).
+- Next: dispatch product-pages.yml after merge and confirm green.
+
+---
+
 ## 2026-11-18 13:10 (Africa/Nairobi) - product-pages.yml build was red: product-description-html.test.mjs
 - Cause (not the validFrom change; the 03:14 scheduled run was red too): line 117 had `<\\/p>` (invalid regex flags, so the whole test file was a SyntaxError), and behind it 13 older assertions still expected the pre-canonical headings ("Key features & benefits", "Safety information" ...) while the renderer now outputs the canonical section names.
 - Done (branch `wip-fix-desc-test`): fixed the regex typo and updated those 13 assertions to the canonical headings, keeping every content-preservation check. All 12 test steps of product-pages.yml pass locally.
