@@ -1,7 +1,7 @@
 // Stermont Arcade - gives every product (/p/), category (/c/) and guide (/guides/) page, and products.html, the mobile-shell look: the shell top bar (back, search, cart) and bottom nav.
 // Why: these static pages must look like the shell themselves for crawlers and desktop visitors (see seo-shell-redirect.mjs). The bar and nav are added by /shell-chrome.js.
 // Runs after every rebuild: product-pages.yml already runs seo-shell-redirect.mjs, which calls runAll() from here at the end (so no workflow edit is needed).
-// Idempotent (markers <!--stm-chrome--> and <!--stm-early-->); redirect stubs (meta refresh) are left alone. Only folders the workflow commits (p, c, guides, products.html) are covered.
+// Idempotent (marker <!--stm-chrome-->); historical early redirect scripts are stripped. Redirect stubs (meta refresh) are left alone.
 // To undo: remove the runAll() call at the bottom of seo-shell-redirect.mjs; pages lose the chrome on the next rebuild.
 // 2026-11-18: product and category pages remain on their clean canonical HTML URLs at every viewport.
 // Historical stm-early scripts are stripped during rebuild; shell-chrome.js only adds navigation chrome and never changes location.
@@ -16,8 +16,7 @@ export const STYLE = '<style>header{min-height:52px;display:flex;align-items:cen
   + 'body.stm-chrome main{padding-bottom:9rem}'
   + 'body.stm-chrome footer{margin-bottom:5rem}</style>';
 export const SCRIPT = '<script src="/shell-chrome.js?v=3" defer></script>';
-// Phone-width real visitors on /p/<slug>.html or /c/<slug>.html go straight to the shell; so does anyone (any width) on the old /p/<slug>.html?shell=1 links.
-// Crawlers, preview bots and ?classic=1 / ?noshell=1 stay on the static page, and so do desktop-width visitors on a plain address.
+// Product and category pages keep their clean static HTML URL at every viewport; navigation chrome is progressive enhancement only.
 export const EARLY = ''; // No client-side route redirects: keep the canonical HTML page for every visitor.
 const EARLY_RE = /<!--stm-early--><script>[\s\S]*?<\/script>/;
 
