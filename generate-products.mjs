@@ -1,4 +1,5 @@
 // 2026-11-18: rebuild product pages after normalising Fumigation Chemicals descriptions and product FAQ structured data.
+// 2026-11-18: rebuild after canonical legacy-label mapping, overview cleanup, and pesticide decimal-safe paragraph splitting.
 // Rebuild requested 2026-11-17: publish the new editorial introductions for all indexable category pages.
 // Rebuild requested 2026-11-17: publish corrected unique product SEO titles and descriptions from Supabase.
 // Rebuild requested 2026-11-11: publish newly verified Ramtons appliance listings and refreshed product prices/photos.
