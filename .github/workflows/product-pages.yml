@@ -322,3 +322,5 @@ jobs:
 # 2026-11-17: rebuild product pages after correcting Rentokil Lumnia Compact glueboard variant descriptions and SEO metadata in Supabase.
 # 2026-11-17: refresh the individual-board variant label and remove the pack-level MPN from the single-board offer.
 # 2026-11-17: rebuild the shared glueboard product page with neutral product name and 1 pack / 10 pack price options.
+
+# 2026-11-18: rebuild product pages and sitemap after activating ten photo-backed Agrovet listings; verify every active SKU has a generated page.
