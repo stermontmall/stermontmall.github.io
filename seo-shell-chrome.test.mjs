@@ -1,5 +1,6 @@
 // Run: node seo-shell-chrome.test.mjs
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { addChrome, MARK, SCRIPT, EARLY, EARLY_MARK } from './seo-shell-chrome.mjs';
 
 const page = '<!doctype html><html><head><title>x</title></head><body><header>h</header><main>m</main></body></html>';
@@ -16,5 +17,7 @@ assert.equal(EARLY, '', 'no early redirect script is configured');
 const legacy = page.replace('</head>', '<!--stm-early--><script>location.replace("/?product=x")</script></head>');
 const cleaned = addChrome(legacy, true);
 assert.ok(!cleaned.includes('stm-early') && !cleaned.includes('location.replace'), 'legacy early redirect is removed');
-assert.ok(cleaned.includes('rel="canonical"') === false, 'test fixture does not invent a canonical tag');
+const chromeJs = readFileSync('shell-chrome.js', 'utf8');
+assert.ok(!chromeJs.includes('location.replace'), 'navigation chrome never redirects product/category pages');
+assert.ok(!chromeJs.includes('location.href'), 'navigation chrome never rewrites the current URL');
 console.log('seo-shell-chrome tests passed');
