@@ -68,7 +68,7 @@ function renderBody(body, heading) {
   return blocks.flatMap(block => block.split(/\n+/).map(x => x.trim()).filter(Boolean).flatMap(line => {
     if (/^[-–•●▪]\s*/.test(line)) return ['<ul><li>' + inline(line.replace(/^[-–•●▪]\s*/, '')) + '</li></ul>'];
     // A Markdown link such as (https://stermontarcade.co.ke/...) must stay in one piece; its dots are not sentence ends.
-    const sentences = line.match(/(?:\[[^\]]*\]\([^)]*\)|[^.!?]|\.(?=\d)|(?<=\d)\.)+(?:[.!?]+|$)/g) || [line];
+    const sentences = line.match(/(?:\[[^\]]*\]\([^)]*\)|[^.!?]|\.(?=\d))+(?:[.!?]+|$)/g) || [line];
     const paras = [];
     for (let i = 0; i < sentences.length; i += 3) paras.push('<p>' + inline(sentences.slice(i, i + 3).join(' ').trim()) + '</p>');
     return paras;
