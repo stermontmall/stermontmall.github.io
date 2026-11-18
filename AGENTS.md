@@ -88,16 +88,8 @@ Use only verified product-specific facts. Keep any additional source, pricing, r
 
 
 ### PRODUCT DESCRIPTION SECTION LABELS — CANONICAL STOREFRONT FORMAT
-Every product description must use these exact canonical section headings (store as Markdown `## Heading` on their own line, followed by a blank line; renderer outputs styled `<h3>`):
-1. Product Overview & Key Benefits
-2. Technical Specifications & Pack Details
-3. Where & How to Use in Kenya
-4. Safety, Storage & Handling Guidelines (include PPE and storage only from the actual product label / authoritative source)
-5. Buying & Pack-Size Guide (include 2–3 relevant internal links to category pages, relevant commercial buying guides, or /services/ pages)
-6. Delivery across Kenya & Nairobi Pickup (M-Pesa checkout, Sarit Centre Westlands pickup coordination, 47-county delivery subject to courier/stock coverage, WhatsApp +254 748 888 230)
-7. Frequently Asked Questions (exactly four detailed buyer Q&As, separately authored and synchronised 1:1 with Product FAQPage JSON-LD)
-Use paragraphs of no more than 2–3 sentences and real bullet lists for verified specifications/checklists. The renderer also normalises legacy inline Markdown headings, but new content must put each canonical heading on its own line. Maintain 800+ useful words only where supported by verified sources; never pad or invent chemical dilution rates, approved uses, PPE, label instructions, registration, efficacy, warranty or safety claims. Never publish a one-wall-of-text description.
 
+Store each section title as a Markdown `## Heading` on its own line, followed by a blank line. The renderer outputs a styled `<h3>` for each recognised section.
 
 1. Product Overview & Key Benefits
 2. Technical Specifications & Pack Details
@@ -107,4 +99,8 @@ Use paragraphs of no more than 2–3 sentences and real bullet lists for verifie
 6. Delivery across Kenya & Nairobi Pickup
 7. Frequently Asked Questions
 
-Each description must contain exactly four detailed buyer Q&As under section 7; FAQPage JSON-LD must match those four pairs 1:1.
+Under section 7, include exactly four detailed buyer questions and answers. Product FAQPage JSON-LD must match those four authored pairs 1:1.
+
+Use paragraphs of no more than 2–3 sentences and real bullet lists for verified specifications/checklists. Include 2–3 relevant internal links to category pages, commercial buying guides, or `/services/` pages. Delivery copy may state M-Pesa checkout, coordinated pickup at Sarit Centre Westlands, delivery across all 47 counties subject to stock/courier coverage, and WhatsApp +254 748 888 230.
+
+Maintain 800+ useful words only where supported by verified sources; never pad or invent pesticide dilution rates, approved uses, PPE, label instructions, registration, efficacy, warranty or safety claims. For pesticide products, the current approved Kenyan label takes precedence. Never publish a wall of plain text.
