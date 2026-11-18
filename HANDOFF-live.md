@@ -432,7 +432,7 @@ User request: publish five products under "relectronics" (interpreted as Electro
 - VON VPS15X7LEK IPX7 Bluetooth Portable Speaker 15W RMS — Bluetooth Speakers (category 66).
 - TP-Link Archer C80 AC1900 Dual-Band Wi-Fi 5 Router — Networking & Smart Home (category 20).
 
-All five rows are active in Supabase. Each has stock=1000, low_at=20, featured=false, a stored product image, unique slug, populated alt text/keywords, and SEO metadata. Descriptions use the renderer's uppercase section labels and passed the 600–900 word publishing check (Logitech 802, APC 773, LDNIO 767, VON 704, TP-Link 805 words). SEO title lengths are 55–60 characters and meta descriptions are 140–155 characters.
+All five rows are active in Supabase. Each has stock=1000, low_at=20, featured=false, a stored product image, unique slug, populated alt text/keywords, and SEO metadata. Descriptions use the renderer's uppercase section labels and passed the 600–900 word publishing check (Logitech 802, APC 810, LDNIO 767, VON 704, TP-Link 805 words). SEO title lengths are 55–60 characters and meta descriptions are 140–155 characters.
 
 Pricing method applied: where no wholesale invoice cost was available, baseline cost = lowest verified in-stock Kenyan retail reference × 85%; selling price = baseline cost × 1.30, rounded to nearest KSh 50.
 - Logitech MK270: OneTech retail KSh 3,000; baseline cost KSh 2,550; selling price KSh 3,300. Source: https://onetech.binbyte.tech/products/logitech-mk270-keyboard-mouse-combo
