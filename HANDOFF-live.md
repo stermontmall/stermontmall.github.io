@@ -421,3 +421,33 @@ Failing step in the SEO pull request quality gate (run 43703801865, read with `g
 - Existing products check found HTC-2 Digital LCD Thermometer Hygrometer already listed; do not create a duplicate. Many poultry feeders, drinkers, incubators and knapsack sprayers are already listed, so exact model/size checks are required before choosing those families.
 - No products were created or activated in this checkpoint. The available supplier page provides current prices and product cards, but several detail pages failed to load in research; no exact image was uploaded/verified and no new row passed the 800+ word item-specific content gate. Do not mark anything live until each candidate has an exact source match, unique SKU, useful verified description, stored image, and successful database verification.
 - Next: select 10 unique products after full-catalogue duplicate checks; verify product detail facts and exact image for each; apply current canonical tiered baseline pricing (retail baseline = 85% of exact Kenyan retail where no wholesale price exists, then applicable tier, margin floor, nearest KSh 50, KSh 200 minimum); create via public.add_draft_product; attach via public.add_product_photo; activate only after all gates; verify and rebuild pages.
+
+
+## 2026-11-18 — Electronics catalogue batch (5 products)
+
+User request: publish five products under "relectronics" (interpreted as Electronics). No single top-level Electronics category exists in the live category tree, so each item was assigned to its closest existing category:
+- Logitech MK270 Wireless Keyboard and Mouse Combo — Computing (category 7).
+- APC Easy UPS BV 650VA AVR Universal Outlet 230V — Computing (category 7).
+- LDNIO WL01 5-in-1 Wireless Charger with 30cm Type-C Cable — Phone Accessories (category 17).
+- VON VPS15X7LEK IPX7 Bluetooth Portable Speaker 15W RMS — Bluetooth Speakers (category 66).
+- TP-Link Archer C80 AC1900 Dual-Band Wi-Fi 5 Router — Networking & Smart Home (category 20).
+
+All five rows are active in Supabase. Each has stock=1000, low_at=20, featured=false, a stored product image, unique slug, populated alt text/keywords, and SEO metadata. Descriptions use the renderer's uppercase section labels and passed the 600–900 word publishing check (Logitech 802, APC 773, LDNIO 767, VON 704, TP-Link 805 words). SEO title lengths are 55–60 characters and meta descriptions are 140–155 characters.
+
+Pricing method applied: where no wholesale invoice cost was available, baseline cost = lowest verified in-stock Kenyan retail reference × 85%; selling price = baseline cost × 1.30, rounded to nearest KSh 50.
+- Logitech MK270: OneTech retail KSh 3,000; baseline cost KSh 2,550; selling price KSh 3,300. Source: https://onetech.binbyte.tech/products/logitech-mk270-keyboard-mouse-combo
+- APC Easy UPS BV 650VA: Avechi retail KSh 10,299; baseline cost KSh 8,754.15; selling price KSh 11,400. Source: https://avechi.co.ke/product/apc-easy-ups-bv-650va/
+- LDNIO WL01: Hotpoint retail KSh 2,995; baseline cost KSh 2,545.75; selling price KSh 3,300. Source: https://www.hotpoint.co.ke/catalogue/ldnio-wl01-5-in-1-wireless-charger-with-30cm-type-c-cable/
+- VON VPS15X7LEK: Hotpoint retail KSh 3,995; baseline cost KSh 3,395.75; selling price KSh 4,400. Source: https://hotpoint.co.ke/catalogue/von-vps15x7lek-ipx7-bluetooth-portable-speaker-ipx7-waterproof-15w-rms_5174/
+- TP-Link Archer C80: Wymore retail KSh 4,999; baseline cost KSh 4,249.15; selling price KSh 5,500. Source: https://wymorestore.co.ke/product/tp-link-ac1900-mu-mimo-wi-fi-5-router-tl-archer-c80/
+
+Product images are stored in the public product-images bucket and passed the >15 KB file-size check:
+- Logitech MK270: 239,410 bytes; official Logitech image source.
+- APC BV650I-MSX: 53,788 bytes; exact-model product image. Note: Avechi's page and Schneider Electric's manufacturer page disagree on input plug type and cable length; the product description explicitly tells buyers to confirm the exact unit with Avechi before ordering.
+- LDNIO WL01: 173,520 bytes; manufacturer product image.
+- VON VPS15X7LEK: 110,276 bytes; Hotpoint product image.
+- TP-Link Archer C80: 192,690 bytes; official TP-Link product page image.
+
+A temporary VON VPS40X5LPK draft was removed because no suitable product image passed the image validation threshold. Its unused image object may remain unreferenced in Storage.
+
+The Build product pages GitHub Actions workflow is scheduled every 30 minutes; the five newly active product pages will be regenerated on the next scheduled run. Do not manually create duplicate product rows while that build is pending.
