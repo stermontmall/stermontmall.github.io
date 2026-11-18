@@ -4,43 +4,7 @@
    Load with: <script src="/shell-chrome.js?v=1" defer></script>. To undo: remove that line from the page.
    /p/ and /c/ pages get it from seo-shell-chrome.mjs (run by product-pages.yml); no tab is marked current there. */
 (function () {
-  /* SHELL DOMINANT (owner decision 2026-11-08, reverses the 2026-11-03 removal): a real visitor on a phone-width screen who opens a static
-     product page /p/<slug>.html or category page /c/<slug>.html is sent into the mobile shell (/?product=<slug>, /?cat=<slug>).
-     Search engine crawlers, link-preview bots and speed-test tools are NOT redirected, so Google keeps indexing the static pages.
-     Escape hatches: add ?classic=1 or ?noshell=1 to a page address to stay on the static page. Desktop-width screens are not redirected.
-     "#<size slug>" on a product address selects that pack size inside the shell. Uses location.replace so Back does not loop.
-     RISK (owner accepted): showing crawlers and visitors different pages can be read as a "sneaky redirect" (see HANDOFF-stop-shell-redirect.md).
-     If Search Console shows a ranking or indexing drop, delete this whole try block (the next try block is only the older ?shell=1 handler). */
-  try {
-    var ua = navigator.userAgent || '';
-    var bot = /bot|crawl|spider|slurp|inspectiontool|google-|googleother|mediapartners|facebookexternalhit|facebot|whatsapp|telegram|twitter|linkedin|slack|preview|lighthouse|pagespeed|headless|pingdom|gtmetrix|yandex|baidu|duckduck/i.test(ua);
-    var optOut = /[?&](classic|noshell)=1(&|$)/.test(location.search);
-    var phone = (window.innerWidth || 0) > 0 && window.innerWidth <= 820;
-    if (!bot && !optOut && phone) {
-      var pm = /^\/p\/([^\/]+)\.html$/.exec(location.pathname);
-      var cm = /^\/c\/([^\/]+)\.html$/.exec(location.pathname);
-      var okSlug = /^[A-Za-z0-9._%~-]+$/;
-      if (pm) {
-        var psize = location.hash.length > 1 ? location.hash.slice(1) : pm[1];
-        if (okSlug.test(psize)) { location.replace('/?product=' + psize); return; }
-      } else if (cm && cm[1] !== 'index' && okSlug.test(cm[1])) {
-        location.replace('/?cat=' + cm[1]); return;
-      } else if (location.pathname === '/c/' || location.pathname === '/c/index.html') {
-        location.replace('/?tab=categories'); return;
-      }
-    }
-  } catch (e) {}
-  /* Shared product links: /p/<slug>.html?shell=1 is the link the shell's Share button gives out (and its address bar shows while a product is open).
-     Whoever opens it lands on that product INSIDE the shell (/?product=<slug>), the full product view with pack sizes, quantity, Add to cart and Buy now.
-     WhatsApp / Facebook / Google read the page's own head for the preview (they do not run scripts), so the link still previews as the product.
-     A "#<size slug>" on the link selects that pack size. To undo: delete this try block. */
-  try {
-    var sm = /^\/p\/([^\/]+)\.html$/.exec(location.pathname);
-    if (sm && /[?&]shell=1(&|$)/.test(location.search)) {
-      var target = location.hash.length > 1 ? location.hash.slice(1) : sm[1];
-      if (/^[A-Za-z0-9._%~-]+$/.test(target)) { location.replace('/?product=' + target); return; }
-    }
-  } catch (e) {}
+  // Product and category URLs are canonical, responsive pages. Never redirect them into query-string shell routes.
   try {
     if (window.__stmChrome) return; window.__stmChrome = 1;
     var P = '#7c3aed', LINE = '#e5e7eb';
