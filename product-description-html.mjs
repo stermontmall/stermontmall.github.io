@@ -9,13 +9,13 @@ import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const normalizeInternalPath = path => {
-  const legacyProduct = path.match(/^\\/p\\/([^/?#]+)\\.html$/i);
+  const legacyProduct = path.match(/^\/p\/([^/?#]+)\.html$/i);
   if (legacyProduct) {
     let slug = legacyProduct[1];
     try { slug = decodeURIComponent(slug); } catch {}
     return shellProductLink(slug);
   }
-  return path.replace(/^\\/category\\/([a-z0-9][a-z0-9-]*)\\/?$/i, '/c/$1.html');
+  return path.replace(/^\/category\/([a-z0-9][a-z0-9-]*)\/?$/i, '/c/$1.html');
 };
 const inline = s => esc(s)
   .replace(/\[([^\]]+)\]\((?:https?:\/\/stermontarcade\.co\.ke)?(\/[^)\s]*)\)/g, (_match, label, path) => `<a href="${normalizeInternalPath(path)}">${label}</a>`)
