@@ -242,7 +242,7 @@
       '<div class="cx-r">' +
       '<div><label>' + (edit ? 'Pieces in stock' : 'Initial pieces (fixed default)') + '</label><input class="cx-f" id="cx-stock" type="number" min="0" inputmode="numeric" value="' + (edit ? p.stock : 1000) + '"' + (edit ? '' : ' readonly') + '></div>' +
       '<div><label>Low-stock alert below</label><input class="cx-f" id="cx-low" type="number" min="0" value="' + (edit ? p.low_at : 20) + '"' + (edit ? '' : ' readonly') + '></div></div>' +
-      '<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" id="cx-feat"' + (edit && p.featured ? ' checked' : '') + '> Feature as advert / top banner</label>' +
+      '<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" id="cx-feat"' + (edit && p.featured ? ' checked' : '') + (edit ? '' : ' disabled') + '> Feature as advert / top banner</label>' +
       '<label>Photos</label><input type="file" id="cx-file" accept="image/*" multiple>' +
       '<label>OR paste a direct photo link (jpg, png or webp)</label><div style="display:flex;gap:.4rem"><input class="cx-f" id="cx-plink" type="url" placeholder="https://example.com/photo.jpg" style="flex:1"><button type="button" class="btn alt sm" id="cx-padd">Add link</button></div>' +
       '<div class="cx-th" id="cx-th"></div><div class="meta" id="cx-up"></div>';
