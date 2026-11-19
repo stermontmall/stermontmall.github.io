@@ -23,12 +23,14 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 6. PUBLISH LIVE only after both exact photo and source price are verified. Set `active=true` only when `images` contains the uploaded photo URL. The database now rejects a new product activation with an empty photo array. If no exact suitable photo can be found/uploaded, leave `active=false` and report the blocker. After activation, verify the generated product page, image, canonical, Product JSON-LD and sitemap entry once the product-pages workflow completes.
 7. GIVE THE MOBILE-SHELL LINK (owner rule 2026-11-08, permanent): see "Product links" below.
 
-## Product links and default shell routing (owner rule updated 2026-11-19)
-- Every product link given to the owner (chat reply, report, handoff) MUST open the mobile shell: `https://stermontarcade.co.ke/?product=<products.slug>`. Read `slug` from the product row (it usually equals `id`; older rows may differ).
-- Direct `/p/<id>.html` and `/c/<slug>.html` visits must automatically bootstrap into the full mobile-shell app on every device and viewport. No `classic=1`, user-agent, or desktop exception may leave a visitor on the old static layout.
-- Generated `/p/` and `/c/` HTML remains the crawlable SEO source (canonical metadata and structured data); its route bootstrap immediately opens the matching product/category inside the shell. The shell restores the canonical path in the address bar after loading.
-- `/blog/`, `/guides/`, and informational pages retain their article/content body with the shared shell navigation; product and category shopping flows must always use the full app shell.
-- Check before reporting: the row is `active=true`, then give the shell link. Opening a direct product URL on phone or desktop must show the shell product view (photo, pack options, price, product code and Add to cart).
+## Product links and default shell routing (permanent owner rule, 2026-11-19)
+- EVERY customer- or staff-facing product link (WhatsApp prefill/message, share/copy button, storefront card, related-product card, admin/order/receipt/email, blog/guide/service CTA, recent-order shortcut, and any product URL given to the owner) MUST use the shared shellProductLink(slug) helper and resolve exactly to https://stermontarcade.co.ke/?product=<products.slug>. Read the real slug from the product row; never assume it equals id.
+- NEVER use /p/<slug>.html or /classic.html as a human-facing product link.
+- /p/<slug>.html remains a live, indexable static SEO document. Preserve its canonical, og:url, sitemap-products.xml entry, Product/ItemList JSON-LD, breadcrumbs and seo-links crawl links unchanged.
+- Do NOT add a visitor redirect, JavaScript redirect or user-agent-based switching on /p/ pages. Do not cloak or change what Googlebot sees.
+- The shell product deep link /?product=<slug> opens the product inside the mobile app and keeps the homepage canonical. An unknown slug falls back to the normal shell homepage.
+- Blog, guide, service, admin and order generators must emit shell URLs for visible product links. The SEO-only /p/ references listed above are the sole exception.
+- Run node no-static-share-links.test.mjs and node no-classic-hop.test.mjs before opening a PR.
 ## Price and inventory rules for NEW products
 - Find the source price online yourself (owner rule 2026-11-08): the lowest current in-stock KES listing of the EXACT product (same brand, model, pack size) on a reputable Kenyan seller or supplier page. Record that page URL as the source. Never invent or estimate a price. If no KES listing of the exact product exists, stop and ask the owner.
 - Let `C` be that source price in KES.
