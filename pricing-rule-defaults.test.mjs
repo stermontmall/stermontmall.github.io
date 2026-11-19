@@ -7,6 +7,7 @@ const rulesUi = read('admin-publishing-rules.js');
 const bulk = read('admin-bulk.js');
 const catalog = read('catalog-v10.js');
 const photoAi = read('admin-photo-ai.js');
+const legacyUploader = read('list-products.html');
 const policy = JSON.parse(read('rules/publishing-rule.json'));
 const migration = read('database/enforce-canonical-four-tier-product-defaults.sql');
 const claude = read('CLAUDE.md');
