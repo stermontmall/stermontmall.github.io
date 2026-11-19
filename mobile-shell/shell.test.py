@@ -522,7 +522,7 @@ with sync_playwright() as p:
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
     p12.goto(f'{BASE}/c/garden-outdoors.html', wait_until='domcontentloaded'); p12.wait_for_timeout(1200)
     p12.wait_for_selector('#bottom-nav', state='visible', timeout=15000)
-    check('direct category URL opens the full shell at its canonical URL', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('#bottom-nav').count() == 1 and p12.locator('#stm-nav').count() == 0 and p12.locator('#grid-title').inner_text() == 'Garden Outdoors', p12.url)
+    check('direct category URL opens the full shell at its canonical URL', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('#bottom-nav').count() == 1 and p12.locator('#stm-nav').count() == 0 and p12.locator('#grid-title').inner_text() == 'Outdoor & Garden', p12.url)
     check('category shell page has no page errors', not e12, e12[:3])
     c12.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
@@ -621,7 +621,7 @@ with sync_playwright() as p:
     p15.goto(URL); p15.wait_for_selector('#grid .card[data-id]')
     p15.locator('#chips [data-chip="phones-accessories"]').click()
     p15.wait_for_function("location.pathname === '/c/phones-accessories.html'", timeout=10000)
-    p15.reload(wait_until='domcontentloaded'); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href^="/p/"]')
+    p15.reload(wait_until='domcontentloaded'); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href^="/p/"]'); p15.wait_for_selector('#bottom-nav', state='visible', timeout=15000); p15.wait_for_function("document.querySelector('#grid .card[data-id]') && document.querySelector('#grid-title').textContent === 'Phones & Accessories'", timeout=15000)
     check('top-level category reload restores the full shell and selected category', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and p15.locator('#bottom-nav').count() == 1 and p15.locator('#stm-nav').count() == 0 and p15.locator('#grid .card[data-id]').count() > 0, p15.url)
 
     p15.goto(f'{BASE}/?cat=garden-tools'); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
