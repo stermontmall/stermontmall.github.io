@@ -78,18 +78,18 @@ assert.deepEqual(offenders, [], 'human-facing static product/classic links found
 const generator = readFileSync('generate-products.mjs', 'utf8');
 const relatedFill = readFileSync('seo-related-fill.mjs', 'utf8');
 const kenya = readFileSync('seo-kenya.mjs', 'utf8');
-assert.match(kenya, /shellProductLink\\(i\\.slug\\)/);
-assert.match(kenya, /shellProductLink\\(cheap\\.slug\\)/);
-assert.match(kenya, /url: SITE \\+ i\\.url/); // ItemList JSON-LD retains canonical /p/ URLs
-assert.match(relatedFill, /shellHref: shellProductLink/);
+assert.ok(kenya.includes('shellProductLink(i.slug)'));
+assert.ok(kenya.includes('shellProductLink(cheap.slug)'));
+assert.ok(kenya.includes('url: SITE + i.url')); // ItemList JSON-LD retains canonical /p/ URLs
+assert.ok(relatedFill.includes('shellHref: shellProductLink'));
 assert.ok(relatedFill.includes('href="${p.shellHref}"'));
-assert.match(generator, /<link rel="canonical" href="\$\{SITE\}\$\{path\}">/);
-assert.match(generator, /property="og:url" content="\$\{SITE\}\$\{path\}"/);
-assert.match(generator, /url: SITE \+ path/);
-assert.match(generator, /crumbLd\(\[\['Home', SITE \+ '\/'\]/); // BreadcrumbList remains on the canonical product page
-assert.match(generator, /seo-links:start/); // Homepage crawler links remain in their dedicated block
+assert.ok(generator.includes('<link rel="canonical" href="${SITE}${path}">'));
+assert.ok(generator.includes('property="og:url" content="${SITE}${path}"'));
+assert.ok(generator.includes('url: SITE + path'));
+assert.ok(generator.includes("crumbLd([['Home', SITE + '/']")); // BreadcrumbList remains on the canonical product page
+assert.ok(generator.includes('seo-links:start')); // Homepage crawler links remain in their dedicated block
 const sitemap = readFileSync('seo-extras.mjs', 'utf8');
-assert.match(sitemap, /\$\{SITE\}\/p\/\$\{f\}/); // sitemap-products.xml keeps canonical /p/ URLs
+assert.ok(sitemap.includes('${SITE}/p/${f}')); // sitemap-products.xml keeps canonical /p/ URLs
 assert.ok(SEO_SURFACE_ALLOWLIST.length === 5);
 
 console.log('OK: customer-facing product links use the mobile shell; SEO-only /p/ surfaces remain allowlisted.');
