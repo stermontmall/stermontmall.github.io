@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('../product-links.js');
+import { normalizeGeneratedProductPages } from '../product-link-normalizer.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -388,3 +389,6 @@ if (banned.length) { console.error('BANNED TOWN NAME FOUND IN:', banned.join(', 
 const low = [...Object.entries(counts.services), ...Object.entries(counts.guides), ...Object.entries(counts.pests || {}).filter(([k]) => k !== 'index')].filter(([, n]) => n < 600);
 console.log('wrote', out.length, 'files', JSON.stringify(counts));
 if (low.length) console.log('UNDER 600 WORDS:', JSON.stringify(low));
+
+// Final shared pass catches links inherited from every service/pest source section.
+normalizeGeneratedProductPages();
