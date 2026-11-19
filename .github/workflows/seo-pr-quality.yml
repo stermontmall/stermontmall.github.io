@@ -6,6 +6,16 @@ on:
     paths:
       - 'seo-*.mjs'
       - 'generate-products.mjs'
+      - 'product-links.js'
+      - 'site-links.js'
+      - 'storefront-live.js'
+      - 'product-trust.js'
+      - 'product-seo-optimizer.js'
+      - 'no-static-share-links.test.mjs'
+      - 'blog-write.mjs'
+      - 'seo-pest/blog-build.mjs'
+      - 'CLAUDE.md'
+      - 'AGENTS.md'
       - 'catalog-v10.js'
       - 'product-codes.test.mjs'
       - 'seo-overrides.json'
@@ -72,6 +82,8 @@ jobs:
       # Reset per-test tab state when asserting the default landing view.
       - name: Nothing may go through /classic.html (guard)
         run: node no-classic-hop.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02-no-classic-hop.log"
+      - name: No human-facing product links may use static SEO pages
+        run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02-no-static-share-links.log"
       - name: Test server-rendered homepage product cards
         run: node home-grid-ssr.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-home-grid-ssr.log"
       - name: Prepare generated product/category fixtures with the production mobile-shell routing
@@ -89,6 +101,16 @@ jobs:
         run: |
           {
             node --check category-editorial.mjs
+            node --check product-links.js
+            node --check site-links.js
+            node --check storefront-live.js
+            node --check product-trust.js
+            node --check product-seo-optimizer.js
+            node --check product-description-html.mjs
+            node --check blog-write.mjs
+            node --check seo-pest/blog-build.mjs
+            node --check mobile-shell/app.js
+            node --check mobile-shell/pp-whatsapp.js
             node --check generate-products.mjs
             node --check seo-shell-redirect.mjs
             node --check seo-shell-redirect.test.mjs
