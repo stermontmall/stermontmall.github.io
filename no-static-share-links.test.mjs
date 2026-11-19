@@ -18,7 +18,7 @@ const SEO_SURFACE_ALLOWLIST = [
   'product breadcrumbs',
   'homepage <!-- seo-links:start --> ... <!-- seo-links:end --> crawl links'
 ];
-const SKIP_DIRS = new Set(['.git', 'node_modules', 'assets', 'product-photos']);
+const SKIP_DIRS = new Set(['.git', 'node_modules', 'assets', 'product-photos', 'docs']);
 const GENERATED_DIRS = new Set(['p', 'c', 'guides', 'pest-control', 'services']);
 const GENERATED_FILES = new Set(['products.html', 'index.html']);
 const GENERATED_MARKER = '<!-- stm-shell-product-links:v1 -->';
