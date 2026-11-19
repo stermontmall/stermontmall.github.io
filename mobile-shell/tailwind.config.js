@@ -4,8 +4,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: { DEFAULT: '#7c3aed', dark: '#6d28d9', soft: '#f5f0ff' }, // = site theme-color
-        sale: '#e11d48',   // price + discount badge
+        brand: { DEFAULT: '#5b21b6', dark: '#4c1d95', soft: '#f3eefe' }, // Stermont royal purple
+        sale: '#f97316',   // Stermont orange price + discount badge
         star: '#f59e0b',   // rating stars
         ink: '#1f2937',    // primary text
         mute: '#6b7280',   // secondary text
