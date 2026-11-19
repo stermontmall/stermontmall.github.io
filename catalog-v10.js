@@ -468,7 +468,7 @@
     shown.forEach(function (p) {
       var s = stat(p), lowS = p.stock < p.low_at, c = el('div', 'card');
       c.innerHTML = '<div class="cx-p">' + (p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="' + esc(p.name) + '" loading="lazy" onerror="this.outerHTML=&quot;<div class=cx-ph>📦</div>&quot;">' : '<div class="cx-ph">' + catIcon(p.category_id) + '</div>') +
-        '<div style="min-width:0"><div class="ref">' + esc(p.name) + '</div><div class="when">' + esc(catName(p.category_id)) + '</div><div class="meta" style="font-weight:700">Code: ' + esc(p.product_code || 'Pending') + '</div><div style="margin-top:.3rem">'
+        '<div style="min-width:0"><div class="ref">' + esc(p.name) + '</div><div class="when">' + esc(catName(p.category_id)) + '</div><div class="meta" style="font-weight:700">Code: ' + esc(p.product_code || 'Pending') + '</div><div style="margin-top:.3rem">' +
         (p.stock === 0 ? '<span class="badge b-declined">Out of stock</span> ' : lowS ? '<span class="badge b-low">Low · ' + p.stock + ' left</span> ' : '<span class="badge b-paid">In stock</span> ') +
         (p.featured ? '<span class="badge b-ad">Advert</span> ' : '') + (p.active ? '' : '<span class="badge b-pending">Hidden</span>') + '</div></div></div>' +
         (p.description ? '<div class="meta" style="margin:.5rem 0 0;white-space:pre-line">' + esc(p.description.length > 140 ? p.description.slice(0, 140) + '…' : p.description) + '</div>' : '<div class="meta" style="margin:.5rem 0 0;color:#b45309">No description yet. Tap Edit to add one.</div>') +
