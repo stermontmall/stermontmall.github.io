@@ -23,7 +23,7 @@ for (const file of files) {
   const lines = text.split('\n');
   lines.forEach((line, index) => {
 
-      if (/(?:href\s*=\s*["'][^"']*\/p\/|Link:\s*[^\n<]*\/p\/|href\s*=\s*["'][^"']*\/classic\.html)/i.test(html)) {
+    if (/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/classic\.html/i.test(line)) offenders.push(file + ':' + (index + 1) + ': human-facing /classic.html link: ' + line.trim().slice(0, 220));
     if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/p\//i.test(line)) return;
     // Internal SEO document fetches and explicitly defined Google crawl surfaces are not customer links.
     if (file === 'index.html' && line.includes('href="/p/')) return; // owner-approved seo-links crawl block, not the visible product grid
