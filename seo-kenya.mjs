@@ -170,14 +170,14 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
 console.log(`Kenya titles and descriptions set on ${pDone} product page(s).`);
 
 // ---------- 2) category pages + 3) guides ----------
-const ITEM = /<li><a href="(\/p\/[^"]+)"><img[^>]*?>([^<]*)<\/a><span>KSh ([\d,]+)<\/span><\/li>/g;
+const ITEM = /<li><a href="([^"]+)"><img[^>]*?>([^<]*)<\/a><span>KSh ([\d,]+)<\/span><\/li>/g;
 const cats = [];
 let cDone = 0;
 if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.html') && f !== 'index.html')) {
   try {
     const slug = f.replace(/\.html$/, ''), file = `c/${f}`; let h = readFileSync(file, 'utf8');
     const h1 = unesc(((h.match(/<h1>([\s\S]*?)<\/h1>/) || [])[1] || '').replace(/<[^>]+>/g, '').trim());
-    const items = [...h.matchAll(ITEM)].map(m => { const slug = m[1].startsWith(SITE + '/?product=') ? new URL(m[1]).searchParams.get('product') : m[1].replace(/^\\/p\\//, '').replace(/\\.html$/, ''); return { url: '/p/' + encodeURIComponent(slug) + '.html', slug, name: m[2], price: Number(m[3].replace(/,/g, '')) }; }).filter(i => i.price > 0 && i.slug);
+    const items = [...h.matchAll(ITEM)].map(m => { const raw = m[1]; const slug = raw.startsWith(SITE + '/?product=') ? new URL(raw).searchParams.get('product') : raw.slice(3).replace('.html', ''); return { url: '/p/' + encodeURIComponent(slug) + '.html', slug, name: m[2], price: Number(m[3].replace(/,/g, '')) }; }).filter(i => i.price > 0 && i.slug);
     const guide = CATEGORY_GUIDES[slug];
     if (guide && !h.includes(`data-seo-guide="${slug}"`)) {
       h = h.replace(/<ul class="g">/, `${guide}
