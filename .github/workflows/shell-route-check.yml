@@ -1,0 +1,56 @@
+name: Full mobile-shell route regression
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'shell-route-loader.js'
+      - 'seo-shell-redirect.mjs'
+      - 'seo-shell-redirect.test.mjs'
+      - 'seo-shell-chrome.mjs'
+      - 'seo-shell-chrome.test.mjs'
+      - 'mobile-shell/app.js'
+      - 'mobile-shell/navigation.test.mjs'
+      - 'mobile-shell/shell.test.py'
+      - '.github/workflows/shell-route-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  route-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      - name: Test in-place route injection and SEO fallback
+        run: node seo-shell-redirect.test.mjs
+
+      - name: Test shared shell navigation chrome
+        run: node seo-shell-chrome.test.mjs
+
+      - name: Test direct product/category route startup
+        run: node mobile-shell/navigation.test.mjs
+
+      - name: Set up Python and browser tests
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install Playwright
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Test full shell on direct product and category URLs
+        run: python mobile-shell/shell.test.py
