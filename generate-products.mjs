@@ -20,7 +20,7 @@
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
-import { productIdentifiers } from './seo-product-identifiers.mjs';
+import { productIdentifiers, productSku } from './seo-product-identifiers.mjs';
 import { productDescriptionHtml, extractProductFaq } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
 import { buildCategoryIntro, buildCategoryFaq } from './category-editorial.mjs';
@@ -88,13 +88,13 @@ const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.imag
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
-  const cols = ['id,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
-                'id,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,created_at,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
+  const cols = ['id,product_code,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
+                'id,product_code,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,product_code,created_at,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,product_code,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,product_code,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
                 'id,created_at,name,price,old_price,unit,stock,images,description,categories(name,slug)',
-                'id,created_at,name,price,stock,images,description,categories(name,slug)'];
+                'id,product_code,created_at,name,price,stock,images,description,categories(name,slug)'];
   for (const c of cols) {
     const all = [];
     let offset = 0;
@@ -660,11 +660,11 @@ for (const p of products) {
   const stickyWa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order ${p.name}. Pack size: ${packLabel}. Price: KES ${Math.round(Number(p.price) || 0).toLocaleString('en-KE')}. Please confirm availability and delivery.`)}`;
   const cartUrl = `/?product=${encodeURIComponent(sl(p.id))}`;
   const askLines = [`Hello ${BRAND}, I would like to enquire about this item:`, '', `Product: ${p.name}`, `Price: ${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ' / ' + p.unit : ''}`,
-    ...(p.variants ? [`Sizes: ${p.variants.map(v => v.variant_label).join(', ')}`] : []), `Availability: ${inStock ? 'In stock' : 'Currently sold out'}`, ...(cat ? [`Category: ${cat.name}`] : []), `Ref: ${p.id}`, `Link: ${SITE}${path}`, '', 'Please confirm availability and the delivery fee to my location.'];
+    ...(p.variants ? [`Sizes: ${p.variants.map(v => v.variant_label).join(', ')}`] : []), `Availability: ${inStock ? 'In stock' : 'Currently sold out'}`, ...(cat ? [`Category: ${cat.name}`] : []), `Product code: ${productSku(p)}`, `Record ref: ${p.id}`, `Link: ${SITE}${path}`, '', 'Please confirm availability and the delivery fee to my location.'];
   const ask = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(askLines.join('\n'))}`;
   const ldOne = jsonLd({
     '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
-    description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.id), category: cat?.name,
+    description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: productSku(p), category: cat?.name,
     brand: { '@type': 'Brand', name: brandOf(p.name) }, ...productIdentifiers(p),
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: Number(Math.round(Number(p.price) || 0)),
       availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), validFrom: offerValidFrom(p), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
@@ -674,7 +674,7 @@ for (const p of products) {
   const ldGroup = p.variants ? jsonLd({
     '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, category: cat?.name, brand: { '@type': 'Brand', name: brandOf(p.name) }, ...rLd,
-    hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label, ...productIdentifiers(v),
+    hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: productSku(v), size: v.variant_label, ...productIdentifiers(v),
       // Merchant Listings wants a description on every variant: use the pack's own text, else the product's, else the same generic line as the group.
       description: clip(v.description, 500) || clip(p.description, 500) || `Buy ${p.name} – ${v.variant_label} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`,
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
@@ -687,7 +687,7 @@ for (const p of products) {
   const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '') + productFaqLd;
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
     const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${pdpVariantUrl(path, v.slug, p.slug)}`)}`;
-    return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
+    return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small><small class="meta">Code: ${esc(productSku(v))}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
   // Local-utility sections (H2s): what it is used for, price and M-Pesa ordering, delivery and Sarit Centre pickup. Facts match shipping.html and nairobi.html.
   const nameE = esc(p.name), priceTxt = `${p.variants ? 'from ' : ''}${money(p.price)}${p.unit ? ' / ' + esc(p.unit) : ''}`;
   const usesTxt = isPcpb(cat?.slug)
@@ -705,7 +705,7 @@ for (const p of products) {
   const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
 <div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.alt_text || (p.name + ' - product photo'))}" fetchpriority="high" loading="eager" decoding="async" width="720" height="720" data-fallbacks="${esc(JSON.stringify(img.slice(1)))}">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
 <div><h1>${esc(h1)}</h1><p class="tagline" style="margin:.1rem 0 .6rem;color:#5b21b6;font-weight:600">${esc(tagline)}</p><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
-<p class="${inStock ? 'ok' : 'no'}">${inStock ? 'In stock' : 'Currently sold out'}</p>
+<p class="${inStock ? 'ok' : 'no'}">${inStock ? 'In stock' : 'Currently sold out'}</p><p class="meta" style="margin:.15rem 0 .6rem">Product code: <b>${esc(productSku(p))}</b></p>
 <p>Buy ${esc(p.name)} online in Kenya from ${BRAND}. Pay by M-Pesa and get delivery to all 47 counties.</p>
 <a class="btn" href="${esc(wa)}">Order on WhatsApp</a><a class="btn alt" href="${esc(cartUrl)}">Add to Cart / Pay with M-Pesa</a>
 <div class="box trustline" aria-label="Shopping and delivery assurances">✓ Instant M-Pesa Checkout • ✓ Coordinated via Westlands Office • ✓ Same-Day Nairobi Delivery &amp; Sarit Centre Pickup • ✓ 47-County Shipping</div></div></div>
