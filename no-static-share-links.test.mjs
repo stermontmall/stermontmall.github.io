@@ -38,9 +38,9 @@ assert.deepEqual(offenders, [], 'Human-facing links still point to static produc
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), 'https://stermontarcade.co.ke/?product=premise-200-sc-termiticide-50-ml');
 const homepage = readFileSync('index.html', 'utf8');
-const homeGrid = (homepage.match(/<ul id="grid"[\\s\\S]*?<\\/ul>/) || [])[0] || '';
+const homeGrid = (homepage.match(/<ul id="grid"[\s\S]*?<\/ul>/) || [])[0] || '';
 assert.ok(homeGrid.includes('https://stermontarcade.co.ke/?product='), 'homepage SSR cards must expose shell product URLs');
-assert.doesNotMatch(homeGrid, /href="\\/p\\//, 'homepage SSR cards must not expose static product URLs');
+assert.doesNotMatch(homeGrid, /href="\/p\//, 'homepage SSR cards must not expose static product URLs');
 assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'), 'homepage SEO crawl links must remain present');
 const helper = readFileSync('product-links.js', 'utf8');
 assert.match(helper, /function shellProductLink\(slug\)/, 'shared shellProductLink helper must exist');
