@@ -5,9 +5,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(dir, '..');
 const SITE = 'https://stermontarcade.co.ke';
+const shellProductLink = createRequire(import.meta.url)('../product-links.js');
 export const DATE = '2026-10-30';
 export const words = s => (String(s).match(/\S+/g) || []).length;
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -33,7 +35,7 @@ export function renderPost(a) {
   const faqHtml = `<h2>Frequently asked questions</h2>\n${a.faq.map(([q, an]) => `<h3>${esc(q)}</h3>\n<p>${esc(an)}</p>`).join('\n')}`;
   const catTitle = (() => { try { const m = fs.readFileSync(path.join(root, 'c', a.cat + '.html'), 'utf8').match(/<h1[^>]*>([^<]*)<\/h1>/i); return m ? unesc(m[1].trim()) : 'Browse the category'; } catch { return 'Browse the category'; } })();
   const relTitle = r => { try { const m = fs.readFileSync(path.join(root, 'blog', r + '.html'), 'utf8').match(/<h1[^>]*>([\s\S]*?)<\/h1>/i); return m ? unesc(m[1].replace(/<[^>]+>/g, '').trim()) : r; } catch { return r; } };
-  const catHtml = `<div class="box"><strong>Shop this category</strong><ul class="rel"><li><a href="/c/${a.cat}.html">${esc(catTitle)}</a></li><li><a href="/p/${a.product}.html">See the product and its sizes</a></li></ul></div>`;
+  const catHtml = `<div class="box"><strong>Shop this category</strong><ul class="rel"><li><a href="/c/${a.cat}.html">${esc(catTitle)}</a></li><li><a href="${esc(shellProductLink(a.product, SITE))}">See the product and its sizes</a></li></ul></div>`;
   const relHtml = a.related.length ? `<h2>Related guides</h2>\n<ul class="rel">${a.related.map(r => `<li><a href="/blog/${r}.html">${esc(relTitle(r))}</a></li>`).join('')}</ul>` : '';
   const serviceHtml = `<div class="box"><strong>Need professional help?</strong><p>Explore <a href="/pest-control/">professional pest control and fumigation services in Kenya</a> or visit the <a href="/pest-control/blog/">Pest Control Advice Centre</a>. For a quotation, share your town, property type and pest concern.</p></div>`;
   return `<!doctype html>
