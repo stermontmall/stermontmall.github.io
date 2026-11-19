@@ -36,7 +36,7 @@
     head.appendChild(el('hr'));
 
     head.appendChild(el('p', 'meta', 'Add up to 10 products in one session. For each item, upload its photo from your device OR paste a direct link to the photo, and paste the exact product page URL. AI reads the product and source price, writes the listing and SEO fields, then saves it as an unpublished draft for your review.'));
-    head.appendChild(el('p', 'meta', 'Price rule: use the exact source KSh/KES price with the 30% markup, or enter your own selling price to override it. Owner-set prices are saved exactly with no markup.'));
+    head.appendChild(el('p', 'meta', 'Price rule (owner rule 2026-11-18): the source KSh/KES price is treated as a Kenyan retail price, so the baseline is that price × 0.85. The tiered markup is then applied (30% under KSh 20,000, 25% up to 39,999, 20% up to 60,000, 17.5% above), with a 15% minimum margin, rounded to the nearest KSh 50 and a KSh 200 minimum. Syngenta items are excluded from automatic pricing and need your own selling price. You can also enter your own selling price to override it; owner-set prices are saved exactly with no markup.'));
     var status = el('p', 'meta', '0 of 10 product slots used.');
     var actions = el('div', 'acts');
     var add = button('+ Add product', 'alt', addRow);
@@ -138,7 +138,7 @@
       var urlLabel = el('label', null, 'Source product website URL'), url = el('input');
       url.type = 'url'; url.placeholder = 'https://example.com/product-page'; url.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
       var priceLabel = el('label', null, 'Your selling price in KSh (optional override)'), price = el('input');
-      price.type = 'number'; price.min = '1'; price.step = '0.01'; price.placeholder = 'Leave blank to use source price + 30%'; price.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
+      price.type = 'number'; price.min = '1'; price.step = '0.01'; price.placeholder = 'Leave blank to use the tiered pricing rule'; price.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
       var preview = el('img'); preview.alt = 'Selected product preview'; preview.hidden = true; preview.style.cssText = 'display:block;max-width:140px;max-height:120px;object-fit:contain;margin-top:.6rem;border-radius:8px';
       var remove = button('Remove', 'alt sm', function () { rows = rows.filter(function (r) { return r.card !== card; }); card.remove(); renumber(); update(); });
       var line = el('div', 'acts'); line.append(remove);
@@ -216,7 +216,7 @@
               saved++;
               var card = el('div', 'card done');
               card.appendChild(el('h4', null, '✓ Draft saved: ' + data.product.name));
-              card.appendChild(el('p', null, data.source_price_kes == null ? 'Owner-set selling price: KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' · No markup · Not published' : 'Source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Selling price includes 30% markup · Not published'));
+              card.appendChild(el('p', null, data.source_price_kes == null ? 'Owner-set selling price: KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' · No markup · Not published' : 'Source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Baseline: KSh ' + Number(data.baseline_cost_kes).toLocaleString('en-KE') + ' · Selling price: KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' (tiered markup rule, +' + data.markup_percent + '%) · Not published'));
               card.appendChild(el('p', 'meta', 'SEO title: ' + data.seo_title));
               card.appendChild(el('p', 'meta', 'Meta description preview: ' + data.meta_description_preview));
               card.appendChild(el('p', 'meta', data.price_note || data.page_note || 'Source price verified.'));
