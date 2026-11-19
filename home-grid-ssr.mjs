@@ -1,6 +1,6 @@
 // Safe build-time HTML for the homepage's JavaScript-hydrated product grid.
 // Only explicit positive stock is eligible; the live shell replaces these fallback cards after hydration.
-const SHELL_PRODUCT_LINK = /^https:\/\/stermontarcade\\.co\\.ke\\/\\?product=[a-z0-9][a-z0-9-]*$/;
+const SHELL_PRODUCT_LINK = /^https:\/\/stermontarcade\.co\.ke\/\?product=[a-z0-9][a-z0-9-]*$/;
 const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 
 export function renderHomeGridFallback(products, { limit = 8 } = {}) {
