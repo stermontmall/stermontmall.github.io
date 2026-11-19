@@ -1,10 +1,9 @@
-// Product and category pages stay on their own canonical, crawlable URLs.
-// The full mobile-shell app remains available through explicit deep links: /?product=<slug> and /?cat=<slug>.
-// Keep the shell's shared top bar and bottom navigation on generated pages, but never JavaScript-redirect every visitor or Googlebot.
+// Product and category pages retain their own canonical URLs and server-rendered SEO content.
+// The route loader hydrates the real mobile shell in place; it never redirects shoppers to the homepage.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const DIR = process.env.P_DIR || 'p';
-export const MARK = '<!--stm-shell-route-->';
+export const MARK = '<!--stm-full-shell-route-->';
 // Remove every historical route bootstrap that sent /p/ or /c/ visitors to the homepage app.
 const LEGACY_ROUTE_RE = /<!--stm-(?:shell|shell-cat|shell-route|early)--><script[\s\S]*?<\/script>/gi;
 
@@ -13,8 +12,17 @@ function stripRoute(html) {
   return html.replace(LEGACY_ROUTE_RE, '');
 }
 
-export function inject(html, _slug) { return stripRoute(html); }
-export function injectCat(html, _slug) { return stripRoute(html); }
+const ROUTE_SCRIPT = '<script src="/shell-route-loader.js?v=1" defer></script>';
+
+function addFullShell(html) {
+  const clean = stripRoute(html);
+  if (/http-equiv=["']refresh["']/i.test(clean) || clean.includes(MARK)) return clean;
+  if (!/<\/body>/i.test(clean)) return clean;
+  return clean.replace(/<\/body>/i, MARK + ROUTE_SCRIPT + '</body>');
+}
+
+export function inject(html, _slug) { return addFullShell(html); }
+export function injectCat(html, _slug) { return addFullShell(html); }
 
 function run(dir, fn, label) {
   let n = 0, total = 0, files = [];
@@ -28,7 +36,7 @@ function run(dir, fn, label) {
       if (after !== before) { writeFileSync(path, after); n++; }
     } catch (e) { console.log('skipped', f, e.message); }
   }
-  console.log('seo-shell-redirect: removed legacy route redirects from ' + n + ' of ' + total + ' ' + label + ' pages');
+  console.log('seo-shell-redirect: installed in-place full-shell loader on ' + n + ' of ' + total + ' ' + label + ' pages');
 }
 
 if (process.argv[1] && process.argv[1].endsWith('seo-shell-redirect.mjs')) {
