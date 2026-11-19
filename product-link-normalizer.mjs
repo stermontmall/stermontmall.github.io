@@ -10,20 +10,20 @@ const ROOTS = ['p', 'c', 'guides', 'blog', 'services', 'pest-control'];
 const ROOT_FILES = ['index.html', 'products.html', 'fashion.html', 'cars-for-sale.html', 'checkout.html'];
 const rewriteBody = html => {
   const head = [];
-  let body = String(html || '').replace(/<head\\b[\\s\\S]*?<\\/head>/gi, block => { head.push(block); return ''; });
+  let body = String(html || '').replace(/<head\b[\s\S]*?<\/head>/gi, block => { head.push(block); return ''; });
   const preserved = [];
   const preserve = re => { body = body.replace(re, block => { preserved.push(block); return `<!-- stm-preserved-${preserved.length - 1} -->`; }); };
-  preserve(/<script[^>]*type=["']application\\/ld\\+json["'][^>]*>[\\s\\S]*?<\\/script>/gi);
-  preserve(/<nav[^>]*class=["'][^"']*\\bbc\\b[^"']*["'][^>]*>[\\s\\S]*?<\\/nav>/gi);
-  preserve(/<!--\\s*seo-links:start\\s*-->[\\s\\S]*?<!--\\s*seo-links:end\\s*-->/gi);
-  preserve(/<section[^>]*class=["'][^"']*\\bseo-links\\b[^"']*["'][^>]*>[\\s\\S]*?<\\/section>/gi);
-  body = body.replace(/<a\\b([^>]*?)\\bhref=(["'])([^"']+)\\2([^>]*)>/gi, (all, before, quote, href, after) => {
-    const match = href.match(/^(?:https?:\\/\\/(?:www\\.)?stermontarcade\\.co\\.ke)?\\/p\\/([^/?#]+)\\.html(?:[?#].*)?$/i);
+  preserve(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi);
+  preserve(/<nav[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi);
+  preserve(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi);
+  preserve(/<section[^>]*class=["'][^"']*\bseo-links\b[^"']*["'][^>]*>[\s\S]*?<\/section>/gi);
+  body = body.replace(/<a\b([^>]*?)\bhref=(["'])([^"']+)\2([^>]*)>/gi, (all, before, quote, href, after) => {
+    const match = href.match(/^(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/p\/([^/?#]+)\.html(?:[?#].*)?$/i);
     if (!match) return all;
     let slug = match[1]; try { slug = decodeURIComponent(slug); } catch {}
     return `<a${before}href=${quote}${shellProductLink(slug)}${quote}${after}>`;
   });
-  body = body.replace(/<!-- stm-preserved-(\\d+) -->/g, (_m, i) => preserved[Number(i)]);
+  body = body.replace(/<!-- stm-preserved-(\d+) -->/g, (_m, i) => preserved[Number(i)]);
   return head.join('') + body;
 };
 
