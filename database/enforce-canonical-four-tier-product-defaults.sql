@@ -58,7 +58,7 @@ begin
     if tg_op = 'INSERT' then
       new.old_price := round(new.old_price / 50) * 50;
       if new.price is not null and new.old_price <= new.price then
-        new.old_price := null;
+        new.old_price := new.price + 50;
       end if;
     else
       b := floor(new.old_price / 100) * 100;
