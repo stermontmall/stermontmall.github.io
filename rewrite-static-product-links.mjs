@@ -4,7 +4,7 @@ import shellProductLink from './product-links.js';
 
 const SITE = 'https://stermontarcade.co.ke';
 const ROOTS = ['p', 'c', 'blog', 'guides', 'pest-control', 'services'];
-const ROOT_FILES = ['index.html', 'products.html'];
+const ROOT_FILES = readdirSync('.').filter(name => name.endsWith('.html') && name !== 'classic.html');
 const MARKER = '<!-- stm-shell-product-links:v1 -->';
 const PROTECTED = [
   /<head\b[^>]*>[\s\S]*?<\/head>/gi,
