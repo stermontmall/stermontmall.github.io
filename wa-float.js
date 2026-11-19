@@ -35,7 +35,7 @@
   if (/admin|upload-photos/.test(location.pathname)) return;
   var NUMBER = '254748888230';
   var page = document.title || 'your website';
-  var pathSlug = location.pathname.match(/^\\/p\\/([^/]+)\\.html$/i);
+  var pathSlug = location.pathname.match(/^\/p\/([^/]+)\.html$/i);
   var productLink = pathSlug && window.shellProductLink ? window.shellProductLink(decodeURIComponent(pathSlug[1])) : location.href;
   var msg = 'Hello Stermont Arcade, I would like to ask about stock and delivery for: ' + page + ' (' + productLink + ')';
   var a = document.createElement('a');
