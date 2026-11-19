@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import shellProductLink from './product-links.js';
 import { productDescriptionHtml } from './product-description-html.mjs';
 import { renderPost } from './seo-pest/blog-build.mjs';
+import { rewriteHtml } from './rewrite-static-product-links.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SEO_SURFACE_ALLOWLIST = [
@@ -26,6 +27,15 @@ const HUMAN_CLASSIC = /<a\b[^>]*\bhref\s*=\s*["'`][^"'`]*classic\.html|href\s*=\
 
 assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), SITE + '/?product=premise-200-sc-termiticide-50-ml');
 assert.equal(shellProductLink(''), SITE + '/');
+
+// The migration rewrites only customer anchors and protects the explicit SEO surfaces.
+const migrated = rewriteHtml('<html><head></head><body><a href="/p/demo-product.html">Product</a><nav class="bc"><a href="/p/breadcrumb.html">Breadcrumb</a></nav><!-- seo-links:start --><a href="/p/crawl-only.html">Crawler</a><!-- seo-links:end --><link rel="canonical" href="https://stermontarcade.co.ke/p/demo-product.html"></body></html>');
+assert.equal(migrated.replaced, 1);
+assert.match(migrated.html, /href="https:\\/\\/stermontarcade\\.co\\.ke\\/\\?product=demo-product"/);
+assert.match(migrated.html, /href="\\/p\\/breadcrumb\\.html"/);
+assert.match(migrated.html, /href="\\/p\\/crawl-only\\.html"/);
+assert.match(migrated.html, /rel="canonical" href="https:\\/\\/stermontarcade\\.co\\.ke\\/p\\/demo-product\\.html"/);
+assert.ok(migrated.html.includes(GENERATED_MARKER));
 
 // Exercise actual generated HTML renderers, not just a helper string.
 const description = productDescriptionHtml('Related item: [Premise 200 SC](/p/premise-200-sc-termiticide-50-ml.html).');
