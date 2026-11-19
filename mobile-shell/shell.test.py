@@ -615,7 +615,7 @@ with sync_playwright() as p:
     p15.locator('#chips [data-chip="phones-accessories"]').click()
     p15.wait_for_function("location.pathname === '/c/phones-accessories.html'", timeout=10000)
     p15.reload(); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href^="/p/"]')
-    check('top-level category reload restores the full shell category view', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and p15.locator('#grid .card[data-id]').count() >= 6 and p15.locator('#bottom-nav').is_visible(), p15.url)
+    check('top-level category reload restores its canonical static page with shell navigation', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and p15.locator('#stm-nav').count() == 1 and p15.locator('h1').count() >= 1 and p15.locator('#grid .card[data-id]').count() == 0, p15.url)
 
     p15.goto(f'{BASE}/?cat=garden-tools'); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
     check('sub-category deep link opens the selected category in the mobile shell', p15.locator('#grid-title').inner_text() == 'Garden Tools' and p15.locator('#grid .card[data-id]').count() > 0 and p15.url.endswith('/?cat=garden-tools'), p15.url)
