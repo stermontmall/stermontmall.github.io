@@ -262,7 +262,8 @@ window.addEventListener('popstate', e => {
   if (!stack.length && opener) { opener.focus?.({ preventScroll: true }); opener = null; }
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
-const DEEP = new URLSearchParams(location.search).get('product');   // /?product=<slug>: a shared or reloaded product address, opened after the catalog loads
+const PRODUCT_PATH = /^\/p\/([^/]+)\.html$/i.exec(location.pathname);
+const DEEP = new URLSearchParams(location.search).get('product') || (PRODUCT_PATH ? decodeURIComponent(PRODUCT_PATH[1]) : null);   // Shared query links and direct /p/<slug>.html pages open the same in-shell product view
 let deepOpen = false;   // the product page for DEEP has been opened (by the fast path in section 9b, or after the full catalog)
 /* /?cart=<product id>:<qty>,<product id>:<qty>: a shared cart link (the Share cart link button). The cart itself lives in each phone's own storage, so the link
    carries the lines. They are kept in sessionStorage until the catalog has added them, so a reload before that does not lose them. */
@@ -277,7 +278,8 @@ const CART_DEEP = (() => {
 })();
 const TAB_DEEP = CART_DEEP.length ? 'cart' : new URLSearchParams(location.search).get('tab');   // /?tab=cart|categories|deals|account: the bottom nav of the static pages (shell-chrome.js); a shared cart link opens the cart
 const Q_DEEP = (new URLSearchParams(location.search).get('q') || '').trim().slice(0, 80);   // /?q=<words>: the search box of the static pages
-const CAT_DEEP = new URLSearchParams(location.search).get('cat');   // /?cat=<slug>: a category (or sub-category) page address; /c/<slug>.html sends phones here
+const CATEGORY_PATH = /^\/c\/([^/]+)\.html$/i.exec(location.pathname);
+const CAT_DEEP = new URLSearchParams(location.search).get('cat') || (CATEGORY_PATH ? decodeURIComponent(CATEGORY_PATH[1]) : null);   // Query deep links and direct /c/<slug>.html pages open the in-shell category
 /* A reload keeps the tab the customer was on: the browser hands back the state of the current history entry, and every tab hop stores its tab in it
    (goTab). The first view is Home only for a fresh visit or an unknown tab. The tab is shown at the very end of this file, once the views exist. */
 const TABS = ['home', 'categories', 'deals', 'cart', 'account'];
@@ -285,7 +287,7 @@ const SAVED_TAB = (() => { try { const t = sessionStorage.getItem('shell.activeT
 const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab
   : (!DEEP && !CAT_DEEP && !Q_DEEP && TABS.includes(TAB_DEEP)) ? TAB_DEEP
   : (!DEEP && !CAT_DEEP && !Q_DEEP && SAVED_TAB) ? SAVED_TAB : 'home';
-history.replaceState({ tab: START_TAB, stack: [] }, '', (DEEP || CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname : undefined); // a reload lands on a clean base entry (no sheet), on the same tab
+history.replaceState({ tab: START_TAB, stack: [] }, '', (DEEP || CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname + (DEEP ? location.hash : '') : undefined); // Strip deep-link query parameters but retain a selected pack-size hash
 scrim.addEventListener('click', closeTop);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop(); });
 syncOverlays();
@@ -706,12 +708,15 @@ function openQuickBuy(id) {
   editingCartKey = '';
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
 }
-function openDeepLink(slug) {   // the full product page for a /?product=<slug> address (any pack size's slug works)
+function openDeepLink(slug) {   // the full product page for a /?product=<slug> or direct /p/<slug>.html address
   const hit = x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug);   // /p/<id>.html pages are named by the row id, which differs from the slug on some products
   const p = PRODUCTS.find(hit);
   if (!p) { toast('That product is no longer available'); return; }
+  let hashSize = '';
+  try { hashSize = decodeURIComponent(location.hash.replace(/^#/, '')); } catch { hashSize = location.hash.replace(/^#/, ''); }
+  const chosen = hashSize || slug;
   deepOpen = true;
-  qb.p = p; qb.size = (p.sizes.find(z => z.slug === slug || z.rowId === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
+  qb.p = p; qb.size = (p.sizes.find(z => z.slug === chosen || z.rowId === chosen) || p.sizes.find(z => z.slug === slug || z.rowId === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
   renderQB(); openProductPage();
 }
 /* FAST PATH for /?product=<slug> (owner 2026-11-08: the link must go straight to the product, not wait for the whole catalog).
