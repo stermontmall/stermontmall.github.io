@@ -1,6 +1,7 @@
 // Safe build-time HTML for the homepage's JavaScript-hydrated product grid.
 // Only explicit positive stock is eligible; the live shell replaces these fallback cards after hydration.
 const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const isOwnedImage = value => typeof value === 'string' && /^https:\/\/(?:stermontarcade\.co\.ke|oewvtbnmyombbtggamor\.supabase\.co)\//i.test(value);
 
 export function renderHomeGridFallback(products, { limit = 8 } = {}) {
   if (!Array.isArray(products) || !Number.isInteger(limit) || limit < 1) return '';
@@ -8,7 +9,7 @@ export function renderHomeGridFallback(products, { limit = 8 } = {}) {
     .filter(p => p && p.name && Number(p.stock) > 0 && Number(p.price) > 0 && /^\/p\/[a-z0-9][a-z0-9-]*\.html$/.test(String(p.href || '')))
     .slice(0, limit)
     .map((p, index) => {
-      const image = typeof p.image === 'string' && /^https:\/\//i.test(p.image)
+      const image = isOwnedImage(p.image)
         ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" ${index < 4 ? "loading=\"eager\"" : "loading=\"lazy\""} ${index === 0 ? "fetchpriority=\"high\"" : ""} decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff">`
         : '<span class="text-sm text-mute">Product details</span>';
       const price = Math.round(Number(p.price)).toLocaleString('en-KE');
