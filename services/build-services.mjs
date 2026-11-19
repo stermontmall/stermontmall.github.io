@@ -211,10 +211,10 @@ ${hero({
     lead: esc(s.short),
     priceHtml: `<div class="pricebox"><span>Typical price range</span><b>${priceTxt}</b><small>${esc(s.priceNote)}</small></div>`,
     cta: `<a class="btn light" href="${ask}">Get a quote on WhatsApp</a><a class="btn ghost" href="#faq">Common questions</a>`,
-    chips: ['Quote after inspection', 'Pay by M-Pesa', 'Nairobi and all 47 counties']
+    chips: ['Quote after inspection', 'Pay by M-Pesa', 'Nairobi and all 47 counties', '5 years of experience']
   })}
 ${s.intro.map(p => `<p>${esc(p)}</p>`).join('')}
-<section class="trust-note"><h2>Experienced service team</h2><p>Our team brings five years of hands-on experience across service enquiries and on-site work. We begin by understanding the property and the problem, explain the recommended scope, confirm availability and provide a quotation before work starts. The final method and schedule depend on site conditions and the agreed scope.</p></section>
+
 <h2>What is included</h2><ul class="checks">${s.included.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
 <h2>How it works</h2><ol class="steps">${s.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
 <h2>What decides the price</h2><ul class="checks">${s.priceFactors.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
