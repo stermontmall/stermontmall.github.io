@@ -34,15 +34,15 @@ const BRAND = 'Stermont Arcade';
 // Hand-written, model-specific buying guidance. Only add entries after checking the live catalogue description.
 const PRODUCT_CONTENT = existsSync('product-content.json') ? JSON.parse(readFileSync('product-content.json', 'utf8')) : {};
 // Real product brand for Google. Add more brands here any time; if none matches, the store name is used.
-const BRANDS = ['Alagzi', 'Kungu Nil', 'Greenlife', 'Zagro', 'Alonze', 'Pentagon', 'Absolute', 'Abasi', 'Hisense', 'Samsung', 'LG', 'Tecno', 'Infinix', 'Itel', 'Oppo', 'Xiaomi', 'Redmi', 'Apple', 'Nokia', 'Sony', 'JBL', 'TCL', 'Syinix', 'Vitron', 'Ramtons', 'Von', 'Mika', 'Nunix', 'Sayona', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Philips', 'Bruhm', 'Rockstar', 'Snake', 'Fumakilla', 'Moskill', 'Mos-Kill', 'Resolve'];
-const brandOf = name => { const n = ` ${String(name).toLowerCase()} `; const hit = BRANDS.filter(b => n.includes(` ${b.toLowerCase()} `)).sort((a, b) => b.length - a.length)[0]; return hit || BRAND; };
+const BRANDS = ['Alagzi', 'Kungu Nil', 'Greenlife', 'Zagro', 'Alonze', 'Pentagon', 'Absolute', 'Abasi', 'Actellic', 'Ailyons', 'AICO', 'Essie', 'Premier', 'Solo', 'Punisher', 'Rafiki', 'RodiRid', 'Hisense', 'Samsung', 'LG', 'Tecno', 'Infinix', 'Itel', 'Oppo', 'Xiaomi', 'Redmi', 'Apple', 'Nokia', 'Sony', 'JBL', 'TCL', 'Syinix', 'Vitron', 'Ramtons', 'Von', 'Mika', 'Nunix', 'Sayona', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Philips', 'Bruhm', 'Rockstar', 'Snake', 'Fumakilla', 'Moskill', 'Mos-Kill', 'Resolve'];
+const brandOf = name => { const n = ` ${String(name).toLowerCase()} `; return BRANDS.filter(b => n.includes(` ${b.toLowerCase()} `)).sort((a, b) => b.length - a.length)[0] || null; };
 const RETURNS = { '@type': 'MerchantReturnPolicy', applicableCountry: 'KE', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 2, url: 'https://stermontarcade.co.ke/returns.html' };
 // Delivery facts from shipping.html: all of Kenya, usually 1 to 3 days. The fee depends on location and is confirmed before payment, so no fixed rate is claimed here.
 const SHIPPING = { '@type': 'OfferShippingDetails', shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'KE' }, deliveryTime: { '@type': 'ShippingDeliveryTime', transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' } } };
 // Store facts match the live Nairobi pickup page and returns/shipping policies.
 const STORE_LD = {
   '@context': 'https://schema.org',
-  '@type': ['Store', 'OnlineStore'],
+  '@type': ['Store', 'OnlineStore', 'LocalBusiness'],
   '@id': `${SITE}/#store`,
   name: BRAND,
   url: SITE + '/',
@@ -55,13 +55,18 @@ const STORE_LD = {
     postalCode: '00800',
     addressCountry: 'KE'
   },
-  description: 'Sarit Centre, Westlands is a coordination and order-pickup point for confirmed orders by appointment; contact Stermont Arcade before visiting.',
+  description: 'Sarit Centre, Westlands is open daily 8 AM to 8 PM, walk-ins welcome; confirm stock on WhatsApp first.',
+  openingHoursSpecification: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(dayOfWeek => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: `https://schema.org/${dayOfWeek}`, opens: '08:00', closes: '20:00' })),
   areaServed: [{ '@type': 'City', name: 'Nairobi' }, { '@type': 'Country', name: 'Kenya' }],
   paymentAccepted: 'M-Pesa',
   currenciesAccepted: 'KES'
 };
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cleanSupplierCopy = value => String(value || '')
+  .replace(/(?:^|(?<=[.!?]\s))[^.!?]*(?:Agropests|the supplier|supplier(?:'s)?|sold by other suppliers)[^.!?]*[.!?]?/gi, ' ')
+  .replace(/Supplier\s*:\s*[^.\n]+[.]?/gi, ' ')
+  .replace(/\s{2,}/g, ' ').trim();
 const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
 const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; };
 const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
@@ -81,10 +86,9 @@ const offerValidFrom = r => {
 // The files are the same, so serve them from the main domain: one site for Google to index, nothing breaks if github.io is ever turned off.
 const OLD_HOST = /^https?:\/\/stermontmall\.github\.io\//i;
 const fixImg = u => (typeof u === 'string' ? u.replace(OLD_HOST, SITE + '/') : u);
-// Do not render known-missing legacy files as product photos. Keep the catalog rows active;
-// product pages fall back to the store identity until an exact, verified pack photo is uploaded.
-const MISSING_LEGACY_PRODUCT_PHOTO = /(?:acetochlor-50-ec-herbicide-1-litre|jade-premium-bio-pesticide-1-litre|one-touch-crop-protector-insecticide-250-ml|ortiva-250-sc-fungicide-1-litre|total-touch-250-sc-insecticide-1-litre|touchdown-herbicide-1-litre|tower-extreme-680-wg-fungicide-1-kg)\.(?:jpg|webp)$/i;
-const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.images) ? p.images : []).filter(u => typeof u === 'string' && !MISSING_LEGACY_PRODUCT_PHOTO.test(u)).map(fixImg) }));
+const isOwnedImage = u => typeof u === 'string' && /^https:\/\/(?:stermontarcade\.co\.ke|oewvtbnmyombbtggamor\.supabase\.co)\//i.test(u);
+// Only first-party product photography may appear in storefront templates. External supplier/marketplace images remain in the audit CSV until replaced with owned photos.
+const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.images) ? p.images : []).map(fixImg).filter(isOwnedImage) }));
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
@@ -139,7 +143,7 @@ h1{font-size:clamp(1.55rem,3vw,2.25rem);line-height:1.2;letter-spacing:-.035em;m
 .product-description h2,.product-content h2,.box h2{font-size:1.3rem;letter-spacing:-.02em;color:#172033}.desc{white-space:pre-line}
 .product-description-section{margin:1rem 0 0;padding:1.1rem 1.2rem;background:#fff;border:1px solid var(--line);border-left:4px solid #7c3aed;border-radius:14px}.product-description-section h3{margin:0 0 .55rem;color:var(--brand-dark);font-size:1.05rem;font-weight:850;line-height:1.35}.product-description-section p{margin:.35rem 0 .65rem;color:#374151;line-height:1.75}.product-description-section ul{margin:.35rem 0 .5rem;padding-left:1.25rem;list-style:disc}.product-description-section li{padding:.15rem 0 .3rem;line-height:1.65}.product-description-section:first-of-type{margin-top:.6rem}
 ul.g{list-style:none;padding:0;display:grid;gap:.8rem;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}ul.g img{display:block;width:100%;height:155px;aspect-ratio:1/1;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:.55rem}ul.g li{background:#fff;border:1px solid var(--line);border-radius:14px;padding:.8rem}ul.g a{text-decoration:none;font-weight:700;color:var(--ink)}ul.g span{display:block;color:var(--brand-dark);font-weight:850}
-.product-silo{margin:2rem 0;padding:clamp(1rem,2.5vw,1.5rem);background:#f1f5f9;border:1px solid #dbe3ed;border-radius:18px}.product-silo h2{margin:.1rem 0 .6rem;font-size:1.3rem}.product-silo h3{margin:1rem 0 .45rem;font-size:1rem}.product-silo p{color:#596579;margin:.35rem 0 .7rem}.silo-links{display:flex;flex-wrap:wrap;gap:.55rem}.silo-links a{display:inline-block;padding:.55rem .8rem;background:#fff;border:1px solid #dce3ec;border-radius:9px;text-decoration:none}.silo-products{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.7rem}.silo-products a{display:block;padding:.8rem;background:#fff;border:1px solid #e1e6ed;border-radius:12px;text-decoration:none;font-weight:700}.silo-products small{display:block;color:var(--brand-dark);margin-top:.25rem}.silo-guides{padding-left:1.2rem;line-height:1.9}.silo-guides a{font-weight:650}
+.product-silo{margin:2rem 0;padding:clamp(1rem,2.5vw,1.5rem);background:#f1f5f9;border:1px solid #dbe3ed;border-radius:18px}.product-silo h2{margin:.1rem 0 .6rem;font-size:1.3rem}.product-silo h3{margin:1rem 0 .45rem;font-size:1rem}.product-silo p{color:#596579;margin:.35rem 0 .7rem}.silo-links{display:flex;flex-wrap:wrap;gap:.55rem}.silo-links a{display:inline-block;padding:.55rem .8rem;background:#fff;border:1px solid #dce3ec;border-radius:9px;text-decoration:none}.silo-products{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.7rem}.silo-products a{display:flex;align-items:center;gap:.65rem;padding:.8rem;background:#fff;border:1px solid #e1e6ed;border-radius:12px;text-decoration:none;font-weight:700}.silo-product-card img,.silo-photo-pending{width:88px;height:88px;flex:0 0 88px;object-fit:contain;background:#fff;border-radius:8px}.silo-photo-pending{display:grid;place-items:center;color:#64748b;font-size:.75rem;text-align:center}.silo-products small{display:block;color:var(--brand-dark);margin-top:.25rem}.silo-guides{padding-left:1.2rem;line-height:1.9}.silo-guides a{font-weight:650}
 footer{max-width:1160px;margin:2rem auto;padding:1.2rem clamp(1rem,3vw,2rem);color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}.trustline{font-size:.88rem;line-height:1.7;font-weight:700;color:#166534;background:#f0fdf4;border-color:#bbf7d0;box-shadow:none}.stk{display:none}
 @media(max-width:759px){main{padding:1rem .85rem 7rem}.pg{gap:1rem;padding:.85rem;border-radius:18px}.pg>div:first-child>img{max-height:420px;border-radius:14px}h1{font-size:1.55rem}.stk{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;align-items:center;gap:.55rem;padding:.65rem .75rem calc(.65rem + env(safe-area-inset-bottom));background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-top:1px solid var(--line);box-shadow:0 -5px 22px rgba(15,23,42,.1)}.stk b{flex:1;min-width:0;font-size:.92rem;line-height:1.2;color:var(--brand-dark)}.stk b small{display:block;color:var(--ink);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stk a{flex:none;text-decoration:none;font-weight:800;border-radius:11px;padding:.7rem .8rem;background:var(--green);color:#fff}.stk a.call{background:#fff;color:var(--brand-dark);border:1.5px solid #c4b5fd;padding:.62rem .72rem}}
 @media(min-width:760px){.stk{display:none!important}}`;
@@ -156,7 +160,7 @@ ${path.startsWith('/p/') && og ? '<link rel="preload" as="image" href="' + esc(o
 <meta name="theme-color" content="#7c3aed"><style>${CSS}</style>${ld || ''}</head><body>
 <header><a href="${SITE}/">${BRAND}</a></header><main>${body}</main>
 <footer>${BRAND} · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 748 888 230</a>
-· <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/about.html">About</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns-warranty.html">Returns &amp; Warranty</a> · <a href="${SITE}/privacy-policy.html">Privacy</a> · <a href="${SITE}/terms.html">Terms</a></footer><script src="/img-protect.js" defer></script><script src="/analytics.js" defer></script></body></html>`;
+· <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/about.html">About</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns.html">Returns &amp; Warranty</a> · <a href="${SITE}/privacy-policy.html">Privacy</a> · <a href="${SITE}/terms.html">Terms</a></footer><script src="/img-protect.js" defer></script><script src="/analytics.js" defer></script></body></html>`;
 
 // Tidy names: drop any "| Stermont Arcade Kenya" / "| Buy in Kenya" tail (the page title adds its own wording).
 const tidy = n => String(n).replace(/\s*\|.*$/, '').replace(/\s+/g, ' ').trim();
@@ -515,12 +519,12 @@ rmSync('p', { recursive: true, force: true }); rmSync('c', { recursive: true, fo
 mkdirSync('p', { recursive: true }); mkdirSync('c', { recursive: true });
 const urls = [];
 
-const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(optimizedImageUrl(u, 320))}" alt="${esc(p.alt_text || (p.name + ' product photo'))}" width="160" height="150" loading="lazy" decoding="async">` : ''; };
+const thumb = p => { const u = (p.images || []).filter(isOwnedImage)[0]; return u ? `<img src="${esc(optimizedImageUrl(u, 320))}" alt="${esc(p.alt_text || (p.name + ' product photo'))}" width="160" height="150" loading="lazy" decoding="async">` : '<span class="product-photo-pending">Product photo coming soon</span>'; };
 const card = p => `<li data-name="${esc(p.name)}" data-price="${Math.max(0, Number(p.price) || 0)}"><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 // Helpful, category-specific buying checks. Avoid inventing product specifications, certifications or warranty terms.
 function productSiloHtml(p, cat, related) {
-  if (!cat) return related.length ? `<section class="product-silo"><h2>Related products</h2><div class="silo-products">${related.map(x => `<a href="/p/${encodeURIComponent(sl(x.id))}.html">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div></section>` : '';
+  if (!cat) return related.length ? `<section class="product-silo"><h2>Related products</h2><div class="silo-products">${related.slice(0, 6).map(x => { const photo = (x.images || []).find(isOwnedImage); return `<a class="silo-product-card" href="/p/${encodeURIComponent(sl(x.id))}.html">${photo ? `<img src="${esc(photo)}" alt="${esc(x.name)}" loading="lazy" decoding="async" width="120" height="120">` : '<span class="silo-photo-pending">Photo coming soon</span>'}<span>${esc(x.name)}<small>${money(x.price)}</small></span></a>`; }).join('')}</div></section>` : '';
   const parent = Object.entries(HUBS).find(([hubSlug, hub]) => hubSlug !== cat.slug && hub.kids.includes(cat.slug));
   const hubSlug = parent ? parent[0] : cat.slug;
   const hub = byCat[hubSlug] || byCat[cat.slug] || cat;
@@ -551,7 +555,7 @@ function productSiloHtml(p, cat, related) {
     <h3>Shop the main category</h3>
     <div class="silo-links"><a href="${hubUrl}">${esc(hub.name || cat.name)} in Kenya</a></div>
     ${children.length ? `<h3>Related categories</h3><div class="silo-links">${children.map(slug => `<a href="/c/${encodeURIComponent(slug)}.html">${esc(byCat[slug].name)}</a>`).join('')}</div>` : ''}
-    ${related.length ? `<h3>Related products</h3><div class="silo-products">${related.slice(0,6).map(x => `<a href="/p/${encodeURIComponent(sl(x.id))}.html">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div>` : ''}
+    ${related.length ? `<h3>Related products</h3><div class="silo-products">${related.slice(0, 6).map(x => { const photo = (x.images || []).find(isOwnedImage); return `<a class="silo-product-card" href="/p/${encodeURIComponent(sl(x.id))}.html">${photo ? `<img src="${esc(photo)}" alt="${esc(x.name)}" loading="lazy" decoding="async" width="120" height="120">` : '<span class="silo-photo-pending">Photo coming soon</span>'}<span>${esc(x.name)}<small>${money(x.price)}</small></span></a>`; }).join('')}</div>` : ''}
     ${guides.length ? `<h3>Helpful guides</h3><ul class="silo-guides">${guides.map(([url,label]) => `<li><a href="${url}">${esc(label)}</a></li>`).join('')}</ul>` : ''}
   </section>`;
 }
@@ -625,7 +629,7 @@ function productBuyingNotes(p, cat) {
 const NAMES = {};   // product id -> the heading its page shows; the shop list reads this (product-names.json) so list, view and page always carry the same wording
 const sitemapEligibleProductPaths = new Set(); // only explicitly in-stock product pages enter the product sitemap
 for (const p of products) {
-  const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean).map(u => optimizedImageUrl(u, 900));
+  const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(isOwnedImage).map(u => optimizedImageUrl(u, 900));
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
   if (Number(p.stock) > 0) sitemapEligibleProductPaths.add(path);
   const revs = reviewsFor(p), rLd = reviewLd(revs);
@@ -634,10 +638,11 @@ for (const p of products) {
   const ctx = { brand: brandOf(p.name), catSlug: cat?.slug };
   const approvedName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
   const generatedTitle = pdpTitle(p.name, ctx);
-  const generatedDescription = pdpDescription(p.name, ctx, p.description);
+  const cleanDescription = cleanSupplierCopy(p.description);
+  const generatedDescription = pdpDescription(p.name, ctx, cleanDescription);
   const title = String(p.meta_title || p.seo_title || generatedTitle).trim();
   // Prefer stored snippets only when they are complete sentences. Legacy imports often stored 155-character cut-offs or visible section labels.
-  const storedDescription = String(p.meta_description || '').trim();
+  const storedDescription = cleanSupplierCopy(p.meta_description || '');
   const storedDescriptionIsClean = storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(storedDescription);
   const desc = storedDescriptionIsClean ? storedDescription : generatedDescription;
   const h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
@@ -656,16 +661,17 @@ for (const p of products) {
     return Array.from({ length: Math.min(6, list.length - 1) }, (_, k) => list[(i + 1 + k) % list.length]);
   })();
   const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} (${money(p.price)}) ${SITE}${path}`)}`;
-  const packLabel = p.unit || (p.variants?.length ? p.variants.map(v => v.variant_label).join(', ') : 'confirm pack size');
+  const displayUnit = /^(?:piece|pieces|pc|pcs)$/i.test(String(p.unit || '').trim()) ? '' : String(p.unit || '').trim();
+  const packLabel = displayUnit || (p.variants?.length ? p.variants.map(v => v.variant_label).join(', ') : 'confirm pack size');
   const stickyWa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order ${p.name}. Pack size: ${packLabel}. Price: KES ${Math.round(Number(p.price) || 0).toLocaleString('en-KE')}. Please confirm availability and delivery.`)}`;
   const cartUrl = `/?product=${encodeURIComponent(sl(p.id))}`;
-  const askLines = [`Hello ${BRAND}, I would like to enquire about this item:`, '', `Product: ${p.name}`, `Price: ${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ' / ' + p.unit : ''}`,
+  const askLines = [`Hello ${BRAND}, I would like to enquire about this item:`, '', `Product: ${p.name}`, `Price: ${p.variants ? 'From ' : ''}${money(p.price)}${displayUnit ? ' / ' + displayUnit : ''}`,
     ...(p.variants ? [`Sizes: ${p.variants.map(v => v.variant_label).join(', ')}`] : []), `Availability: ${inStock ? 'In stock' : 'Currently sold out'}`, ...(cat ? [`Category: ${cat.name}`] : []), `Ref: ${p.id}`, `Link: ${SITE}${path}`, '', 'Please confirm availability and the delivery fee to my location.'];
   const ask = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(askLines.join('\n'))}`;
   const ldOne = jsonLd({
     '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
-    description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.id), category: cat?.name,
-    brand: { '@type': 'Brand', name: brandOf(p.name) }, ...productIdentifiers(p),
+    description: clip(cleanDescription, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.id), category: cat?.name,
+    ...(brandOf(p.name) ? { brand: { '@type': 'Brand', name: brandOf(p.name) } } : {}), ...productIdentifiers(p),
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: Number(Math.round(Number(p.price) || 0)),
       availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), validFrom: offerValidFrom(p), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
       seller: { '@id': `${SITE}/#store` } },
@@ -673,11 +679,11 @@ for (const p of products) {
   });
   const ldGroup = p.variants ? jsonLd({
     '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
-    description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, category: cat?.name, brand: { '@type': 'Brand', name: brandOf(p.name) }, ...rLd,
+    description: clip(cleanDescription, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, category: cat?.name, ...(brandOf(p.name) ? { brand: { '@type': 'Brand', name: brandOf(p.name) } } : {}), ...rLd,
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label, ...productIdentifiers(v),
       // Merchant Listings wants a description on every variant: use the pack's own text, else the product's, else the same generic line as the group.
-      description: clip(v.description, 500) || clip(p.description, 500) || `Buy ${p.name} – ${v.variant_label} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`,
-      image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
+      description: clip(cleanSupplierCopy(v.description), 500) || clip(cleanDescription, 500) || `Buy ${p.name} – ${v.variant_label} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`,
+      image: (v.images || []).filter(isOwnedImage).length ? (v.images || []).filter(isOwnedImage) : undefined,
       offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: Number(Math.round(Number(v.price) || 0)),
         availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), validFrom: offerValidFrom(v), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
         seller: { '@id': `${SITE}/#store` } } }))
@@ -688,35 +694,31 @@ for (const p of products) {
   const sizeBox = p.variants ? `<div class="box"><h2 style="margin-top:0">Available sizes</h2><ul class="g">${p.variants.map(v => {
     const w = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} \u2013 ${v.variant_label} (${money(v.price)}) ${pdpVariantUrl(path, v.slug, p.slug)}`)}`;
     return `<li>${esc(v.variant_label)}<span>${money(v.price)}</span><small class="${inS(v) ? 'ok' : 'no'}">${inS(v) ? 'In stock' : 'Sold out'}</small>${inS(v) ? ` <a href="${esc(w)}">Order on WhatsApp</a>` : ''}</li>`; }).join('')}</ul></div>` : '';
-  // Local-utility sections (H2s): what it is used for, price and M-Pesa ordering, delivery and Sarit Centre pickup. Facts match shipping.html and nairobi.html.
-  const nameE = esc(p.name), priceTxt = `${p.variants ? 'from ' : ''}${money(p.price)}${p.unit ? ' / ' + esc(p.unit) : ''}`;
+  // Keep product-specific use guidance here; shared delivery and ordering details live on /shipping.html.
   const usesTxt = isPcpb(cat?.slug)
     ? `Use ${nameE} only as directed on the product label: check the listed target, approved use, application rate and interval. Follow the specified protective equipment and keep children, pets and food away where the label requires it.${isPest(cat?.slug) ? ' Looking for help with kunguni, mchwa, mende, mbu or panya?' : ''} Not sure it fits your problem? <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> before you order.`
     : productType(cat?.slug) === 'farm'
       ? `Check the pack for the intended crop, animal species or farm use, and follow its stated application, feeding or handling directions. Do not guess rates or combine products without qualified advice. <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> if you need help confirming suitability.`
       : `Check the product details, exact model or size and the manufacturer's instructions before use. Confirm that it suits your intended setup and any accessories or compatibility requirements. <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> if you need help checking a detail.`;
-  const seoBoxes = `${hd.uses ? `<div class="box"><h2 style="margin-top:0">${esc(hd.uses)}</h2><p>${usesTxt}</p></div>` : ''}
-<div class="box"><h2 style="margin-top:0">${esc(hd.price)}</h2><p>${nameE} costs <b>${priceTxt}</b> at ${BRAND}${inStock ? ' and is in stock' : ', but is currently sold out, so ask us when it is back'}. Add it to your cart, pay by M-Pesa and enter the M-Pesa code from your SMS, or <a href="${esc(inStock ? wa : ask)}" rel="noopener">order on WhatsApp</a>. Buying in bulk? Message us for a quote.</p></div>
-<div class="box"><h2 style="margin-top:0">${esc(hd.delivery)}</h2><p>Orders to Nairobi usually arrive the same day or the next day, and the other counties usually within 1 to 3 days. We confirm the delivery fee for your location before you pay. Prefer store pickup? Collect at The Sarit Centre, Karuna Road, Westlands, available for confirmed orders by appointment; contact us before visiting. See <a href="/shipping.html">shipping</a> and <a href="/nairobi.html">Nairobi delivery and pickup</a>.</p></div>`;
-  const catalogDescription = String(p.description || '').trim();
+  const seoBoxes = `${hd.uses ? `<div class="box"><h2 style="margin-top:0">${esc(hd.uses)}</h2><p>${usesTxt}</p></div>` : ''}<div class="box shared-order-info"><p>Need help before ordering? <a href="${esc(ask)}" rel="noopener">Confirm product details and availability on WhatsApp</a>, then review <a href="/shipping.html">delivery and pickup information</a>.</p></div>`;
+  const catalogDescription = cleanSupplierCopy(p.description);
   const detailFallback = 'This listing is for ' + p.name + ' in the ' + (cat?.name || 'Stermont Arcade') + ' category. Check the exact model, pack size or variant and the specifications shown on this page before ordering. If a detail is not listed, contact Stermont Arcade to confirm it. Current availability and delivery charges are confirmed before payment.';
   const productDescription = catalogDescription.length >= 100 ? catalogDescription : [catalogDescription, detailFallback].filter(Boolean).join(' ');
-  const buyerNotes = productBuyingNotes(p, cat);
   const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
 <div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.alt_text || (p.name + ' - product photo'))}" fetchpriority="high" loading="eager" decoding="async" width="720" height="720" data-fallbacks="${esc(JSON.stringify(img.slice(1)))}">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
-<div><h1>${esc(h1)}</h1><p class="tagline" style="margin:.1rem 0 .6rem;color:#5b21b6;font-weight:600">${esc(tagline)}</p><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
+<div><h1>${esc(h1)}</h1><p class="tagline" style="margin:.1rem 0 .6rem;color:#5b21b6;font-weight:600">${esc(tagline)}</p><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${displayUnit ? ` <small>/ ${esc(displayUnit)}</small>` : ''}</div>
 <p class="${inStock ? 'ok' : 'no'}">${inStock ? 'In stock' : 'Currently sold out'}</p>
-<p>Buy ${esc(p.name)} online in Kenya from ${BRAND}. Pay by M-Pesa and get delivery to all 47 counties.</p>
+
 <a class="btn" href="${esc(wa)}">Order on WhatsApp</a><a class="btn alt" href="${esc(cartUrl)}">Add to Cart / Pay with M-Pesa</a>
-<div class="box trustline" aria-label="Shopping and delivery assurances">✓ Instant M-Pesa Checkout • ✓ Coordinated via Westlands Office • ✓ Same-Day Nairobi Delivery &amp; Sarit Centre Pickup • ✓ 47-County Shipping</div></div></div>
+</div></div>
 ${sizeBox}
 ${`<div class="box product-description"><h2 style="margin-top:0">About ${esc(p.name)}</h2>${productDescriptionHtml(productDescription)}</div>`}
 ${productContentHtml(p)}
 ${seoBoxes}
-${buyerNotes}
+
 ${revs.length ? `<div class="box"><h2 style="margin-top:0">Customer reviews (${(revs.reduce((a, r) => a + Number(r.rating), 0) / revs.length).toFixed(1)} / 5 from ${revs.length})</h2>${revs.slice(0, 10).map(r => `<p><b>${'\u2605'.repeat(r.rating)}${'\u2606'.repeat(5 - r.rating)}</b> ${esc(r.reviewer || 'Customer')}${r.body ? '<br>' + esc(r.body) : ''}</p>`).join('')}</div>` : ''}
 ${productSiloHtml(p, cat, related)}
-<div class="stk" role="complementary" aria-label="Order this product"><a class="call" href="${esc(inStock ? stickyWa : ask)}">Order via WhatsApp</a><a href="${esc(cartUrl)}">Add to Cart / Pay with M-Pesa</a></div>`;
+<div class="stk" role="complementary" aria-label="Order this product">${inStock ? `<a class="call" href="${esc(stickyWa)}">Order via WhatsApp</a><a href="${esc(cartUrl)}">Add to Cart / Pay with M-Pesa</a>` : `<span class="no">Currently sold out — <a href="${esc(ask)}">ask about restocking</a></span>`}</div>`;
   writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, og: img[0], body, ld, ogType: 'product', extra: `<meta name="stm-id" content="${esc(p.id)}"><meta name="stm-seo" content="v2"><meta property="product:price:amount" content="${Math.round(Number(p.price) || 0)}"><meta property="product:price:currency" content="KES"><meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` }));
   urls.push(path);
 }
@@ -733,15 +735,17 @@ for (const [slug, c] of Object.entries(byCat)) {
   const title = info.title || c.meta_title || catTitle(c.name);   // approved category metadata takes precedence over generated fallback
   const desc = info.desc || c.meta_description || catDescription(c.name, slug);
   const categoryIntro = buildCategoryIntro(c, info.intro || c.description || 'Browse the products listed below and compare the exact model, pack size or variant before ordering.');
+  const visibleItems = HUBS[slug] ? c.items.slice(0, 36) : c.items;
+  const categoryIntroHtml = categoryIntro.split(/\n\s*\n/).filter(Boolean).map(paragraph => '<p>' + esc(paragraph) + '</p>').join('');
   const categoryFaq = buildCategoryFaq(c, info.faq || []);
   const helpCta = isPest(slug) ? '<div class="box"><b>Need help choosing a pest-control product?</b><p>Tell us the pest, treatment site and pack size you are considering. We can help confirm the product listing, stock and delivery fee before you order.</p><a class="btn" href="https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent('Hello Stermont Arcade, please help me choose a ' + c.name.toLowerCase() + ' product. Please confirm its listed use, pack size, stock and delivery fee.') + '">Ask on WhatsApp</a></div>' : '';
   const serviceCrosslink = isPest(slug) ? '<div class="box"><b>Need professional pest-control help?</b><p>Read our service information for treatment options, inspection questions and how to request a quote.</p><a href="/services/">Explore pest-control services</a> · <a href="/services/pests/termites.html">Termite information</a> · <a href="/services/pests/bed-bugs.html">Bed bug information</a></div>' : '';
-  const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: c.items.slice(0, 50).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
+  const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: c.name, itemListElement: visibleItems.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   const categoryFaqHtml = '<section class="category-faq"><h2>Frequently asked questions</h2>' + categoryFaq.map(([q, a]) => '<details><summary>' + esc(q) + '</summary><p>' + esc(a) + '</p></details>').join('') + '</section>';
   const categoryTools = '<style>.category-tools{display:grid;grid-template-columns:2fr 1fr 1fr;gap:.65rem;margin:1.1rem 0;padding:1rem;border:1px solid #e6e1f5;border-radius:12px;background:#fff}.category-tools label{display:grid;gap:.3rem;font-weight:700;font-size:.85rem}.category-tools input,.category-tools select{width:100%;min-width:0;padding:.7rem;border:1px solid #cfc7df;border-radius:8px;font:inherit}.category-result-count{color:#625b70;font-size:.9rem;margin:.35rem 0 .75rem}.category-faq details{padding:.85rem 0;border-bottom:1px solid #e6e1f5}.category-faq summary{cursor:pointer;font-weight:750}.category-faq p{margin:.45rem 0;line-height:1.65}@media(max-width:620px){.category-tools{grid-template-columns:1fr 1fr}.category-tools label:first-child{grid-column:1/-1}}</style><section class="category-tools" aria-label="Quick-buying filters"><label>Search products<input id="category-search" type="search" placeholder="Search this category" autocomplete="off"></label><label>Maximum price (KES)<input id="category-price" type="number" min="0" step="1" inputmode="numeric" placeholder="No maximum"></label><label>Sort by<select id="category-sort"><option value="default">Recommended</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></label></section><p class="category-result-count" id="category-result-count" aria-live="polite"></p>';
   const categoryFilterScript = '<script>(function(){var list=document.getElementById("category-products");if(!list)return;var cards=Array.prototype.slice.call(list.querySelectorAll("li[data-price]"));var search=document.getElementById("category-search"),price=document.getElementById("category-price"),sort=document.getElementById("category-sort"),count=document.getElementById("category-result-count");if(!search||!price||!sort||!count)return;function apply(){var q=(search.value||"").toLowerCase().trim(),max=price.value===""?Infinity:Number(price.value);cards.forEach(function(card){var name=(card.getAttribute("data-name")||card.textContent).toLowerCase(),amount=Number(card.getAttribute("data-price")||0),matchName=!q||name.indexOf(q)!==-1,matchPrice=!Number.isFinite(max)||amount<=max;card.hidden=!(matchName&&matchPrice)});var visible=cards.filter(function(card){return !card.hidden});if(sort.value==="low"||sort.value==="high"){visible.sort(function(a,b){var d=Number(a.dataset.price)-Number(b.dataset.price);return sort.value==="low"?d:-d}).forEach(function(card){list.appendChild(card)})}else{cards.forEach(function(card){list.appendChild(card)})}count.textContent=visible.length+" of "+cards.length+" products shown"}search.addEventListener("input",apply);price.addEventListener("change",apply);sort.addEventListener("change",apply);apply()})();</script>';
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
-<p>${esc(categoryIntro)}</p>${categoryTools}<p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or ask about pickup at Sarit Centre, Westlands. Delivery fees are confirmed before payment.</p>${helpCta}${serviceCrosslink}<ul class="g" id="category-products">${c.items.map(card).join('')}</ul>
+${categoryIntroHtml}${categoryTools}<p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or visit Sarit Centre, Westlands, open daily 8 AM to 8 PM, walk-ins welcome; confirm stock on WhatsApp first.</p>${helpCta}${serviceCrosslink}<ul class="g" id="category-products">${visibleItems.map(card).join('')}</ul>
 ${categoryFilterScript}
 ${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
 ${info.guide || ''}
@@ -755,7 +759,7 @@ ${categoryFaqHtml}
     const destination = `${SITE}${legacyDestination}`;
     writeFileSync(`.${oldPath}`, `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Category moved | ${BRAND}</title><link rel="canonical" href="${destination}"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0; url=${legacyDestination}"></head><body><p>This category has moved. <a href="${legacyDestination}">Continue to Stermont Arcade</a>.</p><script>window.location.replace(${JSON.stringify(legacyDestination)})</script></body></html>`);
   }
-  const robots = c.items.length < 5 ? 'noindex, follow' : 'index, follow, max-image-preview:large';
+  const robots = visibleItems.length < 5 ? 'noindex, follow' : 'index, follow, max-image-preview:large';
   writeFileSync(`.${path}`.replace(/%[0-9A-F]{2}/gi, m => decodeURIComponent(m)), shell({ title, desc, path, body, robots, ld: ld + faqLd + crumbLd([['Home', SITE + '/'], [c.name, SITE + path]]) }));
   urls.push(path);
 }
@@ -815,7 +819,7 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
     feed.push(`<item><g:id>${esc(p.id)}</g:id><title>${esc(title)}</title><description>${esc(clip(p.description, 4000) || `${title} available at ${BRAND}, Kenya. Pay by M-Pesa, delivery to all 47 counties.`)}</description>
 <link>${esc(page)}</link><g:image_link>${esc(imgs[0])}</g:image_link>${imgs.slice(1, 10).map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('')}
 <g:availability>${inS(p) ? 'in_stock' : 'out_of_stock'}</g:availability>${old > price ? `<g:price>${old} KES</g:price><g:sale_price>${price} KES</g:sale_price>` : `<g:price>${price} KES</g:price>`}
-<g:brand>${esc(brandOf(p.name))}</g:brand><g:condition>new</g:condition><g:identifier_exists>no</g:identifier_exists>${p.categories?.name ? `<g:product_type>${esc(p.categories.name)}</g:product_type>` : ''}${grouped ? `<g:item_group_id>${esc(p.variant_group)}</g:item_group_id>` : ''}</item>`);
+<g:brand>${esc((brandOf(p.name) || BRAND))}</g:brand><g:condition>new</g:condition><g:identifier_exists>no</g:identifier_exists>${p.categories?.name ? `<g:product_type>${esc(p.categories.name)}</g:product_type>` : ''}${grouped ? `<g:item_group_id>${esc(p.variant_group)}</g:item_group_id>` : ''}</item>`);
   }
   writeFileSync('merchant-feed.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0"><channel><title>${BRAND}</title><link>${SITE}/</link><description>${BRAND} product feed</description>\n${feed.join('\n')}\n</channel></rss>\n`);
   console.log(`Merchant feed: ${feed.length} items.`);
