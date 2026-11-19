@@ -52,7 +52,7 @@
     }
 
     function slugFromPath(p) { var m = /\/p\/([^\/?#]+)\.html/.exec(p || ''); return m ? m[1] : ''; }
-    function shellUrl(slug) { return OK.test(slug || '') ? BASE + '/?product=' + slug : ''; }
+    function shellUrl(slug) { return OK.test(slug || '') ? (window.shellProductLink ? window.shellProductLink(slug, BASE) : BASE + '/?product=' + encodeURIComponent(slug)) : ''; }
 
     function update() {
       try {
