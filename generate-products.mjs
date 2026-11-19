@@ -148,7 +148,7 @@ footer{max-width:1160px;margin:2rem auto;padding:1.2rem clamp(1rem,3vw,2rem);col
 @media(min-width:760px){.stk{display:none!important}}`;
 
 const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '', robots = 'index, follow, max-image-preview:large' }) => `<!doctype html>
-<html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en-KE"><head><!-- stm-shell-product-links:v1 --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${SITE}${path}"><meta name="robots" content="${esc(robots)}">
 <script>(function(){var q=new URLSearchParams(location.search);if(["search","sort","filter"].some(function(k){return q.has(k)})){var m=document.querySelector('meta[name="robots"]');if(m)m.setAttribute("content","noindex,follow");}})();</script>
