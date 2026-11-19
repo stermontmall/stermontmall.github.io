@@ -225,7 +225,7 @@ const catSlugOf = (chip, sub) => {   // slug of the open category or sub-categor
   if (sub) { const top = CATROWS.find(x => !x.parent_id && x.slug === chip), s = top && CATROWS.find(x => x.parent_id === top.id && x.name === sub); if (s) return s.slug; }
   return chip;
 };
-const catUrl = () => { const s = store.get(), z = s.tab === 'home' && !s.q ? catSlugOf(s.chip, s.sub) : ''; return z && /^[A-Za-z0-9._~-]+$/.test(z) ? '/c/' + z + '.html' : '/'; };
+const catUrl = () => { const s = store.get(), z = s.tab === 'home' && !s.q ? catSlugOf(s.chip, s.sub) : ''; if (!z || !/^[A-Za-z0-9._~-]+$/.test(z)) return '/'; return s.sub ? '/?cat=' + encodeURIComponent(z) : '/c/' + z + '.html'; };
 const catTitle = () => { const s = store.get(), z = catUrl() !== '/' ? (s.sub || (CATS.find(c => c.id === s.chip) || {}).name) : ''; return z ? z + ' | Stermont Arcade' : BASE_TITLE; };
 function syncProductMeta() {   // tab title + address follow the open product (and the chosen size), else the open category; both return to normal when nothing is open
   const open = qb.p && stack.some(id => PRODUCT_OVERLAYS.includes(id));
@@ -235,6 +235,11 @@ function syncProductMeta() {   // tab title + address follow the open product (a
   if (open) { const u = productUrl(); if (u && location.pathname + location.search + location.hash !== u) history.replaceState(history.state, '', u); }
   else if (cu !== '/') { if (location.pathname + location.search + location.hash !== cu) history.replaceState(history.state, '', cu); }
   else if (/^\/c\/[^/]+\.html$/.test(location.pathname)) history.replaceState(history.state, '', '/');   // only an address this code set is reset: other parameters (campaign tags) stay
+  else if (location.pathname === '/' && new URLSearchParams(location.search).has('cat')) {
+    const params = new URLSearchParams(location.search); params.delete('cat');
+    const rest = params.toString();
+    history.replaceState(history.state, '', '/' + (rest ? '?' + rest : '') + location.hash);
+  }
 }
 function openOverlay(id) {
   if (stack.includes(id)) return;
