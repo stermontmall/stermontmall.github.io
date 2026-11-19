@@ -158,7 +158,7 @@ ${path.startsWith('/p/') && og ? '<link rel="preload" as="image" href="' + esc(o
 <meta name="theme-color" content="#7c3aed"><style>${CSS}</style>${ld || ''}</head><body>
 <header><a href="${SITE}/">${BRAND}</a></header><main>${body}</main>
 <footer>${BRAND} · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 748 888 230</a>
-· <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/about.html">About</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns-warranty.html">Returns &amp; Warranty</a> · <a href="${SITE}/privacy-policy.html">Privacy</a> · <a href="${SITE}/terms.html">Terms</a></footer><script src="/img-protect.js" defer></script><script src="/analytics.js" defer></script></body></html>`;
+· <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/about.html">About</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns-warranty.html">Returns &amp; Warranty</a> · <a href="${SITE}/privacy-policy.html">Privacy</a> · <a href="${SITE}/terms.html">Terms</a></footer><script src="/product-links.js" defer></script><script src="/img-protect.js" defer></script><script src="/analytics.js" defer></script></body></html>`;
 
 // Tidy names: drop any "| Stermont Arcade Kenya" / "| Buy in Kenya" tail (the page title adds its own wording).
 const tidy = n => String(n).replace(/\s*\|.*$/, '').replace(/\s+/g, ' ').trim();
