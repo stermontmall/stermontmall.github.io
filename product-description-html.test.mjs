@@ -138,9 +138,9 @@ ok(!/<p>&amp; Key Benefits<\/p>/.test(comparingHtml), 'overview suffix is not re
 
 // Legacy category links embedded in product descriptions are rewritten to current, generated /c/ routes.
 const legacyCategoryLinks = productDescriptionHtml('BUYING GUIDE\\nCompare related listings: [Agrovet category](https://stermontarcade.co.ke/category/agrovet), [Seeds & Seedlings](/category/seeds-seedlings), [Fertilizers](https://stermontarcade.co.ke/category/fertilizers), [Farm & Garden Tools](/category/farm-garden-tools) and [Sprayers & Equipment](/category/sprayers-equipment).');
-ok(/href="\\/c\\/agrovet\\.html"/.test(legacyCategoryLinks), 'absolute legacy category URLs use the generated /c/ route');
-ok(/href="\\/c\\/seeds-seedlings\\.html"/.test(legacyCategoryLinks), 'relative legacy category URLs use the generated /c/ route');
-ok(/href="\\/c\\/fertilizers\\.html"/.test(legacyCategoryLinks), 'absolute legacy fertilizer URLs use the generated /c/ route');
-ok(/href="\\/c\\/farm-garden-tools\\.html"/.test(legacyCategoryLinks), 'farm and garden tool links use the generated /c/ route');
-ok(/href="\\/c\\/sprayers-equipment\\.html"/.test(legacyCategoryLinks), 'sprayer category links use the generated /c/ route');
+ok(/href="\/c\/agrovet\.html"/.test(legacyCategoryLinks), 'absolute legacy category URLs use the generated /c/ route');
+ok(/href="\/c\/seeds-seedlings\.html"/.test(legacyCategoryLinks), 'relative legacy category URLs use the generated /c/ route');
+ok(/href="\/c\/fertilizers\.html"/.test(legacyCategoryLinks), 'absolute legacy fertilizer URLs use the generated /c/ route');
+ok(/href="\/c\/farm-garden-tools\.html"/.test(legacyCategoryLinks), 'farm and garden tool links use the generated /c/ route');
+ok(/href="\/c\/sprayers-equipment\.html"/.test(legacyCategoryLinks), 'sprayer category links use the generated /c/ route');
 ok(!legacyCategoryLinks.includes('/category/'), 'rendered product copy contains no obsolete category routes');
