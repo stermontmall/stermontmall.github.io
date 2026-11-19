@@ -241,10 +241,12 @@ function syncProductMeta() {   // tab title + address follow the open product (a
     history.replaceState(history.state, '', '/' + (rest ? '?' + rest : '') + location.hash);
   }
 }
-function openOverlay(id) {
+function openOverlay(id, replace = false) {
   if (stack.includes(id)) return;
   stack.push(id);
-  history.pushState({ tab: store.get().tab, stack: [...stack] }, '', PRODUCT_OVERLAYS.includes(id) ? productUrl() : undefined);
+  const state = { tab: store.get().tab, stack: [...stack] };
+  const url = PRODUCT_OVERLAYS.includes(id) ? productUrl() : undefined;
+  if (replace) history.replaceState(state, '', url); else history.pushState(state, '', url);
   syncOverlays(); syncProductMeta();
   const el = $('#' + id); const f = el.querySelector('button,input'); if (f) f.focus({ preventScroll: true });
 }
@@ -658,7 +660,7 @@ async function renderPP() {
   if (!pp.img && imgs[0]) $('#pp-img').innerHTML = thumb({ img: imgs[0], emoji: p.emoji }, true);
   $('#pp-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-pp-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: p.emoji })}</button>`).join('') : '';
 }
-function openProductPage() { if (!qb.p) return; editingCartKey = ''; pp.img = ''; renderPP(); $('#pp-body').scrollTop = 0; openOverlay('page-product'); }
+function openProductPage(fromDeepLink = false) { if (!qb.p) return; editingCartKey = ''; pp.img = ''; renderPP(); $('#pp-body').scrollTop = 0; openOverlay('page-product', fromDeepLink); }
 $('#qb-page').addEventListener('click', e => { e.preventDefault(); openProductPage(); });   // the href stays as a fallback (new tab / no script)
 document.addEventListener('click', e => {
   const t = e.target; let el;
@@ -712,7 +714,7 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
   if (!p) { toast('That product is no longer available'); deepOpen = false; qb.p = null; try { history.replaceState(null, '', '/'); } catch (e) {} syncProductMeta(); return; }
   deepOpen = true;
   qb.p = p; qb.size = (p.sizes.find(z => z.slug === slug || z.rowId === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
-  renderQB(); openProductPage();
+  renderQB(); openProductPage(true);
 }
 /* FAST PATH for /?product=<slug> (owner 2026-11-08: the link must go straight to the product, not wait for the whole catalog).
    It reads only what that one product needs: its row, the other rows of its pack-size group, the (small) category list and product-names.json, in parallel with
