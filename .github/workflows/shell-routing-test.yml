@@ -29,5 +29,5 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 20
-      - name: Verify product/category pages open in the mobile shell for all visitors
+      - name: Verify product/category pages never redirect visitors or crawlers
         run: node seo-shell-chrome.test.mjs

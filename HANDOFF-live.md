@@ -1,3 +1,19 @@
+## 2026-11-19 16:10 (Africa/Nairobi) - Visitor redirect removed in the generator (branch wip-remove-visitor-redirect)
+- Done: `seo-shell-chrome.mjs` no longer adds the `stm-early` redirect and strips it from pages on rebuild; `seo-shell-chrome.test.mjs`, 9 route checks in `mobile-shell/shell.test.py` and the `shell-routing-test.yml` step name now expect NO redirect (own address kept, `#stm-bar`/`#stm-nav` shell look). Generated pages not hand-edited.
+- Tested locally: `seo-shell-chrome.test.mjs`, `no-classic-hop.test.mjs`, `home-grid-ssr.test.mjs` pass; shell.test.py 176 PASS, only FAIL is "no console/page errors" from sandbox network (ERR_TUNNEL_CONNECTION_FAILED). After fixture prep, generated product pages have 0 `stm-early`.
+- Next: open PR from this branch to main, let the quality gate run, merge, then `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main` to rebuild pages. PR #970 should be closed or reworked (its purpose was the redirect). Then check Search Console URL Inspection on a few /p/ pages.
+- Left (separate project, owner decision): in-place shell on /p/ addresses.
+
+---
+
+## 2026-11-19 15:50 (Africa/Nairobi) - URGENT finding: main already redirects every visitor (incl. Googlebot) from /p/ and /c/
+- `origin/main` (adf669f, 11:33) generated pages contain the `<!--stm-early-->` `location.replace` script (checked `p/zinc-sulphate-fertilizer-25kg.html`). So the redirect from PR #970's line of work is already live, not just in the PR.
+- Decision (owner: "use your professional experience"): remove the visitor redirect, keep the shell look on static pages (`shell-chrome.js`: `#stm-bar` + `#stm-nav`, no redirect). `/?product=<slug>` links still open the full shell (owner product-link rule unchanged).
+- Branch `wip-remove-visitor-redirect` (from main). Edit generator `seo-shell-chrome.mjs` (strip EARLY, never add), update `seo-shell-chrome.test.mjs`, `mobile-shell/shell.test.py` route checks, workflow step name in `shell-routing-test.yml`. Do NOT hand-edit generated pages: after merge, run `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+- Test: `node seo-shell-chrome.test.mjs && node seo-shell-chrome.mjs && python3 mobile-shell/shell.test.py`.
+
+---
+
 ## 2026-11-19 08:02 (Africa/Nairobi) — Fix stale product-category links and improve high-opportunity snippets
 - Done (branch `wip-fix-stale-category-links`, PR #903): `product-description-html.mjs` now rewrites legacy Markdown links from `/category/<slug>` to the current `/c/<slug>.html` routes, including absolute Stermont Arcade URLs. Added regression checks for the five routes from the 2026-11-19 daily SEO report.
 - Done: added the product-description renderer test to the SEO PR quality gate and its path triggers.
