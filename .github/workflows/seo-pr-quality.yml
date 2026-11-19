@@ -165,6 +165,10 @@ jobs:
             node seo-safe-meta.mjs
             node seo-shell-redirect.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
+      - name: Migrate legacy generated customer product anchors
+        run: node rewrite-static-product-links.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-shell-link-migration.log"
+      - name: Recheck all generated pages for static customer product links
+        run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-shell-link-regression.log"
       - name: Run full on-page SEO audit against production-equivalent generated pages
         run: |
           log="$RUNNER_TEMP/ci-logs/16-seo-check.log"
