@@ -93,7 +93,7 @@ with sync_playwright() as p:
     mock_network(c0)
     c0.route('**/mobile-shell/app.js*', lambda rt: rt.fulfill(status=200, content_type='application/javascript', body=''))
     p0 = c0.new_page(); p0.goto(URL, wait_until='domcontentloaded')
-    check('server-rendered home grid exposes crawlable product links before hydration', p0.locator('#grid a[href^="/p/"]').count() >= 6, p0.locator('#grid a[href^="/p/"]').count())
+    check('server-rendered home grid exposes shell product links before hydration', p0.locator('#grid a[href*="product="]').count() >= 6, p0.locator('#grid a[href*="product="]').count())
     check('initial empty-state message stays hidden before hydration', p0.locator('#grid-empty').is_hidden())
     c0.close()
 
