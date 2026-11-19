@@ -54,7 +54,7 @@
         dd.textContent = ''; var seen = {}, n = 0;
         rows.forEach(function (r) {
           var k = String(r.name || '').toLowerCase(); if (!k || seen[k]) return; seen[k] = 1; n++;
-          var a = el('a'); a.href = '/p/' + encodeURIComponent(r.slug || r.id) + '.html';
+          var a = el('a'); a.href = (window.shellProductLink || function (s) { return '/?product=' + encodeURIComponent(s); })(r.slug || r.id);
           var im = (r.images || []).filter(Boolean)[0]; if (im) { var i = new Image(); i.src = im; i.alt = ''; i.loading = 'lazy'; a.appendChild(i); }
           var t = el('span', '', r.name); t.appendChild(el('small', '', money(r.price))); a.appendChild(t); dd.appendChild(a);
         });
