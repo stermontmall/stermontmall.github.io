@@ -5,8 +5,18 @@
 // Before, only the last label kept it and every other section was rendered as a generic "Product information" heading.
 // Descriptions without labels render exactly as before (overview + details paragraphs); no heading is ever guessed from ordinary words.
 
+import { createRequire } from 'node:module';
+const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const normalizeInternalPath = path => path.replace(/^\/category\/([a-z0-9][a-z0-9-]*)\/?$/i, '/c/$1.html');
+const normalizeInternalPath = path => {
+  const legacyProduct = path.match(/^\\/p\\/([^/?#]+)\\.html$/i);
+  if (legacyProduct) {
+    let slug = legacyProduct[1];
+    try { slug = decodeURIComponent(slug); } catch {}
+    return shellProductLink(slug);
+  }
+  return path.replace(/^\\/category\\/([a-z0-9][a-z0-9-]*)\\/?$/i, '/c/$1.html');
+};
 const inline = s => esc(s)
   .replace(/\[([^\]]+)\]\((?:https?:\/\/stermontarcade\.co\.ke)?(\/[^)\s]*)\)/g, (_match, label, path) => `<a href="${normalizeInternalPath(path)}">${label}</a>`)
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
