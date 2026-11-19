@@ -69,8 +69,8 @@ for (const file of walk('.')) {
   }
   // The explicit SEO crawl block and product breadcrumb are allowlisted, never treated as customer CTAs.
   // Canonical/Open Graph metadata and structured data are SEO-only, not share links.
-  source = source.replace(/<head\\b[^>]*>[\\s\\S]*?<\\/head>/gi, '');
-  source = source.replace(/<script\\b(?=[^>]*type=["']application\\/ld\\+json["'])[^>]*>[\\s\\S]*?<\\/script>/gi, '');
+  source = source.replace(/<head\b[^>]*>[\s\S]*?<\/head>/gi, '');
+  source = source.replace(/<script\b(?=[^>]*type=["']application\/ld\+json["'])[^>]*>[\s\S]*?<\/script>/gi, '');
   source = source.replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, '');
   source = source.replace(/<nav\b[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi, '');
   if (HUMAN_PRODUCT.test(source)) offenders.push(file + ' (static product URL)');
