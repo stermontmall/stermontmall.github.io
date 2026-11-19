@@ -486,7 +486,7 @@ with sync_playwright() as p:
     def serve_p(ctx): pass
     c11 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c11); serve_p(c11)
     p11 = c11.new_page(); e11 = []; p11.on('pageerror', lambda e: e11.append(str(e)))
-    p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml'); p11.wait_for_timeout(1200)
+    p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml', wait_until='domcontentloaded'); p11.wait_for_timeout(1200)
     check('direct product URL stays on its canonical page with shell navigation', p11.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and p11.locator('#stm-nav').count() == 1 and p11.locator('h1').count() >= 1 and p11.locator('#page-product').count() == 0, p11.url)
     check('direct product shell page has no page errors', not e11, e11[:3])
     c11.close()
@@ -494,11 +494,11 @@ with sync_playwright() as p:
                       ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_p(cx)
-        px = cx.new_page(); px.goto(f'{BASE}/p/garden-set-1Litre.html'); px.wait_for_timeout(1200)
+        px = cx.new_page(); px.goto(f'{BASE}/p/garden-set-1Litre.html', wait_until='domcontentloaded'); px.wait_for_timeout(1200)
         check(f'{label} receives the same canonical product page without a redirect', px.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and px.locator('h1').count() >= 1 and px.locator('#page-product').count() == 0, px.url)
         cx.close()
     cc = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc); serve_p(cc)
-    pc = cc.new_page(); pc.goto(f'{BASE}/p/garden-set-1Litre.html?classic=1'); pc.wait_for_timeout(1200)
+    pc = cc.new_page(); pc.goto(f'{BASE}/p/garden-set-1Litre.html?classic=1', wait_until='domcontentloaded'); pc.wait_for_timeout(1200)
     check('?classic=1 does not cause a redirect from a product page', pc.evaluate('location.pathname') == '/p/garden-set-1Litre.html')
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
@@ -516,7 +516,7 @@ with sync_playwright() as p:
     check('generated category pages do not contain a visitor redirect', 'stm-shell-route' not in cat_page('garden-outdoors') and 'location.replace' not in cat_page('garden-outdoors').split('<body')[0])
     c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12); serve_c(c12)
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
-    p12.goto(f'{BASE}/c/garden-outdoors.html'); p12.wait_for_timeout(1200)
+    p12.goto(f'{BASE}/c/garden-outdoors.html', wait_until='domcontentloaded'); p12.wait_for_timeout(1200)
     check('direct category URL stays on its canonical page with shell navigation', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('#stm-nav').count() == 1 and p12.locator('h1').count() >= 1, p12.url)
     check('category shell page has no page errors', not e12, e12[:3])
     c12.close()
@@ -524,11 +524,11 @@ with sync_playwright() as p:
                       ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_c(cx)
-        px = cx.new_page(); px.goto(f'{BASE}/c/garden-outdoors.html'); px.wait_for_timeout(1200)
+        px = cx.new_page(); px.goto(f'{BASE}/c/garden-outdoors.html', wait_until='domcontentloaded'); px.wait_for_timeout(1200)
         check(f'{label} receives the same canonical category page without a redirect', px.evaluate('location.pathname') == '/c/garden-outdoors.html' and px.locator('h1').count() >= 1, px.url)
         cx.close()
     cc2 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc2); serve_c(cc2)
-    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1'); pc2.wait_for_timeout(1200)
+    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1', wait_until='domcontentloaded'); pc2.wait_for_timeout(1200)
     check('?classic=1 does not cause a redirect from a category page', pc2.evaluate('location.pathname') == '/c/garden-outdoors.html')
     cc2.close()
     # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell
