@@ -1,6 +1,11 @@
 // Optional manufacturer identifiers for Product structured data.
 // Only publish a GTIN when it is numeric, has a supported length and a valid check digit.
 // MPN is emitted only when explicitly supplied in the catalogue; never infer it from our SKU.
+export function productSku(product = {}) {
+  const code = String(product.product_code ?? '').trim();
+  return /^STM-[0-9]{6,}$/.test(code) ? code : String(product.id ?? '');
+}
+
 export function productIdentifiers(product = {}) {
   const out = {};
   const raw = String(product.gtin ?? '').replace(/[\s-]/g, '');
