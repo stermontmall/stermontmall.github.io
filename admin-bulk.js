@@ -113,7 +113,7 @@
           var cost = g('price') === '' ? null : Number(g('price').replace(/,/g, ''));
           if (cost != null && !(cost > 0)) o.errs.push('Baseline cost must be a positive KES amount');
           o.cost = cost; o.price = cost != null && cost > 0 ? up(cost) : null;
-          var old = g('old') === '' ? null : Number(g('old').replace(/,/g, '')); if (old != null && !(old > o.price)) { o.warns.push('Old price ignored (must be higher than the calculated price)'); old = null; } o.old = old;
+          var old = g('old') === '' ? null : Number(g('old').replace(/,/g, '')); var comparePrice = o.price != null ? o.price : (exist[o.id] ? Number(exist[o.id].price) : 0); if (old != null && !(old > comparePrice)) { o.warns.push('Old price ignored (must be higher than the current price)'); old = null; } o.old = old;
           o.stock = 1000; o.unit = g('unit'); o.desc = g('desc'); o.featured = false;
           var toks = g('photo').split(/[;|]/).map(function (x) { return x.trim(); }).filter(Boolean);
           if (!toks.length) { var auto = files[slug(o.name + (o.pack ? ' ' + o.pack : ''))] || files[slug(o.name)]; if (auto) toks = [auto.name]; }
