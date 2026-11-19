@@ -10,12 +10,13 @@ const rows = [
   { name: 'Second Item', price: 2000, stock: 1, href: '/p/second.html' }
 ];
 const html = renderHomeGridFallback(rows, { limit: 8 });
-assert.equal((html.match(/ssr-product-card/g) || []).length, 2);
+assert.equal((html.match(/ssr-product-card/g) || []).length, 3);
 assert.match(html, /href="\/p\/spray-1\.html"/);
 assert.match(html, /Sprayer &amp; &lt;Nozzle&gt;/);
 assert.match(html, /KSh 1,250/);
 assert.doesNotMatch(html, /Sold Out Item|Unknown Stock Item|Unsafe Link/);
 assert.doesNotMatch(html, /images\\.example/);
+assert.match(html, /Product details/);
 assert.match(html, /loading=\\"eager\\"/);
 assert.match(html, /fetchpriority=\\"high\\"/);
 assert.equal(renderHomeGridFallback(rows, { limit: 0 }), '');
