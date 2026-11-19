@@ -339,7 +339,7 @@
     </div>
     <div style="background:#fff;margin-top:8px;padding:12px 16px">
       <p class="text-xs font-semibold mb-2">Pack size</p>
-      <div id="pp-sizes" class="flex flex-wrap gap-2"></div>
+      <div id="pp-sizes" class="pack-grid" role="radiogroup" aria-label="Pack size"></div>
       <div class="flex items-center justify-between" style="margin-top:14px">
         <span class="text-xs font-semibold">Quantity</span>
         <div class="flex items-center gap-3">
@@ -421,7 +421,7 @@
   </div>
   <div class="px-4 pb-3">
     <p class="text-xs font-semibold mb-2">Pack size</p>
-    <div id="qb-sizes" class="flex flex-wrap gap-2"></div>
+    <div id="qb-sizes" class="pack-grid" role="radiogroup" aria-label="Pack size"></div>
   </div>
   <div id="qb-details" class="px-4 pb-3" hidden style="flex:0 1 auto;min-height:0;overflow:auto">
     <p class="text-xs font-semibold mb-1">Details</p>
@@ -446,7 +446,7 @@
 
 <div id="toast" class="fixed left-1/2 -translate-x-1/2 top-[64px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
 
-<script src="/mobile-shell/app.js?v=40" defer></script>
+<script src="/mobile-shell/app.js?v=41" defer></script>
 <script src="/analytics.js" defer></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
 </body>

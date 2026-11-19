@@ -116,6 +116,43 @@ function loadCatalog() {
 }
 const discOf = p => p.old ? Math.round((1 - p.price / p.old) * 100) : 0;
 const sizeOf = (p, label) => p.sizes.find(s => s.label === label) || p.sizes[0];
+/* @pack-start  (pure helpers; mobile-shell/packs.test.mjs runs this block on its own)
+   Pack sizes are DISPLAYED smallest pack first, with each size's price on its own card. p.sizes itself stays price-sorted (the "From KSh" price and the
+   default size depend on it). A size is only compared with the others when every label is one plain amount in the same family (volume, weight or count);
+   multipacks such as "3 x 100 ml" and unreadable labels keep price order and get no "Best value" tag, so nothing is guessed. */
+function packAmount(label) {
+  const t = String(label || '').toLowerCase().replace(/,/g, '').trim();
+  if (/\d\s*(x|×)\s*\d|\bpack of\b|\d\s*-?\s*pack\b|\bset of\b/.test(t) && /(ml|litre|liter|\bl\b|kg|\bg\b|gram)/.test(t)) return null;
+  let m = /^(\d+(?:\.\d+)?)\s*(ml|millilitres?|milliliters?)\b/.exec(t); if (m) return { fam: 'vol', n: +m[1] };
+  m = /^(\d+(?:\.\d+)?)\s*(l|litres?|liters?)\b/.exec(t); if (m) return { fam: 'vol', n: +m[1] * 1000 };
+  m = /^(\d+(?:\.\d+)?)\s*(kg|kilograms?|kilos?)\b/.exec(t); if (m) return { fam: 'wt', n: +m[1] * 1000 };
+  m = /^(\d+(?:\.\d+)?)\s*(g|grams?)\b/.exec(t); if (m) return { fam: 'wt', n: +m[1] };
+  m = /^(\d+)\s*(pcs?|pieces?|units?|pack|packs|sachets?|tablets?|capsules?)\b/.exec(t) || /^pack of (\d+)$/.exec(t); if (m) return { fam: 'cnt', n: +m[1] };
+  return null;
+}
+function packOptions(sizes) {   // -> [{ ...size, best: boolean, save: percent }] in display order
+  const list = sizes.map(z => ({ ...z, amt: packAmount(z.label) }));
+  const fam = list.length > 1 && list.every(z => z.amt) && list.every(z => z.amt.fam === list[0].amt.fam && z.amt.n > 0) ? list[0].amt.fam : '';
+  if (fam) list.sort((a, b) => a.amt.n - b.amt.n || a.price - b.price);
+  let bestRow = null;
+  if (fam) {
+    const per = list.map(z => z.price / z.amt.n), min = Math.min(...per), others = per.filter(v => v > min * 1.01);
+    if (others.length === per.length - 1) bestRow = list[per.indexOf(min)];   // one clear winner, at least 1% cheaper per unit than every other size
+  }
+  return list.map(z => ({ rowId: z.rowId, slug: z.slug, label: z.label, price: z.price, old: z.old, best: z === bestRow, save: z.old ? Math.round((1 - z.price / z.old) * 100) : 0 }));
+}
+/* @pack-end */
+const PACK_CSS = `.pack-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 8px;padding-top:6px}
+.chip.pack{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;height:auto;min-height:62px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;background:#fff;text-align:left;color:#1f2937;white-space:normal;font-weight:400}
+.chip.pack[aria-selected="true"]{border-color:#6d28d9;background:#f5f0ff;color:#1f2937;box-shadow:0 0 0 1px #6d28d9 inset}
+.chip.pack[aria-selected="true"]::after{content:"\\2713";position:absolute;top:8px;right:10px;width:18px;height:18px;border-radius:50%;background:#6d28d9;color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center}
+.chip.pack .pk-name{font-size:13px;font-weight:700;line-height:1.25;padding-right:22px}
+.chip.pack .pk-price{font-size:13px;font-weight:800;color:#6d28d9}
+.chip.pack .pk-old{font-size:11px;color:#6b7280;text-decoration:line-through;margin-left:4px;font-weight:500}
+.chip.pack .pk-tag{position:absolute;top:-8px;left:10px;padding:1px 7px;border-radius:999px;background:#15803d;color:#fff;font-size:10px;font-weight:800;letter-spacing:.2px}
+.chip.pack:focus-visible{outline:2px solid #6d28d9;outline-offset:2px}`;
+if (!document.getElementById('pack-style')) { const st = document.createElement('style'); st.id = 'pack-style'; st.textContent = PACK_CSS; document.head.appendChild(st); }
+const packCards = (sizes, selected, attr) => packOptions(sizes).map(z => `<button type="button" role="radio" class="chip pack" ${attr}="${esc(z.label)}" aria-checked="${z.label === selected}" aria-selected="${z.label === selected}">${z.best ? '<span class="pk-tag">Best value</span>' : ''}<span class="pk-name">${esc(z.label)}</span><span class="pk-price">KSh ${fmt(z.price)}${z.old ? `<span class="pk-old">KSh ${fmt(z.old)}</span>` : ''}</span></button>`).join('');
 /* Product images never fall back to emoji. If a lead photo fails, try the next genuine gallery photo before showing a neutral unavailable-photo label. */
 const thumb = (p, eager = false) => {
   const photos = [...new Set([p.img, ...(Array.isArray(p.photos) ? p.photos : [])].filter(u => typeof u === 'string' && u.trim()))];
@@ -479,7 +516,7 @@ function renderQB() {
   $('#qb-name').textContent = p.name; $('#qb-price').textContent = 'KSh ' + fmt(sz.price);
   $('#qb-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : '';
   $('#qb-qty').textContent = qb.qty;
-  $('#qb-sizes').innerHTML = p.sizes.map(s => `<button class="chip !px-4" data-size="${esc(s.label)}" aria-selected="${s.label === qb.size}">${esc(s.label)}</button>`).join('');
+  $('#qb-sizes').innerHTML = packCards(p.sizes, qb.size, 'data-size');
   if (qb.shown !== sz.rowId) { qb.shown = sz.rowId; renderDetails(sz.rowId); }   // quantity changes do not reload the details
   syncProductMeta();
 }
@@ -643,7 +680,7 @@ async function renderPP() {
   $('#pp-img').style.background = '#fff'; $('#pp-img').innerHTML = thumb({ img: pp.img || p.img, emoji: p.emoji }, true);
   $('#pp-price').textContent = 'KSh ' + fmt(sz.price); $('#pp-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : ''; $('#pp-off').textContent = off ? '-' + off + '%' : '';
   $('#pp-qty').textContent = qb.qty;
-  $('#pp-sizes').innerHTML = p.sizes.map(x => `<button class="chip !px-4" data-pp-size="${esc(x.label)}" aria-selected="${x.label === qb.size}">${esc(x.label)}</button>`).join('');
+  $('#pp-sizes').innerHTML = packCards(p.sizes, qb.size, 'data-pp-size');
   const rel = PRODUCTS.filter(x => x.cat === p.cat && x.id !== p.id).sort((a, b) => (b.sub === p.sub) - (a.sub === p.sub)).slice(0, 8);
   $('#pp-related-wrap').hidden = !rel.length;
   $('#pp-related').innerHTML = rel.map(x => `<button class="tap" data-pp-open="${esc(x.id)}" style="flex:none;width:112px;text-align:left"><span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:112px;height:112px;background:#fff;border:1px solid #e5e7eb">${thumb(x)}</span><span class="line-clamp-2 text-xs" style="display:block;margin-top:4px">${esc(x.name)}</span><span class="text-xs font-bold text-sale">KSh ${fmt(x.price)}</span></button>`).join('');
