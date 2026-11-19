@@ -6,8 +6,9 @@
 // Descriptions without labels render exactly as before (overview + details paragraphs); no heading is ever guessed from ordinary words.
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const normalizeInternalPath = path => path.replace(/^\/category\/([a-z0-9][a-z0-9-]*)\/?$/i, '/c/$1.html');
 const inline = s => esc(s)
-  .replace(/\[([^\]]+)\]\((?:https?:\/\/stermontarcade\.co\.ke)?(\/[^)\s]*)\)/g, '<a href="$2">$1</a>')
+  .replace(/\[([^\]]+)\]\((?:https?:\/\/stermontarcade\.co\.ke)?(\/[^)\s]*)\)/g, (_match, label, path) => `<a href="${normalizeInternalPath(path)}">${label}</a>`)
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
 // Only explicit uppercase section labels match. Never ordinary words such as "used", "order" or "safety" inside sentences.

@@ -233,7 +233,7 @@
   },
   "pentagon-50ec-insecticide-1-litre": {
     "title": "Pentagon 50EC Insecticide 1L | Lambda-cyhalothrin | {price}",
-    "desc": "Buy Pentagon 50EC (Kiua Dudu) 1L for thrips and aphids control. Lambda-cyhalothrin 50g/L. {price}, M-Pesa, delivery to all 47 counties."
+    "desc": "Pentagon 50EC (Kiua Dudu) 1L costs {price}. Check label-approved crops and pests; pay by M-Pesa and arrange delivery across Kenya."
   },
   "lockable-rodent-bait-station": {
     "title": "Lockable Rodent Bait Station Price in Kenya | Stermont",
@@ -2835,9 +2835,9 @@
     ]
   },
   "livergen-plus-poultry-liver-tonic-500-ml": {
-    "desc": "Livergen Plus poultry liver tonic 500 ml in Kenya for {price}. Check label directions before use. M-Pesa checkout and delivery across Kenya."
+    "desc": "Livergen Plus poultry liver tonic 500ml costs {price}. Follow the label directions; pay by M-Pesa and arrange delivery across Kenya."
   },
   "nilzan-plus-drench-1-litre": {
-    "desc": "Nilzan Plus livestock drench 1 litre in Kenya for {price}. Confirm species, dose and withdrawal periods with a vet. M-Pesa and Kenya delivery."
+    "desc": "Nilzan Plus Drench 1L costs {price}. Confirm species, dose and withdrawal periods with a vet; pay by M-Pesa for delivery across Kenya."
   }
 }

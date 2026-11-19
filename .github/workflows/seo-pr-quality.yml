@@ -6,6 +6,9 @@ on:
     paths:
       - 'seo-*.mjs'
       - 'generate-products.mjs'
+      - 'seo-overrides.json'
+      - 'product-description-html.mjs'
+      - 'product-description-html.test.mjs'
       - 'home-grid-ssr.mjs'
       - 'home-grid-ssr.test.mjs'
       - 'kili-pages.js'
@@ -89,6 +92,8 @@ jobs:
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-syntax.log"
       - name: Test category buying introductions and FAQ consistency
         run: node category-editorial.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-category-editorial.log"
+      - name: Test product description rendering and legacy category-link normalization
+        run: node product-description-html.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/08-product-description-html.log"
       - name: Test product category and safety enrichment
         run: node seo-product-extras.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/08-product-extras.log"
       - name: Test product and category SEO metadata
