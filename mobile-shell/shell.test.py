@@ -30,7 +30,7 @@ CATS_FIX = [
     dict(id=83, name='Kili Featured', slug='kili-featured', parent_id=None, sort_order=1, is_promo=True),  # promo bucket: must not become a chip
 ]
 def row(id, cat, name, price, old, featured=False, group=None, label=None, stock=100, img=OK):
-    return dict(id=id, slug=id, name=name, category_id=cat, price=str(price), old_price=str(old), stock=stock, featured=featured,
+    return dict(id=id, slug=id, name=name, category_id=cat, price=str(price), old_price=str(old), stock=stock, featured=featured, product_code='STM-' + str(id).upper(),
                 images=[img] if img else [], unit=None, variant_group=group, variant_label=label)
 ROWS = [row('home-0', 24, 'Hot Plate', 2500, 3000, featured=True)]
 ROWS += [row(f'garden-set-{l.replace(" ", "")}', 71, 'Garden Hose Connector Set', pr, int(pr * 1.15), featured=True, group='garden-set', label=l)
@@ -56,7 +56,7 @@ def on_rest(route):
     if '/rest/v1/products' in url and 'id=eq.' in url:   # details of one row, fetched when a product is opened
         rid = url.split('id=eq.')[1].split('&')[0]
         r = next((x for x in ROWS if x['id'] == rid), None)
-        return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK])])
+        return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK], product_code=r['product_code'])])
     if '/rest/v1/rpc/get_store_catalog' in url: return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in ROWS])
     serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
@@ -175,7 +175,7 @@ with sync_playwright() as p:
     pg.locator('#qb-sizes [data-size="250 ml"]').click()
     check('each size shows its own price', pg.locator('#qb-price').inner_text() == 'KSh 1,550' and pg.locator('#qb-old').inner_text() == 'KSh 1,782', pg.locator('#qb-price').inner_text())
     pg.wait_for_function("document.querySelector('#qb-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
-    check('details: description, unit and stock of the chosen size are shown', 'line one' in pg.locator('#qb-desc').inner_text() and pg.locator('#qb-meta').inner_text() == 'Unit: Each · In stock', pg.locator('#qb-meta').inner_text())
+    check('details: description, unit and stock of the chosen size are shown', 'line one' in pg.locator('#qb-desc').inner_text() and pg.locator('#qb-meta').inner_text() == 'Product code: STM-GARDEN-SET-250ML · Unit: Each · In stock', pg.locator('#qb-meta').inner_text())
     check('details: link to the full product page of that size', pg.locator('#qb-page').get_attribute('href') == '/p/garden-set-250ml.html' and pg.locator('#qb-page').is_visible(), pg.locator('#qb-page').get_attribute('href'))
     check('details: extra photos listed and tapping one changes the main photo', pg.locator('#qb-photos [data-photo]').count() == 2 and (pg.locator('#qb-photos [data-photo]').nth(1).click() or True) and pg.locator('#qb-img img').count() == 1)
     pg.screenshot(path=f'{OUT}/shot-details.png')
@@ -185,7 +185,7 @@ with sync_playwright() as p:
     pg.wait_for_selector('#page-product.open', timeout=5000)
     pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
     check('product page opens inside the shell (same URL, shell still loaded)', pg.url == url_before and pg.locator('#bottom-nav').count() == 1, pg.url)
-    check('product page shows name, price, sizes, description, unit and trust lines', 'Garden Hose Connector Set' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
+    check('product page shows name, price, sizes, description, unit and trust lines', 'Garden Hose Connector Set' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Product code: STM-GARDEN-SET-250ML' in pg.locator('#pp-meta').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
     pg.screenshot(path=f'{OUT}/shot-product-page.png')
     check('product page: similar products listed', pg.locator('#pp-related [data-pp-open]').count() >= 1)
     pg.locator('#pp-sizes [data-pp-size="1 Litre"]').click()
