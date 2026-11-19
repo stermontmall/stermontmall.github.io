@@ -65,7 +65,10 @@ def mock_network(ctx):
     # Keep shell product URLs on the local fixture origin. Generated SEO pages expose
     # the production-domain helper, which would otherwise send the headless test away
     # from this local shell before it can exercise the in-shell product overlay.
-    ctx.add_init_script("window.shellProductLink = s => '/?product=' + encodeURIComponent(s);")
+    # index.html also loads /product-links.js (deferred), which would overwrite an init-script stub with the
+    # production-domain helper, so answer that request with a local-origin version of the same helper.
+    ctx.add_init_script("window.shellProductLink = s => location.origin + '/?product=' + encodeURIComponent(s);")
+    ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/?product=' + encodeURIComponent(v) : '/'); };"))
     def serve_product_page(rt):
         # Match the requested fixture slug to the generated SEO page's early shell bootstrap.
         # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
@@ -188,10 +191,11 @@ with sync_playwright() as p:
     pg.screenshot(path=f'{OUT}/shot-details.png')
     # the full product page opens INSIDE the shell (no navigation to /p/...)
     url_before = pg.url
+    pg.evaluate("window.__shellStillLoaded = true")   # survives only if the document is NOT reloaded or navigated away
     pg.locator('#qb-page').click()
     pg.wait_for_selector('#page-product.open', timeout=5000)
     pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
-    check('product page opens inside the shell (same URL, shell still loaded)', pg.url == url_before and pg.locator('#bottom-nav').count() == 1, pg.url)
+    check('product page opens inside the shell (no reload, address becomes the shell product link, shell still loaded)', pg.evaluate("window.__shellStillLoaded === true") and pg.url == f'{URL.rstrip("/")}/?product=garden-set-250ml' and '/p/' not in pg.url and pg.locator('#bottom-nav').count() == 1, pg.url)
     check('product page shows name, price, sizes, description, unit and trust lines', 'Garden Hose Connector Set' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Product code: STM-GARDEN-SET-250ML' in pg.locator('#pp-meta').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
     pg.screenshot(path=f'{OUT}/shot-product-page.png')
     check('product page: similar products listed', pg.locator('#pp-related [data-pp-open]').count() >= 1)
@@ -513,7 +517,7 @@ with sync_playwright() as p:
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_selector('#page-product.open', timeout=15000)
     check('explicit /?product=<slug> deep link still opens the product page', p10.evaluate('location.pathname + location.search') == '/?product=garden-set-250ml', p10.url)
-    check('shell product deep link keeps the homepage canonical', p10.evaluate("document.querySelector('link[rel=canonical]').href") == BASE + '/', p10.evaluate("document.querySelector('link[rel=canonical]').href"))
+    check('shell product deep link keeps the homepage canonical', p10.evaluate("document.querySelector('link[rel=canonical]').href") == 'https://stermontarcade.co.ke/', p10.evaluate("document.querySelector('link[rel=canonical]').href"))
     c10.close()
 
     def cat_page(slug):
