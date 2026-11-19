@@ -15,7 +15,7 @@ const PCPB = new Set(['pest-control-fumigation', 'bed-bug-killers', 'cockroach-a
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const unesc = s => String(s ?? '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
 
-const STYLE = '<style>.pt table{border-collapse:collapse;width:100%}.pt th,.pt td{border:1px solid #e6e1f5;padding:.45rem .6rem;text-align:left;vertical-align:top}.pt th{background:#f1ebff}.pw{overflow-x:auto}.how ol{margin:.3rem 0 .6rem;padding-left:1.2rem}.how li{margin:.25rem 0}</style>';
+const STYLE = '<style>.pt{padding:clamp(1rem,2.5vw,1.5rem)}.pt h2{margin:0 0 .9rem}.pack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:.8rem}.pack-card{display:flex;flex-direction:column;gap:.55rem;min-width:0;padding:1rem;border:1px solid #e5e7eb;border-radius:14px;background:linear-gradient(180deg,#fff 0%,#faf9ff 100%)}.pack-card .pack-size{font-size:1.05rem;font-weight:800;color:#172033}.pack-card .pack-price{font-size:1.45rem;line-height:1.2;font-weight:850;letter-spacing:-.025em;color:#4c1d95}.pack-card .pack-stock{font-size:.88rem;font-weight:750}.pack-card .pack-stock.ok{color:#15803d}.pack-card .pack-stock.no{color:#b91c1c}.pack-card .pack-order{display:block;margin-top:auto;padding:.7rem .85rem;border-radius:10px;background:#15803d;color:#fff;text-align:center;text-decoration:none;font-weight:800}.pack-card .pack-unavailable{margin-top:auto;padding:.7rem .85rem;border-radius:10px;background:#f1f5f9;color:#64748b;text-align:center;font-weight:700}.how ol{margin:.3rem 0 .6rem;padding-left:1.2rem}.how li{margin:.25rem 0}@media(max-width:480px){.pack-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}.pack-card{padding:.75rem}.pack-card .pack-price{font-size:1.2rem}.pack-card .pack-order,.pack-card .pack-unavailable{padding:.65rem .45rem;font-size:.9rem}}</style>';
 
 let done = 0;
 if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.html'))) {
@@ -31,8 +31,8 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     h = h.replace(/<div class="box"><h2 style="margin-top:0">Available sizes<\/h2><ul class="g">([\s\S]*?)<\/ul><\/div>/, (m, inner) => {
       const rows = [...inner.matchAll(/<li>([\s\S]*?)<span>([\s\S]*?)<\/span><small class="(ok|no)">([\s\S]*?)<\/small>(?: <a href="([^"]*)">[\s\S]*?<\/a>)?<\/li>/g)];
       if (!rows.length) return m;
-      return `<div class="box pt"><h2 style="margin-top:0">Price of ${nm} by size</h2><div class="pw"><table><thead><tr><th>Size</th><th>Price</th><th>Availability</th><th>Order</th></tr></thead><tbody>` +
-        rows.map(r => `<tr><td>${r[1]}</td><td>${r[2]}</td><td class="${r[3]}">${r[4]}</td><td>${r[5] ? `<a href="${r[5]}">WhatsApp</a>` : '–'}</td></tr>`).join('') + '</tbody></table></div></div>';
+      return `<section class="box pt" aria-label="Available pack sizes and prices"><h2>Choose your pack size</h2><div class="pack-grid">` +
+        rows.map(r => `<article class="pack-card"><div class="pack-size">${r[1]}</div><div class="pack-price">${r[2]}</div><div class="pack-stock ${r[3]}">${r[4]}</div>${r[5] ? `<a class="pack-order" href="${r[5]}" rel="noopener">Order this pack on WhatsApp</a>` : '<span class="pack-unavailable">Currently unavailable</span>'}</article>`).join('') + '</div></section>';
     });
 
     // 2) local delivery + how to order
