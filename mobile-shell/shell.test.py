@@ -483,9 +483,9 @@ with sync_playwright() as p:
     c11 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c11); serve_p(c11)
     p11 = c11.new_page(); e11 = []; p11.on('pageerror', lambda e: e11.append(str(e)))
     p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml'); p11.wait_for_timeout(1500)
-    check('a phone opening a product page enters the mobile shell product view', p11.evaluate('location.pathname') == '/' and p11.locator('#page-product').count() == 1, p11.url)
+    check('a phone opening a product page enters the mobile shell product view', p11.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and p11.locator('#page-product').count() == 1, p11.url)
     p11.goto(f'{BASE}/p/garden-set-1Litre.html'); p11.wait_for_timeout(1500)
-    check('product page route keeps the mobile shell navigation', p11.evaluate('location.pathname') == '/' and p11.locator('#bottom-nav').count() == 1, p11.url)
+    check('product page route keeps the mobile shell navigation', p11.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and p11.locator('#bottom-nav').count() == 1, p11.url)
     check('redirect removed: no page errors', not e11, e11[:3])
     c11.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
@@ -493,11 +493,11 @@ with sync_playwright() as p:
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_p(cx)
         px = cx.new_page(); px.goto(f'{BASE}/p/garden-set-1Litre.html'); px.wait_for_timeout(1500)
-        check(f'{label} opens the mobile shell for product routes', px.evaluate('location.pathname') == '/' and px.locator('#page-product').count() == 1, px.url)
+        check(f'{label} opens the mobile shell for product routes', px.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and px.locator('#page-product').count() == 1, px.url)
         cx.close()
     cc = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc); serve_p(cc)
     pc = cc.new_page(); pc.goto(f'{BASE}/p/garden-set-1Litre.html?classic=1'); pc.wait_for_timeout(1500)
-    check('?classic=1 does not bypass the mobile shell on product routes', pc.evaluate('location.pathname') == '/', pc.url)
+    check('?classic=1 does not bypass the mobile shell on product routes', pc.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and pc.locator('#bottom-nav').count() == 1, pc.url)
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_function("location.pathname !== '/'", timeout=15000)
@@ -516,7 +516,7 @@ with sync_playwright() as p:
     c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12); serve_c(c12)
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
     p12.goto(f'{BASE}/c/garden-outdoors.html'); p12.wait_for_timeout(1500)
-    check('a phone opening a category page enters the shell category view', p12.evaluate('location.pathname') == '/' and p12.locator('#grid .card[data-id]').count() > 0, p12.url)
+    check('a phone opening a category page enters the shell category view', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('#grid .card[data-id]').count() > 0, p12.url)
     p12.goto(f'{BASE}/?cat=garden-outdoors'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
     check('shell address /?cat=<slug> still opens that category (only its products)', ids and all(i.startswith('outdoor-') for i in ids), ids)
@@ -533,11 +533,11 @@ with sync_playwright() as p:
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_c(cx)
         px = cx.new_page(); px.goto(f'{BASE}/c/garden-outdoors.html'); px.wait_for_timeout(1500)
-        check(f'{label} opens the mobile shell for category routes', px.evaluate('location.pathname') == '/' and px.locator('#grid .card[data-id]').count() > 0, px.url)
+        check(f'{label} opens the mobile shell for category routes', px.evaluate('location.pathname') == '/c/garden-outdoors.html' and px.locator('#grid .card[data-id]').count() > 0, px.url)
         cx.close()
     cc2 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc2); serve_c(cc2)
     pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1'); pc2.wait_for_timeout(1500)
-    check('?classic=1 does not bypass the mobile shell on category routes', pc2.evaluate('location.pathname') == '/', pc2.url)
+    check('?classic=1 does not bypass the mobile shell on category routes', pc2.evaluate('location.pathname') == '/c/garden-outdoors.html' and pc2.locator('#bottom-nav').count() == 1, pc2.url)
     cc2.close()
 
     # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell
