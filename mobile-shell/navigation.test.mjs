@@ -11,12 +11,12 @@ const end = source.indexOf('history.replaceState({ tab: START_TAB, stack: [] }',
 assert.notEqual(end, -1, 'production start-tab resolution must exist');
 const productionBlock = source.slice(start, end);
 
-function resolve({ search = '', saved = null, historyState = null } = {}) {
+function resolve({ search = '', pathname = '/', saved = null, historyState = null } = {}) {
   const context = {
     URLSearchParams,
-    location: { search, pathname: '/' },
-    DEEP: new URLSearchParams(search).get('product'),
-    CAT_DEEP: new URLSearchParams(search).get('cat'),
+    location: { search, pathname },
+    DEEP: new URLSearchParams(search).get('product') || ((/^\\/p\\/([^/]+)\\.html$/i.exec(pathname) || [])[1] || null),
+    CAT_DEEP: new URLSearchParams(search).get('cat') || ((/^\\/c\\/([^/]+)\\.html$/i.exec(pathname) || [])[1] || null),
     Q_DEEP: (new URLSearchParams(search).get('q') || '').trim().slice(0, 80),
     TAB_DEEP: new URLSearchParams(search).get('tab'),
     sessionStorage: { getItem: key => key === 'shell.activeTab' ? saved : null },
@@ -32,6 +32,8 @@ assert.equal(resolve({ saved: 'cart', historyState: { tab: 'deals' } }), 'deals'
 assert.equal(resolve({ saved: 'cart', search: '?tab=categories' }), 'categories', 'explicit tab deep link takes precedence over saved tab');
 assert.equal(resolve({ saved: 'cart', search: '?product=sample-item' }), 'home', 'product deep link takes precedence over saved tab');
 assert.equal(resolve({ saved: 'cart', search: '?cat=home-kitchen' }), 'home', 'category deep link takes precedence over saved tab');
+assert.equal(resolve({ saved: 'cart', pathname: '/p/premise-200-sc-termiticide-50-ml.html' }), 'home', 'direct product path takes precedence over saved tab');
+assert.equal(resolve({ saved: 'cart', pathname: '/c/fumigation-chemicals.html' }), 'home', 'direct category path takes precedence over saved tab');
 assert.equal(resolve({ saved: 'cart', search: '?q=desk-lamp' }), 'home', 'search deep link takes precedence over saved tab');
 assert.equal(resolve({ saved: 'cart', search: '?tab=unknown' }), 'cart', 'unknown explicit tab is ignored and the saved tab is restored');
 
