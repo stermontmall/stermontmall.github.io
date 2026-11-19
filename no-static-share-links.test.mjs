@@ -69,4 +69,28 @@ assert.match(readFileSync('kili-pages.js', 'utf8'), /\\?product=/, 'product sear
 const briefs = readFileSync('blog-topics.json', 'utf8');
 assert.doesNotMatch(briefs, /"\/p\/[^"]+\.html"/, 'blog/guide product CTAs must not use static product URLs');
 assert.ok(existsSync('no-classic-hop.test.mjs'), 'classic-hop guard must remain installed');
+if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
+  let scanned = 0;
+  const generatedDirs = ['p', 'c', 'guides', 'blog'];
+  const generatedOffenders = [];
+  for (const dir of generatedDirs) {
+    if (!existsSync(dir)) continue;
+    for (const name of readdirSync(dir).filter(name => name.endsWith('.html'))) {
+      const file = join(dir, name);
+      let html = readFileSync(file, 'utf8');
+      // Keep SEO-only /p/ references intact while inspecting the customer-visible page body.
+      html = html.replace(/<head\\b[\\s\\S]*?<\\/head>/gi, '')
+        .replace(/<script[^>]*type=["']application\\/ld\\+json["'][^>]*>[\\s\\S]*?<\\/script>/gi, '')
+        .replace(/<nav[^>]*class=["'][^"']*\\bbc\\b[^"']*["'][^>]*>[\\s\\S]*?<\\/nav>/gi, '')
+        .replace(/<!--\\s*seo-links:start\\s*-->[\\s\\S]*?<!--\\s*seo-links:end\\s*-->/gi, '');
+      try { html = decodeURIComponent(html.replace(/&amp;/g, '&')); } catch {}
+      scanned++;
+      if (/(?:href\\s*=\\s*["'][^"']*\\/p\\/|Link:\\s*[^\\n<]*\\/p\\/|href\\s*=\\s*["'][^"']*\\/classic\\.html)/i.test(html)) {
+        generatedOffenders.push(file);
+      }
+    }
+  }
+  assert.deepEqual(generatedOffenders, [], 'Generated customer-visible pages still emit static product/classic links: ' + generatedOffenders.join(', '));
+  console.log('OK: inspected ' + scanned + ' generated product/category/guide/blog pages; no static human-facing product links.');
+}
 console.log('OK: human-facing product links use shellProductLink; SEO-only /p/ surfaces remain allowlisted.');
