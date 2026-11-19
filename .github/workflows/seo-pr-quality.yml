@@ -89,13 +89,6 @@ jobs:
         run: node no-classic-hop.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02-no-classic-hop.log"
       - name: Test server-rendered homepage product cards
         run: node home-grid-ssr.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-home-grid-ssr.log"
-      - name: Prepare generated product/category fixtures with the production mobile-shell routing
-        run: |
-          node seo-shell-chrome.mjs
-          node seo-shell-redirect.mjs
-          node seo-shell-redirect.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-shell-route-fixtures.log"
-      - name: Run mobile shell browser regression suite
-        run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
       - name: Broken and placeholder links (link-check.mjs)
         run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/05-link-check.log"
       - name: Test permanent product-code display and admin integration
@@ -172,6 +165,13 @@ jobs:
           for file in seo-pest/blogs-*.json; do
             node seo-pest/blog-build.mjs "$(basename "$file" .json)"
           done
+      - name: Prepare generated product/category fixtures with the production mobile-shell routing
+        run: |
+          node seo-shell-chrome.mjs
+          node seo-shell-redirect.mjs
+          node seo-shell-redirect.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-shell-route-fixtures.log"
+      - name: Run mobile shell browser regression suite
+        run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
       - name: Recheck all generated pages for static customer product links
         run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-shell-link-regression.log"
       - name: Run full on-page SEO audit against production-equivalent generated pages
