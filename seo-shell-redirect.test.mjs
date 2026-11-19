@@ -29,7 +29,7 @@ const stub = '<html><head><meta http-equiv="refresh" content="0;url=/p/example.h
 assert.equal(inject(stub, 'extra-pack'), stub, 'intentional extra-pack redirect stubs remain untouched');
 
 const loader = readFileSync('shell-route-loader.js', 'utf8');
-assert.ok(loader.includes("fetch('/')"), 'loader fetches the actual homepage shell');
+assert.ok(loader.includes("fetch('/',"), 'loader fetches the actual homepage shell');
 assert.ok(loader.includes("querySelector('#appbar')") && loader.includes("querySelector('#bottom-nav')"), 'loader verifies the full shell, not just navigation chrome');
 assert.ok(loader.includes("originalMain.cloneNode(true)") && loader.includes("document.createElement('details')"), 'loader preserves server-rendered SEO content as an accessible fallback');
 assert.ok(loader.includes("loadScript('/mobile-shell/app.js"), 'loader starts the actual mobile-shell application');
