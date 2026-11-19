@@ -84,9 +84,9 @@
     var id = curProd.id, c = D.getElementById('p-' + id);
     if (c && window.STM_openView) {                       /* storefront: open the product view in place */
       var g = c.closest && c.closest('.mcat'); if (g) g.classList.add('open');
-      try { window.STM_openView(c); } catch (e) { location.href = '/#p-' + id; }
+      try { window.STM_openView(c); } catch (e) { location.href = (window.shellProductLink || function (s) { return '/?product=' + encodeURIComponent(s); })(id); }
     } else {                                               /* any other page: storefront with that product open */
-      location.href = '/#p-' + encodeURIComponent(id);
+      location.href = (window.shellProductLink || function (s) { return '/?product=' + encodeURIComponent(s); })(id);
     }
   }
   box.addEventListener('click', function (e) { if (e.target === x) return; go(); });
