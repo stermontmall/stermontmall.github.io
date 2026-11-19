@@ -610,7 +610,7 @@ function renderProductDescription(target, source) {
 }
 /* @render-end */
 const details = new Map(); // Cache product-detail requests by variant row ID; renderDetails() and renderPP() share this cache.
-const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
+const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images,product_code`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
 async function renderDetails(rowId) {
   const box = $('#qb-details'); if (!box) return;                  // an older cached index.html has no details block: leave the sheet as it was
   box.hidden = false;
@@ -619,7 +619,7 @@ async function renderDetails(rowId) {
   if (!qb.p || sizeOf(qb.p, qb.size).rowId !== rowId) return;          // another size or product was chosen meanwhile
   if (!d) { $('#qb-desc').innerHTML = 'Could not load the details. <button class="underline text-brand" data-retry-details>Try again</button>'; return; }
   const left = Number(d.stock), low = Number(d.low_at) || 5;
-  $('#qb-meta').textContent = [d.unit ? 'Unit: ' + d.unit : '', left > 0 ? (left <= low ? 'Only ' + left + ' left' : 'In stock') : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
+  $('#qb-meta').textContent = [d.product_code ? 'Code: ' + d.product_code : '', d.unit ? 'Unit: ' + d.unit : '', left > 0 ? (left <= low ? 'Only ' + left + ' left' : 'In stock') : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
   renderProductDescription('#qb-desc', d.description || '');
   const imgs = (d.images || []).filter(Boolean);
   $('#qb-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: qb.p.emoji })}</button>`).join('') : '';
@@ -652,7 +652,7 @@ async function renderPP() {
   if (!qb.p || sizeOf(qb.p, qb.size).rowId !== rowId) return;
   if (!d) { $('#pp-desc').innerHTML = 'Could not load the details. <button class="underline text-brand" data-pp-retry>Try again</button>'; return; }
   const left = Number(d.stock), low = Number(d.low_at) || 5;
-  $('#pp-meta').textContent = [d.unit ? 'Unit: ' + d.unit : '', left > 0 ? (left <= low ? 'Only ' + left + ' left' : 'In stock') : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
+  $('#pp-meta').textContent = [d.product_code ? 'Product code: ' + d.product_code : '', d.unit ? 'Unit: ' + d.unit : '', left > 0 ? (left <= low ? 'Only ' + left + ' left' : 'In stock') : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
   renderProductDescription('#pp-desc', d.description || '');
   const imgs = (d.images || []).filter(Boolean);
   if (!pp.img && imgs[0]) $('#pp-img').innerHTML = thumb({ img: imgs[0], emoji: p.emoji }, true);
