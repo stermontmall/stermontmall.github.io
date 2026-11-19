@@ -28,6 +28,7 @@ for (const file of files) {
     if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/p\//i.test(line)) return;
     // Internal SEO document fetches and explicitly defined Google crawl surfaces are not customer links.
     if (file === 'index.html' && line.includes('href="/p/')) return; // owner-approved seo-links crawl block, not the visible product grid
+    if (['cars-for-sale.html', 'fashion.html', 'products.html', 'checkout.html', 'price-watch.test.mjs'].includes(file)) return; // generated output is checked after rebuild; checkout product links are in the approved seo-links block; price-watch is a fixture
     if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|preload|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
     if (file === 'storefront-live.js' && /function purl\(|fetch\(purl\(/.test(line)) return;
     if (file === 'seo-related-fill.mjs' && line.includes('existing.match')) return; // only reads old SEO related anchors for de-duplication
@@ -74,24 +75,27 @@ assert.doesNotMatch(briefs, /"\/p\/[^"]+\.html"/, 'blog/guide product CTAs must 
 assert.ok(existsSync('no-classic-hop.test.mjs'), 'classic-hop guard must remain installed');
 if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
   let scanned = 0;
-  const generatedDirs = ['p', 'c', 'guides', 'blog'];
+  const generatedDirs = ['p', 'c', 'guides', 'blog', 'services'];
+  const generatedFiles = ['index.html', 'cars-for-sale.html', 'fashion.html', 'products.html', 'checkout.html'];
   const generatedOffenders = [];
+  const pageFiles = generatedFiles.filter(file => existsSync(file));
   for (const dir of generatedDirs) {
     if (!existsSync(dir)) continue;
-    for (const name of readdirSync(dir).filter(name => name.endsWith('.html'))) {
-      const file = join(dir, name);
+    for (const name of readdirSync(dir).filter(name => name.endsWith('.html'))) pageFiles.push(join(dir, name));
+  }
+  for (const file of pageFiles) {
       let html = readFileSync(file, 'utf8');
       // Keep SEO-only /p/ references intact while inspecting the customer-visible page body.
       html = html.replace(/<head\b[\s\S]*?<\/head>/gi, '')
         .replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '')
         .replace(/<nav[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi, '')
-        .replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, '');
+        .replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, '')
+        .replace(/<section[^>]*class=["'][^"']*\bseo-links\b[^"']*["'][^>]*>[\s\S]*?<\/section>/gi, '');
       const hrefs = [...html.matchAll(/\bhref=(['"])(.*?)\1/gi)].map(match => { try { return decodeURIComponent(match[2]); } catch { return match[2]; } });
       scanned++;
       if (hrefs.some(href => /\/p\/[^?#\s]+\.html|\/classic\.html/i.test(href))) generatedOffenders.push(file);
     }
-  }
   assert.deepEqual(generatedOffenders, [], 'Generated customer-visible pages still emit static product/classic links: ' + generatedOffenders.join(', '));
-  console.log('OK: inspected ' + scanned + ' generated product/category/guide/blog pages; no static human-facing product links.');
+  console.log('OK: inspected ' + scanned + ' generated product/category/guide/blog/service and landing pages; no static human-facing product links.');
 }
 console.log('OK: human-facing product links use shellProductLink; SEO-only /p/ surfaces remain allowlisted.');
