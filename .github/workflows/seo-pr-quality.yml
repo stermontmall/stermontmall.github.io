@@ -24,6 +24,7 @@ on:
       - 'AGENTS.md'
       - 'rules/publishing-rule.json'
       - 'database/enforce-canonical-four-tier-product-defaults.sql'
+      - 'database/no-fake-old-price-on-new-products.sql'
       - 'pricing-rule-defaults.test.mjs'
       - 'product-codes.test.mjs'
       - 'seo-overrides.json'
