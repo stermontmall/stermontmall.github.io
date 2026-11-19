@@ -15,6 +15,16 @@ on:
       - 'blog-build.mjs'
       - 'seo-pest/**'
       - 'catalog-v10.js'
+      - 'admin.html'
+      - 'admin-bulk.js'
+      - 'admin-photo-ai.js'
+      - 'admin-publishing-rules.js'
+      - 'PUBLISHING.md'
+      - 'CLAUDE.md'
+      - 'AGENTS.md'
+      - 'rules/publishing-rule.json'
+      - 'database/enforce-canonical-four-tier-product-defaults.sql'
+      - 'pricing-rule-defaults.test.mjs'
       - 'product-codes.test.mjs'
       - 'seo-overrides.json'
       - 'product-description-html.mjs'
@@ -104,6 +114,10 @@ jobs:
             node --check seo-shell-redirect.mjs
             node --check seo-shell-redirect.test.mjs
             node --check catalog-v10.js
+            node --check admin-bulk.js
+            node --check admin-photo-ai.js
+            node --check admin-publishing-rules.js
+            node --check pricing-rule-defaults.test.mjs
             node --check product-codes.test.mjs
             node --check seo-check.mjs
             node --check data-health.mjs
@@ -114,6 +128,8 @@ jobs:
             node --check product-content.test.mjs
             node --check seo-meta.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-syntax.log"
+      - name: Test canonical admin pricing and posting rules
+        run: node pricing-rule-defaults.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/07b-pricing-rule-defaults.log"
       - name: Test category buying introductions and FAQ consistency
         run: node category-editorial.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-category-editorial.log"
       - name: Test product description rendering and legacy category-link normalization
