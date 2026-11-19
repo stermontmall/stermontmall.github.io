@@ -7,6 +7,11 @@
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const normalizeInternalPath = path => path.replace(/^\/category\/([a-z0-9][a-z0-9-]*)\/?$/i, '/c/$1.html');
+const stripSupplierAttribution = value => String(value || '')
+  .replace(/(?:^|(?<=[.!?]\s))[^.!?]*(?:Agropests|the supplier|supplier(?:'s)?|sold by other suppliers)[^.!?]*[.!?]?/gi, ' ')
+  .replace(/Supplier\s*:\s*[^.\n]+[.]?/gi, ' ')
+  .replace(/(?:^|[\n;])\s*Pack:\s*(?:piece|pieces|pc|pcs)\s*(?=$|[\n;])/gi, ' ')
+  .replace(/\s{2,}/g, ' ').trim();
 const inline = s => esc(s)
   .replace(/\[([^\]]+)\]\((?:https?:\/\/stermontarcade\.co\.ke)?(\/[^)\s]*)\)/g, (_match, label, path) => `<a href="${normalizeInternalPath(path)}">${label}</a>`)
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
@@ -48,13 +53,14 @@ function renderBody(body, heading) {
     body = String(body || '').replace(/^\s*&\s*Key Benefits\b[\s:—-]*/i, '').replace(/^\s*Product Overview\s*&\s*Key Benefits\b[\s:—-]*/i, '');
   }
   if (heading.toLowerCase().includes('frequently asked questions') || heading.toLowerCase() === 'faqs') {
-    const qLines = body.split(/\n+/).map(x => x.trim()).filter(Boolean);
+    body = String(body).replace(/\s+Q:\s*/gi, '\nQ: ').replace(/\s+A:\s*/gi, '\nA: ');
+    const qLines = body.replace(/\s+Q:\s*/gi, '\nQ: ').replace(/\s+A:\s*/gi, '\nA: ').split(/\n+/).map(x => x.trim()).filter(Boolean);
     const marked = qLines.filter(x => /^Q:\s*/i.test(x));
     if (marked.length) return marked.map(q => {
       const rest = q.replace(/^Q:\s*/i, '');
       const split = rest.match(/^(.+?\?)\s+([\s\S]+)$/);
       const question = split ? split[1] : rest;
-      const answer = split ? split[2] : (qLines.slice(qLines.indexOf(q) + 1).find(x => !/^Q:/i.test(x)) || '');
+      const answer = (split ? split[2] : (qLines.slice(qLines.indexOf(q) + 1).find(x => /^A:/i.test(x)) || '')).replace(/^A:\s*/i, '');
       return '<p><strong>' + inline(question) + '</strong></p>' + (answer ? '<p>' + inline(answer) + '</p>' : '');
     }).join('');
     const faq = splitFaq(body);
@@ -80,7 +86,7 @@ function renderBody(body, heading) {
 
 // Extract exactly four authored buyer Q&As for product FAQPage JSON-LD.
 export function extractProductFaq(source) {
-  let raw = String(source || '').replace(/\\r\\n|\\n|\\r/g, '\n')
+  let raw = stripSupplierAttribution(String(source || '')).replace(/\\r\n|\n|\\r/g, '\n')
     .replace(/^#[^#\n]*##[ \t]*/i, '## ')
     .replace(/[ \t]+##[ \t]+/g, '\n\n## ')
     .replace(/[ \t]+###[ \t]+/g, '\nQ: ');
@@ -121,13 +127,13 @@ function splitInlineMarkdownHeadings(source) {
     (_m, opening) => '\n## Product Overview & Key Benefits\n\n' + opening);
   // The canonical titles are known exactly, so split them without depending on the next sentence's first word.
   for (const [title, canonical] of KNOWN_TITLES) {
-    const known = new RegExp('##\\s+' + title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\w])\\s*', 'gi');
+    const known = new RegExp('##\s+' + title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\w])\s*', 'gi');
     text = text.replace(known, () => '\n## ' + canonical + '\n');
   }
   // Earlier catalogue drafts placed each section title and its first sentence on the same line.
   // Split only at known sentence-opening cues; retain every original word and map the title to a canonical section.
   const cues = '(?:The|This|PCPB|Agropests|Imagine Care|Cheapthings|Farm Rescue|Farm|Naivas|Jumia|Osho|PPCK|AgriGuard|M-Tolori|Air Chopper|Hafeton|Navigator|Mende Mo Fire|Osefin|Sevin|SCUD|Punisher|Kilex|Hygienic|Pareto|Customers|Shoppers|People|Before|Check|Confirm|Compare|Browse|Read|Follow|Always|Ask|Use|Do|Keep|If|Once|For|One|An|A larger|A smaller|A small|A product|A 20|A 100|A separate|A retailer|A|An|It|Our|Stermont|The current|M-Pesa|WhatsApp|Sarit|Delivery)';
-  const re = new RegExp('##\\s+([^\\n]{3,110}?)\\s+(' + cues + ')\\b', 'g');
+  const re = new RegExp('##\s+([^\n]{3,110}?)\s+(' + cues + ')\b', 'g');
   const canonicalTitles = new Set(KNOWN_TITLES.map(([, canonical]) => canonical));
   // A line that is already a canonical title is left alone, otherwise the "Use" in "Where & How to Use in Kenya" reads as a cue.
   return text.split('\n').map(line => canonicalTitles.has(line.replace(/^##\s+/, '').trim()) ? line : line.replace(re, (_m, title, start) => {
@@ -138,9 +144,9 @@ function splitInlineMarkdownHeadings(source) {
 
 export function productDescriptionHtml(source) {
   // Remove generic buying-guide boilerplate; retain the product-specific copy.
-  let raw = String(source || '')
+  let raw = stripSupplierAttribution(String(source || ''))
     // Decode stored escaped line breaks; split inline Markdown headings into renderer section boundaries.
-    .replace(/\\r\\n|\\n|\\r/g, '\n')
+    .replace(/\\r\n|\n|\\r/g, '\n')
     .replace(/^#[^#\n]*##[ \t]*/i, '## ')
     .replace(/[ \t]+##[ \t]+/g, '\n\n## ')
     .replace(/[ \t]+###[ \t]+/g, '\nQ: ')
