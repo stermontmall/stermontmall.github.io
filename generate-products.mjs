@@ -34,9 +34,9 @@ const BRAND = 'Stermont Arcade';
 // Hand-written, model-specific buying guidance. Only add entries after checking the live catalogue description.
 const PRODUCT_CONTENT = existsSync('product-content.json') ? JSON.parse(readFileSync('product-content.json', 'utf8')) : {};
 // Real product brand for Google. Add more brands here any time; if none matches, the store name is used.
-const BRANDS = ['Alagzi', 'Kungu Nil', 'Greenlife', 'Zagro', 'Alonze', 'Pentagon', 'Absolute', 'Abasi', 'Hisense', 'Samsung', 'LG', 'Tecno', 'Infinix', 'Itel', 'Oppo', 'Xiaomi', 'Redmi', 'Apple', 'Nokia', 'Sony', 'JBL', 'TCL', 'Syinix', 'Vitron', 'Ramtons', 'Von', 'Mika', 'Nunix', 'Sayona', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Philips', 'Bruhm', 'Rockstar', 'Snake', 'Fumakilla', 'Moskill', 'Mos-Kill', 'Resolve'];
+const BRANDS = ['Alagzi', 'Kungu Nil', 'Greenlife', 'Zagro', 'Alonze', 'Pentagon', 'Absolute', 'Abasi', 'Actellic', 'Ailyons', 'AICO', 'Essie', 'Premier', 'Solo', 'Punisher', 'Rafiki', 'RodiRid', 'Hisense', 'Samsung', 'LG', 'Tecno', 'Infinix', 'Itel', 'Oppo', 'Xiaomi', 'Redmi', 'Apple', 'Nokia', 'Sony', 'JBL', 'TCL', 'Syinix', 'Vitron', 'Ramtons', 'Von', 'Mika', 'Nunix', 'Sayona', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Philips', 'Bruhm', 'Rockstar', 'Snake', 'Fumakilla', 'Moskill', 'Mos-Kill', 'Resolve'];
 const brandOf = name => { const n = ` ${String(name).toLowerCase()} `; return BRANDS.filter(b => n.includes(` ${b.toLowerCase()} `)).sort((a, b) => b.length - a.length)[0] || null; };
-const RETURNS = { '@type': 'MerchantReturnPolicy', applicableCountry: 'KE', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 2, url: 'https://stermontarcade.co.ke/returns.html' };
+const RETURNS = { '@type': 'MerchantReturnPolicy', applicableCountry: 'KE', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 2, url: 'https://stermontarcade.co.ke/returns-warranty.html' };
 // Delivery facts from shipping.html: all of Kenya, usually 1 to 3 days. The fee depends on location and is confirmed before payment, so no fixed rate is claimed here.
 const SHIPPING = { '@type': 'OfferShippingDetails', shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'KE' }, deliveryTime: { '@type': 'ShippingDeliveryTime', transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' } } };
 // Store facts match the live Nairobi pickup page and returns/shipping policies.
@@ -63,6 +63,10 @@ const STORE_LD = {
 };
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cleanSupplierCopy = value => String(value || '')
+  .replace(/(?:^|(?<=[.!?]\\s))[^.!?]*(?:Agropests|the supplier|supplier(?:'s)?|sold by other suppliers)[^.!?]*[.!?]?/gi, ' ')
+  .replace(/Supplier\\s*:\\s*[^.\\n]+[.]?/gi, ' ')
+  .replace(/\\s{2,}/g, ' ').trim();
 const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
 const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; };
 const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
@@ -634,10 +638,11 @@ for (const p of products) {
   const ctx = { brand: brandOf(p.name), catSlug: cat?.slug };
   const approvedName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
   const generatedTitle = pdpTitle(p.name, ctx);
-  const generatedDescription = pdpDescription(p.name, ctx, p.description);
+  const cleanDescription = cleanSupplierCopy(p.description);
+  const generatedDescription = pdpDescription(p.name, ctx, cleanDescription);
   const title = String(p.meta_title || p.seo_title || generatedTitle).trim();
   // Prefer stored snippets only when they are complete sentences. Legacy imports often stored 155-character cut-offs or visible section labels.
-  const storedDescription = String(p.meta_description || '').trim();
+  const storedDescription = cleanSupplierCopy(p.meta_description || '');
   const storedDescriptionIsClean = storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(storedDescription);
   const desc = storedDescriptionIsClean ? storedDescription : generatedDescription;
   const h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
@@ -665,7 +670,7 @@ for (const p of products) {
   const ask = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(askLines.join('\n'))}`;
   const ldOne = jsonLd({
     '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
-    description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.id), category: cat?.name,
+    description: clip(cleanDescription, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.id), category: cat?.name,
     ...(brandOf(p.name) ? { brand: { '@type': 'Brand', name: brandOf(p.name) } } : {}), ...productIdentifiers(p),
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: Number(Math.round(Number(p.price) || 0)),
       availability: 'https://schema.org/' + (inStock ? 'InStock' : 'OutOfStock'), validFrom: offerValidFrom(p), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
@@ -674,10 +679,10 @@ for (const p of products) {
   });
   const ldGroup = p.variants ? jsonLd({
     '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
-    description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, category: cat?.name, ...(brandOf(p.name) ? { brand: { '@type': 'Brand', name: brandOf(p.name) } } : {}), ...rLd,
+    description: clip(cleanDescription, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, category: cat?.name, ...(brandOf(p.name) ? { brand: { '@type': 'Brand', name: brandOf(p.name) } } : {}), ...rLd,
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label, ...productIdentifiers(v),
       // Merchant Listings wants a description on every variant: use the pack's own text, else the product's, else the same generic line as the group.
-      description: clip(v.description, 500) || clip(p.description, 500) || `Buy ${p.name} – ${v.variant_label} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`,
+      description: clip(cleanSupplierCopy(v.description), 500) || clip(cleanDescription, 500) || `Buy ${p.name} – ${v.variant_label} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`,
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
       offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: Number(Math.round(Number(v.price) || 0)),
         availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), validFrom: offerValidFrom(v), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
@@ -696,7 +701,7 @@ for (const p of products) {
       ? `Check the pack for the intended crop, animal species or farm use, and follow its stated application, feeding or handling directions. Do not guess rates or combine products without qualified advice. <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> if you need help confirming suitability.`
       : `Check the product details, exact model or size and the manufacturer's instructions before use. Confirm that it suits your intended setup and any accessories or compatibility requirements. <a href="${esc(ask)}" rel="noopener">Ask us on WhatsApp</a> if you need help checking a detail.`;
   const seoBoxes = `${hd.uses ? `<div class="box"><h2 style="margin-top:0">${esc(hd.uses)}</h2><p>${usesTxt}</p></div>` : ''}<div class="box shared-order-info"><p>Need help before ordering? <a href="${esc(ask)}" rel="noopener">Confirm product details and availability on WhatsApp</a>, then review <a href="/shipping.html">delivery and pickup information</a>.</p></div>`;
-  const catalogDescription = String(p.description || '').trim();
+  const catalogDescription = cleanSupplierCopy(p.description);
   const detailFallback = 'This listing is for ' + p.name + ' in the ' + (cat?.name || 'Stermont Arcade') + ' category. Check the exact model, pack size or variant and the specifications shown on this page before ordering. If a detail is not listed, contact Stermont Arcade to confirm it. Current availability and delivery charges are confirmed before payment.';
   const productDescription = catalogDescription.length >= 100 ? catalogDescription : [catalogDescription, detailFallback].filter(Boolean).join(' ');
   const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
@@ -740,7 +745,7 @@ for (const [slug, c] of Object.entries(byCat)) {
   const categoryTools = '<style>.category-tools{display:grid;grid-template-columns:2fr 1fr 1fr;gap:.65rem;margin:1.1rem 0;padding:1rem;border:1px solid #e6e1f5;border-radius:12px;background:#fff}.category-tools label{display:grid;gap:.3rem;font-weight:700;font-size:.85rem}.category-tools input,.category-tools select{width:100%;min-width:0;padding:.7rem;border:1px solid #cfc7df;border-radius:8px;font:inherit}.category-result-count{color:#625b70;font-size:.9rem;margin:.35rem 0 .75rem}.category-faq details{padding:.85rem 0;border-bottom:1px solid #e6e1f5}.category-faq summary{cursor:pointer;font-weight:750}.category-faq p{margin:.45rem 0;line-height:1.65}@media(max-width:620px){.category-tools{grid-template-columns:1fr 1fr}.category-tools label:first-child{grid-column:1/-1}}</style><section class="category-tools" aria-label="Quick-buying filters"><label>Search products<input id="category-search" type="search" placeholder="Search this category" autocomplete="off"></label><label>Maximum price (KES)<input id="category-price" type="number" min="0" step="1" inputmode="numeric" placeholder="No maximum"></label><label>Sort by<select id="category-sort"><option value="default">Recommended</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></label></section><p class="category-result-count" id="category-result-count" aria-live="polite"></p>';
   const categoryFilterScript = '<script>(function(){var list=document.getElementById("category-products");if(!list)return;var cards=Array.prototype.slice.call(list.querySelectorAll("li[data-price]"));var search=document.getElementById("category-search"),price=document.getElementById("category-price"),sort=document.getElementById("category-sort"),count=document.getElementById("category-result-count");if(!search||!price||!sort||!count)return;function apply(){var q=(search.value||"").toLowerCase().trim(),max=price.value===""?Infinity:Number(price.value);cards.forEach(function(card){var name=(card.getAttribute("data-name")||card.textContent).toLowerCase(),amount=Number(card.getAttribute("data-price")||0),matchName=!q||name.indexOf(q)!==-1,matchPrice=!Number.isFinite(max)||amount<=max;card.hidden=!(matchName&&matchPrice)});var visible=cards.filter(function(card){return !card.hidden});if(sort.value==="low"||sort.value==="high"){visible.sort(function(a,b){var d=Number(a.dataset.price)-Number(b.dataset.price);return sort.value==="low"?d:-d}).forEach(function(card){list.appendChild(card)})}else{cards.forEach(function(card){list.appendChild(card)})}count.textContent=visible.length+" of "+cards.length+" products shown"}search.addEventListener("input",apply);price.addEventListener("change",apply);sort.addEventListener("change",apply);apply()})();</script>';
   const body = `<nav class="bc"><a href="${SITE}/">Home</a> › ${esc(c.name)}</nav><h1>${esc(info.h1 || c.name + ' in Kenya')}</h1>
-${categoryIntroHtml}${categoryTools}<p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or ask about pickup at Sarit Centre, Westlands. Delivery fees are confirmed before payment.</p>${helpCta}${serviceCrosslink}<ul class="g" id="category-products">${visibleItems.map(card).join('')}</ul>
+${categoryIntroHtml}${categoryTools}<p><b>Ordering from Kenya:</b> Pay by M-Pesa, arrange delivery to all 47 counties or visit Sarit Centre, Westlands, open daily 8 AM to 8 PM, walk-ins welcome; confirm stock on WhatsApp first.</p>${helpCta}${serviceCrosslink}<ul class="g" id="category-products">${visibleItems.map(card).join('')}</ul>
 ${categoryFilterScript}
 ${HUBS[slug] ? '<h2>' + esc(HUBS[slug].label || 'Browse by type') + '</h2><ul class="g">' + HUBS[slug].kids.filter(k => byCat[k]).map(k => `<li><a href="/c/${k}.html">${esc(byCat[k].name)}</a></li>`).join('') + '</ul>' : ''}
 ${info.guide || ''}
