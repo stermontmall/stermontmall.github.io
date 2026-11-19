@@ -10,8 +10,8 @@
 // Safe by design: every file is wrapped in try/catch, a bad page is skipped, the script never exits with an error.
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
-const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 import { catTitle, catDescription } from './seo-meta.mjs';
+const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const SITE = 'https://stermontarcade.co.ke';
 const WA = 'https://wa.me/254748888230';
