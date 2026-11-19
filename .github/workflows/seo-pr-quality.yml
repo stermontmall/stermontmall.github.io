@@ -72,6 +72,8 @@ jobs:
       # Reset per-test tab state when asserting the default landing view.
       - name: Nothing may go through /classic.html (guard)
         run: node no-classic-hop.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02-no-classic-hop.log"
+      - name: No human-facing static product share links (guard)
+        run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02b-no-static-share-links.log"
       - name: Test server-rendered homepage product cards
         run: node home-grid-ssr.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-home-grid-ssr.log"
       - name: Prepare generated product/category fixtures with the production mobile-shell routing
