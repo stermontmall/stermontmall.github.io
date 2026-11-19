@@ -18,12 +18,13 @@ const walk = (dir, out = []) => {
 };
 const files = walk('.');
 const offenders = [];
+const classicLinkPattern = new RegExp('(?:href\\s*=|\\.href\\s*=|Link:\\s*|navigator\\.share|window\\.open)[^\\n]*' + '/classic' + '\\\\.html', 'i');
 for (const file of files) {
   const text = readFileSync(file, 'utf8');
   const lines = text.split('\n');
   lines.forEach((line, index) => {
 
-    if (/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/classic\.html/i.test(line) && !['no-classic-hop.test.mjs', 'no-static-share-links.test.mjs'].includes(file)) offenders.push(file + ':' + (index + 1) + ': human-facing /classic.html link: ' + line.trim().slice(0, 220));
+    if (classicLinkPattern.test(line) && !['no-classic-hop.test.mjs', 'no-static-share-links.test.mjs'].includes(file)) offenders.push(file + ':' + (index + 1) + ': human-facing legacy-page link: ' + line.trim().slice(0, 220));
     if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/p\//i.test(line)) return;
     // Internal SEO document fetches and explicitly defined Google crawl surfaces are not customer links.
     if (file === 'index.html' && line.includes('href="/p/')) return; // owner-approved seo-links crawl block, not the visible product grid
