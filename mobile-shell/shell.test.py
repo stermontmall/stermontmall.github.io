@@ -470,11 +470,11 @@ with sync_playwright() as p:
 
     # Product/category pages hydrate the real app in place while preserving canonical SEO HTML.
     import subprocess, re as _re
-    check('generated product pages have the in-place full-shell loader', '/shell-route-loader.js?v=1' in run_node('inject', REAL, 'abasi-5-ec'))
     def run_node(fn, html, slug):
         js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1],process.argv[2])))" % fn
         return subprocess.run(['node', '-e', js, html, slug], cwd=ROOT, capture_output=True, text=True, check=True).stdout
-    page = '<!doctype html><html><head><title>t</title></head><body>x</body></html>'
+    check('generated product pages have the in-place full-shell loader', '/shell-route-loader.js?v=1' in run_node('inject', REAL, 'abasi-5-ec'))
+    page = '<!doctype html><html><head><title>t</title><link rel="canonical" href="https://stermontarcade.co.ke/p/t.html"></head><body>x</body></html>'
     new_page = run_node('inject', page, 'termidor-96-sc-1-litre')
     check('product page stays canonical and receives in-place shell hydration', '/shell-route-loader.js?v=1' in new_page and 'location.replace' not in new_page and 'rel="canonical"' in new_page, new_page)
     check('product shell bootstrap preserves SEO page metadata and is idempotent', '<title>t</title>' in new_page and run_node('inject', new_page, 'termidor-96-sc-1-litre') == new_page)
