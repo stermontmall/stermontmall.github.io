@@ -7,6 +7,7 @@ const guide = readFileSync(new URL('./PUBLISHING.md', import.meta.url), 'utf8');
 const rules = readFileSync(new URL('./PRICING-RULES.md', import.meta.url), 'utf8');
 const catalog = readFileSync(new URL('./catalog-v10.js', import.meta.url), 'utf8');
 const ruleJson = JSON.parse(readFileSync(new URL('./rules/publishing-rule.json', import.meta.url), 'utf8'));
+const canonicalSql = readFileSync(new URL('./supabase/sql/canonical_four_tier_product_pricing.sql', import.meta.url), 'utf8');
 const sqlHelper = readFileSync(new URL('./database/add-draft-product-unique-opening.sql', import.meta.url), 'utf8');
 const policy = readFileSync(new URL('./supabase/sql/staff-read-publishing-rules.sql', import.meta.url), 'utf8');
 
@@ -36,6 +37,8 @@ assert.match(catalog, /edit \\? p\\.stock : '1000'/);
 assert.match(catalog, /edit \\? p\\.low_at : 20/);
 assert.match(sqlHelper, /public\\.price_4tier\\(v_source_cost\\)/);
 assert.doesNotMatch(sqlHelper, /p_markup_pct/);
+assert.match(canonicalSql, /create or replace function public\\.price_4tier/);
+assert.match(canonicalSql, /when b < 20000 then 1\\.30[\\s\\S]*when b < 40000 then 1\\.25[\\s\\S]*when b <= 60000 then 1\\.20[\\s\\S]*else 1\\.175/);
 assert.equal(ruleJson.pricing.default_for_new_products, true);
 assert.equal(ruleJson.pricing.source_of_truth, 'Supabase public.price_4tier(p_baseline)');
 assert.equal(ruleJson.pricing.tiers.length, 4);
