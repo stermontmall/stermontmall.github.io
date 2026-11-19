@@ -24,7 +24,7 @@ const GENERATED_FILES = new Set(['products.html', 'index.html']);
 const GENERATED_MARKER = '<!-- stm-shell-product-links:v1 -->';
 const CLASSIC_FILE = ['classic', 'html'].join('.');
 const SKIP_FILES = new Set(['no-static-share-links.test.mjs', 'no-classic-hop.test.mjs', CLASSIC_FILE]);
-const HUMAN_PRODUCT = /<a\b[^>]*\bhref\s*=\s*["'`][^"'`]*\/p\/|href\s*=\s*["'`]\/p\/|(?:Link|Product link):[^\n`]*\/p\//i;
+const HUMAN_PRODUCT = /<a\b[^>]*\bhref\s*=\s*["'][^"']*(?:\/p\/|%2fp%2f)|href\s*=\s*["'][^"']*(?:\/p\/|%2fp%2f)|(?:Link|Product link):[^\n]*(?:\/p\/|%2fp%2f)/i;
 const HUMAN_CLASSIC = new RegExp('<a\\b[^>]*\\bhref\\s*=\\s*["\\x27\\x60][^"\\x27\\x60]*' + CLASSIC_FILE + '|href\\s*=\\s*["\\x27\\x60][^"\\x27\\x60]*' + CLASSIC_FILE + '|(?:location\\.(?:href|assign|replace)|window\\.open)\\s*[^;\\n]*' + CLASSIC_FILE, 'i');
 assert.ok(HUMAN_CLASSIC.test('<a href="/' + CLASSIC_FILE + '">fixture</a>'), 'classic-link detector must recognize forbidden customer links');
 
@@ -76,10 +76,11 @@ for (const file of walk('.')) {
 assert.deepEqual(offenders, [], 'human-facing static product/classic links found: ' + offenders.join(', '));
 
 // The generated-page migration changes only human-facing body URLs.
-const migrated = rewriteHtml('<html><head><link rel="canonical" href="https://stermontarcade.co.ke/p/demo-product.html"><meta property="og:url" content="https://stermontarcade.co.ke/p/demo-product.html"></head><body><nav class="bc"><a href="/p/breadcrumb.html">Breadcrumb</a></nav><!-- seo-links:start --><a href="/p/crawl-only.html">Crawler</a><!-- seo-links:end --><a href="/p/demo-product.html">Buy product</a><script>var pack={url:"/p/demo-product.html"};</script><script type="application/ld+json">{"url":"https://stermontarcade.co.ke/p/demo-product.html"}</script></body></html>');
-assert.equal(migrated.replaced, 2);
+const migrated = rewriteHtml('<html><head><link rel="canonical" href="https://stermontarcade.co.ke/p/demo-product.html"><meta property="og:url" content="https://stermontarcade.co.ke/p/demo-product.html"></head><body><nav class="bc"><a href="/p/breadcrumb.html">Breadcrumb</a></nav><!-- seo-links:start --><a href="/p/crawl-only.html">Crawler</a><!-- seo-links:end --><a href="/p/demo-product.html">Buy product</a><script>var pack={url:"/p/demo-product.html"};</script><script type="application/ld+json">{"url":"https://stermontarcade.co.ke/p/demo-product.html"}</script><a href="https://wa.me/?text=Link%3A%20https%3A%2F%2Fstermontarcade.co.ke%2Fp%2Fdemo-product.html">WhatsApp</a></body></html>');
+assert.equal(migrated.replaced, 3);
 assert.match(migrated.html, /href="https:\/\/stermontarcade\.co\.ke\/\?product=demo-product"/);
 assert.match(migrated.html, /url:"https:\/\/stermontarcade\.co\.ke\/\?product=demo-product"/);
+assert.match(migrated.html, /https%3A%2F%2Fstermontarcade\.co\.ke%2F%3Fproduct%3Ddemo-product/);
 assert.match(migrated.html, /rel="canonical" href="https:\/\/stermontarcade\.co\.ke\/p\/demo-product\.html"/);
 assert.match(migrated.html, /property="og:url" content="https:\/\/stermontarcade\.co\.ke\/p\/demo-product\.html"/);
 assert.match(migrated.html, /href="\/p\/breadcrumb\.html"/);
@@ -106,6 +107,14 @@ assert.ok(generator.includes('<link rel="canonical" href="${SITE}${path}">'));
 assert.ok(generator.includes('property="og:url" content="${SITE}${path}"'));
 assert.ok(generator.includes('url: SITE + path'));
 assert.ok(generator.includes("crumbLd([['Home', SITE + '/']")); // BreadcrumbList remains on the canonical product page
+const admin = readFileSync('admin-blog.js', 'utf8');
+assert.match(admin, /window\\.shellProductLink\\(product\\[1\\]\\)/);
+const adminPage = readFileSync('admin.html', 'utf8');
+assert.ok(adminPage.indexOf('/product-links.js') < adminPage.indexOf('admin-blog.js'), 'shared helper must load before admin blog preview');
+const kili = readFileSync('kili-pages.js', 'utf8');
+assert.ok(kili.includes('var cartHref = window.shellProductLink(pid)'));
+const receipt = readFileSync('receipt.js', 'utf8');
+assert.doesNotMatch(receipt, /\\/p\\/[a-z0-9-]+\\.html|classic\\.html/i);
 assert.ok(generator.includes('seo-links:start')); // Homepage crawler links remain in their dedicated block
 const sitemap = readFileSync('seo-extras.mjs', 'utf8');
 assert.ok(sitemap.includes('${SITE}/p/${f}')); // sitemap-products.xml keeps canonical /p/ URLs
