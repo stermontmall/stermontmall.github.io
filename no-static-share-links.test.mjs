@@ -23,6 +23,7 @@ for (const file of files) {
   const lines = text.split('\n');
   lines.forEach((line, index) => {
     if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/p\//i.test(line)) return;
+    if (/(?:href\\s*=|\\.href\\s*=|Link:\\s*|navigator\\.share|window\\.open)[^\\n]*\\/classic\\.html/i.test(line) && !['classic.html', 'no-classic-hop.test.mjs', 'no-static-share-links.test.mjs'].includes(file)) offenders.push(file + ':' + (index + 1) + ': human-facing /classic.html link: ' + line.trim().slice(0, 220));
     // Internal SEO document fetches and explicitly defined Google crawl surfaces are not customer links.
     if (file === 'index.html' && line.includes('href="/p/')) return; // owner-approved seo-links crawl block, not the visible product grid
     if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|preload|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
