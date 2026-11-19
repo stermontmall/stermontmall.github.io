@@ -30,6 +30,7 @@ for (const file of files) {
     if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|preload|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
     if (file === 'storefront-live.js' && /function purl\(|fetch\(purl\(/.test(line)) return;
     if (file === 'seo-related-fill.mjs' && line.includes('existing.match')) return; // only reads old SEO related anchors for de-duplication
+    if (file === 'blog-build.mjs' && line.includes('body = body.replace')) return; // transforms old blog links through shellProductLink below
     if (['seo-pest/blog-build.mjs', 'blog-write.mjs', 'blog-build.mjs', 'services/build-services.mjs'].includes(file) && line.includes('shellProductLink')) return;
     if (/seo-links|seo-links\.mjs|seo-links\.js/.test(file)) return;
     if (/no-static-share-links\.test\.mjs/.test(file)) return;
