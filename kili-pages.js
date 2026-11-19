@@ -54,7 +54,7 @@
         dd.textContent = ''; var seen = {}, n = 0;
         rows.forEach(function (r) {
           var k = String(r.name || '').toLowerCase(); if (!k || seen[k]) return; seen[k] = 1; n++;
-          var a = el('a'); a.href = '/p/' + encodeURIComponent(r.slug || r.id) + '.html';
+          var a = el('a'); a.href = (window.shellProductLink || function (s) { return '/?product=' + encodeURIComponent(s); })(r.slug || r.id);
           var im = (r.images || []).filter(Boolean)[0]; if (im) { var i = new Image(); i.src = im; i.alt = ''; i.loading = 'lazy'; a.appendChild(i); }
           var t = el('span', '', r.name); t.appendChild(el('small', '', money(r.price))); a.appendChild(t); dd.appendChild(a);
         });
@@ -66,7 +66,7 @@
         api('products?active=eq.true&name=ilike.' + encodeURIComponent('*' + term.replace(/ /g, '*') + '*') + '&select=id,slug,name,price,images&order=name.asc&limit=12').then(function (rows) { if (term === last) render(rows.slice(0, 12), q); });
       };
       inp.addEventListener('input', function () { clearTimeout(tm); var q = inp.value.trim(); if (q.length < 2) { dd.hidden = true; return; } tm = setTimeout(function () { run(q); }, 220); });
-      form.addEventListener('submit', function (e) { e.preventDefault(); var a = dd.querySelector('a[href^="/p/"]'); if (a) location.href = a.href; else if (inp.value.trim().length > 1) run(inp.value.trim()); });
+      form.addEventListener('submit', function (e) { e.preventDefault(); var a = dd.querySelector('a[href*="?product="]'); if (a) location.href = a.href; else if (inp.value.trim().length > 1) run(inp.value.trim()); });
       D.addEventListener('click', function (e) { if (!form.contains(e.target)) dd.hidden = true; });
       D.addEventListener('keydown', function (e) { if (e.key === 'Escape') dd.hidden = true; });
       setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 0);
@@ -90,7 +90,7 @@
       api('products?active=eq.true&select=id,slug,price,old_price,stock').then(function (rows) {
         var m = {}; rows.forEach(function (r) { m[r.id] = r; if (r.slug) m[r.slug] = r; });   /* card links use either the id or the clean slug */
         [].forEach.call(D.querySelectorAll('ul.g li'), function (li) {
-          var a = li.querySelector('a[href^="/p/"]'), pr = li.lastElementChild; if (!a || !pr || pr === a) return;
+          var a = li.querySelector('a[href*="?product="]'), pr = li.lastElementChild; if (!a || !pr || pr === a) return;
           if (/^\s*from/i.test(pr.textContent)) return;   /* pages that group several pack sizes keep their "From" price */
           var r = m[idOf(a.getAttribute('href'))]; if (!r) return;
           var now = Number(r.price), was = Number(r.old_price);

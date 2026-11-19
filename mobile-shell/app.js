@@ -214,7 +214,7 @@ const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
    a copied or shared link then previews as this product, from that page's head, and a phone that opens it goes straight into this same product view inside
    the shell (the inline script at the top of the page head, seo-shell-chrome.mjs, and shell-chrome.js send /p/<slug>.html to /?product=<slug>).
    Crawlers get the static page, whose canonical is this same clean address. Older links that still end in ?shell=1 keep working (same two scripts). */
-const productUrl = () => { if (!qb.p) return undefined; const z = sizeOf(qb.p, qb.size).slug || qb.p.slug; return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); };
+const productUrl = () => { if (!qb.p) return undefined; const z = sizeOf(qb.p, qb.size).slug || qb.p.slug; if (stack.includes('page-product')) return (window.shellProductLink || (s => '/?product=' + encodeURIComponent(s)))(z); return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); };
 /* A category has its own address too (owner 2026-11-09: "when I tap on categories, make a direct link"): /c/<slug>.html, the clean address of the generated category page
    (a sub-category uses its own slug). A copied or shared link previews as that category, and a phone that opens it goes straight back into the same category in the shell
    (the inline script of seo-shell-chrome.mjs sends /c/<slug>.html to /?cat=<slug>, handled by openCatLink in section 9b). The address only changes in place (replaceState):
@@ -474,6 +474,13 @@ $('#f-reset').addEventListener('click', () => {
 /* ---------- 9. Quick buy sheet ---------- */
 const qb = { p: null, size: '', qty: 1, shown: '' };
 let editingCartKey = ''; // Existing cart line being changed from the cart screen.
+function packOptions(sizes, selected, dataAttr) {
+  return sizes.map(s => {
+    const active = s.label === selected;
+    const style = 'display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;min-width:0;width:100%;padding:10px 12px;border:1px solid ' + (active ? '#7c3aed' : '#e5e7eb') + ';border-radius:12px;background:' + (active ? '#f5f0ff' : '#fff') + ';color:#1f2937;text-align:left;white-space:normal;line-height:1.25';
+    return `<button type="button" class="chip pack-option" ${dataAttr}="${esc(s.label)}" aria-selected="${active}" aria-pressed="${active}" style="${style}"><span style="font-size:12px;font-weight:600">${esc(s.label)}</span><strong style="font-size:14px;color:#6d28d9">KSh ${fmt(s.price)}</strong>${s.old ? `<s style="font-size:11px;color:#6b7280">KSh ${fmt(s.old)}</s>` : ''}</button>`;
+  }).join('');
+}
 function renderQB() {
   const { p } = qb; if (!p) return;
   const sz = sizeOf(p, qb.size);
@@ -481,7 +488,7 @@ function renderQB() {
   $('#qb-name').textContent = p.name; $('#qb-price').textContent = 'KSh ' + fmt(sz.price);
   $('#qb-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : '';
   $('#qb-qty').textContent = qb.qty;
-  $('#qb-sizes').innerHTML = p.sizes.map(s => `<button class="chip !px-4" data-size="${esc(s.label)}" aria-selected="${s.label === qb.size}">${esc(s.label)}</button>`).join('');
+  $('#qb-sizes').innerHTML = packOptions(p.sizes, qb.size, 'data-size');
   if (qb.shown !== sz.rowId) { qb.shown = sz.rowId; renderDetails(sz.rowId); }   // quantity changes do not reload the details
   syncProductMeta();
 }
@@ -625,7 +632,7 @@ async function renderDetails(rowId) {
   renderProductDescription('#qb-desc', d.description || '');
   const imgs = (d.images || []).filter(Boolean);
   $('#qb-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: qb.p.emoji })}</button>`).join('') : '';
-  if (d.slug) { $('#qb-page').href = '/p/' + encodeURIComponent(d.slug) + '.html'; $('#qb-page').hidden = false; }
+  if (d.slug) { $('#qb-page').href = (window.shellProductLink || (s => '/?product=' + encodeURIComponent(s)))(d.slug); $('#qb-page').hidden = false; }
 }
 document.addEventListener('click', e => {
   const ph = e.target.closest('[data-photo]');
@@ -645,7 +652,7 @@ async function renderPP() {
   $('#pp-img').style.background = '#fff'; $('#pp-img').innerHTML = thumb({ img: pp.img || p.img, emoji: p.emoji }, true);
   $('#pp-price').textContent = 'KSh ' + fmt(sz.price); $('#pp-old').textContent = sz.old ? 'KSh ' + fmt(sz.old) : ''; $('#pp-off').textContent = off ? '-' + off + '%' : '';
   $('#pp-qty').textContent = qb.qty;
-  $('#pp-sizes').innerHTML = p.sizes.map(x => `<button class="chip !px-4" data-pp-size="${esc(x.label)}" aria-selected="${x.label === qb.size}">${esc(x.label)}</button>`).join('');
+  $('#pp-sizes').innerHTML = packOptions(p.sizes, qb.size, 'data-pp-size');
   const rel = PRODUCTS.filter(x => x.cat === p.cat && x.id !== p.id).sort((a, b) => (b.sub === p.sub) - (a.sub === p.sub)).slice(0, 8);
   $('#pp-related-wrap').hidden = !rel.length;
   $('#pp-related').innerHTML = rel.map(x => `<button class="tap" data-pp-open="${esc(x.id)}" style="flex:none;width:112px;text-align:left"><span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:112px;height:112px;background:#fff;border:1px solid #e5e7eb">${thumb(x)}</span><span class="line-clamp-2 text-xs" style="display:block;margin-top:4px">${esc(x.name)}</span><span class="text-xs font-bold text-sale">KSh ${fmt(x.price)}</span></button>`).join('');
@@ -675,7 +682,8 @@ document.addEventListener('click', e => {
    inside the shell (seo-shell-chrome.mjs inline script + shell-chrome.js). (A /?product= address is one shell page, so it can only preview as the home page.) */
 $('#pp-share').addEventListener('click', async () => {
   if (!qb.p) return;
-  const url = location.origin + productUrl(), title = qb.p.name + ' | Stermont Arcade';
+  const shareSlug = sizeOf(qb.p, qb.size).slug || qb.p.slug;
+      const url = (window.shellProductLink || (s => '/?product=' + encodeURIComponent(s)))(shareSlug), title = qb.p.name + ' | Stermont Arcade';
   try { if (navigator.share) { await navigator.share({ title, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { toast(url); }
 });

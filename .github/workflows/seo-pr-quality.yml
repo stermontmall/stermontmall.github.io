@@ -6,6 +6,14 @@ on:
     paths:
       - 'seo-*.mjs'
       - 'generate-products.mjs'
+      - 'product-links.js'
+      - 'site-links.js'
+      - 'storefront-live.js'
+      - 'wa-float.js'
+      - 'product-trust.js'
+      - 'cat-feel.js'
+      - 'blog-build.mjs'
+      - 'seo-pest/**'
       - 'catalog-v10.js'
       - 'product-codes.test.mjs'
       - 'seo-overrides.json'
@@ -43,6 +51,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         # Explicit bash gives -eo pipefail, so `cmd | tee log` still fails the step when cmd fails.
@@ -72,6 +81,8 @@ jobs:
       # Reset per-test tab state when asserting the default landing view.
       - name: Nothing may go through /classic.html (guard)
         run: node no-classic-hop.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02-no-classic-hop.log"
+      - name: No human-facing static product share links (guard)
+        run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02b-no-static-share-links.log"
       - name: Test server-rendered homepage product cards
         run: node home-grid-ssr.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-home-grid-ssr.log"
       - name: Prepare generated product/category fixtures with the production mobile-shell routing
@@ -80,7 +91,7 @@ jobs:
           node seo-shell-redirect.mjs
           node seo-shell-redirect.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-shell-route-fixtures.log"
       - name: Run mobile shell browser regression suite
-        run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
+        run: timeout --signal=TERM --kill-after=30s 12m python3 -u mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
       - name: Broken and placeholder links (link-check.mjs)
         run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/05-link-check.log"
       - name: Test permanent product-code display and admin integration
@@ -135,6 +146,14 @@ jobs:
             node seo-safe-meta.mjs
             node seo-shell-redirect.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
+      - name: Build service pages for the generated-link guard
+        run: node services/build-services.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15a-service-pages.log"
+      - name: Normalize all generated customer-facing product links
+        run: node product-link-normalizer.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-normalize-generated-links.log"
+      - name: Verify generated pages contain no static human-facing product links
+        env:
+          STM_CHECK_GENERATED_PRODUCT_PAGES: '1'
+        run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-generated-product-links.log"
       - name: Run full on-page SEO audit against production-equivalent generated pages
         run: |
           log="$RUNNER_TEMP/ci-logs/16-seo-check.log"

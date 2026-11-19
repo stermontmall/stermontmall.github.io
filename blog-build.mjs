@@ -4,6 +4,8 @@
 // it never touches product pages, and it writes nothing when nothing changed.
 import './seo-blog-chrome.mjs';   // 2026-11-05: shell top bar + bottom nav on every blog page (same page for everyone). Remove this line to stop.
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
+const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const SITE = 'https://stermontarcade.co.ke';
 const START = '<!--BLOG-POSTS-START-->', END = '<!--BLOG-POSTS-END-->';
@@ -23,8 +25,37 @@ if (!existsSync('blog')) { console.log('No blog folder - nothing to do.'); proce
 
 // ---- read every published post ----
 const posts = [];
+const normalizePostProductLinks = html => {
+  const headEnd = html.indexOf('</head>');
+  if (headEnd < 0) return html;
+  const head = html.slice(0, headEnd + 7);
+  let body = html.slice(headEnd + 7);
+  const preserved = [];
+  const hold = value => { preserved.push(value); return '__STM_PRESERVED_' + (preserved.length - 1) + '__'; };
+  body = body.replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, hold)
+    .replace(/<nav[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi, hold)
+    .replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, hold)
+    .replace(/<section[^>]*class=["'][^"']*\bseo-links\b[^"']*["'][^>]*>[\s\S]*?<\/section>/gi, hold);
+  body = body.replace(/\bhref=(["'])(https:\/\/stermontarcade\.co\.ke)?\/p\/([^"'?#]+)\.html(?:#[^"']*)?\1/gi,
+    (m, quote, host, productSlug) => 'href=' + quote + shellProductLink(decodeURIComponent(productSlug)) + quote);
+  body = body.replace(/\bhref=(["'])(https:\/\/wa\.me\/[^"']+)\1/gi, (m, quote, value) => {
+    try {
+      const url = new URL(value), message = url.searchParams.get('text') || '';
+      const next = message.replace(/https:\/\/stermontarcade\.co\.ke\/p\/([^/?#]+)\.html(?:#[^\s]*)?/g,
+        (match, productSlug) => shellProductLink(decodeURIComponent(productSlug)));
+      if (next !== message) url.searchParams.set('text', next);
+      return 'href=' + quote + url.toString() + quote;
+    } catch { return m; }
+  });
+  body = body.replace(/__STM_PRESERVED_(\d+)__/g, (m, index) => preserved[Number(index)] || m);
+  return head + body;
+};
 for (const f of readdirSync('blog').filter(f => f.endsWith('.html') && f !== 'index.html').sort()) {
-  const h = readFileSync(`blog/${f}`, 'utf8'), slug = f.replace(/\.html$/, '');
+  const file = `blog/${f}`;
+  const original = readFileSync(file, 'utf8');
+  const h = normalizePostProductLinks(original);
+  if (h !== original) writeFileSync(file, h);
+  const slug = f.replace(/\.html$/, '');
   if (/<meta name=["']robots["'] content=["'][^"']*noindex/i.test(h)) { console.log(`Skipping ${f} (noindex).`); continue; }
   const h1 = (h.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1];
   if (!h1) { console.log(`Skipping ${f}: no <h1> heading found.`); continue; }

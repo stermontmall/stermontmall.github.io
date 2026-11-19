@@ -5,6 +5,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+const shellProductLink = createRequire(import.meta.url)('../product-links.js');
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(dir, '..');
 const SITE = 'https://stermontarcade.co.ke';
@@ -23,7 +25,7 @@ export function allText(a) {
 export function closingLinks(a) { return [...new Set(linksOf([a.intro, a.closing, ...a.sections.flatMap(s => s.paragraphs)].join(' ')))]; }
 
 export function renderPost(a) {
-  const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, p, t) => `<a href="${p}">${t}</a>`);
+  const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, p, t) => `<a href="${p.startsWith('/p/') ? shellProductLink(p.slice(3).replace(/\.html$/i, '')) : p}">${t}</a>`);
   const para = s => `<p>${inline(s)}</p>`;
   const total = words(allText(a));
   const url = `${SITE}/blog/${a.slug}.html`;
@@ -33,7 +35,7 @@ export function renderPost(a) {
   const faqHtml = `<h2>Frequently asked questions</h2>\n${a.faq.map(([q, an]) => `<h3>${esc(q)}</h3>\n<p>${esc(an)}</p>`).join('\n')}`;
   const catTitle = (() => { try { const m = fs.readFileSync(path.join(root, 'c', a.cat + '.html'), 'utf8').match(/<h1[^>]*>([^<]*)<\/h1>/i); return m ? unesc(m[1].trim()) : 'Browse the category'; } catch { return 'Browse the category'; } })();
   const relTitle = r => { try { const m = fs.readFileSync(path.join(root, 'blog', r + '.html'), 'utf8').match(/<h1[^>]*>([\s\S]*?)<\/h1>/i); return m ? unesc(m[1].replace(/<[^>]+>/g, '').trim()) : r; } catch { return r; } };
-  const catHtml = `<div class="box"><strong>Shop this category</strong><ul class="rel"><li><a href="/c/${a.cat}.html">${esc(catTitle)}</a></li><li><a href="/p/${a.product}.html">See the product and its sizes</a></li></ul></div>`;
+  const catHtml = `<div class="box"><strong>Shop this category</strong><ul class="rel"><li><a href="/c/${a.cat}.html">${esc(catTitle)}</a></li><li><a href="${shellProductLink(a.product)}">See the product and its sizes</a></li></ul></div>`;
   const relHtml = a.related.length ? `<h2>Related guides</h2>\n<ul class="rel">${a.related.map(r => `<li><a href="/blog/${r}.html">${esc(relTitle(r))}</a></li>`).join('')}</ul>` : '';
   const serviceHtml = `<div class="box"><strong>Need professional help?</strong><p>Explore <a href="/pest-control/">professional pest control and fumigation services in Kenya</a> or visit the <a href="/pest-control/blog/">Pest Control Advice Centre</a>. For a quotation, share your town, property type and pest concern.</p></div>`;
   return `<!doctype html>
@@ -76,7 +78,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     fs.writeFileSync(path.join(root, 'blog', `${a.slug}.html`), renderPost(a));
     let t = data.topics.find(x => x.slug === a.slug);
     if (!t) { t = { slug: a.slug }; data.topics.push(t); }
-    Object.assign(t, { title: a.title, angle: `Product guide for ${a.product} (hand-written, ${words(allText(a))} words).`, keywords: [], facts: ['Facts come from the catalog text of the product page.'], links: [`/p/${a.product}.html`, `/c/${a.cat}.html`, ...a.related.map(r => `/blog/${r}.html`)], status: 'drafted', drafted: DATE });
+    Object.assign(t, { title: a.title, angle: `Product guide for ${a.product} (hand-written, ${words(allText(a))} words).`, keywords: [], facts: ['Facts come from the catalog text of the product page.'], links: [shellProductLink(a.product), `/c/${a.cat}.html`, ...a.related.map(r => `/blog/${r}.html`)], status: 'drafted', drafted: DATE });
     console.log(`blog/${a.slug}.html  ${words(allText(a))} words`);
   }
   fs.writeFileSync(topicsFile, JSON.stringify(data, null, 2) + '\n');

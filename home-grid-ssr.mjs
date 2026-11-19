@@ -5,7 +5,7 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp
 export function renderHomeGridFallback(products, { limit = 8 } = {}) {
   if (!Array.isArray(products) || !Number.isInteger(limit) || limit < 1) return '';
   return products
-    .filter(p => p && p.name && Number(p.stock) > 0 && Number(p.price) > 0 && /^\/p\/[a-z0-9][a-z0-9-]*\.html$/.test(String(p.href || '')))
+    .filter(p => p && p.name && Number(p.stock) > 0 && Number(p.price) > 0 && /^https:\/\/stermontarcade\.co\.ke\/\?product=[a-z0-9][a-z0-9-]*$/i.test(String(p.href || '')))
     .slice(0, limit)
     .map(p => {
       const image = typeof p.image === 'string' && /^https:\/\//i.test(p.image)

@@ -9,6 +9,9 @@
 // same violet hero as the hub. Desktop keeps the plain full page. Never hand-edit the generated pages; edit this file.
 // OWNER RULE: the word "Kitale" must never appear in a generated page. The build fails if it does.
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
+const shellProductLink = createRequire(import.meta.url)('../product-links.js');
+import { normalizeGeneratedProductPages } from '../product-link-normalizer.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -323,7 +326,7 @@ ${p.intro.map(x => `<p>${esc(x)}</p>`).join('')}
 <h2>How to prevent ${esc(lc)}</h2><ul class="checks">${p.prevent.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
 ${p.scope ? `<h2>What we do and what we do not do</h2><p>${esc(p.scope)}</p>` : ''}
 <h2>How we deal with ${esc(lc)}</h2>${p.approach.map(x => `<p>${esc(x)}</p>`).join('')}<ol class="steps">${parent.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
-${p.shop && fs.existsSync(path.join(dir, '..', p.shop.href.replace(/^\//, ''))) ? `<p>Prefer to start yourself? See our <a href="${p.shop.href}">${esc(p.shop.label)}</a> in the shop, and read the label before you use any product.</p>` : ''}
+${p.shop && fs.existsSync(path.join(dir, '..', p.shop.href.replace(/^\//, ''))) ? `<p>Prefer to start yourself? See our <a href="${p.shop.href.startsWith('/p/') ? shellProductLink(p.shop.href.slice(3).replace(/\.html$/i, '')) : p.shop.href}">${esc(p.shop.label)}</a> in the shop, and read the label before you use any product.</p>` : ''}
 <h2>What it costs</h2><p>Pest control and fumigation at Stermont Arcade ranges from ${kes(parent.priceMin)} to ${kes(parent.priceMax)}${parent.priceOpen ? '+' : ''}. The price for ${esc(lc)} depends on the pest, the size of the property and how many visits are needed, and you get the exact price after inspection. See the <a href="${parentUrl}">full pest control service page</a>${costGuide ? ` and our guide, <a href="/services/guides/${costGuide.slug}.html">${esc(costGuide.title)}</a>` : ''}.</p>
 ${pestCoverage(p)}
 <h2 id="faq">Frequently asked questions about ${esc(lc)}</h2>${p.faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
@@ -362,6 +365,23 @@ const urls = ['/services/', '/services/guides/', ...(pests.length ? ['/services/
 write('sitemap-services.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
 
+// Final output guard: service and pest pages may inherit legacy product URLs from source data.
+// Convert only customer-facing anchors; structured data and canonical URLs are not changed.
+const normalizeServiceProductLinks = html => String(html || '').replace(
+  /(\bhref\s*=\s*)(["'])(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/p\/([^"'?#\s]+)\.html(?:[?#][^"']*)?\2/gi,
+  (_match, prefix, quote, rawSlug) => {
+    let slug = rawSlug;
+    try { slug = decodeURIComponent(slug); } catch {}
+    return prefix + quote + shellProductLink(slug) + quote;
+  }
+);
+for (const rel of out.filter(file => file.endsWith('.html'))) {
+  const file = path.join(dir, rel);
+  const before = fs.readFileSync(file, 'utf8');
+  const after = normalizeServiceProductLinks(before);
+  if (after !== before) fs.writeFileSync(file, after);
+}
+
 // Owner rule: never publish the banned town name. Fail the build (so CI commits nothing) if any generated file has it.
 const banned = out.filter(rel => /kitale/i.test(fs.readFileSync(path.join(dir, rel), 'utf8')));
 if (banned.length) { console.error('BANNED TOWN NAME FOUND IN:', banned.join(', ')); process.exit(1); }
@@ -369,3 +389,6 @@ if (banned.length) { console.error('BANNED TOWN NAME FOUND IN:', banned.join(', 
 const low = [...Object.entries(counts.services), ...Object.entries(counts.guides), ...Object.entries(counts.pests || {}).filter(([k]) => k !== 'index')].filter(([, n]) => n < 600);
 console.log('wrote', out.length, 'files', JSON.stringify(counts));
 if (low.length) console.log('UNDER 600 WORDS:', JSON.stringify(low));
+
+// Final shared pass catches links inherited from every service/pest source section.
+normalizeGeneratedProductPages();

@@ -100,6 +100,7 @@
   /* straight product URL: /p/<id>.html (the real page Google indexes), never a #hash */
   var SLUGS = {};   /* product id -> clean page name (products.slug); falls back to the id */
   function purl(id) { return '/p/' + encodeURIComponent(SLUGS[id] || id) + '.html'; }
+   function shareProductUrl(id) { return (window.shellProductLink || function (s) { return '/?product=' + encodeURIComponent(s); })(SLUGS[id] || id); }
 
   /* ---------- tab title + meta description follow the open product (no manual refresh needed) ----------
      The product view is a soft navigation (pushState), so the browser never reloads the page and the tab title would stay on the
@@ -263,7 +264,7 @@
     s.textContent = sold ? 'Sold out' : p.stock <= 5 ? 'Only ' + p.stock + ' left' : 'In stock';
     var avail = sold ? 'Currently sold out' : p.stock <= 5 ? 'Only ' + p.stock + ' left' : 'In stock';
     var sum = ['Hello Stermont Arcade, I would like to enquire about this item:', '', 'Product: ' + p.name.replace(/^Buy\s+/i, ''), 'Price: ' + money(p.price) + (p.unit && !p.variant_label ? ' / ' + p.unit : ''),
-      'Availability: ' + avail].concat(p.categories && p.categories.name ? ['Category: ' + p.categories.name] : [], ['Ref: ' + p.id, 'Link: ' + location.origin + purl(p.id), '', 'Please confirm availability and the delivery fee to my location.']).join('\n');
+      'Availability: ' + avail].concat(p.categories && p.categories.name ? ['Category: ' + p.categories.name] : [], ['Ref: ' + p.id, 'Link: ' + shareProductUrl(p.id), '', 'Please confirm availability and the delivery fee to my location.']).join('\n');
     var wl = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(sum); q('.wa').href = wl; q('.wat').href = wl;
     renderGallery();
     var d = q('.desc'), full = q('.full'); d.textContent = ''; full.hidden = !p.description;
@@ -274,8 +275,8 @@
     if (d.scrollHeight > 270) { d.classList.add('clip'); more.hidden = false; more.textContent = 'Show more ▾'; }
     /* address bar shows the straight product URL; remember the page we came from so closing the view puts it back */
     if (!BASE && location.pathname.indexOf('/p/') !== 0) BASE = location.pathname + location.search;
-    if (!noPush) { try { history.pushState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }
-    else if (keep) { try { history.replaceState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }   /* switching pack size: update the URL in place */
+    if (!noPush) { try { history.pushState({ stm: p.id }, '', shareProductUrl(p.id)); } catch (e) {} }
+    else if (keep) { try { history.replaceState({ stm: p.id }, '', shareProductUrl(p.id)); } catch (e) {} }   /* switching pack size: update the URL in place */
     setMeta(p);   /* tab title + meta description now match the product that is open */
   }
   function hide() {

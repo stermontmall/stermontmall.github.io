@@ -1,3 +1,31 @@
+## 2026-11-20 00:31 (Africa/Nairobi) — First browser run and test-fixture correction
+- The pack-card assertions passed in Actions: all four quick-buy pack cards rendered their own KSh prices; the selected 250 ml card remained highlighted and displayed both KSh 1,550 and its previous KSh 1,782 price; the selected-price summary updated immediately.
+- The broader browser run then stopped at a pre-existing test-order bug: `BASE` was referenced in the early quick-buy deep-link assertion before it was assigned later in the test file. No storefront assertion failed before that point.
+- Corrected that assertion to build the local test URL from the already-defined `URL` constant (`URL.rstrip('/')`), without changing production code.
+- Next: inspect the Actions run for commit `6281900f82d008b1241ad539cc85a9aa6fe118b5`; fix any further genuine failures and rerun until the complete SEO quality gate is green. Not ready to merge yet.
+
+---
+
+## 2026-11-20 00:26 (Africa/Nairobi) — Pack-size prices shown directly on mobile-shell pack cards
+- Done on branch `fix/shell-product-links-2026-11-19-v2` (PR #991): quick-buy and full product-page pack choices now render as two-column cards. Each card shows its exact pack label, its own KSh price, and a crossed-out previous price when discounted. The active pack has a visible selected state and accessible `aria-pressed` / `aria-selected` attributes.
+- Done: the selected pack still updates the main price summary immediately; cart/checkout price data continues to use the selected variant row and its exact price.
+- Done: bumped `/mobile-shell/app.js?v=40` to `?v=41` to avoid stale mobile caches.
+- Regression coverage updated in `mobile-shell/shell.test.py` for per-card prices, selected-state feedback, and immediate price changes in both quick-buy and full product-page views.
+- Customer-facing product URLs in this PR use the mobile shell query route `/?product=<slug>`; canonical static `/p/<slug>.html` pages remain available for Google crawling. This preserves the SEO/canonical surface while making customer product links open the shell.
+- Validation: GitHub Actions quality gate pending after these commits. Do not merge or call the fix live until the mobile-shell browser tests and SEO checks pass.
+- Next exact check: inspect Actions for the latest branch commit, then fix any failing step; after green, verify a multi-pack product on a phone and confirm each card's pack label and KSh price are visible together.
+
+---
+
+## 2026-11-20 00:55 (Africa/Nairobi) — Mobile-shell browser regression: root causes found (branch `fix/shell-product-links-2026-11-19-v2`)
+- Done: `site-links.js` line 32 had a double-escaped regex (`/^\\/p\\/...`), a SyntaxError ("Invalid regular expression flags") on every static /p/ and /c/ page. Fixed to `/^\/p\/([^/]+)\.html$/i`. This bug exists only on this branch, not on `main`.
+- Done: `mobile-shell/shell.test.py` fixture. `index.html` loads `/product-links.js`, which overwrote the test's `window.shellProductLink` stub with the production-domain helper; the test now also serves a local-origin `product-links.js` (and the stub returns `location.origin + ...`). Updated stale expectations: in-shell product open now checks no reload plus the `?product=` address, and the homepage canonical is `https://stermontarcade.co.ke/`.
+- Local result before the final edits: 167/177 passed; remaining failures were these items plus sandbox network errors (`ERR_TUNNEL_CONNECTION_FAILED`, no internet here). The final edited test was NOT re-run to completion (run interrupted).
+- CI result for commit 79c6660 (run 44623036882): "Run mobile shell browser regression suite" now PASSES. The gate next fails at "Verify generated pages contain no static human-facing product links" (`node no-static-share-links.test.mjs`): many generated p/ pages (e.g. `p/abasi-5-ec-100-ml.html`) still emit a customer-visible body link to `https://stermontarcade.co.ke/p/abasi-5-ec.html` (outside head, JSON-LD, breadcrumb and seo-links blocks). Fix belongs in `generate-products.mjs` (use `shellProductLink(slug)` for that link); never edit generated pages.
+- Next: find which generator block emits that body link, switch it to `shellProductLink`, run `node no-static-share-links.test.mjs` after `node generate-products.mjs`, push, re-check `gh run list --branch fix/shell-product-links-2026-11-19-v2`. Merge only after all required checks pass.
+
+---
+
 ## 2026-11-19 — In progress: preserve canonical product/category URLs for Google
 - Found a routing conflict: seo-shell-redirect.mjs injected a JavaScript location.replace from every /p/ and /c/ page to a homepage query deep link, even though seo-shell-chrome.mjs had already been changed to strip an older redirect format.
 - Working on branch fix-seo-static-product-routes-2026-11-19: change the route pass to strip legacy redirect scripts, retain each page's canonical URL and SEO HTML, and still apply the mobile-shell top bar/bottom navigation. Explicit /?product=<slug> and /?cat=<slug> deep links remain supported.

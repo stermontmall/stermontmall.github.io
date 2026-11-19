@@ -30,6 +30,7 @@ for (const f of fs.readdirSync(dir).filter(f => /^blogs-\d+\.json$/.test(f))) {
     ok(!slugs.has(a.slug), `${id}: duplicate slug`); slugs.add(a.slug);
     ok(!fs.existsSync(path.join(root, 'blog', a.slug + '.html')) || fs.readFileSync(path.join(root, 'blog', a.slug + '.html'), 'utf8') === renderPost(a), `${id}: blog file exists and differs`);
     const h = renderPost(a);
+    ok(h.includes('href="https://stermontarcade.co.ke/?product=' + a.product + '"'), `${id}: rendered product CTA must open the mobile shell`);
     for (const m of h.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)) { try { JSON.parse(m[1].replace(/\\u003c/g, '<')); checks++; } catch { checks++; bad.push(`${id}: invalid JSON-LD`); } }
     ok(!/&amp;(amp|lt|gt|quot|#39);/.test(h), `${id}: double-escaped entity (shows as "&amp;" on the page)`);
     ok((h.match(/<h1>/g) || []).length === 1, `${id}: needs exactly one h1`);

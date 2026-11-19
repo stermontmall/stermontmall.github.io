@@ -18,6 +18,8 @@
 // Stermont Arcade - builds a real web page for every product + category, and a sitemap for Google.
 // Runs automatically on GitHub (see .github/workflows/product-pages.yml). No installs needed (Node 18+).
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
+const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 import { createHash } from 'node:crypto';
 import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
@@ -118,7 +120,7 @@ function productContentHtml(p) {
   if (!Array.isArray(sections) || !sections.length) return '';
   const paragraphHtml = x => {
     if (typeof x !== 'string') return '';
-    const safe = esc(x).replace(/\[([^\]]+)\]\((\/p\/[a-z0-9-]+\.html)\)/g, '<a href="$2">$1</a>');
+    const safe = esc(x).replace(/\[([^\]]+)\]\((\/p\/([a-z0-9-]+)\.html)\)/g, (_match, label, _path, slug) => '<a href="' + esc(shellProductLink(slug)) + '">' + label + '</a>');
     return '<p>' + safe + '</p>';
   };
   return '<div class="box product-content"><h2 style="margin-top:0">More about ' + esc(p.name) + '</h2>' +
@@ -144,6 +146,18 @@ footer{max-width:1160px;margin:2rem auto;padding:1.2rem clamp(1rem,3vw,2rem);col
 @media(max-width:759px){main{padding:1rem .85rem 7rem}.pg{gap:1rem;padding:.85rem;border-radius:18px}.pg>div:first-child>img{max-height:420px;border-radius:14px}h1{font-size:1.55rem}.stk{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;align-items:center;gap:.55rem;padding:.65rem .75rem calc(.65rem + env(safe-area-inset-bottom));background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-top:1px solid var(--line);box-shadow:0 -5px 22px rgba(15,23,42,.1)}.stk b{flex:1;min-width:0;font-size:.92rem;line-height:1.2;color:var(--brand-dark)}.stk b small{display:block;color:var(--ink);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stk a{flex:none;text-decoration:none;font-weight:800;border-radius:11px;padding:.7rem .8rem;background:var(--green);color:#fff}.stk a.call{background:#fff;color:var(--brand-dark);border:1.5px solid #c4b5fd;padding:.62rem .72rem}}
 @media(min-width:760px){.stk{display:none!important}}`;
 
+// Final output guard: imported descriptions and future sections can contain legacy
+// product URLs. Normalize customer-visible anchors at the shared render boundary;
+// canonical, Open Graph and JSON-LD URLs are intentionally outside body.
+const normalizeCustomerProductLinks = html => String(html || '').replace(
+  /(\bhref\s*=\s*)(["'])(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/p\/([^"'?#\s]+)\.html(?:[?#][^"']*)?\2/gi,
+  (_match, prefix, quote, rawSlug) => {
+    let slug = rawSlug;
+    try { slug = decodeURIComponent(slug); } catch {}
+    return prefix + quote + esc(shellProductLink(slug)) + quote;
+  }
+);
+
 const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '', robots = 'index, follow, max-image-preview:large' }) => `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
@@ -154,9 +168,9 @@ const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = ''
 <meta property="og:image" content="${esc(og || SITE + '/logo.png')}"><meta property="og:image:alt" content="${esc(og ? title + ' product photo' : BRAND + ' logo')}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(og || SITE + '/logo.png')}"><meta name="twitter:image:alt" content="${esc(og ? title + ' product photo' : BRAND + ' logo')}">${extra}
 ${path.startsWith('/p/') && og ? '<link rel="preload" as="image" href="' + esc(og) + '" fetchpriority="high">' : ''}
 <meta name="theme-color" content="#7c3aed"><style>${CSS}</style>${ld || ''}</head><body>
-<header><a href="${SITE}/">${BRAND}</a></header><main>${body}</main>
+<header><a href="${SITE}/">${BRAND}</a></header><main>${normalizeCustomerProductLinks(body)}</main>
 <footer>${BRAND} · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 748 888 230</a>
-· <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/about.html">About</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns-warranty.html">Returns &amp; Warranty</a> · <a href="${SITE}/privacy-policy.html">Privacy</a> · <a href="${SITE}/terms.html">Terms</a></footer><script src="/img-protect.js" defer></script><script src="/analytics.js" defer></script></body></html>`;
+· <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/about.html">About</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns-warranty.html">Returns &amp; Warranty</a> · <a href="${SITE}/privacy-policy.html">Privacy</a> · <a href="${SITE}/terms.html">Terms</a></footer><script src="/product-links.js" defer></script><script src="/img-protect.js" defer></script><script src="/analytics.js" defer></script></body></html>`;
 
 // Tidy names: drop any "| Stermont Arcade Kenya" / "| Buy in Kenya" tail (the page title adds its own wording).
 const tidy = n => String(n).replace(/\s*\|.*$/, '').replace(/\s+/g, ' ').trim();
@@ -497,10 +511,10 @@ const INFO = {
 <h2>General sanitation at home or work</h2>
 <p>For toilets, washable floors, drains and other household or workplace surfaces, use only products whose labels list those settings. Confirm whether the surface must be rinsed after treatment, especially where people prepare food or touch the surface frequently. Do not assume that a farm disinfectant is suitable for every household use. Keep the original container and label available so the product can be identified and handled correctly.</p>
 <h2>How to compare Kerol and Zagro Ultraxide</h2>
-<p>Compare the exact formulation and labelled application, not just the brand name or price. <a href="/p/kerol-disinfectant-fluid-1-litre.html">Kerol Disinfectant Fluid 1 Litre</a> and <a href="/p/zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre.html">Zagro Ultraxide 1 Litre</a> are separate products. Their ingredients, concentrations, approved uses and dilution rates may differ. Never transfer a dilution rate, contact time or application method from one product to another. Check the current container label and product page before ordering.</p>
+<p>Compare the exact formulation and labelled application, not just the brand name or price. <a href="${shellProductLink('kerol-disinfectant-fluid-1-litre')}">Kerol Disinfectant Fluid 1 Litre</a> and <a href="${shellProductLink('zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre')}">Zagro Ultraxide 1 Litre</a> are separate products. Their ingredients, concentrations, approved uses and dilution rates may differ. Never transfer a dilution rate, contact time or application method from one product to another. Check the current container label and product page before ordering.</p>
 <h2>Safety checks before use</h2>
 <ul><li>Wear the gloves, eye protection, protective clothing and other PPE specified on the label.</li><li>Never mix disinfectants with other cleaners or chemicals unless the label expressly permits it.</li><li>Keep children, pets, livestock, feed and drinking water away during treatment as directed.</li><li>Provide the ventilation required by the label and avoid breathing spray or mist.</li><li>Store the closed original container in the conditions stated on the label and dispose of leftover product safely.</li></ul>
-<p>For application equipment, compare the <a href="/p/2-litre-hand-pressure-sprayer-2-litres.html">2-litre hand pressure sprayer</a> and <a href="/c/sprayers-equipment.html">sprayers and application equipment</a>. Confirm that the sprayer materials and use are compatible with the disinfectant label.</p>`,
+<p>For application equipment, compare the <a href="${shellProductLink('2-litre-hand-pressure-sprayer-2-litres')}">2-litre hand pressure sprayer</a> and <a href="/c/sprayers-equipment.html">sprayers and application equipment</a>. Confirm that the sprayer materials and use are compatible with the disinfectant label.</p>`,
     faq: [
       ['How do I dilute a farm disinfectant?', 'Use the dilution printed on the exact product label for the intended application. Concentrations and contact times differ between brands and uses; do not copy a rate from another disinfectant.'],
       ['Can I use a poultry-house disinfectant while birds are inside?', 'Only if the product label expressly allows that application around live birds. Otherwise remove birds, feed and water, then follow the label for contact time, drying, ventilation and re-entry.'],
@@ -516,11 +530,11 @@ mkdirSync('p', { recursive: true }); mkdirSync('c', { recursive: true });
 const urls = [];
 
 const thumb = p => { const u = (p.images || []).filter(Boolean)[0]; return u ? `<img src="${esc(optimizedImageUrl(u, 320))}" alt="${esc(p.alt_text || (p.name + ' product photo'))}" width="160" height="150" loading="lazy" decoding="async">` : ''; };
-const card = p => `<li data-name="${esc(p.name)}" data-price="${Math.max(0, Number(p.price) || 0)}"><a href="/p/${encodeURIComponent(sl(p.id))}.html">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
+const card = p => `<li data-name="${esc(p.name)}" data-price="${Math.max(0, Number(p.price) || 0)}"><a href="${shellProductLink(sl(p.id))}">${thumb(p)}${esc(p.name)}</a><span>${p.variants ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 // Helpful, category-specific buying checks. Avoid inventing product specifications, certifications or warranty terms.
 function productSiloHtml(p, cat, related) {
-  if (!cat) return related.length ? `<section class="product-silo"><h2>Related products</h2><div class="silo-products">${related.map(x => `<a href="/p/${encodeURIComponent(sl(x.id))}.html">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div></section>` : '';
+  if (!cat) return related.length ? `<section class="product-silo"><h2>Related products</h2><div class="silo-products">${related.map(x => `<a href="${shellProductLink(sl(x.id))}">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div></section>` : '';
   const parent = Object.entries(HUBS).find(([hubSlug, hub]) => hubSlug !== cat.slug && hub.kids.includes(cat.slug));
   const hubSlug = parent ? parent[0] : cat.slug;
   const hub = byCat[hubSlug] || byCat[cat.slug] || cat;
@@ -551,7 +565,7 @@ function productSiloHtml(p, cat, related) {
     <h3>Shop the main category</h3>
     <div class="silo-links"><a href="${hubUrl}">${esc(hub.name || cat.name)} in Kenya</a></div>
     ${children.length ? `<h3>Related categories</h3><div class="silo-links">${children.map(slug => `<a href="/c/${encodeURIComponent(slug)}.html">${esc(byCat[slug].name)}</a>`).join('')}</div>` : ''}
-    ${related.length ? `<h3>Related products</h3><div class="silo-products">${related.slice(0,6).map(x => `<a href="/p/${encodeURIComponent(sl(x.id))}.html">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div>` : ''}
+    ${related.length ? `<h3>Related products</h3><div class="silo-products">${related.slice(0,6).map(x => `<a href="${shellProductLink(sl(x.id))}">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div>` : ''}
     ${guides.length ? `<h3>Helpful guides</h3><ul class="silo-guides">${guides.map(([url,label]) => `<li><a href="${url}">${esc(label)}</a></li>`).join('')}</ul>` : ''}
   </section>`;
 }
@@ -655,12 +669,12 @@ for (const p of products) {
     if (i < 0 || list.length < 2) return list.filter(x => x.id !== p.id).slice(0, 6);
     return Array.from({ length: Math.min(6, list.length - 1) }, (_, k) => list[(i + 1 + k) % list.length]);
   })();
-  const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} (${money(p.price)}) ${SITE}${path}`)}`;
+  const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} (${money(p.price)}) ${shellProductLink(sl(p.id))}`)}`;
   const packLabel = p.unit || (p.variants?.length ? p.variants.map(v => v.variant_label).join(', ') : 'confirm pack size');
   const stickyWa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order ${p.name}. Pack size: ${packLabel}. Price: KES ${Math.round(Number(p.price) || 0).toLocaleString('en-KE')}. Please confirm availability and delivery.`)}`;
   const cartUrl = `/?product=${encodeURIComponent(sl(p.id))}`;
   const askLines = [`Hello ${BRAND}, I would like to enquire about this item:`, '', `Product: ${p.name}`, `Price: ${p.variants ? 'From ' : ''}${money(p.price)}${p.unit ? ' / ' + p.unit : ''}`,
-    ...(p.variants ? [`Sizes: ${p.variants.map(v => v.variant_label).join(', ')}`] : []), `Availability: ${inStock ? 'In stock' : 'Currently sold out'}`, ...(cat ? [`Category: ${cat.name}`] : []), `Ref: ${p.id}`, `Link: ${SITE}${path}`, '', 'Please confirm availability and the delivery fee to my location.'];
+    ...(p.variants ? [`Sizes: ${p.variants.map(v => v.variant_label).join(', ')}`] : []), `Availability: ${inStock ? 'In stock' : 'Currently sold out'}`, ...(cat ? [`Category: ${cat.name}`] : []), `Ref: ${p.id}`, `Link: ${shellProductLink(sl(p.id))}`, '', 'Please confirm availability and the delivery fee to my location.'];
   const ask = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(askLines.join('\n'))}`;
   const ldOne = jsonLd({
     '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
@@ -686,9 +700,9 @@ for (const p of products) {
   const productFaqLd = productFaq.length === 4 ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: productFaq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
   const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '') + productFaqLd;
   const defaultVariant = p.variants?.find(inS) || p.variants?.[0] || null;
-  const variantWa = v => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} – ${v.variant_label} (${money(v.price)}) ${pdpVariantUrl(path, v.slug, p.slug)}`)}`;
+  const variantWa = v => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} – ${v.variant_label} (${money(v.price)}) ${shellProductLink(v.slug || p.slug || p.id)}`)}`;
   const sizeBox = p.variants ? `<section class="box pack-select" data-pack-selector aria-label="Choose product pack size"><h2>Select pack size:</h2><div class="pack-options" role="group" aria-label="Available pack sizes">${p.variants.map((v, i) => `<button type="button" class="pack-option${v.id === defaultVariant?.id ? ' is-selected' : ''}" data-pack-index="${i}" aria-pressed="${v.id === defaultVariant?.id ? 'true' : 'false'}"><span class="pack-option-label">${esc(v.variant_label)}</span><small class="pack-option-code">Code: ${esc(v.product_code || v.id)}</small></button>`).join('')}</div><p class="pack-selected-note" aria-live="polite">Selected: <b data-pack-label>${esc(defaultVariant?.variant_label || '')}</b></p></section>
-<script>(function(){var root=document.querySelector('[data-pack-selector]');if(!root)return;var variants=${JSON.stringify(p.variants.map(v=>({label:v.variant_label,price:Number(v.price)||0,code:v.product_code||v.id,available:inS(v),url:pdpVariantUrl(path,v.slug,p.slug),slug:v.slug||'',id:v.id||''}))).replace(/</g,'\\u003c')};var price=document.querySelector('[data-pack-price]'),stock=document.querySelector('[data-pack-stock]'),code=document.querySelector('[data-pack-code]'),label=root.querySelector('[data-pack-label]'),order=document.querySelector('[data-pack-order]'),sticky=document.querySelector('[data-pack-sticky]');root.addEventListener('click',function(e){var b=e.target.closest('[data-pack-index]');if(!b)return;var v=variants[Number(b.dataset.packIndex)];if(!v)return;root.querySelectorAll('[data-pack-index]').forEach(function(x){var on=x===b;x.classList.toggle('is-selected',on);x.setAttribute('aria-pressed',String(on));});if(price)price.textContent='KSh '+Math.round(v.price).toLocaleString('en-KE');if(stock){stock.textContent=v.available?'In stock':'Sold out';stock.className=v.available?'ok':'no';}if(code)code.textContent=v.code;if(label)label.textContent=v.label;var href=v.available?'https://wa.me/${WHATSAPP}?text='+encodeURIComponent('Hello ${BRAND}, I want to order: ${p.name} – '+v.label+' (KSh '+Math.round(v.price).toLocaleString('en-KE')+') '+v.url):'${esc(ask)}';[order,sticky].forEach(function(el){if(el){el.href=href;el.textContent=v.available?'Order this pack on WhatsApp':'Ask about availability';}});carts.forEach(function(el){el.href='/?product='+encodeURIComponent(v.slug||v.id);});});})();</script>` : '';
+<script>(function(){var root=document.querySelector('[data-pack-selector]');if(!root)return;var variants=${JSON.stringify(p.variants.map(v=>({label:v.variant_label,price:Number(v.price)||0,code:v.product_code||v.id,available:inS(v),url:shellProductLink(v.slug||p.slug||p.id),slug:v.slug||'',id:v.id||''}))).replace(/</g,'\\u003c')};var price=document.querySelector('[data-pack-price]'),stock=document.querySelector('[data-pack-stock]'),code=document.querySelector('[data-pack-code]'),label=root.querySelector('[data-pack-label]'),order=document.querySelector('[data-pack-order]'),sticky=document.querySelector('[data-pack-sticky]');root.addEventListener('click',function(e){var b=e.target.closest('[data-pack-index]');if(!b)return;var v=variants[Number(b.dataset.packIndex)];if(!v)return;root.querySelectorAll('[data-pack-index]').forEach(function(x){var on=x===b;x.classList.toggle('is-selected',on);x.setAttribute('aria-pressed',String(on));});if(price)price.textContent='KSh '+Math.round(v.price).toLocaleString('en-KE');if(stock){stock.textContent=v.available?'In stock':'Sold out';stock.className=v.available?'ok':'no';}if(code)code.textContent=v.code;if(label)label.textContent=v.label;var href=v.available?'https://wa.me/${WHATSAPP}?text='+encodeURIComponent('Hello ${BRAND}, I want to order: ${p.name} – '+v.label+' (KSh '+Math.round(v.price).toLocaleString('en-KE')+') '+v.url):'${esc(ask)}';[order,sticky].forEach(function(el){if(el){el.href=href;el.textContent=v.available?'Order this pack on WhatsApp':'Ask about availability';}});carts.forEach(function(el){el.href='/?product='+encodeURIComponent(v.slug||v.id);});});})();</script>` : '';
   // Local-utility sections (H2s): what it is used for, price and M-Pesa ordering, delivery and Sarit Centre pickup. Facts match shipping.html and nairobi.html.
   const nameE = esc(p.name), priceTxt = `${p.variants ? 'from ' : ''}${money(p.price)}${p.unit ? ' / ' + esc(p.unit) : ''}`;
   const usesTxt = isPcpb(cat?.slug)
@@ -704,7 +718,7 @@ for (const p of products) {
   const productDescription = catalogDescription.length >= 100 ? catalogDescription : [catalogDescription, detailFallback].filter(Boolean).join(' ');
   const buyerNotes = productBuyingNotes(p, cat);
   const body = `<a class="btn ask" href="${esc(ask)}" rel="noopener">\u{1F4AC} Ask about this item on WhatsApp</a>\n<nav class="bc"><a href="${SITE}/">Home</a>${cat ? ` › <a href="/c/${encodeURIComponent(cat.slug)}.html">${esc(cat.name)}</a>` : ''} › ${esc(p.name)}</nav>
-<div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.alt_text || (p.name + ' - product photo'))}" fetchpriority="high" loading="eager" decoding="async" width="720" height="720" data-fallbacks="${esc(JSON.stringify(img.slice(1)))}">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
+<div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.alt_text || (p.name + ' - product photo'))}" fetchpriority="high" loading="eager" decoding="async" width="720" height="720" data-fallbacks="${esc(JSON.stringify(img.slice(1)))}">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${shellProductLink(sl(p.id))}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
 <div><h1>${esc(h1)}</h1><p class="tagline" style="margin:.1rem 0 .6rem;color:#5b21b6;font-weight:600">${esc(tagline)}</p><div class="pr" data-pack-price>${money(defaultVariant ? defaultVariant.price : p.price)}${!p.variants && p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ''}</div>
 <p class="${(defaultVariant ? inS(defaultVariant) : inStock) ? 'ok' : 'no'}" data-pack-stock>${(defaultVariant ? inS(defaultVariant) : inStock) ? 'In stock' : 'Currently sold out'}</p><p class="product-code"><b>Product code:</b> <span data-pack-code>${esc(defaultVariant?.product_code || defaultVariant?.id || p.product_code || p.id)}</span></p>
 <p>Buy ${esc(p.name)} online in Kenya from ${BRAND}. Pay by M-Pesa and get delivery to all 47 counties.</p>
@@ -724,7 +738,7 @@ ${productSiloHtml(p, cat, related)}
 
 for (const a of aliases) {
   const from = `/p/${encodeURIComponent(a.id)}.html`, to = `${SITE}/p/${encodeURIComponent(sl(a.to))}.html`;
-  writeFileSync(fileOf(from), `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Redirecting\u2026</title><link rel="canonical" href="${to}"><meta http-equiv="refresh" content="0;url=${to}"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><p>This product moved. <a href="${to}">Continue to the product page</a>.</p></body></html>`);
+  writeFileSync(fileOf(from), `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Redirecting\u2026</title><link rel="canonical" href="${to}"><meta http-equiv="refresh" content="0;url=${to}"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><p>This product moved. <a href="${shellProductLink(sl(a.to))}">Continue to the product page</a>.</p></body></html>`);
 }
 
 for (const [slug, c] of Object.entries(byCat)) {
@@ -837,7 +851,7 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
       const image = (p.images || []).find(u => typeof u === 'string' && /^https:\/\//i.test(u));
       if (!image) continue;
       seen.add(category);
-      picks.push({ name: p.name, price: p.price, stock: p.stock, image, href: `/p/${encodeURIComponent(sl(p.id))}.html`, category });
+      picks.push({ name: p.name, price: p.price, stock: p.stock, image, href: shellProductLink(sl(p.id)), category });
     }
     picks.sort((a, b) => (b.category === 'pest-control-fumigation') - (a.category === 'pest-control-fumigation'));
     const cards = renderHomeGridFallback(picks, { limit: 8 });
@@ -867,12 +881,12 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
 <h2 id="seo-cats">Shop by category</h2>
 <ul>${catsAll.map(([slug, c]) => `<li><a href="/c/${encodeURIComponent(slug)}.html">${esc(c.name)}</a></li>`).join('')}</ul>
 <h2>Popular products</h2>
-<ul>${picks.slice(0, 12).map(p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${esc(p.name)}</a></li>`).join('')}</ul>
+<ul>${picks.slice(0, 12).map(p => `<li><a href="${shellProductLink(sl(p.id))}">${esc(p.name)}</a></li>`).join('')}</ul>
 <h2>Professional services and business orders</h2>
 <p>Looking for pest-control treatment information, or buying for a hotel, school, farm, office or rental property?</p>
 <ul><li><a href="/services/">Explore Stermont service information</a></li><li><a href="/services/pest-control-fumigation-nairobi.html">Pest control and fumigation service information</a></li><li><a href="/services/pests/termites.html">Termite control information</a></li><li><a href="/services/pests/bed-bugs.html">Bed bug control information</a></li><li><a href="/bulk-quote.html">Request a bulk product quote</a></li><li><a href="/nairobi.html">Nairobi shop, pickup and delivery information</a></li></ul>
 <h2>New arrivals</h2>
-<ul>${[...products].reverse().slice(0, 16).map(p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${esc(p.name)}</a></li>`).join('')}</ul>
+<ul>${[...products].reverse().slice(0, 16).map(p => `<li><a href="${shellProductLink(sl(p.id))}">${esc(p.name)}</a></li>`).join('')}</ul>
 <p><a href="/products.html">View all ${products.length} products</a> &middot; <a href="/c/">All categories</a></p>
 </div></section>
 ${B}`;
@@ -913,7 +927,7 @@ ${B}`;
         picked.push(bucket.shift());
       }
       const cards = renderHomeGridFallback(picked.map(p => ({
-        id: p.id, name: p.name, price: p.price, stock: p.stock, image: p.images?.[0], href: `/p/${encodeURIComponent(sl(p.id))}.html`
+        id: p.id, name: p.name, price: p.price, stock: p.stock, image: p.images?.[0], href: shellProductLink(sl(p.id))
       })), { limit: 8 });
       const updated = current.slice(0, start) + OPEN + cards + current.slice(close);
       if (updated !== current) writeFileSync(HOME, updated);

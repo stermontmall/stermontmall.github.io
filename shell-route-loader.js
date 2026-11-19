@@ -74,7 +74,7 @@
         document.body.appendChild(fallback);
       }
 
-      return loadScript('/mobile-shell/app.js?v=42').then(function () {
+      return loadScript('/mobile-shell/app.js?v=43').then(function () {
         if (isProductRoute) {
           var checkProductReady = function () {
             var page = document.getElementById('page-product');

@@ -46,6 +46,7 @@ on:
       - 'product-content.json'
       - 'product-content.test.mjs'
       - 'seo-kenya.mjs'
+      - 'product-link-normalizer.mjs'
       - '404.html'
       - 'check-product-pages.mjs'
       - 'check-product-pages.test.mjs'
@@ -123,6 +124,9 @@ jobs:
       - name: Kenya SEO titles, descriptions and price guides (seo-kenya.mjs)
         continue-on-error: true
         run: node seo-kenya.mjs
+
+      - name: Normalize visible product links in generated pages
+        run: node product-link-normalizer.mjs
 
       - name: Apply Google titles, descriptions and FAQs (seo-overrides.json)
         run: node seo-overrides.mjs

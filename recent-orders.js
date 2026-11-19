@@ -81,12 +81,12 @@
   /* Open the product so the visitor can buy it. */
   function go() {
     if (!curProd) return;
-    var id = curProd.id, c = D.getElementById('p-' + id);
+    var id = curProd.id, slug = curProd.slug || id, c = D.getElementById('p-' + id);
     if (c && window.STM_openView) {                       /* storefront: open the product view in place */
       var g = c.closest && c.closest('.mcat'); if (g) g.classList.add('open');
-      try { window.STM_openView(c); } catch (e) { location.href = '/#p-' + id; }
+      try { window.STM_openView(c); } catch (e) { location.href = (window.shellProductLink || function (s) { return '/?product=' + encodeURIComponent(s); })(slug); }
     } else {                                               /* any other page: storefront with that product open */
-      location.href = '/#p-' + encodeURIComponent(id);
+      location.href = (window.shellProductLink || function (s) { return '/?product=' + encodeURIComponent(s); })(id);
     }
   }
   box.addEventListener('click', function (e) { if (e.target === x) return; go(); });
@@ -115,13 +115,13 @@
       if (!list.length) return;
       D.body.appendChild(box);
       /* Look the products up so the popup can show a photo and link to the product. Both are optional. */
-      return fetch(SB + '/rest/v1/products?active=eq.true&select=id,name,variant_label,images', { headers: { apikey: KEY } })
-        .then(function (r) { if (r.ok) return r.json(); return fetch(SB + '/rest/v1/products?active=eq.true&select=id,name,images', { headers: { apikey: KEY } }).then(function (r2) { return r2.ok ? r2.json() : []; }); })
+      return fetch(SB + '/rest/v1/products?active=eq.true&select=id,slug,name,variant_label,images', { headers: { apikey: KEY } })
+        .then(function (r) { if (r.ok) return r.json(); return fetch(SB + '/rest/v1/products?active=eq.true&select=id,slug,name,images', { headers: { apikey: KEY } }).then(function (r2) { return r2.ok ? r2.json() : []; }); })
         .then(function (ps) {
           (ps || []).forEach(function (p) {
             if (!p || !p.id || !p.name) return;
             var keys = [norm(p.name)]; if (p.variant_label) keys.unshift(norm(p.name + ' - ' + p.variant_label));
-            prods.push({ id: p.id, keys: keys, img: p.images && p.images[0] });
+            prods.push({ id: p.id, slug: p.slug || p.id, keys: keys, img: p.images && p.images[0] });
           });
         })
         .catch(function () {})
