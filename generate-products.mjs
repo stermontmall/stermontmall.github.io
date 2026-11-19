@@ -64,9 +64,9 @@ const STORE_LD = {
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const cleanSupplierCopy = value => String(value || '')
-  .replace(/(?:^|(?<=[.!?]\\s))[^.!?]*(?:Agropests|the supplier|supplier(?:'s)?|sold by other suppliers)[^.!?]*[.!?]?/gi, ' ')
-  .replace(/Supplier\\s*:\\s*[^.\\n]+[.]?/gi, ' ')
-  .replace(/\\s{2,}/g, ' ').trim();
+  .replace(/(?:^|(?<=[.!?]\s))[^.!?]*(?:Agropests|the supplier|supplier(?:'s)?|sold by other suppliers)[^.!?]*[.!?]?/gi, ' ')
+  .replace(/Supplier\s*:\s*[^.\n]+[.]?/gi, ' ')
+  .replace(/\s{2,}/g, ' ').trim();
 const money = n => 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE');
 const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; };
 const jsonLd = o => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>';
@@ -629,7 +629,7 @@ function productBuyingNotes(p, cat) {
 const NAMES = {};   // product id -> the heading its page shows; the shop list reads this (product-names.json) so list, view and page always carry the same wording
 const sitemapEligibleProductPaths = new Set(); // only explicitly in-stock product pages enter the product sitemap
 for (const p of products) {
-  const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean).map(u => optimizedImageUrl(u, 900));
+  const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(isOwnedImage).map(u => optimizedImageUrl(u, 900));
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
   if (Number(p.stock) > 0) sitemapEligibleProductPaths.add(path);
   const revs = reviewsFor(p), rLd = reviewLd(revs);
@@ -683,7 +683,7 @@ for (const p of products) {
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.id), size: v.variant_label, ...productIdentifiers(v),
       // Merchant Listings wants a description on every variant: use the pack's own text, else the product's, else the same generic line as the group.
       description: clip(cleanSupplierCopy(v.description), 500) || clip(cleanDescription, 500) || `Buy ${p.name} – ${v.variant_label} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`,
-      image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
+      image: (v.images || []).filter(isOwnedImage).length ? (v.images || []).filter(isOwnedImage) : undefined,
       offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: Number(Math.round(Number(v.price) || 0)),
         availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), validFrom: offerValidFrom(v), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
         seller: { '@id': `${SITE}/#store` } } }))
