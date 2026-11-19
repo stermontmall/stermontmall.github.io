@@ -7,6 +7,14 @@ Allow: /
 Disallow: /admin.html
 Disallow: /account.html
 
+# Internal working files that GitHub Pages publishes but that are not site content.
+# This only stops crawling; it does not hide the files from people who know the URL.
+Disallow: /*.md$
+Disallow: /*.csv$
+Disallow: /*.sql$
+Disallow: /*.test.mjs$
+Disallow: /*.test.py$
+
 Sitemap: https://stermontarcade.co.ke/sitemap.xml
 Sitemap: https://stermontarcade.co.ke/sitemap-products.xml
 Sitemap: https://stermontarcade.co.ke/sitemap-images.xml
