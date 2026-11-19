@@ -358,7 +358,7 @@
     AB.appendChild(el('div', 'ac-sec', 'My settings'));
     row('Address book', 'M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z', function () { go('addr'); });
     row('Account management', 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM4 21c0-4 3.6-6 8-6s8 2 8 6', null, null, 'account.html');
-    row('Privacy policy', 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z', null, null, 'privacy.html');
+    row('Privacy policy', 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z', null, null, 'privacy-policy.html');
     if (S) { var lo = el('button', 'ac-out', 'Logout'); lo.type = 'button'; lo.addEventListener('click', function () { try { localStorage.removeItem(SK); } catch (e) {} shut(); location.reload(); }); AB.appendChild(lo); }
   }
 

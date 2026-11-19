@@ -2,8 +2,7 @@
 // Runs after generate-products.mjs. generate-products only links a product to other products in its OWN category, so a product in a
 // category with 1 to 6 items gets few or no product links (for example NIVEA Sun, the only Health & Beauty product, linked to nothing).
 // Pages Google has only seen in a sitemap, with no links from other pages, tend to stay "Discovered - currently not indexed".
-// This tops every product page up to 6 related product links, choosing from the same product family first (pest control, agro, electronics,
-// home, fashion), and rotates the choice so every product also RECEIVES links from other pages. Pure HTML post-processing, no network.
+// This adds up to 6 related product links from the exact same catalogue category. It never crosses into unrelated product families.
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const DIR = 'p', TARGET = 6, MARK = '<!--stm-also-->', BRAND = 'Stermont Arcade';
@@ -33,12 +32,12 @@ for (const f of readdirSync(DIR).sort()) {
     price: pick(html, /<meta property="product:price:amount" content="([^"]*)"/),
     from: /<div class="pr">(?:<s>[^<]*<\/s> )?From /.test(html),
     inStock: !/product:availability" content="out of stock"/.test(html),
-    img: img && !/\/logo\.png$/.test(img) ? img : ''
+    img: img && ownedImage(img) && !/\/logo\.png$/.test(img) ? img : ''
   });
 }
 
 const N = pages.length, idx = new Map(pages.map((p, i) => [p.file, i]));
-const familyOf = cat => FAMILIES.find(fam => fam.includes(cat)) || [];
+const ownedImage = value => /^https:\/\/(?:stermontarcade\.co\.ke|oewvtbnmyombbtggamor\.supabase\.co)\//i.test(String(value || ''));
 const card = p => `<li><a href="${p.href}">${p.img ? `<img src="${p.img}" alt="${p.name.replace(/"/g, '&quot;')}" width="160" height="150" loading="lazy" decoding="async">` : ''}${p.name}</a><span>${p.from ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 let changed = 0, already = 0;
@@ -51,12 +50,12 @@ for (const p of pages) {
   const have = new Set((existing.match(/<li><a href="\/p\/[^"]+/g) || []).map(s => s.replace('<li><a href="', '')));
   const need = TARGET - have.size;
   if (need <= 0) continue;
-  const self = idx.get(p.file), fam = new Set(familyOf(p.cat));
-  const dist = o => (idx.get(o.file) - self + N) % N;                // rotate so links are spread across the whole catalogue
-  const pool = pages.filter(o => o.file !== p.file && o.inStock && !have.has(o.href)).sort((a, b) => (fam.has(b.cat) - fam.has(a.cat)) || (dist(a) - dist(b)));
+  const self = idx.get(p.file);
+  const dist = o => (idx.get(o.file) - self + N) % N;
+  const pool = pages.filter(o => o.file !== p.file && o.inStock && o.cat === p.cat && !have.has(o.href)).sort((a, b) => dist(a) - dist(b));
   const add = pool.slice(0, need);
   if (!add.length) continue;
-  const block = `${MARK}<h2>${have.size ? 'You may also like' : 'More from ' + BRAND}</h2><ul class="g">${add.map(card).join('')}</ul>\n`;
+  const block = `${MARK}<h2>${have.size ? 'You may also like' : 'More in this category'}</h2><ul class="g">${add.map(card).join('')}</ul>\n`;
   writeFileSync(`${DIR}/${p.file}`, p.html.slice(0, stk) + block + p.html.slice(stk));
   changed++;
 }
