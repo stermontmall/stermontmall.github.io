@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import shellProductLink from './product-links.js';
 import { productDescriptionHtml } from './product-description-html.mjs';
 import { renderPost } from './seo-pest/blog-build.mjs';
+import { rewriteHtml } from './rewrite-static-product-links.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), SITE + '/?product=premise-200-sc-termiticide-50-ml');
@@ -18,7 +19,7 @@ const SEO_SURFACE_ALLOWLIST = [
   'homepage <!-- seo-links:start --> ... <!-- seo-links:end --> crawl links'
 ];
 const SKIP_DIRS = new Set(['.git', 'node_modules', 'assets', 'product-photos']);
-const GENERATED_DIRS = new Set(['p', 'c', 'guides']);
+const GENERATED_DIRS = new Set(['p', 'c', 'guides', 'pest-control', 'services']);
 const GENERATED_FILES = new Set(['products.html', 'index.html']);
 const GENERATED_MARKER = '<!-- stm-shell-product-links:v1 -->';
 const CLASSIC_FILE = ['classic', 'html'].join('.');
@@ -66,7 +67,6 @@ for (const file of walk('.')) {
     const end = source.indexOf('<!-- seo-links:end -->');
     assert.ok(start >= 0 && end > start, 'homepage SEO crawl-link markers must remain present');
   }
-  if ((GENERATED_DIRS.has(top) || GENERATED_FILES.has(file)) && !source.includes(GENERATED_MARKER)) continue; // stale output is rebuilt by its source workflow
   // The explicit SEO crawl block and product breadcrumb are allowlisted, never treated as customer CTAs.
   source = source.replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, '');
   source = source.replace(/<nav\b[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi, '');
@@ -74,6 +74,17 @@ for (const file of walk('.')) {
   if (HUMAN_CLASSIC.test(source)) offenders.push(file + ' (classic URL)');
 }
 assert.deepEqual(offenders, [], 'human-facing static product/classic links found: ' + offenders.join(', '));
+
+// The generated-page migration changes only human-facing body URLs.
+const migrated = rewriteHtml('<html><head><link rel="canonical" href="https://stermontarcade.co.ke/p/demo-product.html"><meta property="og:url" content="https://stermontarcade.co.ke/p/demo-product.html"></head><body><nav class="bc"><a href="/p/breadcrumb.html">Breadcrumb</a></nav><!-- seo-links:start --><a href="/p/crawl-only.html">Crawler</a><!-- seo-links:end --><a href="/p/demo-product.html">Buy product</a><script>var pack={url:"/p/demo-product.html"};</script><script type="application/ld+json">{"url":"https://stermontarcade.co.ke/p/demo-product.html"}</script></body></html>');
+assert.equal(migrated.replaced, 2);
+assert.match(migrated.html, /href="https:\/\/stermontarcade\.co\.ke\/\?product=demo-product"/);
+assert.match(migrated.html, /url:"https:\/\/stermontarcade\.co\.ke\/\?product=demo-product"/);
+assert.match(migrated.html, /rel="canonical" href="https:\/\/stermontarcade\.co\.ke\/p\/demo-product\.html"/);
+assert.match(migrated.html, /property="og:url" content="https:\/\/stermontarcade\.co\.ke\/p\/demo-product\.html"/);
+assert.match(migrated.html, /href="\/p\/breadcrumb\.html"/);
+assert.match(migrated.html, /href="\/p\/crawl-only\.html"/);
+assert.match(migrated.html, /"url":"https:\/\/stermontarcade\.co\.ke\/p\/demo-product\.html"/);
 
 // Explicitly protect the SEO surfaces from accidental removal or conversion.
 const generator = readFileSync('generate-products.mjs', 'utf8');
