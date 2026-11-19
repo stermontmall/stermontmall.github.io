@@ -107,8 +107,8 @@ const unchecked = results.length - ok.length + notChecked;
 const out = [];
 out.push(`# Google indexing status ${new Date().toISOString().slice(0, 10)}`);
 out.push('');
-out.push(`Checked **${ok.length}** pages with Google (rotating daily batch, products prioritized). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${unchecked ? `, ${unchecked} not checked in this batch` : ''}.`);
-if (stopReason) out.push('', `> Stopped early because ${stopReason}. The pages not checked are the last ones in the list; they will be checked on a later run.`);
+out.push(`Checked **${ok.length}** pages with Google (rotating daily batch; product URLs lead the cycle). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${unchecked ? `, ${unchecked} not checked in this batch` : ''}.`);
+if (stopReason) out.push('', `> Stopped early because ${stopReason}. The next daily report rotates to a different section of the sitemap.`);
 out.push('');
 if (notIndexed.length) {
   out.push('## Why pages are not indexed');
