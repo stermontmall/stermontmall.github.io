@@ -62,13 +62,13 @@ if (existsSync(`blog/${topic.slug}.html`)) { console.error(`blog/${topic.slug}.h
 const allowed = new Set(['/products.html', '/c/', '/shipping.html', '/returns.html']);
 if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.html') && f !== 'index.html')) allowed.add(`/c/${f}`);
 if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.html')))
-  if (!/http-equiv="refresh"/i.test(readFileSync(`p/${f}`, 'utf8'))) allowed.add(`/p/${f}`);
+  if (!/http-equiv="refresh"/i.test(readFileSync(`p/${f}`, 'utf8'))) { allowed.add(`/p/${f}`); allowed.add(`/?product=${f.replace(/\.html$/i, '')}`); }
 for (const p of posts) allowed.add(p.path);
 
 const tt = tokens([topic.slug, ...(topic.keywords || [])].join(' '));
 const related = posts.map(p => ({ ...p, score: jaccard(tt, p.tok) })).filter(p => p.score > 0).sort((a, b) => b.score - a.score).slice(0, 3);
 const cats = [...new Set((topic.links || []).filter(l => /^\/c\//.test(l) && allowed.has(l)))].slice(0, 3);
-const offered = [...new Set([...(topic.links || []), ...cats, ...related.map(r => r.path), '/products.html', '/blog/how-to-order-and-pay-by-mpesa-online-kenya.html'])].filter(p => allowed.has(p));
+const offered = [...new Set([...(topic.links || []).map(p => p.startsWith('https://stermontarcade.co.ke/?product=') ? p.replace('https://stermontarcade.co.ke', '') : p), ...cats, ...related.map(r => r.path), '/products.html', '/blog/how-to-order-and-pay-by-mpesa-online-kenya.html'])].filter(p => allowed.has(p));
 
 const SYSTEM = `You write buying guides and how-to articles for Stermont Arcade, an online store in Kenya (pest control, agrovet, appliances and electronics). Write plain, friendly English for Kenyan shoppers. The article must answer what a person typing the topic into Google actually wants to know, quickly and clearly.
 Rules:
@@ -176,7 +176,7 @@ for (let i = 0; i < 3; i++) {
 }
 if (problems.length) { save(); note('error', `Could not produce a draft that passes the checks. Last problems: ${problems.join('; ')}`); console.error('Could not produce a draft that passes the checks. Nothing written.'); process.exit(1); }
 
-const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, path, text) => allowed.has(path) ? `<a href="${path.startsWith('/p/') ? shellProductLink(path.slice(3).replace(/\.html$/i, '')) : path}">${text}</a>` : text).replace(/\[\[|\]\]/g, '');
+const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, path, text) => allowed.has(path) ? `<a href="${path.startsWith('/p/') ? shellProductLink(path.slice(3).replace(/\.html$/i, '')) : (path.startsWith('/?product=') ? shellProductLink(decodeURIComponent(path.slice(10))) : path)}">${text}</a>` : text).replace(/\[\[|\]\]/g, '');
 const para = s => '<p>' + inline(s) + '</p>';
 const plain = s => String(s).replace(/\[\[\/[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\[\[|\]\]/g, '');
 const parts = [art.title, art.answer, art.intro, art.closing, ...art.sections.flatMap(s => [s.heading, ...s.paragraphs, ...(s.bullets || [])]), art.table.caption, ...art.table.headers, ...art.table.rows.flat(), ...art.faq.flatMap(f => [f.q, f.a])].filter(Boolean).map(plain);
