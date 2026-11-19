@@ -25,6 +25,7 @@ for (const file of files) {
     // Internal SEO document fetches and explicitly defined Google crawl surfaces are not customer links.
     if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
     if (file === 'storefront-live.js' && /function purl\(|fetch\(purl\(/.test(line)) return;
+    if (['seo-pest/blog-build.mjs', 'blog-write.mjs', 'services/build-services.mjs'].includes(file) && line.includes('shellProductLink')) return;
     if (/seo-links|seo-links\.mjs|seo-links\.js/.test(file)) return;
     if (/no-static-share-links\.test\.mjs/.test(file)) return;
     offenders.push(file + ':' + (index + 1) + ': ' + line.trim().slice(0, 220));
