@@ -1,3 +1,11 @@
+## 2026-11-20 00:31 (Africa/Nairobi) — First browser run and test-fixture correction
+- The pack-card assertions passed in Actions: all four quick-buy pack cards rendered their own KSh prices; the selected 250 ml card remained highlighted and displayed both KSh 1,550 and its previous KSh 1,782 price; the selected-price summary updated immediately.
+- The broader browser run then stopped at a pre-existing test-order bug: `BASE` was referenced in the early quick-buy deep-link assertion before it was assigned later in the test file. No storefront assertion failed before that point.
+- Corrected that assertion to build the local test URL from the already-defined `URL` constant (`URL.rstrip('/')`), without changing production code.
+- Next: inspect the Actions run for commit `6281900f82d008b1241ad539cc85a9aa6fe118b5`; fix any further genuine failures and rerun until the complete SEO quality gate is green. Not ready to merge yet.
+
+---
+
 ## 2026-11-20 00:26 (Africa/Nairobi) — Pack-size prices shown directly on mobile-shell pack cards
 - Done on branch `fix/shell-product-links-2026-11-19-v2` (PR #991): quick-buy and full product-page pack choices now render as two-column cards. Each card shows its exact pack label, its own KSh price, and a crossed-out previous price when discounted. The active pack has a visible selected state and accessible `aria-pressed` / `aria-selected` attributes.
 - Done: the selected pack still updates the main price summary immediately; cart/checkout price data continues to use the selected variant row and its exact price.
