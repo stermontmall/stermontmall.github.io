@@ -708,12 +708,15 @@ function openQuickBuy(id) {
   editingCartKey = '';
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
 }
-function openDeepLink(slug) {   // the full product page for a /?product=<slug> address (any pack size's slug works)
+function openDeepLink(slug) {   // the full product page for a /?product=<slug> or direct /p/<slug>.html address
   const hit = x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug);   // /p/<id>.html pages are named by the row id, which differs from the slug on some products
   const p = PRODUCTS.find(hit);
   if (!p) { toast('That product is no longer available'); return; }
+  let hashSize = '';
+  try { hashSize = decodeURIComponent(location.hash.replace(/^#/, '')); } catch { hashSize = location.hash.replace(/^#/, ''); }
+  const chosen = hashSize || slug;
   deepOpen = true;
-  qb.p = p; qb.size = (p.sizes.find(z => z.slug === slug || z.rowId === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
+  qb.p = p; qb.size = (p.sizes.find(z => z.slug === chosen || z.rowId === chosen) || p.sizes.find(z => z.slug === slug || z.rowId === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
   renderQB(); openProductPage();
 }
 /* FAST PATH for /?product=<slug> (owner 2026-11-08: the link must go straight to the product, not wait for the whole catalog).
