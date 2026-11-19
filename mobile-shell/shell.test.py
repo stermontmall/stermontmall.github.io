@@ -62,6 +62,10 @@ def on_rest(route):
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
 REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
 def mock_network(ctx):
+    # Keep shell product URLs on the local fixture origin. Generated SEO pages expose
+    # the production-domain helper, which would otherwise send the headless test away
+    # from this local shell before it can exercise the in-shell product overlay.
+    ctx.add_init_script("window.shellProductLink = s => '/?product=' + encodeURIComponent(s);")
     def serve_product_page(rt):
         # Match the requested fixture slug to the generated SEO page's early shell bootstrap.
         # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
