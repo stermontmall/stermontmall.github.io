@@ -11,7 +11,7 @@ export function buildCategoryIntro(category, baseIntro = '') {
   const trapBuyingAdvice = 'For insect light traps used in Kenyan hotels, restaurants and food premises, compare glueboard capture with electric-grid designs, the exact model and replacement-part numbers, mounting position, cleaning access and documented coverage. A glueboard can retain insects on an adhesive surface instead of breaking them on an exposed grid, but it is not automatically food-safety approved. Ask for the manufacturer documentation, assess placement away from exposed food, and confirm local food-safety requirements before purchase.';
   const additions = [
     ...(isTrap ? [trapBuyingAdvice] : isPest ? [pestBuyingAdvice] : []),
-    'Compare the exact product name, model or formulation rather than relying on a broad category label. Product titles and pack sizes can differ, so open each listing to review its full description, current price, images and any stated variant details.',
+    'Compare the exact product name, model or formulation rather than relying on a broad category label. Product titles and pack sizes can differ, so open each listing to review its full description, current price, images and stated variant details.',
     'Think about the job the item needs to do, the quantity required and the specifications that matter in your setting. For equipment, check dimensions, capacity, power requirements and included accessories where those details are provided. For consumables, compare unit size and the intended application shown on the product information.',
     'Before placing an order, confirm availability, the final amount and the delivery fee for your town or county. Stermont Arcade accepts M-Pesa and arranges delivery across Kenya; delivery charges and dispatch timing are confirmed for the order before payment. If a listing does not answer an important question, contact the store before checkout.',
     exampleText + ' Use the product page as the source of truth for current listing details, and ask for clarification whenever a specification, compatibility point or intended use is not stated.'
@@ -23,7 +23,9 @@ export function buildCategoryIntro(category, baseIntro = '') {
   }
   const words = text.split(/\s+/).filter(Boolean);
   if (words.length > 165) text = words.slice(0, 160).join(' ').replace(/[.,;:]?$/, '.') ;
-  return text;
+  const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
+  const midpoint = Math.ceil(sentences.length / 2);
+  return sentences.slice(0, midpoint).join(' ').trim() + '\n\n' + sentences.slice(midpoint).join(' ').trim();
 }
 
 export function buildCategoryFaq(category, existing = []) {
