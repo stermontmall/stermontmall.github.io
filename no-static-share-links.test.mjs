@@ -44,11 +44,12 @@ assert.doesNotMatch(description, /href="[^"]*\/p\//);
 
 const post = renderPost({
   slug: 'shell-link-fixture', title: 'Shell link fixture', description: 'A test guide.',
-  answer: 'Use the shell product link.', intro: 'This is a generated test article.',
+  answer: 'Use the shell product link.', intro: 'Read [[/p/premise-200-sc-termiticide-50-ml.html|Premise 200 SC]] before ordering.',
   sections: [], faq: [], closing: '', cat: 'missing-category',
   product: 'premise-200-sc-termiticide-50-ml', related: []
 });
 assert.match(post, /href="https:\/\/stermontarcade\.co\.ke\/\?product=premise-200-sc-termiticide-50-ml"/);
+assert.match(post, /Premise 200 SC/);
 assert.doesNotMatch(post, /<a\b[^>]*href="[^"]*\/p\//i);
 
 // Source scan covers storefront scripts, generators, admin tools and static root pages.
