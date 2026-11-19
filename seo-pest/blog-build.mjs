@@ -25,7 +25,7 @@ export function allText(a) {
 export function closingLinks(a) { return [...new Set(linksOf([a.intro, a.closing, ...a.sections.flatMap(s => s.paragraphs)].join(' ')))]; }
 
 export function renderPost(a) {
-  const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, p, t) => { const product = p.match(/^\/p\/([a-z0-9-]+)\.html$/i); return \`<a href="\${product ? shellProductLink(product[1], SITE) : p}">\${t}</a>\`; });
+  const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, p, t) => { const product = p.match(/^\/p\/([a-z0-9-]+)\.html$/i); const href = product ? shellProductLink(product[1], SITE) : p; return '<a href="' + href + '">' + t + '</a>'; });
   const para = s => `<p>${inline(s)}</p>`;
   const total = words(allText(a));
   const url = `${SITE}/blog/${a.slug}.html`;
