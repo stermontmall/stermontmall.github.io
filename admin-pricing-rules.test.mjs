@@ -5,6 +5,9 @@ const admin = readFileSync(new URL('./admin.html', import.meta.url), 'utf8');
 const panel = readFileSync(new URL('./admin-pricing-rules.js', import.meta.url), 'utf8');
 const guide = readFileSync(new URL('./PUBLISHING.md', import.meta.url), 'utf8');
 const rules = readFileSync(new URL('./PRICING-RULES.md', import.meta.url), 'utf8');
+const catalog = readFileSync(new URL('./catalog-v10.js', import.meta.url), 'utf8');
+const ruleJson = JSON.parse(readFileSync(new URL('./rules/publishing-rule.json', import.meta.url), 'utf8'));
+const sqlHelper = readFileSync(new URL('./database/add-draft-product-unique-opening.sql', import.meta.url), 'utf8');
 const policy = readFileSync(new URL('./supabase/sql/staff-read-publishing-rules.sql', import.meta.url), 'utf8');
 
 assert.match(admin, /admin-pricing-rules\.js\?v=1/);
@@ -24,5 +27,17 @@ assert.doesNotMatch(guide, /stored selling price must equal.*cost \* 1\.30/i);
 assert.match(policy, /to authenticated/i);
 assert.match(policy, /using \(public\.is_staff\(\)\)/i);
 assert.doesNotMatch(policy, /to anon/i);
+
+assert.match(admin, /catalog-v10\\.js\\?v=15/);
+assert.match(catalog, /function up\\(n\\)[\\s\\S]*b < 20000[\\s\\S]*b < 40000[\\s\\S]*b <= 60000[\\s\\S]*1\\.175/);
+assert.match(catalog, /rest\\/v1\\/rpc\\/price_4tier/);
+assert.doesNotMatch(catalog, /MARKUP\\s*=\\s*1\\.30/);
+assert.match(catalog, /edit \\? p\\.stock : '1000'/);
+assert.match(catalog, /edit \\? p\\.low_at : 20/);
+assert.match(sqlHelper, /public\\.price_4tier\\(v_source_cost\\)/);
+assert.doesNotMatch(sqlHelper, /p_markup_pct/);
+assert.equal(ruleJson.pricing.default_for_new_products, true);
+assert.equal(ruleJson.pricing.source_of_truth, 'Supabase public.price_4tier(p_baseline)');
+assert.equal(ruleJson.pricing.tiers.length, 4);
 
 console.log('PASS: canonical pricing rule is visible in staff admin and docs, and Supabase read access is staff-only.');
