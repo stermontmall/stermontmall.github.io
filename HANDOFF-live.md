@@ -1,7 +1,7 @@
 ## 2026-11-19 — In progress: preserve canonical product/category URLs for Google
 - Found a routing conflict: seo-shell-redirect.mjs injected a JavaScript location.replace from every /p/ and /c/ page to a homepage query deep link, even though seo-shell-chrome.mjs had already been changed to strip an older redirect format.
 - Working on branch fix-seo-static-product-routes-2026-11-19: change the route pass to strip legacy redirect scripts, retain each page's canonical URL and SEO HTML, and still apply the mobile-shell top bar/bottom navigation. Explicit /?product=<slug> and /?cat=<slug> deep links remain supported.
-- Validation pending: node seo-shell-redirect.test.mjs, node seo-shell-chrome.test.mjs, full Playwright mobile-shell regression, generated-page SEO audit, and product-page build. Do not merge or claim live until all required GitHub Actions checks pass.
+- Validation pending: node seo-shell-redirect.test.mjs, node seo-shell-chrome.test.mjs, full Playwright mobile-shell regression, generated-page SEO audit, and product-page build. Direct static-page browser navigations now wait for DOMContentLoaded so remote product-image hosts cannot stall the route assertions. Do not merge or claim live until all required GitHub Actions checks pass.
 - UX trade-off: direct /p/ and /c/ links remain on their generated page with shell navigation chrome rather than redirecting into the single-page app; explicit /?product= and /?cat= links continue to open the full app.
 
 ---
