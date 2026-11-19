@@ -216,7 +216,7 @@
               saved++;
               var card = el('div', 'card done');
               card.appendChild(el('h4', null, '✓ Draft saved: ' + data.product.name));
-              card.appendChild(el('p', null, data.source_price_kes == null ? 'Owner-set selling price: KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' · No markup · Not published' : 'Source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Selling price includes 30% markup · Not published'));
+              card.appendChild(el('p', null, data.source_price_kes == null ? 'Owner-set selling price: KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' · No markup · Not published' : 'Source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Selling price follows official four-tier rule · Not published'));
               card.appendChild(el('p', 'meta', 'SEO title: ' + data.seo_title));
               card.appendChild(el('p', 'meta', 'Meta description preview: ' + data.meta_description_preview));
               card.appendChild(el('p', 'meta', data.price_note || data.page_note || 'Source price verified.'));
