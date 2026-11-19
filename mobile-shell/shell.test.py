@@ -164,7 +164,8 @@ with sync_playwright() as p:
     # the plus button asks for a size instead of silently adding the smallest
     pg.locator('#grid .card[data-id="garden-set"] [data-add]').click()
     check('plus on a multi-size card opens the size sheet', pg.locator('#sheet-quickbuy.open').count() == 1 and pg.locator('#bottom-nav [data-badge="cart"]').inner_text() == '1')
-    check('sizes listed smallest price first', pg.locator('#qb-sizes .chip').all_inner_texts() == ['50 ml', '100 ml', '250 ml', '1 Litre'], pg.locator('#qb-sizes .chip').all_inner_texts())
+    check('sizes listed smallest pack first, each card showing its own price', pg.locator('#qb-sizes .pk-name').all_inner_texts() == ['50 ml', '100 ml', '250 ml', '1 Litre'] and all('KSh' in x for x in pg.locator('#qb-sizes .pk-price').all_inner_texts()), pg.locator('#qb-sizes .chip').all_inner_texts())
+    check('exactly one size card is selected (radio semantics)', pg.locator('#qb-sizes [role=radio][aria-checked=true]').count() == 1 and pg.locator('#qb-sizes [role=radiogroup]').count() + pg.locator('#qb-sizes[role=radiogroup]').count() >= 1)
     pg.locator('#qb-sizes [data-size="250 ml"]').click()
     check('each size shows its own price', pg.locator('#qb-price').inner_text() == 'KSh 1,550' and pg.locator('#qb-old').inner_text() == 'KSh 1,782', pg.locator('#qb-price').inner_text())
     pg.wait_for_function("document.querySelector('#qb-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)

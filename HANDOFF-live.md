@@ -1,3 +1,11 @@
+## 2026-11-19 16:40 (Africa/Nairobi) - Pack sizes on the mobile shell: professional layout (branch wip-pack-sizes, from main)
+- PR #971 (remove visitor redirect): `validate` passed; NOT merged yet (owner has not confirmed). After merge: dispatch product-pages.yml.
+- Done (uncommitted at time of writing): `mobile-shell/app.js` pure helpers `packAmount`/`packOptions` (`@pack-start`..`@pack-end`) + `packCards()`; both pack-size pickers (quick-buy `#qb-sizes`, product page `#pp-sizes`) now show 2-column cards: size name, price, old price, check mark on selected, "Best value" tag only when every size is one plain amount in the same family and one size is clearly cheaper per unit. Display order smallest pack first; `p.sizes` stays price-sorted (From-price and default size rely on it). `index.html`: app.js `?v=40` -> `?v=41`, containers get `pack-grid` + radiogroup roles. New `mobile-shell/packs.test.mjs` (12 checks pass).
+- Left: update `shell.test.py` line ~167 ('sizes listed smallest price first' read `.chip` text, now cards), run `python3 mobile-shell/shell.test.py`, commit, PR.
+- Test: `node mobile-shell/packs.test.mjs && python3 mobile-shell/shell.test.py`.
+
+---
+
 ## 2026-11-19 08:02 (Africa/Nairobi) — Fix stale product-category links and improve high-opportunity snippets
 - Done (branch `wip-fix-stale-category-links`, PR #903): `product-description-html.mjs` now rewrites legacy Markdown links from `/category/<slug>` to the current `/c/<slug>.html` routes, including absolute Stermont Arcade URLs. Added regression checks for the five routes from the 2026-11-19 daily SEO report.
 - Done: added the product-description renderer test to the SEO PR quality gate and its path triggers.
