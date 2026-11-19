@@ -142,7 +142,7 @@ function splitInlineMarkdownHeadings(source) {
 
 export function productDescriptionHtml(source) {
   // Remove generic buying-guide boilerplate; retain the product-specific copy.
-  let raw = String(source || '')
+  let raw = stripSupplierAttribution(String(source || ''))
     // Decode stored escaped line breaks; split inline Markdown headings into renderer section boundaries.
     .replace(/\\r\n|\n|\\r/g, '\n')
     .replace(/^#[^#\n]*##[ \t]*/i, '## ')
