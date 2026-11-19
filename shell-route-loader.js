@@ -5,7 +5,7 @@
   var path = location.pathname;
   if (!/^\/(?:p|c)\/[A-Za-z0-9._~-]+\.html$/i.test(path) || window.__stmFullShellLoading) return;
   window.__stmFullShellLoading = true;
-  var isProductRoute = /^\\/p\\//i.test(path);
+  var isProductRoute = /^\/p\//i.test(path);
   if (isProductRoute) document.documentElement.classList.add('deep-open');
   var clearDeepOpen = function () { document.documentElement.classList.remove('deep-open'); };
 
