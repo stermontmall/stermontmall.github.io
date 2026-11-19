@@ -870,12 +870,12 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
 <h2 id="seo-cats">Shop by category</h2>
 <ul>${catsAll.map(([slug, c]) => `<li><a href="/c/${encodeURIComponent(slug)}.html">${esc(c.name)}</a></li>`).join('')}</ul>
 <h2>Popular products</h2>
-<ul>${picks.slice(0, 12).map(p => `<li><a href="${esc(shellProductLink(sl(p.id), SITE))}">${esc(p.name)}</a></li>`).join('')}</ul>
+<ul>${picks.slice(0, 12).map(p => `<li><a href="${SITE}/p/${encodeURIComponent(sl(p.id))}.html">${esc(p.name)}</a></li>`).join('')}</ul>
 <h2>Professional services and business orders</h2>
 <p>Looking for pest-control treatment information, or buying for a hotel, school, farm, office or rental property?</p>
 <ul><li><a href="/services/">Explore Stermont service information</a></li><li><a href="/services/pest-control-fumigation-nairobi.html">Pest control and fumigation service information</a></li><li><a href="/services/pests/termites.html">Termite control information</a></li><li><a href="/services/pests/bed-bugs.html">Bed bug control information</a></li><li><a href="/bulk-quote.html">Request a bulk product quote</a></li><li><a href="/nairobi.html">Nairobi shop, pickup and delivery information</a></li></ul>
 <h2>New arrivals</h2>
-<ul>${[...products].reverse().slice(0, 16).map(p => `<li><a href="${esc(shellProductLink(sl(p.id), SITE))}">${esc(p.name)}</a></li>`).join('')}</ul>
+<ul>${[...products].reverse().slice(0, 16).map(p => `<li><a href="${SITE}/p/${encodeURIComponent(sl(p.id))}.html">${esc(p.name)}</a></li>`).join('')}</ul>
 <p><a href="/products.html">View all ${products.length} products</a> &middot; <a href="/c/">All categories</a></p>
 </div></section>
 ${B}`;
