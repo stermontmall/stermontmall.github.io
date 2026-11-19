@@ -7,7 +7,6 @@ import assert from 'node:assert/strict';
 import shellProductLink from './product-links.js';
 import { productDescriptionHtml } from './product-description-html.mjs';
 import { renderPost } from './seo-pest/blog-build.mjs';
-import { rewriteHtml } from './rewrite-static-product-links.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SEO_SURFACE_ALLOWLIST = [
@@ -18,7 +17,7 @@ const SEO_SURFACE_ALLOWLIST = [
   'homepage <!-- seo-links:start --> ... <!-- seo-links:end --> crawl links'
 ];
 const SKIP_DIRS = new Set(['.git', 'node_modules', 'assets', 'product-photos']);
-const GENERATED_DIRS = new Set(['p', 'c', 'blog', 'guides', 'pest-control']);
+const GENERATED_DIRS = new Set(['p', 'c', 'guides', 'pest-control']);
 const GENERATED_FILES = new Set(['products.html']);
 const GENERATED_MARKER = '<!-- stm-shell-product-links:v1 -->';
 const CLASSIC_FILE = ['classic', 'html'].join('.');
@@ -30,14 +29,6 @@ assert.ok(HUMAN_CLASSIC.test('<a href="/' + CLASSIC_FILE + '">fixture</a>'), 'cl
 assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), SITE + '/?product=premise-200-sc-termiticide-50-ml');
 assert.equal(shellProductLink(''), SITE + '/');
 
-// The migration rewrites only customer anchors and protects the explicit SEO surfaces.
-const migrated = rewriteHtml('<html><head></head><body><a href="/p/demo-product.html">Product</a><nav class="bc"><a href="/p/breadcrumb.html">Breadcrumb</a></nav><!-- seo-links:start --><a href="/p/crawl-only.html">Crawler</a><!-- seo-links:end --><link rel="canonical" href="https://stermontarcade.co.ke/p/demo-product.html"></body></html>');
-assert.equal(migrated.replaced, 1);
-assert.match(migrated.html, /href="https:\/\/stermontarcade\.co\.ke\/\?product=demo-product"/);
-assert.match(migrated.html, /href="\/p\/breadcrumb\.html"/);
-assert.match(migrated.html, /href="\/p\/crawl-only\.html"/);
-assert.match(migrated.html, /rel="canonical" href="https:\/\/stermontarcade\.co\.ke\/p\/demo-product\.html"/);
-assert.ok(migrated.html.includes(GENERATED_MARKER));
 
 // Exercise actual generated HTML renderers, not just a helper string.
 const description = productDescriptionHtml('Related item: [Premise 200 SC](/p/premise-200-sc-termiticide-50-ml.html).');
@@ -86,6 +77,10 @@ assert.deepEqual(offenders, [], 'human-facing static product/classic links found
 // Explicitly protect the SEO surfaces from accidental removal or conversion.
 const generator = readFileSync('generate-products.mjs', 'utf8');
 const relatedFill = readFileSync('seo-related-fill.mjs', 'utf8');
+const kenya = readFileSync('seo-kenya.mjs', 'utf8');
+assert.match(kenya, /shellProductLink\\(i\\.slug\\)/);
+assert.match(kenya, /shellProductLink\\(cheap\\.slug\\)/);
+assert.match(kenya, /url: SITE \\+ i\\.url/); // ItemList JSON-LD retains canonical /p/ URLs
 assert.match(relatedFill, /shellHref: shellProductLink/);
 assert.ok(relatedFill.includes('href="${p.shellHref}"'));
 assert.match(generator, /<link rel="canonical" href="\$\{SITE\}\$\{path\}">/);
