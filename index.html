@@ -153,6 +153,19 @@
 
 <!-- ===== Header / app bar (sticky) ===== -->
 <header id="appbar" class="sticky top-0 z-30 bg-white shadow-sm" style="padding-top:env(safe-area-inset-top)">
+  <a href="/" class="sa-brand" aria-label="Stermont Arcade home">
+    <svg viewBox="0 0 48 42" role="img" aria-hidden="true"><path d="M4 5h5l4.2 22.5h24L43 12H12" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 16h21M19 22h17M25 13l-2 14M34 13l-1 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="18" cy="35" r="3.2" fill="#f58220"/><circle cx="36" cy="35" r="3.2" fill="#f58220"/></svg>
+    <span class="sa-brand-copy"><strong><span>Stermont</span> <em>Arcade</em></strong><small>Shop Smart. Live Better.</small></span>
+  </a>
+  <style>
+    .sa-brand{display:flex;align-items:center;gap:8px;padding:7px 14px 5px;color:#092c61;text-decoration:none;background:#fff;min-height:54px}
+    .sa-brand svg{width:43px;height:39px;flex:none}
+    .sa-brand-copy{display:flex;flex-direction:column;line-height:1.02}
+    .sa-brand-copy strong{font-size:22px;letter-spacing:-.7px;font-weight:850}
+    .sa-brand-copy strong em{font-style:normal;color:#f58220}
+    .sa-brand-copy small{font-size:10px;font-weight:650;letter-spacing:.25px;color:#24436b;margin-top:3px}
+    @media(min-width:640px){.sa-brand{padding-left:20px}.sa-brand svg{width:48px;height:42px}.sa-brand-copy strong{font-size:25px}.sa-brand-copy small{font-size:11px}}
+  </style>
   <div class="relative z-10 bg-white flex items-center gap-1 px-2 h-bar">
     <button class="icon-btn" data-open="drawer-categories" aria-label="All categories"><svg class="w-6 h-6"><use href="#i-menu"/></svg></button>
     <form id="search-form" role="search" class="relative flex-1">
