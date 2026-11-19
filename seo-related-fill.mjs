@@ -5,6 +5,8 @@
 // This tops every product page up to 6 related product links, choosing from the same product family first (pest control, agro, electronics,
 // home, fashion), and rotates the choice so every product also RECEIVES links from other pages. Pure HTML post-processing, no network.
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
+const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const DIR = 'p', TARGET = 6, MARK = '<!--stm-also-->', BRAND = 'Stermont Arcade';
 const FAMILIES = [
