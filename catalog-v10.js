@@ -254,7 +254,7 @@
     modal(edit ? 'Edit item' : 'Add new item', body, edit ? 'Save changes' : 'Publish to website', function () {
       if ($('cx-up').textContent) throw new Error('Wait for photos to finish uploading');
       var name = v('cx-name').trim(), price = num('cx-price'), stock = edit ? (v('cx-stock') === '' ? NaN : parseInt(v('cx-stock'), 10)) : parseInt(v('cx-stock') || 1000, 10);
-      if (!name) throw new Error('Enter an item name'); if (v('cx-price') === '' || !(price > 0)) throw new Error('Enter the selling price');
+      if (!name) throw new Error('Enter an item name'); if (v('cx-price') === '' || !(price > 0)) throw new Error('Enter the verified baseline cost'); if (!edit && /syngenta/i.test(name)) throw new Error('Syngenta is excluded from automatic repricing. Do not create this item without explicit owner approval and a separately verified price.');
       var vl = v('cx-vl').trim(), vl0 = tpl && !tpl.variant_label ? v('cx-vl0').trim() : ''; if (tpl && !vl) throw new Error('Type the pack size for this new item, e.g. 250 mL'); if (tpl && !tpl.variant_label && !vl0) throw new Error('Type the pack size of the existing item too');
       var unit = v('cx-unit') === '__custom' ? v('cx-unitc').trim() : v('cx-unit'); if (v('cx-unit') === '__custom' && !unit) throw new Error('Type the custom unit, or choose one from the list');
       var oldP = v('cx-old') === '' ? null : num('cx-old'); if (oldP != null && !(oldP > price)) throw new Error('Previous price must be higher than the current price (or leave it empty)');
