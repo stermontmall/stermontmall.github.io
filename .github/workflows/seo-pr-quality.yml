@@ -14,6 +14,7 @@ on:
       - 'no-static-share-links.test.mjs'
       - '.github/workflows/blog-build.yml'
       - 'services/*.html'
+      - 'services/build-services.mjs'
       - 'pest-control/*.html'
       - 'blog-write.mjs'
       - 'seo-pest/blog-build.mjs'
@@ -105,6 +106,7 @@ jobs:
         run: |
           {
             node --check category-editorial.mjs
+            node --check services/build-services.mjs
             node --check seo-kenya.mjs
             node --check seo-related-fill.mjs
             node --check cat-feel.js
@@ -165,6 +167,8 @@ jobs:
             node seo-safe-meta.mjs
             node seo-shell-redirect.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
+      - name: Rebuild generated service pages from their source data
+        run: node services/build-services.mjs
       - name: Rebuild generated product guide blog articles
         run: |
           for file in seo-pest/blogs-*.json; do
