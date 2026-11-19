@@ -148,6 +148,8 @@ jobs:
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
       - name: Build service pages for the generated-link guard
         run: node services/build-services.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15a-service-pages.log"
+      - name: Normalize all generated customer-facing product links
+        run: node product-link-normalizer.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-normalize-generated-links.log"
       - name: Verify generated pages contain no static human-facing product links
         env:
           STM_CHECK_GENERATED_PRODUCT_PAGES: '1'
