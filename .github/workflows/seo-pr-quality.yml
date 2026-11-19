@@ -7,6 +7,7 @@ on:
       - 'seo-*.mjs'
       - 'generate-products.mjs'
       - 'product-links.js'
+      - 'rewrite-static-product-links.mjs'
       - 'site-links.js'
       - 'storefront-live.js'
       - 'product-trust.js'
@@ -102,6 +103,7 @@ jobs:
             node --check seo-related-fill.mjs
             node --check cat-feel.js
             node --check product-links.js
+            node --check rewrite-static-product-links.mjs
             node --check site-links.js
             node --check storefront-live.js
             node --check product-trust.js
@@ -172,6 +174,8 @@ jobs:
           node seo-shell-redirect.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-shell-route-fixtures.log"
       - name: Run mobile shell browser regression suite
         run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
+      - name: Migrate legacy generated customer product links without changing SEO surfaces
+        run: node rewrite-static-product-links.mjs
       - name: Recheck all generated pages for static customer product links
         run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-shell-link-regression.log"
       - name: Run full on-page SEO audit against production-equivalent generated pages
