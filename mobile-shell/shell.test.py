@@ -615,16 +615,16 @@ with sync_playwright() as p:
     check('shared cart: desktop no page errors', not e14, e14[:3])
     c14.close()
 
-    # Category URLs must survive reload without sending visitors through a JavaScript-only redirect.
-    # Top-level categories have crawlable static /c/ pages; sub-categories have no standalone page,
-    # so their shareable address stays on the shell as /?cat=<slug>.
-    c15 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c15)
+    # Category URLs survive reload and now enter the mobile shell for every visitor.
+    # The generated /c/ page remains crawlable in its source HTML, then hands off to the shell.
+    c15 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c15); serve_c(c15)
     p15 = c15.new_page(); e15 = []; p15.on('pageerror', lambda e: e15.append(str(e)))
     p15.goto(URL); p15.wait_for_selector('#grid .card[data-id]')
     p15.locator('#chips [data-chip="phones-accessories"]').click()
     p15.wait_for_function("location.pathname === '/c/phones-accessories.html'", timeout=10000)
-    p15.reload(); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href^="/p/"]')
-    check('top-level category reload serves its crawlable static page', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and 'Phones &amp; Accessories' in p15.locator('h1').inner_html() and p15.locator('a[href^="/p/"]').count() >= 6 and p15.locator('#bottom-nav').count() == 0, p15.url)
+    p15.reload(); p15.wait_for_selector('#bottom-nav', timeout=10000); p15.wait_for_selector('#grid .card[data-id]')
+    p15.wait_for_timeout(600)
+    check('top-level category reload enters the mobile shell and restores its selected products', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and p15.locator('#bottom-nav').count() == 1 and p15.locator('#grid-title').inner_text() == 'Phones & Accessories' and p15.locator('#grid .card[data-id]').count() > 0, p15.url)
 
     p15.goto(f'{BASE}/?cat=garden-tools'); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
     check('sub-category deep link opens the selected category in the mobile shell', p15.locator('#grid-title').inner_text() == 'Garden Tools' and p15.locator('#grid .card[data-id]').count() > 0 and p15.url.endswith('/?cat=garden-tools'), p15.url)
