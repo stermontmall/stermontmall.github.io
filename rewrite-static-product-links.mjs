@@ -6,30 +6,38 @@ const SITE = 'https://stermontarcade.co.ke';
 const ROOTS = ['p', 'c', 'blog', 'guides', 'pest-control', 'services'];
 const ROOT_FILES = ['index.html', 'products.html'];
 const MARKER = '<!-- stm-shell-product-links:v1 -->';
-const SEO_LINKS = /<!--\\s*seo-links:start\\s*-->[\\s\\S]*?<!--\\s*seo-links:end\\s*-->/gi;
-const BREADCRUMBS = /<nav\\b[^>]*(?:class=["'][^"']*(?:breadcrumb|\\bbc\\b)[^"']*["'])[^>]*>[\\s\\S]*?<\\/nav>/gi;
-const HEAD = /<head\\b[^>]*>[\\s\\S]*?<\\/head>/gi;
-const JSON_LD = /<script\\b(?=[^>]*type=["']application\\/ld\\+json["'])[^>]*>[\\s\\S]*?<\\/script>/gi;
+const PROTECTED = [
+  /<head\b[^>]*>[\s\S]*?<\/head>/gi,
+  /<script\b(?=[^>]*type=["']application\/ld\+json["'])[^>]*>[\s\S]*?<\/script>/gi,
+  /<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi,
+  /<nav\b[^>]*class=["'][^"']*(?:breadcrumb|\bbc\b)[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi
+];
 
 function protect(html) {
   const saved = [];
-  const protectedHtml = html.replace(new RegExp([HEAD.source, JSON_LD.source, SEO_LINKS.source, BREADCRUMBS.source].join('|'), 'gi'), block => {
-    const token = '<!--stm-protected-seo-' + saved.length + '-->';
-    saved.push(block);
-    return token;
-  });
-  return { html: protectedHtml, restore(value) { return value.replace(/<!--stm-protected-seo-(\\d+)-->/g, (_m, i) => saved[Number(i)]); } };
+  for (const pattern of PROTECTED) {
+    html = html.replace(pattern, block => {
+      const token = '<!--stm-protected-seo-' + saved.length + '-->';
+      saved.push(block);
+      return token;
+    });
+  }
+  return { html, restore(value) {
+    return value.replace(/<!--stm-protected-seo-(\d+)-->/g, (_m, i) => saved[Number(i)]);
+  }};
 }
 
 export function rewriteHtml(source) {
   const protectedParts = protect(source);
   let replaced = 0;
-  let html = protectedParts.html.replace(/<a\\b[^>]*>/gi, tag => tag.replace(/\\bhref=(["'])(.*?)\\1/i, (attr, quote, href) => {
-    const match = href.match(/^(?:https?:\\/\\/stermontarcade\\.co\\.ke)?\\/p\\/([a-z0-9-]+)\\.html(?:[?#].*)?$/i);
-    if (!match) return attr;
+  let html = protectedParts.html.replace(/(?:https?:\/\/stermontarcade\.co\.ke)?\/p\/([a-z0-9-]+)\.html(?:[?#][^"'\s]*)?/gi, (_m, slug) => {
     replaced++;
-    return 'href=' + quote + shellProductLink(decodeURIComponent(match[1]), SITE) + quote;
-  }));
+    return shellProductLink(decodeURIComponent(slug), SITE);
+  });
+  html = html.replace(/https%3A%2F%2Fstermontarcade\.co\.ke%2Fp%2F([a-z0-9-]+)\.html/gi, (_m, slug) => {
+    replaced++;
+    return encodeURIComponent(shellProductLink(decodeURIComponent(slug), SITE));
+  });
   html = protectedParts.restore(html);
   return { html, replaced };
 }
@@ -53,7 +61,7 @@ for (const file of [...new Set(files)]) {
   const before = readFileSync(file, 'utf8');
   const result = rewriteHtml(before);
   if (!result.replaced || result.html === before) continue;
-  if (!before.includes(MARKER)) result.html = result.html.replace(/<body\\b[^>]*>/i, match => match + MARKER);
+  if (!before.includes(MARKER)) result.html = result.html.replace(/<body\b[^>]*>/i, match => match + MARKER);
   writeFileSync(file, result.html);
   total += result.replaced;
   changedFiles++;
