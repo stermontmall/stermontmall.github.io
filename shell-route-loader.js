@@ -76,15 +76,19 @@
 
       return loadScript('/mobile-shell/app.js?v=41').then(function () {
         if (isProductRoute) {
-          var observer = new MutationObserver(function () {
+          var checkProductReady = function () {
             var page = document.getElementById('page-product');
             var toast = document.getElementById('toast');
             if ((page && page.classList.contains('open')) || (toast && toast.style.opacity === '1')) {
               clearDeepOpen();
               observer.disconnect();
+              return true;
             }
-          });
+            return false;
+          };
+          var observer = new MutationObserver(checkProductReady);
           observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
+          checkProductReady();   // The fast product lookup may have completed before the script load event.
           setTimeout(function () { clearDeepOpen(); observer.disconnect(); }, 10000);
         }
         return loadScript('/analytics.js').catch(function () {});
