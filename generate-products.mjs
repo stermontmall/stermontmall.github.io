@@ -88,13 +88,13 @@ const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.imag
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
-  const cols = ['id,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
-                'id,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,created_at,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
-                'id,created_at,name,price,old_price,unit,stock,images,description,categories(name,slug)',
-                'id,created_at,name,price,stock,images,description,categories(name,slug)'];
+  const cols = ['id,product_code,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
+                'id,product_code,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,product_code,created_at,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,product_code,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,product_code,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
+                'id,product_code,created_at,name,price,old_price,unit,stock,images,description,categories(name,slug)',
+                'id,product_code,created_at,name,price,stock,images,description,categories(name,slug)'];
   for (const c of cols) {
     const all = [];
     let offset = 0;
