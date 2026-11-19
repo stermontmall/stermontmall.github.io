@@ -7,6 +7,13 @@
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const normalizeInternalPath = path => path.replace(/^\/category\/([a-z0-9][a-z0-9-]*)\/?$/i, '/c/$1.html');
+const stripSupplierAttribution = value => String(value || '')
+  .replace(/(?:^|(?<=[.!?]\s))[^.!?]*(?:Agropests|the supplier|supplier(?:'s)?|sold by other suppliers)[^.!?]*[.!?]?/gi, ' ')
+  .replace(/Supplier\s*:\s*[^.\n]+[.]?/gi, ' ')
+  .replace(/(?:^|[\n;])\s*Pack:\s*(?:piece|pieces|pc|pcs)\s*(?=$|[\n;])/gi, ' ')
+  .replace(/\s{2,}/g, ' ').trim();
+// Work line by line and never touch Markdown heading lines, so a supplier sentence cannot swallow its section title.
+const stripSupplierLines = text => String(text || '').split('\n').map(l => /^\s*##\s/.test(l) ? l : stripSupplierAttribution(l)).join('\n');
 const inline = s => esc(s)
   .replace(/\[([^\]]+)\]\((?:https?:\/\/stermontarcade\.co\.ke)?(\/[^)\s]*)\)/g, (_match, label, path) => `<a href="${normalizeInternalPath(path)}">${label}</a>`)
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
@@ -48,13 +55,14 @@ function renderBody(body, heading) {
     body = String(body || '').replace(/^\s*&\s*Key Benefits\b[\s:—-]*/i, '').replace(/^\s*Product Overview\s*&\s*Key Benefits\b[\s:—-]*/i, '');
   }
   if (heading.toLowerCase().includes('frequently asked questions') || heading.toLowerCase() === 'faqs') {
-    const qLines = body.split(/\n+/).map(x => x.trim()).filter(Boolean);
+    body = String(body).replace(/\s+Q:\s*/gi, '\nQ: ').replace(/\s+A:\s*/gi, '\nA: ');
+    const qLines = body.replace(/\s+Q:\s*/gi, '\nQ: ').replace(/\s+A:\s*/gi, '\nA: ').split(/\n+/).map(x => x.trim()).filter(Boolean);
     const marked = qLines.filter(x => /^Q:\s*/i.test(x));
     if (marked.length) return marked.map(q => {
       const rest = q.replace(/^Q:\s*/i, '');
       const split = rest.match(/^(.+?\?)\s+([\s\S]+)$/);
       const question = split ? split[1] : rest;
-      const answer = split ? split[2] : (qLines.slice(qLines.indexOf(q) + 1).find(x => !/^Q:/i.test(x)) || '');
+      const answer = (split ? split[2] : (qLines.slice(qLines.indexOf(q) + 1).find(x => /^A:/i.test(x)) || '')).replace(/^A:\s*/i, '');
       return '<p><strong>' + inline(question) + '</strong></p>' + (answer ? '<p>' + inline(answer) + '</p>' : '');
     }).join('');
     const faq = splitFaq(body);
@@ -84,6 +92,7 @@ export function extractProductFaq(source) {
     .replace(/^#[^#\n]*##[ \t]*/i, '## ')
     .replace(/[ \t]+##[ \t]+/g, '\n\n## ')
     .replace(/[ \t]+###[ \t]+/g, '\nQ: ');
+  raw = stripSupplierLines(raw);
   const start = raw.search(/(?:##\s*)?(?:FREQUENTLY ASKED QUESTIONS|FAQS?)\b/i);
   if (start < 0) return [];
   let body = raw.slice(start).replace(/^(?:##\s*)?(?:FREQUENTLY ASKED QUESTIONS|FAQS?)\b:?/i, '');
@@ -149,7 +158,7 @@ export function productDescriptionHtml(source) {
     .replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '')
     .replace(/\s*PRODUCT BUYING GUIDE:[\s\S]*$/i, '')
     .trim();
-  raw = splitInlineMarkdownHeadings(raw);
+  raw = stripSupplierLines(splitInlineMarkdownHeadings(raw));
   if (!raw) return '<p>Product information will be updated shortly.</p>';
 
   const hits = [];

@@ -180,7 +180,7 @@
       '<h1>' + t + '</h1>\n<p class="meta">Updated ' + nice + ' · ' + Math.max(2, Math.round(wc / 200)) + ' min read</p>\n' + main + '\n' +
       '<a class="btn" href="/products.html">Browse all products</a>\n' +
       '<div class="box"><a href="https://wa.me/254748888230?text=Hello%20Stermont%20Arcade">Questions? Chat with us on WhatsApp</a></div>\n</main>\n' +
-      '<footer>Stermont Arcade · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/254748888230">WhatsApp +254 748 888 230</a> · <a href="/shipping.html">Shipping</a> · <a href="/returns.html">Returns</a> · <a href="/privacy.html">Privacy</a></footer><script src="/analytics.js" defer></script></body></html>\n';
+      '<footer>Stermont Arcade · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/254748888230">WhatsApp +254 748 888 230</a> · <a href="/shipping.html">Shipping</a> · <a href="/returns.html">Returns</a> · <a href="/privacy-policy.html">Privacy</a></footer><script src="/analytics.js" defer></script></body></html>\n';
   }
   /* Reads a published page back into the editor fields. std=false means the page has a custom layout that the editor would flatten. */
   function parsePost(text, slug) {
