@@ -62,7 +62,14 @@ def on_rest(route):
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
 REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
 def mock_network(ctx):
-    ctx.route('**/p/*.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=REAL))
+    def serve_product_page(rt):
+        # Match the requested fixture slug to the generated SEO page's early shell bootstrap.
+        # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
+        match = re.search(r'/p/([^/?#]+)\.html', rt.request.url)
+        slug = match.group(1) if match else ''
+        page = re.sub(r'(var p=)["\'][^"\']*["\']', lambda m: m.group(1) + json.dumps(slug), REAL, count=1)
+        rt.fulfill(status=200, content_type='text/html', body=page)
+    ctx.route('**/p/*.html*', serve_product_page)
     ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
@@ -460,43 +467,39 @@ with sync_playwright() as p:
     check('address: no page errors', not e9, e9[:3])
     c9.close()
 
-    # Product/category static URLs remain in place for every visitor; shell deep links remain explicit.
+    # Product/category URLs bootstrap into the full mobile shell for all visitors.
     import subprocess, re as _re
-    check('generated product pages have no automatic route redirect', 'stm-early' not in REAL and 'location.replace' not in REAL)
-    OLD_SCRIPT = '<!--stm-shell--><script>(function(){location.replace("/?product=x")})();</script>'
-    OLD_CAT_SCRIPT = '<!--stm-shell-cat--><script>(function(){location.replace("/?cat=x")})();</script>'
-    def run_node(fn, html):
-        js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1])))" % fn
-        return subprocess.run(['node', '-e', js, html], cwd=ROOT, capture_output=True, text=True, check=True).stdout
-    old_page = '<!doctype html><html><head><meta charset="utf-8">' + OLD_SCRIPT + '<title>t</title></head><body>x</body></html>'
-    new_page = run_node('inject', old_page)
-    check('legacy product redirect is stripped and page content remains', 'stm-shell' not in new_page and '<title>t</title>' in new_page and '<body>x</body>' in new_page, new_page)
-    check('product redirect stripping is idempotent', run_node('inject', new_page) == new_page)
-    stub = '<html><head><meta http-equiv="refresh" content="0;url=/p/x.html">' + OLD_SCRIPT + '</head></html>'
-    check('redirect stubs (meta refresh) are left alone', run_node('inject', stub) == stub)
-    old_cat = '<!doctype html><html><head><meta charset="utf-8">' + OLD_CAT_SCRIPT + '<title>c</title></head><body>y</body></html>'
-    new_cat = run_node('injectCat', old_cat)
-    check('legacy category redirect is stripped and page content remains', 'stm-shell-cat' not in new_cat and '<title>c</title>' in new_cat and '<body>y</body>' in new_cat, new_cat)
-    check('category redirect stripping is idempotent', run_node('injectCat', new_cat) == new_cat)
+    check('generated product pages include the full-shell route bootstrap', 'stm-shell-route' in REAL and 'location.replace' in REAL)
+    def run_node(fn, html, slug):
+        js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1],process.argv[2])))" % fn
+        return subprocess.run(['node', '-e', js, html, slug], cwd=ROOT, capture_output=True, text=True, check=True).stdout
+    page = '<!doctype html><html><head><title>t</title></head><body>x</body></html>'
+    new_page = run_node('inject', page, 'termidor-96-sc-1-litre')
+    check('product page launches the full shell using its product deep link', 'stm-shell-route' in new_page and '"product"' in new_page and 'location.replace(u)' in new_page, new_page)
+    check('product shell bootstrap preserves SEO page metadata and is idempotent', '<title>t</title>' in new_page and run_node('inject', new_page, 'termidor-96-sc-1-litre') == new_page)
+    stub = '<html><head><meta http-equiv="refresh" content="0;url=/p/x.html"></head></html>'
+    check('redirect stubs (meta refresh) are left alone', run_node('inject', stub, 'extra-pack') == stub)
+    new_cat = run_node('injectCat', page, 'garden-outdoors')
+    check('category page launches the full shell using its category deep link', 'stm-shell-route' in new_cat and '"cat"' in new_cat and 'location.replace(u)' in new_cat, new_cat)
+    check('category shell bootstrap is idempotent', run_node('injectCat', new_cat, 'garden-outdoors') == new_cat)
 
     def serve_p(ctx): pass
     c11 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c11); serve_p(c11)
     p11 = c11.new_page(); e11 = []; p11.on('pageerror', lambda e: e11.append(str(e)))
-    p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml'); p11.wait_for_timeout(900)
-    check('direct product URL stays on /p/ and serves its crawlable product page', p11.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml' and p11.locator('h1').count() > 0 and p11.locator('#stm-nav').count() == 1, p11.url)
-    check('direct product page does not mount the full shell app', p11.locator('#page-product').count() == 0 and p11.locator('#bottom-nav').count() == 0)
-    check('product page has no page errors', not e11, e11[:3])
+    p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml'); p11.wait_for_selector('#page-product.open', timeout=15000); p11.wait_for_timeout(300)
+    check('direct product URL opens the full shell product view at its canonical address', p11.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and p11.locator('#bottom-nav').is_visible() and p11.locator('#pp-name').count() == 1, p11.url)
+    check('direct product shell page has no page errors', not e11, e11[:3])
     c11.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
                       ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_p(cx)
-        px = cx.new_page(); px.goto(f'{BASE}/p/garden-set-1Litre.html'); px.wait_for_timeout(700)
-        check(f'{label} stays on the static product URL', px.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and px.locator('h1').count() > 0, px.url)
+        px = cx.new_page(); px.goto(f'{BASE}/p/garden-set-1Litre.html'); px.wait_for_selector('#page-product.open', timeout=15000)
+        check(f'{label} opens the full shell for a direct product URL', px.locator('#bottom-nav').is_visible() and px.locator('#pp-name').count() == 1, px.url)
         cx.close()
     cc = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc); serve_p(cc)
-    pc = cc.new_page(); pc.goto(f'{BASE}/p/garden-set-1Litre.html?classic=1'); pc.wait_for_timeout(700)
-    check('?classic=1 remains on the static product URL', pc.evaluate('location.pathname') == '/p/garden-set-1Litre.html', pc.url)
+    pc = cc.new_page(); pc.goto(f'{BASE}/p/garden-set-1Litre.html?classic=1'); pc.wait_for_selector('#page-product.open', timeout=15000)
+    check('classic query cannot force a product back into the old page', pc.locator('#bottom-nav').is_visible() and pc.locator('#pp-name').count() == 1)
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_function("location.pathname !== '/'", timeout=15000)
@@ -510,25 +513,24 @@ with sync_playwright() as p:
             m = _re.search(r'/c/([a-z0-9-]+)\.html', rt.request.url)
             rt.fulfill(status=200, content_type='text/html', body=cat_page(m.group(1)))
         ctx.route('**/c/*.html*', h)
-    check('generated category pages have no automatic route redirect', 'stm-early' not in cat_page('garden-outdoors') and 'location.replace' not in cat_page('garden-outdoors'))
+    check('generated category pages include the full-shell route bootstrap', 'stm-shell-route' in cat_page('garden-outdoors') and 'location.replace' in cat_page('garden-outdoors'))
     c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12); serve_c(c12)
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
-    p12.goto(f'{BASE}/c/garden-outdoors.html'); p12.wait_for_timeout(700)
-    check('direct category URL stays on /c/ and serves its crawlable category page', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('h1').count() > 0 and p12.locator('#stm-nav').count() == 1, p12.url)
-    check('direct category page does not mount the full shell app', p12.locator('#grid .card[data-id]').count() == 0 and p12.locator('#bottom-nav').count() == 0)
-    check('category page has no page errors', not e12, e12[:3])
+    p12.goto(f'{BASE}/c/garden-outdoors.html'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(400)
+    check('direct category URL opens the full shell category view at its canonical address', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('#bottom-nav').is_visible() and p12.locator('#grid .card[data-id]').count() > 0, p12.url)
+    check('category shell page has no page errors', not e12, e12[:3])
     c12.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
                       ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_c(cx)
-        px = cx.new_page(); px.goto(f'{BASE}/c/garden-outdoors.html'); px.wait_for_timeout(700)
-        check(f'{label} stays on the static category URL', px.evaluate('location.pathname') == '/c/garden-outdoors.html' and px.locator('h1').count() > 0, px.url)
+        px = cx.new_page(); px.goto(f'{BASE}/c/garden-outdoors.html'); px.wait_for_selector('#grid .card[data-id]', timeout=15000)
+        check(f'{label} opens the full shell for a direct category URL', px.locator('#bottom-nav').is_visible() and px.locator('#grid .card[data-id]').count() > 0, px.url)
         cx.close()
     cc2 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc2); serve_c(cc2)
-    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1'); pc2.wait_for_timeout(700)
-    check('?classic=1 remains on the static category URL', pc2.evaluate('location.pathname') == '/c/garden-outdoors.html', pc2.url)
-
+    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1'); pc2.wait_for_selector('#grid .card[data-id]', timeout=15000)
+    check('classic query cannot force a category back into the old page', pc2.locator('#bottom-nav').is_visible() and pc2.locator('#grid .card[data-id]').count() > 0)
+    cc2.close()
     # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell
     PAGES = ['account', 'track', 'shipping', 'returns', 'contact', 'faq', 'about', 'privacy', 'terms']
     c13 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c13)
@@ -613,7 +615,7 @@ with sync_playwright() as p:
     p15.locator('#chips [data-chip="phones-accessories"]').click()
     p15.wait_for_function("location.pathname === '/c/phones-accessories.html'", timeout=10000)
     p15.reload(); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href^="/p/"]')
-    check('top-level category reload serves its crawlable static page', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and 'Phones &amp; Accessories' in p15.locator('h1').inner_html() and p15.locator('a[href^="/p/"]').count() >= 6 and p15.locator('#bottom-nav').count() == 0, p15.url)
+    check('top-level category reload restores the full shell category view', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and p15.locator('#grid .card[data-id]').count() >= 6 and p15.locator('#bottom-nav').is_visible(), p15.url)
 
     p15.goto(f'{BASE}/?cat=garden-tools'); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
     check('sub-category deep link opens the selected category in the mobile shell', p15.locator('#grid-title').inner_text() == 'Garden Tools' and p15.locator('#grid .card[data-id]').count() > 0 and p15.url.endswith('/?cat=garden-tools'), p15.url)

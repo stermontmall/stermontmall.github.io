@@ -1,51 +1,48 @@
-// Stermont Arcade - REMOVES the visitor redirect from product (/p/) and category (/c/) SEO pages.
-// History: until 2026-11-03 this step injected a script that sent every non-crawler browser from /p/<slug>.html to /?product=<slug>
-// (and /c/<slug>.html to /?cat=<slug>), i.e. into the JavaScript mobile shell, while crawlers kept the static page.
-// Why it was removed: showing crawlers one page and visitors another can look like a "sneaky redirect" to Google, and visitors from
-// Google landed on the heavy shell instead of the fast static page. The owner asked for it to stop (2026-11-03).
-// Now: the product-pages workflow still runs this file after every rebuild, but it only STRIPS the old scripts (idempotent), so any
-// page the generator leaves untouched or rewrites loses the redirect. Visitors stay on /p/ and /c/ pages; the shell is for browsing.
-// The shell still shows /p/<slug>.html in its address bar when a product is open (mobile-shell/app.js), so shared links keep working.
-// Redirect stubs (pages with a meta refresh, one per extra pack size) are left alone.
-// To bring the redirect back: see git history of this file (the commit before this one).
-// 2026-11-05: at the end this also runs seo-shell-chrome.mjs, which gives the same static pages the shell top bar and bottom nav
-// (same page for everyone, no redirect). It lives here because this step already runs after every build and the workflow file
-// could not be edited. To turn it off, remove the runAll() call in the block at the bottom.
-// 2026-11-19: product/category pages retain their static URLs. seo-shell-chrome.mjs removes legacy stm-early scripts and keeps shell chrome.
+// Product and category URLs launch the full mobile-shell app by default.
+// Static HTML retains crawlable metadata and schema; visitors are routed to the app deep link.
+// The app restores the canonical /p/ or /c/ URL with history.replaceState after opening the view.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const DIR = process.env.P_DIR || 'p';
-export const MARK = '<!--stm-shell-->';
-export const CAT_MARK = '<!--stm-shell-cat-->';
+export const MARK = '<!--stm-shell-route-->';
+const PRODUCT_RE = /<!--stm-shell--><script>[\s\S]*?<\/script>/g;
+const CAT_RE = /<!--stm-shell-cat--><script>[\s\S]*?<\/script>/g;
+const ROUTE_RE = /<!--stm-shell-route--><script>[\s\S]*?<\/script>/g;
 
-// Matches the marker followed by the injected <script>...</script> block (the old SCRIPT / CAT_SCRIPT text, whatever its exact wording).
-const PRODUCT_RE = new RegExp(MARK.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '<script>[\\s\\S]*?</script>', 'g');
-const CAT_RE = new RegExp(CAT_MARK.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '<script>[\\s\\S]*?</script>', 'g');
-
-export function inject(html) {
-  if (/http-equiv=["']refresh["']/i.test(html)) return html;   // redirect stub of an extra pack size: untouched
-  return html.replace(PRODUCT_RE, '');
+function routeScript(kind, slug) {
+  const key = kind === 'product' ? 'product' : 'cat';
+  const safeSlug = JSON.stringify(String(slug));
+  return MARK + '<script>(function(){var p=' + safeSlug + ';var q=' + JSON.stringify(key) + ';var u="/?"+q+"="+encodeURIComponent(p)+location.hash;if(location.pathname!=="/"||location.search!=="?"+q+"="+encodeURIComponent(p))location.replace(u);})();</script>';
 }
 
-export function injectCat(html) {
+function addRoute(html, kind, slug) {
   if (/http-equiv=["']refresh["']/i.test(html)) return html;
-  return html.replace(CAT_RE, '');
+  if (!/<\/head>/i.test(html)) return html;
+  const old = html.replace(kind === 'product' ? PRODUCT_RE : CAT_RE, '').replace(ROUTE_RE, '');
+  return old.replace(/<\/head>/i, routeScript(kind, slug) + '</head>');
 }
+
+export function inject(html, slug) { return addRoute(html, 'product', slug); }
+export function injectCat(html, slug) { return addRoute(html, 'category', slug); }
 
 function run(dir, fn, label) {
-  let n = 0, total = 0;
-  let files = []; try { files = readdirSync(dir).filter(f => f.endsWith('.html')); } catch (e) { console.log(`seo-shell-redirect: no ${dir}/ folder, skipped`); return; }
+  let n = 0, total = 0, files = [];
+  try { files = readdirSync(dir).filter(f => f.endsWith('.html')); }
+  catch (e) { console.log(`seo-shell-redirect: no ${dir}/ folder, skipped`); return; }
   for (const f of files) {
     total++;
-    try { const s = readFileSync(`${dir}/${f}`, 'utf8'), o = fn(s); if (o !== s) { writeFileSync(`${dir}/${f}`, o); n++; } }
-    catch (e) { console.log('skipped', f, e.message); }
+    try {
+      const path = `${dir}/${f}`, before = readFileSync(path, 'utf8');
+      const slug = f.replace(/\.html$/i, ''), after = fn(before, slug);
+      if (after !== before) { writeFileSync(path, after); n++; }
+    } catch (e) { console.log('skipped', f, e.message); }
   }
-  console.log(`seo-shell-redirect: removed the visitor redirect from ${n} of ${total} ${label} pages`);
+  console.log(`seo-shell-redirect: routed ${n} of ${total} ${label} pages into the full mobile shell`);
 }
 
 if (process.argv[1] && process.argv[1].endsWith('seo-shell-redirect.mjs')) {
   run(DIR, inject, 'product');
   run(process.env.C_DIR || 'c', injectCat, 'category');
-  try { (await import('./seo-shell-chrome.mjs')).runAll(); }   // shell top bar + bottom nav + early phone redirect on p, c; chrome on guides, products.html
+  try { (await import('./seo-shell-chrome.mjs')).runAll(); }
   catch (e) { console.log('seo-shell-chrome skipped:', e.message); }
 }

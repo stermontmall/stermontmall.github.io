@@ -38,6 +38,7 @@ on:
       - 'seo-titles.mjs'
       - 'seo-titles.test.mjs'
       - 'seo-shell-redirect.mjs'
+      - 'seo-shell-redirect.test.mjs'
       - 'seo-shell-chrome.mjs'
       - 'seo-shell-chrome.test.mjs'
       - 'shell-chrome.js'
@@ -144,7 +145,10 @@ jobs:
       - name: Test canonical responsive product-page routing and legacy redirect removal
         run: node seo-shell-chrome.test.mjs
 
-      - name: Remove legacy shell redirects and add responsive navigation chrome
+      - name: Test full mobile-shell routing for product and category URLs
+        run: node seo-shell-redirect.test.mjs
+
+      - name: Route product and category pages into the full mobile shell
         run: node seo-shell-redirect.mjs
 
       - name: Speed - connect to the shop database early (preconnect)

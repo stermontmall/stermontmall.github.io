@@ -1,10 +1,10 @@
 /* Stermont Arcade - shell navigation for static sections (account, tracking, shipping, returns, contact, FAQ, about, privacy, terms, services, and product /p/ and category /c/ pages).
-   Adds the same shell top bar and bottom nav at EVERY viewport, hiding the old section header so users do not fall back to the traditional desktop navigation.
+   Adds shared shell navigation to static informational/article pages. Product and category pages bootstrap into the full app via seo-shell-redirect.mjs.
    Content and payment/order functionality remain intact. Nav/search/cart links return to the main shell.
    Load with: <script src="/shell-chrome.js?v=1" defer></script>. To undo: remove that line from the page.
    /p/ and /c/ pages get it from seo-shell-chrome.mjs (run by product-pages.yml); no tab is marked current there. */
 (function () {
-  // Product and category URLs are canonical, responsive pages. Never redirect them into query-string shell routes.
+  // Product/category redirects are handled before this navigation chrome runs.
   try {
     if (window.__stmChrome) return; window.__stmChrome = 1;
     var P = '#7c3aed', LINE = '#e5e7eb';

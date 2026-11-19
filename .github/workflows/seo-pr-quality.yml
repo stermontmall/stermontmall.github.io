@@ -75,7 +75,10 @@ jobs:
       - name: Test server-rendered homepage product cards
         run: node home-grid-ssr.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-home-grid-ssr.log"
       - name: Prepare generated product/category fixtures with the production mobile-shell routing
-        run: node seo-shell-chrome.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-shell-route-fixtures.log"
+        run: |
+          node seo-shell-chrome.mjs
+          node seo-shell-redirect.mjs
+          node seo-shell-redirect.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-shell-route-fixtures.log"
       - name: Run mobile shell browser regression suite
         run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
       - name: Broken and placeholder links (link-check.mjs)
@@ -87,6 +90,8 @@ jobs:
           {
             node --check category-editorial.mjs
             node --check generate-products.mjs
+            node --check seo-shell-redirect.mjs
+            node --check seo-shell-redirect.test.mjs
             node --check catalog-v10.js
             node --check product-codes.test.mjs
             node --check seo-check.mjs
