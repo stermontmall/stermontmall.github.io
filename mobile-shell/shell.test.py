@@ -260,7 +260,7 @@ with sync_playwright() as p:
     check('header compacts when scrolling down', pg.evaluate("document.querySelector('#appbar').classList.contains('is-compact')"))
     pg.evaluate('window.scrollTo(0, 500)'); pg.wait_for_timeout(300)
     check('header expands when scrolling up', not pg.evaluate("document.querySelector('#appbar').classList.contains('is-compact')"))
-    check('search stays pinned', pg.evaluate("document.querySelector('#search').getBoundingClientRect().top") < 50)
+    check('search stays pinned inside the sticky app bar', pg.evaluate("(() => { const bar = document.querySelector('#appbar').getBoundingClientRect(), search = document.querySelector('#search').getBoundingClientRect(); return bar.top <= 1 && search.top >= bar.top && search.top < 100 && search.bottom <= bar.bottom; })()"))
 
     # search
     pg.fill('#search', 'air fryer'); pg.keyboard.press('Enter'); pg.wait_for_timeout(800)
@@ -523,7 +523,7 @@ with sync_playwright() as p:
     check('shell address /?cat=<slug>: the address becomes the clean /c/<slug>.html address (no leftover ?cat=)', p12.evaluate('location.pathname + location.search') == '/c/garden-outdoors.html', p12.url)
     p12.goto(f'{BASE}/?cat=kitchen-dining'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('shell address /?cat=<sub-category> opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname') == '/c/kitchen-dining.html', ids)
+    check('shell address /?cat=<sub-category> opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname + location.search') == '/?cat=kitchen-dining', ids)
     p12.goto(f'{BASE}/?cat=no-such-category'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     check('shell address /?cat=<unknown> shows a notice and the normal home', 'no longer available' in p12.locator('#toast').inner_text(), p12.locator('#toast').inner_text())
     check('category pages: no page errors', not e12, e12[:3])
@@ -615,34 +615,32 @@ with sync_playwright() as p:
     check('shared cart: desktop no page errors', not e14, e14[:3])
     c14.close()
 
-    # a reload keeps the chosen category (it used to fall back to Home / "For you")
-    # The shell shows an open category as /c/<slug>.html (replaceState), so a reload asks the server for that generated page; on a phone its inline
-    # stm-early script sends it back to /?cat=<slug>. That script skips bots and "headless" browsers, so this context uses an ordinary phone user agent.
-    # A sub-category (garden-tools) has no generated page in the repo, so any /c/<slug>.html without a file is answered with the garden-outdoors page (same script).
-    c15 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True,
-                        user_agent='Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'); mock_network(c15)
-    def _c15_cat_page(rt):
-        m = _re.search(r'/c/([a-z0-9-]+)\.html', rt.request.url)
-        f = os.path.join(ROOT, 'c', (m.group(1) if m else '') + '.html')
-        rt.fulfill(status=200, content_type='text/html', body=open(f if os.path.exists(f) else os.path.join(ROOT, 'c', 'garden-outdoors.html'), encoding='utf-8').read())
-    c15.route('**/c/*.html*', _c15_cat_page)
+    # Category URLs must survive reload without sending visitors through a JavaScript-only redirect.
+    # Top-level categories have crawlable static /c/ pages; sub-categories have no standalone page,
+    # so their shareable address stays on the shell as /?cat=<slug>.
+    c15 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c15)
     p15 = c15.new_page(); e15 = []; p15.on('pageerror', lambda e: e15.append(str(e)))
     p15.goto(URL); p15.wait_for_selector('#grid .card[data-id]')
-    p15.locator('#chips [data-chip="phones-accessories"]').click(); p15.wait_for_timeout(600)
-    p15.reload(); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
-    ids = p15.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('reload keeps the chosen category (chip, title and products)', p15.locator('#chips [data-chip="phones-accessories"]').get_attribute('aria-selected') == 'true' and p15.locator('#grid-title').inner_text() == 'Phones & Accessories' and ids and all(i.startswith('phone-') for i in ids), (ids[:4], p15.locator('#grid-title').inner_text()))
+    p15.locator('#chips [data-chip="phones-accessories"]').click()
+    p15.wait_for_function("location.pathname === '/c/phones-accessories.html'", timeout=10000)
+    p15.reload(); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href^="/p/"]')
+    check('top-level category reload serves its crawlable static page', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and 'Phones &amp; Accessories' in p15.locator('h1').inner_html() and p15.locator('a[href^="/p/"]').count() >= 6 and p15.locator('#bottom-nav').count() == 0, p15.url)
+
     p15.goto(f'{BASE}/?cat=garden-tools'); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
+    check('sub-category deep link opens the selected category in the mobile shell', p15.locator('#grid-title').inner_text() == 'Garden Tools' and p15.locator('#grid .card[data-id]').count() > 0 and p15.url.endswith('/?cat=garden-tools'), p15.url)
     p15.reload(); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
     ids = p15.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('reload keeps a sub-category opened from a /?cat= address', p15.locator('#grid-title').inner_text() == 'Garden Tools' and ids and all(i.startswith('garden-') for i in ids), (ids[:4], p15.locator('#grid-title').inner_text()))
+    check('sub-category reload restores the selected products', p15.locator('#grid-title').inner_text() == 'Garden Tools' and ids and all(i.startswith('garden-') for i in ids), (ids[:4], p15.locator('#grid-title').inner_text()))
+
     p15.locator('#chips [data-chip="all"]').click(); p15.wait_for_timeout(400)
+    check('returning to For you removes only the category query', p15.url == BASE + '/', p15.url)
     p15.reload(); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(400)
     check('reload after going back to For you stays on For you', p15.locator('#grid-title').inner_text() == 'Recommended for you')
     p15.evaluate("sessionStorage.setItem('shell.activeCat', JSON.stringify({ chip: 'no-such-category', sub: '' }))")
     p15.reload(); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
     check('a saved category that no longer exists falls back to For you', p15.locator('#grid-title').inner_text() == 'Recommended for you' and p15.locator('#grid .card[data-id]').count() > 3)
     check('reload category: no page errors', not e15, e15[:3])
+
     c15.close()
     c16 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c16)
     p16 = c16.new_page(); p16.goto(URL); p16.wait_for_selector('#grid .card[data-id]')
