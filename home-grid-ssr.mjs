@@ -5,12 +5,15 @@ const isOwnedImage = value => typeof value === 'string' && /^https:\/\/(?:stermo
 
 export function renderHomeGridFallback(products, { limit = 8 } = {}) {
   if (!Array.isArray(products) || !Number.isInteger(limit) || limit < 1) return '';
+  let imageIndex = 0;
   return products
     .filter(p => p && p.name && Number(p.stock) > 0 && Number(p.price) > 0 && /^\/p\/[a-z0-9][a-z0-9-]*\.html$/.test(String(p.href || '')))
     .slice(0, limit)
-    .map((p, index) => {
-      const image = isOwnedImage(p.image)
-        ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" ${index < 4 ? "loading=\"eager\"" : "loading=\"lazy\""} ${index === 0 ? "fetchpriority=\"high\"" : ""} decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff">`
+    .map(p => {
+      const hasOwnedImage = isOwnedImage(p.image);
+      const priorityIndex = hasOwnedImage ? imageIndex++ : -1;
+      const image = hasOwnedImage
+        ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" ${priorityIndex >= 0 && priorityIndex < 4 ? "loading=\"eager\"" : "loading=\"lazy\""} ${priorityIndex === 0 ? "fetchpriority=\"high\"" : ""} decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff">`
         : '<span class="text-sm text-mute">Product details</span>';
       const price = Math.round(Number(p.price)).toLocaleString('en-KE');
       return `<li class="card ssr-product-card" data-ssr="true"><a href="${esc(p.href)}" aria-label="View ${esc(p.name)}" style="display:block;color:inherit;text-decoration:none">
