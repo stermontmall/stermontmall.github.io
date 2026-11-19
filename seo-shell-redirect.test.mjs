@@ -5,7 +5,7 @@ import { inject, injectCat, MARK } from './seo-shell-redirect.mjs';
 const page = '<!doctype html><html><head><title>SEO title</title><link rel="canonical" href="https://stermontarcade.co.ke/p/example.html"></head><body><main><h1>SEO fallback</h1></main></body></html>';
 const product = inject(page, 'termidor-96-sc-1-litre');
 assert.ok(product.includes(MARK), 'product page receives the full-shell route marker');
-assert.ok(product.includes('/shell-route-loader.js?v=1'), 'product page loads the in-place shell loader');
+assert.ok(product.includes('/shell-route-loader.js?v=2'), 'product page loads the in-place shell loader');
 assert.ok(product.includes('rel="canonical"') && product.includes('SEO fallback'), 'product SEO metadata and server-rendered fallback stay intact');
 assert.ok(!product.includes('location.replace'), 'product route never redirects to the homepage');
 assert.equal(inject(product, 'termidor-96-sc-1-litre'), product, 'product route injection is idempotent');
