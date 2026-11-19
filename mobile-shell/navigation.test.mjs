@@ -15,8 +15,8 @@ function resolve({ search = '', pathname = '/', saved = null, historyState = nul
   const context = {
     URLSearchParams,
     location: { search, pathname },
-    DEEP: new URLSearchParams(search).get('product') || ((/^\\/p\\/([^/]+)\\.html$/i.exec(pathname) || [])[1] || null),
-    CAT_DEEP: new URLSearchParams(search).get('cat') || ((/^\\/c\\/([^/]+)\\.html$/i.exec(pathname) || [])[1] || null),
+    DEEP: new URLSearchParams(search).get('product') || ((/^\/p\/([^/]+)\.html$/i.exec(pathname) || [])[1] || null),
+    CAT_DEEP: new URLSearchParams(search).get('cat') || ((/^\/c\/([^/]+)\.html$/i.exec(pathname) || [])[1] || null),
     Q_DEEP: (new URLSearchParams(search).get('q') || '').trim().slice(0, 80),
     TAB_DEEP: new URLSearchParams(search).get('tab'),
     sessionStorage: { getItem: key => key === 'shell.activeTab' ? saved : null },
