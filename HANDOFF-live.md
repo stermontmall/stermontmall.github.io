@@ -1,3 +1,14 @@
+## 2026-11-20 00:26 (Africa/Nairobi) — Pack-size prices shown directly on mobile-shell pack cards
+- Done on branch `fix/shell-product-links-2026-11-19-v2` (PR #991): quick-buy and full product-page pack choices now render as two-column cards. Each card shows its exact pack label, its own KSh price, and a crossed-out previous price when discounted. The active pack has a visible selected state and accessible `aria-pressed` / `aria-selected` attributes.
+- Done: the selected pack still updates the main price summary immediately; cart/checkout price data continues to use the selected variant row and its exact price.
+- Done: bumped `/mobile-shell/app.js?v=40` to `?v=41` to avoid stale mobile caches.
+- Regression coverage updated in `mobile-shell/shell.test.py` for per-card prices, selected-state feedback, and immediate price changes in both quick-buy and full product-page views.
+- Customer-facing product URLs in this PR use the mobile shell query route `/?product=<slug>`; canonical static `/p/<slug>.html` pages remain available for Google crawling. This preserves the SEO/canonical surface while making customer product links open the shell.
+- Validation: GitHub Actions quality gate pending after these commits. Do not merge or call the fix live until the mobile-shell browser tests and SEO checks pass.
+- Next exact check: inspect Actions for the latest branch commit, then fix any failing step; after green, verify a multi-pack product on a phone and confirm each card's pack label and KSh price are visible together.
+
+---
+
 ## 2026-11-19 — In progress: preserve canonical product/category URLs for Google
 - Found a routing conflict: seo-shell-redirect.mjs injected a JavaScript location.replace from every /p/ and /c/ page to a homepage query deep link, even though seo-shell-chrome.mjs had already been changed to strip an older redirect format.
 - Working on branch fix-seo-static-product-routes-2026-11-19: change the route pass to strip legacy redirect scripts, retain each page's canonical URL and SEO HTML, and still apply the mobile-shell top bar/bottom navigation. Explicit /?product=<slug> and /?cat=<slug> deep links remain supported.
