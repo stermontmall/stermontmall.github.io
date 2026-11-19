@@ -56,5 +56,35 @@
     "delivery_details": "M-Pesa checkout, Sarit Centre Westlands pickup coordination, delivery across all 47 counties subject to courier and stock coverage, WhatsApp +254 748 888 230.",
     "chemical_safety": "Never invent dilution rates, approved uses, PPE, label instructions, registration, efficacy, warranty or safety claims.",
     "faq_count": 4
+  },
+  "pricing": {
+    "default_for_new_products": true,
+    "source_of_truth": "Supabase public.price_4tier(p_baseline)",
+    "baseline_currency": "KES",
+    "tiers": [
+      {
+        "max_exclusive": 20000,
+        "markup_pct": 30
+      },
+      {
+        "min_inclusive": 20000,
+        "max_exclusive": 40000,
+        "markup_pct": 25
+      },
+      {
+        "min_inclusive": 40000,
+        "max_inclusive": 60000,
+        "markup_pct": 20
+      },
+      {
+        "min_exclusive": 60000,
+        "markup_pct": 17.5
+      }
+    ],
+    "minimum_margin_pct": 15,
+    "round_to_kes": 50,
+    "minimum_storefront_price_kes": 200,
+    "syngenta_exclusion": "Do not reprice Syngenta unless the owner explicitly instructs otherwise.",
+    "admin_behavior": "New product entries calculate the selling price by calling public.price_4tier; existing product edits retain the manually entered selling price."
   }
 }
