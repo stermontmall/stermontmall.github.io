@@ -487,7 +487,7 @@ with sync_playwright() as p:
     c11 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c11); serve_p(c11)
     p11 = c11.new_page(); e11 = []; p11.on('pageerror', lambda e: e11.append(str(e)))
     p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml', wait_until='domcontentloaded'); p11.wait_for_timeout(1200)
-    check('direct product URL opens the full mobile-shell product view', p11.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and p11.locator('#stm-nav').count() == 1 and p11.locator('#page-product.open').count() == 1, p11.url)
+    check('direct product URL opens the full mobile-shell product view', p11.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and p11.locator('#bottom-nav').count() == 1 and p11.locator('#page-product.open').count() == 1, p11.url)
     check('direct product shell page has no page errors', not e11, e11[:3])
     c11.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
@@ -495,11 +495,11 @@ with sync_playwright() as p:
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_p(cx)
         px = cx.new_page(); px.goto(f'{BASE}/p/garden-set-1Litre.html', wait_until='domcontentloaded'); px.wait_for_timeout(1200)
-        check(f'{label} receives the full mobile-shell product view', px.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and px.locator('#page-product.open').count() == 1 and px.locator('#stm-nav').count() == 1, px.url)
+        check(f'{label} receives the full mobile-shell product view', px.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and px.locator('#page-product.open').count() == 1 and px.locator('#bottom-nav').count() == 1, px.url)
         cx.close()
     cc = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc); serve_p(cc)
     pc = cc.new_page(); pc.goto(f'{BASE}/p/garden-set-1Litre.html?classic=1', wait_until='domcontentloaded'); pc.wait_for_timeout(1200)
-    check('?classic=1 does not bypass the full mobile shell', pc.locator('#page-product.open').count() == 1 and pc.locator('#stm-nav').count() == 1)
+    check('?classic=1 does not bypass the full mobile shell', pc.locator('#page-product.open').count() == 1 and pc.locator('#bottom-nav').count() == 1)
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_function("location.pathname !== '/'", timeout=15000)
@@ -517,7 +517,7 @@ with sync_playwright() as p:
     c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12); serve_c(c12)
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
     p12.goto(f'{BASE}/c/garden-outdoors.html', wait_until='domcontentloaded'); p12.wait_for_timeout(1200)
-    check('direct category URL opens the full mobile-shell category view', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('#stm-nav').count() == 1 and p12.locator('#view-home').is_visible(), p12.url)
+    check('direct category URL opens the full mobile-shell category view', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('#bottom-nav').count() == 1 and p12.locator('#view-home').is_visible(), p12.url)
     check('category shell page has no page errors', not e12, e12[:3])
     c12.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
@@ -529,7 +529,7 @@ with sync_playwright() as p:
         cx.close()
     cc2 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc2); serve_c(cc2)
     pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1', wait_until='domcontentloaded'); pc2.wait_for_timeout(1200)
-    check('?classic=1 does not bypass the full mobile shell', pc2.locator('#stm-nav').count() == 1 and pc2.locator('#view-home').is_visible())
+    check('?classic=1 does not bypass the full mobile shell', pc2.locator('#bottom-nav').count() == 1 and pc2.locator('#view-home').is_visible())
     cc2.close()
     # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell
     PAGES = ['account', 'track', 'shipping', 'returns', 'contact', 'faq', 'about', 'privacy', 'terms']
@@ -606,16 +606,15 @@ with sync_playwright() as p:
     check('shared cart: desktop no page errors', not e14, e14[:3])
     c14.close()
 
-    # Category URLs must survive reload without sending visitors through a JavaScript-only redirect.
-    # Top-level categories have crawlable static /c/ pages; sub-categories have no standalone page,
-    # so their shareable address stays on the shell as /?cat=<slug>.
+    # Category URLs must survive reload in the full mobile shell. The generated /c/ page remains
+    # crawlable in the initial HTML, then its route bootstrap opens the matching shell category.
     c15 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c15)
     p15 = c15.new_page(); e15 = []; p15.on('pageerror', lambda e: e15.append(str(e)))
     p15.goto(URL); p15.wait_for_selector('#grid .card[data-id]')
     p15.locator('#chips [data-chip="phones-accessories"]').click()
     p15.wait_for_function("location.pathname === '/c/phones-accessories.html'", timeout=10000)
     p15.reload(wait_until='domcontentloaded'); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href^="/p/"]')
-    check('top-level category reload restores its canonical static page with shell navigation', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and p15.locator('#stm-nav').count() == 1 and p15.locator('h1').count() >= 1 and p15.locator('#grid .card[data-id]').count() == 0, p15.url)
+    check('top-level category reload restores its canonical static page with shell navigation', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and p15.locator('#bottom-nav').count() == 1 and p15.locator('#view-home').is_visible() and p15.locator('#grid .card[data-id]').count() > 0, p15.url)
 
     p15.goto(f'{BASE}/?cat=garden-tools'); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
     check('sub-category deep link opens the selected category in the mobile shell', p15.locator('#grid-title').inner_text() == 'Garden Tools' and p15.locator('#grid .card[data-id]').count() > 0 and p15.url.endswith('/?cat=garden-tools'), p15.url)
