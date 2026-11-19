@@ -709,7 +709,7 @@ function openQuickBuy(id) {
 function openDeepLink(slug) {   // the full product page for a /?product=<slug> address (any pack size's slug works)
   const hit = x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug);   // /p/<id>.html pages are named by the row id, which differs from the slug on some products
   const p = PRODUCTS.find(hit);
-  if (!p) { toast('That product is no longer available'); return; }
+  if (!p) { toast('That product is no longer available'); deepOpen = false; qb.p = null; try { history.replaceState(null, '', '/'); } catch (e) {} syncProductMeta(); return; }
   deepOpen = true;
   qb.p = p; qb.size = (p.sizes.find(z => z.slug === slug || z.rowId === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
   renderQB(); openProductPage();
