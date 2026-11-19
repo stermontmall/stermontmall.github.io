@@ -145,6 +145,8 @@ jobs:
             node seo-safe-meta.mjs
             node seo-shell-redirect.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
+      - name: Build service pages for the generated-link guard
+        run: node services/build-services.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15a-service-pages.log"
       - name: Verify generated pages contain no static human-facing product links
         env:
           STM_CHECK_GENERATED_PRODUCT_PAGES: '1'
