@@ -8,6 +8,7 @@ on:
       - 'generate-products.mjs'
       - 'product-links.js'
       - 'site-links.js'
+      - 'shell-route-loader.js'
       - 'storefront-live.js'
       - 'wa-float.js'
       - 'product-trust.js'
