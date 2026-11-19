@@ -52,6 +52,11 @@ const helper = readFileSync('product-links.js', 'utf8');
 assert.match(helper, /function shellProductLink\(slug\)/, 'shared shellProductLink helper must exist');
 assert.match(helper, /\?product=/, 'helper must generate ?product= links');
 const generator = readFileSync('generate-products.mjs', 'utf8');
+assert.match(generator, /const normalizeCustomerProductLinks = html =>/,
+  'final generated-page renderer must normalize legacy product anchors from imported content');
+assert.ok(generator.includes('${normalizeCustomerProductLinks(body)}'),
+  'every generated page body must pass through the final customer-link normalizer');
+
 for (const marker of ['href="${shellProductLink(sl(p.id))}"', '`Link: ${shellProductLink(sl(p.id))}`', '${shellProductLink(v.slug || p.slug || p.id)}']) {
   assert.ok(generator.includes(marker), 'product generator must use shellProductLink for: ' + marker);
 }
