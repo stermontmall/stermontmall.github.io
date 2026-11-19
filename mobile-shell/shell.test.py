@@ -436,7 +436,7 @@ with sync_playwright() as p:
     check('address: selected Home & Living category keeps its clean category address', p9.evaluate('location.pathname + location.search') == '/c/home-living.html', p9.url)
     p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#sheet-quickbuy.open')
     check('address: opening a product puts its shell /?product=<size slug> URL in the address bar', p9.evaluate('location.pathname + location.search') == '/?product=garden-set-50ml', p9.url)
-    check('address: the address bar has no query string (no ?shell=1)', p9.evaluate('location.search') == '?product=garden-set-50ml', p9.url)
+    check('address: the address bar uses the product query and no legacy ?shell=1', p9.evaluate('location.search') == '?product=garden-set-50ml', p9.url)
     check('address: tab title shows the product', 'Garden Hose Connector Set' in p9.title() and p9.title().endswith('| Stermont Arcade'), p9.title())
     p9.locator('#qb-sizes [data-size="250 ml"]').click()
     check('address: choosing another size updates the address (no extra history entry)', p9.evaluate('location.pathname + location.search') == '/?product=garden-set-250ml', p9.url)
@@ -503,7 +503,7 @@ with sync_playwright() as p:
     check('?classic=1 does not cause a redirect from a product page', pc.evaluate('location.pathname') == '/p/garden-set-1Litre.html')
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
-    p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_function("location.pathname !== '/'", timeout=15000)
+    p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_selector('#page-product.open', timeout=15000)
     check('explicit /?product=<slug> deep link still opens the product page', p10.evaluate('location.pathname + location.search') == '/?product=garden-set-250ml', p10.url)
     c10.close()
 
