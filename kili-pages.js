@@ -138,7 +138,7 @@
         col.addEventListener('touchend', function (e) { var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1)); }, { passive: true });
       }
       if (!soldOut && pid) {
-        var cartHref = '/#p-' + encodeURIComponent(pid);
+        var cartHref = window.shellProductLink(pid);
         var first = D.querySelector('.pg a.btn');
         if (first) { var cb = el('a', 'btn kp-cart', '\uD83D\uDED2 Add to cart'); cb.href = cartHref; first.parentNode.insertBefore(cb, first); }
         var stk = D.querySelector('.stk');
