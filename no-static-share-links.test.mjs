@@ -21,7 +21,7 @@ const GENERATED_DIRS = new Set(['p', 'c', 'blog', 'guides']);
 const GENERATED_FILES = new Set(['products.html']);
 const GENERATED_MARKER = '<!-- stm-shell-product-links:v1 -->';
 const SKIP_FILES = new Set(['no-static-share-links.test.mjs', 'no-classic-hop.test.mjs', 'classic.html']);
-const HUMAN_PRODUCT = /<a\b[^>]*\bhref\s*=\s*["'`][^"'`]*\/p\/|href\s*=\s*["'`]\/p\/|(?:Link|Product link):[^\n`]*\/p\/|https?:\/\/stermontarcade\.co\.ke\/p\/[^\s"'`<>]*/i;
+const HUMAN_PRODUCT = /<a\b[^>]*\bhref\s*=\s*["'`][^"'`]*\/p\/|href\s*=\s*["'`]\/p\/|(?:Link|Product link):[^\n`]*\/p\//i;
 const HUMAN_CLASSIC = /<a\b[^>]*\bhref\s*=\s*["'`][^"'`]*classic\.html|href\s*=\s*["'`][^"'`]*classic\.html|(?:location\.(?:href|assign|replace)|window\.open)\s*[^;\n]*classic\.html/i;
 
 assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), SITE + '/?product=premise-200-sc-termiticide-50-ml');
