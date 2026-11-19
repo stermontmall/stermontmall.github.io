@@ -29,6 +29,7 @@ for (const file of files) {
     if (file === 'index.html' && line.includes('href="/p/')) return; // owner-approved seo-links crawl block, not the visible product grid
     if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|preload|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
     if (file === 'storefront-live.js' && /function purl\(|fetch\(purl\(/.test(line)) return;
+    if (file === 'seo-related-fill.mjs' && /existing\\.match/.test(line)) return; // only reads old SEO related anchors for de-duplication
     if (['seo-pest/blog-build.mjs', 'blog-write.mjs', 'services/build-services.mjs'].includes(file) && line.includes('shellProductLink')) return;
     if (/seo-links|seo-links\.mjs|seo-links\.js/.test(file)) return;
     if (/no-static-share-links\.test\.mjs/.test(file)) return;
