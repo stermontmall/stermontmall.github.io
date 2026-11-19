@@ -39,7 +39,7 @@ export function renderPost(a) {
   const relHtml = a.related.length ? `<h2>Related guides</h2>\n<ul class="rel">${a.related.map(r => `<li><a href="/blog/${r}.html">${esc(relTitle(r))}</a></li>`).join('')}</ul>` : '';
   const serviceHtml = `<div class="box"><strong>Need professional help?</strong><p>Explore <a href="/pest-control/">professional pest control and fumigation services in Kenya</a> or visit the <a href="/pest-control/blog/">Pest Control Advice Centre</a>. For a quotation, share your town, property type and pest concern.</p></div>`;
   return `<!doctype html>
-<html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en-KE"><head><!-- stm-shell-product-links:v1 --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(a.title)} | Stermont Arcade</title><meta name="description" content="${esc(a.description)}">
 <link rel="canonical" href="${url}"><meta name="robots" content="index, follow, max-image-preview:large">
 <meta property="og:type" content="article"><meta property="og:site_name" content="Stermont Arcade"><meta property="og:locale" content="en_KE">
