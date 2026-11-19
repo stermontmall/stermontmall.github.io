@@ -28,6 +28,8 @@ assert.match(catalog, /b < 20000 \? 1\.30/);
 assert.match(catalog, /b < 40000 \? 1\.25/);
 assert.match(catalog, /b <= 60000 \? 1\.20 : 1\.175/);
 assert.match(catalog, /row\.stock = 1000; row\.low_at = 20; row\.featured = false; row\.active = false/);
+assert.match(catalog, /if \(!\(row\.old_price > row\.price\)\) row\.old_price = null/);
+assert.doesNotMatch(bulk, /row\.price \+ 50/);
 
 assert.match(photoAi, /official four-tier rule/);
 assert.doesNotMatch(photoAi, /selling_price_kes:\s*r\.price/);
