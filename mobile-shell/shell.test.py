@@ -489,7 +489,7 @@ with sync_playwright() as p:
     p11 = c11.new_page(); e11 = []; p11.on('pageerror', lambda e: e11.append(str(e)))
     p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml', wait_until='domcontentloaded'); p11.wait_for_timeout(1200)
     p11.wait_for_selector('#page-product.open', timeout=15000)
-    check('direct product URL opens the full shell product view without changing its URL', p11.evaluate('location.pathname') == '/p/garden-set-1Litre.html' and p11.locator('#bottom-nav').count() == 1 and p11.locator('#stm-nav').count() == 0 and 'Garden Hose Connector Set' in p11.locator('#pp-name').inner_text(), p11.url)
+    check('direct product URL opens the full shell product view and restores its pack-size hash', p11.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml' and p11.locator('#bottom-nav').count() == 1 and p11.locator('#stm-nav').count() == 0 and 'Garden Hose Connector Set' in p11.locator('#pp-name').inner_text() and p11.locator('#pp-price').inner_text() == 'KSh 1,550', p11.url)
     check('direct product shell page has no page errors', not e11, e11[:3])
     c11.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
