@@ -108,7 +108,7 @@ assert.ok(generator.includes('property="og:url" content="${SITE}${path}"'));
 assert.ok(generator.includes('url: SITE + path'));
 assert.ok(generator.includes("crumbLd([['Home', SITE + '/']")); // BreadcrumbList remains on the canonical product page
 const admin = readFileSync('admin-blog.js', 'utf8');
-assert.match(admin, /window\\.shellProductLink\\(product\\[1\\]\\)/);
+assert.match(admin, /window\.shellProductLink\(product\[1\]\)/);
 const adminPage = readFileSync('admin.html', 'utf8');
 assert.ok(adminPage.indexOf('/product-links.js') < adminPage.indexOf('admin-blog.js'), 'shared helper must load before admin blog preview');
 const kili = readFileSync('kili-pages.js', 'utf8');
