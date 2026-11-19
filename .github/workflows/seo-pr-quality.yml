@@ -12,6 +12,10 @@ on:
       - 'product-trust.js'
       - 'product-seo-optimizer.js'
       - 'no-static-share-links.test.mjs'
+      - 'rewrite-static-product-links.mjs'
+      - '.github/workflows/blog-build.yml'
+      - 'services/*.html'
+      - 'pest-control/*.html'
       - 'blog-write.mjs'
       - 'seo-pest/blog-build.mjs'
       - 'CLAUDE.md'
@@ -102,6 +106,7 @@ jobs:
           {
             node --check category-editorial.mjs
             node --check product-links.js
+            node --check rewrite-static-product-links.mjs
             node --check site-links.js
             node --check storefront-live.js
             node --check product-trust.js
