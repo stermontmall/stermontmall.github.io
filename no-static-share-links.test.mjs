@@ -3,6 +3,7 @@
 // breadcrumbs and seo-links crawl links) are intentionally preserved.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { createRequire } from 'node:module';
 import assert from 'node:assert/strict';
 
 const SKIP = new Set(['.git', 'node_modules', 'p', 'c', 'guides', 'blog', 'product-photos', 'assets', 'services', 'pest-control']);
@@ -34,6 +35,13 @@ for (const file of files) {
 }
 assert.deepEqual(offenders, [], 'Human-facing links still point to static product pages:\n' + offenders.join('\n'));
 
+const shellProductLink = createRequire(import.meta.url)('./product-links.js');
+assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), 'https://stermontarcade.co.ke/?product=premise-200-sc-termiticide-50-ml');
+const homepage = readFileSync('index.html', 'utf8');
+const homeGrid = (homepage.match(/<ul id="grid"[\\s\\S]*?<\\/ul>/) || [])[0] || '';
+assert.ok(homeGrid.includes('https://stermontarcade.co.ke/?product='), 'homepage SSR cards must expose shell product URLs');
+assert.doesNotMatch(homeGrid, /href="\\/p\\//, 'homepage SSR cards must not expose static product URLs');
+assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'), 'homepage SEO crawl links must remain present');
 const helper = readFileSync('product-links.js', 'utf8');
 assert.match(helper, /function shellProductLink\(slug\)/, 'shared shellProductLink helper must exist');
 assert.match(helper, /\?product=/, 'helper must generate ?product= links');
