@@ -121,7 +121,7 @@ function productContentHtml(p) {
   if (!Array.isArray(sections) || !sections.length) return '';
   const paragraphHtml = x => {
     if (typeof x !== 'string') return '';
-    const safe = esc(x).replace(/\\[([^\\]]+)\\]\\((\\/p\\/([a-z0-9-]+)\\.html)\\)/g, (_m, label, _url, slug) => '<a href="' + esc(shellProductLink(slug, SITE)) + '">' + label + '</a>');
+    const safe = esc(x).replace(/\[([^\]]+)\]\((\/p\/([a-z0-9-]+)\.html)\)/g, (_m, label, _url, slug) => '<a href="' + esc(shellProductLink(slug, SITE)) + '">' + label + '</a>');
     return '<p>' + safe + '</p>';
   };
   return '<div class="box product-content"><h2 style="margin-top:0">More about ' + esc(p.name) + '</h2>' +
