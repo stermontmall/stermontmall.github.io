@@ -6,6 +6,8 @@ on:
     paths:
       - 'seo-*.mjs'
       - 'generate-products.mjs'
+      - 'catalog-v10.js'
+      - 'product-codes.test.mjs'
       - 'seo-overrides.json'
       - 'product-description-html.mjs'
       - 'product-description-html.test.mjs'
@@ -76,11 +78,15 @@ jobs:
         run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
       - name: Broken and placeholder links (link-check.mjs)
         run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/05-link-check.log"
+      - name: Test permanent product-code display and admin integration
+        run: node product-codes.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/06-product-codes.log"
       - name: Check JavaScript syntax
         run: |
           {
             node --check category-editorial.mjs
             node --check generate-products.mjs
+            node --check catalog-v10.js
+            node --check product-codes.test.mjs
             node --check seo-check.mjs
             node --check data-health.mjs
             node --check blog-write.mjs
