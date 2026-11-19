@@ -504,7 +504,7 @@ with sync_playwright() as p:
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_selector('#page-product.open', timeout=15000)
     check('explicit /?product=<slug> deep link still opens the product page', p10.evaluate('location.pathname + location.search') == '/?product=garden-set-250ml', p10.url)
-     check('shell product deep link keeps the homepage canonical', p10.evaluate("document.querySelector('link[rel=canonical]').href") == BASE + '/', p10.evaluate("document.querySelector('link[rel=canonical]').href"))
+    check('shell product deep link keeps the homepage canonical', p10.evaluate("document.querySelector('link[rel=canonical]').href") == BASE + '/', p10.evaluate("document.querySelector('link[rel=canonical]').href"))
     c10.close()
 
     def cat_page(slug):
