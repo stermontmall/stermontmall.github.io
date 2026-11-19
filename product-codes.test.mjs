@@ -4,7 +4,7 @@ import fs from 'node:fs';
 const generator = fs.readFileSync('generate-products.mjs', 'utf8');
 const admin = fs.readFileSync('catalog-v10.js', 'utf8');
 
-assert.match(generator, /sku:\s*String\(p\.product_code\s*\|\|\s*p\.id\)/,
+assert.match(generator, /id,product_code,created_at/,\n  'The public product query must fetch product_code for every generated page');\nassert.match(generator, /sku:\s*String\(p\.product_code\s*\|\|\s*p\.id\)/,
   'Single-product JSON-LD must use the permanent product code as SKU');
 assert.match(generator, /sku:\s*String\(v\.product_code\s*\|\|\s*v\.id\)/,
   'Variant JSON-LD must use each variant row product code as SKU');
