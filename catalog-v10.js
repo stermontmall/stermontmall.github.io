@@ -306,7 +306,7 @@
       function pctOf(o, n) { return Math.round((o - n) / o * 1000) / 10; }
       function paint() {
         var o = edit ? fv(eo) : up(fv(eo)), n = edit ? fv(ep) : up(fv(ep)), h = '';
-        if (!n && !o) h = '<span class="meta">Enter the selling price to preview how customers will see it.</span>';
+        if (!n && !o) h = '<span class="meta">Enter a verified baseline cost to preview the official selling price.</span>';
         else if (o && n && o <= n) h = '<span class="bad">Previous price must be higher than the current price.</span>';
         else if (o && n) h = '<span class="cx-bd">-' + Math.max(1, Math.round((o - n) / o * 100)) + '%</span> <s>' + money(o) + '</s> <b>' + money(n) + '</b><div class="meta">Customers save ' + money(o - n) + '</div>';
         else if (n) h = '<b>' + money(n) + '</b><div class="meta">No discount shown. Add a previous price or a discount %.</div>';
