@@ -269,7 +269,7 @@
         if (edit && stock !== p.stock) row.stock = stock;
         if (edit) return call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: row });
         var id = slug(name + (vl ? ' ' + vl : '')) || 'item', n = 2, base = id; while (S.prods.some(function (x) { return x.id === id; })) id = base + '-' + n++;
-        row.id = id; row.stock = stock; row.cost = price;   /* preserve source/cost so the database can verify the exact 30% markup */
+        row.id = id; row.stock = 1000; row.low_at = 20; row.featured = false; row.active = false; row.cost = price;   /* database trigger independently recalculates the four-tier price */
         var first = tpl && !tpl.variant_label ? call('/rest/v1/products?id=eq.' + encodeURIComponent(tpl.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { variant_label: vl0, variant_group: grp } }) : Promise.resolve();
         return first.then(function () { return call('/rest/v1/products', { m: 'POST', h: { Prefer: 'return=minimal' }, body: row }); });
       }).catch(function (e) {
