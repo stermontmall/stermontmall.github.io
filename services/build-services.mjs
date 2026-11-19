@@ -367,7 +367,7 @@ write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
 // Final output guard: service and pest pages may inherit legacy product URLs from source data.
 // Convert only customer-facing anchors; structured data and canonical URLs are not changed.
 const normalizeServiceProductLinks = html => String(html || '').replace(
-  /(\\bhref\\s*=\\s*)(["'])(?:https?:\\/\\/(?:www\\.)?stermontarcade\\.co\\.ke)?\\/p\\/([^"'?#\\s]+)\\.html(?:[?#][^"']*)?\\2/gi,
+  /(\bhref\s*=\s*)(["'])(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/p\/([^"'?#\s]+)\.html(?:[?#][^"']*)?\2/gi,
   (_match, prefix, quote, rawSlug) => {
     let slug = rawSlug;
     try { slug = decodeURIComponent(slug); } catch {}
