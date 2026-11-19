@@ -30,7 +30,7 @@ for (const file of files) {
     if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|preload|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
     if (file === 'storefront-live.js' && /function purl\(|fetch\(purl\(/.test(line)) return;
     if (file === 'seo-related-fill.mjs' && line.includes('existing.match')) return; // only reads old SEO related anchors for de-duplication
-    if (['seo-pest/blog-build.mjs', 'blog-write.mjs', 'services/build-services.mjs'].includes(file) && line.includes('shellProductLink')) return;
+    if (['seo-pest/blog-build.mjs', 'blog-write.mjs', 'blog-build.mjs', 'services/build-services.mjs'].includes(file) && line.includes('shellProductLink')) return;
     if (/seo-links|seo-links\.mjs|seo-links\.js/.test(file)) return;
     if (/no-static-share-links\.test\.mjs/.test(file)) return;
     offenders.push(file + ':' + (index + 1) + ': ' + line.trim().slice(0, 220));
@@ -59,6 +59,7 @@ assert.match(readFileSync('home-grid-ssr.mjs', 'utf8'), /\\?product=/, 'homepage
 assert.match(readFileSync('seo-related-fill.mjs', 'utf8'), /shellProductLink/, 'related-product generator must use shell links');
 assert.match(readFileSync('seo-pest/blog-build.mjs', 'utf8'), /shellProductLink/, 'hand-written blog generator must use shell links');
 assert.match(readFileSync('blog-write.mjs', 'utf8'), /shellProductLink/, 'AI blog generator must use shell links');
+assert.match(readFileSync('blog-build.mjs', 'utf8'), /normalizePostProductLinks/, 'existing published blog posts must be normalized without touching SEO metadata');
 assert.match(readFileSync('seo-kenya.mjs', 'utf8'), /shellProductLink\\(i\\.slug\\)/, 'price guide generator must use shell links');
 assert.match(readFileSync('services/build-services.mjs', 'utf8'), /shellProductLink/, 'service page CTAs must use shell links');
 assert.match(readFileSync('recent-orders.js', 'utf8'), /shellProductLink/, 'recent-order shortcuts must use shell links');
