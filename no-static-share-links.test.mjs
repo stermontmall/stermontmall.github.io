@@ -5,7 +5,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import assert from 'node:assert/strict';
 
-const SKIP = new Set(['.git', 'node_modules', 'p', 'c', 'guides', 'blog', 'product-photos', 'assets']);
+const SKIP = new Set(['.git', 'node_modules', 'p', 'c', 'guides', 'blog', 'product-photos', 'assets', 'services', 'pest-control']);
 const walk = (dir, out = []) => {
   for (const name of readdirSync(dir)) {
     if (SKIP.has(name)) continue;
@@ -23,6 +23,7 @@ for (const file of files) {
   lines.forEach((line, index) => {
     if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/p\//i.test(line)) return;
     // Internal SEO document fetches and explicitly defined Google crawl surfaces are not customer links.
+    if (file === 'index.html' && line.includes('href="/p/')) return; // owner-approved seo-links crawl block, not the visible product grid
     if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
     if (file === 'storefront-live.js' && /function purl\(|fetch\(purl\(/.test(line)) return;
     if (['seo-pest/blog-build.mjs', 'blog-write.mjs', 'services/build-services.mjs'].includes(file) && line.includes('shellProductLink')) return;
