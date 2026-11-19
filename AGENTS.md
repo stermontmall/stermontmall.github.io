@@ -2,6 +2,9 @@
 
 Read `CLAUDE.md` first: it holds the full repository rules (product posting, handoff, working rules). The rule below is the same canonical text as in `CLAUDE.md`; it replaces all older conflicting product-posting rules.
 
+## PERMANENT HUMAN-FACING PRODUCT LINK RULE (owner rule, 2026-11-08)
+Every product link intended for a customer or staff member—including WhatsApp messages, share/copy buttons, order emails, receipts, admin tools, search results, storefront cards, blog and guide CTAs—MUST use the shared `shellProductLink(slug)` helper and the mobile-shell URL `https://stermontarcade.co.ke/?product=<products.slug>`. Never use `/p/<slug>.html` or `/classic.html` as a human-facing product link. Keep `/p/<slug>.html` indexable and unchanged for Google: canonical, `og:url`, product sitemap, JSON-LD, breadcrumbs and `seo-links` crawl links are SEO-only and remain as-is. Never redirect visitors or switch by user-agent on `/p/` pages.
+
 ## AUTONOMOUS BULK PRODUCT PUBLISHING RULE (ZERO-PROMPT DEFAULT)
 
 A server-side mirror is stored in Supabase table `public.publishing_rules` (key `autonomous_bulk_product_publishing`); keep the two aligned.

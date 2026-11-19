@@ -97,13 +97,14 @@
      Reload it once so the list is rebuilt from the database. Only when the page was restored from memory and is older than 20s. */
   var LOADED = Date.now();
   window.addEventListener('pageshow', function (e) { if (e.persisted && Date.now() - LOADED > 20000 && !(pd && pd.classList.contains('on'))) location.reload(); });
-  /* straight product URL: /p/<id>.html (the real page Google indexes), never a #hash */
+  /* Customer-facing product URLs use the shell; fetch the separate /p/ SEO document only for its metadata. */
   var SLUGS = {};   /* product id -> clean page name (products.slug); falls back to the id */
-  function purl(id) { return '/p/' + encodeURIComponent(SLUGS[id] || id) + '.html'; }
+  function purl(id) { return window.shellProductLink(SLUGS[id] || id); }
+  function seoPageUrl(id) { return '/p/' + encodeURIComponent(SLUGS[id] || id) + '.html'; }
 
   /* ---------- tab title + meta description follow the open product (no manual refresh needed) ----------
      The product view is a soft navigation (pushState), so the browser never reloads the page and the tab title would stay on the
-     homepage title. We set a name-based title at once, then revalidate the real /p/ page (cache:'no-cache') and use ITS <title> and
+     homepage title. We set a name-based title at once, then revalidate the canonical /p/ SEO document (cache:'no-cache') and use ITS <title> and
      meta description, so what the tab shows is always what the freshly built page says. Closing the view restores the original. */
   var T0 = null, DESC0 = null, MT = 0;
   function descTag() { return D.querySelector('meta[name="description"]'); }
@@ -111,7 +112,7 @@
     var md = descTag(); if (T0 === null) { T0 = D.title; DESC0 = md ? md.getAttribute('content') : null; }
     var tok = ++MT; D.title = (p.vbase || p.name) + ' | Stermont Arcade';
     try {
-      fetch(purl(p.id), { cache: 'no-cache', credentials: 'omit' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (h) {
+      fetch(seoPageUrl(p.id), { cache: 'no-cache', credentials: 'omit' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (h) {
         if (!h || tok !== MT || !cur) return;
         var dd = new DOMParser().parseFromString(h, 'text/html'), t = dd.title, m = dd.querySelector('meta[name="description"]'), cd = descTag();
         if (t) D.title = t;
@@ -263,7 +264,7 @@
     s.textContent = sold ? 'Sold out' : p.stock <= 5 ? 'Only ' + p.stock + ' left' : 'In stock';
     var avail = sold ? 'Currently sold out' : p.stock <= 5 ? 'Only ' + p.stock + ' left' : 'In stock';
     var sum = ['Hello Stermont Arcade, I would like to enquire about this item:', '', 'Product: ' + p.name.replace(/^Buy\s+/i, ''), 'Price: ' + money(p.price) + (p.unit && !p.variant_label ? ' / ' + p.unit : ''),
-      'Availability: ' + avail].concat(p.categories && p.categories.name ? ['Category: ' + p.categories.name] : [], ['Ref: ' + p.id, 'Link: ' + location.origin + purl(p.id), '', 'Please confirm availability and the delivery fee to my location.']).join('\n');
+      'Availability: ' + avail].concat(p.categories && p.categories.name ? ['Category: ' + p.categories.name] : [], ['Ref: ' + p.id, 'Link: ' + purl(p.id), '', 'Please confirm availability and the delivery fee to my location.']).join('\n');
     var wl = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(sum); q('.wa').href = wl; q('.wat').href = wl;
     renderGallery();
     var d = q('.desc'), full = q('.full'); d.textContent = ''; full.hidden = !p.description;
@@ -272,8 +273,8 @@
     pd.classList.add('on'); D.documentElement.style.overflow = 'hidden'; if (!keep) q('.pd').scrollTop = 0;
     var more = q('.more'); d.classList.remove('clip'); more.hidden = true;
     if (d.scrollHeight > 270) { d.classList.add('clip'); more.hidden = false; more.textContent = 'Show more ▾'; }
-    /* address bar shows the straight product URL; remember the page we came from so closing the view puts it back */
-    if (!BASE && location.pathname.indexOf('/p/') !== 0) BASE = location.pathname + location.search;
+    /* address bar and shared URL use the shell deep link; remember the page we came from so closing the view puts it back */
+    if (!BASE && location.pathname.indexOf('/p/') !== 0) BASE = new URLSearchParams(location.search).has('product') ? '/' : location.pathname + location.search;
     if (!noPush) { try { history.pushState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }
     else if (keep) { try { history.replaceState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }   /* switching pack size: update the URL in place */
     setMeta(p);   /* tab title + meta description now match the product that is open */
@@ -282,7 +283,7 @@
     resetMeta();
     if (pd) pd.classList.remove('on'); D.documentElement.style.overflow = ''; cur = null;
     /* if the view was closed without Back (e.g. the Cart button), restore the homepage URL so relative links keep working */
-    if (BASE && location.pathname.indexOf('/p/') === 0) { try { history.replaceState(null, '', BASE); } catch (e) {} }
+    if (BASE && new URLSearchParams(location.search).has('product')) { try { history.replaceState(null, '', BASE); } catch (e) {} }
   }
   function closeView() { if (history.state && history.state.stm) history.back(); else hide(); }
   window.STM_openView = function (c) { if (c && c._p) openView(c); else if (c) c.click(); };
@@ -386,7 +387,7 @@
       });
       paintHearts(); /* once after the catalogue is built; never scan every wishlist button per product */
       try { buildDeals(rows); buildToolbar(); } catch (e) {}
-      var hm = location.hash.match(/^#p-(.+)$/);   /* old shared #p- links still open the item, and now switch to the straight /p/ URL */
+      var hm = location.hash.match(/^#p-(.+)$/);   /* legacy #p- links still open the item and now switch to the shell product URL */
       if (hm) { var hid = decodeURIComponent(hm[1]); rows.forEach(function (p) { if (p.slug === hid) hid = p.id; }); var c0 = D.getElementById('p-' + hid); if (c0 && c0._p) openView(c0); }
     }).catch(function () {});
 })();

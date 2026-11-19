@@ -6,6 +6,27 @@ on:
     paths:
       - 'seo-*.mjs'
       - 'generate-products.mjs'
+      - 'product-links.js'
+      - 'admin.html'
+      - 'admin-*.js'
+      - 'receipt.js'
+      - 'wa-float.js'
+      - 'kili-pages.js'
+      - 'rewrite-static-product-links.mjs'
+      - 'site-links.js'
+      - 'storefront-live.js'
+      - 'product-trust.js'
+      - 'product-seo-optimizer.js'
+      - 'admin-*.js'
+      - 'no-static-share-links.test.mjs'
+      - '.github/workflows/blog-build.yml'
+      - 'services/*.html'
+      - 'services/build-services.mjs'
+      - 'pest-control/*.html'
+      - 'blog-write.mjs'
+      - 'seo-pest/blog-build.mjs'
+      - 'CLAUDE.md'
+      - 'AGENTS.md'
       - 'catalog-v10.js'
       - 'product-codes.test.mjs'
       - 'seo-overrides.json'
@@ -14,6 +35,7 @@ on:
       - 'home-grid-ssr.mjs'
       - 'home-grid-ssr.test.mjs'
       - 'kili-pages.js'
+      - 'cat-feel.js'
       - 'recent-orders.js'
       - 'product-content.json'
       - 'product-content.test.mjs'
@@ -74,13 +96,6 @@ jobs:
         run: node no-classic-hop.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02-no-classic-hop.log"
       - name: Test server-rendered homepage product cards
         run: node home-grid-ssr.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-home-grid-ssr.log"
-      - name: Prepare generated product/category fixtures with the production mobile-shell routing
-        run: |
-          node seo-shell-chrome.mjs
-          node seo-shell-redirect.mjs
-          node seo-shell-redirect.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-shell-route-fixtures.log"
-      - name: Run mobile shell browser regression suite
-        run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
       - name: Broken and placeholder links (link-check.mjs)
         run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/05-link-check.log"
       - name: Test permanent product-code display and admin integration
@@ -89,6 +104,24 @@ jobs:
         run: |
           {
             node --check category-editorial.mjs
+            node --check services/build-services.mjs
+            node --check seo-kenya.mjs
+            node --check seo-related-fill.mjs
+            node --check cat-feel.js
+            node --check product-links.js
+            node --check rewrite-static-product-links.mjs
+            node --check admin-blog.js
+            node --check kili-pages.js
+            node --check site-links.js
+            node --check storefront-live.js
+            node --check product-trust.js
+            node --check product-seo-optimizer.js
+            for f in admin-*.js; do node --check "$f"; done
+            node --check product-description-html.mjs
+            node --check blog-write.mjs
+            node --check seo-pest/blog-build.mjs
+            node --check mobile-shell/app.js
+            node --check mobile-shell/pp-whatsapp.js
             node --check generate-products.mjs
             node --check seo-shell-redirect.mjs
             node --check seo-shell-redirect.test.mjs
@@ -130,11 +163,30 @@ jobs:
         run: |
           {
             node seo-kenya.mjs
+            node seo-related-fill.mjs
             node seo-overrides.mjs
             node seo-titles.mjs
             node seo-safe-meta.mjs
             node seo-shell-redirect.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
+      - name: Rebuild generated service pages from their source data
+        run: node services/build-services.mjs
+      - name: Rebuild generated product guide blog articles
+        run: |
+          for file in seo-pest/blogs-*.json; do
+            node seo-pest/blog-build.mjs "$(basename "$file" .json)"
+          done
+      - name: Prepare generated product/category fixtures with the production mobile-shell routing
+        run: |
+          node seo-shell-chrome.mjs
+          node seo-shell-redirect.mjs
+          node seo-shell-redirect.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-shell-route-fixtures.log"
+      - name: Run mobile shell browser regression suite
+        run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
+      - name: Migrate legacy generated customer product links without changing SEO surfaces
+        run: node rewrite-static-product-links.mjs
+      - name: Recheck all generated pages for static customer product links
+        run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-shell-link-regression.log"
       - name: Run full on-page SEO audit against production-equivalent generated pages
         run: |
           log="$RUNNER_TEMP/ci-logs/16-seo-check.log"

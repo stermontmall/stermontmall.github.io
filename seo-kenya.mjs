@@ -9,7 +9,9 @@
 //    category pages (no network, no database), plus /guides/ index and the /guides/ entries in sitemap.xml.
 // Safe by design: every file is wrapped in try/catch, a bad page is skipped, the script never exits with an error.
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { catTitle, catDescription } from './seo-meta.mjs';
+const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const SITE = 'https://stermontarcade.co.ke';
 const WA = 'https://wa.me/254748888230';
@@ -170,14 +172,14 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
 console.log(`Kenya titles and descriptions set on ${pDone} product page(s).`);
 
 // ---------- 2) category pages + 3) guides ----------
-const ITEM = /<li><a href="(\/p\/[^"]+)"><img[^>]*?>([^<]*)<\/a><span>KSh ([\d,]+)<\/span><\/li>/g;
+const ITEM = /<li\b[^>]*><a href="(?:\/p\/([^"]+)\.html|(?:https?:\/\/stermontarcade\.co\.ke)?\/\?product=([^"&]+))"><img[^>]*?>([^<]*)<\/a><span>(?:From )?KSh ([\d,]+)<\/span><\/li>/g;
 const cats = [];
 let cDone = 0;
 if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.html') && f !== 'index.html')) {
   try {
     const slug = f.replace(/\.html$/, ''), file = `c/${f}`; let h = readFileSync(file, 'utf8');
     const h1 = unesc(((h.match(/<h1>([\s\S]*?)<\/h1>/) || [])[1] || '').replace(/<[^>]+>/g, '').trim());
-    const items = [...h.matchAll(ITEM)].map(m => ({ url: m[1], name: m[2], price: Number(m[3].replace(/,/g, '')) })).filter(i => i.price > 0);
+    const items = [...h.matchAll(ITEM)].map(m => { const slug = decodeURIComponent(m[1] || m[2] || ''); return { url: `/p/${slug}.html`, slug, name: m[3], price: Number(m[4].replace(/,/g, '')) }; }).filter(i => i.slug && i.price > 0);
     const guide = CATEGORY_GUIDES[slug];
     if (guide && !h.includes(`data-seo-guide="${slug}"`)) {
       h = h.replace(/<ul class="g">/, `${guide}
@@ -210,7 +212,7 @@ console.log(`Kenya titles and descriptions set on ${cDone} category page(s).`);
 const STYLE = `<style>.answer{background:#f1ebff;border-left:4px solid #7c3aed;border-radius:10px;padding:.8rem 1rem;margin:1rem 0}.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;width:100%;font-size:.95rem}caption{text-align:left;font-weight:700;padding:.3rem 0}th,td{border:1px solid #e6e1f5;padding:.5rem .6rem;text-align:left;vertical-align:top}th{background:#f1ebff}h3{font-size:1.05rem;margin:1.1rem 0 .2rem}</style>`;
 const FOOT = `<footer>Stermont Arcade · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href='${WA}'>WhatsApp +254 748 888 230</a> · <a href='/shipping.html'>Shipping</a> · <a href='/returns.html'>Returns</a> · <a href='/privacy.html'>Privacy</a></footer><script src="/analytics.js" defer></script>`;
 const shell = ({ title, desc, path, ld, body }) => `<!doctype html>
-<html lang='en-KE'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<html lang='en-KE'><head><!-- stm-shell-product-links:v1 --><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
 <title>${esc(title)}</title><meta name='description' content='${esc(desc)}'>
 <link rel='canonical' href='${SITE}${path}'><meta name='robots' content='index, follow, max-image-preview:large'>
 <meta property='og:type' content='website'><meta property='og:site_name' content='Stermont Arcade'><meta property='og:locale' content='en_KE'><meta property='og:title' content='${esc(title)}'><meta property='og:description' content='${esc(desc)}'><meta property='og:url' content='${SITE}${path}'><meta property='og:image' content='${SITE}/logo.png'><meta name='twitter:card' content='summary_large_image'><meta name='theme-color' content='#7c3aed'>
@@ -246,7 +248,7 @@ for (const c of cats) {
       ['Do you deliver outside Nairobi?', 'Yes, we deliver to all 47 counties, typically within 1 to 3 days. You can also pick up at The Sarit Centre, Westlands, Nairobi.']
     ];
     if (sw) faq.push([`${cap(sw)} bei gani Kenya?`, `Bei ya ${sw} hapa Stermont Arcade inaanzia ${ksh(min)} hadi ${ksh(max)}. Unaweza kulipa kwa M-Pesa na tunafikisha kaunti zote 47.`]);
-    const rows = top.map((i, n) => `<tr><td>${n + 1}</td><td><a href='${i.url}'>${i.name}</a></td><td>${ksh(i.price)}</td></tr>`).join('\n');
+    const rows = top.map((i, n) => `<tr><td>${n + 1}</td><td><a href='${shellProductLink(i.slug)}'>${i.name}</a></td><td>${ksh(i.price)}</td></tr>`).join('\n');
     const build = (pub, mod) => shell({
       title, desc, path,
       ld: { '@context': 'https://schema.org', '@graph': [
@@ -258,7 +260,7 @@ for (const c of cats) {
       body: `<nav class='bc'><a href='${SITE}/'>Home</a> › <a href='/guides/'>Cheapest prices</a> › ${esc(label)}</nav>
 <h1>Cheapest ${esc(label)} in Kenya</h1>
 <p class='meta'>Prices checked ${month} · live prices in KSh</p>
-<div class='answer'><strong>Quick answer:</strong> the lowest price right now is <a href='${cheap.url}'>${cheap.name}</a> at <strong>${ksh(min)}</strong>. Our ${esc(label.toLowerCase())} go up to ${ksh(max)}.</div>
+<div class='answer'><strong>Quick answer:</strong> the lowest price right now is <a href='${shellProductLink(cheap.slug)}'>${cheap.name}</a> at <strong>${ksh(min)}</strong>. Our ${esc(label.toLowerCase())} go up to ${ksh(max)}.</div>
 <p>Looking for ${esc(label.toLowerCase())} at a fair price? Here are our lowest-priced options, sorted from cheapest to most expensive. Prices are in Kenya shillings and come from our live catalogue, which refreshes several times a day. Pay by M-Pesa and get delivery to all 47 counties.</p>${sw ? `
 <p><em>Kwa Kiswahili:</em> Unatafuta ${esc(sw)} kwa bei nafuu? Hizi ndizo bei za chini zaidi tulizo nazo sasa. Lipa kwa M-Pesa, na tunafikisha bidhaa kaunti zote 47.</p>` : ''}
 <div class='tw'><table><caption>${esc(label)} sorted by price, cheapest first</caption><thead><tr><th>#</th><th>Product</th><th>Price</th></tr></thead><tbody>

@@ -5,6 +5,8 @@
 // This tops every product page up to 6 related product links, choosing from the same product family first (pest control, agro, electronics,
 // home, fashion), and rotates the choice so every product also RECEIVES links from other pages. Pure HTML post-processing, no network.
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
+const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const DIR = 'p', TARGET = 6, MARK = '<!--stm-also-->', BRAND = 'Stermont Arcade';
 const FAMILIES = [
@@ -28,7 +30,7 @@ for (const f of readdirSync(DIR).sort()) {
   if (!name) continue;
   const img = pick(html, /<meta property="og:image" content="([^"]*)"/);
   pages.push({
-    file: f, html, name: name.trim(), href: `/p/${f}`,
+    file: f, html, name: name.trim(), href: `/p/${f}`, shellHref: shellProductLink(f.replace(/\.html$/i, '')),
     cat: pick(html, /<nav class="bc">[\s\S]*?<a href="\/c\/([^"\/]+)\.html"/),
     price: pick(html, /<meta property="product:price:amount" content="([^"]*)"/),
     from: /<div class="pr">(?:<s>[^<]*<\/s> )?From /.test(html),
@@ -39,7 +41,7 @@ for (const f of readdirSync(DIR).sort()) {
 
 const N = pages.length, idx = new Map(pages.map((p, i) => [p.file, i]));
 const familyOf = cat => FAMILIES.find(fam => fam.includes(cat)) || [];
-const card = p => `<li><a href="${p.href}">${p.img ? `<img src="${p.img}" alt="${p.name.replace(/"/g, '&quot;')}" width="160" height="150" loading="lazy" decoding="async">` : ''}${p.name}</a><span>${p.from ? 'From ' : ''}${money(p.price)}</span></li>`;
+const card = p => `<li><a href="${p.shellHref}">${p.img ? `<img src="${p.img}" alt="${p.name.replace(/"/g, '&quot;')}" width="160" height="150" loading="lazy" decoding="async">` : ''}${p.name}</a><span>${p.from ? 'From ' : ''}${money(p.price)}</span></li>`;
 
 let changed = 0, already = 0;
 for (const p of pages) {

@@ -29,7 +29,8 @@
     pg.setAttribute('data-extras', '1');
     var title = h1.textContent.trim();
     var can = document.querySelector('link[rel="canonical"]');
-    var url = (can && can.href) || location.href.split('#')[0];
+    var slug = decodeURIComponent(location.pathname.replace(/^\/p\//, '').replace(/\.html$/, ''));
+    var url = window.shellProductLink(slug);
     var enc = encodeURIComponent;
 
     // 1. Share buttons, placed right under the product block.

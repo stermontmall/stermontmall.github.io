@@ -42,8 +42,8 @@
     setTop(); window.addEventListener('resize', setTop);
 
     var lists = [].slice.call(main.querySelectorAll('ul.g'));
-    var prod = lists.filter(function (u) { return u.querySelector('a[href^="/p/"]'); })[0];
-    var subs = lists.filter(function (u) { return u !== prod && u.querySelector('a[href^="/c/"]') && !u.querySelector('a[href^="/p/"]'); })[0];
+    var prod = lists.filter(function (u) { return u.querySelector('a[href*="product="],a[href^="/p/"]'); })[0];
+    var subs = lists.filter(function (u) { return u !== prod && u.querySelector('a[href^="/c/"]') && !u.querySelector('a[href*="product="],a[href^="/p/"]'); })[0];
 
     /* card tidy-up: image on top, name clamped to two lines, price at the bottom */
     function tidy(li) {

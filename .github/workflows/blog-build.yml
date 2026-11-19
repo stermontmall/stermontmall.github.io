@@ -11,6 +11,18 @@ on:
       - 'seo-blog-titles.mjs'
       - 'seo-safe-blog-meta.mjs'
       - 'seo-safe-blog-meta.test.mjs'
+      - 'product-links.js'
+      - 'rewrite-static-product-links.mjs'
+      - 'no-static-share-links.test.mjs'
+      - 'blog-write.mjs'
+      - 'seo-pest/blog-build.mjs'
+      - 'seo-pest/blogs-*.json'
+      - 'p/*.html'
+      - 'c/*.html'
+      - 'guides/*.html'
+      - 'services/*.html'
+      - 'pest-control/*.html'
+      - '.github/workflows/blog-build.yml'
   workflow_dispatch:
 
 permissions:
@@ -32,6 +44,11 @@ jobs:
         with:
           node-version: 20
 
+      - name: Rebuild generated product guide articles
+        run: |
+          for file in seo-pest/blogs-*.json; do
+            node seo-pest/blog-build.mjs "$(basename "$file" .json)"
+          done
       - name: Normalize blog SEO title lengths
         run: node seo-blog-titles.mjs
       - name: Test safe consumer-guide meta descriptions
@@ -40,12 +57,16 @@ jobs:
         run: node seo-safe-blog-meta.mjs
       - name: Rebuild blog index and sitemap entries
         run: node blog-build.mjs
+      - name: Migrate existing generated customer product links while preserving SEO
+        run: node rewrite-static-product-links.mjs
+      - name: Verify blog and site customer-facing product links
+        run: node no-static-share-links.test.mjs
 
       - name: Save changes (only if something changed)
         run: |
           git config user.name "bot"
           git config user.email "bot@users.noreply.github.com"
-          git add blog/*.html blog/index.html sitemap.xml
+          git add -u
           if git diff --cached --quiet; then
             echo "Nothing changed - no commit needed."
           else
