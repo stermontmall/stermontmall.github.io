@@ -11,7 +11,7 @@
 // 2026-11-05: at the end this also runs seo-shell-chrome.mjs, which gives the same static pages the shell top bar and bottom nav
 // (same page for everyone, no redirect). It lives here because this step already runs after every build and the workflow file
 // could not be edited. To turn it off, remove the runAll() call in the block at the bottom.
-// 2026-11-18: the mobile redirect is intentionally removed. seo-shell-chrome.mjs strips legacy stm-early scripts from every generated product/category page.
+// 2026-11-19: product/category pages retain their static URLs. seo-shell-chrome.mjs removes legacy stm-early scripts and keeps shell chrome.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const DIR = process.env.P_DIR || 'p';
