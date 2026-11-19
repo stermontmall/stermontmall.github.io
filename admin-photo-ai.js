@@ -36,7 +36,7 @@
     head.appendChild(el('hr'));
 
     head.appendChild(el('p', 'meta', 'Add up to 10 products in one session. For each item, upload its photo from your device OR paste a direct link to the photo, and paste the exact product page URL. AI reads the product and source price, writes the listing and SEO fields, then saves it as an unpublished draft for your review.'));
-    head.appendChild(el('p', 'meta', 'Price rule: verified wholesale/distributor KES price is the baseline. If only a reputable Kenyan retail price is available, baseline cost is 85% of that price. The official four-tier markup, 15% minimum floor, nearest KSh 50 rounding and KSh 200 minimum are applied automatically. A manual selling-price override is only for an explicitly owner-approved exception.'));
+    head.appendChild(el('p', 'meta', 'Price rule: verified wholesale/distributor KES price is the baseline. If only a reputable Kenyan retail price is available, baseline cost is 85% of that price. The official four-tier markup, 15% minimum floor, nearest KSh 50 rounding and KSh 200 minimum are applied automatically. If the source page has no verifiable KES price, skip the product; no price override or guess is used.'));
     var status = el('p', 'meta', '0 of 10 product slots used.');
     var actions = el('div', 'acts');
     var add = button('+ Add product', 'alt', addRow);
@@ -53,7 +53,7 @@
     function findCard() {
       var card = el('div', 'card'), list = el('div'), top = el('div', 'acts'), note = el('p', 'meta');
       card.appendChild(el('h3', null, 'Find photos online'));
-      card.appendChild(el('p', 'meta', 'Lists active products that have no photo. "Find photo" shows picture options from an online image search for you to pick; "Find & attach all" lets the server check each picture against the product name (same brand, model and pack size, at least 450×450, no other shop’s branding) and attaches only the ones that pass. Existing photos are never replaced; price, stock and live status never change.'));
+      card.appendChild(el('p', 'meta', 'Lists active products that have no photo. "Find photo" shows picture options from an online image search for you to pick; "Find & attach all" lets the server check each picture against the product name (same brand, model and pack size, at least 500×500 and over 15 KB, no other shop’s branding) and attaches only the ones that pass. Existing photos are never replaced; price, stock and live status never change.'));
       var loadBtn = button('Load products without a photo', 'alt', load), allBtn = button('Find & attach all', 'ok', attachAll);
       allBtn.disabled = true; top.append(loadBtn, allBtn); card.append(top, note, list);
       var items = [], busy = false;
