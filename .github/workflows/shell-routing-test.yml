@@ -8,6 +8,7 @@ on:
       - 'seo-shell-chrome.mjs'
       - 'seo-shell-chrome.test.mjs'
       - 'seo-shell-redirect.mjs'
+      - 'seo-shell-redirect.test.mjs'
       - '.github/workflows/shell-routing-test.yml'
   push:
     branches: [main]
@@ -29,5 +30,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 20
-      - name: Verify product/category pages open in the mobile shell for all visitors
-        run: node seo-shell-chrome.test.mjs
+      - name: Verify shell navigation preserves canonical product/category URLs
+        run: |
+          node seo-shell-chrome.test.mjs
+          node seo-shell-redirect.test.mjs
