@@ -11,6 +11,16 @@ on:
       - 'seo-blog-titles.mjs'
       - 'seo-safe-blog-meta.mjs'
       - 'seo-safe-blog-meta.test.mjs'
+      - 'product-links.js'
+      - 'rewrite-static-product-links.mjs'
+      - 'no-static-share-links.test.mjs'
+      - 'blog-write.mjs'
+      - 'seo-pest/blog-build.mjs'
+      - 'seo-pest/blogs-*.json'
+      - 'p/*.html'
+      - 'c/*.html'
+      - 'guides/*.html'
+      - 'services/*.html'
   workflow_dispatch:
 
 permissions:
@@ -32,6 +42,15 @@ jobs:
         with:
           node-version: 20
 
+      - name: Rebuild generated product guide articles
+        run: |
+          for file in seo-pest/blogs-*.json; do
+            node seo-pest/blog-build.mjs "$(basename "$file" .json)"
+          done
+      - name: Migrate legacy customer-facing product links safely
+        run: node rewrite-static-product-links.mjs
+      - name: Verify customer links and preserved SEO surfaces
+        run: node no-static-share-links.test.mjs
       - name: Normalize blog SEO title lengths
         run: node seo-blog-titles.mjs
       - name: Test safe consumer-guide meta descriptions
@@ -45,7 +64,7 @@ jobs:
         run: |
           git config user.name "bot"
           git config user.email "bot@users.noreply.github.com"
-          git add blog/*.html blog/index.html sitemap.xml
+          git add p/*.html c/*.html blog/*.html guides/*.html services/*.html *.html sitemap.xml
           if git diff --cached --quiet; then
             echo "Nothing changed - no commit needed."
           else
