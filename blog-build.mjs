@@ -34,7 +34,8 @@ const normalizePostProductLinks = html => {
   const hold = value => { preserved.push(value); return '__STM_PRESERVED_' + (preserved.length - 1) + '__'; };
   body = body.replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, hold)
     .replace(/<nav[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi, hold)
-    .replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, hold);
+    .replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, hold)
+    .replace(/<section[^>]*class=["'][^"']*\bseo-links\b[^"']*["'][^>]*>[\s\S]*?<\/section>/gi, hold);
   body = body.replace(/\bhref=(["'])(https:\/\/stermontarcade\.co\.ke)?\/p\/([^"'?#]+)\.html(?:#[^"']*)?\1/gi,
     (m, quote, host, productSlug) => 'href=' + quote + shellProductLink(decodeURIComponent(productSlug)) + quote);
   body = body.replace(/\bhref=(["'])(https:\/\/wa\.me\/[^"']+)\1/gi, (m, quote, value) => {
