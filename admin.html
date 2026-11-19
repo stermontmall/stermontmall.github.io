@@ -323,7 +323,7 @@
     if (tab === 'sales' || tab === 'mpesa' || tab === 'searches') { if (!window.STMInsights) { L.innerHTML = '<div class="err">The insights script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMInsights.mount(L, tab); return; }
     if (tab === 'blogs') { if (!window.STMBlog) { L.innerHTML = '<div class="err">The blog script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMBlog.mount(L); return; }
     if (tab === 'photo-ai') { if (!window.STMPhotoAI) { L.innerHTML = '<div class="err">The AI photo uploader did not load. Refresh the page.</div>'; return; } STMPhotoAI.mount(L); return; }
-    if (tab === 'pricing-rules') { if (!window.STMPublishingRules) { L.innerHTML = '<div class="err">The publishing rulebook did not load. Refresh the page.</div>'; return; } STMPublishingRules.mount(L); return; } STMPhotoAI.mount(L); return; }
+    if (tab === 'pricing-rules') { if (!window.STMPublishingRules) { L.innerHTML = '<div class="err">The publishing rulebook did not load. Refresh the page.</div>'; return; } STMPublishingRules.mount(L); return; }
     if (['bulk', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews'].indexOf(tab) > -1) { if (!window.STMExtras) { L.innerHTML = '<div class="err">The extras script did not load. Refresh the page (Ctrl+F5).</div>'; return; } STMExtras.mount(L, tab); return; }
     if ((tab === 'stock' || tab === 'catalog') && !window.STMCatalog) { L.innerHTML = '<div class="err">The catalogue script did not load. Refresh the page (Ctrl+F5).</div>'; return; }
     if (tab === 'stock') { STMCatalog.mountStock(L); return; }
