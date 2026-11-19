@@ -27,7 +27,10 @@ export function addChrome(html, early = false) {
   let out = html;
   // Rebuild the route script deterministically so previously generated pages receive the current routing policy.
   out = out.replace(new RegExp(EARLY_RE.source, 'g'), '');
-  if (early && !/http-equiv=[\"']refresh[\"']/i.test(out)) out = out.replace(/<\/head>/i, () => EARLY + '</head>');
+  if (early && !/http-equiv=[\"']refresh[\"']/i.test(out)) {
+    if (out.includes(MARK)) out = out.replace(MARK, EARLY + MARK);
+    else out = out.replace(/<\/head>/i, () => EARLY + '</head>');
+  }
   if (!out.includes(MARK)) out = out.replace(/<\/head>/i, () => MARK + STYLE + '</head>').replace(/<\/body>/i, () => SCRIPT + '</body>');
   return out;
 }
