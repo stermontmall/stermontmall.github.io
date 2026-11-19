@@ -9,6 +9,7 @@ import { productDescriptionHtml } from './product-description-html.mjs';
 import { renderPost } from './seo-pest/blog-build.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
+assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), SITE + '/?product=premise-200-sc-termiticide-50-ml');
 const SEO_SURFACE_ALLOWLIST = [
   'canonical and og:url metadata',
   'Product/ProductGroup JSON-LD URLs',
