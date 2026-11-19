@@ -181,6 +181,7 @@
 <script src="catalog-v10.js?v=14"></script>
 <script src="admin-extras.js?v=6"></script>
 <script src="admin-bulk.js?v=4"></script>
+<script src="admin-pricing-rules.js?v=1"></script>
 <script src="admin-photo-ai.js?v=4"></script>
 <script src="admin-insights.js?v=2"></script>
 <script src="admin-blog.js?v=1"></script>
@@ -193,7 +194,7 @@
 <script>
 (function () {
   var D = document, SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
-  var TABS_OK = ['dashboard', 'pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'bulk', 'photo-ai', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'quotations', 'services', 'media', 'market-research'], TK = 'stm_admin_tab';
+  var TABS_OK = ['dashboard', 'pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'pricing-rules', 'bulk', 'photo-ai', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'quotations', 'services', 'media', 'market-research'], TK = 'stm_admin_tab';
   function savedTab() { try { var t = (location.hash || '').replace('#', '') || localStorage.getItem(TK); return TABS_OK.indexOf(t) > -1 ? t : 'dashboard'; } catch (e) { return 'pending'; } }
   function rememberTab(t) { try { localStorage.setItem(TK, t); history.replaceState(null, '', location.pathname + location.search + '#' + t); } catch (e) {} }
   var sess = null, orders = [], tab = savedTab(), q = '';
@@ -275,12 +276,12 @@
 
   function count(s) { return orders.filter(function (o) { return (o.status || 'pending') === s; }).length; }
   var ORDER_TABS = ['pending', 'paid', 'declined', 'all'];
-  var EXTRA = ['dashboard', 'stock', 'catalog', 'bulk', 'photo-ai', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'quotations', 'services', 'media', 'market-research'];
+  var EXTRA = ['dashboard', 'stock', 'catalog', 'pricing-rules', 'bulk', 'photo-ai', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'quotations', 'services', 'media', 'market-research'];
   var NAV = [
     ['Overview', [['dashboard', '🏠', 'Dashboard', 'Private overview of orders, service enquiries and recent business activity']]],
     ['Orders', [['pending', '🕒', 'Pending', 'Orders waiting for payment confirmation'], ['paid', '✅', 'Confirmed', 'Paid orders: packing, delivery and receipts'], ['declined', '🚫', 'Declined', 'Orders that were not paid'], ['all', '📋', 'All orders', 'Every order, newest first'], ['quotations', '🧾', 'Quotations', 'Create, save and send quotations to different clients: PDF, email and WhatsApp, laid out like the receipt']]],
     ['Services', [['quotes', '📨', 'Quote requests', 'Customers asking for a service quote (no payment taken): call, quote, then mark won or lost'], ['services', '🧰', 'Services overview', 'Every service and pest page, demand by service and town, and links to copy'], ['media', '🖼️', 'Service media', 'Upload photos and videos of your work and post them on the service pages']]],
-    ['Store', [['catalog', '🛍️', 'Catalog & ledger', 'Products, prices, restocks, COGS, profit and the financial ledger'], ['stock', '📦', 'Stock', 'Switch products in or out of stock'], ['bulk', '📥', 'Bulk import', 'Add many products from a spreadsheet, and attach photos to items that have none'], ['photo-ai', '📸', 'AI photo upload', 'Attach online photos to existing products or create SEO-ready drafts']]],
+    ['Store', [['catalog', '🛍️', 'Catalog & ledger', 'Products, prices, restocks, COGS, profit and the financial ledger'], ['pricing-rules', '💷', 'Pricing rules', 'View the canonical four-tier product pricing rule and guardrails'], ['stock', '📦', 'Stock', 'Switch products in or out of stock'], ['bulk', '📥', 'Bulk import', 'Add many products from a spreadsheet, and attach photos to items that have none'], ['photo-ai', '📸', 'AI photo upload', 'Attach online photos to existing products or create SEO-ready drafts']]],
     ['Growth', [['market-research', '🇰🇪', 'Kenya Market Research', 'Competitor intelligence, agrovet product categories, pest-control market reports and evidence sources'], ['blogs', '📝', 'Blogs & SEO', 'Published posts with SEO checks, the daily writer, and write your own']]],
     ['Finance', [['sales', '📈', 'Sales dashboard', 'Revenue, best sellers, where orders go and what is waiting to be packed'], ['mpesa', '📲', 'M-Pesa payments', 'Payments received on your Paybill, matched to orders'], ['expenses', '💸', 'Expenses', 'Running costs, kept separate from product cost']]],
     ['Customers', [['searches', '🔎', 'Searches', 'What shoppers search for, and what they could not find'], ['livechat', '🗨️', 'Live chat', 'Chat with logged-in customers in real time'], ['inbox', '💬', 'Messages', 'Questions from shoppers and your replies'], ['reviews', '⭐', 'Reviews', 'Approve or hide product reviews'], ['vouchers', '🎟️', 'Vouchers', 'Discount codes and public offers']]]
@@ -314,6 +315,7 @@
     var L = $('list'); L.textContent = '';
     $('q').hidden = EXTRA.indexOf(tab) > -1;
     if (window.STMServices && tab !== 'quotes') STMServices.stop();   /* quote list auto-refresh only runs while that tab is open */
+    if (tab === 'pricing-rules') { if (!window.STMPricingRules) { L.innerHTML = '<div class="err">The pricing rules panel did not load. Refresh the page.</div>'; return; } STMPricingRules.mount(L); return; }
     if (tab === 'market-research') { if (!window.STMMarketResearch) { L.innerHTML = '<div class="err">The Kenya Market Research dashboard did not load. Refresh the page.</div>'; return; } STMMarketResearch.mount(L); return; }
     if (tab === 'dashboard') { if (!window.STMOverview) { L.innerHTML = '<div class="err">The dashboard script did not load. Refresh the page.</div>'; return; } STMOverview.mount(L); return; }
     if (tab === 'quotes' || tab === 'services') { if (!window.STMServices) { L.innerHTML = '<div class="err">The services script did not load. Refresh the page (Ctrl+F5).</div>'; return; } var dq = want.quote; want.quote = null; STMServices.mount(L, tab, dq); return; }
