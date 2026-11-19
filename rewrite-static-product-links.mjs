@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import shellProductLink from './product-links.js';
 
 const SITE = 'https://stermontarcade.co.ke';
@@ -52,19 +53,21 @@ function walk(dir, out = []) {
   return out;
 }
 
-const files = [...ROOT_FILES.filter(f => { try { return statSync(f).isFile(); } catch { return false; } })];
-for (const dir of ROOTS) {
-  try { files.push(...walk(dir)); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const files = [...ROOT_FILES.filter(f => { try { return statSync(f).isFile(); } catch { return false; } })];
+  for (const dir of ROOTS) {
+    try { files.push(...walk(dir)); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
+  let total = 0, changedFiles = 0;
+  for (const file of [...new Set(files)]) {
+    const before = readFileSync(file, 'utf8');
+    const result = rewriteHtml(before);
+    if (!result.replaced || result.html === before) continue;
+    if (!before.includes(MARKER)) result.html = result.html.replace(/<body\b[^>]*>/i, match => match + MARKER);
+    writeFileSync(file, result.html);
+    total += result.replaced;
+    changedFiles++;
+    console.log(relative('.', file) + ': ' + result.replaced + ' customer link(s) migrated');
+  }
+  console.log('Shell product-link migration: ' + total + ' link(s) across ' + changedFiles + ' HTML file(s). SEO head, JSON-LD, breadcrumbs and seo-links blocks were preserved.');
 }
-let total = 0, changedFiles = 0;
-for (const file of [...new Set(files)]) {
-  const before = readFileSync(file, 'utf8');
-  const result = rewriteHtml(before);
-  if (!result.replaced || result.html === before) continue;
-  if (!before.includes(MARKER)) result.html = result.html.replace(/<body\b[^>]*>/i, match => match + MARKER);
-  writeFileSync(file, result.html);
-  total += result.replaced;
-  changedFiles++;
-  console.log(relative('.', file) + ': ' + result.replaced + ' customer link(s) migrated');
-}
-console.log('Shell product-link migration: ' + total + ' link(s) across ' + changedFiles + ' HTML file(s). SEO head, JSON-LD, breadcrumbs and seo-links blocks were preserved.');
