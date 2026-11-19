@@ -16,7 +16,7 @@
     function api(q) { return fetch(SB + '/rest/v1/' + q, { headers: { apikey: KEY } }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }); }
     function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
     function el(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
-    function idOf(h) { try { var u = new URL(h, location.origin), q = u.searchParams.get('product'); return decodeURIComponent(q || String(h).replace(/^.*\\/p\\//, '').replace(/\\.html.*$/, '')); } catch (e) { return ''; } }
+    function idOf(h) { try { var u = new URL(h, location.origin), q = u.searchParams.get('product'); return decodeURIComponent(q || String(h).replace(/^.*\/p\//, '').replace(/\.html.*$/, '')); } catch (e) { return ''; } }
 
     var st = el('style');
     st.textContent =
