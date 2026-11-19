@@ -12,7 +12,7 @@ const walk = (dir, out = []) => {
     if (SKIP.has(name)) continue;
     const path = join(dir, name), st = statSync(path);
     if (st.isDirectory()) walk(path, out);
-    else if (/\.(html|js|mjs|json|css|webmanifest)$/.test(name) && st.size < 3_000_000) out.push(path);
+    else if (/\.(html|js|mjs|ts|json|css|webmanifest)$/.test(name) && st.size < 3_000_000) out.push(path);
   }
   return out;
 };
