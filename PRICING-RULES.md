@@ -48,6 +48,10 @@ Every pack size/capacity must have its own verified baseline and final price. Us
 
 A product is not ready to publish until its exact product identity, Kenyan KES baseline, calculated selling price, image, product information and applicable regulatory checks are verified. If a price cannot be verified, hold/skip the product rather than publishing a guessed price.
 
+## Default behavior
+
+This is the default pricing policy for every new product and pack variant entered through the staff admin. The admin preview mirrors the tiers, but the final selling price is recalculated by Supabase `public.price_4tier(p_baseline)` before saving. Existing-product edits do not silently reprice the item.
+
 ## Where to see the rule
 
 - GitHub: this file and the canonical sections in `CLAUDE.md` / `AGENTS.md`.
