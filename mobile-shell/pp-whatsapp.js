@@ -28,7 +28,7 @@
       a.className = cls; a.target = '_blank'; a.rel = 'noopener'; a.setAttribute('aria-label', label); a.innerHTML = html; a.href = 'https://wa.me/' + NUMBER;
       return a;
     }
-    function wa(text) { return 'https://wa.me/' + NUMBER + '?text=' + encodeURIComponent(text); }
+    function wa(text) { var slug = new URLSearchParams(location.search).get('product'); var link = slug && window.shellProductLink ? window.shellProductLink(slug) : location.href; return 'https://wa.me/' + NUMBER + '?text=' + encodeURIComponent(text + ' ' + link); }
     function msg(name, size, price, url) {
       return 'Hello Stermont Arcade, I would like to ask about this item: ' + (name || 'a product') + (size ? ' (' + size + ')' : '') + (price ? ' - ' + price : '') + (url ? '\n' + url : '');
     }
