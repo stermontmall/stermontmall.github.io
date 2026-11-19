@@ -37,6 +37,13 @@ If the owner asks to add/post/list an advert or product, or attach product photo
 
 This is the canonical rule. It replaces all older conflicting product-posting rules. A server-side mirror is stored in Supabase table `public.publishing_rules` (key `autonomous_bulk_product_publishing`); keep the two aligned.
 
+
+#### DATABASE & ADMIN ENFORCEMENT (OWNER-APPROVED 2026-11-20)
+- The staff admin tab `/admin.html#pricing-rules` reads `public.publishing_rules` key `autonomous_bulk_product_publishing` directly. This is the canonical, quickly reloadable rule for every session.
+- On every new product INSERT, `public.products_posting_rules()` requires positive KES baseline cost, rejects Syngenta under automatic pricing, recalculates `price` through `public.price_4tier(cost)`, and forces `stock=1000`, `low_at=20`, `featured=false`, `active=false`. The insert-time price trigger preserves nearest-KSh-50 rounding. Existing product edits are not repriced by this insert rule.
+- Catalog and Bulk Import create hidden drafts; Bulk Import takes `baseline_cost_kes`, never a selling-price input. The AI product uploader uses the same four-tier rule and does not expose a new-product price override.
+- Never bypass the database trigger with a direct insert or a competing markup formula. Activate only after all exact-source, image, SEO, duplicate and Kenyan regulatory gates pass.
+
 #### 1. ZERO-QUESTION AUTONOMY & PRE-ANSWERED EDGE CASES (NEVER PAUSE TO ASK)
 Whenever the user says `"Post [N] items on [Category]"` (for ANY category on `stermontarcade.co.ke`), execute continuously until 100% of the batch is live. Use these pre-answered defaults for every possible edge case so you NEVER ask the user for clarification:
 - **Duplicate Check:** Before creating any product, check existing `products` in Supabase by normalized product name, active ingredient/model, and pack size. Skip exact duplicates and move on to the next unique product until you reach the requested count `[N]`.
