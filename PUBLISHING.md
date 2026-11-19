@@ -44,6 +44,7 @@ Admin routes:
 - **Catalog:** enter the verified baseline cost; new products save as hidden drafts.
 - **Bulk import:** use `baseline_cost_kes`, not `selling_price`; new rows save as hidden drafts and existing rows are never repriced.
 - **AI photo uploader:** provide the exact source product page and matching photo. It reads the KES source price, applies the four-tier formula, and saves an unpublished draft. A manual selling-price override is not part of this new-product workflow.
+- **Legacy `/list-products.html`:** redirects to the official Admin AI photo uploader; do not restore its former standalone posting form or 25% formula.
 - **Pricing & posting rules:** reads the live canonical rule from Supabase; use its Refresh control to reload after a rule update.
 
 Do not activate a draft until the exact product and pack photo, source, price, duplicate, SEO and regulatory checks pass. A similar product, generic category image, vendor logo or watermarked image is not acceptable.
