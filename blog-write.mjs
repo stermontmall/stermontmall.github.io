@@ -174,7 +174,7 @@ for (let i = 0; i < 3; i++) {
 }
 if (problems.length) { save(); note('error', `Could not produce a draft that passes the checks. Last problems: ${problems.join('; ')}`); console.error('Could not produce a draft that passes the checks. Nothing written.'); process.exit(1); }
 
-const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, path, text) => allowed.has(path) ? `<a href="${path}">${text}</a>` : text).replace(/\[\[|\]\]/g, '');
+const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, path, text) => allowed.has(path) ? `<a href="${path.startsWith('/p/') ? shellProductLink(path.slice(3).replace(/\\.html$/i, '')) : path}">${text}</a>` : text).replace(/\[\[|\]\]/g, '');
 const para = s => '<p>' + inline(s) + '</p>';
 const plain = s => String(s).replace(/\[\[\/[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\[\[|\]\]/g, '');
 const parts = [art.title, art.answer, art.intro, art.closing, ...art.sections.flatMap(s => [s.heading, ...s.paragraphs, ...(s.bullets || [])]), art.table.caption, ...art.table.headers, ...art.table.rows.flat(), ...art.faq.flatMap(f => [f.q, f.a])].filter(Boolean).map(plain);
