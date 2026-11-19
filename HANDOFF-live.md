@@ -1,3 +1,14 @@
+## 2026-11-20 — Follow-up validation and old-price guard
+
+- Removed the old standalone `/list-products.html` product form; it now redirects to `/admin.html#photo-ai`. The former form had an outdated 25% pricing path and zero-cost insert behavior.
+- Added `database/no-fake-old-price-on-new-products.sql` and applied Supabase migration `no_fake_old_price_on_new_products`. New inserts no longer create a false discount/previous price when the supplied old price is missing or not greater than the selling price.
+- Catalog and Bulk Import now avoid manufacturing a previous price; only a genuine higher previous price is retained.
+- Extended the pricing regression test and SEO workflow path filters for the old-price guard migration.
+- Rechecked 10 static admin/rule/migration assertions: all passed.
+- PR #998 remains open and unmerged. Its previous SEO quality-gate run was cancelled after newer commits; the latest head still has no completed CI result yet. Wait for a fresh full quality-gate run and require green before merging.
+
+---
+
 ## 2026-11-20 02:10 (Africa/Nairobi) — Canonical four-tier pricing enforced in admin and Supabase
 
 - Work is on branch `wip-pricing-rule-admin-default-20261120`; not live on `main` until the PR is merged.
