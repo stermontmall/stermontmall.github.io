@@ -32,16 +32,18 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 - Blog, guide, service, admin and order generators must emit shell URLs for visible product links. The SEO-only /p/ references listed above are the sole exception.
 - Run node no-static-share-links.test.mjs and node no-classic-hop.test.mjs before opening a PR.
 ## Price and inventory rules for NEW products
-- Find the source price online yourself (owner rule 2026-11-08): the lowest current in-stock KES listing of the EXACT product (same brand, model, pack size) on a reputable Kenyan seller or supplier page. Record that page URL as the source. Never invent or estimate a price. If no KES listing of the exact product exists, stop and ask the owner.
-- Let `C` be that source price in KES.
-- Save `cost = round(C, 2)`.
-- Calculate the initial selling price as `round(C * 1.30, 2)`. The existing charm-price trigger may round the stored selling price upward to a supported price point. Do not bypass that trigger; verify and report the actual stored `price`, and do not add a second markup; stored selling price must equal `round(cost * 1.30, 2)`.
-- Default to a 30% markup on all new products. An explicitly requested batch override must be within the helper's accepted 15–300% range.
-- Do not convert foreign currency without an owner-approved exchange rate.
-- Set `stock = 1000`, `low_at = 20`, and `featured = false` unless the owner explicitly requests featured placement.
-- New products are published live (`active=true`) after verification (owner rule 2026-11-08). The earlier draft-first / owner-review rule no longer applies.
-- Use a unique lowercase-hyphen product ID/slug and a category ID read from the live categories table.
-- Do not overwrite an existing product or silently change an existing name, price, cost, description, stock or photo.
+
+The canonical four-tier pricing rule is maintained in `CLAUDE.md`, `AGENTS.md`, and Supabase `public.publishing_rules` (key `autonomous_bulk_product_publishing`). Read **[PRICING-RULES.md](PRICING-RULES.md)** for the human-readable summary and use **Store → Pricing rules** in the staff admin panel to view the live Supabase rule.
+
+- Do not use the older flat 30% rule in this file's history or prior handoffs; it is superseded.
+- Verify the exact product/model/pack-size baseline in KES from a trusted Kenyan supplier. If only reputable Nairobi retail pricing is available, the canonical rule permits retail × 0.85 as an explicitly labelled estimated baseline.
+- Apply exactly one tier: below KSh 20,000 = 30%; KSh 20,000–39,999 = 25%; KSh 40,000–60,000 = 20%; above KSh 60,000 = 17.5%.
+- Enforce the minimum 15% floor above verified baseline cost, round to the nearest KSh 50, and enforce the KSh 200 minimum storefront price.
+- Exclude Syngenta from repricing unless the owner explicitly instructs otherwise.
+- Record the baseline, source URL, selected tier, rounding and actual final stored price. Never invent a price.
+- Set `stock = 1000`, `low_at = 20`, and `featured = false` for new products unless the owner explicitly requests otherwise.
+- Apply each rule separately to every pack size or variant; never copy one pack's price to another.
+
 
 ## Verification SQL
 After posting, run a read-only query using the exact product ID:
