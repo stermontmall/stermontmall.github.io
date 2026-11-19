@@ -21,7 +21,8 @@
 - Done: `site-links.js` line 32 had a double-escaped regex (`/^\\/p\\/...`), a SyntaxError ("Invalid regular expression flags") on every static /p/ and /c/ page. Fixed to `/^\/p\/([^/]+)\.html$/i`. This bug exists only on this branch, not on `main`.
 - Done: `mobile-shell/shell.test.py` fixture. `index.html` loads `/product-links.js`, which overwrote the test's `window.shellProductLink` stub with the production-domain helper; the test now also serves a local-origin `product-links.js` (and the stub returns `location.origin + ...`). Updated stale expectations: in-shell product open now checks no reload plus the `?product=` address, and the homepage canonical is `https://stermontarcade.co.ke/`.
 - Local result before the final edits: 167/177 passed; remaining failures were these items plus sandbox network errors (`ERR_TUNNEL_CONNECTION_FAILED`, no internet here). The final edited test was NOT re-run to completion (run interrupted).
-- Next: `python3 mobile-shell/shell.test.py` (or check the PR quality gate run), fix any leftover assertions, merge only after all required checks pass.
+- CI result for commit 79c6660 (run 44623036882): "Run mobile shell browser regression suite" now PASSES. The gate next fails at "Verify generated pages contain no static human-facing product links" (`node no-static-share-links.test.mjs`): many generated p/ pages (e.g. `p/abasi-5-ec-100-ml.html`) still emit a customer-visible body link to `https://stermontarcade.co.ke/p/abasi-5-ec.html` (outside head, JSON-LD, breadcrumb and seo-links blocks). Fix belongs in `generate-products.mjs` (use `shellProductLink(slug)` for that link); never edit generated pages.
+- Next: find which generator block emits that body link, switch it to `shellProductLink`, run `node no-static-share-links.test.mjs` after `node generate-products.mjs`, push, re-check `gh run list --branch fix/shell-product-links-2026-11-19-v2`. Merge only after all required checks pass.
 
 ---
 
