@@ -137,6 +137,10 @@ jobs:
             node seo-safe-meta.mjs
             node seo-shell-redirect.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
+      - name: Verify generated pages contain no static human-facing product links
+        env:
+          STM_CHECK_GENERATED_PRODUCT_PAGES: '1'
+        run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-generated-product-links.log"
       - name: Run full on-page SEO audit against production-equivalent generated pages
         run: |
           log="$RUNNER_TEMP/ci-logs/16-seo-check.log"
