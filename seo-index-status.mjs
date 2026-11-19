@@ -19,7 +19,7 @@ if (!raw || !property) {
   process.exit(1);
 }
 
-const MAX = Number(process.env.MAX_URLS) || 250;
+const MAX = Number(process.env.MAX_URLS) || 150;
 const deadline = Date.now() + (Number(process.env.MAX_MINUTES) || 20) * 60000;
 
 // ---- Sign in to Google with the service account ----
@@ -37,8 +37,13 @@ if (!tok.access_token) { console.error('Google sign-in failed:', JSON.stringify(
 const locs = f => (existsSync(f) ? [...readFileSync(f, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]) : []);
 const products = locs('sitemap-products.xml').filter(u => u.includes('/p/'));
 const others = [...locs('sitemap.xml'), ...locs('sitemap-products.xml').filter(u => !u.includes('/p/'))];
-const urls = [...new Set([...products, ...others])].slice(0, MAX);
-if (!urls.length) { console.error('No URLs found in sitemap.xml or sitemap-products.xml.'); process.exit(1); }
+const allUrls = [...new Set([...products, ...others])];
+if (!allUrls.length) { console.error('No URLs found in sitemap.xml or sitemap-products.xml.'); process.exit(1); }
+// Rotate the daily batch so pages beyond the runtime limit are not starved forever.
+// 150 URLs per day overlaps batches when the catalogue is larger than 150, covering the full list over successive days.
+const dayNumber = Math.floor(Date.now() / 86400000);
+const startIndex = (dayNumber * MAX) % allUrls.length;
+const urls = Array.from({ length: Math.min(MAX, allUrls.length) }, (_, i) => allUrls[(startIndex + i) % allUrls.length]);
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const inspect = async url => {
@@ -102,7 +107,7 @@ const unchecked = results.length - ok.length + notChecked;
 const out = [];
 out.push(`# Google indexing status ${new Date().toISOString().slice(0, 10)}`);
 out.push('');
-out.push(`Checked **${ok.length}** pages with Google (products first). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${unchecked ? `, ${unchecked} not checked` : ''}.`);
+out.push(`Checked **${ok.length}** pages with Google (rotating daily batch, products prioritized). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${unchecked ? `, ${unchecked} not checked in this batch` : ''}.`);
 if (stopReason) out.push('', `> Stopped early because ${stopReason}. The pages not checked are the last ones in the list; they will be checked on a later run.`);
 out.push('');
 if (notIndexed.length) {
