@@ -146,6 +146,18 @@ footer{max-width:1160px;margin:2rem auto;padding:1.2rem clamp(1rem,3vw,2rem);col
 @media(max-width:759px){main{padding:1rem .85rem 7rem}.pg{gap:1rem;padding:.85rem;border-radius:18px}.pg>div:first-child>img{max-height:420px;border-radius:14px}h1{font-size:1.55rem}.stk{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;align-items:center;gap:.55rem;padding:.65rem .75rem calc(.65rem + env(safe-area-inset-bottom));background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-top:1px solid var(--line);box-shadow:0 -5px 22px rgba(15,23,42,.1)}.stk b{flex:1;min-width:0;font-size:.92rem;line-height:1.2;color:var(--brand-dark)}.stk b small{display:block;color:var(--ink);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stk a{flex:none;text-decoration:none;font-weight:800;border-radius:11px;padding:.7rem .8rem;background:var(--green);color:#fff}.stk a.call{background:#fff;color:var(--brand-dark);border:1.5px solid #c4b5fd;padding:.62rem .72rem}}
 @media(min-width:760px){.stk{display:none!important}}`;
 
+// Final output guard: imported descriptions and future sections can contain legacy
+// product URLs. Normalize customer-visible anchors at the shared render boundary;
+// canonical, Open Graph and JSON-LD URLs are intentionally outside body.
+const normalizeCustomerProductLinks = html => String(html || '').replace(
+  /(\bhref\s*=\s*)(["'])(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/p\/([^"'?#\s]+)\.html(?:[?#][^"']*)?\2/gi,
+  (_match, prefix, quote, rawSlug) => {
+    let slug = rawSlug;
+    try { slug = decodeURIComponent(slug); } catch {}
+    return prefix + quote + esc(shellProductLink(slug)) + quote;
+  }
+);
+
 const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = '', robots = 'index, follow, max-image-preview:large' }) => `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
@@ -156,7 +168,7 @@ const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = ''
 <meta property="og:image" content="${esc(og || SITE + '/logo.png')}"><meta property="og:image:alt" content="${esc(og ? title + ' product photo' : BRAND + ' logo')}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(og || SITE + '/logo.png')}"><meta name="twitter:image:alt" content="${esc(og ? title + ' product photo' : BRAND + ' logo')}">${extra}
 ${path.startsWith('/p/') && og ? '<link rel="preload" as="image" href="' + esc(og) + '" fetchpriority="high">' : ''}
 <meta name="theme-color" content="#7c3aed"><style>${CSS}</style>${ld || ''}</head><body>
-<header><a href="${SITE}/">${BRAND}</a></header><main>${body}</main>
+<header><a href="${SITE}/">${BRAND}</a></header><main>${normalizeCustomerProductLinks(body)}</main>
 <footer>${BRAND} · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 748 888 230</a>
 · <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/about.html">About</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns-warranty.html">Returns &amp; Warranty</a> · <a href="${SITE}/privacy-policy.html">Privacy</a> · <a href="${SITE}/terms.html">Terms</a></footer><script src="/product-links.js" defer></script><script src="/img-protect.js" defer></script><script src="/analytics.js" defer></script></body></html>`;
 
