@@ -1,8 +1,8 @@
 // Stermont Arcade - gives every product (/p/), category (/c/) and guide (/guides/) page, and products.html, the mobile-shell look: the shell top bar (back, search, cart) and bottom nav.
-// Why: these static pages must look like the shell themselves for crawlers and desktop visitors (see seo-shell-redirect.mjs). The bar and nav are added by /shell-chrome.js.
+// These pages retain their SEO HTML and shared shell navigation. Product/category route bootstraps are handled by seo-shell-redirect.mjs.
 // Runs after every rebuild: product-pages.yml already runs seo-shell-redirect.mjs, which calls runAll() from here at the end (so no workflow edit is needed).
 // Idempotent (marker <!--stm-chrome-->); historical auto-redirect scripts are stripped. Redirect stubs (meta refresh) are left alone.
-// Product/category pages stay static at /p/ and /c/; the shell remains available through explicit /?product= and /?cat= links.
+// Product/category pages preserve static SEO markup, but their route bootstrap opens the full shell for visitors.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 export const MARK = '<!--stm-chrome-->';
