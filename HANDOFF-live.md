@@ -1,3 +1,11 @@
+## 2026-11-19 15:35 (Africa/Nairobi) - Finding: in-place shell is a larger build than first thought
+- The shell (`mobile-shell/index.html` 455 lines + `app.js` 921 lines) is one app mounted at `/`; /p/ and /c/ pages are separate static pages with their own markup. Showing the shell on a /p/ address without navigating means mounting that app into the static page, not a small edit.
+- Already in repo: `shell-chrome.js` gives static /p/, /c/, /guides/ pages the shell top bar + bottom nav with no redirect (the pre-#970 behaviour). The only redirect is `EARLY` in `seo-shell-chrome.mjs` (added by PR #970, owner instruction 2026-11-19 morning).
+- Options for owner: (1) drop `EARLY` so /p/ and /c/ stay static with shell chrome (ranking-safe, quick; `/?product=<slug>` links still open the full shell); (2) build the in-place mount (larger, needs a ~20-product trial + Search Console check first).
+- No code changed on `wip-shell-inplace` yet. Nothing merged.
+
+---
+
 ## 2026-11-19 15:20 (Africa/Nairobi) - Task start: mobile shell as default WITHOUT a visitor redirect (owner approved, product links must not change)
 - Owner goal: shell is the default experience, no Google ranking loss. Product link rule unchanged: `https://stermontarcade.co.ke/?product=<slug>`.
 - Context: PR #970 (`mobile-shell-default-all-routes-2026-11-19`) uses `location.replace` from /p/ and /c/ to `/?product=` / `/?cat=` for ALL visitors incl. Googlebot (EARLY script in `seo-shell-chrome.mjs`). `CLAUDE.md`/`PUBLISHING.md`: redirect was removed 2026-11-03 over a suspected ranking drop; needs explicit owner decision (owner now wants shell default, approved a no-redirect approach).
