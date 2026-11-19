@@ -82,6 +82,9 @@ assert.deepEqual(offenders, [], 'human-facing static product/classic links found
 
 // Explicitly protect the SEO surfaces from accidental removal or conversion.
 const generator = readFileSync('generate-products.mjs', 'utf8');
+const relatedFill = readFileSync('seo-related-fill.mjs', 'utf8');
+assert.match(relatedFill, /shellHref: shellProductLink/);
+assert.match(relatedFill, /href="\\$\\{p\\.shellHref\\}"/);
 assert.match(generator, /<link rel="canonical" href="\$\{SITE\}\$\{path\}">/);
 assert.match(generator, /url: SITE \+ path/);
 assert.match(generator, /crumbLd\(\[\['Home', SITE \+ '\/'\]/);
