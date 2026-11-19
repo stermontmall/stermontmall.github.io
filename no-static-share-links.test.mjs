@@ -31,10 +31,10 @@ assert.equal(shellProductLink(''), SITE + '/');
 // The migration rewrites only customer anchors and protects the explicit SEO surfaces.
 const migrated = rewriteHtml('<html><head></head><body><a href="/p/demo-product.html">Product</a><nav class="bc"><a href="/p/breadcrumb.html">Breadcrumb</a></nav><!-- seo-links:start --><a href="/p/crawl-only.html">Crawler</a><!-- seo-links:end --><link rel="canonical" href="https://stermontarcade.co.ke/p/demo-product.html"></body></html>');
 assert.equal(migrated.replaced, 1);
-assert.match(migrated.html, /href="https:\\/\\/stermontarcade\\.co\\.ke\\/\\?product=demo-product"/);
-assert.match(migrated.html, /href="\\/p\\/breadcrumb\\.html"/);
-assert.match(migrated.html, /href="\\/p\\/crawl-only\\.html"/);
-assert.match(migrated.html, /rel="canonical" href="https:\\/\\/stermontarcade\\.co\\.ke\\/p\\/demo-product\\.html"/);
+assert.match(migrated.html, /href="https:\/\/stermontarcade\.co\.ke\/\?product=demo-product"/);
+assert.match(migrated.html, /href="\/p\/breadcrumb\.html"/);
+assert.match(migrated.html, /href="\/p\/crawl-only\.html"/);
+assert.match(migrated.html, /rel="canonical" href="https:\/\/stermontarcade\.co\.ke\/p\/demo-product\.html"/);
 assert.ok(migrated.html.includes(GENERATED_MARKER));
 
 // Exercise actual generated HTML renderers, not just a helper string.
