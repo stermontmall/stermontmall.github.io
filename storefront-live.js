@@ -274,7 +274,7 @@
     var more = q('.more'); d.classList.remove('clip'); more.hidden = true;
     if (d.scrollHeight > 270) { d.classList.add('clip'); more.hidden = false; more.textContent = 'Show more ▾'; }
     /* address bar and shared URL use the shell deep link; remember the page we came from so closing the view puts it back */
-    if (!BASE && location.pathname.indexOf('/p/') !== 0) BASE = location.pathname + location.search;
+    if (!BASE && location.pathname.indexOf('/p/') !== 0) BASE = new URLSearchParams(location.search).has('product') ? '/' : location.pathname + location.search;
     if (!noPush) { try { history.pushState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }
     else if (keep) { try { history.replaceState({ stm: p.id }, '', purl(p.id)); } catch (e) {} }   /* switching pack size: update the URL in place */
     setMeta(p);   /* tab title + meta description now match the product that is open */
