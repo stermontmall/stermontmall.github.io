@@ -287,7 +287,7 @@ const SAVED_TAB = (() => { try { const t = sessionStorage.getItem('shell.activeT
 const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab
   : (!DEEP && !CAT_DEEP && !Q_DEEP && TABS.includes(TAB_DEEP)) ? TAB_DEEP
   : (!DEEP && !CAT_DEEP && !Q_DEEP && SAVED_TAB) ? SAVED_TAB : 'home';
-history.replaceState({ tab: START_TAB, stack: [] }, '', (DEEP || CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname : undefined); // a reload lands on a clean base entry (no sheet), on the same tab
+history.replaceState({ tab: START_TAB, stack: [] }, '', (DEEP || CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname + (DEEP ? location.hash : '') : undefined); // Strip deep-link query parameters but retain a selected pack-size hash
 scrim.addEventListener('click', closeTop);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop(); });
 syncOverlays();
