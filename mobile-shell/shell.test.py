@@ -614,7 +614,7 @@ with sync_playwright() as p:
     p15.goto(URL); p15.wait_for_selector('#grid .card[data-id]')
     p15.locator('#chips [data-chip="phones-accessories"]').click()
     p15.wait_for_function("location.pathname === '/c/phones-accessories.html'", timeout=10000)
-    p15.reload(); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href^="/p/"]')
+    p15.reload(wait_until='domcontentloaded'); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href^="/p/"]')
     check('top-level category reload restores its canonical static page with shell navigation', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and p15.locator('#stm-nav').count() == 1 and p15.locator('h1').count() >= 1 and p15.locator('#grid .card[data-id]').count() == 0, p15.url)
 
     p15.goto(f'{BASE}/?cat=garden-tools'); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
