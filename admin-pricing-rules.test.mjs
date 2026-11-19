@@ -11,7 +11,7 @@ const canonicalSql = readFileSync(new URL('./supabase/sql/canonical_four_tier_pr
 const sqlHelper = readFileSync(new URL('./database/add-draft-product-unique-opening.sql', import.meta.url), 'utf8');
 const policy = readFileSync(new URL('./supabase/sql/staff-read-publishing-rules.sql', import.meta.url), 'utf8');
 
-assert.match(admin, /admin-pricing-rules\.js\?v=1/);
+assert.match(admin, /admin-pricing-rules\.js\?v=2/);
 assert.match(admin, /'pricing-rules'/);
 assert.match(admin, /Store[\s\S]*Pricing rules/);
 assert.match(admin, /STMPricingRules\.mount\(L\)/);
