@@ -531,7 +531,7 @@ function productSiloHtml(p, cat, related) {
   const hubUrl = `/c/${encodeURIComponent(hubSlug)}.html`;
   const children = (HUBS[hubSlug]?.kids || [])
     .filter(slug => slug !== cat.slug && byCat[slug]?.items?.length)
-    .slice(0, 6);
+    .slice(0, 7);
   const guideMap = {
     'pest-control-fumigation': [['/blog/pest-control-products-for-hotels-and-restaurants-kenya.html','Pest control products for hotels and restaurants in Kenya'],['/blog/pest-control-equipment-checklist-businesses-kenya.html','Pest-control equipment checklist for businesses']],
     'bed-bug-killers': [['/blog/how-to-get-rid-of-bed-bugs-kenya.html','How to get rid of bed bugs in Kenya'],['/blog/bed-bugs-in-hostels-and-rentals-kenya.html','Bed bugs in hostels and rental properties']],
