@@ -7,7 +7,7 @@
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this), function () {
   return function shellProductLink(slug, origin) {
     var value = String(slug == null ? '' : slug).trim();
-    var base = String(origin || 'https://stermontarcade.co.ke').replace(/\\/+$/, '');
+    var base = String(origin || 'https://stermontarcade.co.ke').replace(/\/+$/, '');
     if (!value) return base + '/';
     return base + '/?product=' + encodeURIComponent(value);
   };
