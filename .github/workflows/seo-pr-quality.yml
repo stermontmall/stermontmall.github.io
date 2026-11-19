@@ -28,6 +28,7 @@ on:
       - 'home-grid-ssr.mjs'
       - 'home-grid-ssr.test.mjs'
       - 'kili-pages.js'
+      - 'cat-feel.js'
       - 'recent-orders.js'
       - 'product-content.json'
       - 'product-content.test.mjs'
@@ -105,6 +106,8 @@ jobs:
         run: |
           {
             node --check category-editorial.mjs
+            node --check seo-related-fill.mjs
+            node --check cat-feel.js
             node --check product-links.js
             node --check rewrite-static-product-links.mjs
             node --check site-links.js
