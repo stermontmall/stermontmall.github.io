@@ -891,6 +891,7 @@ ${B}`;
 {
   const HOME = 'index.html';
   const OPEN = '<ul id="grid" class="grid grid-cols-2 gap-2 px-2">';
+  const GRID_MARKER = '<!-- stm-shell-product-links:v1 -->';
   if (existsSync(HOME)) {
     const current = readFileSync(HOME, 'utf8');
     const start = current.indexOf(OPEN), close = start < 0 ? -1 : current.indexOf('</ul>', start);
@@ -918,7 +919,7 @@ ${B}`;
       const cards = renderHomeGridFallback(picked.map(p => ({
         id: p.id, name: p.name, price: p.price, stock: p.stock, image: p.images?.[0], href: shellProductLink(sl(p.id), SITE)
       })), { limit: 8 });
-      const updated = current.slice(0, start) + OPEN + cards + current.slice(close);
+      const updated = current.slice(0, start) + OPEN + GRID_MARKER + cards + current.slice(close);
       if (updated !== current) writeFileSync(HOME, updated);
       console.log(`Homepage SSR grid: ${picked.length} positive-stock product links.`);
     } else console.log('Homepage grid marker not found - skipped SSR product cards.');
