@@ -25,7 +25,7 @@ Use a verified Kenyan baseline cost in KES for the exact product, brand/model an
 | KSh 40,000–60,000 inclusive | 20% |
 | Above KSh 60,000 | 17.5% |
 
-Order of calculation: verify baseline in KES → apply exactly one tier → enforce at least 15% above baseline cost → round to nearest KSh 50 → enforce KSh 200 minimum. Never guess, convert foreign currency without an approved rate, or apply a second markup.
+Order of calculation: verify baseline in KES → apply exactly one tier → enforce at least 15% above baseline cost → round to nearest KSh 50 → enforce KSh 200 minimum. Never guess, convert foreign currency without an approved rate, or apply a second markup. Set `old_price` only when a genuine previous/regular price is verified; never manufacture a discount.
 
 **Syngenta:** skip new Syngenta products and leave existing Syngenta price/cost values untouched unless the owner explicitly instructs otherwise.
 
