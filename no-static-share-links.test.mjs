@@ -18,16 +18,16 @@ const SEO_SURFACE_ALLOWLIST = [
 ];
 const SKIP_DIRS = new Set(['.git', 'node_modules', 'p', 'c', 'blog', 'guides', 'services', 'pest-control', 'assets', 'product-photos']);
 const SKIP_FILES = new Set(['no-static-share-links.test.mjs', 'no-classic-hop.test.mjs', 'classic.html', 'products.html']);
-const HUMAN_PRODUCT = /<a\\b[^>]*\\bhref\\s*=\\s*["'`][^"'`]*\\/p\\/|href\\s*=\\s*["'`]\\/p\\/|(?:Link|Product link):[^\\n`]*\\/p\\/|https?:\\/\\/stermontarcade\\.co\\.ke\\/p\\/[^\\s"'`<>]*/i;
-const HUMAN_CLASSIC = /<a\\b[^>]*\\bhref\\s*=\\s*["'`][^"'`]*classic\\.html|href\\s*=\\s*["'`][^"'`]*classic\\.html|(?:location\\.(?:href|assign|replace)|window\\.open)\\s*[^;\\n]*classic\\.html/i;
+const HUMAN_PRODUCT = /<a\b[^>]*\bhref\s*=\s*["'`][^"'`]*\/p\/|href\s*=\s*["'`]\/p\/|(?:Link|Product link):[^\n`]*\/p\/|https?:\/\/stermontarcade\.co\.ke\/p\/[^\s"'`<>]*/i;
+const HUMAN_CLASSIC = /<a\b[^>]*\bhref\s*=\s*["'`][^"'`]*classic\.html|href\s*=\s*["'`][^"'`]*classic\.html|(?:location\.(?:href|assign|replace)|window\.open)\s*[^;\n]*classic\.html/i;
 
 assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), SITE + '/?product=premise-200-sc-termiticide-50-ml');
 assert.equal(shellProductLink(''), SITE + '/');
 
 // Exercise actual generated HTML renderers, not just a helper string.
 const description = productDescriptionHtml('Related item: [Premise 200 SC](/p/premise-200-sc-termiticide-50-ml.html).');
-assert.match(description, /href="https:\\/\\/stermontarcade\\.co\\.ke\\/\\?product=premise-200-sc-termiticide-50-ml"/);
-assert.doesNotMatch(description, /href="[^"]*\\/p\\//);
+assert.match(description, /href="https:\/\/stermontarcade\.co\.ke\/\?product=premise-200-sc-termiticide-50-ml"/);
+assert.doesNotMatch(description, /href="[^"]*\/p\//);
 
 const post = renderPost({
   slug: 'shell-link-fixture', title: 'Shell link fixture', description: 'A test guide.',
@@ -35,8 +35,8 @@ const post = renderPost({
   sections: [], faq: [], closing: '', cat: 'missing-category',
   product: 'premise-200-sc-termiticide-50-ml', related: []
 });
-assert.match(post, /href="https:\\/\\/stermontarcade\\.co\\.ke\\/\\?product=premise-200-sc-termiticide-50-ml"/);
-assert.doesNotMatch(post, /<a\\b[^>]*href="[^"]*\\/p\\//i);
+assert.match(post, /href="https:\/\/stermontarcade\.co\.ke\/\?product=premise-200-sc-termiticide-50-ml"/);
+assert.doesNotMatch(post, /<a\b[^>]*href="[^"]*\/p\//i);
 
 // Source scan covers storefront scripts, generators, admin tools and static root pages.
 // The homepage's explicitly marked seo-links block is the one intentional crawl-link exception.
@@ -45,7 +45,7 @@ function walk(dir, out = []) {
     if (SKIP_DIRS.has(name)) continue;
     const path = join(dir, name), st = statSync(path);
     if (st.isDirectory()) walk(path, out);
-    else if (!SKIP_FILES.has(path.replace(/^\\.\\//, '')) && /\\.(?:html|js|mjs|ts)$/.test(name) && st.size < 3_000_000) out.push(path);
+    else if (!SKIP_FILES.has(path.replace(/^\.\//, '')) && /\.(?:html|js|mjs|ts)$/.test(name) && st.size < 3_000_000) out.push(path);
   }
   return out;
 }
@@ -65,9 +65,9 @@ assert.deepEqual(offenders, [], 'human-facing static product/classic links found
 
 // Explicitly protect the SEO surfaces from accidental removal or conversion.
 const generator = readFileSync('generate-products.mjs', 'utf8');
-assert.match(generator, /<link rel="canonical" href="\\$\\{SITE\\}\\$\\{path\\}">/);
-assert.match(generator, /url: SITE \\+ path/);
-assert.match(generator, /crumbLd\\(\\[\\['Home', SITE \\+ '\/'\\]/);
+assert.match(generator, /<link rel="canonical" href="\$\{SITE\}\$\{path\}">/);
+assert.match(generator, /url: SITE \+ path/);
+assert.match(generator, /crumbLd\(\[\['Home', SITE \+ '\/'\]/);
 assert.match(generator, /sitemap-products|sitemap/);
 assert.ok(SEO_SURFACE_ALLOWLIST.length === 5);
 
