@@ -5,9 +5,9 @@ import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const DIR = process.env.P_DIR || 'p';
 export const MARK = '<!--stm-shell-route-->';
-const PRODUCT_RE = /<!--stm-shell--><script>[\\s\\S]*?<\\/script>/g;
-const CAT_RE = /<!--stm-shell-cat--><script>[\\s\\S]*?<\\/script>/g;
-const ROUTE_RE = /<!--stm-shell-route--><script>[\\s\\S]*?<\\/script>/g;
+const PRODUCT_RE = /<!--stm-shell--><script>[\s\\S]*?<\/script>/g;
+const CAT_RE = /<!--stm-shell-cat--><script>[\s\\S]*?<\/script>/g;
+const ROUTE_RE = /<!--stm-shell-route--><script>[\s\\S]*?<\/script>/g;
 
 function routeScript(kind, slug) {
   const key = kind === 'product' ? 'product' : 'cat';
@@ -17,9 +17,9 @@ function routeScript(kind, slug) {
 
 function addRoute(html, kind, slug) {
   if (/http-equiv=["']refresh["']/i.test(html)) return html;
-  if (!/<\\/head>/i.test(html)) return html;
+  if (!/<\/head>/i.test(html)) return html;
   const old = html.replace(kind === 'product' ? PRODUCT_RE : CAT_RE, '').replace(ROUTE_RE, '');
-  return old.replace(/<\\/head>/i, routeScript(kind, slug) + '</head>');
+  return old.replace(/<\/head>/i, routeScript(kind, slug) + '</head>');
 }
 
 export function inject(html, slug) { return addRoute(html, 'product', slug); }
@@ -33,7 +33,7 @@ function run(dir, fn, label) {
     total++;
     try {
       const path = `${dir}/${f}`, before = readFileSync(path, 'utf8');
-      const slug = f.replace(/\\.html$/i, ''), after = fn(before, slug);
+      const slug = f.replace(/\.html$/i, ''), after = fn(before, slug);
       if (after !== before) { writeFileSync(path, after); n++; }
     } catch (e) { console.log('skipped', f, e.message); }
   }
