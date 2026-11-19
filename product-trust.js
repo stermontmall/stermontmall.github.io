@@ -33,7 +33,7 @@
     c.appendChild(ul);
     var s = mk('small'); s.appendChild(D.createTextNode('Pay by M-Pesa \u00B7 48-hour returns on faulty items. '));
     var a = mk('a', null, 'Ask about stock or delivery fees on WhatsApp');
-    var productPath = location.pathname.match(/^\\/p\\/([^/]+)\\.html$/i);
+    var productPath = location.pathname.match(/^\/p\/([^/]+)\.html$/i);
     var productLink = productPath && window.shellProductLink ? window.shellProductLink(decodeURIComponent(productPath[1])) : location.href;
     a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Hello Stermont Arcade, is this in stock and how much is delivery to my area? ' + name + ' ' + productLink);
     a.target = '_blank'; a.rel = 'noopener';
