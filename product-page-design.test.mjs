@@ -3,9 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 const generator = readFileSync('generate-products.mjs','utf8');
 const workflow = readFileSync('.github/workflows/product-pages.yml','utf8');
-const css = generator.slice(generator.indexOf('const CSS = `'), generator.indexOf('`;
-
-const shell'));
+const css = generator.slice(generator.indexOf('const CSS = `'), generator.indexOf('`;\n\nconst shell'));
 assert.ok(css.includes('--brand:#6d28d9') && css.includes('background:var(--wash)'), 'product pages use the modern storefront palette');
 assert.ok(css.includes('.pg>div:first-child') && css.includes('border-radius:24px'), 'product photo and purchase details sit inside a modern product card');
 assert.ok(css.includes('grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)'), 'desktop product layout uses a balanced two-column grid');
