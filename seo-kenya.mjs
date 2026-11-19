@@ -170,7 +170,7 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
 console.log(`Kenya titles and descriptions set on ${pDone} product page(s).`);
 
 // ---------- 2) category pages + 3) guides ----------
-const ITEM = /<li(?:\s[^>]*)?><a href="([^"]+)"><img[^>]*?>([^<]*)<\/a><span>KSh ([\d,]+)<\/span><\/li>/g;
+const ITEM = /<li(?:\s[^>]*)?><a href="([^"]+)"><img[^>]*?>([^<]*)<\/a><span>(?:From )?KSh ([\d,]+)<\/span><\/li>/g;
 const cats = [];
 let cDone = 0;
 if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.html') && f !== 'index.html')) {
