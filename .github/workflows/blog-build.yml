@@ -21,6 +21,8 @@ on:
       - 'c/*.html'
       - 'guides/*.html'
       - 'services/*.html'
+      - 'pest-control/*.html'
+      - '.github/workflows/blog-build.yml'
   workflow_dispatch:
 
 permissions:
@@ -64,7 +66,7 @@ jobs:
         run: |
           git config user.name "bot"
           git config user.email "bot@users.noreply.github.com"
-          git add p/*.html c/*.html blog/*.html guides/*.html services/*.html *.html sitemap.xml
+          git add p/*.html c/*.html blog/*.html guides/*.html services/*.html pest-control/*.html *.html sitemap.xml
           if git diff --cached --quiet; then
             echo "Nothing changed - no commit needed."
           else
