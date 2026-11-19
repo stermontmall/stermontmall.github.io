@@ -10,7 +10,7 @@ const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const normalizeInternalPath = path => path.replace(/^\/category\/([a-z0-9][a-z0-9-]*)\/?$/i, '/c/$1.html');
 const inline = s => esc(s)
-  .replace(/\\[([^\\]]+)\\]\\((?:https?:\\/\\/stermontarcade\\.co\\.ke)?(\\/[^)\\s]*)\\)/g, (_match, label, path) => { const product = path.match(/^\\/p\\/([a-z0-9-]+)\\.html$/i); return `<a href="${product ? shellProductLink(product[1]) : normalizeInternalPath(path)}">${label}</a>`; })
+  .replace(/\[([^\]]+)\]\((?:https?:\/\/stermontarcade\.co\.ke)?(\/[^)\s]*)\)/g, (_match, label, path) => { const product = path.match(/^\/p\/([a-z0-9-]+)\.html$/i); return \`<a href="\${product ? shellProductLink(product[1]) : normalizeInternalPath(path)}">\${label}</a>\`; })
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
 // Only explicit uppercase section labels match. Never ordinary words such as "used", "order" or "safety" inside sentences.
