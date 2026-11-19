@@ -6,6 +6,7 @@ on:
     paths:
       - 'seo-*.mjs'
       - 'generate-products.mjs'
+      - 'seo-overrides.json'
       - 'product-description-html.mjs'
       - 'product-description-html.test.mjs'
       - 'home-grid-ssr.mjs'
