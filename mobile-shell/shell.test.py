@@ -62,7 +62,14 @@ def on_rest(route):
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
 REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
 def mock_network(ctx):
-    ctx.route('**/p/*.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=REAL))
+    def serve_product_page(rt):
+        # Match the requested fixture slug to the generated SEO page's early shell bootstrap.
+        # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
+        match = re.search(r'/p/([^/?#]+)\.html', rt.request.url)
+        slug = match.group(1) if match else ''
+        page = re.sub(r'(var p=)["\'][^"\']*["\']', lambda m: m.group(1) + json.dumps(slug), REAL, count=1)
+        rt.fulfill(status=200, content_type='text/html', body=page)
+    ctx.route('**/p/*.html*', serve_product_page)
     ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
