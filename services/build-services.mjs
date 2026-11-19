@@ -46,7 +46,7 @@ for (const g of data.guides) {
 }
 const SITE = 'https://stermontarcade.co.ke';
 const shellProductLink = createRequire(import.meta.url)('../product-links.js');
-const shopHref = href => { const m = String(href || '').match(/(?:^|\\/)p\\/([^/?#]+)\\.html$/i); return m ? shellProductLink(decodeURIComponent(m[1]), SITE) : href; };
+const shopHref = href => { const m = String(href || '').match(/(?:^|\/)p\/([^/?#]+)\.html$/i); return m ? shellProductLink(decodeURIComponent(m[1]), SITE) : href; };
 const WA = '254748888230';
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const kes = n => 'KSh ' + Number(n).toLocaleString('en-US');
