@@ -23,7 +23,7 @@ for (const file of files) {
   const lines = text.split('\n');
   lines.forEach((line, index) => {
 
-    if (/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/classic\.html/i.test(line) && !['classic.html', 'no-classic-hop.test.mjs', 'no-static-share-links.test.mjs'].includes(file)) offenders.push(file + ':' + (index + 1) + ': human-facing /classic.html link: ' + line.trim().slice(0, 220));
+      if (/(?:href\s*=\s*["'][^"']*\/p\/|Link:\s*[^\n<]*\/p\/|href\s*=\s*["'][^"']*\/classic\.html)/i.test(html)) {
     if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/p\//i.test(line)) return;
     // Internal SEO document fetches and explicitly defined Google crawl surfaces are not customer links.
     if (file === 'index.html' && line.includes('href="/p/')) return; // owner-approved seo-links crawl block, not the visible product grid
@@ -79,13 +79,13 @@ if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
       const file = join(dir, name);
       let html = readFileSync(file, 'utf8');
       // Keep SEO-only /p/ references intact while inspecting the customer-visible page body.
-      html = html.replace(/<head\\b[\\s\\S]*?<\\/head>/gi, '')
-        .replace(/<script[^>]*type=["']application\\/ld\\+json["'][^>]*>[\\s\\S]*?<\\/script>/gi, '')
-        .replace(/<nav[^>]*class=["'][^"']*\\bbc\\b[^"']*["'][^>]*>[\\s\\S]*?<\\/nav>/gi, '')
-        .replace(/<!--\\s*seo-links:start\\s*-->[\\s\\S]*?<!--\\s*seo-links:end\\s*-->/gi, '');
+      html = html.replace(/<head\b[\s\S]*?<\/head>/gi, '')
+        .replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<nav[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi, '')
+        .replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, '');
       try { html = decodeURIComponent(html.replace(/&amp;/g, '&')); } catch {}
       scanned++;
-      if (/(?:href\\s*=\\s*["'][^"']*\\/p\\/|Link:\\s*[^\\n<]*\\/p\\/|href\\s*=\\s*["'][^"']*\\/classic\\.html)/i.test(html)) {
+      if (/(?:href\s*=\s*["'][^"']*\/p\/|Link:\s*[^\n<]*\/p\/|href\s*=\s*["'][^"']*\/classic\.html)/i.test(html)) {
         generatedOffenders.push(file);
       }
     }
