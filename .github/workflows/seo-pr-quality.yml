@@ -51,6 +51,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         # Explicit bash gives -eo pipefail, so `cmd | tee log` still fails the step when cmd fails.
@@ -90,7 +91,7 @@ jobs:
           node seo-shell-redirect.mjs
           node seo-shell-redirect.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-shell-route-fixtures.log"
       - name: Run mobile shell browser regression suite
-        run: python3 mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
+        run: timeout --signal=TERM --kill-after=30s 12m python3 -u mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
       - name: Broken and placeholder links (link-check.mjs)
         run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/05-link-check.log"
       - name: Test permanent product-code display and admin integration
