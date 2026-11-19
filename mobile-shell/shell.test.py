@@ -30,7 +30,7 @@ CATS_FIX = [
     dict(id=83, name='Kili Featured', slug='kili-featured', parent_id=None, sort_order=1, is_promo=True),  # promo bucket: must not become a chip
 ]
 def row(id, cat, name, price, old, featured=False, group=None, label=None, stock=100, img=OK):
-    return dict(id=id, slug=id, name=name, category_id=cat, price=str(price), old_price=str(old), stock=stock, featured=featured,
+    return dict(id=id, slug=id, name=name, category_id=cat, price=str(price), old_price=str(old), stock=stock, featured=featured, product_code='STM-' + str(id).upper(),
                 images=[img] if img else [], unit=None, variant_group=group, variant_label=label)
 ROWS = [row('home-0', 24, 'Hot Plate', 2500, 3000, featured=True)]
 ROWS += [row(f'garden-set-{l.replace(" ", "")}', 71, 'Garden Hose Connector Set', pr, int(pr * 1.15), featured=True, group='garden-set', label=l)
@@ -56,7 +56,7 @@ def on_rest(route):
     if '/rest/v1/products' in url and 'id=eq.' in url:   # details of one row, fetched when a product is opened
         rid = url.split('id=eq.')[1].split('&')[0]
         r = next((x for x in ROWS if x['id'] == rid), None)
-        return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK])])
+        return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK], product_code=r['product_code'])])
     if '/rest/v1/rpc/get_store_catalog' in url: return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in ROWS])
     serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
