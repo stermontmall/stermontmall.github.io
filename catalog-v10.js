@@ -261,7 +261,7 @@
       return catP.then(function (cid) {
         var row = { category_id: cid, name: name, price: edit ? price : up(price), low_at: edit ? parseInt(v('cx-low') || 20, 10) : 20, featured: edit ? $('cx-feat').checked : false, images: imgs };
         if (oldP != null || (edit && p.old_price != null)) row.old_price = oldP;
-        if (!edit && row.old_price != null) { row.old_price = Math.max(Math.round(row.old_price / 50) * 50, row.price + 50); }
+        if (!edit && row.old_price != null) { row.old_price = Math.round(row.old_price / 50) * 50; if (!(row.old_price > row.price)) row.old_price = null; }
         if (unit || (edit && p.unit)) row.unit = unit || null;
         var grp = tpl ? (tpl.variant_group || slug(tpl.base || tpl.name)) : (edit && p.variant_group) || slug(name);
         if (vl || (edit && (p.variant_label || p.variant_group))) { row.variant_label = vl || null; row.variant_group = vl ? grp : null; }
