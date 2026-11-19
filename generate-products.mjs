@@ -36,7 +36,7 @@ const PRODUCT_CONTENT = existsSync('product-content.json') ? JSON.parse(readFile
 // Real product brand for Google. Add more brands here any time; if none matches, the store name is used.
 const BRANDS = ['Alagzi', 'Kungu Nil', 'Greenlife', 'Zagro', 'Alonze', 'Pentagon', 'Absolute', 'Abasi', 'Actellic', 'Ailyons', 'AICO', 'Essie', 'Premier', 'Solo', 'Punisher', 'Rafiki', 'RodiRid', 'Hisense', 'Samsung', 'LG', 'Tecno', 'Infinix', 'Itel', 'Oppo', 'Xiaomi', 'Redmi', 'Apple', 'Nokia', 'Sony', 'JBL', 'TCL', 'Syinix', 'Vitron', 'Ramtons', 'Von', 'Mika', 'Nunix', 'Sayona', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Philips', 'Bruhm', 'Rockstar', 'Snake', 'Fumakilla', 'Moskill', 'Mos-Kill', 'Resolve'];
 const brandOf = name => { const n = ` ${String(name).toLowerCase()} `; return BRANDS.filter(b => n.includes(` ${b.toLowerCase()} `)).sort((a, b) => b.length - a.length)[0] || null; };
-const RETURNS = { '@type': 'MerchantReturnPolicy', applicableCountry: 'KE', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 2, url: 'https://stermontarcade.co.ke/returns-warranty.html' };
+const RETURNS = { '@type': 'MerchantReturnPolicy', applicableCountry: 'KE', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 2, url: 'https://stermontarcade.co.ke/returns.html' };
 // Delivery facts from shipping.html: all of Kenya, usually 1 to 3 days. The fee depends on location and is confirmed before payment, so no fixed rate is claimed here.
 const SHIPPING = { '@type': 'OfferShippingDetails', shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'KE' }, deliveryTime: { '@type': 'ShippingDeliveryTime', transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' } } };
 // Store facts match the live Nairobi pickup page and returns/shipping policies.
@@ -524,7 +524,7 @@ const card = p => `<li data-name="${esc(p.name)}" data-price="${Math.max(0, Numb
 
 // Helpful, category-specific buying checks. Avoid inventing product specifications, certifications or warranty terms.
 function productSiloHtml(p, cat, related) {
-  if (!cat) return related.length ? `<section class="product-silo"><h2>Related products</h2><div class="silo-products">${related.map(x => `<a href="/p/${encodeURIComponent(sl(x.id))}.html">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div></section>` : '';
+  if (!cat) return related.length ? `<section class="product-silo"><h2>Related products</h2><div class="silo-products">${related.slice(0, 6).map(x => { const photo = (x.images || []).find(isOwnedImage); return `<a class="silo-product-card" href="/p/${encodeURIComponent(sl(x.id))}.html">${photo ? `<img src="${esc(photo)}" alt="${esc(x.name)}" loading="lazy" decoding="async" width="120" height="120">` : '<span class="silo-photo-pending">Photo coming soon</span>'}<span>${esc(x.name)}<small>${money(x.price)}</small></span></a>`; }).join('')}</div></section>` : '';
   const parent = Object.entries(HUBS).find(([hubSlug, hub]) => hubSlug !== cat.slug && hub.kids.includes(cat.slug));
   const hubSlug = parent ? parent[0] : cat.slug;
   const hub = byCat[hubSlug] || byCat[cat.slug] || cat;
@@ -555,7 +555,7 @@ function productSiloHtml(p, cat, related) {
     <h3>Shop the main category</h3>
     <div class="silo-links"><a href="${hubUrl}">${esc(hub.name || cat.name)} in Kenya</a></div>
     ${children.length ? `<h3>Related categories</h3><div class="silo-links">${children.map(slug => `<a href="/c/${encodeURIComponent(slug)}.html">${esc(byCat[slug].name)}</a>`).join('')}</div>` : ''}
-    ${related.length ? `<h3>Related products</h3><div class="silo-products">${related.slice(0,6).map(x => `<a href="/p/${encodeURIComponent(sl(x.id))}.html">${esc(x.name)}<small>${money(x.price)}</small></a>`).join('')}</div>` : ''}
+    ${related.length ? `<h3>Related products</h3><div class="silo-products">${related.slice(0, 6).map(x => { const photo = (x.images || []).find(isOwnedImage); return `<a class="silo-product-card" href="/p/${encodeURIComponent(sl(x.id))}.html">${photo ? `<img src="${esc(photo)}" alt="${esc(x.name)}" loading="lazy" decoding="async" width="120" height="120">` : '<span class="silo-photo-pending">Photo coming soon</span>'}<span>${esc(x.name)}<small>${money(x.price)}</small></span></a>`; }).join('')}</div>` : ''}
     ${guides.length ? `<h3>Helpful guides</h3><ul class="silo-guides">${guides.map(([url,label]) => `<li><a href="${url}">${esc(label)}</a></li>`).join('')}</ul>` : ''}
   </section>`;
 }
