@@ -1,3 +1,12 @@
+## 2026-11-19 08:02 (Africa/Nairobi) — Fix stale product-category links and improve high-opportunity snippets
+- Done (branch `wip-fix-stale-category-links`, PR #903): `product-description-html.mjs` now rewrites legacy Markdown links from `/category/<slug>` to the current `/c/<slug>.html` routes, including absolute Stermont Arcade URLs. Added regression checks for the five routes from the 2026-11-19 daily SEO report.
+- Done: added the product-description renderer test to the SEO PR quality gate and its path triggers.
+- Done (Supabase): refreshed 19 active product meta descriptions using current catalogue prices and exact product/pack names; all descriptions are 137–148 characters. Updated the three override-managed descriptions for Nilzan Plus, Livergen Plus and Pentagon 50EC in `seo-overrides.json`.
+- Local verification: the category-link normalization logic passed 6 Node assertions. Full PR quality gate is running; do not call the website fix complete until its generated-page SEO report confirms the obsolete links are gone.
+- Next: inspect PR #903 quality-gate report, fix any remaining failures, merge only after checks pass, then confirm the product-page build and daily SEO report.
+
+---
+
 ## 2026-11-18 13:40 (Africa/Nairobi) - Merchant Listings "Improve item appearance" warnings
 - Done (branch `wip-merchant-return-shipping`): pack-size variants in ProductGroup JSON-LD now carry `description` (pack's own text, else the product's, else a generic line). Before, all 125 variants had none (Search Console: "Missing field description", 17 items). All 12 test steps of product-pages.yml pass locally.
 - NOT changed, needs owner decisions (published policy does not state them, so nothing was invented): `returnMethod` and `returnFees` (returns.html gives a 48-hour window and replacement/M-Pesa refund but not how items come back or who pays return shipping), `handlingTime` (not stated), `shippingRate` (shipping.html: fee depends on location, confirmed before payment; no fixed rate). Once the owner gives the terms, add them to `RETURNS` / `SHIPPING` in generate-products.mjs.
