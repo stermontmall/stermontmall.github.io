@@ -79,10 +79,14 @@ if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
   const generatedFiles = ['index.html', 'cars-for-sale.html', 'fashion.html', 'products.html', 'checkout.html'];
   const generatedOffenders = [];
   const pageFiles = generatedFiles.filter(file => existsSync(file));
-  for (const dir of generatedDirs) {
-    if (!existsSync(dir)) continue;
-    for (const name of readdirSync(dir).filter(name => name.endsWith('.html'))) pageFiles.push(join(dir, name));
-  }
+  const collectGeneratedHtml = dir => {
+    for (const name of readdirSync(dir)) {
+      const file = join(dir, name), info = statSync(file);
+      if (info.isDirectory()) collectGeneratedHtml(file);
+      else if (name.endsWith('.html')) pageFiles.push(file);
+    }
+  };
+  for (const dir of generatedDirs) if (existsSync(dir)) collectGeneratedHtml(dir);
   for (const file of pageFiles) {
       let html = readFileSync(file, 'utf8');
       // Keep SEO-only /p/ references intact while inspecting the customer-visible page body.
