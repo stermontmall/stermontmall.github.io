@@ -1,3 +1,17 @@
+## 2026-11-20 02:10 (Africa/Nairobi) — Canonical four-tier pricing enforced in admin and Supabase
+
+- Work is on branch `wip-pricing-rule-admin-default-20261120`; not live on `main` until the PR is merged.
+- Added the staff-only Admin **Pricing & posting rules** tab. It reads `public.publishing_rules` key `autonomous_bulk_product_publishing` directly, shows the four price tiers, margin floor, rounding, inventory defaults and full rulebook, and has a Refresh control.
+- Corrected Admin Catalog and Bulk Import so new rows use a verified KES baseline cost and the four-tier formula; Bulk Import now expects `baseline_cost_kes`, not a selling-price column. New rows are saved as hidden drafts with stock 1000, low_at 20 and featured=false. Existing products are not automatically repriced.
+- Updated the AI product uploader to use the verified source price and official four-tier calculation only; it no longer offers a new-product manual selling-price override. Deployed `ai-add-product` Edge Function v19 with exact source-price matching, 500×500 minimum dimensions and >15 KB photo checks.
+- Applied Supabase migration `enforce_canonical_four_tier_product_defaults`: every new product INSERT now requires a positive KES baseline, rejects Syngenta under automatic pricing, recalculates price with `public.price_4tier()`, and forces stock=1000, low_at=20, featured=false, active=false. New inserts now retain nearest-KSh-50 rounding; existing product edits retain their prior edit behaviour.
+- Synchronized `public.publishing_rules.rule_text` and `public.publishing_rule_configs.rulebook` with the canonical GitHub rule. Verified the mirrors match and the staff SELECT policy exists.
+- SQL validation passed: tested all four tier boundaries (including 19,999 / 20,000 / 39,999 / 40,000 / 60,000 / 60,001), minimum KSh 200, new-row defaults, hidden status, Syngenta rejection and zero-cost rejection. Temporary test products were rolled back.
+- Added `database/enforce-canonical-four-tier-product-defaults.sql`, `pricing-rule-defaults.test.mjs`, and extended the SEO PR quality workflow to syntax-check the admin scripts and run the pricing regression test.
+- Next: open the PR, wait for the complete SEO quality gate, fix any CI failures, then merge to make the Admin tab and browser updates live. Do not claim this branch is live before merge.
+
+---
+
 ## 2026-11-20 00:31 (Africa/Nairobi) — First browser run and test-fixture correction
 - The pack-card assertions passed in Actions: all four quick-buy pack cards rendered their own KSh prices; the selected 250 ml card remained highlighted and displayed both KSh 1,550 and its previous KSh 1,782 price; the selected-price summary updated immediately.
 - The broader browser run then stopped at a pre-existing test-order bug: `BASE` was referenced in the early quick-buy deep-link assertion before it was assigned later in the test file. No storefront assertion failed before that point.
