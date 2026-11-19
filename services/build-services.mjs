@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const data = JSON.parse(fs.readFileSync(path.join(dir, 'services-data.json'), 'utf8'));
@@ -44,6 +45,8 @@ for (const g of data.guides) {
   if (e.faqs) g.faqs = g.faqs.concat(e.faqs);
 }
 const SITE = 'https://stermontarcade.co.ke';
+const shellProductLink = createRequire(import.meta.url)('../product-links.js');
+const shopHref = href => { const m = String(href || '').match(/(?:^|\\/)p\\/([^/?#]+)\\.html$/i); return m ? shellProductLink(decodeURIComponent(m[1]), SITE) : href; };
 const WA = '254748888230';
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const kes = n => 'KSh ' + Number(n).toLocaleString('en-US');
@@ -323,7 +326,7 @@ ${p.intro.map(x => `<p>${esc(x)}</p>`).join('')}
 <h2>How to prevent ${esc(lc)}</h2><ul class="checks">${p.prevent.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
 ${p.scope ? `<h2>What we do and what we do not do</h2><p>${esc(p.scope)}</p>` : ''}
 <h2>How we deal with ${esc(lc)}</h2>${p.approach.map(x => `<p>${esc(x)}</p>`).join('')}<ol class="steps">${parent.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
-${p.shop && fs.existsSync(path.join(dir, '..', p.shop.href.replace(/^\//, ''))) ? `<p>Prefer to start yourself? See our <a href="${p.shop.href}">${esc(p.shop.label)}</a> in the shop, and read the label before you use any product.</p>` : ''}
+${p.shop && fs.existsSync(path.join(dir, '..', p.shop.href.replace(/^\//, ''))) ? `<p>Prefer to start yourself? See our <a href="${shopHref(p.shop.href)}">${esc(p.shop.label)}</a> in the shop, and read the label before you use any product.</p>` : ''}
 <h2>What it costs</h2><p>Pest control and fumigation at Stermont Arcade ranges from ${kes(parent.priceMin)} to ${kes(parent.priceMax)}${parent.priceOpen ? '+' : ''}. The price for ${esc(lc)} depends on the pest, the size of the property and how many visits are needed, and you get the exact price after inspection. See the <a href="${parentUrl}">full pest control service page</a>${costGuide ? ` and our guide, <a href="/services/guides/${costGuide.slug}.html">${esc(costGuide.title)}</a>` : ''}.</p>
 ${pestCoverage(p)}
 <h2 id="faq">Frequently asked questions about ${esc(lc)}</h2>${p.faqs.map(f => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
