@@ -1,20 +1,39 @@
-// Product and category pages stay on their own canonical, crawlable URLs.
-// The full mobile-shell app remains available through explicit deep links: /?product=<slug> and /?cat=<slug>.
-// Keep the shell's shared top bar and bottom navigation on generated pages, but never JavaScript-redirect every visitor or Googlebot.
+// Product and category URLs boot into the full mobile-shell app for every visitor.
+// The shell then restores the clean /p/<slug>.html or /c/<slug>.html address with history.replaceState.
+// Static product/category HTML remains in the response for crawlers and no-JavaScript fallback.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const DIR = process.env.P_DIR || 'p';
 export const MARK = '<!--stm-shell-route-->';
-// Remove every historical route bootstrap that sent /p/ or /c/ visitors to the homepage app.
-const LEGACY_ROUTE_RE = /<!--stm-(?:shell|shell-cat|shell-route|early)--><script[\s\S]*?<\/script>/gi;
+const LEGACY_ROUTE_RE = /<!--stm-(?:shell|shell-cat|shell-route|early)--><script[\\s\\S]*?<\\/script>/gi;
 
 function stripRoute(html) {
-  if (/http-equiv=["']refresh["']/i.test(html)) return html; // keep intentional extra-pack alias stubs unchanged
-  return html.replace(LEGACY_ROUTE_RE, '');
+  if (/http-equiv=["']refresh["']/i.test(html)) return html;
+  return html.replace(LEGACY_ROUTE_RE, '').replace(/<!--stm-shell-route--><script[\\s\\S]*?<\\/script>/gi, '');
 }
 
-export function inject(html, _slug) { return stripRoute(html); }
-export function injectCat(html, _slug) { return stripRoute(html); }
+function routeScript(kind, slug) {
+  if (!/^[a-z0-9][a-z0-9-]*$/i.test(slug)) return '';
+  const key = kind === 'product' ? 'product' : 'cat';
+  const target = '/' + '?' + key + '=' + encodeURIComponent(slug);
+  return MARK + '<script>(function(){try{'
+    + 'var p=location.pathname,expected=' + JSON.stringify('/' + (kind === 'product' ? 'p/' : 'c/') + slug + '.html') + ';'
+    + 'if(p!==expected)return;'
+    + 'var target=' + JSON.stringify(target) + '+(location.hash||"");'
+    + 'location.replace(target);'
+    + '}catch(e){}})();</script>';
+}
+
+function injectRoute(html, kind, slug) {
+  if (/http-equiv=["']refresh["']/i.test(html)) return html;
+  if (!/<\\/head>/i.test(html) || !/<\\/body>/i.test(html)) return html;
+  const clean = stripRoute(html);
+  const script = routeScript(kind, slug);
+  return script ? clean.replace(/<\\/head>/i, script + '</head>') : clean;
+}
+
+export function inject(html, slug) { return injectRoute(html, 'product', slug); }
+export function injectCat(html, slug) { return injectRoute(html, 'category', slug); }
 
 function run(dir, fn, label) {
   let n = 0, total = 0, files = [];
@@ -24,11 +43,11 @@ function run(dir, fn, label) {
     total++;
     try {
       const path = dir + '/' + f, before = readFileSync(path, 'utf8');
-      const slug = f.replace(/\.html$/i, ''), after = fn(before, slug);
+      const slug = f.replace(/\\.html$/i, ''), after = fn(before, slug);
       if (after !== before) { writeFileSync(path, after); n++; }
     } catch (e) { console.log('skipped', f, e.message); }
   }
-  console.log('seo-shell-redirect: removed legacy route redirects from ' + n + ' of ' + total + ' ' + label + ' pages');
+  console.log('seo-shell-redirect: added full mobile-shell route to ' + n + ' of ' + total + ' ' + label + ' pages');
 }
 
 if (process.argv[1] && process.argv[1].endsWith('seo-shell-redirect.mjs')) {
