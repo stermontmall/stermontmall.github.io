@@ -1,43 +1,34 @@
-// Product and category URLs launch the full mobile-shell app by default.
-// Static HTML retains crawlable metadata and schema; visitors are routed to the app deep link.
-// The app restores the canonical /p/ or /c/ URL with history.replaceState after opening the view.
+// Product and category pages stay on their own canonical, crawlable URLs.
+// The full mobile-shell app remains available through explicit deep links: /?product=<slug> and /?cat=<slug>.
+// Keep the shell's shared top bar and bottom navigation on generated pages, but never JavaScript-redirect every visitor or Googlebot.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const DIR = process.env.P_DIR || 'p';
 export const MARK = '<!--stm-shell-route-->';
-const PRODUCT_RE = /<!--stm-shell--><script>[\s\S]*?<\/script>/g;
-const CAT_RE = /<!--stm-shell-cat--><script>[\s\S]*?<\/script>/g;
-const ROUTE_RE = /<!--stm-shell-route--><script>[\s\S]*?<\/script>/g;
+// Remove every historical route bootstrap that sent /p/ or /c/ visitors to the homepage app.
+const LEGACY_ROUTE_RE = /<!--stm-(?:shell|shell-cat|shell-route|early)--><script[\s\S]*?<\/script>/gi;
 
-function routeScript(kind, slug) {
-  const key = kind === 'product' ? 'product' : 'cat';
-  const safeSlug = JSON.stringify(String(slug));
-  return MARK + '<script>(function(){var p=' + safeSlug + ';var q=' + JSON.stringify(key) + ';var u="/?"+q+"="+encodeURIComponent(p)+location.hash;if(location.pathname!=="/"||location.search!=="?"+q+"="+encodeURIComponent(p))location.replace(u);})();</script>';
+function stripRoute(html) {
+  if (/http-equiv=["']refresh["']/i.test(html)) return html; // keep intentional extra-pack alias stubs unchanged
+  return html.replace(LEGACY_ROUTE_RE, '');
 }
 
-function addRoute(html, kind, slug) {
-  if (/http-equiv=["']refresh["']/i.test(html)) return html;
-  if (!/<\/head>/i.test(html)) return html;
-  const old = html.replace(kind === 'product' ? PRODUCT_RE : CAT_RE, '').replace(ROUTE_RE, '');
-  return old.replace(/<\/head>/i, routeScript(kind, slug) + '</head>');
-}
-
-export function inject(html, slug) { return addRoute(html, 'product', slug); }
-export function injectCat(html, slug) { return addRoute(html, 'category', slug); }
+export function inject(html, _slug) { return stripRoute(html); }
+export function injectCat(html, _slug) { return stripRoute(html); }
 
 function run(dir, fn, label) {
   let n = 0, total = 0, files = [];
   try { files = readdirSync(dir).filter(f => f.endsWith('.html')); }
-  catch (e) { console.log(`seo-shell-redirect: no ${dir}/ folder, skipped`); return; }
+  catch (e) { console.log('seo-shell-redirect: no ' + dir + '/ folder, skipped'); return; }
   for (const f of files) {
     total++;
     try {
-      const path = `${dir}/${f}`, before = readFileSync(path, 'utf8');
+      const path = dir + '/' + f, before = readFileSync(path, 'utf8');
       const slug = f.replace(/\.html$/i, ''), after = fn(before, slug);
       if (after !== before) { writeFileSync(path, after); n++; }
     } catch (e) { console.log('skipped', f, e.message); }
   }
-  console.log(`seo-shell-redirect: routed ${n} of ${total} ${label} pages into the full mobile shell`);
+  console.log('seo-shell-redirect: removed legacy route redirects from ' + n + ' of ' + total + ' ' + label + ' pages');
 }
 
 if (process.argv[1] && process.argv[1].endsWith('seo-shell-redirect.mjs')) {
