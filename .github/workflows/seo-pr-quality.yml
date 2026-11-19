@@ -110,6 +110,8 @@ jobs:
             node --check cat-feel.js
             node --check product-links.js
             node --check rewrite-static-product-links.mjs
+            node --check admin-blog.js
+            node --check kili-pages.js
             node --check site-links.js
             node --check storefront-live.js
             node --check product-trust.js
