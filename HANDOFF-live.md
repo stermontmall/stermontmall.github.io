@@ -470,3 +470,9 @@ Product images are stored in the public product-images bucket and passed the >15
 A temporary VON VPS40X5LPK draft was removed because no suitable product image passed the image validation threshold. Its unused image object may remain unreferenced in Storage.
 
 The Build product pages GitHub Actions workflow is scheduled every 30 minutes; the five newly active product pages will be regenerated on the next scheduled run. Do not manually create duplicate product rows while that build is pending.
+
+## 2026-11-20 01:40 Africa/Nairobi — Claude: full mobile shell on direct /p/ and /c/ pages (PR #989) + shell product links (PR #991)
+- Done: build failure on branch fix/shell-product-links-2026-11-19-v2 was an invalid regex in product-link-normalizer.mjs (already fixed by commit 251243b; PR #991 builds clean on Node 22).
+- Done: PR #989 failed route-regression because committed /p/ and /c/ pages had no shell-route-loader. Ran `node seo-shell-redirect.mjs` and pushed the result to the PR branch (commit 2f723e7). All PR #989 checks are green.
+- NOTE: that commit touches generated pages (p/, c/); product-pages.yml regenerates them anyway after merge.
+- Next: owner merges #989 and #991, then `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`, then open /p/darvin-50ew-insecticide-28-ml.html on a phone and confirm the full shell loads. #987 duplicates #989 and can be closed.
