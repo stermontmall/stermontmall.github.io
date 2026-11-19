@@ -19,6 +19,7 @@ on:
       - 'mobile-shell/description.test.mjs'
       - 'product-description-html.mjs'
       - 'product-description-html.test.mjs'
+      - 'product-page-design.test.mjs'
       - 'seo-description-layout.mjs'
       - 'seo-indexing-guard.test.mjs'
       - 'category-hubs.mjs'
