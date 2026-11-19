@@ -115,6 +115,7 @@ const kili = readFileSync('kili-pages.js', 'utf8');
 assert.ok(kili.includes('var cartHref = window.shellProductLink(pid)'));
 const receipt = readFileSync('receipt.js', 'utf8');
 assert.doesNotMatch(receipt, /\/p\/[a-z0-9-]+\.html|classic\.html/i);
+assert.ok(generator.includes('href="${SITE}/p/${encodeURIComponent(sl(p.id))}.html"')); // Homepage SEO crawl links stay on canonical product pages
 assert.ok(generator.includes('seo-links:start')); // Homepage crawler links remain in their dedicated block
 const sitemap = readFileSync('seo-extras.mjs', 'utf8');
 assert.ok(sitemap.includes('${SITE}/p/${f}')); // sitemap-products.xml keeps canonical /p/ URLs
