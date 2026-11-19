@@ -1,3 +1,11 @@
+## 2026-11-19 14:55 (Africa/Nairobi) - PR #970 quality gate failing: mobile-shell product/category route checks
+- Reproduced locally on branch `mobile-shell-default-all-routes-2026-11-19` (run `node seo-shell-chrome.mjs` then `python3 mobile-shell/shell.test.py`). Failing: product/category route checks (phone, Googlebot, WhatsApp, desktop, ?classic=1) in `mobile-shell/shell.test.py` (~lines 486-500 and the category equivalents). The "no console errors" failure was sandbox network only.
+- Likely cause (unconfirmed): those checks expect `location.pathname == '/'` after opening `/p/<slug>.html` or `/c/<slug>.html`, but the shell restores the clean `/p/` or `/c/` address after load, which other passing address tests expect.
+- No fix committed yet. Generated pages touched by the fixture step were discarded, not committed.
+- Next: print pathname and `#page-product.open` count after load (temporary copy of the test) to confirm, then update the checks to the `/p/`, `/c/` address plus shell view. Do not edit generated pages.
+
+---
+
 ## 2026-11-19 08:02 (Africa/Nairobi) — Fix stale product-category links and improve high-opportunity snippets
 - Done (branch `wip-fix-stale-category-links`, PR #903): `product-description-html.mjs` now rewrites legacy Markdown links from `/category/<slug>` to the current `/c/<slug>.html` routes, including absolute Stermont Arcade URLs. Added regression checks for the five routes from the 2026-11-19 daily SEO report.
 - Done: added the product-description renderer test to the SEO PR quality gate and its path triggers.
