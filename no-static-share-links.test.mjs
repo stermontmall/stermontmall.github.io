@@ -64,7 +64,7 @@ for (const file of walk('.')) {
   }
   // The explicit SEO crawl block and product breadcrumb are allowlisted, never treated as customer CTAs.
   source = source.replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, '');
-  source = source.replace(/<nav\\b[^>]*class=["'][^"']*\\bbc\\b[^"']*["'][^>]*>[\\s\\S]*?<\\/nav>/gi, '');
+  source = source.replace(/<nav\b[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi, '');
   if (HUMAN_PRODUCT.test(source)) offenders.push(file + ' (static product URL)');
   if (HUMAN_CLASSIC.test(source)) offenders.push(file + ' (classic URL)');
 }
