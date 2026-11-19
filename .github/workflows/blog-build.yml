@@ -12,7 +12,6 @@ on:
       - 'seo-safe-blog-meta.mjs'
       - 'seo-safe-blog-meta.test.mjs'
       - 'product-links.js'
-      - 'rewrite-static-product-links.mjs'
       - 'no-static-share-links.test.mjs'
       - 'blog-write.mjs'
       - 'seo-pest/blog-build.mjs'
@@ -58,7 +57,6 @@ jobs:
       - name: Rebuild blog index and sitemap entries
         run: node blog-build.mjs
       - name: Migrate legacy customer-facing product links safely
-        run: node rewrite-static-product-links.mjs
       - name: Verify customer links and preserved SEO surfaces
         run: node no-static-share-links.test.mjs
 
@@ -66,7 +64,7 @@ jobs:
         run: |
           git config user.name "bot"
           git config user.email "bot@users.noreply.github.com"
-          git add p/*.html c/*.html blog/*.html guides/*.html services/*.html pest-control/*.html *.html sitemap.xml
+          git add blog/*.html blog/index.html sitemap.xml
           if git diff --cached --quiet; then
             echo "Nothing changed - no commit needed."
           else
