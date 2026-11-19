@@ -17,6 +17,10 @@ on:
       - 'catalog-v10.js'
       - 'product-codes.test.mjs'
       - 'admin-pricing-rules.js'
+      - 'admin-pricing-rules.test.mjs'
+      - 'rules/publishing-rule.json'
+      - 'database/**'
+      - '.claude/commands/post-product.md'
       - 'PUBLISHING.md'
       - 'PRICING-RULES.md'
       - 'supabase/sql/**'
@@ -101,7 +105,7 @@ jobs:
       - name: Test permanent product-code display and admin integration
         run: node product-codes.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/06-product-codes.log"
       - name: Test visible staff pricing rule and restricted access
-        run: node admin-pricing-rules.test.mjs 2>&1 | tee \"$RUNNER_TEMP/ci-logs/06a-pricing-rules.log\"
+        run: node admin-pricing-rules.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/06a-pricing-rules.log"
       - name: Check JavaScript syntax
         run: |
           {
