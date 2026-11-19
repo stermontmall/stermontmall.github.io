@@ -29,7 +29,7 @@
     pg.setAttribute('data-extras', '1');
     var title = h1.textContent.trim();
     var can = document.querySelector('link[rel="canonical"]');
-    var slug = decodeURIComponent(location.pathname.replace(/^\\/p\\//, '').replace(/\\.html$/, ''));
+    var slug = decodeURIComponent(location.pathname.replace(/^\/p\//, '').replace(/\.html$/, ''));
     var url = window.shellProductLink ? window.shellProductLink(slug) : ((can && can.href) || location.href.split('#')[0]);
     var enc = encodeURIComponent;
 
