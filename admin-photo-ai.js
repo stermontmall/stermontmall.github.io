@@ -137,8 +137,8 @@
       photoUrl.type = 'url'; photoUrl.placeholder = 'https://example.com/product-photo.jpg'; photoUrl.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
       var urlLabel = el('label', null, 'Source product website URL'), url = el('input');
       url.type = 'url'; url.placeholder = 'https://example.com/product-page'; url.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
-      var priceLabel = el('label', null, 'Owner-approved manual selling-price override (optional)'), price = el('input');
-      price.type = 'number'; price.min = '1'; price.step = '0.01'; price.placeholder = 'Leave blank to use official four-tier pricing'; price.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
+      var priceLabel = el('label', null, 'Selling price (calculated automatically)'), price = el('input');
+      price.type = 'text'; price.value = 'Official four-tier rule'; price.readOnly = true; price.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit;background:#f8f7fc';
       var preview = el('img'); preview.alt = 'Selected product preview'; preview.hidden = true; preview.style.cssText = 'display:block;max-width:140px;max-height:120px;object-fit:contain;margin-top:.6rem;border-radius:8px';
       var remove = button('Remove', 'alt sm', function () { rows = rows.filter(function (r) { return r.card !== card; }); card.remove(); renumber(); update(); });
       var line = el('div', 'acts'); line.append(remove);
@@ -202,7 +202,7 @@
         chain = chain.then(function () {
           progress.textContent = 'Processing ' + (i + 1) + ' of ' + chosen.length + '…';
           return photoPayload(r).then(function (photo) {
-            var body = { url: r.url.value.trim(), selling_price_kes: r.price.value.trim() || undefined };
+            var body = { url: r.url.value.trim() };
             Object.keys(photo).forEach(function (k) { body[k] = photo[k]; });
             return window.STMAdmin.raw('/functions/v1/ai-add-product', {
               method: 'POST',
@@ -216,7 +216,7 @@
               saved++;
               var card = el('div', 'card done');
               card.appendChild(el('h4', null, '✓ Draft saved: ' + data.product.name));
-              card.appendChild(el('p', null, data.source_price_kes == null ? 'Owner-set selling price: KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' · No markup · Not published' : 'Source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Selling price follows official four-tier rule · Not published'));
+              card.appendChild(el('p', null, 'Verified source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Baseline cost: KSh ' + Number(data.baseline_cost_kes).toLocaleString('en-KE') + ' · Four-tier selling price: KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' · Not published'));
               card.appendChild(el('p', 'meta', 'SEO title: ' + data.seo_title));
               card.appendChild(el('p', 'meta', 'Meta description preview: ' + data.meta_description_preview));
               card.appendChild(el('p', 'meta', data.price_note || data.page_note || 'Source price verified.'));
