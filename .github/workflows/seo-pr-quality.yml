@@ -159,6 +159,7 @@ jobs:
         run: |
           {
             node seo-kenya.mjs
+            node seo-related-fill.mjs
             node seo-overrides.mjs
             node seo-titles.mjs
             node seo-safe-meta.mjs
