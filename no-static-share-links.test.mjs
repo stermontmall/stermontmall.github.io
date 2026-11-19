@@ -84,8 +84,9 @@ if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
         .replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '')
         .replace(/<nav[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi, '')
         .replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, '');
-      try { html = decodeURIComponent(html.replace(/&amp;/g, '&')); } catch {}
+      const hrefs = [...html.matchAll(/\\bhref=(['\"])(.*?)\\1/gi)].map(match => { try { return decodeURIComponent(match[2]); } catch { return match[2]; } });
       scanned++;
+      if (hrefs.some(href => /\\/p\\/[^?#\\s]+\\.html|\\/classic\\.html/i.test(href))) generatedOffenders.push(file);
       if (/(?:href\s*=\s*["'][^"']*\/p\/|Link:\s*[^\n<]*\/p\/|href\s*=\s*["'][^"']*\/classic\.html)/i.test(html)) {
         generatedOffenders.push(file);
       }
