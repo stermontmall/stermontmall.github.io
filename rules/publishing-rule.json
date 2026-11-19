@@ -56,5 +56,46 @@
     "delivery_details": "M-Pesa checkout, Sarit Centre Westlands pickup coordination, delivery across all 47 counties subject to courier and stock coverage, WhatsApp +254 748 888 230.",
     "chemical_safety": "Never invent dilution rates, approved uses, PPE, label instructions, registration, efficacy, warranty or safety claims.",
     "faq_count": 4
+  },
+  "pricing": {
+    "baseline_source": "Lowest reliable Kenyan wholesale/distributor price; if only reputable in-stock retail exists, baseline = lowest retail x 0.85.",
+    "tiers": [
+      {
+        "baseline": "< 20000 KES",
+        "markup_pct": 30,
+        "multiplier": 1.3
+      },
+      {
+        "baseline": "20000-39999 KES inclusive",
+        "markup_pct": 25,
+        "multiplier": 1.25
+      },
+      {
+        "baseline": "40000-60000 KES inclusive",
+        "markup_pct": 20,
+        "multiplier": 1.2
+      },
+      {
+        "baseline": "> 60000 KES",
+        "markup_pct": 17.5,
+        "multiplier": 1.175
+      }
+    ],
+    "minimum_margin_pct": 15,
+    "rounding": "nearest KSh 50",
+    "minimum_storefront_price_kes": 200,
+    "syngenta": "Skip new Syngenta pricing and leave existing Syngenta price/cost unchanged unless owner explicitly instructs otherwise.",
+    "database_enforcement": "public.products_posting_rules() recalculates every new insert using public.price_4tier(cost)."
+  },
+  "inventory_defaults": {
+    "stock": 1000,
+    "low_at": 20,
+    "featured": false,
+    "active": false
+  },
+  "admin_portal": {
+    "path": "/admin.html#pricing-rules",
+    "source": "public.publishing_rules",
+    "key": "autonomous_bulk_product_publishing"
   }
 }
