@@ -33,6 +33,8 @@ assert.match(admin, /catalog-v10\\.js\\?v=15/);
 assert.match(catalog, /function up\\(n\\)[\\s\\S]*b < 20000[\\s\\S]*b < 40000[\\s\\S]*b <= 60000[\\s\\S]*1\\.175/);
 assert.match(catalog, /rest\\/v1\\/rpc\\/price_4tier/);
 assert.doesNotMatch(catalog, /MARKUP\\s*=\\s*1\\.30/);
+assert.match(catalog, /Syngenta is excluded from automatic repricing/);
+assert.match(sqlHelper, /v_name ilike '%syngenta%'/);
 assert.match(catalog, /edit \\? p\\.stock : '1000'/);
 assert.match(catalog, /edit \\? p\\.low_at : 20/);
 assert.match(sqlHelper, /public\\.price_4tier\\(v_source_cost\\)/);
