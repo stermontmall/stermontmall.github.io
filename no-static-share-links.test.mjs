@@ -85,7 +85,7 @@ assert.deepEqual(offenders, [], 'human-facing static product/classic links found
 const generator = readFileSync('generate-products.mjs', 'utf8');
 const relatedFill = readFileSync('seo-related-fill.mjs', 'utf8');
 assert.match(relatedFill, /shellHref: shellProductLink/);
-assert.match(relatedFill, /href="\\$\\{p\\.shellHref\\}"/);
+assert.ok(relatedFill.includes('href="${p.shellHref}"'));
 assert.match(generator, /<link rel="canonical" href="\$\{SITE\}\$\{path\}">/);
 assert.match(generator, /property="og:url" content="\$\{SITE\}\$\{path\}"/);
 assert.match(generator, /url: SITE \+ path/);
