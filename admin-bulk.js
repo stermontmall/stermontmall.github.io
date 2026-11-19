@@ -113,8 +113,6 @@
           var cost = g('price') === '' ? null : Number(g('price').replace(/,/g, ''));
           if (cost != null && !(cost > 0)) o.errs.push('Baseline cost must be a positive KES amount');
           o.cost = cost; o.price = cost != null && cost > 0 ? up(cost) : null;
-          if (o.cost == null || !(o.cost > 0)) o.errs.push('Needs a verified baseline_cost_kes');
-          if (/syngenta/i.test(o.name)) o.errs.push('Syngenta is excluded from automatic pricing');
           var old = g('old') === '' ? null : Number(g('old').replace(/,/g, '')); if (old != null && !(old > o.price)) { o.warns.push('Old price ignored (must be higher than the calculated price)'); old = null; } o.old = old;
           o.stock = 1000; o.unit = g('unit'); o.desc = g('desc'); o.featured = false;
           var toks = g('photo').split(/[;|]/).map(function (x) { return x.trim(); }).filter(Boolean);
@@ -123,6 +121,8 @@
           if (o.missing.length) o.warns.push('Photo not selected: ' + o.missing.join(', '));
           if (!o.files.length && !(exist[o.id] && (exist[o.id].images || []).length)) o.warns.push('No photo: left out of Google Shopping');
           var ex = exist[o.id]; o.action = ex ? 'update' : 'create'; o.existing = ex || null;
+          if (o.action === 'create' && (o.cost == null || !(o.cost > 0))) o.errs.push('Needs a verified baseline_cost_kes');
+          if (o.action === 'create' && /syngenta/i.test(o.name)) o.errs.push('Syngenta is excluded from automatic pricing');
           if (o.action === 'create') {
             var sib = prods.filter(function (p) { return norm(p.name) === norm(o.name); });
             if (sib.length) { var withG = sib.filter(function (p) { return p.variant_group; })[0]; if (o.pack && withG) o.group = withG.variant_group; else if (o.pack) o.errs.push('"' + o.name + '" exists without a pack size: use Catalog → ＋ Pack size'); else o.errs.push('"' + o.name + '" already exists: add a pack_size or change the name'); }
