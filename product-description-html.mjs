@@ -8,7 +8,9 @@
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const normalizeInternalPath = path => path.replace(/^\/category\/([a-z0-9][a-z0-9-]*)\/?$/i, '/c/$1.html');
 const stripSupplierAttribution = value => String(value || '')
-  .replace(/(?:Agropests\s+(?:lists|says|describes|states|offers|supplies)\b[^.!?]*[.!?]?|Supplier\s*:\s*Agropests\b[^.!?\n]*[.!?]?|(?:this product is )?sold by other suppliers\b[^.!?]*[.!?]?)/gi, '')
+  .replace(/(?:^|(?<=[.!?]\s))[^.!?]*(?:Agropests|the supplier|supplier(?:'s)?|sold by other suppliers)[^.!?]*[.!?]?/gi, ' ')
+  .replace(/Supplier\s*:\s*[^.\n]+[.]?/gi, ' ')
+  .replace(/(?:^|[\n;])\s*Pack:\s*(?:piece|pieces|pc|pcs)\s*(?=$|[\n;])/gi, ' ')
   .replace(/\s{2,}/g, ' ').trim();
 const inline = s => esc(s)
   .replace(/\[([^\]]+)\]\((?:https?:\/\/stermontarcade\.co\.ke)?(\/[^)\s]*)\)/g, (_match, label, path) => `<a href="${normalizeInternalPath(path)}">${label}</a>`)
