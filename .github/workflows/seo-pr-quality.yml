@@ -12,6 +12,7 @@ on:
       - 'storefront-live.js'
       - 'product-trust.js'
       - 'product-seo-optimizer.js'
+      - 'admin-*.js'
       - 'no-static-share-links.test.mjs'
       - '.github/workflows/blog-build.yml'
       - 'services/*.html'
@@ -108,6 +109,7 @@ jobs:
             node --check storefront-live.js
             node --check product-trust.js
             node --check product-seo-optimizer.js
+            for f in admin-*.js; do node --check "$f"; done
             node --check product-description-html.mjs
             node --check blog-write.mjs
             node --check seo-pest/blog-build.mjs
