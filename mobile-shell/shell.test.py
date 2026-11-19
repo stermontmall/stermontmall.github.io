@@ -523,7 +523,7 @@ with sync_playwright() as p:
     check('shell address /?cat=<slug>: the address becomes the clean /c/<slug>.html address (no leftover ?cat=)', p12.evaluate('location.pathname + location.search') == '/c/garden-outdoors.html', p12.url)
     p12.goto(f'{BASE}/?cat=kitchen-dining'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     ids = p12.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
-    check('shell address /?cat=<sub-category> opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname') == '/c/kitchen-dining.html', ids)
+    check('shell address /?cat=<sub-category> opens its parent category filtered to that sub-category', ids and all(i.startswith('home-') for i in ids) and p12.evaluate('location.pathname + location.search') == '/?cat=kitchen-dining', ids)
     p12.goto(f'{BASE}/?cat=no-such-category'); p12.wait_for_selector('#grid .card[data-id]', timeout=15000); p12.wait_for_timeout(600)
     check('shell address /?cat=<unknown> shows a notice and the normal home', 'no longer available' in p12.locator('#toast').inner_text(), p12.locator('#toast').inner_text())
     check('category pages: no page errors', not e12, e12[:3])
