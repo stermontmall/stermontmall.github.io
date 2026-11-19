@@ -3,7 +3,11 @@ export function buildCategoryIntro(category, baseIntro = '') {
   const name = String(category?.name || 'products').trim();
   const examples = (category?.items || []).slice(0, 3).map(p => p.name).filter(Boolean);
   const exampleText = examples.length ? 'Examples currently listed include ' + examples.join(', ') + '.' : 'Check the live listings for the models and pack sizes currently available.';
-  const opening = String(baseIntro || '').replace(/\s+/g, ' ').trim();
+  let opening = String(baseIntro || '').replace(/\s+/g, ' ').trim();
+  opening = opening.replace(/Product titles and pack sizes can differ, so\.?/gi, 'Compare each listing’s full description, price, images and exact pack-size details.');
+  const openingSentences = opening.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+  const seenOpening = new Set();
+  opening = openingSentences.filter(sentence => { const key = sentence.toLowerCase().replace(/\s+/g, ' ').trim(); if (!key || seenOpening.has(key)) return false; seenOpening.add(key); return true; }).join(' ').trim();
   const categoryKey = name + ' ' + String(category?.slug || '');
   const isPest = /pest|termite|bed.?bug|rodent|fumigation|insect|mosquito|fly|sprayer/i.test(categoryKey);
   const isTrap = /insect.?light|uv.?lamp|fly.?trap/i.test(categoryKey);
