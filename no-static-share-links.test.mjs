@@ -87,9 +87,12 @@ const relatedFill = readFileSync('seo-related-fill.mjs', 'utf8');
 assert.match(relatedFill, /shellHref: shellProductLink/);
 assert.match(relatedFill, /href="\\$\\{p\\.shellHref\\}"/);
 assert.match(generator, /<link rel="canonical" href="\$\{SITE\}\$\{path\}">/);
+assert.match(generator, /property="og:url" content="\$\{SITE\}\$\{path\}"/);
 assert.match(generator, /url: SITE \+ path/);
-assert.match(generator, /crumbLd\(\[\['Home', SITE \+ '\/'\]/);
-assert.match(generator, /sitemap-products|sitemap/);
+assert.match(generator, /crumbLd\(\[\['Home', SITE \+ '\/'\]/); // BreadcrumbList remains on the canonical product page
+assert.match(generator, /seo-links:start/); // Homepage crawler links remain in their dedicated block
+const sitemap = readFileSync('seo-extras.mjs', 'utf8');
+assert.match(sitemap, /\$\{SITE\}\/p\/\$\{f\}/); // sitemap-products.xml keeps canonical /p/ URLs
 assert.ok(SEO_SURFACE_ALLOWLIST.length === 5);
 
 console.log('OK: customer-facing product links use the mobile shell; SEO-only /p/ surfaces remain allowlisted.');
