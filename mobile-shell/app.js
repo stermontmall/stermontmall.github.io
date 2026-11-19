@@ -262,7 +262,8 @@ window.addEventListener('popstate', e => {
   if (!stack.length && opener) { opener.focus?.({ preventScroll: true }); opener = null; }
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
-const DEEP = new URLSearchParams(location.search).get('product');   // /?product=<slug>: a shared or reloaded product address, opened after the catalog loads
+const PRODUCT_PATH = /^\/p\/([^/]+)\.html$/i.exec(location.pathname);
+const DEEP = new URLSearchParams(location.search).get('product') || (PRODUCT_PATH ? decodeURIComponent(PRODUCT_PATH[1]) : null);   // Shared query links and direct /p/<slug>.html pages open the same in-shell product view
 let deepOpen = false;   // the product page for DEEP has been opened (by the fast path in section 9b, or after the full catalog)
 /* /?cart=<product id>:<qty>,<product id>:<qty>: a shared cart link (the Share cart link button). The cart itself lives in each phone's own storage, so the link
    carries the lines. They are kept in sessionStorage until the catalog has added them, so a reload before that does not lose them. */
@@ -277,7 +278,8 @@ const CART_DEEP = (() => {
 })();
 const TAB_DEEP = CART_DEEP.length ? 'cart' : new URLSearchParams(location.search).get('tab');   // /?tab=cart|categories|deals|account: the bottom nav of the static pages (shell-chrome.js); a shared cart link opens the cart
 const Q_DEEP = (new URLSearchParams(location.search).get('q') || '').trim().slice(0, 80);   // /?q=<words>: the search box of the static pages
-const CAT_DEEP = new URLSearchParams(location.search).get('cat');   // /?cat=<slug>: a category (or sub-category) page address; /c/<slug>.html sends phones here
+const CATEGORY_PATH = /^\/c\/([^/]+)\.html$/i.exec(location.pathname);
+const CAT_DEEP = new URLSearchParams(location.search).get('cat') || (CATEGORY_PATH ? decodeURIComponent(CATEGORY_PATH[1]) : null);   // Query deep links and direct /c/<slug>.html pages open the in-shell category
 /* A reload keeps the tab the customer was on: the browser hands back the state of the current history entry, and every tab hop stores its tab in it
    (goTab). The first view is Home only for a fresh visit or an unknown tab. The tab is shown at the very end of this file, once the views exist. */
 const TABS = ['home', 'categories', 'deals', 'cart', 'account'];
