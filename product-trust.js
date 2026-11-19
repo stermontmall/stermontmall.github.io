@@ -33,7 +33,9 @@
     c.appendChild(ul);
     var s = mk('small'); s.appendChild(D.createTextNode('Pay by M-Pesa \u00B7 48-hour returns on faulty items. '));
     var a = mk('a', null, 'Ask about stock or delivery fees on WhatsApp');
-    a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Hello Stermont Arcade, is this in stock and how much is delivery to my area? ' + name + ' ' + ((window.shellProductLink && location.pathname.match(/^\\/p\\/([^/]+)\\.html$/i)) ? window.shellProductLink(decodeURIComponent(location.pathname.match(/^\\/p\\/([^/]+)\\.html$/i)[1])) : location.href));
+    var productPath = location.pathname.match(/^\\/p\\/([^/]+)\\.html$/i);
+    var productLink = productPath && window.shellProductLink ? window.shellProductLink(decodeURIComponent(productPath[1])) : location.href;
+    a.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Hello Stermont Arcade, is this in stock and how much is delivery to my area? ' + name + ' ' + productLink);
     a.target = '_blank'; a.rel = 'noopener';
     s.appendChild(a); s.appendChild(D.createTextNode('. We reply 8:00 AM to 9:00 PM every day.')); c.appendChild(s);
     return c;
