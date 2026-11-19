@@ -165,7 +165,7 @@
           }
           return catId(o).then(function (cid) {
             var row = { id: o.id, category_id: cid, name: o.name, price: o.price, cost: o.cost, stock: 1000, low_at: 20, featured: false, active: false, images: imgs };
-            if (o.desc) row.description = o.desc; if (o.old != null) row.old_price = Math.max(Math.round(o.old / 50) * 50, row.price + 50); if (o.unit) row.unit = o.unit; if (o.pack) { row.variant_label = o.pack; row.variant_group = o.group; }
+            if (o.desc) row.description = o.desc; if (o.old != null) { var oldRounded = Math.round(o.old / 50) * 50; if (oldRounded > row.price) row.old_price = oldRounded; } if (o.unit) row.unit = o.unit; if (o.pack) { row.variant_label = o.pack; row.variant_group = o.group; }
             return req('/rest/v1/products', 'POST', row, 'return=minimal');
           });
         });
