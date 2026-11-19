@@ -16,7 +16,7 @@ const CHECK = args.has('--check');
 
 // Generated pages (p/, c/, blog/, products.html) are owned by their own build scripts and already complete.
 const PAGES = readdirSync('.').filter(f => f.endsWith('.html') && !/^(admin|upload-photos|google|builder|index\.html|products\.html)/.test(f));
-const TITLES = { 'about.html': 'About', 'contact.html': 'Contact', 'faq.html': 'FAQ', 'privacy.html': 'Privacy', 'returns.html': 'Returns', 'shipping.html': 'Shipping', 'terms.html': 'Terms' };
+const TITLES = { 'about.html': 'About', 'contact.html': 'Contact', 'faq.html': 'FAQ', 'privacy-policy.html': 'Privacy', 'returns.html': 'Returns', 'shipping.html': 'Shipping', 'terms.html': 'Terms' };
 
 const esc = s => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const unesc = s => s.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
