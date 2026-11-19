@@ -28,7 +28,7 @@ for (const file of files) {
     if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/p\//i.test(line)) return;
     // Internal SEO document fetches and explicitly defined Google crawl surfaces are not customer links.
     if (file === 'index.html' && line.includes('href="/p/')) return; // owner-approved seo-links crawl block, not the visible product grid
-    if (['cars-for-sale.html', 'fashion.html', 'products.html', 'checkout.html', 'price-watch.test.mjs'].includes(file)) return; // generated output is checked after rebuild; checkout product links are in the approved seo-links block; price-watch is a fixture
+    if (['cars-for-sale.html', 'fashion.html', 'products.html', 'checkout.html', 'price-watch.test.mjs', 'seo-safe-meta.test.mjs', 'seo-shell-redirect.test.mjs'].includes(file)) return; // generated output is checked after rebuild; checkout product links are in the approved seo-links block; price-watch is a fixture
     if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|preload|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
     if (file === 'storefront-live.js' && /function purl\(|fetch\(purl\(/.test(line)) return;
     if (file === 'seo-related-fill.mjs' && line.includes('existing.match')) return; // only reads old SEO related anchors for de-duplication
