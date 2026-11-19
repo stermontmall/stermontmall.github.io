@@ -60,6 +60,12 @@ assert.ok(generator.includes('${normalizeCustomerProductLinks(body)}'),
 for (const marker of ['href="${shellProductLink(sl(p.id))}"', '`Link: ${shellProductLink(sl(p.id))}`', '${shellProductLink(v.slug || p.slug || p.id)}']) {
   assert.ok(generator.includes(marker), 'product generator must use shellProductLink for: ' + marker);
 }
+// Pack-size alias stubs (e.g. p/abasi-5-ec-100-ml.html) keep the static canonical URL only in <head>
+// (canonical + meta refresh). Their visible "Continue" anchor must open the mobile shell.
+assert.ok(generator.includes('<a href="${shellProductLink(sl(a.to))}">Continue to the product page</a>'),
+  'alias redirect stubs must link visitors to the shell ?product= URL');
+assert.ok(!generator.includes('<a href="${to}">'),
+  'alias redirect stubs must not render a visible anchor to the static /p/ canonical URL');
 assert.match(readFileSync('site-links.js', 'utf8'), /shellProductLink/, 'share/copy controls must use shell links');
 assert.match(readFileSync('mobile-shell/app.js', 'utf8'), /const productUrl = .*shellProductLink/, 'mobile shell share URL must use shellProductLink');
 assert.match(readFileSync('storefront-live.js', 'utf8'), /Link: ' \+ shareProductUrl/, 'storefront WhatsApp prefill must use shell links');
