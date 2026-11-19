@@ -6,6 +6,8 @@
 // Each draft is written for search intent: a direct answer box first, question-style headings, a comparison table,
 // an FAQ (with FAQPage structured data), links to the right shop categories and related guides.
 import { readFileSync, writeFileSync, existsSync, readdirSync, appendFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const MODEL = process.env.BLOG_MODEL || 'claude-sonnet-5-5';
 // FREE option: a Google Gemini API key (https://aistudio.google.com/apikey, no card needed) works instead of an Anthropic key.
