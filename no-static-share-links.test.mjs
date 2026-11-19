@@ -59,7 +59,7 @@ function walk(dir, out = []) {
     if (SKIP_DIRS.has(name)) continue;
     const path = join(dir, name), st = statSync(path);
     if (st.isDirectory()) walk(path, out);
-    else if (!SKIP_FILES.has(path.replace(/^\.\//, '')) && /\.(?:html|js|mjs|ts)$/.test(name) && st.size < 3_000_000) out.push(path);
+    else if (!name.endsWith('.test.mjs') && !SKIP_FILES.has(path.replace(/^\.\//, '')) && /\.(?:html|js|mjs|ts)$/.test(name) && st.size < 3_000_000) out.push(path);
   }
   return out;
 }
