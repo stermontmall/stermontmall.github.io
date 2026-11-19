@@ -15,6 +15,12 @@ ok(/<h3>Safety, Storage &amp; Handling Guidelines<\/h3><p>Read the label before 
 ok(/<strong>Why a gel\?<\/strong><br>Cockroaches eat it\. It is neat\./.test(out), 'FAQ question and multi-sentence answer');
 ok(/<strong>How much\?<\/strong><br>Use small dots\./.test(out), 'second FAQ item');
 
+// Compound legacy labels must not leak their suffixes into visible paragraph text.
+const compoundLabels = productDescriptionHtml('PRODUCT SUMMARY\nA sourcing introduction. SPECIFICATIONS & DETAILS\n• Model: Example. ORDERING, PAYMENT & DELIVERY\nConfirm availability and the final quote. IMAGE CREDIT\nPhoto source: manufacturer reference image.');
+assert.deepEqual(heads(compoundLabels), ['Product Overview & Key Benefits', 'Technical Specifications & Pack Details', 'Delivery across Kenya & Nairobi Pickup', 'Image credits']); n++;
+ok(!/&amp; DETAILS|PAYMENT &amp; DELIVERY|IMAGE CREDIT/.test(compoundLabels), 'compound labels are consumed as headings, not displayed in body text');
+ok(/<h3>Image credits<\/h3><p>Photo source: manufacturer reference image\.<\/p>/.test(compoundLabels), 'image credit attribution is retained under its own heading');
+
 // New premium-format headings must become distinct semantic sections.
 const premium = productDescriptionHtml('PRODUCT OVERVIEW\nA product-specific opening. KEY FEATURES & BENEFITS\n• Confirmed feature: practical benefit. SPECIFICATIONS\n• Pack size: 500 ml. BUYING GUIDE\nChoose by the exact use case. IMPORTANT NOTES\nCheck the current label. ORDERING & DELIVERY\nAsk for current availability.');
 assert.deepEqual(heads(premium), ['Product Overview & Key Benefits', 'Technical Specifications & Pack Details', 'Buying & Pack-Size Guide', 'Delivery across Kenya & Nairobi Pickup', 'Important notes']); n++;

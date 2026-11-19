@@ -15,7 +15,7 @@ const inline = s => esc(s)
 const LABELS = [
   ['Product overview', /(?:^|\s)(?:PRODUCT SUMMARY|PRODUCT OVERVIEW)\s*:?\s*/g],
   ['Key features & benefits', /(?:^|\s)KEY PRODUCT FEATURES\s*:?\s*|(?:^|\s)KEY FEATURES(?:\s*&\s*BENEFITS)?\s*:?\s*/g],
-  ['Specifications & product details', /(?:^|\s)SPECIFICATIONS\s*:?\s*/g],
+  ['Specifications & product details', /(?:^|\s)SPECIFICATIONS(?:\s*&\s*DETAILS)?\s*:?\s*/g],
   ['Uses & applications', /(?:^|\s)WHERE IT HELPS\s*:?\s*|(?:^|\s)APPLICATION(?:S)?\s*&?\s*USE\s*:?\s*/g],
   ['Application & dosage guidelines', /(?:^|\s)APPLICATION\s*&\s*DOSAGE GUIDELINES\s*:?\s*/g],
   ['How to use', /(?:^|\s)HOW TO USE(?: IT)?\s*:?\s*|(?:^|\s)DIRECTIONS FOR USE\s*:?\s*/g],
@@ -27,7 +27,8 @@ const LABELS = [
   ['Important notes', /(?:^|\s)IMPORTANT NOTES\s*:?\s*/g],
   ['Frequently asked questions', /(?:^|\s)FREQUENTLY ASKED QUESTIONS\s*|(?:^|\s)FAQS?\s*/g],
   ['Vehicle enquiry & next steps', /(?:^|\s)VEHICLE ENQUIRY\s*(?:&|AND)\s*NEXT STEPS\s*:?\s*/g],
-  ['Ordering & delivery', /(?:^|\s)ORDERING(?:\s*&\s*DELIVERY)?\s*:?\s*|(?:^|\s)ORDER\s*:?\s*/g]
+  ['Ordering & delivery', /(?:^|\s)ORDERING(?:\s*,\s*PAYMENT\s*&\s*DELIVERY|\s*&\s*DELIVERY)?\s*:?\s*|(?:^|\s)ORDER\s*:?\s*/g],
+  ['Image credits', /(?:^|\s)IMAGE\s+CREDITS?\s*:?\s*/g]
 ];
 
 // "Question? Answer. Question? Answer." run together in one paragraph -> one block per question.
