@@ -16,6 +16,10 @@ on:
       - 'seo-pest/**'
       - 'catalog-v10.js'
       - 'product-codes.test.mjs'
+      - 'admin-pricing-rules.js'
+      - 'PUBLISHING.md'
+      - 'PRICING-RULES.md'
+      - 'supabase/sql/**'
       - 'seo-overrides.json'
       - 'product-description-html.mjs'
       - 'product-description-html.test.mjs'
@@ -104,6 +108,7 @@ jobs:
             node --check seo-shell-redirect.mjs
             node --check seo-shell-redirect.test.mjs
             node --check catalog-v10.js
+            node --check admin-pricing-rules.js
             node --check product-codes.test.mjs
             node --check seo-check.mjs
             node --check data-health.mjs
