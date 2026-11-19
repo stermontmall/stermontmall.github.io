@@ -36,7 +36,7 @@
     head.appendChild(el('hr'));
 
     head.appendChild(el('p', 'meta', 'Add up to 10 products in one session. For each item, upload its photo from your device OR paste a direct link to the photo, and paste the exact product page URL. AI reads the product and source price, writes the listing and SEO fields, then saves it as an unpublished draft for your review.'));
-    head.appendChild(el('p', 'meta', 'Price rule: use the exact source KSh/KES price with the 30% markup, or enter your own selling price to override it. Owner-set prices are saved exactly with no markup.'));
+    head.appendChild(el('p', 'meta', 'Price rule: verified wholesale/distributor KES price is the baseline. If only a reputable Kenyan retail price is available, baseline cost is 85% of that price. The official four-tier markup, 15% minimum floor, nearest KSh 50 rounding and KSh 200 minimum are applied automatically. A manual selling-price override is only for an explicitly owner-approved exception.'));
     var status = el('p', 'meta', '0 of 10 product slots used.');
     var actions = el('div', 'acts');
     var add = button('+ Add product', 'alt', addRow);
@@ -137,8 +137,8 @@
       photoUrl.type = 'url'; photoUrl.placeholder = 'https://example.com/product-photo.jpg'; photoUrl.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
       var urlLabel = el('label', null, 'Source product website URL'), url = el('input');
       url.type = 'url'; url.placeholder = 'https://example.com/product-page'; url.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
-      var priceLabel = el('label', null, 'Your selling price in KSh (optional override)'), price = el('input');
-      price.type = 'number'; price.min = '1'; price.step = '0.01'; price.placeholder = 'Leave blank to use source price + 30%'; price.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
+      var priceLabel = el('label', null, 'Owner-approved manual selling-price override (optional)'), price = el('input');
+      price.type = 'number'; price.min = '1'; price.step = '0.01'; price.placeholder = 'Leave blank to use official four-tier pricing'; price.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
       var preview = el('img'); preview.alt = 'Selected product preview'; preview.hidden = true; preview.style.cssText = 'display:block;max-width:140px;max-height:120px;object-fit:contain;margin-top:.6rem;border-radius:8px';
       var remove = button('Remove', 'alt sm', function () { rows = rows.filter(function (r) { return r.card !== card; }); card.remove(); renumber(); update(); });
       var line = el('div', 'acts'); line.append(remove);
