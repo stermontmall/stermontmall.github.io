@@ -43,6 +43,7 @@ This is the canonical rule. It replaces all older conflicting product-posting ru
 - On every new product INSERT, `public.products_posting_rules()` requires positive KES baseline cost, rejects Syngenta under automatic pricing, recalculates `price` through `public.price_4tier(cost)`, and forces `stock=1000`, `low_at=20`, `featured=false`, `active=false`. The insert-time price trigger preserves nearest-KSh-50 rounding. Existing product edits are not repriced by this insert rule.
 - Catalog and Bulk Import create hidden drafts; Bulk Import takes `baseline_cost_kes`, never a selling-price input. The AI product uploader uses the same four-tier rule and does not expose a new-product price override.
 - Never bypass the database trigger with a direct insert or a competing markup formula. Activate only after all exact-source, image, SEO, duplicate and Kenyan regulatory gates pass.
+- New products must never receive a fabricated previous/discount price; set `old_price` only when a genuine, verifiable previous price is supplied.
 
 #### 1. ZERO-QUESTION AUTONOMY & PRE-ANSWERED EDGE CASES (NEVER PAUSE TO ASK)
 Whenever the user says `"Post [N] items on [Category]"` (for ANY category on `stermontarcade.co.ke`), execute continuously until 100% of the batch is live. Use these pre-answered defaults for every possible edge case so you NEVER ask the user for clarification:
