@@ -214,7 +214,7 @@ ${hero({
     chips: ['Quote after inspection', 'Pay by M-Pesa', 'Nairobi and all 47 counties']
   })}
 ${s.intro.map(p => `<p>${esc(p)}</p>`).join('')}
-<section class="trust-note"><h2>Three years of service experience</h2><p>Stermont Arcade brings three years of hands-on service experience. We begin by understanding the property and the problem, explain the recommended scope, confirm availability and provide a quotation before work starts. The final method and schedule depend on site conditions and the agreed scope.</p></section>
+<section class="trust-note"><h2>Experienced service team</h2><p>Our team brings five years of hands-on experience across service enquiries and on-site work. We begin by understanding the property and the problem, explain the recommended scope, confirm availability and provide a quotation before work starts. The final method and schedule depend on site conditions and the agreed scope.</p></section>
 <h2>What is included</h2><ul class="checks">${s.included.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
 <h2>How it works</h2><ol class="steps">${s.steps.map(i => `<li>${esc(i)}</li>`).join('')}</ol>
 <h2>What decides the price</h2><ul class="checks">${s.priceFactors.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
