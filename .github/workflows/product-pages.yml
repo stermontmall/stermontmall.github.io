@@ -102,6 +102,9 @@ jobs:
       - name: Test product description section rendering
         run: node product-description-html.test.mjs
 
+      - name: Test modern responsive product-page design
+        run: node product-page-design.test.mjs
+
       - name: Test the product page guard
         run: node check-product-pages.test.mjs
 
