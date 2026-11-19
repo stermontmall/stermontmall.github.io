@@ -708,9 +708,9 @@ for (const p of products) {
 <div class="pg"><div>${img[0] ? `<img src="${esc(img[0])}" alt="${esc(p.alt_text || (p.name + ' - product photo'))}" fetchpriority="high" loading="eager" decoding="async" width="720" height="720" data-fallbacks="${esc(JSON.stringify(img.slice(1)))}">` : `<img src="/placeholder.svg" alt="${esc(p.name)} - photo coming soon" width="720" height="720"><p style="text-align:center;margin-top:.5rem"><a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, please send me a photo of ${p.name} ${SITE}${path}`)}">Ask for a photo on WhatsApp</a></p>`}</div>
 <div><h1>${esc(h1)}</h1><p class="tagline" style="margin:.1rem 0 .6rem;color:#5b21b6;font-weight:600">${esc(tagline)}</p><div class="pr">${hasOld ? `<s>${money(p.old_price)}</s> ` : ''}${p.variants ? 'From ' : ''}${money(p.price)}${displayUnit ? ` <small>/ ${esc(displayUnit)}</small>` : ''}</div>
 <p class="${inStock ? 'ok' : 'no'}">${inStock ? 'In stock' : 'Currently sold out'}</p>
-<p>Buy ${esc(p.name)} online in Kenya from ${BRAND}. Pay by M-Pesa and get delivery to all 47 counties.</p>
+
 <a class="btn" href="${esc(wa)}">Order on WhatsApp</a><a class="btn alt" href="${esc(cartUrl)}">Add to Cart / Pay with M-Pesa</a>
-<div class="box trustline" aria-label="Shopping and delivery assurances">✓ Instant M-Pesa Checkout • ✓ Coordinated via Westlands Office • ✓ Same-Day Nairobi Delivery &amp; Sarit Centre Pickup • ✓ 47-County Shipping</div></div></div>
+</div></div>
 ${sizeBox}
 ${`<div class="box product-description"><h2 style="margin-top:0">About ${esc(p.name)}</h2>${productDescriptionHtml(productDescription)}</div>`}
 ${productContentHtml(p)}
