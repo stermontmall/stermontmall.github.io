@@ -16,12 +16,12 @@ export const STYLE = '<style>header{min-height:52px;display:flex;align-items:cen
   + 'body.stm-chrome main{padding-bottom:9rem}'
   + 'body.stm-chrome footer{margin-bottom:5rem}</style>';
 export const SCRIPT = '<script src="/shell-chrome.js?v=3" defer></script>';
-// Route every product/category landing into the one mobile-shell app. Keep query parameters (campaign tags), hashes,
-// and use the app's supported deep-link parameters. This is deliberately user-agent neutral (no crawler/visitor split).
-export const EARLY = '<!--stm-early--><script>(function(){var p=location.pathname,m=/^\\/p\\/([^/]+)\\.html$/.exec(p),c=/^\\/c\\/([^/]+)\\.html$/.exec(p);if(!m&&!c)return;var q=new URLSearchParams(location.search);if(m)q.set("product",decodeURIComponent(m[1]));if(c)q.set("cat",decodeURIComponent(c[1]));location.replace("/"+(q.toString()?"?"+q.toString():"")+location.hash)})();</script>';
+// Product and category URLs remain on their crawlable static pages. The full app remains available
+// through explicit shell deep links such as /?product=<slug> and /?cat=<slug>.
+export const EARLY = '';
 const EARLY_RE = /<!--stm-early--><script>[\s\S]*?<\/script>/;
 
-export function addChrome(html, early = false) {
+export function addChrome(html) {
   if (/http-equiv=["']refresh["']/i.test(html)) return html;     // redirect stub of an extra pack size: untouched
   if (!/<\/head>/i.test(html) || !/<\/body>/i.test(html)) return html;
   let out = html;
@@ -53,8 +53,8 @@ function run(dir, label, early) {
 }
 
 export function runAll() {
-  run(process.env.P_DIR || 'p', 'product', true);
-  run(process.env.C_DIR || 'c', 'category', true);
+  run(process.env.P_DIR || 'p', 'product', false);
+  run(process.env.C_DIR || 'c', 'category', false);
   run(process.env.G_DIR || 'guides', 'guide', false);
   try { console.log(`seo-shell-chrome: products.html ${fix('products.html', false) ? 'updated' : 'unchanged'}`); }
   catch (e) { console.log('seo-shell-chrome: products.html skipped', e.message); }
