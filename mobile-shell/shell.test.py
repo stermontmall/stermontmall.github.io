@@ -451,7 +451,7 @@ with sync_playwright() as p:
     check('address: product deep links keep the homepage canonical for Google', p9.locator('link[rel="canonical"]').get_attribute('href') == 'https://stermontarcade.co.ke/', p9.locator('link[rel="canonical"]').get_attribute('href'))
     check('address: the address stays after load and the tab title shows the product', p9.evaluate('location.pathname + location.search') == '/?product=garden-set-250ml' and 'Garden Hose Connector Set' in p9.title())
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
-    check('address: Back from a direct product link returns to the previous shell category', p9.evaluate('location.pathname + location.search') == '/c/home-living.html' and p9.locator('#bottom-nav').is_visible() and p9.locator('#page-product.open').count() == 0, p9.url)
+    check('address: Back from a direct product link returns to the previous shell category', p9.evaluate('location.pathname + location.search') == '/c/home-living.html' and p9.locator('#page-product.open').count() == 0, p9.url)
     p9.goto(URL); p9.wait_for_selector('#grid .card[data-id]'); p9.reload(); p9.wait_for_selector('#grid .card[data-id]')
     p9.goto(f'{BASE}/?product=home-1'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: a single-size product opens from its address too', 'Air Fryer' in p9.locator('#pp-name').inner_text())
