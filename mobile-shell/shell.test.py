@@ -473,15 +473,15 @@ with sync_playwright() as p:
     def run_node(fn, html, slug):
         js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1],process.argv[2])))" % fn
         return subprocess.run(['node', '-e', js, html, slug], cwd=ROOT, capture_output=True, text=True, check=True).stdout
-    check('generated product pages have the in-place full-shell loader', '/shell-route-loader.js?v=1' in run_node('inject', REAL, 'abasi-5-ec'))
+    check('generated product pages have the in-place full-shell loader', '/shell-route-loader.js?v=2' in run_node('inject', REAL, 'abasi-5-ec'))
     page = '<!doctype html><html><head><title>t</title><link rel="canonical" href="https://stermontarcade.co.ke/p/t.html"></head><body>x</body></html>'
     new_page = run_node('inject', page, 'termidor-96-sc-1-litre')
-    check('product page stays canonical and receives in-place shell hydration', '/shell-route-loader.js?v=1' in new_page and 'location.replace' not in new_page and 'rel="canonical"' in new_page, new_page)
+    check('product page stays canonical and receives in-place shell hydration', '/shell-route-loader.js?v=2' in new_page and 'location.replace' not in new_page and 'rel="canonical"' in new_page, new_page)
     check('product shell bootstrap preserves SEO page metadata and is idempotent', '<title>t</title>' in new_page and run_node('inject', new_page, 'termidor-96-sc-1-litre') == new_page)
     stub = '<html><head><meta http-equiv="refresh" content="0;url=/p/x.html"></head></html>'
     check('redirect stubs (meta refresh) are left alone', run_node('inject', stub, 'extra-pack') == stub)
     new_cat = run_node('injectCat', page, 'garden-outdoors')
-    check('category page stays canonical and receives in-place shell hydration', '/shell-route-loader.js?v=1' in new_cat and 'location.replace' not in new_cat and 'rel="canonical"' in new_cat, new_cat)
+    check('category page stays canonical and receives in-place shell hydration', '/shell-route-loader.js?v=2' in new_cat and 'location.replace' not in new_cat and 'rel="canonical"' in new_cat, new_cat)
     check('category route cleanup is idempotent', run_node('injectCat', new_cat, 'garden-outdoors') == new_cat)
 
     def serve_p(ctx): pass
@@ -517,7 +517,7 @@ with sync_playwright() as p:
             m = _re.search(r'/c/([a-z0-9-]+)\.html', rt.request.url)
             rt.fulfill(status=200, content_type='text/html', body=run_node('injectCat', cat_page(m.group(1)), m.group(1)))
         ctx.route('**/c/*.html*', h)
-    check('generated category pages receive the in-place full-shell loader', '/shell-route-loader.js?v=1' in run_node('injectCat', cat_page('garden-outdoors'), 'garden-outdoors'))
+    check('generated category pages receive the in-place full-shell loader', '/shell-route-loader.js?v=2' in run_node('injectCat', cat_page('garden-outdoors'), 'garden-outdoors'))
     c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12); serve_c(c12)
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
     p12.goto(f'{BASE}/c/garden-outdoors.html', wait_until='domcontentloaded'); p12.wait_for_timeout(1200)
