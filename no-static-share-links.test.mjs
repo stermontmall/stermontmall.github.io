@@ -19,9 +19,6 @@ const SEO_SURFACE_ALLOWLIST = [
   'homepage <!-- seo-links:start --> ... <!-- seo-links:end --> crawl links'
 ];
 const SKIP_DIRS = new Set(['.git', 'node_modules', 'assets', 'product-photos', 'docs']);
-const GENERATED_DIRS = new Set(['p', 'c', 'guides', 'pest-control', 'services']);
-const GENERATED_FILES = new Set(['products.html', 'index.html']);
-const GENERATED_MARKER = '<!-- stm-shell-product-links:v1 -->';
 const CLASSIC_FILE = ['classic', 'html'].join('.');
 const SKIP_FILES = new Set(['no-static-share-links.test.mjs', 'no-classic-hop.test.mjs', CLASSIC_FILE]);
 const HUMAN_PRODUCT = /<a\b[^>]*\bhref\s*=\s*["'][^"']*(?:\/p\/|%2fp%2f)|href\s*=\s*["'][^"']*(?:\/p\/|%2fp%2f)|(?:Link|Product link):[^\n]*(?:\/p\/|%2fp%2f)/i;
