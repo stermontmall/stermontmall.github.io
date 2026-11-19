@@ -230,7 +230,7 @@
       '<div class="meta">Leave empty if this item has only one size. To sell the same product in other sizes, save it, then tap <b>\uff0b Pack size</b> on its card. Each size has its own price and stock below.</div></div>';
     var body = '<label>Category</label><select class="cx-f" id="cx-cat">' + opts + '<option value="__new">＋ Create new category…</option></select>' +
       '<input class="cx-f" id="cx-newcat" placeholder="New category name" hidden style="margin-top:.4rem">' +
-      '<label>Item name</label><input class="cx-f" id="cx-name" maxlength="120" value="' + esc(edit ? (p.base || p.name) : '') + '">' + packHtml +
+      '<div class="cx-pr"><div class="cx-pt">🔖 Product code</div>' + (edit ? '<input class="cx-f" value="' + esc(p.product_code || '') + '" readonly aria-label="Permanent product code">' : '<p class="meta">A unique permanent code is assigned automatically when this item is saved.</p>') + '</div>' +\n      '<label>Item name</label><input class="cx-f" id="cx-name" maxlength="120" value="' + esc(edit ? (p.base || p.name) : '') + '">' + packHtml +
       '<label>Description (shown on the product page)</label><textarea class="cx-f" id="cx-desc" rows="9" maxlength="4000" placeholder="One point per line.\nPut a section title on its own line, e.g.\nKey Features\nSpecifications\nBrand: Hisense\nWhat is in the box?">' + esc(edit ? p.description || '' : '') + '</textarea>' +
       unitHtml + '<div class="cx-pr"><div class="cx-pt">🏷️ Pricing</div>' +
       '<div class="cx-r3">' +
@@ -411,11 +411,11 @@
     return /[",\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
   }
   function exportCsv(all) {
-    var head = ['Item', 'Category', 'Pack size', 'Price', 'Stock', 'Low-stock alert', 'Visible', 'Advert', 'Sold', 'Sales', 'Description'];
+    var head = ['Item', 'Product code', 'Category', 'Pack size', 'Price', 'Stock', 'Low-stock alert', 'Visible', 'Advert', 'Sold', 'Sales', 'Description'];
     var lines = [head.map(csvCell).join(',')];
     all.forEach(function (p) {
       var s = stat(p);
-      lines.push([p.base || p.name, catName(p.category_id), p.variant_label || '', p.price, p.stock, p.low_at,
+      lines.push([p.base || p.name, p.product_code || '', catName(p.category_id), p.variant_label || '', p.price, p.stock, p.low_at,
         p.active ? 'yes' : 'no', p.featured ? 'yes' : 'no', s.sold, s.sales, p.description || ''].map(csvCell).join(','));
     });
     var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
@@ -468,7 +468,7 @@
     shown.forEach(function (p) {
       var s = stat(p), lowS = p.stock < p.low_at, c = el('div', 'card');
       c.innerHTML = '<div class="cx-p">' + (p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="' + esc(p.name) + '" loading="lazy" onerror="this.outerHTML=&quot;<div class=cx-ph>📦</div>&quot;">' : '<div class="cx-ph">' + catIcon(p.category_id) + '</div>') +
-        '<div style="min-width:0"><div class="ref">' + esc(p.name) + '</div><div class="when">' + esc(catName(p.category_id)) + '</div><div style="margin-top:.3rem">' +
+        '<div style="min-width:0"><div class="ref">' + esc(p.name) + '</div><div class="when">' + esc(catName(p.category_id)) + '</div><div class="when" style="font-weight:700;color:#5b21b6">Code: ' + esc(p.product_code || 'Pending assignment') + '</div><div style="margin-top:.3rem">' +
         (p.stock === 0 ? '<span class="badge b-declined">Out of stock</span> ' : lowS ? '<span class="badge b-low">Low · ' + p.stock + ' left</span> ' : '<span class="badge b-paid">In stock</span> ') +
         (p.featured ? '<span class="badge b-ad">Advert</span> ' : '') + (p.active ? '' : '<span class="badge b-pending">Hidden</span>') + '</div></div></div>' +
         (p.description ? '<div class="meta" style="margin:.5rem 0 0;white-space:pre-line">' + esc(p.description.length > 140 ? p.description.slice(0, 140) + '…' : p.description) + '</div>' : '<div class="meta" style="margin:.5rem 0 0;color:#b45309">No description yet. Tap Edit to add one.</div>') +
@@ -567,7 +567,7 @@
   /* ---------- Stock tab (live products: pieces left, restock, loss) ---------- */
   /* every typed word must appear in the item name or its category, so "ultra 1l" or "hisense cooker" both work */
   function matches(p, q) {
-    var h = [p.name, p.base, p.variant_label, catName(p.category_id), p.description, p.sku, p.barcode, p.price].map(function (v) { return v == null ? '' : String(v); }).join(' ').toLowerCase();
+    var h = [p.name, p.base, p.variant_label, catName(p.category_id), p.description, p.product_code, p.sku, p.barcode, p.price].map(function (v) { return v == null ? '' : String(v); }).join(' ').toLowerCase();
     return String(q).toLowerCase().split(/\s+/).filter(Boolean).every(function (w) { return h.indexOf(w) > -1; });
   }
   /* type-ahead suggestions for the Catalog and Stock search boxes (best name match first) */
@@ -579,7 +579,7 @@
     var W = window.STMSuggest.words(q);
     var pool = S.prods.filter(function (p) { return !onlyCat || inCat(p, onlyCat); });
     var strict = pool.filter(function (p) {
-      var h = [p.name, p.base, p.variant_label, catName(p.category_id), p.sku, p.barcode].map(function (v) { return v == null ? '' : String(v); }).join(' ').toLowerCase();
+      var h = [p.name, p.base, p.variant_label, catName(p.category_id), p.product_code, p.sku, p.barcode].map(function (v) { return v == null ? '' : String(v); }).join(' ').toLowerCase();
       return W.every(function (w) { return h.indexOf(w) > -1; });
     });
     var list = strict.length ? strict : pool.filter(function (p) { return matches(p, q); }), seen = {};
