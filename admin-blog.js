@@ -152,7 +152,7 @@
   function isH(b) { return /^##\s+/.test(b); }
   function plain(s) { return String(s).replace(/\[\[[^|\]]*\|([^\]]*)\]\]/g, '$1'); }
   function inline(s) {   /* escape first, then allow only [[/site-path|text]] links */
-    return esc(s).replace(/\[\[(\/[A-Za-z0-9\-_\/\.]*)\|([^\]]+)\]\]/g, function (m, p, t) { var product = p.match(/^\\/p\\/([a-z0-9-]+)\\.html$/i); var href = product ? window.shellProductLink(product[1]) : p; return p.indexOf('//') > -1 ? t : '<a href="' + href + '">' + t + '</a>'; }).replace(/\[\[|\]\]/g, '');
+    return esc(s).replace(/\[\[(\/[A-Za-z0-9\-_\/\.]*)\|([^\]]+)\]\]/g, function (m, p, t) { var product = p.match(/^\/p\/([a-z0-9-]+)\.html$/i); var href = product ? window.shellProductLink(product[1]) : p; return p.indexOf('//') > -1 ? t : '<a href="' + href + '">' + t + '</a>'; }).replace(/\[\[|\]\]/g, '');
   }
   function ld(o) { return '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, '\\u003c') + '</script>'; }
   function buildHtml(v, published) {
