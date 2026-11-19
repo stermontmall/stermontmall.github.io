@@ -19,6 +19,7 @@ declare
 begin
   if char_length(v_name)<3 or char_length(v_name)>90 then raise exception 'name must be 3-90 characters'; end if;
   if p_price is null or p_price<=0 then raise exception 'p_price must be the verified baseline cost in KES'; end if;
+  if v_name ilike '%syngenta%' then raise exception 'Syngenta products are excluded from automatic pricing unless the owner explicitly instructs otherwise'; end if;
   if p_source_url is null or p_source_url !~ '^https://[^/]+[.][^/]+' then raise exception 'p_source_url must be the https product page the source price came from'; end if;
   if not exists(select 1 from categories where id=p_category_id) then raise exception 'unknown category_id; select id,name from categories'; end if;
   if v_words<40 or v_words>2000 then raise exception 'description must be 40-2000 words (got %)',v_words; end if;
