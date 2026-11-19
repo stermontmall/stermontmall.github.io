@@ -18,7 +18,7 @@ const walk = (dir, out = []) => {
 };
 const files = walk('.');
 const offenders = [];
-const classicLinkPattern = new RegExp('(?:href\\s*=|\\.href\\s*=|Link:\\s*|navigator\\.share|window\\.open)[^\\n]*' + '/classic' + '\\\\.html', 'i');
+const classicLinkPattern = /(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/classic(?:[.]html)/i;
 for (const file of files) {
   const text = readFileSync(file, 'utf8');
   const lines = text.split('\n');
