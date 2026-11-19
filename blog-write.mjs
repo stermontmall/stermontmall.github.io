@@ -192,7 +192,7 @@ const faqHtml = `<h2>Frequently asked questions</h2>\n${art.faq.map(f => `<h3>${
 const catHtml = cats.length ? `<div class="box"><strong>Shop this category</strong><ul class="rel">${cats.map(c => `<li><a href="${c}">${esc(titleOf(c.slice(1)) || 'Browse the category')}</a></li>`).join('')}</ul></div>` : '';
 const relHtml = related.length ? `<h2>Related guides</h2>\n<ul class="rel">${related.map(r => `<li><a href="${r.path}">${esc(r.title)}</a></li>`).join('')}</ul>` : '';
 const html = `<!doctype html>
-<html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en-KE"><head><!-- stm-shell-product-links:v1 --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(art.title)} | Stermont Arcade</title><meta name="description" content="${esc(art.description)}">
 <link rel="canonical" href="${url}"><meta name="robots" content="index, follow, max-image-preview:large">
 <meta property="og:type" content="article"><meta property="og:site_name" content="Stermont Arcade"><meta property="og:locale" content="en_KE">
