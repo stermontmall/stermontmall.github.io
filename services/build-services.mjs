@@ -391,4 +391,4 @@ console.log('wrote', out.length, 'files', JSON.stringify(counts));
 if (low.length) console.log('UNDER 600 WORDS:', JSON.stringify(low));
 
 // Final shared pass catches links inherited from every service/pest source section.
-normalizeGeneratedProductPages();
+normalizeGeneratedProductPages({ roots: ['services'], rootFiles: [] });

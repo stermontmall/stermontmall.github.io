@@ -6,8 +6,10 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
-const ROOTS = ['p', 'c', 'guides', 'blog', 'services', 'pest-control'];
-const ROOT_FILES = ['index.html', 'products.html', 'fashion.html', 'cars-for-sale.html', 'checkout.html'];
+// Default scope = exactly the paths product-pages.yml commits ("Save changes" step). Touching anything else
+// leaves unstaged files and makes that step's `git rebase` fail. Other generators pass their own scope.
+const ROOTS = ['p', 'c', 'guides'];
+const ROOT_FILES = ['index.html', 'products.html', 'fashion.html', 'cars-for-sale.html'];
 const rewriteBody = html => {
   const head = [];
   let body = String(html || '').replace(/<head\b[\s\S]*?<\/head>/gi, block => { head.push(block); return ''; });
@@ -34,8 +36,8 @@ const walk = dir => {
     return entry.isDirectory() ? walk(file) : (entry.isFile() && entry.name.endsWith('.html') ? [file] : []);
   });
 };
-export function normalizeGeneratedProductPages() {
-  const files = [...new Set([...ROOT_FILES.filter(f => fs.existsSync(f)), ...ROOTS.flatMap(walk)])];
+export function normalizeGeneratedProductPages({ roots = ROOTS, rootFiles = ROOT_FILES } = {}) {
+  const files = [...new Set([...rootFiles.filter(f => fs.existsSync(f)), ...roots.flatMap(walk)])];
   let changed = 0;
   for (const file of files) {
     const before = fs.readFileSync(file, 'utf8');
