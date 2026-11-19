@@ -504,3 +504,8 @@ The Build product pages GitHub Actions workflow is scheduled every 30 minutes; t
 - Done: PR #989 failed route-regression because committed /p/ and /c/ pages had no shell-route-loader. Ran `node seo-shell-redirect.mjs` and pushed the result to the PR branch (commit 2f723e7). All PR #989 checks are green.
 - NOTE: that commit touches generated pages (p/, c/); product-pages.yml regenerates them anyway after merge.
 - Next: owner merges #989 and #991, then `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`, then open /p/darvin-50ew-insecticide-28-ml.html on a phone and confirm the full shell loads. #987 duplicates #989 and can be closed.
+
+## 2026-11-20 01:55 Africa/Nairobi — Claude: product-pages rebuild failing after PR #991 (fix on branch wip-normalizer-scope)
+- Blocked/found: product-pages.yml failed twice on main ("cannot rebase: You have unstaged changes"). Cause: product-link-normalizer.mjs rewrote blog/, services/, pest-control/ and checkout.html, which the workflow's `git add` list never stages.
+- Done: normalizer default scope limited to p, c, guides and index/products/fashion/cars-for-sale; build-services passes services only. Verified locally that each entry point only touches its own folders.
+- Next: merge the PR from wip-normalizer-scope, then `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`. Do NOT edit product-pages.yml. pest-control/ and checkout.html are no longer auto-normalized; check their links if needed.
