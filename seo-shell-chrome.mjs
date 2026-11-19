@@ -3,8 +3,8 @@
 // Runs after every rebuild: product-pages.yml already runs seo-shell-redirect.mjs, which calls runAll() from here at the end (so no workflow edit is needed).
 // Idempotent (marker <!--stm-chrome-->); historical early redirect scripts are stripped. Redirect stubs (meta refresh) are left alone.
 // To undo: remove the runAll() call at the bottom of seo-shell-redirect.mjs; pages lose the chrome on the next rebuild.
-// 2026-11-18: product and category pages remain on their clean canonical HTML URLs at every viewport.
-// Historical stm-early scripts are stripped during rebuild; shell-chrome.js only adds navigation chrome and never changes location.
+// 2026-11-19 owner instruction: product and category visits open in the mobile shell on every device and for every visitor.
+// The same redirect is served to people and crawlers; product/category content and canonical metadata remain in the source HTML.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 export const MARK = '<!--stm-chrome-->';
@@ -16,16 +16,21 @@ export const STYLE = '<style>header{min-height:52px;display:flex;align-items:cen
   + 'body.stm-chrome main{padding-bottom:9rem}'
   + 'body.stm-chrome footer{margin-bottom:5rem}</style>';
 export const SCRIPT = '<script src="/shell-chrome.js?v=3" defer></script>';
-// Product and category pages keep their clean static HTML URL at every viewport; navigation chrome is progressive enhancement only.
-export const EARLY = ''; // No client-side route redirects: keep the canonical HTML page for every visitor.
+// Route every product/category landing into the one mobile-shell app. Keep query parameters (campaign tags), hashes,
+// and use the app's supported deep-link parameters. This is deliberately user-agent neutral (no crawler/visitor split).
+export const EARLY = '<!--stm-early--><script>(function(){var p=location.pathname,m=/^\\/p\\/([^/]+)\\.html$/.exec(p),c=/^\\/c\\/([^/]+)\\.html$/.exec(p);if(!m&&!c)return;var q=new URLSearchParams(location.search);if(m)q.set("product",decodeURIComponent(m[1]));if(c)q.set("cat",decodeURIComponent(c[1]));location.replace("/"+(q.toString()?"?"+q.toString():"")+location.hash)})();</script>';
 const EARLY_RE = /<!--stm-early--><script>[\s\S]*?<\/script>/;
 
 export function addChrome(html, early = false) {
   if (/http-equiv=["']refresh["']/i.test(html)) return html;     // redirect stub of an extra pack size: untouched
   if (!/<\/head>/i.test(html) || !/<\/body>/i.test(html)) return html;
   let out = html;
-  // Remove the historical early redirect from already-generated pages as well as preventing new injections.
+  // Rebuild the route script deterministically so previously generated pages receive the current routing policy.
   out = out.replace(new RegExp(EARLY_RE.source, 'g'), '');
+  if (early && !/http-equiv=[\"']refresh[\"']/i.test(out)) {
+    if (out.includes(MARK)) out = out.replace(MARK, EARLY + MARK);
+    else out = out.replace(/<\/head>/i, () => EARLY + '</head>');
+  }
   if (!out.includes(MARK)) out = out.replace(/<\/head>/i, () => MARK + STYLE + '</head>').replace(/<\/body>/i, () => SCRIPT + '</body>');
   return out;
 }

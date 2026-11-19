@@ -29,5 +29,5 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 20
-      - name: Verify canonical product/category pages never redirect into query-string shell routes
+      - name: Verify product/category pages open in the mobile shell for all visitors
         run: node seo-shell-chrome.test.mjs
