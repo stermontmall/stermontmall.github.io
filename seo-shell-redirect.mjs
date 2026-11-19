@@ -12,7 +12,7 @@ function stripRoute(html) {
   return html.replace(LEGACY_ROUTE_RE, '');
 }
 
-const ROUTE_SCRIPT = '<script src="/shell-route-loader.js?v=1" defer></script>';
+const ROUTE_SCRIPT = '<script src="/shell-route-loader.js?v=2" defer></script>';
 
 function addFullShell(html) {
   const clean = stripRoute(html);
