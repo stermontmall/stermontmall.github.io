@@ -5,6 +5,9 @@
   var path = location.pathname;
   if (!/^\/(?:p|c)\/[A-Za-z0-9._~-]+\.html$/i.test(path) || window.__stmFullShellLoading) return;
   window.__stmFullShellLoading = true;
+  var isProductRoute = /^\\/p\\//i.test(path);
+  if (isProductRoute) document.documentElement.classList.add('deep-open');
+  var clearDeepOpen = function () { document.documentElement.classList.remove('deep-open'); };
 
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
@@ -38,13 +41,22 @@
         fallback.appendChild(originalMain.cloneNode(true));
       }
 
+      // Turn off the static product-page CSS before loading shell styles; generic rules such as
+      // "main { max-width: ... }" would otherwise distort the app's own #views layout.
+      Array.prototype.forEach.call(document.head.querySelectorAll('link[rel="stylesheet"],style'), function (node) {
+        node.disabled = true;
+      });
+
       // Bring over the shell's CSS and inline head styles, but retain this page's SEO metadata,
       // canonical URL, product JSON-LD, title and social preview tags.
       Array.prototype.forEach.call(doc.head.querySelectorAll('link[rel="stylesheet"],style'), function (node) {
         var clone = node.cloneNode(true);
-        if (node.tagName === 'LINK' && !document.head.querySelector('link[href="' + node.getAttribute('href') + '"]')) {
-          document.head.appendChild(clone);
-        } else if (node.tagName === 'STYLE') {
+        if (node.tagName === 'LINK') {
+          var href = node.getAttribute('href');
+          var existing = Array.prototype.find.call(document.head.querySelectorAll('link[rel="stylesheet"]'), function (link) { return link.getAttribute('href') === href; });
+          if (existing) existing.disabled = false;
+          else document.head.appendChild(clone);
+        } else {
           document.head.appendChild(clone);
         }
       });
@@ -63,10 +75,23 @@
       }
 
       return loadScript('/mobile-shell/app.js?v=41').then(function () {
+        if (isProductRoute) {
+          var observer = new MutationObserver(function () {
+            var page = document.getElementById('page-product');
+            var toast = document.getElementById('toast');
+            if ((page && page.classList.contains('open')) || (toast && toast.style.opacity === '1')) {
+              clearDeepOpen();
+              observer.disconnect();
+            }
+          });
+          observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
+          setTimeout(function () { clearDeepOpen(); observer.disconnect(); }, 10000);
+        }
         return loadScript('/analytics.js').catch(function () {});
       }).catch(function (error) {
         // Never strand a shopper on an inert shell if its app bundle cannot load.
         document.body.replaceChildren.apply(document.body, originalChildren);
+        clearDeepOpen();
         throw error;
       });
     })
