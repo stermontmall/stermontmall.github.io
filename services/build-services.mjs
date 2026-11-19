@@ -364,6 +364,23 @@ const urls = ['/services/', '/services/guides/', ...(pests.length ? ['/services/
 write('sitemap-services.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${data.published}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 write('word-counts.json', JSON.stringify(counts, null, 1) + '\n');
 
+// Final output guard: service and pest pages may inherit legacy product URLs from source data.
+// Convert only customer-facing anchors; structured data and canonical URLs are not changed.
+const normalizeServiceProductLinks = html => String(html || '').replace(
+  /(\\bhref\\s*=\\s*)(["'])(?:https?:\\/\\/(?:www\\.)?stermontarcade\\.co\\.ke)?\\/p\\/([^"'?#\\s]+)\\.html(?:[?#][^"']*)?\\2/gi,
+  (_match, prefix, quote, rawSlug) => {
+    let slug = rawSlug;
+    try { slug = decodeURIComponent(slug); } catch {}
+    return prefix + quote + shellProductLink(slug) + quote;
+  }
+);
+for (const rel of out.filter(file => file.endsWith('.html'))) {
+  const file = path.join(dir, rel);
+  const before = fs.readFileSync(file, 'utf8');
+  const after = normalizeServiceProductLinks(before);
+  if (after !== before) fs.writeFileSync(file, after);
+}
+
 // Owner rule: never publish the banned town name. Fail the build (so CI commits nothing) if any generated file has it.
 const banned = out.filter(rel => /kitale/i.test(fs.readFileSync(path.join(dir, rel), 'utf8')));
 if (banned.length) { console.error('BANNED TOWN NAME FOUND IN:', banned.join(', ')); process.exit(1); }
