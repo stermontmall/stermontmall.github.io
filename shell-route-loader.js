@@ -75,7 +75,7 @@
       }
 
       window.__STM_PRODUCT_ROUTE_PATH = isProductRoute ? path : '';
-      return loadScript('/mobile-shell/app.js?v=43').then(function () {
+      return loadScript('/mobile-shell/app.js?v=44').then(function () {
         if (isProductRoute) {
           var checkProductReady = function () {
             var page = document.getElementById('page-product');
