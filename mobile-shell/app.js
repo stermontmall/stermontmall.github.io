@@ -391,6 +391,7 @@ async function loadPage(reset) {
   items.forEach(p => feed.items.set(p.id, p));
   const categoryView = query().cat !== 'all';
   grid.insertAdjacentHTML('beforeend', items.map((p, i) => cardHTML(p, categoryView && feed.page === 1 && i === 0)).join(''));
+  if (feed.page === 1) warmDetails(items);   // the first cards of a list are the most likely to be tapped: have their details ready
   feed.page++; feed.hasMore = hasMore; feed.loading = false;
   const em = $('#grid-empty'); em.textContent = EMPTY_TEXT; em.hidden = grid.children.length > 0;
   if (feed.hasMore && store.get().tab === 'home' && sentinel.getBoundingClientRect().top < innerHeight + 400) loadPage(false);
@@ -623,7 +624,27 @@ function renderProductDescription(target, source) {
 }
 /* @render-end */
 const details = new Map(); // Cache product-detail requests by variant row ID; renderDetails() and renderPP() share this cache.
-const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images,product_code`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
+const DETAIL_COLS = 'description,unit,stock,low_at,slug,images,product_code';
+const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=${DETAIL_COLS}`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
+/* Details are fetched AHEAD of the tap (owner 2026-11-22: "when I click on a product let it open all the details straight away").
+   One request for several products fills the same cache that detailsFor() reads, so a tapped product shows its full description at once instead of "Loading details...".
+   A product the batch misses (or a failed batch) falls back to its own single request, so behaviour is never worse than before. Skipped when the phone has Save-Data on.
+   Used by: the first cards of each list (warmDetails, section 6), and a press / hover on a card or a "More like this" tile (section 11). */
+function prefetchDetails(rowIds) {
+  try {
+    if (navigator.connection && navigator.connection.saveData) return;
+    const ids = [...new Set(rowIds)].filter(id => typeof id === 'string' && /^[A-Za-z0-9][A-Za-z0-9._~-]{0,120}$/.test(id) && !details.has(id)).slice(0, 12);
+    if (!ids.length) return;
+    const batch = api('products?id=in.(' + ids.map(encodeURIComponent).join(',') + ')&select=id,' + DETAIL_COLS).catch(() => null);
+    ids.forEach(id => details.set(id, batch.then(rows => {
+      const r = Array.isArray(rows) ? rows.find(x => x && x.id === id) : null;
+      if (r) return r;
+      details.delete(id); return detailsFor(id);   // the batch missed this one: ask for it alone
+    })));
+  } catch {}
+}
+function idle(fn) { if (typeof requestIdleCallback === 'function') requestIdleCallback(fn, { timeout: 2500 }); else setTimeout(fn, 800); }
+function warmDetails(items) { idle(() => prefetchDetails(items.map(p => p.sizes[0].rowId))); }   // the lead size of each product: the one a tap opens
 async function renderDetails(rowId) {
   const box = $('#qb-details'); if (!box) return;                  // an older cached index.html has no details block: leave the sheet as it was
   box.hidden = false;
@@ -719,6 +740,15 @@ function openQuickBuy(id) {
   const p = feed.items.get(id); if (!p) return;
   editingCartKey = '';
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
+}
+/* Tapping a product card opens its FULL product page at once (owner 2026-11-22). The name, price and lead photo come from the list that is already on screen, and the
+   description / photos / stock are usually in the cache already (prefetchDetails), so nothing waits for a second tap on "See full product details".
+   The quick-buy sheet is still used by the + button on a product with several pack sizes (openQuickBuy). To undo: make the card click call openQuickBuy again (section 11). */
+function openProduct(id) {
+  const p = feed.items.get(id); if (!p) return;
+  editingCartKey = '';
+  qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = '';
+  openProductPage();
 }
 function openDeepLink(slug) {   // the full product page for a /?product=<slug> or direct /p/<slug>.html address
   const hit = x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug);   // /p/<id>.html pages are named by the row id, which differs from the slug on some products
@@ -891,8 +921,16 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-cat-all]'))) return selectCategory(el.dataset.catAll);
   if ((el = t.closest('[data-cat]'))) return selectCategory(el.dataset.cat, el.dataset.sub);
   if ((el = t.closest('[data-drawer-cat]'))) { const id = el.dataset.drawerCat; return closeAllThen(() => selectCategory(id)); }
-  if ((el = t.closest('.card[data-id]'))) return openQuickBuy(el.dataset.id);
+  if ((el = t.closest('.card[data-id]'))) return openProduct(el.dataset.id);   // the full product page straight away (was the quick-buy sheet: openQuickBuy)
 });
+/* Warm a product's details the moment a finger or pointer lands on its card (or on a "More like this" tile), a moment before the tap completes. */
+const warmOnTouch = e => {
+  const el = e.target && e.target.closest ? e.target.closest('.card[data-id], [data-pp-open]') : null; if (!el) return;
+  const id = el.dataset.id || el.dataset.ppOpen, p = id && (feed.items.get(id) || PRODUCTS.find(x => x.id === id));
+  if (p) prefetchDetails([p.sizes[0].rowId]);
+};
+document.addEventListener('pointerdown', warmOnTouch, { passive: true });
+document.addEventListener('mouseover', warmOnTouch, { passive: true });
 document.addEventListener('error', e => {
   const img = e.target;
   if (!img || img.tagName !== 'IMG' || !img.hasAttribute('data-fallbacks')) return;
