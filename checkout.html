@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
   <meta charset="UTF-8">
 <!--stm-classic-shell--><script>(function(){try{var ua=navigator.userAgent||'';if(/bot|crawl|spider|slurp|googlebot|bingbot|facebookexternalhit|whatsapp|telegram|preview|lighthouse|pagespeed|inspectiontool/i.test(ua))return;var q=new URLSearchParams(location.search);if(q.get('checkout')==='1')return;/* Keep the existing verified M-Pesa/order checkout surface; all browsing routes go to shell. */var h=/^#p-([a-z0-9-]+)$/i.exec(location.hash||'');if(h&&!q.has('product'))q.set('product',h[1]);location.replace('/'+(q.toString()?'?'+q.toString():'')+(h?'':location.hash));}catch(e){location.replace('/');}})();</script>
@@ -457,7 +455,9 @@ html.stm-co.stm-co-wait body::before{content:"Preparing your checkout\2026";posi
 /* Runs before the checkout script loads: if the shell left a cart (stm_handoff), start in checkout mode with a clean shop cart so lines are never doubled. */
 try { if (localStorage.getItem('stm_handoff')) { document.documentElement.className += ' stm-co stm-co-wait'; localStorage.removeItem('stm_cart'); } } catch (e) {}
 </script>
-</head>
+</head><!DOCTYPE html>
+<html lang="en">
+
 <body>
   <header>
     <div class="wrap">
