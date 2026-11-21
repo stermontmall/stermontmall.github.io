@@ -39,6 +39,34 @@ export const SAFE_META = Object.freeze({
   'ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd.html': {
     id: 'ecomax-2-1ch-multimedia-speaker-system-bluetooth-usb-sd',
     description: 'ECOMAX 2.1-channel multimedia speakers with Bluetooth, USB/SD and remote. Review the Kenya listing and checkout using M-Pesa.'
+  },
+  'asus-zenbook-14-oled-laptop.html': {
+    id: 'asus-zenbook-14-oled-laptop',
+    description: 'ASUS Zenbook 14 OLED laptop. Check the Kenya listing for configuration, price and delivery details; M-Pesa checkout.'
+  },
+  'classic-mens-black-formal-blazer.html': {
+    id: 'classic-men-s-black-formal-blazer-piece',
+    description: "Classic men's black formal blazer (piece). Review the Kenya listing for available details and delivery options; M-Pesa checkout."
+  },
+  'itel-smartphone.html': {
+    id: 'itel-smartphone',
+    description: 'Itel Smartphone listing in Kenya. Review available model details, price and delivery options on Stermont Arcade; checkout with M-Pesa.'
+  },
+  'infinix-smart-20-4gb-64gb.html': {
+    id: 'infinix-smart-20-4gb-64gb-20261108',
+    description: 'Infinix Smart 20 with 4GB RAM and 64GB storage. Check the Kenya listing for price, available details and delivery options; M-Pesa checkout.'
+  },
+  'infinix-smart-20-4gb-128gb.html': {
+    id: 'infinix-smart-20-4gb-128gb-20261108',
+    description: 'Infinix Smart 20 with 4GB RAM and 128GB storage. Check the Kenya listing for price, available details and delivery options; M-Pesa checkout.'
+  },
+  'apple-iphone-16-128gb-green.html': {
+    id: 'apple-iphone-16-128gb-green',
+    description: 'Apple iPhone 16 128GB in Green. Review the Kenya listing for price and delivery details; M-Pesa checkout.'
+  },
+  'apple-iphone-16-128gb-white.html': {
+    id: 'apple-iphone-16-128gb-white',
+    description: 'Apple iPhone 16 128GB in White. Review the Kenya listing for price and delivery details; M-Pesa checkout.'
   }
 });
 
