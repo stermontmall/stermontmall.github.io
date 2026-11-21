@@ -50,6 +50,10 @@ const ls = {
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
 const api = path => fetch(SB + '/rest/v1/' + path, { headers: { apikey: KEY }, cache: 'no-store' })
   .then(r => { if (!r.ok) throw new Error('Supabase HTTP ' + r.status); return r.json(); });
+// Columns the product-link fast path (quickDeepLink, section 9b) reads from public.products. They match what buildCatalog needs; `cost` is never read.
+// The catalogue RPC returns images[1] as cover_image, so the fast path asks for `images` and withCover() takes the first photo from it.
+const PRODUCT_COLS = 'id,slug,name,category_id,price,old_price,stock,featured,images,unit,variant_group,variant_label';
+const withCover = r => ({ ...r, cover_image: Array.isArray(r.images) && r.images.length ? r.images[0] : r.cover_image });
 // PostgREST caps a response at 1,000 rows. Page the public catalogue RPC so new listings
 // remain visible after the shop grows beyond that cap.
 async function apiAll(path, pageSize = 1000) {
@@ -739,11 +743,11 @@ async function quickDeepLink(slug) {
     // The full catalog loads product-names.json in parallel and refreshes the title afterward.
     const [cats, rows0] = await Promise.all([
       api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
-      api('products?active=eq.true&or=(slug.eq.' + encodeURIComponent(slug) + ',id.eq.' + encodeURIComponent(slug) + ')&select=' + PRODUCT_COLS)
+      api('products?active=eq.true&or=(slug.eq.' + encodeURIComponent(slug) + ',id.eq.' + encodeURIComponent(slug) + ')&select=' + PRODUCT_COLS).then(r => r.map(withCover))
     ]);
     if (deepOpen || fullCatalog || !rows0.length) return;
     let rows = rows0; const g = rows0[0].variant_group;
-    if (g) { rows = await api('products?active=eq.true&variant_group=eq.' + encodeURIComponent(g) + '&select=' + PRODUCT_COLS); if (deepOpen || fullCatalog || !rows.length) return; }
+    if (g) { rows = (await api('products?active=eq.true&variant_group=eq.' + encodeURIComponent(g) + '&select=' + PRODUCT_COLS)).map(withCover); if (deepOpen || fullCatalog || !rows.length) return; }
     buildCatalog(rows, cats, {});   // Use the database name immediately; the full catalog replaces it when it arrives
     if (!PRODUCTS.some(x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug))) { PRODUCTS = []; CATS = []; return; }
     openDeepLink(slug);
