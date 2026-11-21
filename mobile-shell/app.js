@@ -720,6 +720,16 @@ function openQuickBuy(id) {
   editingCartKey = '';
   qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = ''; renderQB(); openOverlay('sheet-quickbuy');
 }
+/* Tapping a product card opens the FULL product page straight away (owner 2026-11-22: "when I click on a product let it open all the details straight away"),
+   instead of the small quick-buy sheet. Same selection state as the sheet, so the page behaves exactly as it did after "View full details"; Back returns to the list.
+   The quick-buy sheet is still used by the "+" button on cards with several pack sizes (pick a size, then add) via openQuickBuy.
+   To undo: make the card branch in section 11 call openQuickBuy(el.dataset.id) again. */
+function openProductDirect(id) {
+  const p = feed.items.get(id); if (!p) return;
+  editingCartKey = '';
+  qb.p = p; qb.size = p.sizes[0].label; qb.qty = 1; qb.shown = '';
+  renderQB(); openProductPage();
+}
 function openDeepLink(slug) {   // the full product page for a /?product=<slug> or direct /p/<slug>.html address
   const hit = x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug);   // /p/<id>.html pages are named by the row id, which differs from the slug on some products
   const p = PRODUCTS.find(hit);
@@ -891,7 +901,7 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-cat-all]'))) return selectCategory(el.dataset.catAll);
   if ((el = t.closest('[data-cat]'))) return selectCategory(el.dataset.cat, el.dataset.sub);
   if ((el = t.closest('[data-drawer-cat]'))) { const id = el.dataset.drawerCat; return closeAllThen(() => selectCategory(id)); }
-  if ((el = t.closest('.card[data-id]'))) return openQuickBuy(el.dataset.id);
+  if ((el = t.closest('.card[data-id]'))) return openProductDirect(el.dataset.id);   // a tap on the card opens the full product page (see openProductDirect)
 });
 document.addEventListener('error', e => {
   const img = e.target;
