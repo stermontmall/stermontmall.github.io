@@ -5,6 +5,66 @@
   var path = location.pathname;
   if (!/^\/(?:p|c)\/[A-Za-z0-9._~-]+\.html$/i.test(path) || window.__stmFullShellLoading) return;
   window.__stmFullShellLoading = true;
+
+  /* Catalogue prefetch (2026-11-21, site speed). Same block as the inline script at the top of index.html (this page never runs that one: the homepage is only parsed
+     below, not executed). The shell has to download the homepage, then app.js, and only then asks Supabase for the categories and the whole catalogue; this starts those
+     requests now, in parallel with that, and hands the answers to app.js's own fetch() calls (identical URLs and headers). Kept in localStorage for 5 minutes. Anything
+     unexpected falls through to the normal fetch. To undo: delete this block (and the one in index.html). */
+  (function () {
+    try {
+      if (!window.fetch || !window.Promise || !window.Response) return;
+      var REST = 'https://oewvtbnmyombbtggamor.supabase.co/rest/v1/', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+      var CATS = REST + 'categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc', RPC = REST + 'rpc/get_store_catalog';
+      var PAGE = 1000, PAGES = 2, TTL = 5 * 60 * 1000, LS = 'shell.catalogPrefetch.v1';
+      var realFetch = window.fetch.bind(window), now = Date.now(), entries = {}, noop = function () {};
+      var wanted = [{ k: 'cats', url: CATS, range: '' }];
+      for (var i = 0; i < PAGES; i++) wanted.push({ k: 'p' + i, url: RPC, range: (i * PAGE) + '-' + (i * PAGE + PAGE - 1) });
+      function net(w) {
+        var h = { apikey: KEY };
+        if (w.range) { h.Range = w.range; h['Range-Unit'] = 'items'; }
+        return realFetch(w.url, { headers: h, cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); });
+      }
+      function plausible(t) { return typeof t === 'string' && t.charAt(0) === '[' && t.charAt(t.length - 1) === ']'; }
+      function persist(texts) {
+        try { var o = { t: Date.now() }; wanted.forEach(function (w, n) { o[w.k] = texts[n]; }); localStorage.setItem(LS, JSON.stringify(o)); } catch (e) {}
+      }
+      function refresh() { Promise.all(wanted.map(net)).then(persist).catch(noop); }
+      var saved = null;
+      try { saved = JSON.parse(localStorage.getItem(LS) || 'null'); } catch (e) {}
+      var age = saved ? now - saved.t : Infinity;
+      var fresh = age >= 0 && age < TTL && wanted.every(function (w) { return plausible(saved[w.k]); });
+      if (fresh) {
+        wanted.forEach(function (w) { entries[w.k] = { t: now, p: Promise.resolve(saved[w.k]) }; });
+        if (age > 60000) refresh();
+      } else {
+        var ps = wanted.map(function (w) { var p = net(w); entries[w.k] = { t: now, p: p }; return p; });
+        Promise.all(ps).then(persist).catch(noop);
+        ps.forEach(function (p) { p.catch(noop); });
+      }
+      var realFetchPublic = window.fetch;
+      window.fetch = function (input, init) {
+        try {
+          var url = typeof input === 'string' ? input : (input && input.url);
+          if (url && (!init || !init.method || init.method === 'GET')) {
+            var key = null, hd = (init && init.headers) || {};
+            if (url === CATS) key = 'cats';
+            else if (url === RPC) {
+              var m = /^(\d+)-(\d+)$/.exec(String(hd.Range || ''));
+              if (m && +m[2] - +m[1] + 1 === PAGE && +m[1] % PAGE === 0 && +m[1] / PAGE < PAGES) key = 'p' + (+m[1] / PAGE);
+            }
+            var e = key && entries[key];
+            if (e && Date.now() - e.t < TTL) {
+              return e.p.then(function (text) {
+                return new Response(text, { status: 200, headers: { 'Content-Type': 'application/json' } });
+              }, function () { delete entries[key]; return realFetchPublic.call(window, input, init); });
+            }
+          }
+        } catch (err) {}
+        return realFetchPublic.call(window, input, init);
+      };
+    } catch (e) {}
+  })();
+
   var isProductRoute = /^\/p\//i.test(path);
   if (isProductRoute) document.documentElement.classList.add('deep-open');
   var clearDeepOpen = function () { document.documentElement.classList.remove('deep-open'); };
