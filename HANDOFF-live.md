@@ -1,3 +1,25 @@
+## 2026-11-21 08:53 (Africa/Nairobi) — CI green; catalogue and PR conflict audit
+
+### Done
+- Read the requested repository instructions and handoffs: `AGENTS.md`, `CLAUDE.md`, `PRICING_HANDOFF.md`, `HANDOFF-product-posting-standard-20261102.md`, `HANDOFF-single-canonical-product-layout.md`, `SEO-ARCHITECTURE.md`, `SEO-PLAYBOOK.md`, `SEO_HANDOFF.md`, `PUBLISHING.md`, and `TESTING-product-photo-upload.md`.
+- Verified PR #998 head `9585cf32bd267006fdc449be646cc851cee45a46`: SEO quality gate run `44872052159` passed all steps, including the pricing/posting regression test, no-static-share-links guard, generated-page link guard, browser suite and production-equivalent on-page SEO audit. Full mobile-shell route regression run `44872052128` also passed.
+- Supabase read-only snapshot: 1,828 products total; 1,713 active; 115 inactive. `get_store_catalog()` returns all rows with `active=true`, so its expected count is 1,713 at this snapshot.
+- 52 active rows have `cost` NULL/zero; 1,661 active rows have positive cost. The 52 rows are pre-existing listings dated 2026-10-29 through 2026-11-11 (29, 1, 4, 2, 15, 1 by day). No prices or product rows were changed. Do not backfill cost or reprice these records without verified source costs and an approved update plan.
+- Reconfirmed that `public.get_store_catalog()` filters only on `active=true`; it does not apply a separate 1,623/1,716 cap. Counts vary as live rows change, so future reports must include the query timestamp and scope.
+
+### Blocked / do not merge yet
+- PR #998 is open and clean/mergeable, but this task's wider product-link and route audit is not complete; its green CI is branch validation, not production deployment.
+- PR #996 is a separate overlapping pricing/admin implementation and has unstable mergeability. PR #998 is the newer canonical implementation; compare before considering #996.
+- PR #990 and PR #987 report GitHub `mergeable_state=dirty`. Do not merge them as-is.
+- Important policy conflict: `CLAUDE.md` and `HANDOFF-single-canonical-product-layout.md` say static `/p/<slug>.html` pages must remain indexable and must not JavaScript-redirect. PR #987 adds a JS redirect from static product/category pages into the shell. The correct customer-facing link rule is to use `shellProductLink(slug)` and preserve static SEO documents; reconcile the route PR with this rule before merging.
+
+### Next
+1. Resolve/retire overlapping PRs and inspect exact merge conflicts before merging any link/routing branch.
+2. Complete the product-link audit against current `main`, including generated pages, WhatsApp, admin/order/share links; run `node no-static-share-links.test.mjs` and the full workflow on the final candidate branch.
+3. Investigate the 52 zero-cost active listings from authoritative supplier records; preserve current prices until each baseline is evidenced.
+4. Reconcile historical counts (1,623 / 1,716) against timestamped database and generated-catalogue snapshots.
+5. Merge only after the complete final branch quality gate is green and route policy is consistent. Then trigger the product-page rebuild and verify live URLs, canonical tags and sitemap endpoints.
+
 ## 2026-11-20 — Follow-up validation and old-price guard
 
 - Removed the old standalone `/list-products.html` product form; it now redirects to `/admin.html#photo-ai`. The former form had an outdated 25% pricing path and zero-cost insert behavior.
