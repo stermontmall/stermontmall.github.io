@@ -1,3 +1,34 @@
+## 2026-11-21 08:59 (Africa/Nairobi) — Pricing admin merged; Pages deployed; product-page save blocker identified
+
+### Done
+- PR #998 merged by squash into main: merge commit 4b5a7a24682d6bce03851a491088cdff9ecc9a78. The canonical four-tier pricing admin tab, Catalog/Bulk Import/AI posting alignment, legacy uploader retirement, and Supabase new-insert enforcement are now part of main.
+- On the exact PR head a0e074369db4406c4cfc13d8ae16732eadfc9007, SEO quality gate run 44872985592 passed and full mobile-shell route regression run 44872985442 passed.
+- GitHub Pages deployment run 44873247668 completed successfully (build, deploy and report-build-status all green) on main commit aa10bb80f7eb3b5f992c260949bec8478ec17851. Public HTTP verification through the available browser was not available in this session.
+- Daily SEO check run 44873230206 passed. Workflow guard run 44873230179 passed.
+- Product-page generation on the merge commit built 1,626 product pages and 69 category pages; link-check.mjs --warn checked 71,908 internal links with zero reported problems. The workflow failed only at the final save/rebase step.
+
+### P0 blocker — product-pages.yml save step
+- Latest build run 44873230213, job 136752185054, failed at Save changes (only if something changed) with: error: cannot rebase: You have unstaged changes.
+- Repeated scheduled failures 44861916258, 44832348136 and 44775006864 show the same failure.
+- Root cause confirmed from the workflow and generator: seo-kenya.mjs calls normalizeGeneratedProductPages(); product-link-normalizer.mjs writes across p/, c/, guides/, blog/, services/, pest-control/ and root HTML files including checkout.html. The workflow git-add list stages only p c guides and selected root files, leaving some normalizer outputs unstaged. The subsequent git rebase origin/main therefore aborts before push.
+- The safe targeted fix is to extend the generated-output staging list in .github/workflows/product-pages.yml to include blog services pest-control checkout.html (and keep the existing robots.txt entry). If any of those files conflict during rebase, keep the current strict unexpected-source-conflict guard rather than overwriting potentially newer editorial content.
+- Repository instructions in CLAUDE.md explicitly prohibit editing/replacing .github/workflows/product-pages.yml. Do not change that workflow without the owner's explicit exception. The exact staging fix is prepared conceptually but not applied.
+
+### Product-link branch status
+- PR #990 remains dirty/unmergeable against current main. Fixed the Markdown .html sentence-splitting bug on its branch in commit 3facb0a5ff35e8981d53761054337acb7a461682; the exact fixture passed an isolated JavaScript smoke check, but full CI for this new code is not yet verified.
+- PR #987 remains dirty and its direct /p/ JavaScript redirect conflicts with the canonical rule to keep static SEO pages indexable without redirect. Do not merge as-is.
+- PR #996 is an overlapping older pricing/admin implementation; PR #998 supersedes it. Do not merge #996.
+
+### Supabase catalogue snapshot (read-only)
+- 1,828 total products; 1,713 active; 115 inactive. The 52 active products with NULL/zero baseline cost are pre-existing rows dated 2026-10-29 through 2026-11-11. No price/cost/product rows were changed. Preserve them pending verified source costs.
+- No bulk repricing was performed. The new insert trigger enforces only future inserts; it does not retroactively reprice existing listings.
+
+### Next
+1. Obtain owner approval for the narrow product-pages.yml staging-list edit, then run the workflow and verify the generated pages/sitemaps are pushed.
+2. Rebase/rebuild PR #990 against current main with the .html link fix, then require the full quality gate and no-static-link test to pass.
+3. Keep PR #987 blocked until its redirect behavior is reconciled with the no-redirect SEO policy.
+4. Investigate the 52 missing baseline costs individually; do not invent costs or change prices.
+
 ## 2026-11-21 08:53 (Africa/Nairobi) — CI green; catalogue and PR conflict audit
 
 ### Done
