@@ -1,5 +1,5 @@
 /* Stermont Arcade · Catalog, Restock & Sales ledger module. Mount: STMCatalog.mount(containerEl)
-   New items take a source/cost price and apply 30%; existing-item edits save the selling price exactly. */
+   New items use the canonical Supabase four-tier pricing rule; existing-item edits save the selling price exactly. */
 (function () {
   var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
   var S = { cats: [], prods: [], st: {}, cat: 'all', q: '', range: 'all' }, root, D = document, view = function () { render(); };
@@ -169,8 +169,13 @@
   /* special admin "categories": items that are out of stock, and items hidden from the shop, each get their own list */
   var CAT_OUT = '__out', CAT_HID = '__hid';
   function inCat(p, c) { return c === 'all' || (c === CAT_OUT ? p.stock <= 0 : c === CAT_HID ? !p.active : String(p.category_id) === c); }
-  /* Owner rule 2026-11-15: every NEW item gets +30% on the source/cost price typed in the admin; editing an existing item saves exactly what is typed. */
-  var MARKUP = 1.30; function up(n) { return Math.round(Number(n) * MARKUP * 100) / 100; }
+  /* Canonical new-product pricing mirrors public.price_4tier in Supabase.
+     The server RPC is called again on save; this local copy is for an immediate preview only. */
+  function up(n) {
+    var b = Number(n); if (!Number.isFinite(b) || b <= 0) return 0;
+    var m = b < 20000 ? 1.30 : b < 40000 ? 1.25 : b <= 60000 ? 1.20 : 1.175;
+    return Math.max(200, Math.round(Math.max(b * m, b * 1.15) / 50) * 50);
+  }
   function discPct(p) { var o = Number(p.old_price), n = Number(p.price); return o > n && n >= 0 ? Math.max(1, Math.round((o - n) / o * 100)) : 0; }
   function priceHtml(p) {
     var d = discPct(p);
@@ -235,21 +240,21 @@
       unitHtml + '<div class="cx-pr"><div class="cx-pt">🏷️ Pricing</div>' +
       '<div class="cx-r3">' +
       '<div><label>Previous price</label><input class="cx-f" id="cx-old" type="number" min="0" inputmode="decimal" placeholder="optional" value="' + (edit && p.old_price ? p.old_price : '') + '"></div>' +
-      '<div><label>' + (edit ? 'Selling price *' : 'Source / cost price *') + '</label><input class="cx-f" id="cx-price" type="number" min="0" inputmode="decimal" placeholder="' + (edit ? 'Type selling price' : 'Type source / cost price') + '" value="' + (edit ? p.price : '') + '"></div>' +
+      '<div><label>' + (edit ? 'Selling price *' : 'Verified baseline cost (KES) *') + '</label><input class="cx-f" id="cx-price" type="number" min="0" inputmode="decimal" placeholder="' + (edit ? 'Type selling price' : 'Type verified KES baseline cost') + '" value="' + (edit ? p.price : '') + '"></div>' +
       '<div><label>Discount %</label><input class="cx-f" id="cx-pct" type="number" min="0" max="95" step="any" inputmode="decimal" placeholder="auto"></div></div>' +
-      '<div class="meta" style="margin:.4rem 0 0">' + (edit ? '' : '<b>30% markup is added to the source / cost price you type when publishing a new item. Existing item edits save the selling price exactly as entered.</b> ') + (edit ? 'Type the selling price yourself. ' : 'Enter the supplier/source cost; the 30% markup is applied automatically. ') + 'Price Watch may update it later to follow market prices. Fill any two boxes and the third is worked out for you. Customers see the old price crossed out, the new price and the % off.</div>' +
+      '<div class="meta" style="margin:.4rem 0 0">' + (edit ? '' : '<b>Official four-tier rule is applied automatically to new items. Existing item edits save the selling price exactly as entered.</b> ') + (edit ? 'Type the selling price yourself. ' : 'Enter the verified baseline cost. The official tier, 15% minimum floor, KSh 50 rounding and KSh 200 minimum are applied automatically. ') + 'Price Watch may update it later to follow market prices. Fill any two boxes and the third is worked out for you. Customers see the old price crossed out, the new price and the % off.</div>' +
       '<div class="cx-quick" id="cx-quick"></div><div class="cx-pvc" id="cx-pvc"></div></div>' +
       '<div class="cx-r">' +
-      '<div><label>' + (edit ? 'Pieces in stock' : 'Initial pieces') + '</label><input class="cx-f" id="cx-stock" type="number" min="0" inputmode="numeric" value="' + (edit ? p.stock : '') + '"></div>' +
-      '<div><label>Low-stock alert below</label><input class="cx-f" id="cx-low" type="number" min="0" value="' + (edit ? p.low_at : 5) + '"></div></div>' +
+      '<div><label>' + (edit ? 'Pieces in stock' : 'Initial pieces') + '</label><input class="cx-f" id="cx-stock" type="number" min="0" inputmode="numeric" value="' + (edit ? p.stock : '1000') + '"></div>' +
+      '<div><label>Low-stock alert below</label><input class="cx-f" id="cx-low" type="number" min="0" value="' + (edit ? p.low_at : 20) + '"></div></div>' +
       '<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" id="cx-feat"' + (edit && p.featured ? ' checked' : '') + '> Feature as advert / top banner</label>' +
       '<label>Photos</label><input type="file" id="cx-file" accept="image/*" multiple>' +
       '<label>OR paste a direct photo link (jpg, png or webp)</label><div style="display:flex;gap:.4rem"><input class="cx-f" id="cx-plink" type="url" placeholder="https://example.com/photo.jpg" style="flex:1"><button type="button" class="btn alt sm" id="cx-padd">Add link</button></div>' +
       '<div class="cx-th" id="cx-th"></div><div class="meta" id="cx-up"></div>';
     modal(edit ? 'Edit item' : 'Add new item', body, edit ? 'Save changes' : 'Publish to website', function () {
       if ($('cx-up').textContent) throw new Error('Wait for photos to finish uploading');
-      var name = v('cx-name').trim(), price = num('cx-price'), stock = edit ? (v('cx-stock') === '' ? NaN : parseInt(v('cx-stock'), 10)) : parseInt(v('cx-stock') || 0, 10);
-      if (!name) throw new Error('Enter an item name'); if (v('cx-price') === '' || !(price > 0)) throw new Error('Enter the selling price');
+      var name = v('cx-name').trim(), price = num('cx-price'), stock = edit ? (v('cx-stock') === '' ? NaN : parseInt(v('cx-stock'), 10)) : parseInt(v('cx-stock') || 1000, 10);
+      if (!name) throw new Error('Enter an item name'); if (v('cx-price') === '' || !(price > 0)) throw new Error('Enter the verified baseline cost'); if (!edit && /syngenta/i.test(name)) throw new Error('Syngenta is excluded from automatic repricing. Do not create this item without explicit owner approval and a separately verified price.');
       var vl = v('cx-vl').trim(), vl0 = tpl && !tpl.variant_label ? v('cx-vl0').trim() : ''; if (tpl && !vl) throw new Error('Type the pack size for this new item, e.g. 250 mL'); if (tpl && !tpl.variant_label && !vl0) throw new Error('Type the pack size of the existing item too');
       var unit = v('cx-unit') === '__custom' ? v('cx-unitc').trim() : v('cx-unit'); if (v('cx-unit') === '__custom' && !unit) throw new Error('Type the custom unit, or choose one from the list');
       var oldP = v('cx-old') === '' ? null : num('cx-old'); if (oldP != null && !(oldP > price)) throw new Error('Previous price must be higher than the current price (or leave it empty)');
@@ -259,9 +264,9 @@
         return call('/rest/v1/categories?on_conflict=slug', { m: 'POST', h: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: { name: cn, slug: slug(cn) } }).then(function (r) { return r[0].id; });
       })() : Promise.resolve(parseInt(v('cx-cat'), 10));
       return catP.then(function (cid) {
-        var row = { category_id: cid, name: name, price: edit ? price : up(price), low_at: parseInt(v('cx-low') || 5, 10), featured: $('cx-feat').checked, images: imgs };
+        var row = { category_id: cid, name: name, price: edit ? price : 0, low_at: parseInt(v('cx-low') || 20, 10), featured: $('cx-feat').checked, images: imgs };
         if (oldP != null || (edit && p.old_price != null)) row.old_price = oldP;
-        if (!edit && row.old_price != null) { row.old_price = up(row.old_price); if (!(row.old_price > row.price)) row.old_price = row.price + 1; }
+        
         if (unit || (edit && p.unit)) row.unit = unit || null;
         var grp = tpl ? (tpl.variant_group || slug(tpl.base || tpl.name)) : (edit && p.variant_group) || slug(name);
         if (vl || (edit && (p.variant_label || p.variant_group))) { row.variant_label = vl || null; row.variant_group = vl ? grp : null; }
@@ -269,9 +274,21 @@
         if (edit && stock !== p.stock) row.stock = stock;
         if (edit) return call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: row });
         var id = slug(name + (vl ? ' ' + vl : '')) || 'item', n = 2, base = id; while (S.prods.some(function (x) { return x.id === id; })) id = base + '-' + n++;
-        row.id = id; row.stock = stock; row.cost = price;   /* preserve source/cost so the database can verify the exact 30% markup */
-        var first = tpl && !tpl.variant_label ? call('/rest/v1/products?id=eq.' + encodeURIComponent(tpl.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { variant_label: vl0, variant_group: grp } }) : Promise.resolve();
-        return first.then(function () { return call('/rest/v1/products', { m: 'POST', h: { Prefer: 'return=minimal' }, body: row }); });
+        row.id = id; row.stock = stock; row.cost = price;
+        /* Ask Supabase for the canonical final KSh price; do not rely on a browser-only markup constant. */
+        return call('/rest/v1/rpc/price_4tier', { m: 'POST', body: { p_baseline: price } }).then(function (serverPrice) {
+          row.price = Number(serverPrice);
+          if (!Number.isFinite(row.price) || row.price < 200) throw new Error('The official pricing rule did not return a valid selling price. Nothing was published.');
+          if (oldP != null) {
+            return call('/rest/v1/rpc/price_4tier', { m: 'POST', body: { p_baseline: oldP } }).then(function (serverOldPrice) {
+              row.old_price = Number(serverOldPrice);
+              if (!Number.isFinite(row.old_price) || row.old_price <= row.price) throw new Error('The previous baseline does not produce a higher official selling price. Adjust it or leave previous price empty.');
+            });
+          }
+        }).then(function () {
+          var first = tpl && !tpl.variant_label ? call('/rest/v1/products?id=eq.' + encodeURIComponent(tpl.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { variant_label: vl0, variant_group: grp } }) : Promise.resolve();
+          return first.then(function () { return call('/rest/v1/products', { m: 'POST', h: { Prefer: 'return=minimal' }, body: row }); });
+        });
       }).catch(function (e) {
         if (/old_price/.test(e.message || '')) throw new Error('Run setup-pricing.sql in Supabase first to enable previous prices, then save again.');
         if (/\bunit\b/.test(e.message || '')) throw new Error('Units are not set up yet. Run this once in the Supabase SQL editor, then save again: alter table products add column if not exists unit text;');
@@ -289,7 +306,7 @@
       function pctOf(o, n) { return Math.round((o - n) / o * 1000) / 10; }
       function paint() {
         var o = edit ? fv(eo) : up(fv(eo)), n = edit ? fv(ep) : up(fv(ep)), h = '';
-        if (!n && !o) h = '<span class="meta">Enter the selling price to preview how customers will see it.</span>';
+        if (!n && !o) h = '<span class="meta">Enter a verified baseline cost to preview the official selling price.</span>';
         else if (o && n && o <= n) h = '<span class="bad">Previous price must be higher than the current price.</span>';
         else if (o && n) h = '<span class="cx-bd">-' + Math.max(1, Math.round((o - n) / o * 100)) + '%</span> <s>' + money(o) + '</s> <b>' + money(n) + '</b><div class="meta">Customers save ' + money(o - n) + '</div>';
         else if (n) h = '<b>' + money(n) + '</b><div class="meta">No discount shown. Add a previous price or a discount %.</div>';

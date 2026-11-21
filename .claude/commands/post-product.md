@@ -1,5 +1,5 @@
 ---
-description: Publish verified SterMont Arcade products using the live Supabase product-photo uploader. Requires exact product photos, current Kenyan pricing, 30% markup, stock 1000 and low-stock 20.
+description: Publish verified SterMont Arcade products using the live Supabase product-photo uploader. Requires exact product photos, verified Kenyan baseline prices, the canonical four-tier pricing rule, stock 1000 and low-stock 20.
 ---
 
 # /post-product — SterMont Arcade product posting
@@ -11,7 +11,7 @@ For every item:
 1. Read `HANDOFF-live.md` first, then `PUBLISHING.md` and the Supabase playbook topics `READ_ME_FIRST`, `add_product` and `add_photo`.
 2. Check the full live catalogue for duplicates. Confirm the exact category, brand, model, variant and pack size.
 3. Verify the lowest current in-stock KES price for the exact product from a reputable Kenyan seller/supplier. Record the source URL. If there is no exact KES price, do not invent one or create a priced listing.
-4. Create the product row with the approved `add_draft_product` helper and factual SEO description. Use the verified source KES price as cost; default 30% markup; stock 1000; low_at 20; featured false unless requested. Respect the existing charm-price trigger. Descriptions must follow the current playbook (600–900 words (the database helper accepts 40–2,000; never pad); no padding).
+4. Create the product row with the approved `add_draft_product` helper and factual SEO description. Use the verified source KES price as cost; call Supabase `public.price_4tier(p_baseline)` for the selling price (four tiers, 15% minimum floor, nearest KSh 50, KSh 200 minimum); stock 1000; low_at 20; featured false unless requested. Never substitute a flat 30% markup. Descriptions must follow the current playbook (600–900 words (the database helper accepts 40–2,000; never pad); no padding).
 5. **Photo is mandatory for publication.** First find the exact product packshot on the manufacturer, supplier or official retailer page. Prefer a sharp image at least 450×450 showing the same brand, model/part number, colour and pack size. Do not use vendor logos, banners, generic category images, unrelated variants or watermarked images.
 6. **Use the deployed Supabase `upload-photos` function (v14):**
    - Preferred: send the public HTTPS supplier/product-page URL as JSON `{product_id, image_url}`. The function automatically inspects up to four page image candidates (Open Graph, Twitter image, `image_src`, image metadata and Product JSON-LD) and downloads a valid image.
@@ -32,4 +32,4 @@ For every item:
 - Never tell the owner to upload a screenshot as the normal photo-upload workflow. Use supplier-page extraction, direct image URLs or image bytes first; ask for a screenshot only as a last-resort visual QA fallback.
 
 
-Owner master prompt update (2026-11-14): source cost is the exact in-stock Kenyan retail price; selling price is exactly `round(cost * 1.30, 2)`. Do not add charm-price markup. Descriptions must be 600–900 original factual words; skip thin-fact products rather than pad. The page generator builds the meta description from the first factual sentence of the product description (max 155 characters); make it concise and unique. No dedicated `meta_description` column exists; do not invent one.
+Superseded owner note (2026-11-14): the former flat 30% formula is retired. Always use the canonical Supabase `public.price_4tier(p_baseline)` four-tier rule. Descriptions must be 600–900 original factual words; skip thin-fact products rather than pad. The page generator builds the meta description from the first factual sentence of the product description (max 155 characters); make it concise and unique. No dedicated `meta_description` column exists; do not invent one.

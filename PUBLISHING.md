@@ -17,7 +17,7 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 ## Posting route
 1. Read `CLAUDE.md`, this file, and Supabase `public.site_playbook` topics `READ_ME_FIRST`, `add_product`, `add_photo`.
 2. Check the live catalogue for duplicates and confirm a valid category.
-3. Create the product row (the `add_draft_product` helper inserts it with `active=false`; that is only the starting state). Write an original factual description of 40–2,000 words in the structured layout from `site_playbook` `READ_ME_FIRST` (the current owner master prompt requires 600–900 original, factual words; the helper accepts 40–2,000 words, but do not pad thin product facts). The helper accepts 40–2,000 words and rejects an opening whose first 200 words match an existing product. Do not pad thin product facts; use the premium item-specific headings and only include relevant sections. Pass the source KES cost as `p_price` (the helper defaults to a 30% markup (or uses an explicitly supplied batch percentage) and sets stock 1000, low_at 20, featured false). The helper builds `seo_title` as the product name plus "– Price in Kenya" (at most 60 characters); check that it reads well with brand, model, pack size and Kenya.
+3. Create the product row (the `add_draft_product` helper inserts it with `active=false`; that is only the starting state). Write an original factual description of 40–2,000 words in the structured layout from `site_playbook` `READ_ME_FIRST` (the current owner master prompt requires 600–900 original, factual words; the helper accepts 40–2,000 words, but do not pad thin product facts). The helper accepts 40–2,000 words and rejects an opening whose first 200 words match an existing product. Do not pad thin product facts; use the premium item-specific headings and only include relevant sections. Pass the verified baseline KES cost as `p_price`; Supabase `public.price_4tier(p_baseline)` applies the four tiers, 15% minimum floor, nearest-KSh-50 rounding and KSh 200 minimum. New-product defaults are stock 1000, low_at 20 and featured false. The helper builds `seo_title` as the product name plus "– Price in Kenya" (at most 60 characters); check that it reads well with brand, model, pack size and Kenya.
 4. PHOTO IS A PUBLICATION REQUIREMENT (owner instruction 2026-11-08): find a sharp direct image of the EXACT product on the manufacturer, supplier or an official retailer page (at least 450x450, correct brand, model, part number, colour and pack size; no other shop's watermark/logo). Prefer passing the public HTTPS supplier/product-page URL directly to `upload-photos` as `{ product_id, image_url }`. The deployed function (v14) automatically searches up to four page-image candidates in this order: Open Graph image, Twitter image, `image_src`, image metadata and Product JSON-LD; it then downloads and byte-validates the selected image. If page extraction fails, use the exact direct HTTPS image URL. If the host blocks downloading, fetch the exact image bytes and send `{ product_id, image_base64 }` (or multipart `files`). For multiple photos use `images:[...]`; `append:true` adds gallery images instead of replacing the main image. `activate:true` can publish after a successful save, but do NOT use it until visual QA has passed. The uploader writes to public bucket `product-images` and updates `products.images`. `public.add_product_photo` is also available as a database helper. If rejected, try another exact source. Verify the uploaded Storage object, reachable public URL and `products.images` array.
 5. Never invent a photo URL. Report a photo as attached only after the Storage object and the `products.images` reference are checked.
 6. PUBLISH LIVE only after both exact photo and source price are verified. Set `active=true` only when `images` contains the uploaded photo URL. The database now rejects a new product activation with an empty photo array. If no exact suitable photo can be found/uploaded, leave `active=false` and report the blocker. After activation, verify the generated product page, image, canonical, Product JSON-LD and sitemap entry once the product-pages workflow completes.
@@ -32,16 +32,18 @@ For each new advert the owner supplies the exact public HTTPS supplier/product p
 - Blog, guide, service, admin and order generators must emit shell URLs for visible product links. The SEO-only /p/ references listed above are the sole exception.
 - Run node no-static-share-links.test.mjs and node no-classic-hop.test.mjs before opening a PR.
 ## Price and inventory rules for NEW products
-- Find the source price online yourself (owner rule 2026-11-08): the lowest current in-stock KES listing of the EXACT product (same brand, model, pack size) on a reputable Kenyan seller or supplier page. Record that page URL as the source. Never invent or estimate a price. If no KES listing of the exact product exists, stop and ask the owner.
-- Let `C` be that source price in KES.
-- Save `cost = round(C, 2)`.
-- Calculate the initial selling price as `round(C * 1.30, 2)`. The existing charm-price trigger may round the stored selling price upward to a supported price point. Do not bypass that trigger; verify and report the actual stored `price`, and do not add a second markup; stored selling price must equal `round(cost * 1.30, 2)`.
-- Default to a 30% markup on all new products. An explicitly requested batch override must be within the helper's accepted 15–300% range.
-- Do not convert foreign currency without an owner-approved exchange rate.
-- Set `stock = 1000`, `low_at = 20`, and `featured = false` unless the owner explicitly requests featured placement.
-- New products are published live (`active=true`) after verification (owner rule 2026-11-08). The earlier draft-first / owner-review rule no longer applies.
-- Use a unique lowercase-hyphen product ID/slug and a category ID read from the live categories table.
-- Do not overwrite an existing product or silently change an existing name, price, cost, description, stock or photo.
+
+The canonical four-tier pricing rule is maintained in `CLAUDE.md`, `AGENTS.md`, and Supabase `public.publishing_rules` (key `autonomous_bulk_product_publishing`). Read **[PRICING-RULES.md](PRICING-RULES.md)** for the human-readable summary and use **Store → Pricing rules** in the staff admin panel to view the live Supabase rule.
+
+- Do not use the older flat 30% rule in this file's history or prior handoffs; it is superseded.
+- Verify the exact product/model/pack-size baseline in KES from a trusted Kenyan supplier. If only reputable Nairobi retail pricing is available, the canonical rule permits retail × 0.85 as an explicitly labelled estimated baseline.
+- Apply exactly one tier: below KSh 20,000 = 30%; KSh 20,000–39,999 = 25%; KSh 40,000–60,000 = 20%; above KSh 60,000 = 17.5%.
+- Enforce the minimum 15% floor above verified baseline cost, round to the nearest KSh 50, and enforce the KSh 200 minimum storefront price.
+- Exclude Syngenta from repricing unless the owner explicitly instructs otherwise.
+- Record the baseline, source URL, selected tier, rounding and actual final stored price. Never invent a price.
+- Set `stock = 1000`, `low_at = 20`, and `featured = false` for new products unless the owner explicitly requests otherwise.
+- Apply each rule separately to every pack size or variant; never copy one pack's price to another.
+
 
 ## Verification SQL
 After posting, run a read-only query using the exact product ID:
@@ -81,7 +83,8 @@ Report the product ID, source cost, selling price, stock, alert threshold, draft
 - Product is not publish-ready until visual QA is complete and recorded.
 
 
-## Current owner master-prompt rules (2026-11-14)
-- New products use `cost = exact verified Kenyan source price` and `price = round(cost * 1.30, 2)`. Stock=1000, low_at=20, featured=false. The helper's 6-argument and 7-argument defaults are now 30%; explicit percentages must be 15–300.
-- The price trigger preserves exact `cost * 1.30` prices for new listings; legacy charm-price rounding remains for other price updates.
-- The current product schema has `seo_title` but no dedicated `meta_description` column. Product meta descriptions are generated at build time by `pdpDescription()` in `seo-meta.mjs` from the first factual sentence in `description` (maximum 155 characters). Write a concise, unique first sentence that fits the remaining snippet budget; do not invent a database column.
+## Superseded pricing note (2026-11-14)
+The former flat 30% markup is retired. It must not be used for new products. The current default is the canonical Supabase `public.price_4tier(p_baseline)` function described above and in `PRICING-RULES.md`.
+
+## SEO metadata note
+The current product schema has `seo_title` but no dedicated `meta_description` column. Product meta descriptions are generated at build time by `pdpDescription()` in `seo-meta.mjs` from the first factual sentence in `description` (maximum 155 characters). Write a concise, unique first sentence that fits the remaining snippet budget; do not invent a database column.
