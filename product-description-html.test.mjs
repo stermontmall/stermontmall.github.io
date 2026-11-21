@@ -41,6 +41,9 @@ ok(/<h3>Vehicle enquiry &amp; next steps<\/h3><p>Request current photos and a wr
 const plain = productDescriptionHtml('A stainless steel milk can has a 20 litre capacity. Its smooth metal body is designed for dairy collection. Dairy farmers use it to carry milk from the shed to the collection point. It is suitable for smallholder milk collection routines. Before use, wash and sanitise the can. Follow the dairy cleaning procedure before filling it. After each collection, rinse the can thoroughly. Store it in a clean dry place between uses. Confirm the exact model and lid arrangement before ordering. Ask the seller whether the lid is included.');
 assert.deepEqual(heads(plain), ['Product overview', 'Uses & applications', 'How to use & application', 'Care, cleaning & storage', 'Buying guide & product checks']); n++;
 ok(plain.includes('20 litre capacity') && plain.includes('collection point') && plain.includes('clean dry place') && plain.includes('lid arrangement'), 'all source facts remain in rendered copy');
+// Unlabelled descriptions must preserve Markdown product links as clickable mobile-shell links.
+const plainProductLink = productDescriptionHtml('Related item: [Premise 200 SC](/p/premise-200-sc-termiticide-50-ml.html).');
+ok(/<a href="https:\/\/stermontarcade\.co\.ke\/\?product=premise-200-sc-termiticide-50-ml">Premise 200 SC<\/a>/.test(plainProductLink), 'unlabelled Markdown product links stay clickable shell links');
 // Short plain descriptions still get one useful overview heading.
 const shortPlain = productDescriptionHtml('Use it safely and order today. Storage is easy.');
 assert.deepEqual(heads(shortPlain), ['Product overview']); n++;
