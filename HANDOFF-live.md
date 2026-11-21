@@ -601,3 +601,9 @@ The Build product pages GitHub Actions workflow is scheduled every 30 minutes; t
 - Done: PR #989 failed route-regression because committed /p/ and /c/ pages had no shell-route-loader. Ran `node seo-shell-redirect.mjs` and pushed the result to the PR branch (commit 2f723e7). All PR #989 checks are green.
 - NOTE: that commit touches generated pages (p/, c/); product-pages.yml regenerates them anyway after merge.
 - Next: owner merges #989 and #991, then `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`, then open /p/darvin-50ew-insecticide-28-ml.html on a phone and confirm the full shell loads. #987 duplicates #989 and can be closed.
+
+## 2026-11-21 12:59 (Africa/Nairobi) — Non-blocking product-link loading change committed
+
+- Branch `wip-products-loading-unblock-20261121`: commit `612f3115aa303b6246e2c6e32cff7eec95d85f9c` removes the full-screen deep-link spinner/hide block from `index.html`. The existing `quickDeepLink`, full-catalog fallback, and product overlay logic remain unchanged. The storefront now stays visible while a shared product link resolves.
+- No Supabase writes were made. Catalogue counts and policies remain unchanged.
+- Next: inspect CI workflows and run the matching quality gate on this branch; only merge after all required checks pass.
