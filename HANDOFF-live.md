@@ -1,3 +1,52 @@
+## 2026-11-21 08:53 (Africa/Nairobi) — CI green; catalogue and PR conflict audit
+
+### Done
+- Read the requested repository instructions and handoffs: `AGENTS.md`, `CLAUDE.md`, `PRICING_HANDOFF.md`, `HANDOFF-product-posting-standard-20261102.md`, `HANDOFF-single-canonical-product-layout.md`, `SEO-ARCHITECTURE.md`, `SEO-PLAYBOOK.md`, `SEO_HANDOFF.md`, `PUBLISHING.md`, and `TESTING-product-photo-upload.md`.
+- Verified PR #998 head `9585cf32bd267006fdc449be646cc851cee45a46`: SEO quality gate run `44872052159` passed all steps, including the pricing/posting regression test, no-static-share-links guard, generated-page link guard, browser suite and production-equivalent on-page SEO audit. Full mobile-shell route regression run `44872052128` also passed.
+- Supabase read-only snapshot: 1,828 products total; 1,713 active; 115 inactive. `get_store_catalog()` returns all rows with `active=true`, so its expected count is 1,713 at this snapshot.
+- 52 active rows have `cost` NULL/zero; 1,661 active rows have positive cost. The 52 rows are pre-existing listings dated 2026-10-29 through 2026-11-11 (29, 1, 4, 2, 15, 1 by day). No prices or product rows were changed. Do not backfill cost or reprice these records without verified source costs and an approved update plan.
+- Reconfirmed that `public.get_store_catalog()` filters only on `active=true`; it does not apply a separate 1,623/1,716 cap. Counts vary as live rows change, so future reports must include the query timestamp and scope.
+
+### Blocked / do not merge yet
+- PR #998 is open and clean/mergeable, but this task's wider product-link and route audit is not complete; its green CI is branch validation, not production deployment.
+- PR #996 is a separate overlapping pricing/admin implementation and has unstable mergeability. PR #998 is the newer canonical implementation; compare before considering #996.
+- PR #990 and PR #987 report GitHub `mergeable_state=dirty`. Do not merge them as-is.
+- Important policy conflict: `CLAUDE.md` and `HANDOFF-single-canonical-product-layout.md` say static `/p/<slug>.html` pages must remain indexable and must not JavaScript-redirect. PR #987 adds a JS redirect from static product/category pages into the shell. The correct customer-facing link rule is to use `shellProductLink(slug)` and preserve static SEO documents; reconcile the route PR with this rule before merging.
+
+### Next
+1. Resolve/retire overlapping PRs and inspect exact merge conflicts before merging any link/routing branch.
+2. Complete the product-link audit against current `main`, including generated pages, WhatsApp, admin/order/share links; run `node no-static-share-links.test.mjs` and the full workflow on the final candidate branch.
+3. Investigate the 52 zero-cost active listings from authoritative supplier records; preserve current prices until each baseline is evidenced.
+4. Reconcile historical counts (1,623 / 1,716) against timestamped database and generated-catalogue snapshots.
+5. Merge only after the complete final branch quality gate is green and route policy is consistent. Then trigger the product-page rebuild and verify live URLs, canonical tags and sitemap endpoints.
+
+## 2026-11-20 — Follow-up validation and old-price guard
+
+- Removed the old standalone `/list-products.html` product form; it now redirects to `/admin.html#photo-ai`. The former form had an outdated 25% pricing path and zero-cost insert behavior.
+- Added `database/no-fake-old-price-on-new-products.sql` and applied Supabase migration `no_fake_old_price_on_new_products`. New inserts no longer create a false discount/previous price when the supplied old price is missing or not greater than the selling price.
+- Catalog and Bulk Import now avoid manufacturing a previous price; only a genuine higher previous price is retained.
+- Extended the pricing regression test and SEO workflow path filters for the old-price guard migration.
+- Rechecked 10 static admin/rule/migration assertions: all passed.
+- PR #998 remains open and unmerged. Its previous SEO quality-gate run was cancelled after newer commits; the latest head still has no completed CI result yet. Wait for a fresh full quality-gate run and require green before merging.
+
+---
+
+## 2026-11-20 02:10 (Africa/Nairobi) — Canonical four-tier pricing enforced in admin and Supabase
+
+- Work is on branch `wip-pricing-rule-admin-default-20261120`; not live on `main` until the PR is merged.
+- Added the staff-only Admin **Pricing & posting rules** tab. It reads `public.publishing_rules` key `autonomous_bulk_product_publishing` directly, shows the four price tiers, margin floor, rounding, inventory defaults and full rulebook, and has a Refresh control.
+- Corrected Admin Catalog and Bulk Import so new rows use a verified KES baseline cost and the four-tier formula; Bulk Import now expects `baseline_cost_kes`, not a selling-price column. New rows are saved as hidden drafts with stock 1000, low_at 20 and featured=false. Existing products are not automatically repriced.
+- Updated the AI product uploader to use the verified source price and official four-tier calculation only; it no longer offers a new-product manual selling-price override. Deployed `ai-add-product` Edge Function v19 with exact source-price matching, 500×500 minimum dimensions and >15 KB photo checks.
+- Retired the standalone `/list-products.html` publisher because it used the old 25% formula and cost=0; it now redirects staff to the official Admin AI uploader, Bulk Import and rulebook.
+- Applied Supabase migration `enforce_canonical_four_tier_product_defaults`: every new product INSERT now requires a positive KES baseline, rejects Syngenta under automatic pricing, recalculates price with `public.price_4tier()`, and forces stock=1000, low_at=20, featured=false, active=false. New inserts now retain nearest-KSh-50 rounding; existing product edits retain their prior edit behaviour.
+- Synchronized `public.publishing_rules.rule_text` and `public.publishing_rule_configs.rulebook` with the canonical GitHub rule. Verified the mirrors match and the staff SELECT policy exists.
+- SQL validation passed: tested all four tier boundaries (including 19,999 / 20,000 / 39,999 / 40,000 / 60,000 / 60,001), minimum KSh 200, new-row defaults, hidden status, Syngenta rejection and zero-cost rejection. Temporary test products were rolled back.
+- Added `database/enforce-canonical-four-tier-product-defaults.sql` and `database/no-fake-old-price-on-new-products.sql`; new inserts no longer fabricate a crossed-out old price. Catalog and Bulk Import now discard invalid old prices instead of inventing discounts.
+- Added `pricing-rule-defaults.test.mjs`, and extended the SEO PR quality workflow to syntax-check the admin scripts and run the pricing regression test.
+- Next: open the PR, wait for the complete SEO quality gate, fix any CI failures, then merge to make the Admin tab and browser updates live. Do not claim this branch is live before merge.
+
+---
+
 ## 2026-11-20 00:31 (Africa/Nairobi) — First browser run and test-fixture correction
 - The pack-card assertions passed in Actions: all four quick-buy pack cards rendered their own KSh prices; the selected 250 ml card remained highlighted and displayed both KSh 1,550 and its previous KSh 1,782 price; the selected-price summary updated immediately.
 - The broader browser run then stopped at a pre-existing test-order bug: `BASE` was referenced in the early quick-buy deep-link assertion before it was assigned later in the test file. No storefront assertion failed before that point.

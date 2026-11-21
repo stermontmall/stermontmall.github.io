@@ -36,7 +36,7 @@
     head.appendChild(el('hr'));
 
     head.appendChild(el('p', 'meta', 'Add up to 10 products in one session. For each item, upload its photo from your device OR paste a direct link to the photo, and paste the exact product page URL. AI reads the product and source price, writes the listing and SEO fields, then saves it as an unpublished draft for your review.'));
-    head.appendChild(el('p', 'meta', 'Price rule: use the exact source KSh/KES price with the 30% markup, or enter your own selling price to override it. Owner-set prices are saved exactly with no markup.'));
+    head.appendChild(el('p', 'meta', 'Price rule: verified wholesale/distributor KES price is the baseline. If only a reputable Kenyan retail price is available, baseline cost is 85% of that price. The official four-tier markup, 15% minimum floor, nearest KSh 50 rounding and KSh 200 minimum are applied automatically. If the source page has no verifiable KES price, skip the product; no price override or guess is used.'));
     var status = el('p', 'meta', '0 of 10 product slots used.');
     var actions = el('div', 'acts');
     var add = button('+ Add product', 'alt', addRow);
@@ -53,7 +53,7 @@
     function findCard() {
       var card = el('div', 'card'), list = el('div'), top = el('div', 'acts'), note = el('p', 'meta');
       card.appendChild(el('h3', null, 'Find photos online'));
-      card.appendChild(el('p', 'meta', 'Lists active products that have no photo. "Find photo" shows picture options from an online image search for you to pick; "Find & attach all" lets the server check each picture against the product name (same brand, model and pack size, at least 450×450, no other shop’s branding) and attaches only the ones that pass. Existing photos are never replaced; price, stock and live status never change.'));
+      card.appendChild(el('p', 'meta', 'Lists active products that have no photo. "Find photo" shows picture options from an online image search for you to pick; "Find & attach all" lets the server check each picture against the product name (same brand, model and pack size, at least 500×500 and over 15 KB, no other shop’s branding) and attaches only the ones that pass. Existing photos are never replaced; price, stock and live status never change.'));
       var loadBtn = button('Load products without a photo', 'alt', load), allBtn = button('Find & attach all', 'ok', attachAll);
       allBtn.disabled = true; top.append(loadBtn, allBtn); card.append(top, note, list);
       var items = [], busy = false;
@@ -137,8 +137,8 @@
       photoUrl.type = 'url'; photoUrl.placeholder = 'https://example.com/product-photo.jpg'; photoUrl.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
       var urlLabel = el('label', null, 'Source product website URL'), url = el('input');
       url.type = 'url'; url.placeholder = 'https://example.com/product-page'; url.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
-      var priceLabel = el('label', null, 'Your selling price in KSh (optional override)'), price = el('input');
-      price.type = 'number'; price.min = '1'; price.step = '0.01'; price.placeholder = 'Leave blank to use source price + 30%'; price.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit';
+      var priceLabel = el('label', null, 'Selling price (calculated automatically)'), price = el('input');
+      price.type = 'text'; price.value = 'Official four-tier rule'; price.readOnly = true; price.style.cssText = 'width:100%;padding:.7rem .8rem;border:1px solid var(--ln);border-radius:10px;font:inherit;background:#f8f7fc';
       var preview = el('img'); preview.alt = 'Selected product preview'; preview.hidden = true; preview.style.cssText = 'display:block;max-width:140px;max-height:120px;object-fit:contain;margin-top:.6rem;border-radius:8px';
       var remove = button('Remove', 'alt sm', function () { rows = rows.filter(function (r) { return r.card !== card; }); card.remove(); renumber(); update(); });
       var line = el('div', 'acts'); line.append(remove);
@@ -202,7 +202,7 @@
         chain = chain.then(function () {
           progress.textContent = 'Processing ' + (i + 1) + ' of ' + chosen.length + '…';
           return photoPayload(r).then(function (photo) {
-            var body = { url: r.url.value.trim(), selling_price_kes: r.price.value.trim() || undefined };
+            var body = { url: r.url.value.trim() };
             Object.keys(photo).forEach(function (k) { body[k] = photo[k]; });
             return window.STMAdmin.raw('/functions/v1/ai-add-product', {
               method: 'POST',
@@ -216,7 +216,7 @@
               saved++;
               var card = el('div', 'card done');
               card.appendChild(el('h4', null, '✓ Draft saved: ' + data.product.name));
-              card.appendChild(el('p', null, data.source_price_kes == null ? 'Owner-set selling price: KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' · No markup · Not published' : 'Source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Selling price includes 30% markup · Not published'));
+              card.appendChild(el('p', null, 'Verified source price: KSh ' + Number(data.source_price_kes).toLocaleString('en-KE') + ' · Baseline cost: KSh ' + Number(data.baseline_cost_kes).toLocaleString('en-KE') + ' · Four-tier selling price: KSh ' + Number(data.selling_price_kes).toLocaleString('en-KE') + ' · Not published'));
               card.appendChild(el('p', 'meta', 'SEO title: ' + data.seo_title));
               card.appendChild(el('p', 'meta', 'Meta description preview: ' + data.meta_description_preview));
               card.appendChild(el('p', 'meta', data.price_note || data.page_note || 'Source price verified.'));

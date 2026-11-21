@@ -214,7 +214,7 @@ const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
    a copied or shared link then previews as this product, from that page's head, and a phone that opens it goes straight into this same product view inside
    the shell (the inline script at the top of the page head, seo-shell-chrome.mjs, and shell-chrome.js send /p/<slug>.html to /?product=<slug>).
    Crawlers get the static page, whose canonical is this same clean address. Older links that still end in ?shell=1 keep working (same two scripts). */
-const productUrl = () => { if (!qb.p) return undefined; const z = sizeOf(qb.p, qb.size).slug || qb.p.slug; if (stack.includes('page-product')) return (window.shellProductLink || (s => '/?product=' + encodeURIComponent(s)))(z); return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); };
+const productUrl = () => { if (!qb.p) return undefined; const z = sizeOf(qb.p, qb.size).slug || qb.p.slug; if (stack.includes('page-product')) { if (PRODUCT_PATH && DEEP) return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); return (window.shellProductLink || (s => '/?product=' + encodeURIComponent(s)))(z); } return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); };
 /* A category has its own address too (owner 2026-11-09: "when I tap on categories, make a direct link"): /c/<slug>.html, the clean address of the generated category page
    (a sub-category uses its own slug). A copied or shared link previews as that category, and a phone that opens it goes straight back into the same category in the shell
    (the inline script of seo-shell-chrome.mjs sends /c/<slug>.html to /?cat=<slug>, handled by openCatLink in section 9b). The address only changes in place (replaceState):
@@ -262,7 +262,7 @@ window.addEventListener('popstate', e => {
   if (!stack.length && opener) { opener.focus?.({ preventScroll: true }); opener = null; }
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
-const PRODUCT_PATH = /^\/p\/([^/]+)\.html$/i.exec(location.pathname);
+const PRODUCT_PATH = /^\/p\/([^/]+)\.html$/i.exec(window.__STM_PRODUCT_ROUTE_PATH || location.pathname);
 const DEEP = new URLSearchParams(location.search).get('product') || (PRODUCT_PATH ? decodeURIComponent(PRODUCT_PATH[1]) : null);   // Shared query links and direct /p/<slug>.html pages open the same in-shell product view
 let deepOpen = false;   // the product page for DEEP has been opened (by the fast path in section 9b, or after the full catalog)
 /* /?cart=<product id>:<qty>,<product id>:<qty>: a shared cart link (the Share cart link button). The cart itself lives in each phone's own storage, so the link
