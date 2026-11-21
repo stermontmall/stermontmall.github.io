@@ -340,7 +340,7 @@ with sync_playwright() as p:
     BASE = URL.rstrip('/')
     html = pg.evaluate("fetch('/').then(r => r.text())")   # the HTML the server sends (the live page's title changes while a product is open)
     check('home page keeps the SEO head (brand-first title, canonical, index robots, JSON-LD)', re.search(r'<title>Stermont Arcade \|[^<]*</title>', html) and 'rel="canonical" href="https://stermontarcade.co.ke/"' in html and 'index, follow' in html and html.count('application/ld+json') >= 2 and 'noindex' not in html)
-    check('home page carries the seo-links markers the build bot fills (crawlable category + product links)', html.count('<!-- seo-links:start -->') == 1 and html.count('<!-- seo-links:end -->') == 1 and '/c/' in html and '/p/' in html)
+    check('home page carries the seo-links markers the build bot fills (crawlable category + product links)', html.count('<!-- seo-links:start -->') == 1 and html.count('<!-- seo-links:end -->') == 1 and '/c/' in html and '?product=' in html)
     cls = open(os.path.join(ROOT, 'classic.html'), encoding='utf-8').read()
     chk = open(os.path.join(ROOT, 'checkout.html'), encoding='utf-8').read()
     check('checkout.html (the checkout surface) is noindex so only / is indexed', 'content="noindex, follow"' in chk and 'index, follow, max-image' not in chk)
