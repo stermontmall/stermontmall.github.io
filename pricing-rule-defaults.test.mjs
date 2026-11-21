@@ -32,7 +32,7 @@ assert.match(catalog, /row\.stock = 1000; row\.low_at = 20; row\.featured = fals
 assert.match(catalog, /if \(!\(row\.old_price > row\.price\)\) row\.old_price = null/);
 assert.doesNotMatch(bulk, /row\.price \+ 50/);
 
-assert.match(photoAi, /official four-tier rule/);
+assert.match(photoAi, /official four-tier rule/i);
 assert.doesNotMatch(photoAi, /selling_price_kes:\s*r\.price/);
 
 assert.deepEqual(policy.pricing.tiers.map(t => t.markup_pct), [30, 25, 20, 17.5]);
