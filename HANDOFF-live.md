@@ -1,3 +1,20 @@
+## 2026-11-21 12:58 (Africa/Nairobi) — Unblock storefront during shared-product loading
+
+### Done
+- Connected to GitHub repository `stermontmall/stermontmall.github.io` and Supabase project `oewvtbnmyombbtggamor`; both are accessible.
+- Read the current handoff and repository rules. Main is `4762adc21ae9327d02065ebad35e1362f416e7a2`; Pages deployment run `44876665580` completed successfully.
+- Read-only Supabase verification: project `ACTIVE_HEALTHY`; 1,828 products, 1,713 active, 1,711 active with positive stock, 92 categories. `get_store_catalog` and public category requests returned HTTP 200 in live mobile requests at 2026-11-21 09:55 UTC. Existing product data and security policies were not changed.
+- Root cause of the screenshot's blank white spinner identified in `index.html`: the `?product=` deep-link preloader intentionally sets `visibility:hidden` on the entire app and overlays a full-screen spinner while product data loads. This masks the shop during a slow/failed deep-link open even though the catalogue backend is responding.
+
+### In progress
+- Branch: `wip-products-loading-unblock-20261121` from `main`.
+- Remove only the full-screen hide/spinner behavior so the home catalogue remains visible while a shared product link resolves; retain the existing product overlay and no-transition behavior. No Supabase schema/data/security or product-link/SEO rules will change.
+
+### Next
+1. Update `index.html` on `wip-products-loading-unblock-20261121` to remove the blocking deep-link preloader.
+2. Run the relevant HTML/shell regression checks and GitHub Actions quality gate; inspect deployment only after tests pass.
+3. Report exact commit/PR and deployment result; do not merge unless required checks pass.
+
 ## 2026-11-21 08:59 (Africa/Nairobi) — Pricing admin merged; Pages deployed; product-page save blocker identified
 
 ### Done
