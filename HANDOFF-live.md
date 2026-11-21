@@ -1,3 +1,16 @@
+## 2026-11-21 08:55 (Africa/Nairobi) — Product description links: sentence-split regression fix
+
+- Investigated failed PR #990 SEO quality-gate run `44589313675`, job `135790841390`. The failing assertion showed `productDescriptionHtml()` left a Markdown product link as plain text because the unlabelled-description sentence splitter divided the `.html` URL at its period before inline Markdown conversion.
+- Fixed `product-description-html.mjs` on branch `fix/shell-product-links-2026-11-19`, commit `3facb0a5ff35e8981d53761054337acb7a461682`. Sentence splitting now treats a complete Markdown link token as indivisible, preserving its `.html` suffix; the existing inline renderer then converts it to `shellProductLink(slug)`.
+- Verified the exact failing fixture against the corrected splitter/renderer logic in an isolated JavaScript check: it now renders `https://stermontarcade.co.ke/?product=premise-200-sc-termiticide-50-ml`.
+- The full repository test could not be run in this environment because the GitHub clone attempt failed (DNS/network unavailable). No new GitHub Actions run was visible for the new commit at 08:55 Africa/Nairobi; CI proof is still pending.
+- PR #990 remains dirty/unmergeable against `main`; do not merge until the branch conflict is resolved and the complete quality gate passes.
+
+### Next
+1. Confirm GitHub Actions starts for commit `3facb0a5ff35e8981d53761054337acb7a461682`; inspect the full quality-gate result and fix any further failures.
+2. Resolve PR #990's merge conflict without losing the customer-link migration or the existing static SEO allowlist.
+3. Keep static `/p/<slug>.html` documents indexable; human-facing product links must open the mobile shell via `shellProductLink(slug)`.
+ 
 ## 2026-11-19 — In progress: customer-facing product links must open the mobile shell
 
 - Done on branch `fix/shell-product-links-2026-11-19`, PR #990: added shared `product-links.js` / `shellProductLink(slug)`; updated product-page WhatsApp prefill and Link lines, pack-size WhatsApp/cart actions, mobile-shell share/copy/deep-link URLs, storefront share/copy, category/search cards, product-trust CTA, admin SEO links, product-description Markdown, blog/guide generators, related-product cards, and service-page product CTAs.
