@@ -559,7 +559,6 @@
         box(b, 'Payment submitted', [[doneVia === 'card' ? 'Card reference' : 'M-Pesa code', doneCode], ['Amount', money(doneAmt)]]);
         var a = h('a', 'btn btn-main', 'Message us on WhatsApp'); a.href = lastUrl; a.target = '_blank'; a.rel = 'noopener'; f.appendChild(a);
         btn(f, 'Copy order details', function () { try { navigator.clipboard.writeText(lastMsg).then(function () { toast('Copied'); }); } catch (e) {} }, 'btn-alt');
-        if (session()) { var mo = h('a', 'btn btn-alt', 'View my orders'); mo.href = 'account.html'; f.appendChild(mo); }
         btn(f, 'Close', function () { step = 'cart'; closeDr(); }, 'btn-alt');
       }
       function render() {
