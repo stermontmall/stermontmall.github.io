@@ -69,6 +69,8 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version: 20
@@ -152,9 +154,31 @@ jobs:
             node blog-build.mjs
             node seo-safe-blog-meta.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/13-blog-build.log"
+      # Do not make unrelated admin/backend PRs depend on the legacy live Supabase catalogue.
+      # The deterministic shell/SEO unit tests above always run. Build live generated pages only
+      # when this PR changes catalogue or page-generation inputs (or on manual dispatch).
+      - name: Detect whether this PR changes generated catalogue inputs
+        id: live_catalogue
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" != "pull_request" ]; then
+            echo "required=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed="$(git diff --name-only "$BASE_SHA" "$GITHUB_SHA")"
+          if printf '%s\n' "$changed" | grep -Eq '^(generate-products\.mjs|catalog-v10\.js|product-content\.json|product-description-html\.mjs|seo-[^/]+\.mjs|seo-overrides\.json|product-links\.js|product-link-normalizer\.mjs|p/|c/|blog/|guides/|services/|pest-control/)'; then
+            echo "required=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "required=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping live catalogue build: this PR does not change catalogue/page-generation inputs."
+          fi
       - name: Build product and category pages from the live public catalogue
+        if: steps.live_catalogue.outputs.required == 'true'
         run: node generate-products.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/14-generate-products.log"
       - name: Apply the same SEO enrichment passes used by production
+        if: steps.live_catalogue.outputs.required == 'true'
         run: |
           {
             node seo-kenya.mjs
@@ -164,14 +188,18 @@ jobs:
             node seo-shell-redirect.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
       - name: Build service pages for the generated-link guard
+        if: steps.live_catalogue.outputs.required == 'true'
         run: node services/build-services.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15a-service-pages.log"
       - name: Normalize all generated customer-facing product links
+        if: steps.live_catalogue.outputs.required == 'true'
         run: node product-link-normalizer.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-normalize-generated-links.log"
       - name: Verify generated pages contain no static human-facing product links
+        if: steps.live_catalogue.outputs.required == 'true'
         env:
           STM_CHECK_GENERATED_PRODUCT_PAGES: '1'
         run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-generated-product-links.log"
       - name: Run full on-page SEO audit against production-equivalent generated pages
+        if: steps.live_catalogue.outputs.required == 'true'
         run: |
           log="$RUNNER_TEMP/ci-logs/16-seo-check.log"
           if ! node seo-check.mjs > seo-pr-report.md 2> "$log"; then

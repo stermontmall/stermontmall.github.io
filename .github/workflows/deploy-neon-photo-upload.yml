@@ -1,0 +1,70 @@
+name: Deploy Neon photo upload function
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: 'Type DEPLOY to deploy photoupload to the Stermont main Neon branch'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: neon-photoupload-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: ${{ inputs.confirm_deploy == 'DEPLOY' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Neon CLI and function dependencies
+        run: |
+          npm install --global neon@latest
+          npm install --prefix neon-functions/photoupload --omit=dev
+
+      - name: Deploy bundled function to Neon
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: restless-shape-79120240
+        run: |
+          if [ -z "$NEON_API_KEY" ]; then
+            echo "::error::Repository secret NEON_API_KEY is not configured."
+            exit 1
+          fi
+          neon set-context --project-id "$NEON_PROJECT_ID" --branch-id br-fancy-bird-bh01xcbs
+          neon functions deploy photoupload \
+            --src neon-functions/photoupload \
+            --branch br-fancy-bird-bh01xcbs \
+            --wait
+
+      - name: Verify deployment status
+        run: neon functions get photoupload --branch br-fancy-bird-bh01xcbs
+
+      - name: Smoke-test the deployed HTTP endpoint
+        env:
+          PHOTO_UPLOAD_URL: https://br-fancy-bird-bh01xcbs-photoupload.compute.c-10.eu-central-1.aws.neon.tech/
+        run: |
+          response="$(curl --fail --silent --show-error --retry 5 --retry-delay 3 --retry-connrefused "${PHOTO_UPLOAD_URL}health")"
+          printf '%s' "$response" | node -e '
+            let s = "";
+            process.stdin.on("data", c => s += c);
+            process.stdin.on("end", () => {
+              const body = JSON.parse(s);
+              if (body.ok !== true || body.service !== "stermont-photo-upload") process.exit(1);
+              process.stdout.write("Photo upload function health check passed.\\n");
+            });
+          '
