@@ -27,6 +27,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 20
+      - name: Check automation script syntax
+        run: node --check neon-automation-sync.mjs
       - name: Install Neon serverless driver
         run: npm install --no-save @neondatabase/serverless
       - name: Sync blog topics and published posts into Neon
