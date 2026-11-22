@@ -713,6 +713,33 @@ with sync_playwright() as p:
     FAIL[0] = False
     c18.close()
 
+    # Supabase Storage returns 402 and the ImageKit proxy returns 404 (the real production state): photos must end in the
+    # "photo coming soon" placeholder, and the page must stop requesting Supabase originals once one is known to be broken.
+    c19 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c19)
+    sb_hits = []
+    def storage_402(rt):
+        sb_hits.append(rt.request.url)
+        rt.fulfill(status=402, content_type='application/json', body='{"message":"exceed_cached_egress_quota"}', headers={'access-control-allow-origin': '*'})
+    c19.route('https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/**', storage_402)
+    c19.route('https://ik.imagekit.io/**', lambda rt: rt.fulfill(status=404, body='not found'))
+    c19.route('**/placeholder.svg', lambda rt: rt.fulfill(status=200, content_type='image/svg+xml', body='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10"/></svg>'))
+    p19 = c19.new_page(); e19 = []; p19.on('pageerror', lambda e: e19.append(str(e)))
+    p19.goto(URL); p19.wait_for_selector('#grid .card')
+    SBU = 'https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/'
+    # Point real card photos at Supabase originals (as production does); the browser then gets genuine HTTP 402 error events.
+    # Card 0 has a verified non-Supabase gallery photo to fall back to; the others have only Supabase photos.
+    p19.evaluate("""(SBU) => { [...document.querySelectorAll('#grid .card img')].slice(0, 4).forEach((i, n) => {
+      i.setAttribute('data-fallbacks', n === 0 ? JSON.stringify(['https://img.test/ok.png']) : '[]'); i.src = SBU + 'gone-' + n + '.jpg'; }); }""", SBU)
+    p19.wait_for_timeout(1500)
+    srcs = p19.evaluate("() => [...document.querySelectorAll('#grid .card img')].slice(0, 4).map(i => i.getAttribute('src') || '')")
+    check('with Supabase 402 no product card keeps a Supabase or ImageKit-proxy photo URL', not any('supabase.co' in x for x in srcs), [x for x in srcs if 'supabase.co' in x][:2])
+    check('failed Supabase photos show the same-origin photo-unavailable placeholder', sum(x.endswith('/placeholder.svg') for x in srcs) >= 2, srcs)
+    check('a verified non-Supabase gallery photo is used instead of the broken Supabase one', srcs[0] == 'https://img.test/ok.png', srcs[0])
+    n_after = len(sb_hits); p19.wait_for_timeout(800)
+    check('Supabase originals known to be broken are not requested again', len(sb_hits) == n_after, (n_after, len(sb_hits)))
+    check('Supabase 402 photo handling has no JavaScript errors', not e19, e19[:3])
+    c19.close()
+
     co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
     check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
     check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'failed_requests': failed_requests[:3]})

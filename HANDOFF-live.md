@@ -1,4 +1,18 @@
 
+## 2026-11-22 17:35 (Africa/Nairobi) — Photo restore: audit result + browser guard (branch wip-product-photos-restore-20261122)
+
+### Audit run 45030606023 (GitHub Actions, real HTTP; 1,993 unique image URLs in the generated site)
+- Supabase originals: 1,628 URLs; 3/3 direct samples HTTP 402. Via ImageKit /supabase proxy: 0 OK (1,615 x 404, 12 x 400, 1 x 200 non-image). ImageKit native copies (#1023 route): 0 of 1,628 exist. #1023 copy run 44998826030 = dry run, 402, 0 found/uploaded/skipped/missing/failed.
+- GitHub Pages: 156 OK, 2 broken. Third-party hotlinks: 130 OK, 77 broken.
+- Supabase-only photos CANNOT be recovered without Supabase access: no GitHub copy, no ImageKit copy, no backup in the repo.
+
+### Done
+- imagekit-url.js: Supabase originals known broken (error -> 10 min verdict) are never requested again; verified non-Supabase gallery photo used if any, else /placeholder.svg ("Photo coming soon"). Tests: photo-probe.test.mjs (real localhost HTTP), imagekit-fallback.test.mjs, shell.test.py Supabase-402 case; wired into seo-pr-quality.yml.
+
+### Next
+1. Open PR, read CI; merge only if green.
+2. Owner restores Supabase billing, then run copy workflow (dry run first), verify via image-source-audit.yml, then update products.images to verified ImageKit URLs.
+
 ## 2026-11-22 17:20 (Africa/Nairobi) — PRIORITY: permanent product photo restoration (branch wip-product-photos-restore-20261122)
 
 ### Findings (Supabase SQL, 17:05)

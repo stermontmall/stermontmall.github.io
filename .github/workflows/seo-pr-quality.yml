@@ -26,6 +26,11 @@ on:
       - 'database/enforce-canonical-four-tier-product-defaults.sql'
       - 'database/no-fake-old-price-on-new-products.sql'
       - 'pricing-rule-defaults.test.mjs'
+      - 'imagekit-url.js'
+      - 'imagekit-url.test.mjs'
+      - 'imagekit-fallback.test.mjs'
+      - 'photo-probe.test.mjs'
+      - 'scripts/photo-probe.mjs'
       - 'product-codes.test.mjs'
       - 'seo-overrides.json'
       - 'product-description-html.mjs'
@@ -131,6 +136,11 @@ jobs:
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-syntax.log"
       - name: Test canonical admin pricing and posting rules
         run: node pricing-rule-defaults.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/07b-pricing-rule-defaults.log"
+      - name: Test photo delivery (200 image responses, broken ImageKit URLs, Supabase 402 fallback)
+        run: |
+          node photo-probe.test.mjs
+          node imagekit-fallback.test.mjs
+          node imagekit-url.test.mjs
       - name: Test category buying introductions and FAQ consistency
         run: node category-editorial.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-category-editorial.log"
       - name: Test product description rendering and legacy category-link normalization
