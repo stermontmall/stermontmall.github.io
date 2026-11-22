@@ -1,6 +1,6 @@
 /* Stermont Arcade mobile shell prototype.
-   Vanilla JS, no framework. Data is live: products + categories come from Supabase (section 1).
-   Sections: 1 data (Supabase)  2 store + badges  3 history-backed overlays  4 tabs  5 header scroll
+   Vanilla JS, no framework. Data is live: products + categories come from the temporary Neon Store API (section 1).
+   Sections: 1 data (Neon)  2 store + badges  3 history-backed overlays  4 tabs  5 header scroll
              6 grid + skeletons  7 categories  8 filters  9 quick buy  10 cart  11 wiring */
 (() => {
 'use strict';
@@ -42,7 +42,7 @@ const ls = {
   set(k, v) { try { localStorage.setItem('shell.' + k, JSON.stringify(v)); } catch {} }
 };
 
-/* ---------- 1. Data: live Supabase catalog ----------
+/* ---------- 1. Data: live Neon catalog ----------
    One fetch of every active product row + the category tree (small: ~225 rows). Pack sizes of one product are separate
    rows that share `variant_group`; they are folded into ONE card with a `sizes` list, each size carrying its own price.
    Names come from /product-names.json (the heading each product page shows, rebuilt with the site); if that file is
@@ -141,7 +141,7 @@ const thumb = (p, eager = false) => {
   return `<img ${source} alt="${esc(p.name)} product photo" decoding="async" data-imagekit-original="${esc(original)}" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
 };
 
-/* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
+/* Resolves {items, hasMore}; rejects when the Neon API cannot be reached (the grid shows a retry link). */
 // Keep the first mobile product batch small; infinite scroll fetches more only as the shopper approaches the list end.
 async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 8 }) {
   await loadCatalog();
@@ -436,7 +436,7 @@ function selectCategory(chip, sub = '') {
 }
 let sideCat = '__top';
 /* Photo for a tile: the first product photo in that category (and sub-category); the emoji shows if there is none or it fails to load. */
-const SERVICE_TILE_PHOTO = 'https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/service-media/pest-control-fumigation-nairobi/2026-11/mvzjhdh3-7c9e80602774.jpg';
+const SERVICE_TILE_PHOTO = '/product-photos/petrol-thermal-fogger-machine-fumigation-1.jpg';
 const photoOf = (cat, sub) => (PRODUCTS.find(p => p.cat === cat && (!sub || p.sub === sub) && p.img) || {}).img || '';
 const tile = (attrs, label, img, emoji, bg) => `<li><button class="tap w-full flex flex-col items-center gap-1.5" ${attrs}>
       <span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:64px;height:64px;background:${bg}">${img ? thumb({ img, emoji }) : esc(emoji || '')}</span>
@@ -634,8 +634,8 @@ function renderProductDescription(target, source) {
 }
 /* @render-end */
 const details = new Map(); // Cache product-detail requests by variant row ID; renderDetails() and renderPP() share this cache.
-const staticDetails = new Map(); // Read-only details parsed from the published SEO page when Supabase REST is restricted.
-/* Read-only description fallback for opening a product from a card while Supabase REST is restricted (HTTP 402). The card's slug has a generated
+const staticDetails = new Map(); // Read-only details parsed from the published SEO page when the Neon API is unavailable.
+/* Read-only description fallback for opening a product from a card while the database API is unavailable. The card's slug has a generated
    /p/<slug>.html page on GitHub Pages with the full buyer guide in .product-description > .pd-sec blocks; read the text from there. Nothing is written
    or redirected. Returns null (the normal "Could not load the details" + retry) when the page is missing or has no description. */
 async function staticDetailsFor(rowId) {
@@ -785,7 +785,7 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
    still runs, so the behaviour is never worse than before. To undo: delete this function and the call to it in section 11. */
 async function openStaticProductFallback(slug) {
   // Published /p/ pages are generated from the catalogue and remain available on GitHub Pages
-  // even while Supabase REST is returning 402 (egress quota exceeded). Treat them as read-only;
+  // even while the Neon API is temporarily unavailable. Treat them as read-only;
   // this fetch hydrates the in-app view without redirecting or modifying the canonical SEO document.
   const response = await fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' });
   if (!response.ok) throw new Error('Published product page returned HTTP ' + response.status);
