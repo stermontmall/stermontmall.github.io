@@ -36,6 +36,8 @@ const jsonFields=new Set(["items"]);
 function normalize(row,collection){
  const out={};
  for(const [k,v] of Object.entries(row)){
+  if((v===undefined||v===null||v==="")&&arrayFields.has(k)){out[k]=[];continue;}
+  if(v===undefined||v===null||v==="")continue;
   if(k==="id"){out.supabase_id=String(v);continue;}
   if(k==="cost"&&collection==="products")continue;
   if(collection==="products"&&(k==="price"||k==="old_price")&&v!==""&&v!=null){
@@ -63,7 +65,7 @@ async function loadState(){try{return JSON.parse(await fs.readFile(statePath,"ut
 async function saveState(s){await fs.writeFile(statePath,JSON.stringify(s,null,2)+"\n",{mode:0o600});}
 async function existingMap(collection){
  const map=new Map();let page=1;
- for(;;){const r=await request("/api/collections/"+collection+"/records?perPage=500&page="+page+"&fields=id,supabase_id,pid");for(const x of r.items||[]){const key=x.supabase_id??x.pid;if(key!=null)map.set(String(key),x.id);}if(page>=r.totalPages)break;page++;}
+ for(;;){const r=await request("/api/collections/"+collection+"/records?perPage=500&page="+page+"&fields=id,supabase_id,supabase_user_id,pid");for(const x of r.items||[]){const key=x.supabase_id??x.supabase_user_id??x.pid;if(key!=null)map.set(String(key),x.id);}if(page>=r.totalPages)break;page++;}
  return map;
 }
 async function sequential(collection,ops,onDone){
@@ -75,6 +77,7 @@ async function writeBatch(collection,records,existing,state){
  for(const group of groups){
   try{
    const result=await request("/api/batch",{method:"POST",body:JSON.stringify({requests:group.map(o=>({method:o.method,url:o.url,body:o.body}))})});
+   if(!Array.isArray(result)||result.some(x=>!x||x.status>=400))throw new Error("Batch returned one or more failed subrequests.");
    for(let i=0;i<group.length;i++){const body=result[i]?.body||{};if(body.id)existing.set(group[i].key,body.id);state.completed[collection]=(state.completed[collection]||0)+1;}
    await saveState(state);
   }catch(batchError){
@@ -90,6 +93,10 @@ async function main(){
  for(const [collection,file] of tasks){
   const rows=await readCSV(file);if(!rows.length)continue;
   let clean=rows.map(r=>normalize(r,collection));
+  if(collection==="orders"){
+   const users=await existingMap("users");
+   clean=clean.map((record,index)=>{const legacy=rows[index].user_id||"";record.supabase_user_id=legacy||"";record.user_id=legacy?(users.get(String(legacy))||""):"";return record;});
+  }
   let costRows=[];
   if(collection==="products"){costRows=rows.filter(r=>r.cost!==""&&r.cost!=null).map(r=>({pid:String(r.id||r.slug),cost:val(r.cost,"number")}));if(onlyActive)clean=clean.filter(r=>r.active===true&&Array.isArray(r.images)&&r.images.length>0);}
   if(!clean.length){console.log(collection+": no rows to import");continue;}
