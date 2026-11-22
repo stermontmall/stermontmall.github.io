@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { parseCSV } from "./csv.mjs";
+const rows=parseCSV('id,name,description\n1,"Sprayer, 2L","first line\nsecond line"\n2,"A ""quoted"" name","plain"');
+assert.equal(rows.length,2);
+assert.equal(rows[0].name,"Sprayer, 2L");
+assert.equal(rows[0].description,"first line\nsecond line");
+assert.equal(rows[1].name,'A "quoted" name');
+assert.equal(parseCSV('\uFEFFa,b\n1,2')[0].b,"2");
+assert.throws(()=>parseCSV('a,b\n1,"unterminated'),/quoted field/);
+console.log("CSV parser tests passed.");
