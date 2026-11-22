@@ -698,6 +698,21 @@ with sync_playwright() as p:
     FAIL[0] = False
     c17.close()
 
+    # Tapping a product card loads its description over REST; with HTTP 402 it must come from the card's published /p/ page instead.
+    c18 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c18)
+    card_html = '''<!doctype html><html><head></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Card description comes from the published page.</p><ul><li>Second line item</li></ul></section></div><script type="application/ld+json">{"@type":"Product","offers":{"availability":"https://schema.org/InStock"}}</script></body></html>'''
+    c18.route('**/p/home-1.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=card_html))
+    p18 = c18.new_page(); e18 = []; p18.on('pageerror', lambda e: e18.append(str(e)))
+    p18.goto(URL); p18.wait_for_selector('#grid .card[data-id="home-1"]')
+    FAIL[0] = True  # Supabase REST now returns 402 for the details request
+    p18.locator('#grid .card[data-id="home-1"]').click(); p18.wait_for_selector('#page-product.open', timeout=15000)
+    p18.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Card description comes from the published page.')", timeout=8000)
+    check('tapping a card shows its description from the published page when Supabase REST returns 402', 'Card description comes from the published page.' in p18.locator('#pp-desc').inner_text() and 'Second line item' in p18.locator('#pp-desc').inner_text(), p18.locator('#pp-desc').inner_text()[:80])
+    check('card-tap fallback marks the product in stock and shows no load error', 'In stock' in p18.locator('#pp-meta').inner_text() and 'Could not load' not in p18.locator('#pp-desc').inner_text(), p18.locator('#pp-meta').inner_text())
+    check('card-tap description fallback has no JavaScript errors', not e18, e18[:3])
+    FAIL[0] = False
+    c18.close()
+
     co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
     check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
     check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'failed_requests': failed_requests[:3]})
