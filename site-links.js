@@ -7,8 +7,7 @@
 (function () {
   'use strict';
   var WA = '254748888230';
-  var SB = 'https://oewvtbnmyombbtggamor.supabase.co';
-  var KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';   // public (publishable) key, same one the product-page builder uses
+  var NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
   function el(tag, css, text) { var e = document.createElement(tag); if (css) e.style.cssText = css; if (text) e.textContent = text; return e; }
 
   function footerLinks() {
@@ -79,10 +78,10 @@
         try { if (localStorage.getItem(key)) { say('You already asked for this alert. We have your number.'); return; } } catch (e) {}
         btn.disabled = true; btn.textContent = 'Sending\u2026';
         var what = kind === 'restock' ? 'back in stock' : 'price drop';
-        fetch(SB + '/rest/v1/messages', {
+        fetch(NEON_REST + 'rpc/submit_message', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', apikey: KEY, Prefer: 'return=minimal' },
-          body: JSON.stringify({ name: 'Stock alert request', phone: phone.slice(0, 20), body: ('[ALERT: ' + what + '] Please contact me about: ' + title + ' ' + url).slice(0, 1000) })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ p_name: 'Stock alert request', p_phone: phone.slice(0, 20), p_email: null, p_body: ('[ALERT: ' + what + '] Please contact me about: ' + title + ' ' + url).slice(0, 1000) })
         }).then(function (r) {
           if (!r.ok) throw new Error('status ' + r.status);
           try { localStorage.setItem(key, '1'); } catch (e) {}
