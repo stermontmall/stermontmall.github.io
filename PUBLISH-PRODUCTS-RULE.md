@@ -21,7 +21,7 @@ If the owner says "publish products", "run the publish rule", or asks you to add
 
 ---
 
-## The rule (mirror of Neon `publish_products`, version 6: v3 rule plus the photo-sourcing addendum and photo policy v6)
+## The rule (mirror of Neon `publish_products`, version 8: v3 rule plus photo policy v6, Kenyan third-party sources v7 and upload procedure v8)
 
 ```
 PUBLISH-PRODUCTS RULE v3 - FULLY AUTONOMOUS - PERMANENT STANDING INSTRUCTION
@@ -103,7 +103,7 @@ VENDOR PHOTO FALLBACK CLARIFICATION (owner-approved 2026-11-22): Search manufact
 ```
 
 
-## PHOTO POLICY v6 — supersedes the "Vendor photo fallback clarification" above (owner-approved 2026-11-22)
+## PHOTO POLICY v6 (the retailer/competitor restriction below is superseded by v7) — supersedes the "Vendor photo fallback clarification" above (owner-approved 2026-11-22)
 
 Photos may be taken from the official manufacturer's or an authorized distributor's own product page for the exact product and exact pack size, to advertise that product for sale. No separate written permission is required for these sources.
 
@@ -116,3 +116,25 @@ All other gates are unchanged: baseline cost, description and SEO, duplicate che
 ## GO-LIVE NOTE v6 (checked 2026-11-22)
 
 Neon is the database new products are posted to. The public storefront (`mobile-shell/app.js`) and the page generator (`generate-products.mjs`) still read Supabase, so `active = true` in Neon does not by itself show a product on the website. Checked 2026-11-22: the Supabase catalogue has 0 active products (1,828 rows, all hidden; `get_store_catalog()` returns 0 rows), so the public shop shows no products at the moment, and Neon held 7 inactive drafts. Switching the storefront and page generator to read Neon is a separate, tested PR; until it is merged, `active = true` in Neon does not show a product on the website.
+
+
+## PHOTO POLICY v7 — KENYAN THIRD-PARTY SOURCES (owner-approved 2026-11-22; mirror of the Neon row, written by another session)
+
+The owner authorizes sourcing product photos from other websites operating in Kenya, not only manufacturers or authorized distributors: Kenyan agrovets, pest-control suppliers, wholesalers, retailers, marketplaces and other Kenyan commercial product listings (including Jumia Kenya and Kilimall), provided the image is for the exact product and exact pack size sold by Stermont Arcade.
+
+For each candidate image:
+- Confirm the product name/brand and exact pack size match the Neon product record. A different size, formulation, concentration, label, model or variant is not acceptable.
+- Prefer a clean, genuine product image with no seller watermark, contact details, price overlay or competitor branding. No logos, generic category images, search thumbnails, AI mockups, edited/relabelled or misleading images.
+- Verify the image loads, is at least 500 x 500 px, and record the original Kenyan product-page URL, direct asset URL, source business/site name, retrieval date, dimensions and exact-pack match note in product attributes. Record the source basis as `kenyan_vendor` for a Kenyan third-party source.
+- Download/store an approved image on Stermont's configured stable public image host (Neon Object Storage or ImageKit); use the stable hosted HTTPS URL in `images`. Do not hotlink a temporary URL or invent a URL.
+- Check the source site's terms and applicable image rights before copying or republishing. The owner's instruction authorizes Stermont's sourcing workflow but does not transfer copyright or override a site's terms. If reuse is prohibited, expressly restricted, or materially unclear, do not copy that asset; seek permission or choose another source whose terms allow reuse.
+- Do not remove watermarks, crop out ownership notices, or imply that Stermont created or owns a third-party image. Keep source attribution in product attributes and, where appropriate, on the product page.
+
+Manufacturer and authorized-distributor assets remain preferred. All photo quality, cost, description, SEO, duplicate and regulatory gates remain unchanged. A product with no qualifying image stays inactive. A photo update alone never changes active status, price, stock, slug or product code.
+
+## PHOTO UPLOAD PROCEDURE v8 (owner-approved 2026-11-22; applies to Claude and ChatGPT)
+
+1. **Storage.** Upload the copied image to Neon Object Storage bucket `product-photos` (public_read), project `restless-shape-79120240`, branch `br-fancy-bird-bh01xcbs`. Object key `<product_code>/<number>-<slug>.<ext>`. Public URL `https://br-fancy-bird-bh01xcbs.storage.c-10.eu-central-1.aws.neon.tech/product-photos/<object key>` (path-style; unverified until the first upload). Request that URL and confirm it returns an image before saving it in `products.images`; if it does not, stop and report. Never save a presigned URL or the vendor's own URL.
+2. **Any image format is accepted** (JPEG, PNG, WebP, AVIF, GIF, HEIC/HEIF, TIFF, BMP and similar). Keep the original upload. If a format does not display in every browser (HEIC/HEIF, TIFF, BMP, and AVIF where needed), also make a JPEG or WebP copy (long side at most 1600 px, at least 500 x 500) and put that browser-safe copy in `products.images`. Set the matching Content-Type on each file.
+3. **Upload straight away** (ChatGPT or Claude with the Neon connector): (a) `presign_storage_object` with operation `upload`, bucket `product-photos`, the object key and the file's `content_type`; (b) HTTP PUT the image bytes to the returned URL using exactly the returned headers; (c) request the public URL and confirm it returns an image; (d) one UPDATE on `public.products` for that `product_code` setting `images`, `alt_text` and the photo attributes from v6/v7. If the owner attaches a photo in the chat, use it as is after the exact-pack check. The older Supabase `upload-photos` function and `chatgpt-photo-upload-openapi.json` are not used for new products.
+4. A photo-only update never changes `active`, `price`, `stock`, `slug` or `product_code`. Activation still requires every gate above. The public shop shows Neon products only once the storefront switch (PR 1044) is merged.

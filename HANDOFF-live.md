@@ -1,3 +1,10 @@
+## 2026-11-22 23:20 (Africa/Nairobi) — Rule `publish_products` is now v8 (photo upload procedure)
+
+- Another session raised the rule to v7 (Kenyan third-party photo sources incl. Jumia/Kilimall, with site-terms check, copy not hotlink). I did not overwrite it: backups are in Neon keys `publish_products_v5_backup`, `_v6_backup`, `_v7_backup`.
+- I added v8: copy to Neon bucket `product-photos` (public_read, empty so far), object key `<product_code>/<n>-<slug>.<ext>`, any image format accepted (browser-safe JPEG/WebP copy when needed), and the ChatGPT/Claude upload steps (`presign_storage_object` upload, HTTP PUT, verify public URL, one UPDATE of images/alt_text/photo attributes). Mirrored in `PUBLISH-PRODUCTS-RULE.md` and `.claude/commands/post-product.md`.
+- UNVERIFIED: the public URL form `https://br-fancy-bird-bh01xcbs.storage.c-10.eu-central-1.aws.neon.tech/product-photos/<key>`. The sandbox cannot PUT/GET (outbound blocked), so the first real upload (from ChatGPT or an owner device) must confirm the URL returns an image before it is saved.
+- No photo uploaded, no product activated.
+
 ## 2026-11-22 23:35 (Africa/Nairobi) — Storefront and page generator switched to Neon (branch `wip-neon-storefront-2026-11-22`, NOT merged)
 
 ### Done
