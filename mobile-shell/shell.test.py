@@ -52,7 +52,7 @@ def serve(route, body, ctype='application/json'):
     time.sleep(0.4)   # a real network round trip, so the skeleton state is observable
     route.fulfill(status=200, content_type=ctype, body=body if isinstance(body, (bytes, str)) else json.dumps(body), headers={'access-control-allow-origin': '*'})
 def on_rest(route):
-    if FAIL[0]: return route.fulfill(status=503, body='down', headers={'access-control-allow-origin': '*'})
+    if FAIL[0]: return route.fulfill(status=402, body='exceed_cached_egress_quota', headers={'access-control-allow-origin': '*'})
     url = route.request.url
     if '/rest/v1/products' in url and 'id=eq.' in url:   # details of one row, fetched when a product is opened
         rid = url.split('id=eq.')[1].split('&')[0]
@@ -62,6 +62,12 @@ def on_rest(route):
     serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
 REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
+
+def run_node(fn, html, slug):
+    # Shared at module scope because Playwright route callbacks can run before h() reaches its later test section.
+    import subprocess
+    js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1],process.argv[2])))" % fn
+    return subprocess.run(['node', '-e', js, html, slug], cwd=ROOT, capture_output=True, text=True, check=True).stdout
 def mock_network(ctx):
     # Keep shell product URLs on the local fixture origin. Generated SEO pages expose
     # the production-domain helper, which would otherwise send the headless test away
@@ -506,9 +512,6 @@ with sync_playwright() as p:
 
     # Product/category pages hydrate the real app in place while preserving canonical SEO HTML.
     import subprocess, re as _re
-    def run_node(fn, html, slug):
-        js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1],process.argv[2])))" % fn
-        return subprocess.run(['node', '-e', js, html, slug], cwd=ROOT, capture_output=True, text=True, check=True).stdout
     check('generated product pages have the in-place full-shell loader', '/shell-route-loader.js?v=2' in run_node('inject', REAL, 'abasi-5-ec'))
     page = '<!doctype html><html><head><title>t</title><link rel="canonical" href="https://stermontarcade.co.ke/p/t.html"></head><body>x</body></html>'
     new_page = run_node('inject', page, 'termidor-96-sc-1-litre')
@@ -681,6 +684,34 @@ with sync_playwright() as p:
     p16 = c16.new_page(); p16.goto(URL); p16.wait_for_selector('#grid .card[data-id]')
     check('a fresh visit still starts on For you', p16.locator('#grid-title').inner_text() == 'Recommended for you')
     c16.close()
+
+    # Published SEO product pages are the read-only fallback when Supabase REST is restricted.
+    c17 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c17)
+    FAIL[0] = True  # simulate the Supabase 402 quota restriction for every REST request
+    fallback_html = '''<!doctype html><html><head><meta name="stm-id" content="static-fallback"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Static Fallback Sprayer","image":["https://img.test/ok.png"],"sku":"STM-TEST-402","offers":{"@type":"Offer","priceCurrency":"KES","price":1234,"availability":"https://schema.org/InStock"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"http://test/"},{"@type":"ListItem","position":2,"name":"Garden Tools","item":"http://test/c/garden-tools.html"},{"@type":"ListItem","position":3,"name":"Static Fallback Sprayer","item":"http://test/p/static-fallback.html"}]}</script></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Published description survives a database outage.</p></section></div></body></html>'''
+    c17.route('**/p/static-fallback.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=fallback_html))
+    p17 = c17.new_page(); e17 = []; p17.on('pageerror', lambda e: e17.append(str(e)))
+    p17.goto(f'{BASE}/?product=static-fallback'); p17.wait_for_selector('#page-product.open', timeout=15000); p17.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Published description survives')", timeout=5000)
+    check('product deep link opens from the published SEO page when Supabase REST returns 402', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
+    check('static fallback retains product code and full published description', 'STM-TEST-402' in p17.locator('#pp-meta').inner_text() and 'Published description survives a database outage.' in p17.locator('#pp-desc').inner_text())
+    check('static product fallback has no JavaScript errors', not e17, e17[:3])
+    FAIL[0] = False
+    c17.close()
+
+    # Tapping a product card loads its description over REST; with HTTP 402 it must come from the card's published /p/ page instead.
+    c18 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c18)
+    card_html = '''<!doctype html><html><head></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Card description comes from the published page.</p><ul><li>Second line item</li></ul></section></div><script type="application/ld+json">{"@type":"Product","offers":{"availability":"https://schema.org/InStock"}}</script></body></html>'''
+    c18.route('**/p/home-1.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=card_html))
+    p18 = c18.new_page(); e18 = []; p18.on('pageerror', lambda e: e18.append(str(e)))
+    p18.goto(URL); p18.wait_for_selector('#grid .card[data-id="home-1"]')
+    FAIL[0] = True  # Supabase REST now returns 402 for the details request
+    p18.locator('#grid .card[data-id="home-1"]').click(); p18.wait_for_selector('#page-product.open', timeout=15000)
+    p18.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Card description comes from the published page.')", timeout=8000)
+    check('tapping a card shows its description from the published page when Supabase REST returns 402', 'Card description comes from the published page.' in p18.locator('#pp-desc').inner_text() and 'Second line item' in p18.locator('#pp-desc').inner_text(), p18.locator('#pp-desc').inner_text()[:80])
+    check('card-tap fallback marks the product in stock and shows no load error', 'In stock' in p18.locator('#pp-meta').inner_text() and 'Could not load' not in p18.locator('#pp-desc').inner_text(), p18.locator('#pp-meta').inner_text())
+    check('card-tap description fallback has no JavaScript errors', not e18, e18[:3])
+    FAIL[0] = False
+    c18.close()
 
     co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
     check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)

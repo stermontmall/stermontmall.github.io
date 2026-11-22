@@ -1,3 +1,49 @@
+
+## 2026-11-22 17:35 (Africa/Nairobi) — Product descriptions not opening from cards (Supabase 402): card-tap fallback
+
+### Done (branch `wip-product-description-fallback-20261122`, branched from PR #1026 branch `wip-static-product-fallback-2026-11-22`; NOT merged, NOT live)
+- Owner report: tapping a product card opens no description. Root cause: `detailsFor()` in `mobile-shell/app.js` reads description/unit/stock from `products?id=eq...` over Supabase REST, which returns HTTP 402 (quota/billing restriction, see entries below). PR #1026 only covers `/?product=<slug>` deep links, not card taps.
+- Added `staticDetailsFor(rowId)`: when the REST details call fails or returns nothing, fetch the card's generated `/p/<slug>.html` (GitHub Pages, not Supabase), read `.product-description .pd-sec` blocks into the same section text format, and return it to the existing renderers. Read-only; no redirects; REST stays first choice. Returns null (existing "Could not load the details" + retry) if the page has no description.
+- Finding: pack-size pages such as `p/abasi-5-ec-100-ml.html` (433 of 2,059 files in `p/`) are 512-byte meta-refresh stubs to the group page. The real pages (1,626, e.g. `p/abasi-5-ec.html`) use `ProductGroup` JSON-LD for multi-pack products, so PR #1026's deep-link fallback, which requires `@type: Product`, will fail on multi-pack products. The card-tap fix uses the card's group slug and the HTML description, so it does not depend on that. TODO: make `openStaticProductFallback` accept `ProductGroup` (use `hasVariant[0]` offers/sku/image).
+- Bumped `app.js?v=45` to `?v=46` in `index.html` and `shell-route-loader.js`. `node --check mobile-shell/app.js` passes.
+- Added regression in `mobile-shell/shell.test.py` (block after the c17 402 test): load the shop, switch REST to 402, tap card `home-1`, assert the description and "In stock" come from the mocked `/p/home-1.html`, no JS errors.
+- Local result (`python3 mobile-shell/shell.test.py`, Chromium OK): 178/179 passed, including all 3 new checks and the existing 402 deep-link checks. The 1 failure is `no console/page errors or unexpected failed requests`: three home-page static card photos (`https://stermontarcade.co.ke/product-photos/jacto-hd-550-...jpg`, `...pruning-shears...jpg`, `...popvet-total-dog-dewormer...jpg`, hard-coded in index.html) could not load because this sandbox has no internet (curl to the site returns HTTP 000). Not caused by this change (index.html diff is only the ?v= bump); expected to pass in CI. Verify in the Actions run.
+- Photos still come from Supabase Storage and stay broken until billing is fixed (or PR #1022 ImageKit lands).
+
+### CI result for PR #1030 (head cf57892, 2026-11-22 ~16:50 Nairobi)
+- Full mobile-shell route regression (run 45028995674): PASSED (includes the 3 new card-tap checks).
+- SEO pull request quality gate (run 45028995709): FAILED at step "Build product and category pages from the live public catalogue" (`node generate-products.mjs`): `HTTP 402 ... restricted due to the following violations: exceed_cached_egress_quota. The project owner must upgrade their plan or remove spend caps to restore service.` This is the Supabase billing restriction, not the code in this PR; any branch fails this step until billing is fixed.
+- Exact cause of the outage is now confirmed: Supabase `exceed_cached_egress_quota`.
+
+### Next
+1. Owner decides whether to merge #1030 now (code check green; the gate fails only on Supabase 402) or after Supabase billing is restored and the gate is re-run.
+2. Fix the `ProductGroup` gap in `openStaticProductFallback` (multi-pack products' deep links) in a follow-up commit on this branch.
+3. Merge only when CI is green; then open a product card and a shared /?product= link on a phone and confirm the description appears.
+
+### 2026-11-22 PR / CI checkpoint
+- Opened PR #1026: https://github.com/stermontmall/stermontmall.github.io/pull/1026.
+- GitHub Actions started: Full mobile-shell route regression run 45002208966 and SEO pull request quality gate run 45002208943. At checkpoint both browser-suite steps were still running; no result has been claimed.
+- Exact validation to inspect next: fetch jobs for run IDs 45002208966 and 45002208943; if either browser test fails, fetch job logs and fix before merge. If the SEO gate later fails only at the product build because REST returns 402, record that separately from the product fallback regression.
+
+## 2026-11-22 — Product deep-link fallback for Supabase REST quota restriction
+
+### Done (on review branch)
+- Root cause confirmed: both the one-product deep-link lookup and the full catalogue load depend on Supabase REST; when REST returns HTTP 402 (exceed_cached_egress_quota), the product overlay never opens. The generated /p/<slug>.html pages remain published and contain Product JSON-LD, generated price, product code and full description.
+- Added a read-only fallback in mobile-shell/app.js: if the live product lookup fails or returns no row, fetch the matching published /p/<slug>.html, parse its Product/Breadcrumb JSON-LD and generated description, then open the same mobile-shell product view. When Supabase works, the live row path remains first choice. Static fallback details are held in memory only; no database writes or stale snapshot sync occur.
+- Added a Playwright regression case simulating Supabase HTTP 402 and asserting that the product page, price, product code and description still open from the published SEO page.
+- Bumped the mobile-shell app URL to ?v=45 in both index.html and shell-route-loader.js to avoid stale browser/service-worker copies.
+
+### In progress / validation
+- Branch: wip-static-product-fallback-2026-11-22.
+- GitHub Actions validation has not yet run; do not merge until the mobile-shell browser test and route/SEO checks pass.
+
+### Next
+1. Open a PR from wip-static-product-fallback-2026-11-22 into main and inspect CI.
+2. After CI passes, merge and verify all three customer product URLs in a real browser, including product photo, description and price.
+3. This fallback uses each already-published product page; products without a generated /p/ page still need the normal successful page build.
+
+### Blocked
+- Supabase REST quota restriction remains external to this code fix. The fallback restores read-only product viewing and does not restore live catalogue edits, cart/order writes or checkout API calls while REST remains restricted.
 ## 2026-11-21 08:59 (Africa/Nairobi) — Pricing admin merged; Pages deployed; product-page save blocker identified
 
 ### Done
@@ -584,3 +630,5 @@ The Build product pages GitHub Actions workflow is scheduled every 30 minutes; t
 - Done: PR #989 failed route-regression because committed /p/ and /c/ pages had no shell-route-loader. Ran `node seo-shell-redirect.mjs` and pushed the result to the PR branch (commit 2f723e7). All PR #989 checks are green.
 - NOTE: that commit touches generated pages (p/, c/); product-pages.yml regenerates them anyway after merge.
 - Next: owner merges #989 and #991, then `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`, then open /p/darvin-50ew-insecticide-28-ml.html on a phone and confirm the full shell loads. #987 duplicates #989 and can be closed.
+
+- The handoff-only checkpoint advanced the PR branch head after the first CI start; the SEO gate run 45002208943 was cancelled during that update, and route run 45002208966 was still executing against the earlier code-identical app/test state. A final app-path commit is being pushed to retrigger both workflows against the latest PR head; merge only after those final-head runs complete.
