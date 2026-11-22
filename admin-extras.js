@@ -12,7 +12,7 @@
       .then(function (r) {
         if (r.status === 401) throw new Error('Your session expired. Sign in again.');
         if (r.status === 404) throw new Error('Table missing. Run setup-admin-extras.sql in Supabase.');
-        if (!r.ok) return r.text().then(function (t) { var m = ''; try { m = JSON.parse(t).message; } catch (e) {} var x = new Error(m || 'Request failed (' + r.status + ')'); x.status = r.status; throw x; });
+        if (!r.ok) return r.text().then(function (t) { var m = ''; try { m = JSON.parse(t).message; } catch (e) {} var x = new Error((r.status === 402 || r.status === 429 || r.status >= 500) && A().errorMessage ? A().errorMessage({ status: r.status }) : (m || 'Request failed (' + r.status + ')')); x.status = r.status; throw x; });
         return r.status === 204 ? null : r.text().then(function (t) { return t ? JSON.parse(t) : null; });
       });
   }
