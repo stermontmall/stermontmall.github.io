@@ -625,7 +625,12 @@ function renderProductDescription(target, source) {
 }
 /* @render-end */
 const details = new Map(); // Cache product-detail requests by variant row ID; renderDetails() and renderPP() share this cache.
-const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images,product_code`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
+const staticDetails = new Map(); // Read-only details parsed from the published SEO page when Supabase REST is restricted.
+const detailsFor = rowId => {
+  if (staticDetails.has(rowId)) return Promise.resolve(staticDetails.get(rowId));
+  if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images,product_code`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; }));
+  return details.get(rowId);
+};
 async function renderDetails(rowId) {
   const box = $('#qb-details'); if (!box) return;                  // an older cached index.html has no details block: leave the sheet as it was
   box.hidden = false;
@@ -748,22 +753,70 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
    the full catalog that Home still loads in the background, and opens the product page as soon as they arrive. When the full catalog lands, the open page is
    refreshed (refreshDeep) so "More like this" fills in. If anything here fails or finds nothing (sold out, unknown slug), the normal path after the full catalog
    still runs, so the behaviour is never worse than before. To undo: delete this function and the call to it in section 11. */
+async function openStaticProductFallback(slug) {
+  // Published /p/ pages are generated from the catalogue and remain available on GitHub Pages
+  // even while Supabase REST is returning 402 (egress quota exceeded). Treat them as read-only.
+  const response = await fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' });
+  if (!response.ok) throw new Error('Published product page returned HTTP ' + response.status);
+  const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+  let product = null, breadcrumb = null;
+  for (const node of doc.querySelectorAll('script[type="application/ld+json"]')) {
+    try {
+      const data = JSON.parse(node.textContent || 'null');
+      for (const item of (Array.isArray(data) ? data : [data])) {
+        const types = Array.isArray(item && item['@type']) ? item['@type'] : [item && item['@type']];
+        if (!product && types.includes('Product')) product = item;
+        if (!breadcrumb && types.includes('BreadcrumbList')) breadcrumb = item;
+      }
+    } catch {}
+  }
+  const offer = Array.isArray(product && product.offers) ? product.offers[0] : product && product.offers;
+  const price = Number(offer && offer.price);
+  if (!product || !product.name || !(price > 0)) throw new Error('Published page has no usable Product schema');
+  const id = doc.querySelector('meta[name="stm-id"]')?.content || slug;
+  const photos = [...new Set((Array.isArray(product.image) ? product.image : [product.image]).filter(x => typeof x === 'string' && x.trim()))];
+  const crumbs = breadcrumb && Array.isArray(breadcrumb.itemListElement) ? breadcrumb.itemListElement : [];
+  const crumbData = crumbs.map(x => ({ name: x.name || (x.item && x.item.name) || '', url: typeof x.item === 'string' ? x.item : (x.item && (x.item['@id'] || x.item.url)) || '' }));
+  const category = crumbData.find(x => /\/c\//.test(x.url));
+  const categorySlug = category ? (category.url.match(/\/c\/([^/?#]+)\.html/i) || [])[1] : 'others';
+  const descriptionRoot = doc.querySelector('.product-description');
+  const sections = descriptionRoot ? [...descriptionRoot.querySelectorAll('.pd-sec')].map(section => {
+    const heading = section.querySelector('h3')?.textContent.trim() || '';
+    const lines = [...section.querySelectorAll('p,li')].map(node => node.textContent.trim()).filter(Boolean);
+    return [heading, ...lines].filter(Boolean).join('\n');
+  }).filter(Boolean) : [];
+  const description = sections.join('\n\n') || product.description || '';
+  const stock = String(offer && offer.availability || '').includes('InStock') ? 1000 : 0;
+  const code = product.sku || doc.querySelector('[data-pack-code]')?.textContent.trim() || '';
+  const unit = doc.querySelector('[data-pack-unit]')?.textContent.trim() || null;
+  staticDetails.set(id, { description, unit, stock, low_at: 5, slug: id, images: photos, product_code: code });
+  const label = doc.querySelector('[data-pack-label]')?.textContent.trim() || 'Standard';
+  const p = { id, slug, cat: categorySlug || 'others', catName: category?.name || 'Products', sub: crumbData.length > 3 ? crumbData[crumbData.length - 2].name : '',
+    name: product.name, img: photos[0] || '', photos, emoji: '🛍️', bg: BGS[hashStr(id) % BGS.length], price, old: 0,
+    sizes: [{ rowId: id, slug, label, price, old: 0 }], featured: false, rating: 0, reviews: 0 };
+  PRODUCTS = [p, ...PRODUCTS.filter(x => x.id !== id)];
+  openDeepLink(slug);
+}
 async function quickDeepLink(slug) {
+  if (!/^[A-Za-z0-9._%~-]+$/.test(slug)) return;
   try {
-    if (!/^[A-Za-z0-9._%~-]+$/.test(slug)) return;
-    // Keep the deep-link critical path to the product row and category tree.
-    // The full catalog loads product-names.json in parallel and refreshes the title afterward.
     const [cats, rows0] = await Promise.all([
       api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
       api('products?active=eq.true&or=(slug.eq.' + encodeURIComponent(slug) + ',id.eq.' + encodeURIComponent(slug) + ')&select=' + PRODUCT_COLS).then(r => r.map(withCover))
     ]);
-    if (deepOpen || fullCatalog || !rows0.length) return;
+    if (deepOpen || fullCatalog) return;
+    if (!rows0.length) { await openStaticProductFallback(slug); return; }
     let rows = rows0; const g = rows0[0].variant_group;
-    if (g) { rows = (await api('products?active=eq.true&variant_group=eq.' + encodeURIComponent(g) + '&select=' + PRODUCT_COLS)).map(withCover); if (deepOpen || fullCatalog || !rows.length) return; }
-    buildCatalog(rows, cats, {});   // Use the database name immediately; the full catalog replaces it when it arrives
-    if (!PRODUCTS.some(x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug))) { PRODUCTS = []; CATS = []; return; }
+    if (g) { rows = (await api('products?active=eq.true&variant_group=eq.' + encodeURIComponent(g) + '&select=' + PRODUCT_COLS)).map(withCover); if (deepOpen || fullCatalog) return; }
+    buildCatalog(rows, cats, {});
+    if (!PRODUCTS.some(x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug))) { await openStaticProductFallback(slug); return; }
     openDeepLink(slug);
-  } catch (e) { if (!deepOpen && !fullCatalog) { PRODUCTS = []; CATS = []; } }
+  } catch (e) {
+    if (!deepOpen && !fullCatalog) {
+      try { await openStaticProductFallback(slug); }
+      catch (fallbackError) { toast('Product details are temporarily unavailable. Please try again shortly.'); }
+    }
+  }
 }
 function refreshDeep() {   // the full catalog is in: swap in the full product entry and redraw the open product page (related products, any size changes)
   if (!qb.p) return;
