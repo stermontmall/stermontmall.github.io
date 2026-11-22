@@ -6,8 +6,8 @@
      after the first has finished) plus the category list, and nothing beyond the build-time cards below (category chips, drawer, Deals, product links, "More like this")
      works until that is done. This block starts those same requests right now, in parallel, before app.js is even downloaded, and hands the answers to app.js's own fetch()
      calls (identical URLs and headers, so app.js needs no change). The answer is also kept in localStorage for 5 minutes, so the next product link or a quick return visit is
-     instant; a background refresh runs when that copy is older than 1 minute. Anything unexpected falls straight through to the normal fetch. The key below is the public
-     (publishable) key already in app.js. To undo: delete this script block. */
+     instant; a background refresh runs when that copy is older than 1 minute. Anything unexpected falls straight through to the normal fetch. Neon uses its configured
+     anonymous read role; no browser secret is sent. To undo: delete this script block. */
   (function () {
     try {
       if (!window.fetch || !window.Promise || !window.Response) return;
