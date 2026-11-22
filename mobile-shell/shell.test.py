@@ -720,7 +720,10 @@ with sync_playwright() as p:
     c19.route('**/p/garden-set-*.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=stub_html))
     c19.route('**/p/garden-set.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=group_html))
     p19 = c19.new_page(); e19 = []; p19.on('pageerror', lambda e: e19.append(str(e)))
-    p19.goto(URL); p19.wait_for_selector('#grid .card[data-id="garden-set"]')
+    p19.goto(URL); p19.wait_for_selector('#grid .card[data-id]')
+    p19.locator('#chips [data-chip="home-living"]').click()   # the home feed is paginated (8 items): open the category that holds the multi-size fixture
+    p19.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
+    p19.wait_for_selector('#grid .card[data-id="garden-set"]', timeout=10000)
     FAIL[0] = True
     p19.locator('#grid .card[data-id="garden-set"]').click(); p19.wait_for_selector('#page-product.open', timeout=15000)
     p19.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Group page description reached through the pack stub.')", timeout=8000)

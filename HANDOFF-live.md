@@ -7,9 +7,11 @@
 - Fix in `mobile-shell/app.js` `staticDetailsFor`: try `p.slug`, follow `<link rel=canonical>` of a stub, then `p.id` (the group id); max 4 fetches. `app.js?v=46` to `?v=47` in index.html and shell-route-loader.js. `node --check` passes.
 - Added regression in `mobile-shell/shell.test.py` (after the c18 block): multi-pack card `garden-set`, pack page is a stub, group page has the text; REST 402.
 
+- Local result: `python3 mobile-shell/shell.test.py` = 180/181. New multi-pack checks pass (the test first needed the Home & Living chip click because the home feed shows only 8 cards). The 1 failure is the known `failed_requests` check: hard-coded home-page photos on stermontarcade.co.ke cannot load because this sandbox has no internet. I did not run the new test against the old code to see it fail first.
+
 ### Next
-1. Run: `cd /home/claude/stermontmall.github.io && python3 mobile-shell/shell.test.py` (expect only the sandbox-no-internet `failed_requests` check to fail).
-2. Push, open PR, merge when the mobile-shell regression is green (the SEO gate fails on Supabase 402 until billing is restored).
+1. Open PR from `wip-description-follow-canonical-20261122` into main; merge when the Full mobile-shell route regression is green (the SEO gate fails on Supabase 402 until billing is restored).
+2. After deploy: on a phone open a multi-pack product card (e.g. Abasi 5% EC) and a single-pack card; both should show the description.
 
 ## 2026-11-22 16:50 (Africa/Nairobi) — PR #1030 MERGED to main (merge commit dc89ec4b, 13:47:39Z); Supabase still 402
 
