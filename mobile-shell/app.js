@@ -626,9 +626,30 @@ function renderProductDescription(target, source) {
 /* @render-end */
 const details = new Map(); // Cache product-detail requests by variant row ID; renderDetails() and renderPP() share this cache.
 const staticDetails = new Map(); // Read-only details parsed from the published SEO page when Supabase REST is restricted.
+/* Read-only description fallback for opening a product from a card while Supabase REST is restricted (HTTP 402). The card's slug has a generated
+   /p/<slug>.html page on GitHub Pages with the full buyer guide in .product-description > .pd-sec blocks; read the text from there. Nothing is written
+   or redirected. Returns null (the normal "Could not load the details" + retry) when the page is missing or has no description. */
+async function staticDetailsFor(rowId) {
+  try {
+    const p = PRODUCTS.find(x => x.sizes.some(s => s.rowId === rowId));
+    const slug = p && p.slug;
+    if (!slug || !/^[A-Za-z0-9._%~-]+$/.test(slug)) return null;
+    const res = await fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const sections = [...doc.querySelectorAll('.product-description .pd-sec')].map(sec => {
+      const heading = sec.querySelector('h3')?.textContent.trim() || '';
+      const lines = [...sec.querySelectorAll('p,li')].map(n => n.textContent.trim()).filter(Boolean);
+      return [heading, ...lines].filter(Boolean).join('\n');
+    }).filter(Boolean);
+    if (!sections.length) return null;
+    return { description: sections.join('\n\n'), unit: null, stock: /InStock/.test(html) ? 1000 : 0, low_at: 5, slug, images: [], product_code: '' };
+  } catch (e) { return null; }
+}
 const detailsFor = rowId => {
   if (staticDetails.has(rowId)) return Promise.resolve(staticDetails.get(rowId));
-  if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images,product_code`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; }));
+  if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images,product_code`).then(r => r[0] || null).catch(() => null).then(d => d || staticDetailsFor(rowId)).then(d => { if (!d) details.delete(rowId); return d; }));
   return details.get(rowId);
 };
 async function renderDetails(rowId) {

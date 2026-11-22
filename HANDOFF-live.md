@@ -1,4 +1,18 @@
 
+## 2026-11-22 17:35 (Africa/Nairobi) — Product descriptions not opening from cards (Supabase 402): card-tap fallback
+
+### Done (branch `wip-product-description-fallback-20261122`, branched from PR #1026 branch `wip-static-product-fallback-2026-11-22`; NOT merged, NOT live)
+- Owner report: tapping a product card opens no description. Root cause: `detailsFor()` in `mobile-shell/app.js` reads description/unit/stock from `products?id=eq...` over Supabase REST, which returns HTTP 402 (quota/billing restriction, see entries below). PR #1026 only covers `/?product=<slug>` deep links, not card taps.
+- Added `staticDetailsFor(rowId)`: when the REST details call fails or returns nothing, fetch the card's generated `/p/<slug>.html` (GitHub Pages, not Supabase), read `.product-description .pd-sec` blocks into the same section text format, and return it to the existing renderers. Read-only; no redirects; REST stays first choice. Returns null (existing "Could not load the details" + retry) if the page has no description.
+- Finding: pack-size pages such as `p/abasi-5-ec-100-ml.html` (433 of 2,059 files in `p/`) are 512-byte meta-refresh stubs to the group page. The real pages (1,626, e.g. `p/abasi-5-ec.html`) use `ProductGroup` JSON-LD for multi-pack products, so PR #1026's deep-link fallback, which requires `@type: Product`, will fail on multi-pack products. The card-tap fix uses the card's group slug and the HTML description, so it does not depend on that. TODO: make `openStaticProductFallback` accept `ProductGroup` (use `hasVariant[0]` offers/sku/image).
+- Bumped `app.js?v=45` to `?v=46` in `index.html` and `shell-route-loader.js`. `node --check mobile-shell/app.js` passes.
+- Not tested in a browser yet. Photos still come from Supabase Storage and stay broken until billing is fixed (or PR #1022 ImageKit lands).
+
+### Next
+1. Run the shell browser suite: `cd /home/claude/stermontmall.github.io && python3 mobile-shell/shell.test.py` (needs Chromium for Playwright; may not be available offline). Add a regression that routes `**/rest/v1/products?id=eq*` to HTTP 402 and asserts the description renders after tapping a card.
+2. Fix the `ProductGroup` gap in `openStaticProductFallback`.
+3. Open PR into main (or into the #1026 branch), wait for the quality gate, merge only when green.
+
 ### 2026-11-22 PR / CI checkpoint
 - Opened PR #1026: https://github.com/stermontmall/stermontmall.github.io/pull/1026.
 - GitHub Actions started: Full mobile-shell route regression run 45002208966 and SEO pull request quality gate run 45002208943. At checkpoint both browser-suite steps were still running; no result has been claimed.
