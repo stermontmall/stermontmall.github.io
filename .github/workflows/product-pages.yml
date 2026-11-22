@@ -1,20 +1,26 @@
 # Stermont Arcade - rebuilds every product page, category page and the product sitemap automatically.
 # Runs: every 30 minutes, when generate-products.mjs changes, on a repository_dispatch event of type catalog-changed (instant rebuild), and whenever you tap "Run workflow" in the Actions tab.
 # Why every 30 minutes: a product only has a /p/ page after a build, so a product activated between builds had a dead link until the next one (2026-11-06, Agrimec 018EC). 404.html now opens such links in the shop meanwhile, and check-product-pages.mjs fails the run if an active product is still missing a page.
-# Rebuild requested 2026-11-02: five new products (Mos-Kill vaporizer and coils, Shenke, KMAX 20 L, solar traps).
-# Car catalogue content refresh 2026-11-09: rebuild after vehicle enquiry sections were made listing-specific.
+# Safety: catalogue-count-guard.mjs stops the build when the live catalogue is almost empty (for example while products are hidden during a database quota pause), because the build deletes every old page before it writes the new ones.
 name: Build product pages
 
 on:
   schedule:
     - cron: '*/30 * * * *'
   workflow_dispatch:
+    inputs:
+      allow_small_catalogue:
+        description: 'Type 1 only if the catalogue is intentionally small (turns off the empty-catalogue guard)'
+        required: false
+        default: ''
   repository_dispatch:
     types: [catalog-changed]
   push:
     branches: [main]
     paths:
       - 'generate-products.mjs'
+      - 'catalogue-count-guard.mjs'
+      - 'catalogue-count-guard.test.mjs'
       - 'mobile-shell/app.js'
       - 'mobile-shell/description.test.mjs'
       - 'product-description-html.mjs'
@@ -93,6 +99,14 @@ jobs:
 
       - name: Test active catalogue SEO metadata quality guard
         run: node seo-catalog-guard.test.mjs
+
+      - name: Test the empty-catalogue guard
+        run: node catalogue-count-guard.test.mjs
+
+      - name: Guard - refuse to rebuild from an almost empty catalogue
+        env:
+          ALLOW_SMALL_CATALOGUE: ${{ github.event.inputs.allow_small_catalogue }}
+        run: node catalogue-count-guard.mjs
 
       - name: Audit active catalogue before page generation
         run: node seo-catalog-guard.mjs
@@ -233,121 +247,3 @@ jobs:
           except Exception as e:
               print("IndexNow submit failed (not critical):", e)
           PY
-
-# Catalog rebuild trigger: publish the ten owner-approved pest-control products (2026-11-05).
-
-# Rebuild catalog after adding the newly verified product records (2026-11-05).
-
-# Catalog rebuild requested after adding 10 verified photo-backed products (2026-11-05).
-
-# Rebuild catalog after the next ten photo-backed products were added (2026-11-05).
-
-# Rebuild after owner-authorized product publication from the Agrovet/Pest Control PDF (2026-11-06).
-
-# Rebuild again after adding Escort 19 EC verified packs (2026-11-06).
-
-# Rebuild after adding three verified PDF products with photo-backed Storage URLs (2026-11-06).
-
-# Rebuild catalogue after owner-directed publication of 20 fertilizer and crop-nutrition products (2026-11-06).
-
-# 2026-11-06: rebuild product pages after replacing the latest 20 product photos.
-
-# 2026-11-06: rebuild after three refreshed supplier-original product photos.
-
-# 2026-11-08: rebuild catalog after owner-approved Essie Mugo pack repricing from Jumia + 15%.
-
-# 2026-11-08: rebuild Tatua Advion 30g page after replacing its product image.
-
-# 2026-11-08: rebuild product pages and product sitemap after publishing 15 new photo-backed PPE products.
-
-# 2026-11-08: rebuild catalogue pages and sitemap after adding 15 new PPE products with photos and long-form SEO descriptions.
-
-# 2026-11-08: rebuild motorcycle spare-parts product pages and sitemap for Kenya-focused catalogue additions.
-
-# 2026-11-08: rebuild product pages and sitemap for the second Kenya-focused Bajaj Boxer spare-parts batch.
-
-# 2026-11-08: rebuild product pages and sitemap after adding 15 new Bajaj Boxer motorcycle spare parts with photos and Kenya SEO content.
-
-# 2026-11-08: rebuild product pages and sitemap after publishing 15 new Bajaj Boxer spare parts sourced from the official Bajaj East Africa catalog.
-
-# 2026-11-08: rebuild product pages after replacing mismatched Bajaj Boxer spare-part photos.
-
-# 2026-11-08: include final verified BM150 CDI, BM100 cylinder-head and chain-tensioner image corrections.
-
-# 2026-11-08: refresh Bajaj Boxer crankshaft and lock-kit photos using exact model/part-number supplier references.
-
-# 2026-11-08: rebuild after replacing TVS HLX 125 carburettor photo with a model-matched supplier image.
-
-# 2026-11-08: rebuild product pages after verified Endurance Miles BM150 crankshaft, piston and oil-filter image replacements.
-
-# 2026-11-08: rebuild product pages after exact BM150 exhaust and TVS Apache NF160230 speedometer image replacements.
-
-# 2026-11-08: Rebuild product pages and sitemap after publishing 15 new TVS HLX motorcycle spare parts.
-
-# 2026-11-08: rebuild product pages and sitemap after publishing 20 additional Bajaj Boxer spare parts.
-
-# 2026-11-08: rebuild product detail pages and category thumbnails after Supabase photo-array updates for the latest Bajaj Boxer spare-parts batch.
-
-# 2026-11-08: rebuild static product pages after adding two verified TVS carburettor-adaptor photos and enforcing mandatory photo publication.
-
-# 2026-11-08: rebuild product pages after two verified FDR supplier photos were added to the latest motorcycle spare-parts batch.
-
-# 2026-11-08: rebuild product pages after adding a verified rechargeable mosquito racket photo.
-
-# 2026-11-08: rebuild product pages and sitemap for three fresh photo-verified Boxer BM150 listings.
-
-# 2026-11-08: rebuild static pages and sitemap for three additional fresh photo-backed spare parts.
-
-# 2026-11-08: rebuild static product pages and sitemap after adding ten fresh TVS HLX photo-backed listings.
-# 2026-11-08: rebuild after adding the latest three fresh Bajaj BM150 photo-backed products.
-
-# 2026-11-08: rebuild ten TVS HLX spare-part pages after expanding original product descriptions and tightening Kenya search titles.
-
-# Rebuild requested 2026-11-08: publish the ten unique TVS spare-parts meta descriptions.
-
-# 2026-11-09: rebuild all car product pages and sitemap after adding multi-angle vehicle gallery photos.
-
-# 2026-11-09: rebuild car advert pages after replacing lead photos with better model-matched web-sourced images.
-
-# 2026-11-09: rebuild vehicle listing galleries after adding model-matched multi-angle photo sets.
-
-# 2026-11-09: rebuild additional vehicle galleries (RAV4 Hybrid, Range Rover Vogue, Lexus LX500d).
-
-# 2026-11-09: rebuild car listing pages after sourcing further verified model-specific gallery images.
-
-# 2026-11-09: rebuild product pages after car-category-only description cleanup and content refresh.
-
-# 2026-11-09: rebuild after car-category-only SEO content enrichment.
-
-# 2026-11-09: rebuild car pages after removing repeated generic buyer-guidance copy and tailoring inspection, usage and enquiry sections.
-
-# 2026-11-09: rebuild after catalogue pack-specific descriptions and Epson L3250 content enrichment.
-
-# 2026-11-11: rebuild after publishing 20 new photo-backed Ariete and VON appliance listings with batch-specific 30% markup.
-# 2026-11-12: rebuild after publishing 11 supplier-photo-backed agrochemical, crop-nutrition and pest-control products with 25% markup, product-specific SEO copy and verified stock defaults.
-# 2026-11-12: rebuild again after adding Decis Forte EC 250ml, Decis EC 25 1L and Bandur Forte SC 600 1L; all have supplier photos, 600+ word copy and stock/markup defaults.
-# 2026-11-12: rebuild product pages and sitemap after adding 16 new supplier-backed agrochemical and fertilizer SKUs with 25% markup and storage photos.
-# 2026-11-12: final rebuild after normalizing the earlier seven product prices to exactly 25% over recorded supplier cost.
-
-# 2026-11-12: rebuild product pages and sitemap after publishing four additional supplier-photo-backed agrochemical and pest-control listings.
-
-# 2026-11-12: rebuild catalogue pages and sitemap after two additional verified fungicide SKUs.
-
-# 2026-11-12: rebuild product pages and sitemap after adding Faya Dudu Dust 100g with verified image and metadata.
-# 2026-11-12: rebuild product pages and sitemap after adding 50 verified photo-backed agrochemical, fungicide, insecticide and fumigation catalogue listings with 600+ word descriptions, pack-specific pricing and stock defaults.
-
-# 2026-11-12: rebuild active mosquito door-screen catalogue entries.
-
-# 2026-11-12: rebuild mosquito door-screen pages after replacing size-matched product photos.
-
-# 2026-11-17: rebuild product pages after correcting Rentokil Lumnia Compact glueboard variant descriptions and SEO metadata in Supabase.
-# 2026-11-17: refresh the individual-board variant label and remove the pack-level MPN from the single-board offer.
-# 2026-11-17: rebuild the shared glueboard product page with neutral product name and 1 pack / 10 pack price options.
-
-# 2026-11-18: rebuild product pages and sitemap after activating ten photo-backed Agrovet listings; verify every active SKU has a generated page.
-
-# 2026-11-18: rebuild the public product pages and sitemap for the newly activated pest-control batch (10 SKUs).
-
-# 2026-11-18: rebuild after correcting the PCPB-registered use text on K-Othrine EC 15 product page.
-
-# 2026-11-18: final rebuild after confirming all ten pest-control SKUs are active, photo-backed and featured.
