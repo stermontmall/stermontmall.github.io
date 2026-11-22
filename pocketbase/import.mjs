@@ -15,9 +15,9 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function pgArray(s){
  if(Array.isArray(s))return s;if(s==null||s==="")return [];
  const t=String(s).trim();if(!t.startsWith("{")||!t.endsWith("}"))return [t];
- const out=[];let v="",q=false,esc=false;
- for(let i=1;i<t.length-1;i++){const c=t[i];if(esc){v+=c;esc=false;}else if(c==="\\")esc=true;else if(c==='"')q=!q;else if(c===","&&!q){out.push(v==="NULL"&&!q?null:v);v="";}else v+=c;}
- if(v.length||t.length>2)out.push(v==="NULL"?null:v);return out;
+ const out=[];let v="",q=false,esc=false,wasQuoted=false;
+ for(let i=1;i<t.length-1;i++){const c=t[i];if(esc){v+=c;esc=false;}else if(c==="\\\\")esc=true;else if(c==='"'){q=!q;wasQuoted=true;}else if(c===","&&!q){out.push(!wasQuoted&&v==="NULL"?null:v);v="";wasQuoted=false;}else v+=c;}
+ if(v.length||t.length>2)out.push(!wasQuoted&&v==="NULL"?null:v);return out;
 }
 function val(v,type="text"){
  if(v===undefined||v===null||v==="")return null;
@@ -99,7 +99,7 @@ async function main(){
    clean=clean.map((record,index)=>{const legacy=rows[index].user_id||"";record.supabase_user_id=legacy||"";record.user_id=legacy?(users.get(String(legacy))||""):"";return record;});
   }
   let costRows=[];
-  if(collection==="products"){costRows=rows.filter(r=>r.cost!==""&&r.cost!=null).map(r=>({pid:String(r.id||r.slug),cost:val(r.cost,"number")}));if(onlyActive)clean=clean.filter(r=>r.active===true&&Array.isArray(r.images)&&r.images.length>0);}
+  if(collection==="products"){const eligible=onlyActive?rows.filter(r=>["true","t","1","yes"].includes(String(r.active).toLowerCase())&&pgArray(r.images).length>0):rows;costRows=eligible.filter(r=>r.cost!==""&&r.cost!=null).map(r=>({pid:String(r.id||r.slug),cost:val(r.cost,"number")}));if(onlyActive)clean=clean.filter(r=>r.active===true&&Array.isArray(r.images)&&r.images.length>0);}
   if(!clean.length){console.log(collection+": no rows to import");continue;}
   const existing=await existingMap(collection);
   console.log(collection+": importing "+clean.length+" rows (existing records will be updated safely)");
