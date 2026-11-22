@@ -1,5 +1,5 @@
 /* Admin console: SERVICES tabs. STMServices.mount(listEl, 'quotes' | 'services') is called by admin.html render().
-   Quote requests come from public.service_quotes (written by /services/quote.js, no payment). Staff only (RLS is_staff()).
+   Quote requests come from public.service_quotes (written by /services/quote.js, no payment). Staff only (Neon is_store_admin() RLS).
    Tab 2 reads /services/services-data.json (+ /services/pests-data.json when present) and joins it with the quote counts. */
 (function () {
   'use strict';
@@ -29,7 +29,7 @@
   function fail(L, e) {
     L.textContent = '';
     if (e && e.message === 'expired') { L.appendChild(h('div', 'err', 'Your session expired. Refresh the page and sign in again.')); return; }
-    L.appendChild(h('div', 'err', 'Could not load quote requests. Run setup-service-quotes.sql in Supabase and make sure your email is in the staff table.'));
+    L.appendChild(h('div', 'err', 'Could not load quote requests. Check the Neon service_quotes table and your active Neon admin profile.'));
   }
   function stop() { if (timer) { clearInterval(timer); timer = null; } }
 
