@@ -674,7 +674,7 @@ with sync_playwright() as p:
 
     co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
     check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
-    check('no console/page errors', not errors, errors[:3])
+    check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'failed_requests': failed_requests[:3]})
     b.close()
 
 fails = [n for n, ok in results if not ok]
