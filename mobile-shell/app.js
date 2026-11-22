@@ -778,25 +778,38 @@ async function openStaticProductFallback(slug) {
   // Published /p/ pages are generated from the catalogue and remain available on GitHub Pages
   // even while Supabase REST is returning 402 (egress quota exceeded). Treat them as read-only;
   // this fetch hydrates the in-app view without redirecting or modifying the canonical SEO document.
-  const response = await fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' });
-  if (!response.ok) throw new Error('Published product page returned HTTP ' + response.status);
-  const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
-  let product = null, breadcrumb = null;
-  for (const node of doc.querySelectorAll('script[type="application/ld+json"]')) {
-    try {
-      const data = JSON.parse(node.textContent || 'null');
-      for (const item of (Array.isArray(data) ? data : [data])) {
-        const types = Array.isArray(item && item['@type']) ? item['@type'] : [item && item['@type']];
-        if (!product && types.includes('Product')) product = item;
-        if (!breadcrumb && types.includes('BreadcrumbList')) breadcrumb = item;
-      }
-    } catch {}
+  // Multi-pack products publish a ProductGroup page (one Product per pack size under hasVariant), and each pack-size URL
+  // (/p/<group>-100-ml.html) is a small stub that points at the group page through its canonical link; follow that once.
+  const typesOf = item => Array.isArray(item && item['@type']) ? item['@type'] : [item && item['@type']];
+  let doc = null, product = null, breadcrumb = null, pageSlug = slug;
+  for (let hop = 0; hop < 2 && !product; hop++) {
+    const response = await fetch('/p/' + encodeURIComponent(pageSlug) + '.html', { cache: 'no-cache' });
+    if (!response.ok) throw new Error('Published product page returned HTTP ' + response.status);
+    doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+    for (const node of doc.querySelectorAll('script[type="application/ld+json"]')) {
+      try {
+        const data = JSON.parse(node.textContent || 'null');
+        for (const item of (Array.isArray(data) ? data : [data])) {
+          const types = typesOf(item);
+          if (!product && (types.includes('Product') || types.includes('ProductGroup'))) product = item;
+          if (!breadcrumb && types.includes('BreadcrumbList')) breadcrumb = item;
+        }
+      } catch {}
+    }
+    if (product) break;
+    const target = ((doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || '').match(/\/p\/([^/?#]+)\.html/i) || [])[1];
+    if (!target || target === pageSlug) break;
+    pageSlug = decodeURIComponent(target);
+    if (!/^[A-Za-z0-9._%~-]+$/.test(pageSlug)) break;
   }
-  const offer = Array.isArray(product && product.offers) ? product.offers[0] : product && product.offers;
-  const price = Number(offer && offer.price);
-  if (!product || !product.name || !(price > 0)) throw new Error('Published page has no usable Product schema');
-  const id = doc.querySelector('meta[name="stm-id"]')?.content || slug;
-  const photos = [...new Set((Array.isArray(product.image) ? product.image : [product.image]).filter(x => typeof x === 'string' && x.trim()))];
+  if (!product || !product.name) throw new Error('Published page has no usable Product schema');
+  const offerOf = v => Array.isArray(v && v.offers) ? v.offers[0] : v && v.offers;
+  const isGroup = typesOf(product).includes('ProductGroup');
+  const variants = (isGroup ? (Array.isArray(product.hasVariant) ? product.hasVariant : []) : [product]).filter(v => v && typeof v === 'object' && Number(offerOf(v) && offerOf(v).price) > 0);
+  if (!variants.length) throw new Error('Published page has no usable Product schema');
+  const imagesOf = v => (Array.isArray(v && v.image) ? v.image : [v && v.image]).filter(x => typeof x === 'string' && x.trim());
+  const photos = [...new Set([...variants.flatMap(imagesOf), ...imagesOf(product)])];
+  const id = doc.querySelector('meta[name="stm-id"]')?.content || pageSlug;
   const crumbs = breadcrumb && Array.isArray(breadcrumb.itemListElement) ? breadcrumb.itemListElement : [];
   const crumbData = crumbs.map(x => ({ name: x.name || (x.item && x.item.name) || '', url: typeof x.item === 'string' ? x.item : (x.item && (x.item['@id'] || x.item.url)) || '' }));
   const category = crumbData.find(x => /\/c\//.test(x.url));
@@ -808,16 +821,24 @@ async function openStaticProductFallback(slug) {
     return [heading, ...lines].filter(Boolean).join('\n');
   }).filter(Boolean) : [];
   const description = sections.join('\n\n') || product.description || '';
-  const stock = String(offer && offer.availability || '').includes('InStock') ? 1000 : 0;
-  const code = product.sku || doc.querySelector('[data-pack-code]')?.textContent.trim() || '';
-  const unit = doc.querySelector('[data-pack-unit]')?.textContent.trim() || null;
-  staticDetails.set(id, { description, unit, stock, low_at: 5, slug: id, images: photos, product_code: code });
-  const label = doc.querySelector('[data-pack-label]')?.textContent.trim() || 'Standard';
-  const p = { id, slug, cat: categorySlug || 'others', catName: category?.name || 'Products', sub: crumbData.length > 3 ? crumbData[crumbData.length - 2].name : '',
-    name: product.name, img: photos[0] || '', photos, emoji: '🛍️', bg: BGS[hashStr(id) % BGS.length], price, old: 0,
-    sizes: [{ rowId: id, slug, label, price, old: 0 }], featured: false, rating: 0, reviews: 0 };
+  const variantSlug = (v, i) => {   // a pack size is addressed by the fragment of its offer URL (/p/<group>.html#<pack-slug>)
+    const url = String(offerOf(v).url || ''), at = url.indexOf('#');
+    let frag = ''; if (at >= 0) { try { frag = decodeURIComponent(url.slice(at + 1)); } catch { frag = url.slice(at + 1); } }
+    return /^[A-Za-z0-9._%~-]+$/.test(frag) ? frag : (isGroup ? id + '-' + (i + 1) : id);
+  };
+  const packLabel = v => String(v.size || '').trim() || String(v.name || '').split(/\s[–-]\s/).pop().trim() || 'Standard';
+  const sizes = variants.map((v, i) => {
+    const vslug = isGroup ? variantSlug(v, i) : pageSlug, price = Number(offerOf(v).price);
+    const label = isGroup ? packLabel(v) : (doc.querySelector('[data-pack-label]')?.textContent.trim() || 'Standard');
+    const inStock = String(offerOf(v).availability || '').includes('InStock') ? 1000 : 0;
+    staticDetails.set(isGroup ? vslug : id, { description, unit: isGroup ? label : (doc.querySelector('[data-pack-unit]')?.textContent.trim() || null), stock: inStock, low_at: 5, slug: isGroup ? vslug : id, images: imagesOf(v).length ? imagesOf(v) : photos, product_code: v.sku || doc.querySelector('[data-pack-code]')?.textContent.trim() || '' });
+    return { rowId: isGroup ? vslug : id, slug: vslug, label, price, old: 0 };
+  });
+  const p = { id, slug: pageSlug, cat: categorySlug || 'others', catName: category?.name || 'Products', sub: crumbData.length > 3 ? crumbData[crumbData.length - 2].name : '',
+    name: product.name, img: photos[0] || '', photos, emoji: '🛍️', bg: BGS[hashStr(id) % BGS.length], price: sizes[0].price, old: 0,
+    sizes, featured: false, rating: 0, reviews: 0 };
   PRODUCTS = [p, ...PRODUCTS.filter(x => x.id !== id)];
-  openDeepLink(slug);
+  openDeepLink(sizes.some(z => z.slug === slug || z.rowId === slug) || p.slug === slug || p.id === slug ? slug : pageSlug);
 }
 async function quickDeepLink(slug) {
   if (!/^[A-Za-z0-9._%~-]+$/.test(slug)) return;

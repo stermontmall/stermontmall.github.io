@@ -1,3 +1,48 @@
+## 2026-11-22 23:10 (Africa/Nairobi) — Rule `publish_products` is now v6 (photo policy); storefront switch to Neon NOT done
+
+### Owner decisions (2026-11-22)
+- Website source: switch the site to Neon (recommended option chosen). Photos: allow official manufacturer or authorized distributor images for the exact product and pack, recorded with source URL.
+
+### Done
+- Neon `publish_products` updated v5 -> v6 (v5 text backed up under key `publish_products_v5_backup`). v6 adds photo policy v6 (manufacturer/authorized-distributor images allowed without separate written permission; retailer-only, thumbnails, watermarked and generated images not allowed; attributes to record) and a go-live note. Cost, description/SEO, duplicate and PCPB gates are unchanged.
+- Mirrored in `PUBLISH-PRODUCTS-RULE.md`, `.claude/commands/post-product.md`; version reference updated in `CLAUDE.md`, `AGENTS.md`, `PUBLISHING.md`.
+
+### Finding (corrected 23:20): the storefront still reads Supabase, but Supabase has 0 active products
+- CORRECTION: an earlier version of this entry said the live shop shows about 1,700 active products and that switching to Neon would blank it. That figure came from the 2026-11-21 snapshot and was not re-checked. Checked 2026-11-22: Supabase `products` has 1,828 rows, 0 active; `get_store_catalog()` returns 0 rows. The shop already shows no products, so switching to Neon cannot blank it.
+- `mobile-shell/app.js` and `generate-products.mjs` read only Supabase (no Neon reference), so `active = true` in Neon does not show a product on the website yet.
+- Switch plan (separate tested PR): (1) public read-only access in Neon (anonymous select on active products and categories only); (2) point the storefront, generator, image URLs, index.html prefetch and `mobile-shell/shell.test.py` at Neon together; (3) copy the 92 categories from Supabase to Neon if they differ; (4) the old 1,828 hidden Supabase products stay hidden unless the owner decides to bring them back.
+
+### Next
+1. Build the Neon storefront switch on a wip- branch (do not merge until a phone check shows Neon products).
+2. Source the remaining 13 products into Neon as inactive drafts, with manufacturer/distributor photos recorded per policy v6.
+
+## 2026-11-22 23:00 (Africa/Nairobi) — Owner decision: Neon only for now; Supabase not needed for about two weeks
+
+- Owner: "I am using Neon. I don't need Supabase for now. It will be used in two weeks." Do NOT chase Supabase billing (HTTP 402 `exceed_cached_egress_quota`) until about 2026-12-06. Products are posted to Neon only (project restless-shape-79120240).
+- Expected while Supabase is off: the SEO quality gate fails at `node generate-products.mjs` on any branch; the mobile-shell route regression is the meaningful check. Do not treat that SEO failure as a regression from a code change.
+- When Supabase is wanted again: restore billing for org munfmuvialgwzxwgthtw, then dispatch `product-pages.yml` (`gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`) and re-run the SEO gate.
+
+## 2026-11-22 23:00 (Africa/Nairobi) — Multi-pack (ProductGroup) fallback fixed; /post-product aligned to Neon v5
+
+### Done (branch `wip-productgroup-fallback-2026-11-22`, NOT merged)
+- `openStaticProductFallback` in `mobile-shell/app.js` now accepts `ProductGroup` pages: it builds one pack size per `hasVariant` (label from `size`, price/availability/sku/images from each variant offer, pack slug from the offer URL fragment), keeps the group description for every pack, and follows the canonical link of a pack-size stub (`/p/<group>-100-ml.html`) once to the group page, then selects that pack. Single `Product` pages behave as before. Still read-only: no redirects, no writes.
+- `app.js?v=46` bumped to `?v=47` in `index.html` and `shell-route-loader.js`.
+- 5 regression checks added to `mobile-shell/shell.test.py` (group deep link under 402, all pack sizes kept, stub link selects its pack, no JS errors). Local result: 182/183; the 1 failure is the same sandbox-only one as before (3 hard-coded home-page photos on stermontarcade.co.ke cannot load with no internet), expected green in CI.
+- `.claude/commands/post-product.md` rewritten to the Neon `publish_products` v5 rule (it still pointed at Supabase `autonomous_bulk_product_publishing`, 800+ word guides and Supabase Storage uploads, which `publish_products` supersedes).
+- Neon audit of STM-001838 to STM-001844: price equals `price_4tier(cost)` on all 7, stock 1000, low_at 20, featured false, active false, cost basis `retail_x0.85` with source URL and retail reference recorded, all 5 products triggers enabled. No photos, no `pcpb_reg`, no `photo_source` on any (correctly inactive).
+
+### Found, not changed
+- STM-001841 description is 59 words by whitespace count; v5 asks for 60 to 120. All other drafts are 60 to 66. Add one sourced sentence from its imaginecare.co.ke page before activation.
+- Nothing was activated, repriced or photographed. Photos need written reuse permission (v5); rodenticides and the cockroach gel also need confirmed PCPB registration.
+
+### Blocked (owner)
+- Supabase billing (`exceed_cached_egress_quota`, HTTP 402) for org munfmuvialgwzxwgthtw: until restored, the SEO gate fails at `node generate-products.mjs` and product photos stay broken. After restoring: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+- 13 of the 20-product batch are not yet sourced; STM-001838 to STM-001844 are the 7 inserted.
+
+### Next
+1. Open the PR, check CI (the mobile-shell regression should be green; the SEO gate fails only on Supabase 402 until billing is back), merge when green.
+2. On a phone: open /?product=abasi-5-ec and /?product=abasi-5-ec-100-ml and confirm the page opens with pack sizes.
+
 
 ## 2026-11-22 22:30 (Africa/Nairobi) — Admin rulebook page now reads Neon `publish_products` (v5)
 
