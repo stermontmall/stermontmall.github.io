@@ -114,7 +114,21 @@ function loadCatalog() {
       apiAll('rpc/get_store_catalog'),
       api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
       fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}))
-    ]).then(([rows, cats, names]) => { buildCatalog(rows, cats, names); fullCatalog = true; }).catch(e => { catalogP = null; throw e; });  // a failed load can be retried
+    ]).then(([rows, cats, names]) => { buildCatalog(rows, cats, names); fullCatalog = true; })
+      .catch(async liveError => {
+        try {
+          const [fallback, names] = await Promise.all([
+            loadProductFallbacks(),
+            fetch('/product-names.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))
+          ]);
+          const rows = fallback.products.map(p => ({ ...p, cover_image: Array.isArray(p.images) && p.images.length ? p.images[0] : (p.cover_image || '') }));
+          buildCatalog(rows, fallback.categories, names);
+          fullCatalog = false; // this is a read-only partial catalogue; never mistake it for a complete live result
+        } catch (fallbackError) {
+          catalogP = null;
+          throw liveError || fallbackError;
+        }
+      });
   }
   return catalogP;
 }
@@ -626,13 +640,110 @@ function renderProductDescription(target, source) {
 /* @render-end */
 const details = new Map(); // Cache product-detail requests by variant row ID; renderDetails() and renderPP() share this cache.
 let fallbackDataPromise;
+async function scrapePublishedCatalog() {
+  const cacheKey = 'stm.publishedCatalog.v1';
+  try {
+    const saved = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+    if (saved && saved.version === 1 && Array.isArray(saved.products) && Date.now() - saved.cached_at < 30 * 60 * 1000) return saved;
+  } catch {}
+  const sitemap = await fetch('/sitemap-products.xml', { cache: 'no-cache' });
+  if (!sitemap.ok) throw new Error('Product sitemap HTTP ' + sitemap.status);
+  const xml = new DOMParser().parseFromString(await sitemap.text(), 'application/xml');
+  const urls = [...xml.querySelectorAll('url loc')].map(n => n.textContent.trim())
+    .filter(u => /^https:\/\/stermontarcade\.co\.ke\/p\/[A-Za-z0-9._~-]+\.html$/.test(u));
+  if (!urls.length) throw new Error('No published product URLs found');
+  // Sample evenly across the sitemap so the emergency catalogue covers multiple product categories,
+  // rather than downloading thousands of pages during every restricted-API visit.
+  const limit = Math.min(72, urls.length), selected = limit === urls.length ? urls : Array.from({ length: limit }, (_, i) => urls[Math.floor(i * (urls.length - 1) / (limit - 1))]);
+  const products = [], categories = [], categoryIds = new Map();
+  let nextId = 1;
+  const slugify = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'others';
+  const ensureCategory = (name, slug, parentId) => {
+    const key = (parentId || 0) + '|' + slug;
+    if (categoryIds.has(key)) return categoryIds.get(key);
+    const id = nextId++;
+    categories.push({ id, name, slug, parent_id: parentId || null, sort_order: id, is_promo: false });
+    categoryIds.set(key, id);
+    return id;
+  };
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < selected.length) {
+      const url = selected[cursor++];
+      try {
+        const response = await fetch(url, { cache: 'no-cache' });
+        if (!response.ok) continue;
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const nodes = [];
+        doc.querySelectorAll('script[type="application/ld+json"]').forEach(script => {
+          try {
+            const value = JSON.parse(script.textContent || 'null');
+            const add = x => { if (Array.isArray(x)) x.forEach(add); else if (x && typeof x === 'object') { nodes.push(x); if (Array.isArray(x['@graph'])) add(x['@graph']); } };
+            add(value);
+          } catch {}
+        });
+        const product = nodes.find(x => (Array.isArray(x['@type']) ? x['@type'] : [x['@type']]).includes('Product'));
+        if (!product || !product.name) continue;
+        const offer = Array.isArray(product.offers) ? product.offers[0] : product.offers;
+        const price = Number(offer && offer.price || doc.querySelector('meta[property="product:price:amount"]')?.content);
+        if (!(price > 0)) continue;
+        const slug = (url.match(/\/p\/([^/]+)\.html$/) || [])[1];
+        const id = doc.querySelector('meta[name="stm-id"]')?.content || slug;
+        const images = [...new Set((Array.isArray(product.image) ? product.image : [product.image]).filter(x => typeof x === 'string' && /^https?:\/\//i.test(x)))];
+        const crumb = nodes.find(x => (Array.isArray(x['@type']) ? x['@type'] : [x['@type']]).includes('BreadcrumbList'));
+        const crumbItems = crumb && Array.isArray(crumb.itemListElement) ? crumb.itemListElement : [];
+        const levels = crumbItems.filter(x => {
+          const item = typeof x.item === 'string' ? x.item : x.item && (x.item['@id'] || x.item.url);
+          return item && /\/c\/[^/]+\.html/i.test(item);
+        }).map(x => ({ name: x.name || (x.item && x.item.name) || '', url: typeof x.item === 'string' ? x.item : (x.item && (x.item['@id'] || x.item.url)) || '' })).filter(x => x.name);
+        let categoryId;
+        if (levels.length) {
+          const topSlug = slugify((levels[0].url.match(/\/c\/([^/.]+)\.html/i) || [])[1] || levels[0].name);
+          const topId = ensureCategory(levels[0].name, topSlug, null);
+          if (levels.length > 1) {
+            const subSlug = slugify((levels[levels.length - 1].url.match(/\/c\/([^/.]+)\.html/i) || [])[1] || levels[levels.length - 1].name);
+            categoryId = ensureCategory(levels[levels.length - 1].name, subSlug, topId);
+          } else categoryId = topId;
+        } else categoryId = ensureCategory('Other Products', 'others', null);
+        const descRoot = doc.querySelector('.product-description');
+        const description = descRoot ? descRoot.textContent.trim() : (product.description || '');
+        const availability = String(offer && offer.availability || '');
+        const productCode = product.sku || doc.querySelector('[data-pack-code]')?.textContent.trim() || '';
+        products.push({ id, slug, name: product.name, category_id: categoryId, price, old_price: null,
+          stock: /InStock/i.test(availability) ? 1000 : 0, featured: false, images, cover_image: images[0] || '',
+          unit: doc.querySelector('[data-pack-unit]')?.textContent.trim() || '', variant_group: null,
+          variant_label: 'Standard', low_at: 5, description, product_code: productCode });
+      } catch {}
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(8, selected.length) }, worker));
+  if (!products.length) throw new Error('No usable products could be read from published pages');
+  const data = { version: 1, cached_at: Date.now(), source: 'published GitHub Pages product pages', products, categories };
+  try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch {}
+  return data;
+}
 function loadProductFallbacks() {
-  if (!fallbackDataPromise) fallbackDataPromise = fetch('/mobile-shell/product-fallbacks.json', { cache: 'no-cache' })
-    .then(r => { if (!r.ok) throw new Error('Product fallback HTTP ' + r.status); return r.json(); })
-    .then(data => {
-      if (!data || data.version !== 1 || !Array.isArray(data.products) || !Array.isArray(data.categories)) throw new Error('Invalid product fallback snapshot');
-      return data;
-    });
+  if (!fallbackDataPromise) fallbackDataPromise = (async () => {
+    let snapshot = { version: 1, products: [], categories: [] };
+    try {
+      const r = await fetch('/mobile-shell/product-fallbacks.json', { cache: 'no-cache' });
+      if (r.ok) snapshot = await r.json();
+    } catch {}
+    if (!snapshot || !Array.isArray(snapshot.products) || !Array.isArray(snapshot.categories)) snapshot = { version: 1, products: [], categories: [] };
+    if (snapshot.products.length >= 24) return snapshot;
+    try {
+      const scraped = await scrapePublishedCatalog();
+      const byId = new Map(scraped.products.map(p => [p.id, p]));
+      snapshot.products.forEach(p => byId.set(p.id, p));
+      const categories = [...scraped.categories];
+      snapshot.categories.forEach(c => { if (!categories.some(x => x.slug === c.slug && x.parent_id === c.parent_id)) categories.push(c); });
+      return { version: 1, products: [...byId.values()], categories };
+    } catch {
+      if (snapshot.products.length) return snapshot;
+      throw new Error('No published product fallback is available');
+    }
+  })();
   return fallbackDataPromise;
 }
 const fallbackRow = async slug => {
