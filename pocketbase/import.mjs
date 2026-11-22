@@ -4,6 +4,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import { parseCSV } from "./csv.mjs";
 const arg=(name,def)=>{const i=process.argv.indexOf(name);return i>=0?process.argv[i+1]:def;};
 const onlyActive=process.argv.includes("--active-with-images");
 const statePath=path.resolve(arg("--state",".pocketbase-import-state.json"));
@@ -11,21 +12,6 @@ const base=(process.env.PB_URL||"").trim().replace(/\/+$/,"");
 const email=(process.env.PB_ADMIN_EMAIL||"").trim(), password=process.env.PB_ADMIN_PASSWORD||"";
 if(!base||!email||!password){console.error("Set PB_URL, PB_ADMIN_EMAIL and PB_ADMIN_PASSWORD. Never put these in the CSV or source files.");process.exit(2);}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-function parseCSV(input){
- input=input.replace(/^\uFEFF/,"");const rows=[];let row=[],cell="",quoted=false;
- for(let i=0;i<input.length;i++){const ch=input[i],next=input[i+1];
-  if(quoted){if(ch==='"'&&next==='"'){cell+='"';i++;}else if(ch==='"')quoted=false;else cell+=ch;}
-  else if(ch==='"')quoted=true;
-  else if(ch===","){row.push(cell);cell="";}
-  else if(ch==="\n"){row.push(cell.replace(/\r$/,""));rows.push(row);row=[];cell="";}
-  else cell+=ch;
- }
- if(quoted)throw new Error("CSV ends inside a quoted field.");
- if(cell.length||row.length){row.push(cell.replace(/\r$/,""));rows.push(row);}
- if(!rows.length)return [];
- const headers=rows.shift().map(x=>x.trim());
- return rows.filter(r=>r.some(v=>v!=="")).map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]??""])));
-}
 function pgArray(s){
  if(Array.isArray(s))return s;if(s==null||s==="")return [];
  const t=String(s).trim();if(!t.startsWith("{")||!t.endsWith("}"))return [t];
@@ -52,8 +38,8 @@ function normalize(row,collection){
  for(const [k,v] of Object.entries(row)){
   if(k==="id"){out.supabase_id=String(v);continue;}
   if(k==="cost"&&collection==="products")continue;
-  if(collection==="products"&&k==="price"&&v!==""&&v!=null){
-   const n=Number(v);if(!Number.isFinite(n)||Math.abs(n-Math.round(n))>0.000001||![0,50,99].includes(Math.round(n)%100))throw new Error("Product "+(row.slug||row.id)+" has a KES price not ending 00, 50 or 99: "+v);
+  if(collection==="products"&&(k==="price"||k==="old_price")&&v!==""&&v!=null){
+   const n=Number(v);if(!Number.isFinite(n)||Math.abs(n-Math.round(n))>0.000001||![0,50,99].includes(Math.round(n)%100))throw new Error("Product "+(row.slug||row.id)+" field "+k+" must be a whole KES amount ending 00, 50 or 99: "+v);
   }
   if(boolFields.has(k))out[k]=val(v,"bool");
   else if(numberFields.has(k))out[k]=val(v,"number");
