@@ -28,7 +28,7 @@
       '.ov-muted{color:var(--mu);font-size:.84rem}.ov-refresh{border:0;border-radius:9px;padding:.55rem .85rem;background:#5b21b6;color:#fff;font:inherit;font-weight:600}'
     ].join('');D.head.appendChild(s);
   }
-  function api(path) { return STMAdmin.ready().then(function(){return STMAdmin.api(path);}).then(function(r){if(r.status===401)throw Error('Your session expired. Sign in again.');if(!r.ok)throw Error('Could not load dashboard data ('+r.status+'). Check staff access and table policies.');return r.json();}); }
+  function api(path) { return STMAdmin.ready().then(function(){return STMAdmin.api(path);}).then(function(r){if(r.status===401)throw Error('Your session expired. Sign in again.');if(!r.ok){var e=Error('Dashboard request failed (HTTP '+r.status+').');e.status=r.status;throw e;}return r.json();}); }
   function mount(host) {
     root=host;styles();host.textContent='';
     var head=el('div','ov-head');head.appendChild(el('div','','Private business overview'));
@@ -60,7 +60,7 @@
         var quick=el('section','ov-panel');quick.style.marginTop='.7rem';quick.appendChild(el('h3','','Quick access'));var links=el('div','ov-links');
         [['Pending orders','pending','Review payments'],['All orders','all','Search and manage orders'],['Service enquiries','quotes','Contact and quote customers'],['Sales dashboard','sales','Sales trends and products'],['M-Pesa payments','mpesa','Match received payments'],['Stock','stock','Manage availability']].forEach(x=>links.appendChild(link(x[0],x[1],x[2])));quick.appendChild(links);host.appendChild(quick);
         status.textContent='Updated '+date(new Date())+' · Last 30 days · Private staff view';
-      }).catch(function(e){if(root===host)status.textContent=e.message||'Could not load dashboard.';}).finally(function(){busy=false;refresh.disabled=false;});
+      }).catch(function(e){if(root===host)status.textContent=STMAdmin.errorMessage?STMAdmin.errorMessage(e):(e.message||'Could not load dashboard.');}).finally(function(){busy=false;refresh.disabled=false;});
     }
     refresh.onclick=draw;draw();
   }

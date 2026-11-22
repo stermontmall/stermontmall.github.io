@@ -1,0 +1,42 @@
+name: Admin outage recovery tests
+
+on:
+  pull_request:
+    paths:
+      - 'admin.html'
+      - 'admin-http.js'
+      - 'tests/admin-http.test.cjs'
+      - '.github/workflows/admin-outage-tests.yml'
+  push:
+    branches:
+      - fix/admin-supabase-outage-2026-11-22
+    paths:
+      - 'admin.html'
+      - 'admin-http.js'
+      - 'tests/admin-http.test.cjs'
+      - '.github/workflows/admin-outage-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  admin-http-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run admin outage regression tests
+        run: node --test tests/admin-http.test.cjs
+      - name: Check admin JavaScript syntax
+        run: |
+          node --check admin-http.js
+          node <<'NODE'
+          const fs = require('node:fs');
+          const html = fs.readFileSync('admin.html', 'utf8');
+          const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
+            .map(match => match[1]).filter(source => source.trim());
+          for (const source of scripts) new Function(source);
+          console.log('Inline admin scripts parse successfully');
+          NODE

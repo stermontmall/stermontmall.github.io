@@ -12,7 +12,7 @@
       .then(function (r) {
         if (r.status === 401) throw new Error('Your session expired. Sign in again.');
         if (r.status === 404) throw new Error('Table missing. Run setup-admin-extras.sql in Supabase.');
-        if (!r.ok) return r.text().then(function (t) { var m = ''; try { m = JSON.parse(t).message; } catch (e) {} throw new Error(m || 'Request failed (' + r.status + ')'); });
+        if (!r.ok) return r.text().then(function (t) { var m = ''; try { m = JSON.parse(t).message; } catch (e) {} var x = new Error((r.status === 402 || r.status === 429 || r.status >= 500) && A().errorMessage ? A().errorMessage({ status: r.status }) : (m || 'Request failed (' + r.status + ')')); x.status = r.status; throw x; });
         return r.status === 204 ? null : r.text().then(function (t) { return t ? JSON.parse(t) : null; });
       });
   }
@@ -134,7 +134,7 @@
     /* live chat: refresh every 8s while this tab is open, but never while a reply is being typed */
     var live = setInterval(function () {
       if (!c.isConnected) { clearInterval(live); return; }
-      if (D.hidden) return;
+      if (D.hidden || (A().shouldPoll && !A().shouldPoll())) return;
       var typing = [].some.call(list.querySelectorAll('textarea'), function (t) { return t === D.activeElement || t.value !== t.defaultValue; });
       if (typing) return;
       req('/rest/v1/messages?select=*&order=created_at.desc&limit=300').then(function (r) { rows = r; draw(); }).catch(function () {});
@@ -234,7 +234,7 @@
       }).catch(function (e) { msg(c, e.message.indexOf('Table missing') > -1 ? 'Chat table missing. Run setup-chat.sql in Supabase.' : e.message); });
     }
     load(true);
-    var live = setInterval(function () { if (!c.isConnected) { clearInterval(live); return; } if (!D.hidden) load(false); }, 6000);
+    var live = setInterval(function () { if (!c.isConnected) { clearInterval(live); return; } if (!D.hidden && (!A().shouldPoll || A().shouldPoll())) load(false); }, 6000);
   }
 
   window.STMExtras = { mount: function (root, view) { ({ bulk: bulk, vouchers: vouchers, expenses: expenses, inbox: inbox, livechat: livechat, reviews: reviews })[view](root); } };

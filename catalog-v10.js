@@ -100,7 +100,7 @@
       var hd = Object.assign({ apikey: KEY, Authorization: 'Bearer ' + t }, o.h || {}), body = o.body;
       if (body !== undefined && !(body instanceof Blob)) { hd['Content-Type'] = 'application/json'; body = JSON.stringify(body); }
       return fetch(SB + path, { method: o.m || 'GET', headers: hd, body: body }).then(function (r) {
-        if (!r.ok) return r.text().then(function (x) { var m = x; try { m = JSON.parse(x).message || x; } catch (e) {} throw new Error(m); });
+        if (!r.ok) return r.text().then(function (x) { var m = x; try { m = JSON.parse(x).message || x; } catch (e) {} var error = new Error((r.status === 402 || r.status === 429 || r.status >= 500) && window.STMAdmin && window.STMAdmin.errorMessage ? window.STMAdmin.errorMessage({ status: r.status }) : (m || ('Request failed (' + r.status + ')'))); error.status = r.status; throw error; });
         return r.text().then(function (x) { return x ? JSON.parse(x) : null; });
       });
     });
@@ -144,9 +144,9 @@
   }
   function load() {
     S.warn = '';
-    function retry(fn) { return fn().catch(function (e) { if (/signed out|expired/i.test(e.message)) throw e; return new Promise(function (ok) { setTimeout(ok, 700); }).then(fn); }); }
+    function retry(fn) { return fn().catch(function (e) { if (e.status === 401 || e.status === 402 || e.status === 403 || /signed out|expired/i.test(e.message)) throw e; return new Promise(function (ok) { setTimeout(ok, 700); }).then(fn); }); }
     var catsP = retry(function () { return call('/rest/v1/categories?select=*&order=name'); }).catch(function (e) { S.warn = 'Categories could not load (' + e.message + '). Items are still shown.'; return S.cats || []; });
-    var prodP = retry(function () { return callAll('/rest/v1/products?select=*&order=created_at.desc,id.asc'); }).catch(function () { return callAll('/rest/v1/products?select=*&order=id.asc'); });
+    var prodP = retry(function () { return callAll('/rest/v1/products?select=*&order=created_at.desc,id.asc'); }).catch(function (e) { if (e.status === 402 || e.status === 401 || e.status === 403) throw e; return callAll('/rest/v1/products?select=*&order=id.asc'); });
     return Promise.all([catsP, prodP, statsCall(), logsCall(), restCall()])
       .then(function (r) { r[1] = Array.isArray(r[1]) ? r[1] : []; r[2] = Array.isArray(r[2]) ? r[2] : []; S.cats = Array.isArray(r[0]) ? r[0] : []; S.prods = r[1].map(function (p) { if (typeof p.images === 'string') { try { p.images = JSON.parse(p.images); } catch (e) { p.images = p.images ? [p.images] : []; } } if (!Array.isArray(p.images)) p.images = []; p.name = p.name || 'Unnamed item'; p.stock = Number(p.stock) || 0; p.low_at = Number(p.low_at) || 0; p.price = Number(p.price) || 0; p.cost = Number(p.cost) || 0; p.base = p.name; if (p.variant_label) p.name = p.base + ' \u2013 ' + p.variant_label; return p; }); S.st = {}; r[2].forEach(function (x) { S.st[x.product_id] = x; }); S.logs = r[3] || []; S.rest = r[4] || []; });
   }

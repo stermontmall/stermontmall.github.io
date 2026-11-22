@@ -23,13 +23,13 @@
 
   function load() {
     return api('/rest/v1/service_quotes?select=*&order=created_at.desc&limit=500').then(function (r) {
-      if (r.status === 401) throw new Error('expired'); if (!r.ok) throw new Error('load'); return r.json();
+      if (r.status === 401) throw new Error('expired'); if (!r.ok) { var e = new Error('Could not load quote requests.'); e.status = r.status; throw e; } return r.json();
     }).then(function (j) { rows = j; window.STM_quotesNew = count('new'); return j; });
   }
   function fail(L, e) {
     L.textContent = '';
     if (e && e.message === 'expired') { L.appendChild(h('div', 'err', 'Your session expired. Refresh the page and sign in again.')); return; }
-    L.appendChild(h('div', 'err', 'Could not load quote requests. Run setup-service-quotes.sql in Supabase and make sure your email is in the staff table.'));
+    L.appendChild(h('div', 'err', STMAdmin.errorMessage ? STMAdmin.errorMessage(e) : 'Could not load quote requests. Check the server response before changing Supabase setup.'));
   }
   function stop() { if (timer) { clearInterval(timer); timer = null; } }
 
@@ -78,7 +78,7 @@
     }).catch(function (e) { fail(list, e); });
     timer = setInterval(function () {
       if (!L.isConnected) { stop(); return; }
-      if (D.hidden || !D.getElementById('cf').hidden || L.querySelector('.sq input:focus, .sq textarea:focus')) return;
+      if (D.hidden || !D.getElementById('cf').hidden || L.querySelector('.sq input:focus, .sq textarea:focus') || (STMAdmin.shouldPoll && !STMAdmin.shouldPoll())) return;
       reload();
     }, 45000);
 

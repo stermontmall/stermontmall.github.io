@@ -38,7 +38,9 @@
   function human(e) {
     if (!e) return 'Something went wrong.';
     if (e.message === 'expired' || e.status === 401) return 'Your session expired. Refresh the page and sign in again.';
-    if (e.status === 403 || /row-level security|policy/i.test(e.message)) return 'You do not have staff access. Ask an admin to add your email to the staff table.';
+    if (e.status === 402) return 'Supabase is quota-restricted (HTTP 402). Your admin session is preserved, but service-media data and uploads are unavailable until Supabase restores access.';
+    if (e.status === 429 || e.status >= 500 || e.status === 0) return STMAdmin.errorMessage ? STMAdmin.errorMessage(e) : 'Supabase is temporarily unavailable. Try again later.';
+    if (e.status === 403 || /row-level security|policy/i.test(e.message || '')) return 'You do not have staff access. Ask an admin to add your email to the staff table.';
     if (e.status === 413 || /too large|exceeded/i.test(e.message)) return 'That file is too large. The limit is 50 MB per file.';
     if (e.status === 404 || /schema cache|does not exist/i.test(e.message)) return 'The service tables are missing in Supabase. Tell the developer to run the service_posts_and_catalog migration.';
     if (e.status === 400 || e.status === 409) return 'The server rejected this: ' + e.message;

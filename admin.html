@@ -177,6 +177,7 @@
 </div>
 
 <script src="receipt.js?v=13"></script>
+<script src="admin-http.js?v=1"></script>
 <script src="admin-suggest.js?v=1"></script>
 <script src="catalog-v10.js?v=15"></script>
 <script src="admin-extras.js?v=6"></script>
@@ -204,6 +205,12 @@
   var STAGES = ['packed', 'out_for_delivery', 'delivered'];
   function fmt(d) { try { return new Date(d).toLocaleString('en-KE'); } catch (e) { return ''; } }
   var LABEL = { pending: 'Pending', paid: 'Order confirmed ✅', declined: 'Declined' };
+  var pollBackoff = new STMAdminHttp.Backoff({ baseMs: 30000, maxMs: 300000 });
+  function adminErrorMessage(error) {
+    var info = STMAdminHttp.classifyStatus(error && error.status ? error.status : 0);
+    if (info.kind === 'quota') return 'Supabase quota exceeded (HTTP 402). Your admin session is preserved. Database-backed admin data and changes may be unavailable until Supabase restores access.';
+    return info.message;
+  }
 
   function $(id) { return D.getElementById(id); }
   function h(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
@@ -211,29 +218,61 @@
   function load() { try { return JSON.parse(localStorage.getItem(SK)); } catch (e) { return null; } }
   function save(s) { try { if (s) localStorage.setItem(SK, JSON.stringify(s)); else localStorage.removeItem(SK); } catch (e) {} }
 
-  window.STMAdmin = { base: SB, raw: function (path, o) { o = o || {}; return ready().then(function () { var hd = { apikey: KEY }; if (sess) hd.Authorization = 'Bearer ' + sess.access_token; return fetch(SB + path, { method: o.method || 'GET', headers: Object.assign(hd, o.headers || {}), body: o.body }); }); }, api: function (p, o) { return api(p, o); }, ready: function () { return ready(); }, money: function (n) { return money(n); }, fmt: function (d) { return fmt(d); }, email: function () { return (sess && sess.email) || ''; }, approveWith: function (ref, code, amt) { approveWith(ref, code, amt); } };
+  var sharedReadBackoff = new STMAdminHttp.Backoff({ baseMs: 30000, maxMs: 300000 });
+  function trackedFetch(url, options) {
+    options = options || {};
+    var method = String(options.method || 'GET').toUpperCase(), readOnly = method === 'GET' || method === 'HEAD';
+    return fetch(url, options).then(function (response) {
+      if (readOnly) {
+        if (response.ok) sharedReadBackoff.success();
+        else if (response.status === 402 || response.status === 429 || response.status >= 500) sharedReadBackoff.fail();
+      }
+      return response;
+    }, function (error) {
+      if (readOnly) sharedReadBackoff.fail();
+      throw error;
+    });
+  }
+  window.STMAdmin = {
+    base: SB,
+    raw: function (path, o) { o = o || {}; return ready().then(function () { var hd = { apikey: KEY }; if (sess) hd.Authorization = 'Bearer ' + sess.access_token; return trackedFetch(SB + path, { method: o.method || 'GET', headers: Object.assign(hd, o.headers || {}), body: o.body }); }); },
+    api: function (p, o) { return api(p, o); },
+    ready: function () { return ready(); },
+    money: function (n) { return money(n); },
+    fmt: function (d) { return fmt(d); },
+    email: function () { return (sess && sess.email) || ''; },
+    shouldPoll: function () { return !sharedReadBackoff.waiting(); },
+    errorMessage: function (error) { return adminErrorMessage(error); },
+    approveWith: function (ref, code, amt) { approveWith(ref, code, amt); }
+  };
   function api(path, opt) {
     opt = opt || {};
     var hd = { apikey: KEY, 'Content-Type': 'application/json' };
     if (sess) hd.Authorization = 'Bearer ' + sess.access_token;
-    return fetch(SB + path, { method: opt.method || 'GET', headers: Object.assign(hd, opt.headers || {}), body: opt.body ? JSON.stringify(opt.body) : undefined });
+    return trackedFetch(SB + path, { method: opt.method || 'GET', headers: Object.assign(hd, opt.headers || {}), body: opt.body ? JSON.stringify(opt.body) : undefined });
   }
   function setSession(j) { sess = { access_token: j.access_token, refresh_token: j.refresh_token, email: (j.user && j.user.email) || (sess && sess.email) || '', exp: Date.now() + (j.expires_in || 3600) * 1000 - 60000 }; save(sess); }
   function refresh() {
-    if (!sess || !sess.refresh_token) return Promise.reject();
+    if (!sess || !sess.refresh_token) return Promise.reject(new Error('No refresh token is available.'));
     return fetch(SB + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: sess.refresh_token }) })
-      .then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(setSession);
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (payload) {
+        if (!r.ok) { var error = new Error('Supabase token refresh failed.'); error.status = r.status; error.payload = payload; throw error; }
+        return payload;
+      }); }).then(setSession);
   }
-  /* One renewal at a time (several callers can ask at once; reusing a refresh token can revoke the session).
-     If the login cannot be renewed, go back to the sign-in screen instead of leaving dead buttons. */
+  /* Share one refresh request; only an explicit invalid-token response ends the session. */
   var renewing = null;
   function ready() {
     if (!(sess && Date.now() > sess.exp)) return Promise.resolve();
     if (!renewing) {
-      renewing = refresh().then(function () { renewing = null; }, function () {
-        renewing = null; sess = null; save(null); show('login');
-        var le = $('lerr'); if (le) { le.textContent = 'Your session expired. Please sign in again.'; le.hidden = false; }
-        throw new Error('expired');
+      renewing = refresh().then(function () { renewing = null; }, function (error) {
+        renewing = null;
+        if (STMAdminHttp.isInvalidSessionError(error)) {
+          sess = null; save(null); show('login');
+          var le = $('lerr'); if (le) { le.textContent = 'Your admin session has expired or been revoked. Please sign in again.'; le.hidden = false; }
+          throw new Error('expired');
+        }
+        throw error;
       });
     }
     return renewing;
@@ -244,33 +283,48 @@
   $('lf').addEventListener('submit', function (e) {
     e.preventDefault(); var b = $('lb'), er = $('lerr'); er.hidden = true; b.disabled = true; b.textContent = 'Signing in...';
     fetch(SB + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: $('em').value.trim(), password: $('pw').value }) })
-      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error('bad'); return j; }); })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (payload) {
+        if (!r.ok) { var error = new Error('Sign-in request failed.'); error.status = r.status; error.payload = payload; throw error; }
+        return payload;
+      }); })
       .then(function (j) { setSession(j); $('pw').value = ''; start(); })
-      .catch(function () { er.textContent = 'Could not sign in. Check your email and password.'; er.hidden = false; })
+      .catch(function (error) {
+        var kind = STMAdminHttp.classifyStatus(error && error.status ? error.status : 0).kind;
+        er.textContent = kind === 'quota' ? 'Supabase is quota-restricted (HTTP 402). Sign-in is temporarily unavailable; this is not a password or staff-setup error.'
+          : kind === 'unauthorized' ? 'Sign-in was rejected. Check your email and password.'
+          : kind === 'forbidden' ? 'Supabase denied this sign-in request (HTTP 403). Ask the site administrator to check project access.'
+          : adminErrorMessage(error);
+        er.hidden = false;
+      })
       .then(function () { b.disabled = false; b.textContent = 'Sign in'; });
   });
   $('out').addEventListener('click', function () { if (window.STMServices) STMServices.stop(); sess = null; save(null); show('login'); });
-  $('refresh').addEventListener('click', function () { q = ''; $('q').value = ''; fetchOrders(); if (window.STMServices) STMServices.badge(renderTabs); });
-  setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && !D.hidden && EXTRA.indexOf(tab) < 0) fetchOrders(); }, 30000);
+  $('refresh').addEventListener('click', function () { q = ''; $('q').value = ''; fetchOrders(true); });
+  setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && !D.hidden && EXTRA.indexOf(tab) < 0 && !sharedReadBackoff.waiting()) fetchOrders(); }, 30000);
 
-  function fetchOrders() {
+  function fetchOrders(force) {
+    if (!force && pollBackoff.waiting()) return Promise.resolve();
     var er = $('aerr'); er.hidden = true;
     return ready().then(function () { return api('/rest/v1/orders?select=*&order=created_at.desc&limit=500'); })
       .then(function (r) {
         if (r.status === 401) throw new Error('expired');
-        if (!r.ok) throw new Error('load');
+        if (!r.ok) { var error = new Error('Could not load orders.'); error.status = r.status; throw error; }
         return r.json();
       })
       .then(function (rows) {
+        pollBackoff.success();
         orders = rows; window.STM_orders = rows;
         if (rows.length && !rows.some(function (o) { return o.status === 'pending' || o.status === 'paid' || o.status === 'declined'; })) {
           /* status column missing or no staff access */
         }
         render(); handleDeepLink();
+        if (window.STMServices) STMServices.badge(renderTabs);
       })
       .catch(function (e) {
         if (e && e.message === 'expired') { sess = null; save(null); show('login'); return; }
-        er.textContent = 'Could not load orders. Make sure setup.sql was run in Supabase and your email is in the staff table.'; er.hidden = false;
+        if (e && e.status === 401) { sess = null; save(null); show('login'); var le = $('lerr'); le.textContent = 'Your admin session has expired or been revoked. Please sign in again.'; le.hidden = false; return; }
+        pollBackoff.fail();
+        er.textContent = adminErrorMessage(e); er.hidden = false;
       });
   }
 
@@ -503,12 +557,12 @@
       if (needsCode) { patch.pay_code = code; patch.pay_amount = amt; }
       if (patch.status) { patch.handled_by = action === 'pending' ? null : (sess.email || null); patch.handled_at = action === 'pending' ? null : new Date().toISOString(); }
       ready().then(function () { return api('/rest/v1/orders?ref=eq.' + encodeURIComponent(o.ref) + '&select=ref,status', { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: patch }); })
-        .then(function (r) { if (!r.ok) throw r.status; return r.json(); })
+        .then(function (r) { if (!r.ok) { var error = new Error('Order update failed.'); error.status = r.status; throw error; } return r.json(); })
         .then(function (rows) {
           if (!rows.length) throw 0; $('cf').hidden = true;
           var rpc = (action === 'approve') ? 'record_sale' : (action === 'pending' && o.status === 'paid') ? 'reverse_sale' : null;
           var done = rpc ? ready().then(function () { return api('/rest/v1/rpc/' + rpc, { method: 'POST', body: { p_ref: o.ref } }); })
-            .then(function (r) { if (!r.ok) throw 0; }).catch(function () { note('Order updated, but the sales ledger could not be updated. Run setup-catalog.sql and setup-catalog-2.sql in Supabase.', false); })
+            .then(function (r) { if (!r.ok) { var error = new Error('Sales ledger update failed.'); error.status = r.status; throw error; } }).catch(function (error) { note(error && error.status ? adminErrorMessage(error) : 'Order updated, but the sales ledger could not be updated. Please investigate the ledger operation before retrying.', false); })
             .then(fetchOrders) : fetchOrders();
           if (action === 'approve') {
             var paid = Object.assign({}, o, { status: 'paid', handled_at: new Date().toISOString(), pay_code: code, pay_amount: amt });
@@ -521,10 +575,10 @@
         })
         .catch(function (e) {
           $('cf').hidden = true; var er = $('aerr');
-          if (e === 401) { sess = null; save(null); show('login'); var le = $('lerr'); le.textContent = 'Your session expired. Please sign in again.'; le.hidden = false; return; }
+          if (e === 401 || (e && e.status === 401)) { sess = null; save(null); show('login'); var le = $('lerr'); le.textContent = 'Your admin session has expired or been revoked. Please sign in again.'; le.hidden = false; return; }
           er.textContent = e === 409 ? 'That M-Pesa code is already used on another order.'
             : (e === 400 && needsCode) ? 'Could not save the payment code. Run setup-receipts.sql in Supabase first.'
-            : 'Could not update the order. You may not have staff access.';
+            : adminErrorMessage(e);
           er.hidden = false;
         });
     };
@@ -573,13 +627,13 @@
 
   function start() {
     show('app');
-    if (window.STMServices) { STMServices.onBadge = function () { renderTabs(); }; STMServices.badge(renderTabs); }   /* nav badge: new quote requests */
+    if (window.STMServices) { STMServices.onBadge = function () { renderTabs(); }; }   /* badge polling waits until the primary Supabase request succeeds */
     fetchOrders();
   }
   sess = load();
   if (sess) start(); else show('login');
-  setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && EXTRA.indexOf(tab) < 0) fetchOrders(); }, 60000);
-  setInterval(function () { if (sess && !$('app').hidden && !D.hidden && tab !== 'quotes' && window.STMServices) STMServices.badge(renderTabs); }, 60000);
+  setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && EXTRA.indexOf(tab) < 0 && !sharedReadBackoff.waiting()) fetchOrders(); }, 60000);
+  setInterval(function () { if (sess && !$('app').hidden && !D.hidden && tab !== 'quotes' && window.STMServices && !pollBackoff.waiting() && !sharedReadBackoff.waiting()) STMServices.badge(renderTabs); }, 60000);
 
   /* ---- signature pad ---- */
   (function () {
