@@ -6,24 +6,16 @@
 // Test locally with no network: PRODUCTS_JSON=rows.json node check-product-pages.mjs   (rows: [{id, slug}, ...])
 import { readFileSync, existsSync } from 'node:fs';
 
-const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
-const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';   // publishable (public) key, same one the shop and generate-products.mjs use
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
 const DIR = process.env.P_DIR || 'p';
 
 async function rows() {
   if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));
-  const all = [];
-  let offset = 0;
-  while (true) {
-    const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=id,slug&order=created_at.asc&limit=1000&offset=${offset}`, { headers: { apikey: KEY } });
-    if (!r.ok) throw new Error(`Could not read products from Supabase (HTTP ${r.status})`);
-    const batch = await r.json();
-    if (!Array.isArray(batch)) throw new Error('Supabase returned an invalid product-page list');
-    all.push(...batch);
-    if (batch.length < 1000) break;
-    offset += batch.length;
-  }
-  return all;
+  const r = await fetch(NEON_REST + 'rpc/get_product_pages', { signal: AbortSignal.timeout(30000) });
+  if (!r.ok) throw new Error(`Could not read active products from Neon (HTTP ${r.status})`);
+  const products = await r.json();
+  if (!Array.isArray(products)) throw new Error('Neon returned an invalid product-page list');
+  return products.map(({ id, slug }) => ({ id, slug }));
 }
 
 export function missingPages(list, has) {
