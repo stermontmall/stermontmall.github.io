@@ -18,8 +18,10 @@ const publishing = read('PUBLISHING.md');
 assert.match(admin, /admin-publishing-rules\.js/);
 assert.match(admin, /'pricing-rules'/);
 assert.match(admin, /STMPublishingRules\.mount/);
-assert.match(rulesUi, /publishing_rules\?select=key,rule_text,config,updated_at/);
-assert.match(rulesUi, /autonomous_bulk_product_publishing/);
+assert.match(rulesUi, /apirest\.c-10\.eu-central-1\.aws\.neon\.tech/);
+assert.match(rulesUi, /publishing_rules\?select=key,version,title,content,updated_at/);
+assert.match(rulesUi, /GOVERNING_KEY = 'publish_products'/);
+assert.doesNotMatch(rulesUi, /autonomous_bulk_product_publishing|\/rest\/v1\/publishing_rules\?select=key,rule_text/);
 
 assert.match(bulk, /baseline_cost_kes/);
 assert.match(bulk, /price: o\.price, cost: o\.cost, stock: 1000, low_at: 20, featured: false, active: false/);

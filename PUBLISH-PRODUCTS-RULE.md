@@ -21,7 +21,7 @@ If the owner says "publish products", "run the publish rule", or asks you to add
 
 ---
 
-## The rule (mirror of Neon `publish_products`, version 3)
+## The rule (mirror of Neon `publish_products`, version 5: v3 rule plus the photo-sourcing addendum)
 
 ```
 PUBLISH-PRODUCTS RULE v3 - FULLY AUTONOMOUS - PERMANENT STANDING INSTRUCTION
@@ -87,4 +87,17 @@ A short table: name, product code, cost, price, status (published, or inactive w
 
 LEGACY NOTE
 Key supabase_legacy_rules holds the older Supabase-era rules. This rule (publish_products) governs on any conflict.
+
+
+PHOTO SOURCING ADDENDUM — PERMANENT STANDING RULE (approved 2026-11-22)
+
+The owner does not need to upload product photos. For every product, independently search online for the exact product and exact pack size. Search manufacturer first, then authorized distributor, Kenyan supplier, then reputable retailer. Use a direct image URL from the product page, not a search-results thumbnail.
+
+Before saving: verify the URL loads as an image; confirm the visible brand, model/product, and pack size match the listing; confirm image dimensions are at least 500 x 500; and record the product-page URL in attributes.photo_source. Set accurate alt_text. Prefer clean, unwatermarked product photography. Do not use logos, generic category images, competitor-branded photos, AI-generated mockups presented as real product photography, or a different pack size. Never stretch or relabel an image to make it appear to match.
+
+Use manufacturer/distributor/retailer assets only where their product/reseller use is permitted or reasonably authorized. If the source does not permit reuse or the image rights are unclear, do not copy or hotlink it as though owned; find an authorized asset or leave the product without a photo. Prefer storing authorized images in the configured product image host (Neon Object Storage or ImageKit) and use a stable public HTTPS URL. Do not invent storage URLs or treat a temporary presigned URL as a permanent product image.
+
+If no exact, qualifying photo can be verified, leave images empty, keep the product inactive, and report the exact blocker. A near-match is not a match. Never activate a product solely because a photo was found; all v3 price, description, SEO, duplicate, and regulatory checks still apply. Photo-only updates must not change active status, price, stock, slug, or product code.
+
+VENDOR PHOTO FALLBACK CLARIFICATION (owner-approved 2026-11-22): Search manufacturer, authorized distributor, Kenyan vendor, and reputable retailer product pages for exact product/pack photos. A vendor listing is a discovery/source lead, not by itself a reuse license. Before copying, downloading, hotlinking, or storing an image, require written permission, an explicit reuse license, or clear platform terms authorizing commercial reuse. Record the source page, direct asset URL, permission/license evidence, retrieval date, dimensions, and exact-pack verification in product attributes/audit log. If permission is absent or unclear, request permission or use an authorized manufacturer/distributor asset; do not attach the image and do not activate the product. Never substitute search thumbnails, generated previews, similar products, or different pack sizes. All existing photo quality, regulatory, cost, SEO, and activation checks remain mandatory.
 ```

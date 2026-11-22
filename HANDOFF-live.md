@@ -1,4 +1,20 @@
 
+## 2026-11-22 22:30 (Africa/Nairobi) — Admin rulebook page now reads Neon `publish_products` (v5)
+
+### Done (branch `wip-admin-rulebook-neon-2026-11-22`, NOT merged)
+- Neon (project restless-shape-79120240): `grant select on public.publishing_rules to authenticated` plus policy `publishing_rules_admin_read` (select, `is_store_admin()`). Anonymous still has no access; no write grants.
+- `admin-publishing-rules.js` now reads `public.publishing_rules` from the Neon Data API with the Neon Auth session (same as `neon-admin.html`), shows `publish_products` (v5) as the governing rule and the other keys as supplementary. If no Neon session it shows a sign-in link to `/neon-admin.html`.
+- `pricing-rule-defaults.test.mjs` updated to the new source; `node pricing-rule-defaults.test.mjs` and `node no-static-share-links.test.mjs` pass locally; `node --check admin-publishing-rules.js` passes.
+- Added a PRECEDENCE note to `CLAUDE.md`, `AGENTS.md`, `PUBLISHING.md`; `PUBLISH-PRODUCTS-RULE.md` mirror updated to v5 (photo-sourcing addendum).
+- Neon products inserted today (all inactive, no photos, rodenticides/gel lack PCPB confirmation): STM-001838 to STM-001844 (Imagine Care, retail x0.85 baseline).
+
+### Not verified
+- The admin page was not opened in a browser (no browser here). Check on a phone: /admin.html#pricing-rules; sign in once at /neon-admin.html first.
+
+### Next
+1. Open PR, check CI, merge when green. Then verify the tab in a browser.
+2. Source the remaining 13 products from other Nairobi suppliers; photos need written reuse permission (v5).
+
 ## 2026-11-22 16:50 (Africa/Nairobi) — PR #1030 MERGED to main (merge commit dc89ec4b, 13:47:39Z); Supabase still 402
 
 ### Done
