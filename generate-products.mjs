@@ -20,6 +20,7 @@
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
+const imageKitUrl = createRequire(import.meta.url)('./imagekit-url.js');
 import { createHash } from 'node:crypto';
 import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
@@ -178,34 +179,8 @@ const tidy = n => String(n).replace(/\s*\|.*$/, '').replace(/\s+/g, ' ').trim();
 const SIZE_END = /\s+\d+(?:\.\d+)?\s?(?:ml|l|ltr|litres?|liters?|g|kg)\s*$/i;
 const rawRows = (await getProducts()).filter(p => p && p.id && p.name).map(p => ({ ...p, name: tidy(p.name) }));
 
-// Use Supabase's image proxy only when this project confirms that transformations
-// are enabled. The HEAD probe is deliberately fail-open: free-tier/disabled
-// transformations leave every original photo URL untouched.
-const transformedStorageUrl = (source, width) => {
-  try {
-    const u = new URL(source);
-    if (u.origin !== SB || !u.pathname.includes('/storage/v1/object/public/')) return source;
-    u.pathname = u.pathname.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-    u.searchParams.set('width', String(width));
-    u.searchParams.set('quality', '75');
-    return u.toString();
-  } catch { return source; }
-};
-let storageImageTransformsEnabled = false;
-const imageTransformsRequested = process.env.SUPABASE_IMAGE_TRANSFORMS === 'true';
-const imageProbe = imageTransformsRequested ? rawRows.flatMap(p => Array.isArray(p.images) ? p.images : []).find(u => typeof u === 'string' && u.includes('/storage/v1/object/public/')) : null;
-if (imageProbe) {
-  try {
-    const probe = await fetch(transformedStorageUrl(imageProbe, 720), { method: 'HEAD', headers: { Accept: 'image/webp,image/*;q=0.8' } });
-    storageImageTransformsEnabled = probe.ok && /^image\//i.test(probe.headers.get('content-type') || '');
-    console.log('[image-optimization] Supabase transformations ' + (storageImageTransformsEnabled ? 'enabled; resized images use automatic WebP negotiation.' : 'unavailable; retaining original image URLs.'));
-  } catch {
-    console.log('[image-optimization] Probe failed; retaining original image URLs.');
-  }
-} else if (!imageTransformsRequested) {
-  console.log('[image-optimization] Transformations are opt-in to avoid unexpected Storage transformation charges; existing WebP/AVIF assets and intrinsic dimensions remain in use.');
-}
-const optimizedImageUrl = (source, width) => storageImageTransformsEnabled ? transformedStorageUrl(source, width) : source;
+// Use ImageKit Web Proxy for rendered images; keep original source URLs in catalogue data.
+const optimizedImageUrl = (source, width) => imageKitUrl(source, width);
 const rows = rawRows;
 // Approved customer reviews (public read). Failure or a missing table just means no review markup.
 async function getReviews() {
