@@ -1,0 +1,490 @@
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>
+  <script>
+  /* Catalogue prefetch (2026-11-21, site speed). mobile-shell/app.js loads the whole catalogue from Supabase (get_store_catalog, 1,000 rows per request, the second request only
+     after the first has finished) plus the category list, and nothing beyond the build-time cards below (category chips, drawer, Deals, product links, "More like this")
+     works until that is done. This block starts those same requests right now, in parallel, before app.js is even downloaded, and hands the answers to app.js's own fetch()
+     calls (identical URLs and headers, so app.js needs no change). The answer is also kept in localStorage for 5 minutes, so the next product link or a quick return visit is
+     instant; a background refresh runs when that copy is older than 1 minute. Anything unexpected falls straight through to the normal fetch. The key below is the public
+     (publishable) key already in app.js. To undo: delete this script block. */
+  (function () {
+    try {
+      if (!window.fetch || !window.Promise || !window.Response) return;
+      var REST = 'https://oewvtbnmyombbtggamor.supabase.co/rest/v1/', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+      var CATS = REST + 'categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc', RPC = REST + 'rpc/get_store_catalog';
+      var PAGE = 1000, PAGES = 2, TTL = 5 * 60 * 1000, LS = 'shell.catalogPrefetch.v1';
+      var realFetch = window.fetch.bind(window), now = Date.now(), entries = {}, noop = function () {};
+      var wanted = [{ k: 'cats', url: CATS, range: '' }];
+      for (var i = 0; i < PAGES; i++) wanted.push({ k: 'p' + i, url: RPC, range: (i * PAGE) + '-' + (i * PAGE + PAGE - 1) });
+      function net(w) {
+        var h = { apikey: KEY };
+        if (w.range) { h.Range = w.range; h['Range-Unit'] = 'items'; }
+        return realFetch(w.url, { headers: h, cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); });
+      }
+      function plausible(t) { return typeof t === 'string' && t.charAt(0) === '[' && t.charAt(t.length - 1) === ']'; }
+      function persist(texts) {
+        try { var o = { t: Date.now() }; wanted.forEach(function (w, n) { o[w.k] = texts[n]; }); localStorage.setItem(LS, JSON.stringify(o)); } catch (e) {}
+      }
+      function refresh() { Promise.all(wanted.map(net)).then(persist).catch(noop); }
+      var saved = null;
+      try { saved = JSON.parse(localStorage.getItem(LS) || 'null'); } catch (e) {}
+      var age = saved ? now - saved.t : Infinity;
+      var fresh = age >= 0 && age < TTL && wanted.every(function (w) { return plausible(saved[w.k]); });
+      if (fresh) {
+        wanted.forEach(function (w) { entries[w.k] = { t: now, p: Promise.resolve(saved[w.k]) }; });
+        if (age > 60000) refresh();
+      } else {
+        var ps = wanted.map(function (w) { var p = net(w); entries[w.k] = { t: now, p: p }; return p; });
+        Promise.all(ps).then(persist).catch(noop);
+        ps.forEach(function (p) { p.catch(noop); });
+      }
+      var realFetchPublic = window.fetch;
+      window.fetch = function (input, init) {
+        try {
+          var url = typeof input === 'string' ? input : (input && input.url);
+          if (url && (!init || !init.method || init.method === 'GET')) {
+            var key = null, hd = (init && init.headers) || {};
+            if (url === CATS) key = 'cats';
+            else if (url === RPC) {
+              var m = /^(\d+)-(\d+)$/.exec(String(hd.Range || ''));
+              if (m && +m[2] - +m[1] + 1 === PAGE && +m[1] % PAGE === 0 && +m[1] / PAGE < PAGES) key = 'p' + (+m[1] / PAGE);
+            }
+            var e = key && entries[key];
+            if (e && Date.now() - e.t < TTL) {
+              return e.p.then(function (text) {
+                return new Response(text, { status: 200, headers: { 'Content-Type': 'application/json' } });
+              }, function () { delete entries[key]; return realFetchPublic.call(window, input, init); });
+            }
+          }
+        } catch (err) {}
+        return realFetchPublic.call(window, input, init);
+      };
+    } catch (e) {}
+  })();
+  </script>
+  <meta name="theme-color" content="#7c3aed">
+  <title>Stermont Arcade | Pest Control &amp; Online Shopping Kenya</title>
+  <meta name="description" content="Shop pest control products and agrovet supplies in Kenya. Request fumigation, termite, rodent, bed bug and CCTV services. M-Pesa and nationwide delivery.">
+  <meta name="author" content="Stermont Arcade"> <!-- updated -->
+  <meta name="geo.region" content="KE-110">
+  <meta name="geo.placename" content="Westlands, Nairobi">
+  <link rel="alternate" hreflang="en-ke" href="https://stermontarcade.co.ke/">
+  <link rel="alternate" hreflang="x-default" href="https://stermontarcade.co.ke/">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:image" content="https://stermontarcade.co.ke/logo.png">
+  <link rel="canonical" href="https://stermontarcade.co.ke/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Stermont Arcade | Pest Control &amp; Online Shopping Kenya">
+  <meta property="og:site_name" content="Stermont Arcade">
+  <meta property="og:image:alt" content="Stermont Arcade logo">
+  <meta property="og:description" content="Shop pest control products and agrovet supplies in Kenya. Request fumigation, termite, rodent, bed bug and CCTV services. M-Pesa and nationwide delivery.">
+  <meta property="og:url" content="https://stermontarcade.co.ke/">
+  <meta property="og:locale" content="en_KE">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Stermont Arcade | Pest Control &amp; Online Shopping Kenya">
+  <meta name="twitter:description" content="Shop pest control products and agrovet supplies in Kenya. Request fumigation, termite, rodent, bed bug and CCTV services. M-Pesa and nationwide delivery.">
+  <meta name="twitter:image" content="https://stermontarcade.co.ke/logo.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "OnlineStore",
+    "@id": "https://stermontarcade.co.ke/#org",
+    "name": "Stermont Arcade",
+    "url": "https://stermontarcade.co.ke/",
+    "logo": "https://stermontarcade.co.ke/logo.png",
+    "telephone": "+254748888230",
+    "email": "support@stermontarcade.co.ke",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "The Sarit Centre, Karuna Road",
+      "addressLocality": "Westlands, Nairobi",
+      "postalCode": "00800",
+      "addressCountry": "KE"
+    },
+    "hasMap": "https://www.google.com/maps/search/?api=1&query=The+Sarit+Centre+Westlands+Nairobi",
+    "description": "Online store for pest control products, agrovet supplies and everyday essentials in Kenya. Sarit Centre, Westlands is a coordination and order-pickup point for confirmed orders by appointment; it is not advertised as a walk-in shop with fixed opening hours.",
+    "areaServed": { "@type": "Country", "name": "Kenya" },
+    "priceRange": "KSh",
+    "currenciesAccepted": "KES",
+    "paymentAccepted": "M-Pesa"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": "https://stermontarcade.co.ke/#pickup-office",
+    "name": "Stermont Arcade — Sarit Centre Coordination & Pickup",
+    "url": "https://stermontarcade.co.ke/nairobi.html",
+    "telephone": "+254748888230",
+    "email": "support@stermontarcade.co.ke",
+    "parentOrganization": { "@id": "https://stermontarcade.co.ke/#org" },
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "The Sarit Centre, Karuna Road",
+      "addressLocality": "Westlands, Nairobi",
+      "postalCode": "00800",
+      "addressCountry": "KE"
+    },
+    "hasMap": "https://www.google.com/maps/search/?api=1&query=The+Sarit+Centre+Westlands+Nairobi",
+    "additionalProperty": { "@type": "PropertyValue", "name": "Pickup terms", "value": "Confirmed orders by appointment; contact Stermont Arcade before visiting." },
+    "currenciesAccepted": "KES",
+    "paymentAccepted": "M-Pesa"
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://stermontarcade.co.ke/#website", "name": "Stermont Arcade", "alternateName": ["Stermont Arcade Kenya", "Stermont", "StermontArcade"], "url": "https://stermontarcade.co.ke/", "inLanguage": "en-KE", "publisher": {"@id": "https://stermontarcade.co.ke/#org"}}]}
+  </script>
+  <link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#7c3aed"><link rel="apple-touch-icon" href="/icon-192.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="stylesheet" href="/mobile-shell/tailwind.css?v=5">
+<style>/* WhatsApp button: sit above the bottom nav, and get out of the way while a sheet or page is open (it covered Buy now) */#wa-float{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}body.no-scroll #wa-float{display:none!important}</style>
+  <style>/* the build bot rewrites the crawler links between the seo-links markers (generate-products.mjs); these variables style them */
+  :root{--panel:#f3f4f6;--line:#e5e7eb;--ink:#1f2937}.seo-links .wrap{padding:0 12px 8px}.seo-links h2{color:var(--ink)}</style>
+  <script>
+  /* Mobile shell is the sole customer storefront on phones, tablets and desktop.
+     Preserve old shared product links (#p-...) by translating them into the shell's product deep link.
+     SEO crawlers still read this canonical homepage normally. */
+  (function () {
+    try {
+      var m = /^#p-([a-z0-9-]+)$/i.exec(location.hash || '');
+      var q = new URLSearchParams(location.search);
+      var it = q.get('item');   /* /?item=<id>: the share link the old home page gave out before the shell (2026-10-30) */
+      if (!m && !(it && /^[a-z0-9][a-z0-9-]*$/i.test(it) && !q.has('product'))) return;
+      if (it) q.delete('item');
+      if (!q.has('product')) q.set('product', m ? m[1] : it);
+      location.replace('/?' + q.toString());
+    } catch (e) {}
+  })();
+  </script>
+  <!-- Shared product links keep the storefront visible while the product overlay resolves. --></head><!DOCTYPE html>
+<html lang="en-KE">
+
+<body class="min-h-dvh">
+<!-- The primary page heading is visible in the home view below. -->
+
+<!-- ===== Icon sprite (stroke icons, 24x24) ===== -->
+<svg width="0" height="0" class="absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></g></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.5l2.2 10.5h9.6L19.5 8H6.2"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></g></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20c1-4 4-5.5 7.5-5.5s6.5 1.5 7.5 5.5"/></g></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5v8.5a1 1 0 01-1 1h-4.5v-6h-5v6H5a1 1 0 01-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></g></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5.5 13.5H11L10 21l7.5-10.5H12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- ===== Header / app bar (sticky) ===== -->
+<header id="appbar" class="sticky top-0 z-30 bg-white shadow-sm" style="padding-top:env(safe-area-inset-top)">
+  <a href="/" class="sa-brand" aria-label="Stermont Arcade home">
+    <svg viewBox="0 0 48 42" role="img" aria-hidden="true"><path d="M4 5h5l4.2 22.5h24L43 12H12" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 16h21M19 22h17M25 13l-2 14M34 13l-1 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="18" cy="35" r="3.2" fill="#f58220"/><circle cx="36" cy="35" r="3.2" fill="#f58220"/></svg>
+    <span class="sa-brand-copy"><strong><span>Stermont</span> <em>Arcade</em></strong><small>Shop Smart. Live Better.</small></span>
+  </a>
+  <style>
+    .sa-brand{display:flex;align-items:center;gap:8px;padding:7px 14px 5px;color:#092c61;text-decoration:none;background:#fff;min-height:54px}
+    .sa-brand svg{width:43px;height:39px;flex:none}
+    .sa-brand-copy{display:flex;flex-direction:column;line-height:1.02}
+    .sa-brand-copy strong{font-size:22px;letter-spacing:-.7px;font-weight:850}
+    .sa-brand-copy strong em{font-style:normal;color:#f58220}
+    .sa-brand-copy small{font-size:10px;font-weight:650;letter-spacing:.25px;color:#24436b;margin-top:3px}
+    @media(min-width:640px){.sa-brand{padding-left:20px}.sa-brand svg{width:48px;height:42px}.sa-brand-copy strong{font-size:25px}.sa-brand-copy small{font-size:11px}}
+  </style>
+  <div class="relative z-10 bg-white flex items-center gap-1 px-2 h-bar">
+    <button class="icon-btn" data-open="drawer-categories" aria-label="All categories"><svg class="w-6 h-6"><use href="#i-menu"/></svg></button>
+    <form id="search-form" role="search" class="relative flex-1">
+      <input id="search" name="q" type="search" aria-label="Search the shop" enterkeyhint="search" autocomplete="off" placeholder="Search pest control, agrovet, phones..." class="w-full h-9 pl-9 pr-3 rounded-full bg-gray-100 text-sm outline-none focus:ring-2 focus:ring-brand/40 transition-[height] duration-200">
+      <button type="submit" class="sr-only" aria-label="Submit search">Search</button>
+      <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-mute"><use href="#i-search"/></svg>
+    </form>
+    <button class="icon-btn" data-tab="cart" aria-label="Cart"><svg class="w-6 h-6"><use href="#i-cart"/></svg><span class="badge" data-badge="cart" hidden>0</span></button>
+    <button class="icon-btn" data-tab="account" aria-label="Account"><svg class="w-6 h-6"><use href="#i-user"/></svg></button>
+  </div>
+  <div id="chips-wrap">
+    <nav id="chips" role="tablist" aria-label="Sub-categories" class="flex gap-2 px-3 py-1.5 overflow-x-auto no-sb"></nav>
+  </div>
+</header>
+
+<!-- ===== Views (one visible at a time) ===== -->
+<main id="views" class="pb-[calc(56px+env(safe-area-inset-bottom)+8px)]">
+
+  <section id="view-home" data-view="home">
+    <div class="px-3 pt-2 pb-1"><h1 class="text-sm font-semibold tracking-tight text-gray-900">Stermont Arcade: Pest Control Products, Agrovet Supplies &amp; Online Shopping in Kenya</h1><p class="mt-1 text-xs text-gray-600">Stermont Arcade — shop online and request professional home and business services.</p></div>
+    <div class="flex gap-2 overflow-x-auto no-sb px-3 py-2 text-2xs text-brand font-medium">
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">M-Pesa checkout</span>
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">Delivery to all 47 counties</span>
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">Pickup at Sarit Centre, Westlands</span>
+      <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">WhatsApp +254 748 888 230</span>
+    </div>
+    <div class="flex items-center justify-between px-3 pb-2">
+      <div class="flex items-center gap-1 min-w-0">
+        <h2 id="grid-title" class="text-sm font-semibold">Recommended for you</h2>
+        <!-- Category link: shown by mobile-shell/app.js (syncProductMeta) only inside a category; it shares the category's own address /c/<slug>.html -->
+        <button id="cat-share" class="icon-btn" aria-label="Share a link to this category" style="display:none"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg></button>
+      </div>
+      <button id="open-filters" data-open="sheet-filters" class="tap flex items-center gap-1 text-xs text-ink px-2 h-8 rounded-full bg-white shadow-card">
+        <svg class="w-4 h-4"><use href="#i-filter"/></svg>Filter<span id="filter-count" class="text-brand font-semibold" hidden></span>
+      </button>
+    </div>
+    <ul id="grid" class="grid grid-cols-2 gap-2 px-2"><li class="card ssr-product-card" data-ssr="true"><a href="https://stermontarcade.co.ke/?product=air-chopper-7-5sc-insecticide-100-ml" aria-label="View Air Chopper 7.5SC Insecticide" style="display:block;color:inherit;text-decoration:none">
+        <div class="relative aspect-square grid place-items-center" style="background:#fff;overflow:hidden"><img src="https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/air-chopper-7-5sc-insecticide-100-ml-mw9eelqq2j.jpg" alt="Air Chopper 7.5SC Insecticide" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff"></div>
+        <div class="p-2"><p class="text-xs leading-4 line-clamp-2 min-h-8">Air Chopper 7.5SC Insecticide</p><p class="mt-1"><span class="text-sale font-bold text-sm">KSh 899</span></p></div>
+      </a></li>
+<li class="card ssr-product-card" data-ssr="true"><a href="https://stermontarcade.co.ke/?product=abasi-5-ec" aria-label="View Abasi 5% EC Insecticide (1 Litre)" style="display:block;color:inherit;text-decoration:none">
+        <div class="relative aspect-square grid place-items-center" style="background:#fff;overflow:hidden"><img src="https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/abasi-5-ec-17915448282940.jpg" alt="Abasi 5% EC Insecticide (1 Litre)" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff"></div>
+        <div class="p-2"><p class="text-xs leading-4 line-clamp-2 min-h-8">Abasi 5% EC Insecticide (1 Litre)</p><p class="mt-1"><span class="text-sale font-bold text-sm">KSh 450</span></p></div>
+      </a></li>
+<li class="card ssr-product-card" data-ssr="true"><a href="https://stermontarcade.co.ke/?product=jacto-hd-550-knapsack-sprayer-20-litres" aria-label="View Jacto HD 550 Knapsack Sprayer – 20 Litres" style="display:block;color:inherit;text-decoration:none">
+        <div class="relative aspect-square grid place-items-center" style="background:#fff;overflow:hidden"><img src="https://stermontarcade.co.ke/product-photos/jacto-hd-550-knapsack-sprayer-20-litres.jpg" alt="Jacto HD 550 Knapsack Sprayer – 20 Litres" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff"></div>
+        <div class="p-2"><p class="text-xs leading-4 line-clamp-2 min-h-8">Jacto HD 550 Knapsack Sprayer – 20 Litres</p><p class="mt-1"><span class="text-sale font-bold text-sm">KSh 7,150</span></p></div>
+      </a></li>
+<li class="card ssr-product-card" data-ssr="true"><a href="https://stermontarcade.co.ke/?product=screw-chicken-nipple-drinker" aria-label="View Screw Chicken Nipple Drinker" style="display:block;color:inherit;text-decoration:none">
+        <div class="relative aspect-square grid place-items-center" style="background:#fff;overflow:hidden"><img src="https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/screw-chicken-nipple-drinker.webp" alt="Screw Chicken Nipple Drinker" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff"></div>
+        <div class="p-2"><p class="text-xs leading-4 line-clamp-2 min-h-8">Screw Chicken Nipple Drinker</p><p class="mt-1"><span class="text-sale font-bold text-sm">KSh 200</span></p></div>
+      </a></li>
+<li class="card ssr-product-card" data-ssr="true"><a href="https://stermontarcade.co.ke/?product=stainless-steel-pruning-shears-secateurs" aria-label="View Stainless Steel Pruning Shears Secateurs" style="display:block;color:inherit;text-decoration:none">
+        <div class="relative aspect-square grid place-items-center" style="background:#fff;overflow:hidden"><img src="https://stermontarcade.co.ke/product-photos/stainless-steel-pruning-shears-secateurs.jpg" alt="Stainless Steel Pruning Shears Secateurs" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff"></div>
+        <div class="p-2"><p class="text-xs leading-4 line-clamp-2 min-h-8">Stainless Steel Pruning Shears Secateurs</p><p class="mt-1"><span class="text-sale font-bold text-sm">KSh 1,099</span></p></div>
+      </a></li>
+<li class="card ssr-product-card" data-ssr="true"><a href="https://stermontarcade.co.ke/?product=popvet-total-dog-dewormer-4-tablets" aria-label="View Popvet Total Dewormer for Dogs (4 Tabs) – 4 tablets" style="display:block;color:inherit;text-decoration:none">
+        <div class="relative aspect-square grid place-items-center" style="background:#fff;overflow:hidden"><img src="https://stermontarcade.co.ke/product-photos/popvet-total-dog-dewormer-4-tablets.jpg" alt="Popvet Total Dewormer for Dogs (4 Tabs) – 4 tablets" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff"></div>
+        <div class="p-2"><p class="text-xs leading-4 line-clamp-2 min-h-8">Popvet Total Dewormer for Dogs (4 Tabs) – 4 tablets</p><p class="mt-1"><span class="text-sale font-bold text-sm">KSh 1,299</span></p></div>
+      </a></li>
+<li class="card ssr-product-card" data-ssr="true"><a href="https://stermontarcade.co.ke/?product=kynofos-21-elite-feed-phosphate-25-kg" aria-label="View Kynofos 21 Elite Feed Phosphate – 25 kg" style="display:block;color:inherit;text-decoration:none">
+        <div class="relative aspect-square grid place-items-center" style="background:#fff;overflow:hidden"><img src="https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/kynofos-21-elite-feed-phosphate-179197412237210.jpg" alt="Kynofos 21 Elite Feed Phosphate – 25 kg" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff"></div>
+        <div class="p-2"><p class="text-xs leading-4 line-clamp-2 min-h-8">Kynofos 21 Elite Feed Phosphate – 25 kg</p><p class="mt-1"><span class="text-sale font-bold text-sm">KSh 5,550</span></p></div>
+      </a></li>
+<li class="card ssr-product-card" data-ssr="true"><a href="https://stermontarcade.co.ke/?product=tecamin-max-foliar-fertilizer-1-litre" aria-label="View Tecamin Max Foliar Fertilizer (1L) – 1 Litre" style="display:block;color:inherit;text-decoration:none">
+        <div class="relative aspect-square grid place-items-center" style="background:#fff;overflow:hidden"><img src="https://stermontarcade.co.ke/product-photos/tecamin-max-foliar-fertilizer-1-litre.jpg" alt="Tecamin Max Foliar Fertilizer (1L) – 1 Litre" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;background:#fff"></div>
+        <div class="p-2"><p class="text-xs leading-4 line-clamp-2 min-h-8">Tecamin Max Foliar Fertilizer (1L) – 1 Litre</p><p class="mt-1"><span class="text-sale font-bold text-sm">KSh 3,899</span></p></div>
+      </a></li></ul>
+    <p id="grid-empty" class="text-center text-mute py-10" hidden>No products match these filters.</p>
+    <div id="sentinel" class="h-10"></div>
+    <section class="px-3 py-5" aria-labelledby="home-pest-services">
+      <h2 id="home-pest-services" class="text-base font-semibold text-gray-900">Pest control products, agrovet supplies and professional services in Kenya</h2>
+      <p class="mt-2 text-sm leading-6 text-gray-700">Stermont Arcade brings together an online catalogue of pest control products, agrovet supplies and everyday shopping, with service enquiries for homes, farms and businesses. Browse insecticides, rodent-control products, mosquito and fly-control products, sprayers and related equipment. Check each product page for its available pack size, current price, product details and label guidance before ordering.</p>
+      <p class="mt-2 text-sm leading-6 text-gray-700">Need more than a product? Request a site assessment or quotation for fumigation, bed bug treatment, termite management, rodent control or CCTV and smart security installation. Our service work is backed by five years of hands-on experience. We handle enquiries in Nairobi and across Kenya’s 47 counties; visit dates and service availability are confirmed when you request a quote.</p>
+      <p class="mt-2 text-sm leading-6 text-gray-700">For safer pest management, identify the pest and the area that needs attention before choosing a treatment. Always follow the product label, use the stated protective equipment and keep people, pets and food away as directed. If you are unsure which product or service is suitable, ask our team before buying or applying a treatment.</p>
+      <ul class="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+        <li><a class="text-brand underline" href="/c/pest-control-fumigation.html">Shop pest control products</a></li>
+        <li><a class="text-brand underline" href="/c/agrovet.html">Browse agrovet supplies</a></li>
+        <li><a class="text-brand underline" href="/pest-control/">Pest control and fumigation services</a></li>
+        <li><a class="text-brand underline" href="/services/cctv-smart-security-installation-nairobi.html">CCTV and smart security installation</a></li>
+        <li><a class="text-brand underline" href="https://wa.me/254748888230?text=Hello%20Stermont%20Arcade%2C%20I%20would%20like%20a%20product%20or%20service%20quotation.">Request a WhatsApp quotation</a></li>
+      </ul>
+    </section>
+    <!-- seo-links:start -->
+<section class="seo-links" aria-labelledby="seo-cats"><div class="wrap">
+<style>.seo-links{padding:1.5rem 0 .5rem}.seo-links h2{font-size:1.25rem;margin:0 0 .6rem}.seo-links ul{list-style:none;display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 1.2rem;padding:0}.seo-links li a{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem;font-size:.92rem;color:var(--ink);text-decoration:none}.seo-links li a:hover{border-color:currentColor}</style>
+<h2 id="seo-cats">Shop by category</h2>
+<ul><li><a href="/c/pest-control-fumigation.html">Pest Control &amp; Fumigation</a></li><li><a href="/c/adjuvants-growth-regulators.html">Adjuvants &amp; Growth Regulators</a></li><li><a href="/c/agrochemicals.html">Agrochemicals</a></li><li><a href="/c/agrovet.html">Agrovet</a></li><li><a href="/c/animal-feeds.html">Animal Feeds</a></li><li><a href="/c/appliances.html">Appliances</a></li><li><a href="/c/automotive.html">Automotive</a></li><li><a href="/c/bed-bug-killers.html">Bed Bug Killers</a></li><li><a href="/c/beekeeping.html">Beekeeping</a></li><li><a href="/c/bluetooth-speakers.html">Bluetooth Speakers</a></li><li><a href="/c/fashion.html">Clothing &amp; Fashion</a></li><li><a href="/c/cockroach-ant-killers.html">Cockroach &amp; Ant Killers</a></li><li><a href="/c/computers-accessories.html">Computers &amp; Accessories</a></li><li><a href="/c/computing.html">Computing</a></li><li><a href="/c/crop-insecticides.html">Crop Insecticides</a></li><li><a href="/c/disinfectants-hygiene.html">Disinfectants &amp; Farm Hygiene</a></li><li><a href="/c/earphones-headset.html">Earphones &amp; Headset</a></li><li><a href="/c/electrical-lighting.html">Electrical &amp; Lighting</a></li><li><a href="/c/farm-garden-tools.html">Farm &amp; Garden Tools</a></li><li><a href="/c/fertilizers.html">Fertilizers</a></li><li><a href="/c/fish-farming.html">Fish Farming</a></li><li><a href="/c/fogging-ulv-machines.html">Fogging &amp; ULV Machines</a></li><li><a href="/c/fridges-freezers.html">Fridges &amp; Freezers</a></li><li><a href="/c/fumigation-chemicals.html">Fumigation Chemicals</a></li><li><a href="/c/fungicides.html">Fungicides</a></li><li><a href="/c/garden-outdoors.html">Garden &amp; Outdoors</a></li><li><a href="/c/health-beauty.html">Health &amp; Beauty</a></li><li><a href="/c/herbicides.html">Herbicides</a></li><li><a href="/c/home-kitchen.html">Home &amp; Kitchen</a></li><li><a href="/c/home-theatre.html">Home Theatre &amp; Sound Systems</a></li><li><a href="/c/insect-light-traps-uv-lamps.html">Insect Light Traps &amp; UV Lamps</a></li><li><a href="/c/baby-products.html">Kids &amp; Baby Products</a></li><li><a href="/c/kitchen-dining.html">Kitchen &amp; Dining</a></li><li><a href="/c/medical-supplies.html">Medical Supplies &amp; Wellness</a></li><li><a href="/c/mens-fashion.html">Men&#39;s Fashion</a></li><li><a href="/c/mens-sneakers.html">Men&#39;s Sneakers</a></li><li><a href="/c/mosquito-fly-control.html">Mosquito &amp; Fly Control</a></li><li><a href="/c/motorcycle-accessories.html">Motorcycle Accessories</a></li><li><a href="/c/motorcycle-spare-parts.html">Motorcycle Spare Parts</a></li><li><a href="/c/networking-smart-home.html">Networking &amp; Smart Home</a></li><li><a href="/c/pest-monitoring-inspection-tools.html">Pest Monitoring &amp; Inspection Tools</a></li><li><a href="/c/pet-supplies.html">Pet Supplies</a></li><li><a href="/c/phone-accessories.html">Phone Accessories</a></li><li><a href="/c/phones-accessories.html">Phones &amp; Accessories</a></li><li><a href="/c/phones-tablets.html">Phones &amp; Tablets</a></li><li><a href="/c/poultry-dairy-equipment.html">Poultry &amp; Dairy Equipment</a></li><li><a href="/c/printers-office-machines.html">Printers &amp; Office Machines</a></li><li><a href="/c/protective-wear-safety.html">Protective Wear &amp; Safety</a></li><li><a href="/c/rodent-control.html">Rodent Control</a></li><li><a href="/c/security-cctv.html">Security &amp; CCTV</a></li><li><a href="/c/seeds-seedlings.html">Seeds &amp; Seedlings</a></li><li><a href="/c/shoes.html">Shoes</a></li><li><a href="/c/solar-power.html">Solar &amp; Power</a></li><li><a href="/c/sporting-goods-fitness.html">Sporting Goods &amp; Fitness</a></li><li><a href="/c/sprayers-equipment.html">Sprayers &amp; Equipment</a></li><li><a href="/c/stermont-cars-for-sale.html">Stermont Cars For Sale</a></li><li><a href="/c/televisions.html">Televisions</a></li><li><a href="/c/termite-control.html">Termite Control</a></li><li><a href="/c/tools-machinery.html">Tools &amp; Machinery</a></li><li><a href="/c/toys-games.html">Toys &amp; Games</a></li><li><a href="/c/tv-mounts-accessories.html">TV Mounts &amp; Accessories</a></li><li><a href="/c/tv-audio-video.html">TV, Audio &amp; Video</a></li><li><a href="/c/tvs-audio.html">TVs &amp; Audio</a></li><li><a href="/c/veterinary-drugs.html">Veterinary Drugs &amp; Vaccines</a></li><li><a href="/c/washing-machines.html">Washing Machines</a></li><li><a href="/c/watches-jewellery.html">Watches &amp; Jewellery</a></li><li><a href="/c/water-tanks-irrigation.html">Water Tanks &amp; Irrigation</a></li><li><a href="/c/womens-fashion.html">Women&#39;s Fashion</a></li><li><a href="/c/womens-sneakers.html">Women&#39;s Sneakers</a></li></ul>
+<h2>Popular products</h2>
+<ul><li><a href="https://stermontarcade.co.ke/?product=air-chopper-7-5sc-insecticide-100-ml">Air Chopper 7.5SC Insecticide</a></li><li><a href="https://stermontarcade.co.ke/?product=hisense-hmc6mbk-7-in-1-pressure-cooker">Hisense HMC6MBK 7-in-1 Pressure Cooker 1000W</a></li><li><a href="https://stermontarcade.co.ke/?product=abasi-5-ec">Abasi 5% EC Insecticide (1 Litre)</a></li><li><a href="https://stermontarcade.co.ke/?product=zagro-ultraxide-disinfectant-for-poultry-livestock-farms-1-litre">Zagro Ultraxide Disinfectant 1L – 1 Litre</a></li><li><a href="https://stermontarcade.co.ke/?product=absolute-375sc-systemic-fungicide-greenlife-1-litres">Absolute 375SC Systemic Fungicide</a></li><li><a href="https://stermontarcade.co.ke/?product=promax-20-ec-odourless-bed-bug-insecticide">Promax 20 EC Odourless Bed Bug Insecticide</a></li><li><a href="https://stermontarcade.co.ke/?product=premise-200-sc-termiticide-50-ml">Premise 200 SC Termiticide</a></li><li><a href="https://stermontarcade.co.ke/?product=syngenta-tatua-rat-and-mice-poison-blocks">Syngenta Tatua Rat and Mice Poison Blocks</a></li><li><a href="https://stermontarcade.co.ke/?product=actellic-25ec-insecticide-1-litre">Actellic 25EC Insecticide – 1 Litre</a></li><li><a href="https://stermontarcade.co.ke/?product=kynofos-21-elite-feed-phosphate-25-kg">Kynofos 21 Elite Feed Phosphate – 25 kg</a></li><li><a href="https://stermontarcade.co.ke/?product=weed-out-480sl-glyphosate-herbicide-5-litres">Weed-Out 480SL Glyphosate Herbicide – 5 Litres</a></li><li><a href="https://stermontarcade.co.ke/?product=kelvin-dudu-dust-100-g">Kelvin Dudu Dust – 100 g</a></li></ul>
+<h2>Professional services and business orders</h2>
+<p>Looking for pest-control treatment information, or buying for a hotel, school, farm, office or rental property?</p>
+<ul><li><a href="/services/">Explore Stermont service information</a></li><li><a href="/services/pest-control-fumigation-nairobi.html">Pest control and fumigation service information</a></li><li><a href="/services/pests/termites.html">Termite control information</a></li><li><a href="/services/pests/bed-bugs.html">Bed bug control information</a></li><li><a href="/bulk-quote.html">Request a bulk product quote</a></li><li><a href="/nairobi.html">Nairobi shop, pickup and delivery information</a></li></ul>
+<h2>New arrivals</h2>
+<ul><li><a href="https://stermontarcade.co.ke/?product=premier-petrol-mist-sprayer-fogging-machine-fumigator">Premier Petrol Mist Sprayer Fogging Machine Fumigator</a></li><li><a href="https://stermontarcade.co.ke/?product=dolphy-jycd05-5l-electric-ulv-cold-fogger">Dolphy JYCD05 5L Electric ULV Cold Fogger</a></li><li><a href="https://stermontarcade.co.ke/?product=k-s-solumap-map-12-61-0-fertilizer-25kg">K+S SoluMAP MAP 12-61-0 Fertilizer 25kg</a></li><li><a href="https://stermontarcade.co.ke/?product=agita-1gb-granular-fly-bait-20g">Agita 1GB Granular Fly Bait 20g</a></li><li><a href="https://stermontarcade.co.ke/?product=chali-dudu-60-insecticidal-dust-100g">Chali Dudu 60 Insecticidal Dust 100g</a></li><li><a href="https://stermontarcade.co.ke/?product=cockrakill-paste-cockroach-bait-100g">Cockrakill Paste Cockroach Bait 100g</a></li><li><a href="https://stermontarcade.co.ke/?product=mende-sharp-shooter-0-5gb-cockroach-gel-5g">Mende Sharp Shooter 0.5GB Cockroach Gel 5g</a></li><li><a href="https://stermontarcade.co.ke/?product=k-othrine-ec-15-public-health-insecticide-1l">K-Othrine EC 15 Public Health Insecticide 1L</a></li><li><a href="https://stermontarcade.co.ke/?product=mos-n-roach-100ec-insecticide-100ml">Mos-N-Roach 100EC Insecticide 100ml</a></li><li><a href="https://stermontarcade.co.ke/?product=mos-n-roach-100ec-insecticide-1l">Mos-N-Roach 100EC Insecticide 1L</a></li><li><a href="https://stermontarcade.co.ke/?product=mos-n-roach-100ec-insecticide-20ml">Mos-N-Roach 100EC Insecticide 20ml</a></li><li><a href="https://stermontarcade.co.ke/?product=medex-0-05-rb-cockroach-gel-bait-10g">Medex 0.05% RB Cockroach Gel Bait 10g</a></li><li><a href="https://stermontarcade.co.ke/?product=anvil-pruning-shear-8-inch-300200">Anvil Pruning Shear 8 Inch 300200</a></li><li><a href="https://stermontarcade.co.ke/?product=thyme-seedlings">Thyme Seedlings</a></li><li><a href="https://stermontarcade.co.ke/?product=almond-seedlings">Almond Seedlings</a></li><li><a href="https://stermontarcade.co.ke/?product=grafted-blood-orange-seedlings">Grafted Blood Orange Seedlings</a></li></ul>
+<p><a href="/products.html">View all 1626 products</a> &middot; <a href="/c/">All categories</a></p>
+</div></section>
+<!-- seo-links:end -->
+    <footer class="px-3 py-5 text-center text-xs text-mute" style="color:#4b5563">stermontarcade.co.ke</footer>
+  </section>
+
+  <section id="view-categories" data-view="categories" hidden>
+    <div class="flex" style="height:calc(100dvh - 48px - 56px - env(safe-area-inset-top) - env(safe-area-inset-bottom))">
+      <aside id="cat-side" class="w-24 shrink-0 overflow-y-auto bg-gray-100 no-sb" role="tablist" aria-label="Main categories"></aside>
+      <div id="cat-main" class="flex-1 overflow-y-auto bg-white p-3"></div>
+    </div>
+  </section>
+
+  <section id="view-deals" data-view="deals" hidden>
+    <div class="mx-2 mt-2 rounded-lg bg-gradient-to-r from-sale to-orange-500 text-white p-3 flex items-center justify-between">
+      <div><p class="font-semibold text-sm">Flash deals</p><p class="text-2xs opacity-90">Biggest discounts first</p></div>
+      <svg class="w-7 h-7"><use href="#i-bolt"/></svg>
+    </div>
+    <ul id="deals-grid" class="grid grid-cols-2 gap-2 p-2"></ul>
+  </section>
+
+  <section id="view-cart" data-view="cart" hidden>
+    <h2 class="px-3 pt-3 pb-2 font-semibold">Cart <span id="cart-title-count" class="text-mute font-normal"></span></h2>
+    <ul id="cart-list" class="px-2 space-y-2"></ul>
+    <div id="cart-empty" class="text-center text-mute py-16" hidden>
+      <svg class="w-12 h-12 mx-auto mb-2 opacity-40"><use href="#i-cart"/></svg>Your cart is empty
+    </div>
+    <div id="cart-total-bar" class="mx-2 mt-3 p-3 bg-white rounded-lg shadow-card flex items-center justify-between" hidden>
+      <div><p class="text-xs text-mute">Total</p><p id="cart-total" class="font-bold text-sale text-base"></p></div>
+      <button id="checkout" class="tap h-10 px-6 rounded-full bg-brand text-white font-semibold text-sm">Checkout</button>
+    </div>
+    <button id="share-cart" class="tap" style="width:calc(100% - 16px);margin:8px 8px 0;height:40px;border-radius:9999px;border:1.5px solid #7c3aed;color:#7c3aed;background:#fff;font-weight:600;font-size:14px" hidden>Share cart link</button>
+  </section>
+
+  <section id="view-account" data-view="account" hidden>
+    <div class="bg-brand text-white p-5 pt-6"><p class="font-semibold text-base">Your account</p><p class="text-xs opacity-80">Sign in to see and track your orders</p></div>
+    <ul class="m-2 bg-white rounded-lg divide-y divide-line shadow-card">
+      <li><a class="tap block px-4 py-3.5" href="/account.html">Sign in / My orders</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/track.html">Track an order</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/shipping.html">Delivery information</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/returns.html">Returns</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/contact.html">Contact us</a></li>
+      <li><a class="tap block px-4 py-3.5" href="https://wa.me/254748888230">Chat on WhatsApp</a></li>
+      <li><a class="tap block px-4 py-3.5" href="/">Return to the Stermont Arcade mobile shell</a></li>
+    </ul>
+  </section>
+</main>
+
+<!-- ===== Bottom navigation ===== -->
+<nav id="bottom-nav" class="fixed bottom-0 inset-x-0 z-30 bg-white border-t border-line flex" style="padding-bottom:env(safe-area-inset-bottom)" aria-label="Main">
+  <button class="nav-item" data-tab="home" aria-current="page"><svg class="w-6 h-6"><use href="#i-home"/></svg>Home</button>
+  <button class="nav-item" data-tab="categories"><svg class="w-6 h-6"><use href="#i-grid"/></svg>Categories</button>
+  <button class="nav-item" data-tab="deals"><svg class="w-6 h-6"><use href="#i-bolt"/></svg>Deals<span class="badge" data-badge="deals" style="left:55%;right:auto" hidden>0</span></button>
+  <button class="nav-item" data-tab="cart"><svg class="w-6 h-6"><use href="#i-cart"/></svg>Cart<span class="badge" data-badge="cart" style="left:55%;right:auto" hidden>0</span></button>
+  <button class="nav-item" data-tab="account"><svg class="w-6 h-6"><use href="#i-user"/></svg>Account</button>
+</nav>
+
+<!-- ===== Overlays ===== -->
+<!-- ===== Product page (full screen, inside the shell) ===== -->
+<section id="page-product" class="sheet" role="dialog" aria-modal="true" aria-label="Product" style="z-index:55;top:0;right:0;bottom:0;left:0;transform:translateX(100%);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);background:#f3f4f6">
+  <div style="display:flex;align-items:center;gap:8px;height:48px;padding:0 8px;background:#fff;border-bottom:1px solid #e5e7eb;flex:none">
+    <button class="icon-btn" data-close aria-label="Back"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+    <p id="pp-title" style="flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></p>
+    <button class="icon-btn" id="pp-share" aria-label="Share this product"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg></button>
+    <button class="icon-btn" data-pp-cart aria-label="Open cart"><svg class="w-6 h-6"><use href="#i-cart"/></svg></button>
+  </div>
+  <div id="pp-body" style="flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:16px">
+    <div style="background:#fff">
+      <div id="pp-img" class="grid place-items-center text-6xl" style="width:100%;aspect-ratio:1/1;max-height:60dvh;overflow:hidden;background:#fff"></div>
+      <div id="pp-photos" style="display:flex;gap:8px;overflow-x:auto;padding:0 16px 12px"></div>
+      <div style="padding:4px 16px 16px">
+        <h2 id="pp-name" style="font-size:16px;font-weight:600;line-height:1.35">Product details</h2>
+        <p style="margin-top:6px"><span id="pp-price" class="text-sale font-bold" style="font-size:22px"></span> <s id="pp-old" class="text-mute text-xs"></s> <span id="pp-off" class="text-xs font-semibold text-sale"></span></p>
+        <p id="pp-meta" class="text-xs text-mute" style="margin-top:4px"></p>
+      </div>
+    </div>
+    <div style="background:#fff;margin-top:8px;padding:12px 16px">
+      <p class="text-xs font-semibold mb-2">Pack size</p>
+      <div id="pp-sizes" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"></div>
+      <div class="flex items-center justify-between" style="margin-top:14px">
+        <span class="text-xs font-semibold">Quantity</span>
+        <div class="flex items-center gap-3">
+          <button id="pp-minus" class="icon-btn bg-gray-100" aria-label="Less"><svg class="w-4 h-4"><use href="#i-minus"/></svg></button>
+          <span id="pp-qty" class="w-6 text-center font-semibold">1</span>
+          <button id="pp-plus" class="icon-btn bg-gray-100" aria-label="More"><svg class="w-4 h-4"><use href="#i-plus"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div style="background:#fff;margin-top:8px;padding:12px 16px;font-size:12px;line-height:1.7">
+      <p>&#10003; Pay with M-Pesa at checkout</p><p>&#10003; Delivery to all 47 counties</p><p>&#10003; Pickup at Sarit Centre, Westlands, Nairobi</p>
+    </div>
+    <div style="background:#fff;margin-top:8px;padding:12px 16px">
+      <p class="text-xs font-semibold mb-2">Product details</p>
+      <div id="pp-desc" style="white-space:pre-line;font-size:13px;line-height:1.55;overflow-wrap:anywhere"></div>
+    </div>
+    <div id="pp-related-wrap" style="background:#fff;margin-top:8px;padding:12px 0 12px 16px" hidden>
+      <p class="text-xs font-semibold mb-2">More like this</p>
+      <div id="pp-related" style="display:flex;gap:10px;overflow-x:auto;padding-right:16px"></div>
+    </div>
+  </div>
+  <div style="flex:none;display:flex;gap:12px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e5e7eb">
+    <button id="pp-add" class="tap flex-1 h-11 rounded-full bg-brand-soft text-brand font-semibold">Add to cart</button>
+    <button id="pp-buy" class="tap flex-1 h-11 rounded-full bg-brand text-white font-semibold">Buy now</button>
+  </div>
+</section>
+
+<div id="scrim" class="scrim" aria-hidden="true"></div>
+
+<aside id="drawer-categories" class="sheet sheet-left" role="dialog" aria-modal="true" aria-label="Categories">
+  <div class="flex items-center justify-between px-4 h-bar border-b border-line">
+    <span class="font-semibold">All categories</span>
+    <button class="icon-btn" data-close aria-label="Close"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+  </div>
+  <ul id="drawer-cats" class="flex-1 overflow-y-auto"></ul>
+</aside>
+
+<section id="sheet-filters" class="sheet sheet-bottom" role="dialog" aria-modal="true" aria-label="Filters">
+  <div class="flex items-center justify-between px-4 h-12 border-b border-line">
+    <span class="font-semibold">Filters</span>
+    <button class="icon-btn" data-close aria-label="Close"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="flex-1 overflow-y-auto p-4 space-y-5">
+    <div>
+      <p class="text-xs font-semibold mb-2">Sort by</p>
+      <div id="f-sort" class="flex flex-wrap gap-2">
+        <button class="chip" data-sort="rec" aria-selected="true">Recommended</button>
+        <button class="chip" data-sort="low" aria-selected="false">Price: low to high</button>
+        <button class="chip" data-sort="high" aria-selected="false">Price: high to low</button>
+        <button class="chip" data-sort="disc" aria-selected="false">Biggest discount</button>
+      </div>
+    </div>
+    <div>
+      <p class="text-xs font-semibold mb-2">Price (KSh)</p>
+      <div class="flex items-center gap-2">
+        <input id="f-min" inputmode="numeric" aria-label="Minimum price in Kenyan shillings" placeholder="Min" class="w-full h-10 px-3 rounded-lg bg-gray-100 outline-none">
+        <span class="text-mute">to</span>
+        <input id="f-max" inputmode="numeric" aria-label="Maximum price in Kenyan shillings" placeholder="Max" class="w-full h-10 px-3 rounded-lg bg-gray-100 outline-none">
+      </div>
+    </div>
+    <label class="flex items-center justify-between text-sm">On discount only
+      <input id="f-disc" type="checkbox" class="w-5 h-5 accent-[#7c3aed]">
+    </label>
+  </div>
+  <div class="flex gap-3 p-3 border-t border-line">
+    <button id="f-reset" class="tap flex-1 h-11 rounded-full bg-gray-100 font-semibold">Reset</button>
+    <button id="f-apply" class="tap flex-1 h-11 rounded-full bg-brand text-white font-semibold">Show results</button>
+  </div>
+</section>
+
+<section id="sheet-quickbuy" class="sheet sheet-bottom" role="dialog" aria-modal="true" aria-label="Quick buy">
+  <div class="flex gap-3 p-4">
+    <div id="qb-img" class="w-24 h-24 rounded-lg shrink-0 grid place-items-center text-4xl"></div>
+    <div class="min-w-0 flex-1">
+      <p id="qb-name" class="text-sm font-medium line-clamp-2"></p>
+      <p class="mt-1"><span id="qb-price" class="text-sale font-bold text-lg"></span> <s id="qb-old" class="text-mute text-xs"></s></p>
+    </div>
+    <button class="icon-btn self-start -mt-1 -mr-2" data-close aria-label="Close"><svg class="w-5 h-5"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="px-4 pb-3">
+    <p class="text-xs font-semibold mb-2">Pack size</p>
+    <div id="qb-sizes" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"></div>
+  </div>
+  <div id="qb-details" class="px-4 pb-3" hidden style="flex:0 1 auto;min-height:0;overflow:auto">
+    <p class="text-xs font-semibold mb-1">Details</p>
+    <p id="qb-meta" class="text-xs text-mute mb-2"></p>
+    <div id="qb-photos" class="flex gap-2 mb-2" style="overflow-x:auto"></div>
+    <div id="qb-desc" style="white-space:pre-line;font-size:13px;line-height:1.5;overflow-wrap:anywhere"></div>
+    <a id="qb-page" class="inline-block mt-2 text-xs text-brand underline" hidden>See full product details &rsaquo;</a>
+  </div>
+  <div class="px-4 pb-4 flex items-center justify-between">
+    <span class="text-xs font-semibold">Quantity</span>
+    <div class="flex items-center gap-3">
+      <button id="qb-minus" class="icon-btn bg-gray-100" aria-label="Less"><svg class="w-4 h-4"><use href="#i-minus"/></svg></button>
+      <span id="qb-qty" class="w-6 text-center font-semibold">1</span>
+      <button id="qb-plus" class="icon-btn bg-gray-100" aria-label="More"><svg class="w-4 h-4"><use href="#i-plus"/></svg></button>
+    </div>
+  </div>
+  <div class="flex gap-3 p-3 border-t border-line">
+    <button id="qb-add" class="tap flex-1 h-11 rounded-full bg-brand-soft text-brand font-semibold">Add to cart</button>
+    <button id="qb-buy" class="tap flex-1 h-11 rounded-full bg-brand text-white font-semibold">Buy now</button>
+  </div>
+</section>
+
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 top-[64px] z-[60] px-4 py-2 rounded-full bg-ink/90 text-white text-xs opacity-0 pointer-events-none transition-opacity duration-200"></div>
+
+<script src="/product-links.js" defer></script>
+<script src="/imagekit-url.js" defer></script>
+<script src="/mobile-shell/app.js?v=46" defer></script>
+<script src="/analytics.js" defer></script>
+<script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
+</body>
+</html>
+
+<!-- Trigger site link audit after first-party product image repair. -->
