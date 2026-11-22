@@ -30,8 +30,22 @@ import { buildCategoryIntro, buildCategoryFaq } from './category-editorial.mjs';
 import { renderHomeGridFallback } from './home-grid-ssr.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
-const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
-const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
+const NEON_PAGE_SIZE = 200;
+async function neonRows(path) {
+  const rows = [];
+  for (let offset = 0; ; offset += NEON_PAGE_SIZE) {
+    const response = await fetch(NEON_REST + path, {
+      headers: { Range: offset + '-' + (offset + NEON_PAGE_SIZE - 1), 'Range-Unit': 'items' },
+      signal: AbortSignal.timeout(30000)
+    });
+    if (!response.ok) throw new Error(`Neon Data API ${path} failed: HTTP ${response.status}`);
+    const batch = await response.json();
+    if (!Array.isArray(batch)) throw new Error(`Neon Data API ${path} returned a non-array response`);
+    rows.push(...batch);
+    if (batch.length < NEON_PAGE_SIZE) return rows;
+  }
+}
 const WHATSAPP = '254748888230';
 const BRAND = 'Stermont Arcade';
 // Hand-written, model-specific buying guidance. Only add entries after checking the live catalogue description.
@@ -90,62 +104,20 @@ const MISSING_LEGACY_PRODUCT_PHOTO = /(?:acetochlor-50-ec-herbicide-1-litre|jade
 const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.images) ? p.images : []).filter(u => typeof u === 'string' && !MISSING_LEGACY_PRODUCT_PHOTO.test(u)).map(fixImg) }));
 
 async function getProducts() {
-  if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
-  const cols = ['id,product_code,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
-                'id,product_code,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,product_code,created_at,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,product_code,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,product_code,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
-                'id,product_code,created_at,name,price,old_price,unit,stock,images,description,categories(name,slug)',
-                'id,product_code,created_at,name,price,stock,images,description,categories(name,slug)'];
-  // Keep each REST response small enough for constrained hosted runners and retry transient
-  // gateway/rate-limit failures. The previous 1,000-row response could be several megabytes.
-  const PAGE_SIZE = 200;
-  const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
-  let lastError = 'No request attempted';
-  for (const c of cols) {
-    const all = [];
-    let offset = 0;
-    let failed = false;
-    while (true) {
-      const url = `${SB}/rest/v1/products?active=eq.true&select=${c}&order=created_at.asc&limit=${PAGE_SIZE}&offset=${offset}`;
-      let batch = null;
-      for (let attempt = 1; attempt <= 3; attempt++) {
-        try {
-          const r = await fetch(url, { headers: { apikey: KEY, accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
-          if (!r.ok) {
-            const detail = (await r.text()).replace(/\\s+/g, ' ').slice(0, 350);
-            lastError = `HTTP ${r.status} at offset ${offset}: ${detail || r.statusText}`;
-            // Authentication/permission failures affect every select shape; don't hide them by retrying variants.
-            if (r.status === 401 || r.status === 403) throw new Error(lastError);
-            if (![408, 425, 429, 500, 502, 503, 504].includes(r.status)) break;
-            if (attempt < 3) await pause(700 * attempt);
-            continue;
-          }
-          const payload = await r.json();
-          if (!Array.isArray(payload)) {
-            lastError = `Unexpected JSON response at offset ${offset}: ${JSON.stringify(payload).slice(0, 350)}`;
-            break;
-          }
-          batch = payload;
-          break;
-        } catch (error) {
-          if (error?.message?.startsWith('HTTP 401') || error?.message?.startsWith('HTTP 403')) throw error;
-          lastError = `Request error at offset ${offset}: ${String(error?.message || error).slice(0, 350)}`;
-          if (attempt < 3) await pause(700 * attempt);
-        }
-      }
-      if (batch === null) { failed = true; break; }
-      all.push(...batch);
-      if (batch.length < PAGE_SIZE) break;
-      offset += batch.length;
-    }
-    if (!failed) {
-      console.log(`Loaded ${all.length} active products from Supabase using ${PAGE_SIZE}-row pages.`);
-      return fixProducts(all);
-    }
-  }
-  throw new Error(`Could not read products from Supabase after trying all compatible select shapes. Last API error: ${lastError}`);
+  if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));
+  const rows = await neonRows('rpc/get_product_pages');
+  const products = rows.map(row => ({
+    ...row,
+    categories: row.category_name ? {
+      name: row.category_name,
+      slug: row.category_slug,
+      description: row.category_description,
+      meta_title: row.category_meta_title,
+      meta_description: row.category_meta_description
+    } : null
+  }));
+  console.log(`Loaded ${products.length} active products from Neon.`);
+  return fixProducts(products);
 }
 
 function productContentHtml(p) {
@@ -218,8 +190,7 @@ const rows = rawRows;
 async function getReviews() {
   try {
     if (process.env.REVIEWS_JSON) return JSON.parse(readFileSync(process.env.REVIEWS_JSON, 'utf8'));
-    const r = await fetch(`${SB}/rest/v1/reviews?status=eq.approved&select=product_name,rating,body,reviewer,created_at&order=created_at.desc&limit=1000`, { headers: { apikey: KEY } });
-    return r.ok ? await r.json() : [];
+    return await neonRows('rpc/get_approved_reviews');
   } catch { return []; }
 }
 const normName = n => tidy(n).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -279,7 +250,7 @@ products.forEach(p => { if (sl(p.id) !== p.id) aliases.push({ id: p.id, to: p.id
   let hist = [];
   try {
     if (process.env.SLUG_REDIRECTS_JSON) hist = JSON.parse(readFileSync(process.env.SLUG_REDIRECTS_JSON, 'utf8'));
-    else { const r = await fetch(`${SB}/rest/v1/product_slug_redirects?select=old_slug,product_id`, { headers: { apikey: KEY } }); if (r.ok) hist = await r.json(); }
+    else hist = await neonRows('rpc/get_product_slug_redirects');
   } catch { hist = []; }
   const topOf = {}; aliases.forEach(x => { topOf[x.id] = x.to; });
   const taken = new Set(); products.forEach(p => { taken.add(p.id); taken.add(sl(p.id)); }); aliases.forEach(x => taken.add(x.id));
