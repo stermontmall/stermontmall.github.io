@@ -92,14 +92,19 @@
     delete() { this.action = "delete"; return this; }
     async readAll() {
       const records = []; let page = 1; let totalItems = 0; let totalPages = 1;
+      const requestedRows = this.rangeEnd !== null
+        ? this.rangeStart + (this.limitValue === null ? this.rangeEnd - this.rangeStart + 1 : Math.min(this.rangeEnd - this.rangeStart + 1, this.limitValue))
+        : (this.limitValue === null ? null : this.rangeStart + this.limitValue);
+      if (requestedRows === 0) return { records, totalItems: null };
       do {
         const result = await api("/api/collections/" + encodeURIComponent(this.table) + "/records?" + queryString(this, page));
         const items = result.items || [];
         records.push(...items);
         totalItems = Number(result.totalItems || 0); totalPages = Number(result.totalPages || 1);
-        if (records.length >= MAX_READ_ROWS && page < totalPages) throw new Error("PocketBase compatibility read exceeded " + MAX_READ_ROWS + " records; add filters or pagination.");
+        if (records.length >= MAX_READ_ROWS && page < totalPages && (requestedRows === null || requestedRows > MAX_READ_ROWS)) throw new Error("PocketBase compatibility read exceeded " + MAX_READ_ROWS + " records; add filters or pagination.");
         page += 1;
-      } while (page <= totalPages && records.length < MAX_READ_ROWS);
+      } while (page <= totalPages && records.length < (requestedRows === null ? MAX_READ_ROWS : Math.min(requestedRows, MAX_READ_ROWS)));
+      if (requestedRows !== null && requestedRows > MAX_READ_ROWS) throw new Error("PocketBase compatibility read exceeded " + MAX_READ_ROWS + " records; reduce the requested range.");
       return { records, totalItems };
     }
     async execute() {
