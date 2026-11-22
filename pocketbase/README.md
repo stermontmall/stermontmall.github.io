@@ -194,6 +194,6 @@ Do not mechanically replace all Supabase references. Build scripts, staff-only o
 
 ## What has and has not been tested
 
-Source definitions and parser test are committed, but the parser test has not been executed in this environment. Not tested against your PocketHost instance because no instance URL/credentials were provided and this environment cannot run your hosted PocketBase. The following remain mandatory before production cutover: run setup.mjs, inspect every rule in the admin UI, run a small test CSV import, verify public vs staff access using separate browser sessions, test customer order ownership, and confirm product pages/checkout end to end.
+JavaScript syntax checks passed for the adapter, CSV module and test file; the setup/import module bodies also passed syntax parsing. The CSV parser behavior passed the multiline/quoted-cell assertions in an isolated JavaScript harness. The Node CLI test command above still needs to be run locally. Not tested against your PocketHost instance because no instance URL/credentials were provided and this environment cannot run your hosted PocketBase. The following remain mandatory before production cutover: run setup.mjs, inspect every rule in the admin UI, run a small test CSV import, verify public vs staff access using separate browser sessions, test customer order ownership, and confirm product pages/checkout end to end.
 
 PocketBase is the temporary backend only. This branch does not switch the live shop, does not merge to main, and does not alter Supabase.
