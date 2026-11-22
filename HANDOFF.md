@@ -80,3 +80,19 @@ Date: 2026-11-22. Status: MERGED. Only `neon-admin.html` (new, noindex) and this
 - Owner's Neon Auth account still has to be approved in `admin_profiles` before /neon-admin.html works: open the page, use "Create first admin account", send the Neon user ID it shows.
 - neon-admin.html imports https://esm.sh/@neon/auth without a pinned version. Pin it after checking in a browser which published version the sign-in works with (not done: no browser in the session, and the package name/versions on npm were unclear).
 - Storefront catalogue reads are still on Supabase. Switching them to Neon needs its own PR, with index.html's prefetch block and mobile-shell/shell.test.py updated together.
+
+---
+
+# Neon admin sign-in fix (branch wip-neon-admin-followups, commit c544a93)
+
+Date: 2026-11-22. Status: pushed to the branch, NOT merged, NOT tested in a browser.
+
+## Problem
+On https://stermontarcade.co.ke/neon-admin.html the sign-in page showed "Your login session expired. Sign in again." The page is on a different origin from the Neon Auth host, and Neon's docs say `authClient.token()` returns no token unless the client sends credentials (cookies) cross-origin.
+
+## Done
+- neon-admin.html: `createAuthClient(AUTH,{fetchOptions:{credentials:"include"}})`; `token()` tries `auth.token()` first, then falls back to `auth.getSession()` (`data.session.token`).
+
+## Left
+- Merge this branch (PR from wip-neon-admin-followups into main), wait for GitHub Pages, hard-reload /neon-admin.html and sign in. If the same message appears, the site's domains (stermontarcade.co.ke and stermontmall.github.io) probably have to be added as allowed/trusted origins in the Neon Auth settings in the Neon console.
+- Then approve the owner's Neon user ID in `admin_profiles` (see above).
