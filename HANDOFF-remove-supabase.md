@@ -10,6 +10,14 @@
 - Work continues on `neon-migration-20261123`; do not merge this branch until the application has been migrated and tests/CI pass.
 - Main currently contains legacy Supabase references in application code, generated pages, documentation, and archived files. A repository-wide inventory is still required.
 
+## Recovery on the migration branch
+
+- Restored `mobile-shell/app.js` from pre-deletion commit `458fc2fc59bfe5778ed6ca1a42ef67fee349cf67`; main had deleted it in commit `5ea1f6ae26ce8e117392620638200c215e0e5c55`.
+- Restored `catalog-v10.js` from pre-deletion commit `4b5a7a24682d6bce03851a491088cdff9ecc9a78`; main had deleted it in commit `0f91885cc4629adade261a541c6e2cde246292fb`.
+- These are source restorations on this migration branch only. They still contain Supabase calls and are not ready to deploy. Their purpose is to preserve the existing UI while replacing the backend.
+- Main's `index.html` and `account.html` still contain Supabase URLs/SDK calls; `admin.html` still embeds the Supabase project URL/key. `generate-products.mjs` also has Supabase REST configuration.
+- Main's index references the missing mobile-shell script and admin references the missing catalogue script; those missing-file references are now repaired on this migration branch by restoring the source files above.
+
 ## Verified Neon inventory (2026-11-23)
 
 - Project: `restless-shape-79120240`
@@ -18,6 +26,8 @@
 - Tables: 93 categories, 3 orders, 2 admin profiles, 0 products; reviews/archive records also exist in the exported archive.
 - Storage buckets: `product-photos`, `service-media`.
 - Deployed function: `photoupload` (deployment 5). Its end-to-end authenticated storefront/admin integration has not yet been verified.
+- Neon Auth is enabled (Better Auth); trusted origin includes `https://stermontarcade.co.ke`; email/password auth is enabled but public sign-up is disabled.
+- Both storage buckets currently contain zero objects (`product-photos`, `service-media`).
 - Archived catalogue: 22 rows in `archive.products_backup_20261123`; 6 active, 6 with image URLs. Do not publish automatically; verify product details, images, prices, stock, and category before restoration.
 
 ## Migration requirements
