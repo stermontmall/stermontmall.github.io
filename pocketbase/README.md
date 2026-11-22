@@ -36,9 +36,25 @@ Never put the admin password in the repository or in a chat.
 - **Nobody can make themselves staff.** Sign-up and profile edits cannot set the `role`.
 - **Customers cannot mark their own order as paid or handled** when placing it.
 
+## Making the website use PocketBase (the shim)
+
+`site-shim.js` sits in front of the site's existing Supabase calls and redirects the tables above to PocketBase, so
+the ~20 site files need **no edits**. It returns whole catalogues (not one page of 30), joins the category name,
+hides the wholesale cost unless a staff token is present, and refuses bulk edits/deletes.
+It is **not wired into any page yet**. To switch it on later, add this to the top of each page's `<head>`, before every other script:
+```
+<script>window.STM_PB_URL='https://<name>.pockethost.io'</script>
+<script src="/pocketbase/site-shim.js"></script>
+```
+and remove it again when Supabase is back. Test: `node pocketbase/site-shim.test.mjs` (fake PocketBase only).
+
+Review note: ChatGPT's alternative `adapter.js` (branch `wip-pocketbase-interim-backend`) was not used. It imitates the
+supabase-js library, which this site does not use; without a limit it returns only 30 rows; update/delete without a filter
+would hit every record; and its schema (`supabase_id` fields) does not match this one.
+
 ## What is NOT included yet
 
-- Making the website talk to PocketBase (a small adapter plus edits to about 20 files). Next step.
+- Customer and staff **login** through the shim (the site's Supabase Auth calls), so the admin screens cannot sign in yet. Next step.
 - Public voucher checking, guest order tracking by reference and phone, M-Pesa and Paystack automation
   (these were Supabase functions; they need PocketBase hooks, "Phase 2").
 - Photos: new photos go to ImageKit. Existing Supabase photo links stay as they are.

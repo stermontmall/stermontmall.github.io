@@ -1,3 +1,13 @@
+## 2026-11-22 16:04 (Africa/Nairobi) — PocketBase site shim added (branch wip-pocketbase-claude-version)
+
+### Done
+- pocketbase/site-shim.js: intercepts the site's Supabase REST calls (products, categories, orders, reviews, vouchers, slug redirects) and serves them from PocketBase; no edits to the ~20 site files. Tests: node pocketbase/site-shim.test.mjs (fake PocketBase).
+- Reviewed ChatGPT's adapter.js (branch wip-pocketbase-interim-backend): not used (imitates supabase-js, 30-row default page, unguarded bulk update/delete, different schema). Its setup.mjs also left users sign-up/update rules open to self-granting the staff role; do not run it.
+
+### Next
+- Login through the shim (Supabase Auth endpoints -> PocketBase users) so admin works; then wire the two script tags into pages behind the STM_PB_URL switch.
+- Run setup.mjs + import.mjs on the real PocketHost instance (needs owner's URL and CSV exports).
+
 ## 2026-11-22 16:00 (Africa/Nairobi) — PocketBase interim backend prepared (not live, not yet run on a real instance)
 
 ### Done (branch wip-pocketbase-interim-backend, folder pocketbase/)
