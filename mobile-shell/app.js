@@ -1,6 +1,6 @@
 /* Stermont Arcade mobile shell prototype.
-   Vanilla JS, no framework. Data is live: products + categories come from Supabase (section 1).
-   Sections: 1 data (Supabase)  2 store + badges  3 history-backed overlays  4 tabs  5 header scroll
+   Vanilla JS, no framework. Data is live: products + categories come from Neon (section 1).
+   Sections: 1 data (Neon)  2 store + badges  3 history-backed overlays  4 tabs  5 header scroll
              6 grid + skeletons  7 categories  8 filters  9 quick buy  10 cart  11 wiring */
 (() => {
 'use strict';
@@ -42,14 +42,14 @@ const ls = {
   set(k, v) { try { localStorage.setItem('shell.' + k, JSON.stringify(v)); } catch {} }
 };
 
-/* ---------- 1. Data: live Supabase catalog ----------
+/* ---------- 1. Data: live Neon catalog ----------
    One fetch of every active product row + the category tree (small: ~225 rows). Pack sizes of one product are separate
    rows that share `variant_group`; they are folded into ONE card with a `sizes` list, each size carrying its own price.
    Names come from /product-names.json (the heading each product page shows, rebuilt with the site); if that file is
    missing the plain database name is used. Filtering, sorting and paging then run in memory, so every filter is instant. */
-const SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
-const api = path => fetch(SB + '/rest/v1/' + path, { headers: { apikey: KEY }, cache: 'no-store' })
-  .then(r => { if (!r.ok) throw new Error('Supabase HTTP ' + r.status); return r.json(); });
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
+const api = path => fetch(NEON_REST + path, { cache: 'no-store' })
+  .then(r => { if (!r.ok) throw new Error('Neon catalogue HTTP ' + r.status); return r.json(); });
 // Columns the product-link fast path (quickDeepLink, section 9b) reads from public.products. They match what buildCatalog needs; `cost` is never read.
 // The catalogue RPC returns images[1] as cover_image, so the fast path asks for `images` and withCover() takes the first photo from it.
 const PRODUCT_COLS = 'id,slug,name,category_id,price,old_price,stock,featured,images,unit,variant_group,variant_label';
@@ -59,13 +59,13 @@ const withCover = r => ({ ...r, cover_image: Array.isArray(r.images) && r.images
 async function apiAll(path, pageSize = 1000) {
   const all = [];
   for (let offset = 0; ; offset += pageSize) {
-    const r = await fetch(SB + '/rest/v1/' + path, {
-      headers: { apikey: KEY, Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
+    const r = await fetch(NEON_REST + path, {
+      headers: { Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
       cache: 'no-store'
     });
-    if (!r.ok) throw new Error('Supabase HTTP ' + r.status + ' while loading catalogue page ' + (offset / pageSize + 1));
+    if (!r.ok) throw new Error('Neon HTTP ' + r.status + ' while loading catalogue page ' + (offset / pageSize + 1));
     const batch = await r.json();
-    if (!Array.isArray(batch)) throw new Error('Supabase returned an invalid catalogue page');
+    if (!Array.isArray(batch)) throw new Error('Neon returned an invalid catalogue page');
     all.push(...batch);
     if (batch.length < pageSize) break;
   }
@@ -132,7 +132,7 @@ const thumb = (p, eager = false) => {
   return `<img ${source} alt="${esc(p.name)} product photo" decoding="async" data-imagekit-original="${esc(original)}" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
 };
 
-/* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */
+/* Resolves {items, hasMore}; rejects when Neon cannot be reached (the grid shows a retry link). */
 // Keep the first mobile product batch small; infinite scroll fetches more only as the shopper approaches the list end.
 async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 8 }) {
   await loadCatalog();
@@ -625,8 +625,8 @@ function renderProductDescription(target, source) {
 }
 /* @render-end */
 const details = new Map(); // Cache product-detail requests by variant row ID; renderDetails() and renderPP() share this cache.
-const staticDetails = new Map(); // Read-only details parsed from the published SEO page when Supabase REST is restricted.
-/* Read-only description fallback for opening a product from a card while Supabase REST is restricted (HTTP 402). The card's slug has a generated
+const staticDetails = new Map(); // Read-only details parsed from the published SEO page when Neon Data API is restricted.
+/* Read-only description fallback for opening a product from a card while Neon Data API is restricted (HTTP 402). The card's slug has a generated
    /p/<slug>.html page on GitHub Pages with the full buyer guide in .product-description > .pd-sec blocks; read the text from there. Nothing is written
    or redirected. Returns null (the normal "Could not load the details" + retry) when the page is missing or has no description. */
 async function staticDetailsFor(rowId) {
@@ -776,7 +776,7 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
    still runs, so the behaviour is never worse than before. To undo: delete this function and the call to it in section 11. */
 async function openStaticProductFallback(slug) {
   // Published /p/ pages are generated from the catalogue and remain available on GitHub Pages
-  // even while Supabase REST is returning 402 (egress quota exceeded). Treat them as read-only;
+  // even while Neon Data API is returning an error (egress quota exceeded). Treat them as read-only;
   // this fetch hydrates the in-app view without redirecting or modifying the canonical SEO document.
   const response = await fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' });
   if (!response.ok) throw new Error('Published product page returned HTTP ' + response.status);
