@@ -13,14 +13,14 @@
   (function () {
     try {
       if (!window.fetch || !window.Promise || !window.Response) return;
-      var REST = 'https://oewvtbnmyombbtggamor.supabase.co/rest/v1/', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+      var REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
       var CATS = REST + 'categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc', RPC = REST + 'rpc/get_store_catalog';
       var PAGE = 1000, PAGES = 2, TTL = 5 * 60 * 1000, LS = 'shell.catalogPrefetch.v1';
       var realFetch = window.fetch.bind(window), now = Date.now(), entries = {}, noop = function () {};
       var wanted = [{ k: 'cats', url: CATS, range: '' }];
       for (var i = 0; i < PAGES; i++) wanted.push({ k: 'p' + i, url: RPC, range: (i * PAGE) + '-' + (i * PAGE + PAGE - 1) });
       function net(w) {
-        var h = { apikey: KEY };
+        var h = {};
         if (w.range) { h.Range = w.range; h['Range-Unit'] = 'items'; }
         return realFetch(w.url, { headers: h, cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); });
       }
