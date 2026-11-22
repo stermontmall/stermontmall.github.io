@@ -55,7 +55,7 @@ if (mode === 'content') {
   const checked = Number(summary?.[1] || 0), indexed = Number(summary?.[2] || 0), notIndexed = Number(summary?.[3] || 0);
   await sql`INSERT INTO public.seo_audits (source,issue_count,report_markdown,metrics)
     VALUES ('google-search-console-url-inspection',${notIndexed},${report},${JSON.stringify({checked_pages:checked,indexed_pages:indexed,not_indexed_pages:notIndexed})}::jsonb)`;
-  await sql\`UPDATE public.google_index_inspections SET verdict='STALE', inspected_at=now()\`;
+  await sql`UPDATE public.google_index_inspections SET verdict='STALE', inspected_at=now()`;
   const table = report.split('## All pages not indexed')[1] || '';
   for (const line of table.split('\n')) {
     const m = line.match(/^\|\s*(\/[^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]*)\s*\|$/);
