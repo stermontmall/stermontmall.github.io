@@ -11,7 +11,7 @@
   if (/admin|upload-photos|track|account/.test(location.pathname)) return;
   try { if (sessionStorage.getItem('stm_buypop_off') === '1') return; } catch (e) {}
 
-  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+  var NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
   /* The popup appears every INTERVAL ms (start to start): visible for SHOW_FOR ms, hidden for the rest. */
   var D = document, FIRST_DELAY = 7000, SHOW_FOR = 8000, INTERVAL = 15000;
 
@@ -107,16 +107,14 @@
     timer = setTimeout(hideThenNext, SHOW_FOR);
   }
 
-  function hdr() { return { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' }; }
-  fetch(SB + '/rest/v1/rpc/recent_purchases', { method: 'POST', headers: hdr(), body: '{}', cache: 'no-store' })
+  fetch(NEON_REST + 'rpc/recent_purchases', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : []; })
     .then(function (rows) {
       list = (rows || []).filter(function (p) { return p && p.item && p.created_at; });
       if (!list.length) return;
       D.body.appendChild(box);
       /* Look the products up so the popup can show a photo and link to the product. Both are optional. */
-      return fetch(SB + '/rest/v1/products?active=eq.true&select=id,slug,name,variant_label,images', { headers: { apikey: KEY } })
-        .then(function (r) { if (r.ok) return r.json(); return fetch(SB + '/rest/v1/products?active=eq.true&select=id,slug,name,images', { headers: { apikey: KEY } }).then(function (r2) { return r2.ok ? r2.json() : []; }); })
+      return fetch(NEON_REST + 'rpc/get_product_pages', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : []; })
         .then(function (ps) {
           (ps || []).forEach(function (p) {
             if (!p || !p.id || !p.name) return;
