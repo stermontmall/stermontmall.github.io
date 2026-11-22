@@ -217,7 +217,7 @@
   /* ---------- Add / Edit item ---------- */
   function itemForm(p, from) {
     var edit = !!p, tpl = !edit && from ? from : null;
-    var imgs = edit ? (p.images || []).slice() : (tpl ? (tpl.images || []).slice() : []);
+    var imgs = edit ? (p.images || []).slice() : (tpl ? (tpl.images || []).slice() : []), pendingFiles = [], pendingLinks = [];
     var opts = S.cats.map(function (c) { return '<option value="' + c.id + '"' + (edit && p.category_id === c.id ? ' selected' : '') + '>' + (ICONS[c.slug] ? ICONS[c.slug] + ' ' : '') + esc(c.name) + '</option>'; }).join('');
     var curU = edit && p.unit ? String(p.unit) : '', knownU = UNITS.some(function (g) { return g[1].indexOf(curU) > -1; });
     var unitHtml = '<label>Unit of sale</label><select class="cx-f" id="cx-unit"><option value="">No unit (sold per item)</option>' +
@@ -246,8 +246,14 @@
       '<label>Photos</label><input type="file" id="cx-file" accept="image/*" multiple>' +
       '<label>OR paste a direct photo link (jpg, png or webp)</label><div style="display:flex;gap:.4rem"><input class="cx-f" id="cx-plink" type="url" placeholder="https://example.com/photo.jpg" style="flex:1"><button type="button" class="btn alt sm" id="cx-padd">Add link</button></div>' +
       '<div class="cx-th" id="cx-th"></div><div class="meta" id="cx-up"></div>';
+    function uploadPending(productCode) {
+      var chain = Promise.resolve();
+      pendingFiles.forEach(function (file) { chain = chain.then(function () { return upload(file, productCode).then(function (url) { imgs.push(url); }); }); });
+      pendingLinks.forEach(function (link) { chain = chain.then(function () { return uploadLink(link, productCode).then(function (url) { imgs.push(url); }); }); });
+      return chain.then(function () { pendingFiles = []; pendingLinks = []; });
+    }
     modal(edit ? 'Edit item' : 'Add new item', body, edit ? 'Save changes' : 'Save hidden draft', function () {
-      if ($('cx-up').textContent) throw new Error('Wait for photos to finish uploading');
+      if (/^Uploading/.test($('cx-up').textContent)) throw new Error('Wait for photos to finish uploading');
       var name = v('cx-name').trim(), price = num('cx-price'), stock = edit ? (v('cx-stock') === '' ? NaN : parseInt(v('cx-stock'), 10)) : 1000;
       if (!name) throw new Error('Enter an item name'); if (v('cx-price') === '' || !(price > 0)) throw new Error('Enter the selling price');
       var vl = v('cx-vl').trim(), vl0 = tpl && !tpl.variant_label ? v('cx-vl0').trim() : ''; if (tpl && !vl) throw new Error('Type the pack size for this new item, e.g. 250 mL'); if (tpl && !tpl.variant_label && !vl0) throw new Error('Type the pack size of the existing item too');
@@ -259,7 +265,7 @@
         return call('/rest/v1/categories?on_conflict=slug', { m: 'POST', h: { Prefer: 'resolution=merge-duplicates,return=representation' }, body: { name: cn, slug: slug(cn) } }).then(function (r) { return r[0].id; });
       })() : Promise.resolve(parseInt(v('cx-cat'), 10));
       return catP.then(function (cid) {
-        var row = { category_id: cid, name: name, price: edit ? price : up(price), low_at: edit ? parseInt(v('cx-low') || 20, 10) : 20, featured: edit ? $('cx-feat').checked : false, images: imgs };
+        var row = { category_id: cid, name: name, price: edit ? price : up(price), low_at: edit ? parseInt(v('cx-low') || 20, 10) : 20, featured: edit ? $('cx-feat').checked : false, images: edit ? imgs : [] };
         if (oldP != null || (edit && p.old_price != null)) row.old_price = oldP;
         if (!edit && row.old_price != null) { row.old_price = Math.round(row.old_price / 50) * 50; if (!(row.old_price > row.price)) row.old_price = null; }
         if (unit || (edit && p.unit)) row.unit = unit || null;
@@ -267,15 +273,22 @@
         if (vl || (edit && (p.variant_label || p.variant_group))) { row.variant_label = vl || null; row.variant_group = vl ? grp : null; }
         var desc = v('cx-desc').trim(); if (desc || (edit && p.description)) row.description = desc;
         if (edit && stock !== p.stock) row.stock = stock;
-        if (edit) return call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: row });
+        if (edit) return call('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: row }).then(function () { return uploadPending(p.product_code); });
         var id = slug(name + (vl ? ' ' + vl : '')) || 'item', n = 2, base = id; while (S.prods.some(function (x) { return x.id === id; })) id = base + '-' + n++;
         row.id = id; row.stock = 1000; row.low_at = 20; row.featured = false; row.active = false; row.cost = price;   /* database trigger independently recalculates the four-tier price */
         var first = tpl && !tpl.variant_label ? call('/rest/v1/products?id=eq.' + encodeURIComponent(tpl.id), { m: 'PATCH', h: { Prefer: 'return=minimal' }, body: { variant_label: vl0, variant_group: grp } }) : Promise.resolve();
-        return first.then(function () { return call('/rest/v1/products', { m: 'POST', h: { Prefer: 'return=minimal' }, body: row }); });
+        return first.then(function () { return call('/rest/v1/products', { m: 'POST', h: { Prefer: 'return=representation' }, body: row }); })
+          .then(function (created) {
+            var product = Array.isArray(created) ? created[0] : null;
+            if (!product || !product.product_code) throw new Error('Neon saved the draft but did not return its permanent product code. Refresh and retry the photo upload.');
+            return uploadPending(product.product_code).catch(function (e) {
+              toast('Draft saved in Neon. Photo upload still needs attention: ' + e.message + '. Reopen the draft to add the photos.');
+            });
+          });
       }).catch(function (e) {
-        if (/old_price/.test(e.message || '')) throw new Error('Run setup-pricing.sql in Supabase first to enable previous prices, then save again.');
-        if (/\bunit\b/.test(e.message || '')) throw new Error('Units are not set up yet. Run this once in the Supabase SQL editor, then save again: alter table products add column if not exists unit text;');
-        if (/variant_/.test(e.message || '')) throw new Error('Pack sizes are not set up yet. Run this once in the Supabase SQL editor, then save again: alter table products add column if not exists variant_group text, add column if not exists variant_label text;');
+        if (/old_price/.test(e.message || '')) throw new Error('Check the Neon products schema for old_price before saving again.');
+        if (/\bunit\b/.test(e.message || '')) throw new Error('Neon is missing the products.unit column; apply the current Neon catalogue schema migration before saving again.');
+        if (/variant_/.test(e.message || '')) throw new Error('Neon is missing pack-size columns; apply the current Neon catalogue schema migration before saving again.');
         throw e;
       });
     }, function (c) {
@@ -319,25 +332,33 @@
         th.innerHTML = ''; imgs.forEach(function (u, i) { var d = el('div', '', '<img src="' + esc(u) + '" alt=""><button type="button" aria-label="Remove">×</button>'); d.querySelector('button').onclick = function () { imgs.splice(i, 1); thumbs(); }; th.appendChild(d); });
       } thumbs();
       c.querySelector('#cx-file').onchange = function (e) {
-        var fs = [].slice.call(e.target.files), up = c.querySelector('#cx-up'); if (!fs.length) return; up.textContent = 'Uploading ' + fs.length + ' photo(s)…';
-        var base = slug(v('cx-name')) || 'item';
-        Promise.all(fs.map(function (f) { return upload(f, base); })).then(function (us) { imgs.push.apply(imgs, us); up.textContent = ''; thumbs(); })
-          .catch(function (er) { up.textContent = ''; var x = c.querySelector('#cx-me'); x.textContent = 'Upload failed: ' + er.message; x.hidden = false; });
+        var fs = [].slice.call(e.target.files), up = c.querySelector('#cx-up'); if (!fs.length) return;
+        if (edit && p.product_code) {
+          up.textContent = 'Uploading ' + fs.length + ' photo(s) to Neon…';
+          Promise.all(fs.map(function (f) { return upload(f, p.product_code); })).then(function (us) { imgs.push.apply(imgs, us); up.textContent = ''; thumbs(); })
+            .catch(function (er) { up.textContent = ''; var x = c.querySelector('#cx-me'); x.textContent = 'Neon upload failed: ' + er.message; x.hidden = false; });
+        } else {
+          pendingFiles.push.apply(pendingFiles, fs);
+          up.textContent = pendingFiles.length + ' photo(s) queued; save the draft to upload them to Neon.';
+        }
         e.target.value = '';
       };
-      /* Photo link: the server downloads it (browsers cannot, because of CORS) and stores it in Storage. */
+      /* Photo links are fetched server-side by the Neon photoupload function, so browser CORS does not block them. */
       var padd = c.querySelector('#cx-padd');
       padd.onclick = function () {
         var link = v('cx-plink').trim(), up = c.querySelector('#cx-up'), x = c.querySelector('#cx-me');
         if (!link) return;
-        padd.disabled = true; up.textContent = 'Fetching photo from link…'; x.hidden = true;
-        call('/functions/v1/fetch-photo', { m: 'POST', body: { image_url: link, name: v('cx-name') } })
-          .then(function (r) {
-            if (!r || !r.ok) throw new Error((r && r.error) || 'Could not add that photo link');
-            imgs.push(r.url); c.querySelector('#cx-plink').value = ''; thumbs();
-          })
-          .catch(function (er) { x.textContent = 'Photo link failed: ' + er.message; x.hidden = false; })
-          .then(function () { up.textContent = ''; padd.disabled = false; });
+        padd.disabled = true; x.hidden = true;
+        if (edit && p.product_code) {
+          up.textContent = 'Fetching photo through Neon…';
+          uploadLink(link, p.product_code).then(function (url) { imgs.push(url); c.querySelector('#cx-plink').value = ''; thumbs(); })
+            .catch(function (er) { x.textContent = 'Photo link failed: ' + er.message; x.hidden = false; })
+            .then(function () { up.textContent = ''; padd.disabled = false; });
+        } else {
+          pendingLinks.push(link); c.querySelector('#cx-plink').value = '';
+          up.textContent = pendingLinks.length + ' photo link(s) queued; save the draft to fetch them through Neon.';
+          padd.disabled = false;
+        }
       };
     });
   }
