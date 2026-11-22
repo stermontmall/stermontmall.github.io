@@ -100,7 +100,7 @@
       var hd = Object.assign({ apikey: KEY, Authorization: 'Bearer ' + t }, o.h || {}), body = o.body;
       if (body !== undefined && !(body instanceof Blob)) { hd['Content-Type'] = 'application/json'; body = JSON.stringify(body); }
       return fetch(SB + path, { method: o.m || 'GET', headers: hd, body: body }).then(function (r) {
-        if (!r.ok) return r.text().then(function (x) { var m = x; try { m = JSON.parse(x).message || x; } catch (e) {} var error = new Error(m || ('Request failed (' + r.status + ')')); error.status = r.status; throw error; });
+        if (!r.ok) return r.text().then(function (x) { var m = x; try { m = JSON.parse(x).message || x; } catch (e) {} var error = new Error((r.status === 402 || r.status === 429 || r.status >= 500) && window.STMAdmin && window.STMAdmin.errorMessage ? window.STMAdmin.errorMessage({ status: r.status }) : (m || ('Request failed (' + r.status + ')'))); error.status = r.status; throw error; });
         return r.text().then(function (x) { return x ? JSON.parse(x) : null; });
       });
     });
