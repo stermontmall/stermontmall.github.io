@@ -731,14 +731,11 @@ function loadProductFallbacks() {
       if (r.ok) snapshot = await r.json();
     } catch {}
     if (!snapshot || !Array.isArray(snapshot.products) || !Array.isArray(snapshot.categories)) snapshot = { version: 1, products: [], categories: [] };
-    if (snapshot.products.length >= 24) return snapshot;
     try {
       const scraped = await scrapePublishedCatalog();
-      const byId = new Map(scraped.products.map(p => [p.id, p]));
-      snapshot.products.forEach(p => byId.set(p.id, p));
-      const categories = [...scraped.categories];
-      snapshot.categories.forEach(c => { if (!categories.some(x => x.slug === c.slug && x.parent_id === c.parent_id)) categories.push(c); });
-      return { version: 1, products: [...byId.values()], categories };
+      if (scraped.products.length >= 24) return scraped;
+      if (snapshot.products.length) return snapshot;
+      return scraped;
     } catch {
       if (snapshot.products.length) return snapshot;
       throw new Error('No published product fallback is available');
