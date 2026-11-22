@@ -1,6 +1,6 @@
 # Stermont Arcade — canonical product posting and pricing rules
 
-> **PRECEDENCE (2026-11-22, owner-approved):** New products are posted to **Neon**, not Supabase. The governing rule is Neon `public.publishing_rules` key `publish_products` (currently version 6; mirror: `PUBLISH-PRODUCTS-RULE.md`). The admin tab `/admin.html#pricing-rules` now reads that Neon row. Where this file's Supabase-era text (800+ word descriptions, Supabase Storage photo upload, Supabase duplicate check) conflicts with `publish_products`, `publish_products` wins.
+> **PRECEDENCE (2026-11-22, owner-approved):** New products are posted to **Neon**, not Supabase. The governing rule is Neon `public.publishing_rules` key `publish_products` (currently version 8; mirror: `PUBLISH-PRODUCTS-RULE.md`). The admin tab `/admin.html#pricing-rules` now reads that Neon row. Where this file's Supabase-era text (800+ word descriptions, Supabase Storage photo upload, Supabase duplicate check) conflicts with `publish_products`, `publish_products` wins.
 
 This file is the short operational guide. The full owner-approved rule is in `CLAUDE.md` / `AGENTS.md` and the staff-readable Supabase row `public.publishing_rules` with key `autonomous_bulk_product_publishing`.
 

@@ -1,3 +1,25 @@
+## 2026-11-22 23:20 (Africa/Nairobi) — Rule `publish_products` is now v8 (photo upload procedure)
+
+- Another session raised the rule to v7 (Kenyan third-party photo sources incl. Jumia/Kilimall, with site-terms check, copy not hotlink). I did not overwrite it: backups are in Neon keys `publish_products_v5_backup`, `_v6_backup`, `_v7_backup`.
+- I added v8: copy to Neon bucket `product-photos` (public_read, empty so far), object key `<product_code>/<n>-<slug>.<ext>`, any image format accepted (browser-safe JPEG/WebP copy when needed), and the ChatGPT/Claude upload steps (`presign_storage_object` upload, HTTP PUT, verify public URL, one UPDATE of images/alt_text/photo attributes). Mirrored in `PUBLISH-PRODUCTS-RULE.md` and `.claude/commands/post-product.md`.
+- UNVERIFIED: the public URL form `https://br-fancy-bird-bh01xcbs.storage.c-10.eu-central-1.aws.neon.tech/product-photos/<key>`. The sandbox cannot PUT/GET (outbound blocked), so the first real upload (from ChatGPT or an owner device) must confirm the URL returns an image before it is saved.
+- No photo uploaded, no product activated.
+
+## 2026-11-22 23:35 (Africa/Nairobi) — Storefront and page generator switched to Neon (branch `wip-neon-storefront-2026-11-22`, NOT merged)
+
+### Done
+- Neon (project restless-shape-79120240): `grant select` on non-sensitive `public.products` columns and on `public.categories` to role `anonymous` (NOT `cost`, `attributes`, `description_backup`); created `public.get_store_catalog()` (same logic as the Supabase one, `category_id` is uuid) and granted execute to `anonymous`, `authenticated`. Existing RLS policies `products_public_read` / `categories_public_read` limit anonymous to active rows.
+- `mobile-shell/app.js` `api()` / `apiAll()` read `https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/` with no apikey; `index.html` prefetch block and `generate-products.mjs` point at the same Neon Data API; `app.js?v=48`.
+- Local `python3 mobile-shell/shell.test.py`: 182/183 (the 1 failure is the sandbox having no internet for 3 hard-coded home photos). Guard tests pass.
+
+### NOT verified (sandbox cannot reach the Neon endpoint)
+- That the Neon Data API serves anonymous (no JWT) requests from a browser (CORS and anonymous role). Test on a phone after deploy of this branch, or run: `curl -s 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/categories?select=id,name&limit=3'`. If it answers 401, enable anonymous access in the Neon Data API settings.
+- Checkout, orders, M-Pesa, search log, chat and reviews still call Supabase; they will not work while Supabase is restricted.
+
+### Next
+1. Check the curl above, merge PR only after the shop loads Neon categories and an active Neon product on a phone.
+2. Add verified manufacturer/distributor photos (policy v6) to the 3 non-chemical drafts (STM-001840, STM-001843, STM-001844), then activate.
+
 ## 2026-11-22 23:10 (Africa/Nairobi) — Rule `publish_products` is now v6 (photo policy); storefront switch to Neon NOT done
 
 ### Owner decisions (2026-11-22)

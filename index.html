@@ -1,5 +1,6 @@
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech" crossorigin>
   <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>
   <script>
   /* Catalogue prefetch (2026-11-21, site speed). mobile-shell/app.js loads the whole catalogue from Supabase (get_store_catalog, 1,000 rows per request, the second request only
@@ -11,14 +12,14 @@
   (function () {
     try {
       if (!window.fetch || !window.Promise || !window.Response) return;
-      var REST = 'https://oewvtbnmyombbtggamor.supabase.co/rest/v1/', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+      var REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
       var CATS = REST + 'categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc', RPC = REST + 'rpc/get_store_catalog';
       var PAGE = 1000, PAGES = 2, TTL = 5 * 60 * 1000, LS = 'shell.catalogPrefetch.v1';
       var realFetch = window.fetch.bind(window), now = Date.now(), entries = {}, noop = function () {};
       var wanted = [{ k: 'cats', url: CATS, range: '' }];
       for (var i = 0; i < PAGES; i++) wanted.push({ k: 'p' + i, url: RPC, range: (i * PAGE) + '-' + (i * PAGE + PAGE - 1) });
       function net(w) {
-        var h = { apikey: KEY };
+        var h = {};
         if (w.range) { h.Range = w.range; h['Range-Unit'] = 'items'; }
         return realFetch(w.url, { headers: h, cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); });
       }
@@ -481,7 +482,7 @@
 
 <script src="/product-links.js" defer></script>
 <script src="/imagekit-url.js" defer></script>
-<script src="/mobile-shell/app.js?v=47" defer></script>
+<script src="/mobile-shell/app.js?v=48" defer></script>
 <script src="/analytics.js" defer></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
 </body>

@@ -5,19 +5,15 @@
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
-const SB = process.env.SUPABASE_URL || 'https://oewvtbnmyombbtggamor.supabase.co';
-const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';   // public read key, same one stock-report.mjs uses
-const COLS = 'id,slug,name,seo_name,seo_title,price,old_price,unit,variant_group,variant_label,stock,images,description,featured,category_id';
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));
-  const out = [];
-  for (let from = 0; ; from += 1000) {
-    const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=${COLS}&order=id.asc&limit=1000&offset=${from}`, { headers: { apikey: KEY }, signal: AbortSignal.timeout(30000) });
-    if (!r.ok) throw new Error('Could not read products from Supabase: HTTP ' + r.status);
-    const rows = await r.json(); out.push(...rows); if (rows.length < 1000) break;
-  }
-  return out;
+  const r = await fetch(NEON_REST + 'rpc/get_product_pages', { signal: AbortSignal.timeout(30000) });
+  if (!r.ok) throw new Error('Could not read products from Neon: HTTP ' + r.status);
+  const rows = await r.json();
+  if (!Array.isArray(rows)) throw new Error('Neon returned an invalid product-watch dataset');
+  return rows;
 }
 
 export function fingerprint(products) {
