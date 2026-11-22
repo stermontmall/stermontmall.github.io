@@ -62,3 +62,5 @@ Date: 2026-11-22. Status: NOT safe to merge yet.
 - `validate` and `route-regression` fail on #1022 (they also failed on #1020). The logs were not readable from this session: open the failed job in Actions, copy the first failing assertion or error, and fix that before merging. Re-run after commit 5111c50 first; it may change the result for tests of the /p/ and /c/ shell pages.
 - Open one Supabase Storage product image through https://ik.imagekit.io/w6hxfnwmw/supabase/tr:w-480,q-75,f-auto/<storage image URL> in a browser; only a GitHub Pages photo has been confirmed through the proxy so far.
 - Not changed, harmless: storefront-live.js renderThumbs() assigns t.onerror twice, so the first (retry the original) is overwritten by the second (drop the thumbnail); the window-level listener in imagekit-url.js normally handles the retry first.
+
+- 2026-11-22: PR #1030 merged (dc89ec4b): product descriptions fall back to the published /p/ page when Supabase REST returns 402; app.js v=46. Outage cause: Supabase exceed_cached_egress_quota; see HANDOFF-live.md.

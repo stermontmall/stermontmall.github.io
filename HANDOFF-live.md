@@ -1,4 +1,16 @@
 
+## 2026-11-22 16:50 (Africa/Nairobi) — PR #1030 MERGED to main (merge commit dc89ec4b, 13:47:39Z); Supabase still 402
+
+### Done
+- Owner merged PR #1030 (card-tap description fallback, app.js v=46, includes PR #1026 deep-link fallback). Pages deploy will publish it within a few minutes.
+- Merged with the SEO quality gate red: its only failure was `generate-products.mjs` reading Supabase and getting `exceed_cached_egress_quota` (HTTP 402); the mobile-shell regression was green.
+- Supabase edge logs: still 100% HTTP 402 through 13:47Z (0 successful requests in the last 8 active minutes). Billing not restored yet. Photos stay broken until it is.
+
+### Next
+1. Owner: restore Supabase billing (upgrade plan or remove spend cap) for org munfmuvialgwzxwgthtw. Then re-run the SEO gate / product-pages workflow: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+2. On a phone: open a product card and confirm the description appears; open a /?product=<slug> link for a multi-pack product (e.g. abasi-5-ec) and check it. `openStaticProductFallback` only accepts `@type: Product`, not `ProductGroup`, so multi-pack deep links may still fail: fix in a new `wip-` branch.
+3. Fix PR #1022 (ImageKit) CI to cut Storage egress so the quota is not exceeded again.
+
 ## 2026-11-22 17:35 (Africa/Nairobi) — Product descriptions not opening from cards (Supabase 402): card-tap fallback
 
 ### Done (branch `wip-product-description-fallback-20261122`, branched from PR #1026 branch `wip-static-product-fallback-2026-11-22`; NOT merged, NOT live)
