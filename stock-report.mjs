@@ -2,24 +2,16 @@
 // Runs from .github/workflows/stock-report.yml (no installs needed, Node 18+). Read-only: it never changes any product.
 import { readFileSync, appendFileSync } from 'node:fs';
 
-const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
-const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';   // public read key, same one the product-page build uses
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
 const DEFAULT_LOW = 5;                                           // used when an item has no low-stock level of its own
 
 async function getProducts() {
-  if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));   // for local testing only
-  const cols = ['id,name,stock,low_at,variant_label,categories(name)', 'id,name,stock,variant_label,categories(name)', 'id,name,stock'];
-  for (const c of cols) {
-    const all = []; let ok = true;
-    for (let from = 0; ; from += 1000) {
-      const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=${c}&order=name.asc&limit=1000&offset=${from}`, { headers: { apikey: KEY } });
-      if (!r.ok) { ok = false; break; }
-      const page = await r.json(); all.push(...page);
-      if (page.length < 1000) break;
-    }
-    if (ok) return all;
-  }
-  throw new Error('Could not read products from Supabase');
+  if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));
+  const r = await fetch(NEON_REST + 'rpc/get_product_pages', { signal: AbortSignal.timeout(30000) });
+  if (!r.ok) throw new Error('Could not read products from Neon: HTTP ' + r.status);
+  const rows = await r.json();
+  if (!Array.isArray(rows)) throw new Error('Neon returned an invalid stock report dataset');
+  return rows;
 }
 
 const rows = (await getProducts()).filter(p => p && p.id && p.name);
