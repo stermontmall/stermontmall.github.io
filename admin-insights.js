@@ -307,7 +307,7 @@
       Promise.all([payments(force), A().api('/rest/v1/orders?select=ref,status,subtotal,phone,pay_code,created_at,customer_name&order=created_at.desc&limit=500').then(function (r) { return r.ok ? r.json() : []; })])
         .then(function (r) { rowsData = r[0]; window.__siOrders = r[1]; draw(); })
         .catch(function (e) {
-          errBox(body, e.message === 'missing' ? 'The payments table is not set up yet. In Supabase, run supabase-mpesa.sql, then deploy the payments-in function (steps are in supabase/functions/payments-in/README.md).' : e.message);
+          errBox(body, e.message === 'missing' ? 'The Neon M-Pesa payment table or admin permission is unavailable. Check Neon mpesa_c2b_payments and the admin profile.' : e.message);
         });
     }
     function draw() {
