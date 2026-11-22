@@ -1,3 +1,20 @@
+## 2026-11-22 16:00 (Africa/Nairobi) — PocketBase interim backend prepared (not live, not yet run on a real instance)
+
+### Done (branch wip-pocketbase-interim-backend, folder pocketbase/)
+- Owner chose PocketBase (PocketHost) as a stop-gap while Supabase is blocked (HTTP 402, exceed_cached_egress_quota) until about 6 Dec 2026.
+- Added schema.mjs (collections + access rules), setup.mjs, import.mjs (CSV exports -> PocketBase), csv.mjs helpers, README.md. Tests pass against a fake server: node pocketbase/csv.test.mjs and node pocketbase/scripts.mock.test.mjs.
+- Security fixes built in: wholesale cost moved to a staff-only collection (in Supabase anon can read products.cost); users cannot set their own role; customers cannot set order status/payment fields.
+- Finding: the staff functions record_sale, reverse_sale, record_loss, restock_product, admin_list_accounts all check is_staff() - no change needed.
+
+### Blocked / waiting on owner
+- PocketHost instance URL + admin account, and CSV exports from the Supabase dashboard (products, categories, vouchers, orders, reviews, product_slug_redirects).
+
+### Next
+- Run setup.mjs then import.mjs on the real instance and fix any API differences.
+- Write the site adapter (about 20 files call Supabase REST directly) and test on a branch.
+- Phase 2: M-Pesa/Paystack via PocketBase hooks; voucher check and guest order tracking.
+- Unrelated: PR #1025 (page-build test fix) is open; merge once Supabase answers again, then rebuild pages.
+
 ## 2026-11-21 08:59 (Africa/Nairobi) — Pricing admin merged; Pages deployed; product-page save blocker identified
 
 ### Done
