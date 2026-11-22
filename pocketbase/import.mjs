@@ -16,7 +16,7 @@ function pgArray(s){
  if(Array.isArray(s))return s;if(s==null||s==="")return [];
  const t=String(s).trim();if(!t.startsWith("{")||!t.endsWith("}"))return [t];
  const out=[];let v="",q=false,esc=false,wasQuoted=false;
- for(let i=1;i<t.length-1;i++){const c=t[i];if(esc){v+=c;esc=false;}else if(c==="\\\\")esc=true;else if(c==='"'){q=!q;wasQuoted=true;}else if(c===","&&!q){out.push(!wasQuoted&&v==="NULL"?null:v);v="";wasQuoted=false;}else v+=c;}
+ for(let i=1;i<t.length-1;i++){const c=t[i];if(esc){v+=c;esc=false;}else if(c.charCodeAt(0)===92)esc=true;else if(c==='"'){q=!q;wasQuoted=true;}else if(c===","&&!q){out.push(!wasQuoted&&v==="NULL"?null:v);v="";wasQuoted=false;}else v+=c;}
  if(v.length||t.length>2)out.push(!wasQuoted&&v==="NULL"?null:v);return out;
 }
 function val(v,type="text"){
