@@ -48,8 +48,11 @@ const ls = {
    Names come from /product-names.json (the heading each product page shows, rebuilt with the site); if that file is
    missing the plain database name is used. Filtering, sorting and paging then run in memory, so every filter is instant. */
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
-const api = path => fetch(SB + '/rest/v1/' + path, { headers: { apikey: KEY }, cache: 'no-store' })
-  .then(r => { if (!r.ok) throw new Error('Supabase HTTP ' + r.status); return r.json(); });
+// The catalogue is read from Neon's public Data API (anonymous role: active products and categories only; no cost or attributes columns).
+// SB / KEY stay for Supabase Storage photo URLs of the older catalogue.
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
+const api = path => fetch(NEON_REST + path, { cache: 'no-store' })
+  .then(r => { if (!r.ok) throw new Error('Catalogue HTTP ' + r.status); return r.json(); });
 // Columns the product-link fast path (quickDeepLink, section 9b) reads from public.products. They match what buildCatalog needs; `cost` is never read.
 // The catalogue RPC returns images[1] as cover_image, so the fast path asks for `images` and withCover() takes the first photo from it.
 const PRODUCT_COLS = 'id,slug,name,category_id,price,old_price,stock,featured,images,unit,variant_group,variant_label';
@@ -59,11 +62,11 @@ const withCover = r => ({ ...r, cover_image: Array.isArray(r.images) && r.images
 async function apiAll(path, pageSize = 1000) {
   const all = [];
   for (let offset = 0; ; offset += pageSize) {
-    const r = await fetch(SB + '/rest/v1/' + path, {
-      headers: { apikey: KEY, Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
+    const r = await fetch(NEON_REST + path, {
+      headers: { Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
       cache: 'no-store'
     });
-    if (!r.ok) throw new Error('Supabase HTTP ' + r.status + ' while loading catalogue page ' + (offset / pageSize + 1));
+    if (!r.ok) throw new Error('Catalogue HTTP ' + r.status + ' while loading catalogue page ' + (offset / pageSize + 1));
     const batch = await r.json();
     if (!Array.isArray(batch)) throw new Error('Supabase returned an invalid catalogue page');
     all.push(...batch);

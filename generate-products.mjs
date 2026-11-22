@@ -30,7 +30,7 @@ import { buildCategoryIntro, buildCategoryFaq } from './category-editorial.mjs';
 import { renderHomeGridFallback } from './home-grid-ssr.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
-const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
+const SB = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont';   // Neon public Data API (anonymous role); the catalogue moved from Supabase on 2026-11-22
 const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
 const WHATSAPP = '254748888230';
 const BRAND = 'Stermont Arcade';
