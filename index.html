@@ -2,7 +2,7 @@
   <meta charset="UTF-8">
   <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>
   <script>
-  /* Catalogue prefetch (2026-11-21, site speed). mobile-shell/app.js loads the whole catalogue from Supabase (get_store_catalog, 1,000 rows per request, the second request only
+  /* Catalogue prefetch (2026-11-21, site speed). mobile-shell/app.js loads the whole active catalogue from the Neon Store API (100 rows per request
      after the first has finished) plus the category list, and nothing beyond the build-time cards below (category chips, drawer, Deals, product links, "More like this")
      works until that is done. This block starts those same requests right now, in parallel, before app.js is even downloaded, and hands the answers to app.js's own fetch()
      calls (identical URLs and headers, so app.js needs no change). The answer is also kept in localStorage for 5 minutes, so the next product link or a quick return visit is
@@ -481,7 +481,7 @@
 
 <script src="/product-links.js" defer></script>
 <script src="/imagekit-url.js" defer></script>
-<script src="/mobile-shell/app.js?v=46" defer></script>
+<script src="/mobile-shell/app.js?v=47" defer></script>
 <script src="/analytics.js" defer></script>
 <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});</script>
 </body>
