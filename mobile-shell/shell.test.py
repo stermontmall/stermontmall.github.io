@@ -713,6 +713,22 @@ with sync_playwright() as p:
     FAIL[0] = False
     c18.close()
 
+    # A multi-pack card is keyed to one pack's slug, whose /p/ page is a redirect stub; the description lives on the stub's canonical group page.
+    c19 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c19)
+    stub_html = '<head><meta charset="utf-8"><link rel="canonical" href="https://stermontarcade.co.ke/p/garden-set.html"><meta http-equiv="refresh" content="0;url=https://stermontarcade.co.ke/p/garden-set.html"></head><!doctype html><html><body><p>This product moved.</p></body></html>'
+    group_html = '''<!doctype html><html><head></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Group page description reached through the pack stub.</p></section></div></body></html>'''
+    c19.route('**/p/garden-set-*.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=stub_html))
+    c19.route('**/p/garden-set.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=group_html))
+    p19 = c19.new_page(); e19 = []; p19.on('pageerror', lambda e: e19.append(str(e)))
+    p19.goto(URL); p19.wait_for_selector('#grid .card[data-id="garden-set"]')
+    FAIL[0] = True
+    p19.locator('#grid .card[data-id="garden-set"]').click(); p19.wait_for_selector('#page-product.open', timeout=15000)
+    p19.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Group page description reached through the pack stub.')", timeout=8000)
+    check('multi-pack card follows its pack stub to the group page description when Supabase REST returns 402', 'Group page description reached through the pack stub.' in p19.locator('#pp-desc').inner_text() and 'Could not load' not in p19.locator('#pp-desc').inner_text(), p19.locator('#pp-desc').inner_text()[:80])
+    check('multi-pack description fallback has no JavaScript errors', not e19, e19[:3])
+    FAIL[0] = False
+    c19.close()
+
     co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
     check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
     check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'failed_requests': failed_requests[:3]})
