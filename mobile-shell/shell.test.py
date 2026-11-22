@@ -15,7 +15,7 @@ threading.Thread(target=srv.serve_forever, daemon=True).start()
 URL = f'http://127.0.0.1:{port}/'
 
 
-# ---- Supabase fixture: the shell talks to the real REST API in production; here the three requests it makes are answered locally ----
+# ---- Neon fixture: the shell talks to the Neon Data API in production; tests answer the RPC requests locally ----
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 OK, BROKEN = 'https://img.test/ok.png', 'https://img.test/broken.jpg'
 CATS_FIX = [
@@ -54,12 +54,27 @@ def serve(route, body, ctype='application/json'):
 def on_rest(route):
     if FAIL[0]: return route.fulfill(status=402, body='exceed_cached_egress_quota', headers={'access-control-allow-origin': '*'})
     url = route.request.url
-    if '/rest/v1/products' in url and 'id=eq.' in url:   # details of one row, fetched when a product is opened
+    if '/rest/v1/products' in url and 'id=eq.' in url:   # legacy details endpoint used by older static product routes
         rid = url.split('id=eq.')[1].split('&')[0]
         r = next((x for x in ROWS if x['id'] == rid), None)
         return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK], product_code=r['product_code'])])
-    if '/rest/v1/rpc/get_store_catalog' in url: return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in ROWS])
-    serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
+    if '/rest/v1/rpc/get_store_catalog' in url:
+        return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in ROWS])
+    if '/rest/v1/rpc/get_product_pages' in url:
+        cats = {str(c['id']): c for c in CATS_FIX}
+        return serve(route, [dict(**r, category_name=cats.get(str(r['category_id']), {}).get('name'), category_slug=cats.get(str(r['category_id']), {}).get('slug')) for r in ROWS])
+    if '/rest/v1/rpc/get_products_by_ids' in url:
+        try: ids = route.request.post_data_json.get('p_ids', [])
+        except Exception: ids = []
+        return serve(route, [r for r in ROWS if r['id'] in ids and r['stock'] > 0])
+    if '/rest/v1/rpc/get_approved_reviews' in url: return serve(route, [])
+    if '/rest/v1/rpc/get_product_slug_redirects' in url: return serve(route, [])
+    if '/rest/v1/rpc/recent_purchases' in url: return serve(route, [])
+    if '/rest/v1/rpc/log_search' in url: return serve(route, {'ok': True})
+    if '/rest/v1/rpc/check_voucher' in url: return serve(route, {'ok': False, 'reason': 'Invalid voucher'})
+    if '/rest/v1/rpc/create_guest_order' in url: return serve(route, {'ok': True, 'ref': 'STM-TEST01', 'subtotal': 1000, 'items': []})
+    if '/rest/v1/rpc/track_order' in url: return serve(route, {'ok': False, 'reason': 'No matching order'})
+    serve(route, CATS_FIX)
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
 REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
 
@@ -85,7 +100,16 @@ def mock_network(ctx):
         page = run_node('inject', page, slug)
         rt.fulfill(status=200, content_type='text/html', body=page)
     ctx.route('**/p/*.html*', serve_product_page)
-    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
+    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # Neon storefront catalogue RPC
+    ctx.route('**/rest/v1/rpc/get_product_pages*', on_rest)
+    ctx.route('**/rest/v1/rpc/get_products_by_ids*', on_rest)
+    ctx.route('**/rest/v1/rpc/get_approved_reviews*', on_rest)
+    ctx.route('**/rest/v1/rpc/get_product_slug_redirects*', on_rest)
+    ctx.route('**/rest/v1/rpc/recent_purchases*', on_rest)
+    ctx.route('**/rest/v1/rpc/log_search*', on_rest)
+    ctx.route('**/rest/v1/rpc/check_voucher*', on_rest)
+    ctx.route('**/rest/v1/rpc/create_guest_order*', on_rest)
+    ctx.route('**/rest/v1/rpc/track_order*', on_rest)
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
     for host in ('https://www.googletagmanager.com/**', 'https://cdn.jsdelivr.net/**', 'https://www.google-analytics.com/**', 'https://*.google-analytics.com/**'):
