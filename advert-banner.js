@@ -3,7 +3,7 @@
    (photo, badge, price with old price and % off, Order now + Add to cart). Auto-rotates, pauses when touched, updates the dots.
    Add at the end of index.html, after account-panel.js:  <script src="advert-banner.js" defer></script> */
 (function () {
-  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', D = document, WA = '254748888230';
+  var NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/', D = document, WA = '254748888230';
   var MAX = 6, EVERY = 5000, GRAD = ['linear-gradient(135deg,#7c3aed,#3b0f8c 70%)', 'linear-gradient(135deg,#1d0745,#5b21b6 75%)', 'linear-gradient(135deg,#5b21b6,#2a0e5c 70%)'];
   function mk(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
@@ -94,7 +94,21 @@
   }
 
   /* One slide per product (not per pack size). Sizes of the same product share a variant_group. */
-  function get(q) { return fetch(SB + '/rest/v1/products?' + q, { headers: { apikey: KEY } }); }
+  function get(q) {
+    return fetch(NEON_REST + 'rpc/get_product_pages', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
+      .then(function (rows) {
+        rows = Array.isArray(rows) ? rows : [];
+        if (String(q).indexOf('featured=eq.true') >= 0) {
+          rows = rows.filter(function (p) { return p.featured && Number(p.stock) > 0; })
+            .sort(function (a, b) { return String(b.created_at || '').localeCompare(String(a.created_at || '')); }).slice(0, 30);
+        } else {
+          var m = String(q).match(/variant_group=in\.\(([^)]+)\)/);
+          if (m) { var groups = m[1].split(',').map(decodeURIComponent); rows = rows.filter(function (p) { return groups.indexOf(p.variant_group) >= 0 && Number(p.stock) > 0; }); }
+        }
+        return { ok: true, json: function () { return Promise.resolve(rows); } };
+      });
+  }
   var BASE = 'active=eq.true&featured=eq.true&stock=gt.0&order=created_at.desc&limit=30&select=';
   get(BASE + 'id,name,price,old_price,stock,images,created_at,variant_group,variant_label')
     .then(function (r) { return r.ok ? r : get(BASE + 'id,name,price,stock,images,created_at,variant_group,variant_label'); })   /* old_price column not added yet */
