@@ -15,7 +15,7 @@ function reply(data,status=200,origin="") {
   if(["https://stermontarcade.co.ke","https://www.stermontarcade.co.ke"].includes(origin)){
     h["access-control-allow-origin"]=origin;h["access-control-allow-headers"]="authorization, content-type";h["access-control-allow-methods"]="POST, OPTIONS";
   }
-  return new Response(JSON.stringify(data),{status,headers:h});
+  return new Response(status===204?null:JSON.stringify(data),{status,headers:h});
 }
 function valid(bytes,type) {
   if(type==="image/jpeg")return bytes[0]===255&&bytes[1]===216&&bytes[2]===255;
