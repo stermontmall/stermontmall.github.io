@@ -3,9 +3,10 @@
 Updated: 2026-11-23. Work is strictly sequential: complete Phase 1 removal and prove zero matches before beginning Phase 2 Neon integration. The deleted Supabase project is not to be restored. Never commit credentials.
 
 ## Owner requirements
-- Phase 1: remove all Supabase code, references, generated artifacts, setup instructions, workflows, and Supabase-only features.
-- Phase 1 exit gate: repository-wide search for `supabase`, `sb_publishable`, and `oewvtbnmyombbtggamor` returns zero matches.
-- Phase 2 only after Phase 1 passes: use Neon Postgres behind a serverless API; never expose a Neon connection string in browser code.
+- Phase 1: remove all Supabase code, references, generated artifacts, setup instructions, workflows, and Supabase-only client dependencies. Do not delete customer-facing capabilities that must be preserved for Phase 2.
+- Phase 1 exit gate: executable repository code and generated customer-facing pages contain no Supabase URLs, SDKs, keys, or calls; docs and archived history may retain clearly labelled migration references only where necessary.
+- Phase 2 only after Phase 1 passes: migrate the preserved storefront, account, admin, catalogue, order, review, chat, search, publishing, image and service capabilities to Neon Postgres and Neon services behind authenticated server APIs; never expose a Neon connection string in browser code.
+- Owner confirmation on 2026-11-23 supersedes the earlier `no replacement` decision: preserve existing features and migrate their backend to Neon; do not silently retire features.
 - Keep work on `wip-remove-supabase`; do not merge to main until build and CI pass.
 - Preserve product-page build requirements: JSON-LD `priceCurrency: "KES"`, valid ISO-8601 `validFrom`, brand `Stermont Arcade`, and never create a `/blog/` folder.
 
@@ -37,4 +38,7 @@ Still being scanned on the branch. Do not treat GitHub code-search results again
 - Generated HTML and documentation cleanup: not yet complete.
 - Repository-wide zero-match scan: NOT YET PASSED.
 - Build and GitHub Actions: NOT YET VERIFIED.
-- Phase 2 Neon work: NOT STARTED; must not begin until Phase 1 exit gate passes.
+- Neon project verified: `restless-shape-79120240`, default branch `br-fancy-bird-bh01xcbs` (`main`), region `aws-eu-central-1`.
+- Neon currently has 93 categories, 3 orders, 3 reviews, 2 admin profiles, 0 products, 0 blog posts, and 0 service catalog rows. `product-photos` and `service-media` buckets exist; `photoupload` function is deployed.
+- Archive contains 22 product backup rows (6 active; only 6 have images) and exported rows for orders (3), reviews (3), service quotes (1), stock restocks (16), and vouchers (1). Do not publish backup products until image URLs and product data are verified.
+- Phase 2 Neon work: NOT STARTED; begin after Phase 1 exit gate passes.
