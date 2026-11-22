@@ -1,3 +1,20 @@
+## 2026-11-22 17:10 (Africa/Nairobi) — ChatGPT activity audit: ChatGPT is NOT the cause
+
+### Done (branch `wip-site-not-working-20261122`, note-only; no code changed)
+- Repo history: 0 commits by ChatGPT/OpenAI/Codex in the last 300 on main. Authors: owner 278, bot (generated pages/sitemaps) 12, github-actions 5, Claude 5.
+- ChatGPT's only footprint in the repo is the owner's Custom GPT Action: `chatgpt-photo-upload-openapi.json` calls the Supabase Edge Function `upload-photos` (passcode in `public.upload_settings` key `photo_passcode`, sent as Bearer). Also `llms.txt` / `seo-extras.mjs` only mention ChatGPT as an AI-search audience. `robots.txt` allows all crawlers (no GPTBot rule).
+- Supabase logs (2026-11-21 14:00Z to 2026-11-22 13:40Z): zero requests with ChatGPT / GPTBot / OAI-SearchBot / OpenAI user agents; zero `upload-photos` function calls. Latest `product-images` object was created 2026-11-21 05:49Z (0 in the last 24h, 232 in 7 days). Storage is only 212 MB (1,693 files), so size is not the problem.
+- Traffic sample 07:00-13:40Z on 2026-11-22: about 1,700 REST+Storage hits from mobile browsers (customers), Googlebot about 60, other bots about 30, Bingbot 2. No AI bot traffic.
+- CORRECTION to the entry below: the first HTTP 402 was 2026-11-21 22:10Z (01:10 Nairobi, 22 Nov), 6,624 blocked requests through 13:35Z, so the shop has been down about 15 hours, not since 13:25Z.
+
+### Conclusion
+- The outage cause is unchanged: Supabase billing/quota restriction (402). Egress is mostly customers loading product photos from Storage. Fix = owner billing action + move photo delivery to ImageKit (PR #1022, still red CI).
+
+### Next
+1. Owner: Supabase dashboard > Billing/Usage, upgrade or raise spend cap.
+2. Read the first failing assertion for `validate` and `route-regression` on PR #1022 in Actions, fix, then merge to cut Storage egress.
+3. Optional hardening of `upload-photos`: rotate `photo_passcode` if it was ever shared outside the owner's GPT.
+
 ## 2026-11-22 16:45 (Africa/Nairobi) — "Site not working": root cause = Supabase HTTP 402 (quota/billing restriction)
 
 ### Done
