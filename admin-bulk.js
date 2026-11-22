@@ -1,7 +1,7 @@
 /* Stermont Arcade · Bulk import: new rows use the canonical KES baseline-cost rule and are always saved hidden.
    Existing rows may receive photos/descriptions only; price, cost and stock are not silently changed. */
 (function () {
-  var D = document, BUCKET = 'product-images';
+  var D = document, PHOTO_UPLOAD = 'https://br-fancy-bird-bh01xcbs-photoupload.compute.c-10.eu-central-1.aws.neon.tech/upload';
   function h(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function slug(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
   function norm(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
@@ -37,7 +37,7 @@
     ['Haier 7L Air Fryer', 'Appliances', 10000, 15000, 'piece', '', 'Digital air fryer, 7 litre.', 'haier-air-fryer.jpg']];
   function download(name, text) { var a = h('a'); a.href = URL.createObjectURL(new Blob(['﻿' + text], { type: 'text/csv' })); a.download = name; D.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 500); }
 
-  /* ---------- images (resized in the browser, stored in Supabase Storage like the Catalog does) ---------- */
+  /* ---------- images (resized in the browser, stored in Neon Object Storage) ---------- */
   function shrink(file) {
     return new Promise(function (res, rej) {
       var img = new Image(); img.onload = function () {
@@ -47,16 +47,26 @@
       }; img.onerror = function () { rej(new Error('"' + file.name + '" is not a readable image')); }; img.src = URL.createObjectURL(file);
     });
   }
-  function upload(file, base) {
-    return shrink(file).then(function (b) {
-      var path = slug(base).slice(0, 80) + '-' + Date.now() + Math.floor(Math.random() * 99) + '.jpg';
-      return A().raw('/storage/v1/object/' + BUCKET + '/' + path, { method: 'POST', body: b, headers: { 'Content-Type': 'image/jpeg' } }).then(function (r) {
-        if (!r.ok) throw new Error('Photo upload failed (' + r.status + ')'); return A().base + '/storage/v1/object/public/' + BUCKET + '/' + path; });
+  function upload(file, productCode) {
+    if (!productCode) return Promise.reject(new Error('This product has no permanent product code; assign its code before uploading a photo.'));
+    return shrink(file).then(function (blob) {
+      var fd = new FormData();
+      fd.append('product_code', productCode);
+      fd.append('source_name', 'Admin bulk upload');
+      fd.append('file', blob, file.name.replace(/\\.[^.]+$/, '') + '.jpg');
+      return A().ready().then(function (jwt) {
+        return fetch(PHOTO_UPLOAD, { method: 'POST', headers: { Authorization: 'Bearer ' + jwt }, body: fd });
+      }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok || !j.ok) throw new Error(j.error || ('Neon photo upload failed (' + r.status + ')'));
+          return j.image_url;
+        });
+      });
     });
   }
   function fileMap(files) { var m = {}; Array.prototype.forEach.call(files || [], function (f) { m[f.name.toLowerCase()] = f; m[slug(baseName(f.name))] = m[slug(baseName(f.name))] || f; }); return m; }
   function findFile(m, token) { token = String(token).trim(); return m[token.toLowerCase()] || m[slug(baseName(token))] || null; }
-  /* Supabase returns at most 1000 rows per request: read big tables page by page */
+  /* Neon Data API: read big tables page by page. */
   function reqAll(path) { var rows = [], size = null; function page(off) { return req(path + '&limit=1000&offset=' + off).then(function (r) { r = Array.isArray(r) ? r : []; rows = rows.concat(r); if (size === null) size = r.length; if (!r.length || r.length < size || off > 100000) return rows; return page(off + r.length); }); } return page(0); }
   function req(path, method, body, prefer) {
     return A().api(path, { method: method || 'GET', body: body, headers: prefer ? { Prefer: prefer } : {} }).then(function (r) {
@@ -91,7 +101,7 @@
     var out1 = h('div'); out1.style.marginTop = '.8rem'; c1.appendChild(out1);
 
     function load() {
-      return Promise.all([req('/rest/v1/categories?select=id,name,slug'), reqAll('/rest/v1/products?select=id,name,images,variant_group,variant_label&order=id.asc')]).then(function (r) { cats = r[0] || []; prods = r[1] || []; });
+      return Promise.all([req('/rest/v1/categories?select=id,name,slug'), reqAll('/rest/v1/products?select=id,name,images,variant_group,variant_label,product_code&order=id.asc')]).then(function (r) { cats = r[0] || []; prods = r[1] || []; });
     }
 
     function check() {
@@ -152,21 +162,30 @@
     function run(list, go) {
       if (busy) return; busy = true; go.disabled = true; msg(c, '');
       var bar = h('div', 'meta', 'Starting…'), done = 0, fails = [], upCache = {}, catCache = {}; out1.appendChild(bar);
-      function photoUrl(f, base) { var k = f.name + f.size; return upCache[k] ? Promise.resolve(upCache[k]) : upload(f, base).then(function (u) { return upCache[k] = u; }); }
+      function photoUrl(f, productCode) { var k = f.name + f.size + ':' + productCode; return upCache[k] ? Promise.resolve(upCache[k]) : upload(f, productCode).then(function (u) { return upCache[k] = u; }); }
       function catId(o) {
         if (o.cat) return Promise.resolve(o.cat.id); var k = norm(o.catName); if (catCache[k]) return Promise.resolve(catCache[k]);
         return req('/rest/v1/categories?on_conflict=slug', 'POST', { name: o.catName, slug: slug(o.catName) }, 'resolution=merge-duplicates,return=representation').then(function (r) { return catCache[k] = r[0].id; });
       }
       function one(o) {
-        var imgs = []; return o.files.reduce(function (p, f) { return p.then(function () { return photoUrl(f, o.name).then(function (u) { imgs.push(u); }); }); }, Promise.resolve()).then(function () {
-          if (o.action === 'update') {
-            var patch = {}; if (imgs.length) patch.images = (o.existing.images || []).concat(imgs); if (o.desc) patch.description = o.desc; if (o.old != null) patch.old_price = o.old; if (o.unit) patch.unit = o.unit;
-            if (!Object.keys(patch).length) return null; return req('/rest/v1/products?id=eq.' + encodeURIComponent(o.id), 'PATCH', patch, 'return=minimal');
-          }
-          return catId(o).then(function (cid) {
-            var row = { id: o.id, category_id: cid, name: o.name, price: o.price, cost: o.cost, stock: 1000, low_at: 20, featured: false, active: false, images: imgs };
-            if (o.desc) row.description = o.desc; if (o.old != null) { var oldRounded = Math.round(o.old / 50) * 50; if (oldRounded > row.price) row.old_price = oldRounded; } if (o.unit) row.unit = o.unit; if (o.pack) { row.variant_label = o.pack; row.variant_group = o.group; }
-            return req('/rest/v1/products', 'POST', row, 'return=minimal');
+        if (o.action === 'update') {
+          var p = Promise.resolve();
+          o.files.forEach(function (f) { p = p.then(function () { return photoUrl(f, o.existing.product_code); }); });
+          return p.then(function () {
+            var patch = {}; if (o.desc) patch.description = o.desc; if (o.old != null) patch.old_price = o.old; if (o.unit) patch.unit = o.unit;
+            if (!Object.keys(patch).length) return null;
+            return req('/rest/v1/products?id=eq.' + encodeURIComponent(o.id), 'PATCH', patch, 'return=minimal');
+          });
+        }
+        return catId(o).then(function (cid) {
+          var row = { id: o.id, category_id: cid, name: o.name, price: o.price, cost: o.cost, stock: 1000, low_at: 20, featured: false, active: false, images: [] };
+          if (o.desc) row.description = o.desc; if (o.old != null) { var oldRounded = Math.round(o.old / 50) * 50; if (oldRounded > row.price) row.old_price = oldRounded; } if (o.unit) row.unit = o.unit; if (o.pack) { row.variant_label = o.pack; row.variant_group = o.group; }
+          return req('/rest/v1/products', 'POST', row, 'return=representation').then(function (created) {
+            var product = Array.isArray(created) ? created[0] : null;
+            if (!product || !product.product_code) throw new Error('Draft was saved, but Neon did not return its permanent product code. Refresh the catalogue before attaching photos.');
+            var p = Promise.resolve();
+            o.files.forEach(function (f) { p = p.then(function () { return photoUrl(f, product.product_code); }); });
+            return p;
           });
         });
       }
@@ -200,7 +219,7 @@
       var good = m2.filter(function (x) { return x.p && !x.skip; });
       if (good.length) { var b = btn('Attach ' + good.length + ' photo' + (good.length === 1 ? '' : 's'), 'ok', function () {
         if (busy) return; busy = true; b.disabled = true; var n = 0, bad = [];
-        good.reduce(function (pr, x) { return pr.then(function () { return upload(x.f, x.p.id).then(function (u) { return req('/rest/v1/products?id=eq.' + encodeURIComponent(x.p.id), 'PATCH', { images: (x.p.images || []).concat([u]) }, 'return=minimal'); }).then(function () { n++; }).catch(function (e) { bad.push(x.f.name + ': ' + e.message); }); }); }, Promise.resolve())
+        good.reduce(function (pr, x) { return pr.then(function () { return upload(x.f, x.p.product_code).then(function () { n++; }).catch(function (e) { bad.push(x.f.name + ': ' + e.message); }); }); }, Promise.resolve())
           .then(function () { busy = false; out2.textContent = ''; phIn2.value = ''; msg(c, n + ' photo' + (n === 1 ? '' : 's') + ' attached.' + (bad.length ? ' Failed: ' + bad.join(' | ') : ''), !bad.length); return load(); }).then(drawMissing);
       }); b.style.cssText = 'width:100%;margin-top:.8rem'; out2.appendChild(b); }
     });
