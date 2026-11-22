@@ -45,7 +45,7 @@
     var browsing = /^\/(p|c)\//.test(location.pathname);
     var nav = document.createElement('nav'); nav.id = 'stm-nav'; nav.setAttribute('aria-label', 'Main');
     nav.innerHTML = '<a href="/">' + I.home + 'Home</a><a href="/?tab=categories">' + I.grid + 'Categories</a><a href="/?tab=deals">' + I.bolt + 'Deals</a>' +
-      '<a href="/?tab=cart">' + I.cart + 'Cart' + badge + '</a><a href="/account.html"' + (browsing ? '' : ' aria-current="page"') + '>' + I.user + 'Account</a>';
+      '<a href="/?tab=cart">' + I.cart + 'Cart' + badge + '</a><a href="/track.html"' + (location.pathname === '/track.html' ? ' aria-current="page"' : '') + '>' + I.user + 'Track order</a>';
     var go = function () {
       document.body.classList.add('stm-chrome');
       document.body.insertBefore(bar, document.body.firstChild); document.body.appendChild(nav);
