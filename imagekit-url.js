@@ -12,19 +12,30 @@
     root.document.addEventListener('error', function (event) {
       var img = event.target;
       if (!img || img.tagName !== 'IMG' || !img.dataset || !img.dataset.imagekitOriginal) return;
+      // A failed ImageKit request gets exactly one retry against the untouched catalogue URL.
       if (!img.dataset.imagekitFallbackTried && String(img.src || '').indexOf(ENDPOINT + '/') === 0) {
         img.dataset.imagekitFallbackTried = '1';
         img.src = img.dataset.imagekitOriginal;
         return;
       }
-      if (img.dataset.imagekitFallbackTried) {
-        var list = [];
-        try { list = JSON.parse(img.dataset.fallbacks || '[]'); } catch (_) {}
-        var next = Number(img.dataset.imagekitFallbackIndex || 0);
-        if (next < list.length) {
-          img.dataset.imagekitFallbackIndex = String(next + 1);
-          img.src = list[next];
-        }
+      // If the original is missing, try each remaining genuine gallery photo in order.
+      var list = [];
+      try { list = JSON.parse(img.dataset.fallbacks || '[]'); } catch (_) {}
+      var next = Number(img.dataset.imagekitFallbackIndex || 0);
+      if (next < list.length) {
+        img.dataset.imagekitFallbackIndex = String(next + 1);
+        img.src = list[next];
+        return;
+      }
+      // Never leave a broken-image icon or an empty card.
+      if (img.parentNode && root.document.createElement) {
+        var placeholder = root.document.createElement('span');
+        placeholder.className = 'photo-unavailable';
+        placeholder.setAttribute('role', 'img');
+        placeholder.setAttribute('aria-label', 'Product photo unavailable');
+        placeholder.textContent = 'Photo unavailable';
+        placeholder.style.cssText = 'display:grid;place-items:center;width:100%;height:100%;padding:8px;color:#64748b;background:#f8fafc;font:12px/1.4 system-ui;text-align:center';
+        img.parentNode.replaceChild(placeholder, img);
       }
     }, true);
   }
