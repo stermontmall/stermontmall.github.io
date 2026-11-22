@@ -51,6 +51,26 @@ DEALS_EXPECTED = 19
 def serve(route, body, ctype='application/json'):
     time.sleep(0.4)   # a real network round trip, so the skeleton state is observable
     route.fulfill(status=200, content_type=ctype, body=body if isinstance(body, (bytes, str)) else json.dumps(body), headers={'access-control-allow-origin': '*'})
+def on_neon(route):
+    """Mock the Neon Store API used by the current mobile shell."""
+    url = route.request.url
+    if '/api/categories' in url:
+        return serve(route, CATS_FIX)
+    if '/api/products' in url:
+        from urllib.parse import urlparse, parse_qs
+        q = parse_qs(urlparse(url).query)
+        rid = (q.get('id') or [''])[0]
+        if rid:
+            r = next((x for x in ROWS if str(x['id']) == rid), None)
+            return serve(route, [] if not r else [dict(id=r['id'], slug=r['slug'], name=r['name'],
+                description=f"ABOUT {r['name']}\\n- line one\\n- line two", unit='Each', stock=r['stock'],
+                low_at=5, images=[OK, OK], cover_image=OK, product_code=r['product_code'])])
+        rows = [dict(**r, cover_image=(r['images'][0] if r['images'] else '')) for r in ROWS]
+        limit = int((q.get('limit') or [len(rows)])[0])
+        offset = int((q.get('offset') or ['0'])[0])
+        return serve(route, rows[offset:offset + limit])
+    return serve(route, [])
+
 def on_rest(route):
     if FAIL[0]: return route.fulfill(status=402, body='exceed_cached_egress_quota', headers={'access-control-allow-origin': '*'})
     url = route.request.url
@@ -85,7 +105,11 @@ def mock_network(ctx):
         page = run_node('inject', page, slug)
         rt.fulfill(status=200, content_type='text/html', body=page)
     ctx.route('**/p/*.html*', serve_product_page)
-    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
+    # Current storefront uses Neon Store API, not the retired Supabase REST/RPC routes.
+    ctx.route('**/api/products*', on_neon)
+    ctx.route('**/api/categories*', on_neon)
+    # Retain REST fixtures for generated SEO-page compatibility checks.
+    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
     for host in ('https://www.googletagmanager.com/**', 'https://cdn.jsdelivr.net/**', 'https://www.google-analytics.com/**', 'https://*.google-analytics.com/**'):
@@ -97,8 +121,7 @@ def mock_network(ctx):
         url = unquote(route.request.url)
         if url.endswith('https://img.test/ok.png'):
             return route.fulfill(status=200, content_type='image/png', body=PNG)
-        if url.endswith('https://img.test/broken.jpg'):
-            return route.abort()
+        if url.endswith('https://img.test/broken.jpg'):            return route.abort()
         # Static homepage/product fixtures can contain real catalogue image URLs.
         # Keep those requests deterministic in CI while still exercising the actual
         # ImageKit proxy URL shape and browser fallback logic. Any public Supabase
@@ -197,8 +220,7 @@ with sync_playwright() as p:
     check('tapping a product opens its full product page directly', pg.locator('#page-product.open').count() == 1)
     check('opening product pushed one history entry', pg.evaluate('history.length') == h0 + 1)
     check('body scroll locked', pg.evaluate("document.body.classList.contains('no-scroll')"))
-    pg.wait_for_timeout(450); pg.screenshot(path=f'{OUT}/shot-product.png')
-    pg.go_back()
+    pg.wait_for_timeout(450); pg.screenshot(path=f'{OUT}/shot-product.png')    pg.go_back()
     pg.wait_for_timeout(350)
     check('Back closes product page and stays on shop', pg.locator('#page-product.open').count() == 0 and pg.url == URL, pg.url)
     check('scroll unlocked after close', not pg.evaluate("document.body.classList.contains('no-scroll')"))
@@ -297,8 +319,7 @@ with sync_playwright() as p:
 
     # buy now flow from the full product page (the current card-tap behaviour)
     pg.locator('#grid .card[data-id]').first.locator('p').first.click()
-    pg.wait_for_selector('#page-product.open')
-    pg.locator('#pp-plus').click()
+    pg.wait_for_selector('#page-product.open')    pg.locator('#pp-plus').click()
     pg.locator('#pp-buy').click()
     pg.wait_for_timeout(500)
     check('Buy now closes product page and opens Cart tab', pg.locator('#page-product.open').count() == 0 and pg.locator('#view-cart').is_visible())
@@ -397,8 +418,7 @@ with sync_playwright() as p:
     ch = chain('/?item=abasi-5-ec')
     check('old home-page share link /?item=<id> opens that product in the shell', '/?product=abasi-5-ec' in ch, ch)
     ch = chain('/classic.html?cart=home-0:2')
-    check('old classic ?cart= link keeps the cart lines and goes to the shell', any(u.startswith('/?cart=') for u in ch), ch)
-    ch = chain('/classic.html?checkout=1')
+    check('old classic ?cart= link keeps the cart lines and goes to the shell', any(u.startswith('/?cart=') for u in ch), ch)    ch = chain('/classic.html?checkout=1')
     check('a stale shell that still opens classic.html?checkout=1 reaches the checkout page', ch[-1].startswith('/checkout.html'), ch)
     ch = chain('/checkout.html')
     check('opening checkout.html directly (no cart handoff) goes to the shell, never shows the old home', ch[-1] == '/', ch)
@@ -497,8 +517,7 @@ with sync_playwright() as p:
     p9.reload(); p9.wait_for_selector('#grid .card[data-id]')
     p9.goto(f'{BASE}/?product=home-1'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: a single-size product opens from its address too', 'Air Fryer' in p9.locator('#pp-name').inner_text())
-    p9.evaluate("window.__shared = null; navigator.share = d => { window.__shared = d; return Promise.resolve(); }")
-    p9.locator('#pp-share').click(); p9.wait_for_function('window.__shared')
+    p9.evaluate("window.__shared = null; navigator.share = d => { window.__shared = d; return Promise.resolve(); }")    p9.locator('#pp-share').click(); p9.wait_for_function('window.__shared')
     sh = p9.evaluate('window.__shared')
     check('share: shares the exact mobile-shell product link', sh['url'] == f'{BASE}/?product=home-1' and 'shell=1' not in sh['url'] and 'Air Fryer' in sh['title'], sh)
     p9.evaluate("navigator.share = undefined; window.__copied = null; Object.defineProperty(navigator, 'clipboard', { value: { writeText: t => { window.__copied = t; return Promise.resolve(); } }, configurable: true })")
@@ -597,8 +616,7 @@ with sync_playwright() as p:
     check('static pages: the nav Cart link opens the shell on the Cart tab (address cleaned to /)', p13.locator('#view-cart').is_visible() and p13.evaluate('location.pathname + location.search') == '/', p13.url)
     p13.goto(f'{BASE}/faq.html'); p13.wait_for_selector('#stm-nav', state='attached')
     p13.locator('#stm-nav a', has_text='Categories').click(); p13.wait_for_selector('#view-categories:not([hidden])', timeout=15000)
-    check('static pages: the nav Categories link opens the shell on Categories', p13.locator('#view-categories').is_visible() and p13.locator('#view-home').is_hidden())
-    p13.goto(f'{BASE}/contact.html'); p13.wait_for_selector('#stm-bar', state='attached')
+    check('static pages: the nav Categories link opens the shell on Categories', p13.locator('#view-categories').is_visible() and p13.locator('#view-home').is_hidden())    p13.goto(f'{BASE}/contact.html'); p13.wait_for_selector('#stm-bar', state='attached')
     p13.fill('#stm-bar input', 'nozzle'); p13.keyboard.press('Enter'); p13.wait_for_selector('#grid .card[data-id]', timeout=15000); p13.wait_for_timeout(600)
     ids = p13.locator('#grid .card[data-id]').evaluate_all('els => els.map(e => e.dataset.id)')
     check('static pages: the top-bar search opens the shell with that search (box filled, only matching products)', p13.input_value('#search') == 'nozzle' and ids and all(i.startswith('outdoor-') for i in ids) and p13.evaluate('location.search') == '', (p13.input_value('#search'), ids))
@@ -697,7 +715,6 @@ with sync_playwright() as p:
     check('static product fallback has no JavaScript errors', not e17, e17[:3])
     FAIL[0] = False
     c17.close()
-
     # Tapping a product card loads its description over REST; with HTTP 402 it must come from the card's published /p/ page instead.
     c18 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c18)
     card_html = '''<!doctype html><html><head></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Card description comes from the published page.</p><ul><li>Second line item</li></ul></section></div><script type="application/ld+json">{"@type":"Product","offers":{"availability":"https://schema.org/InStock"}}</script></body></html>'''
