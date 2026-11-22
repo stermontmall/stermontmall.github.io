@@ -11,11 +11,19 @@ const DIR = process.env.P_DIR || 'p';
 
 async function rows() {
   if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));
-  const r = await fetch(NEON_REST + 'rpc/get_product_pages', { signal: AbortSignal.timeout(30000) });
-  if (!r.ok) throw new Error(`Could not read active products from Neon (HTTP ${r.status})`);
-  const products = await r.json();
-  if (!Array.isArray(products)) throw new Error('Neon returned an invalid product-page list');
-  return products.map(({ id, slug }) => ({ id, slug }));
+  const all = [];
+  const pageSize = 200;
+  for (let offset = 0; ; offset += pageSize) {
+    const r = await fetch(NEON_REST + 'rpc/get_product_pages', {
+      headers: { Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
+      signal: AbortSignal.timeout(30000)
+    });
+    if (!r.ok) throw new Error(`Could not read active products from Neon (HTTP ${r.status})`);
+    const batch = await r.json();
+    if (!Array.isArray(batch)) throw new Error('Neon returned an invalid product-page list');
+    all.push(...batch.map(({ id, slug }) => ({ id, slug })));
+    if (batch.length < pageSize) return all;
+  }
 }
 
 export function missingPages(list, has) {
