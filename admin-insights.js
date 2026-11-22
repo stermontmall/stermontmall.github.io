@@ -45,7 +45,7 @@
     return A().ready().then(function () { return A().api(path); }).then(function (r) {
       if (r.status === 401) throw new Error('Your session expired. Sign in again.');
       if (r.status === 404) throw new Error('missing');
-      if (!r.ok) { var e = new Error('Request failed (' + r.status + ')'); e.status = r.status; throw e; }
+      if (!r.ok) { var e = new Error(A().errorMessage ? A().errorMessage({ status: r.status }) : ('Request failed (' + r.status + ')')); e.status = r.status; throw e; }
       return r.json();
     });
   }
