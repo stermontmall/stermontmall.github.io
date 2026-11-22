@@ -542,30 +542,33 @@
   /* ---------- stock ---------- */
   var slug = function (t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); };
   function renderStock(L) {
+    L.textContent = '';
+    L.appendChild(h('p', 'meta', 'Manage stock quantities directly on Neon products. Setting stock to zero hides the item from the customer catalogue; restoring it uses the store default of 1,000.'));
     L.appendChild(h('div', 'empty', 'Loading products...'));
-    Promise.all([
-      fetch('index.html', { cache: 'no-store' }).then(function (r) { return r.text(); }),
-      ready().then(function () { return api('/rest/v1/stock?select=product,in_stock'); }).then(function (r) { if (!r.ok) throw 0; return r.json(); })
-    ]).then(function (res) {
-      var doc = new DOMParser().parseFromString(res[0], 'text/html'), out = {};
-      res[1].forEach(function (x) { if (x.in_stock === false) out[x.product] = true; });
-      L.textContent = '';
-      L.appendChild(h('p', 'meta', 'Mark a product as sold out and customers will not be able to add it to the cart.'));
-      doc.querySelectorAll('#featured .pcard:not(.cta)').forEach(function (c) {
-        var n = c.querySelector('h3'); if (!n) return;
-        var name = n.textContent.trim(), id = slug(name), sold = !!out[id], card = h('div', 'card'), top = h('div', 'top');
-        var im = c.querySelector('img'), th = h('div', ''); th.style.cssText = 'width:56px;height:56px;border-radius:10px;background:#eceaf5;flex:none;display:flex;align-items:center;justify-content:center;font-size:1.5rem;overflow:hidden';
-        if (im && im.getAttribute('src')) { var pi = new Image(); pi.src = im.getAttribute('src'); pi.alt = ''; pi.style.cssText = 'width:100%;height:100%;object-fit:cover'; th.appendChild(pi); } else { th.textContent = '📦'; }
-        var nm = h('div', 'ref', name); nm.style.flex = '1'; top.style.alignItems = 'center'; top.appendChild(th); top.appendChild(nm); top.appendChild(h('span', 'badge ' + (sold ? 'b-declined' : 'b-paid'), sold ? 'Sold out' : 'In stock')); card.appendChild(top);
-        var b = h('button', 'btn ' + (sold ? 'ok' : 'no') + ' sm', sold ? 'Mark back in stock' : 'Mark sold out'); b.type = 'button'; b.style.marginTop = '.6rem';
-        b.onclick = function () {
-          b.disabled = true;
-          api('/rest/v1/stock?on_conflict=product', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: { product: id, in_stock: sold } })
-            .then(function (r) { if (!r.ok) throw 0; render(); }).catch(function () { b.disabled = false; var er = $('aerr'); er.textContent = 'Could not update stock. Check the Neon products table permissions.'; er.hidden = false; });
-        };
-        card.appendChild(b); L.appendChild(card);
-      });
-    }).catch(function () { L.textContent = ''; var er = $('aerr'); er.textContent = 'Could not load stock. Run setup-extras.sql in Supabase first.'; er.hidden = false; });
+    ready().then(function () { return api('/rest/v1/products?select=id,slug,name,stock,images,active&order=name.asc&limit=1000'); })
+      .then(function (r) { if (!r.ok) throw new Error('Neon products request failed (' + r.status + ')'); return r.json(); })
+      .then(function (products) {
+        L.textContent = '';
+        if (!Array.isArray(products) || !products.length) { L.appendChild(h('div', 'empty', 'No products found in Neon.')); return; }
+        products.forEach(function (p) {
+          var sold = Number(p.stock) <= 0, card = h('div', 'card'), top = h('div', 'top');
+          var im = h('div', ''); im.style.cssText = 'width:56px;height:56px;border-radius:10px;background:#eceaf5;flex:none;display:flex;align-items:center;justify-content:center;font-size:1.5rem;overflow:hidden';
+          if (Array.isArray(p.images) && p.images[0]) { var pi = new Image(); pi.src = p.images[0]; pi.alt = ''; pi.style.cssText = 'width:100%;height:100%;object-fit:cover'; im.appendChild(pi); } else im.textContent = '📦';
+          var nm = h('div', 'ref', p.name || p.slug || p.id); nm.style.flex = '1';
+          top.style.alignItems = 'center'; top.appendChild(im); top.appendChild(nm);
+          top.appendChild(h('span', 'badge ' + (p.active ? (sold ? 'b-declined' : 'b-paid') : 'b-pending'), !p.active ? 'Draft' : (sold ? 'Sold out' : 'In stock')));
+          card.appendChild(top); card.appendChild(h('div', 'meta', 'Stock: ' + Number(p.stock || 0).toLocaleString('en-KE') + ' · Code/ID: ' + (p.id || '')));
+          var bt = h('button', 'btn ' + (sold ? 'ok' : 'no') + ' sm', sold ? 'Restore stock (1,000)' : 'Mark sold out'); bt.type = 'button'; bt.style.marginTop = '.6rem';
+          bt.onclick = function () {
+            bt.disabled = true;
+            api('/rest/v1/products?id=eq.' + encodeURIComponent(p.id), { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: { stock: sold ? 1000 : 0 } })
+              .then(function (r) { if (!r.ok) throw new Error('Neon stock update failed (' + r.status + ')'); return r.json(); })
+              .then(function (rows) { if (!rows || !rows.length) throw new Error('Neon did not update this product.'); renderStock(L); })
+              .catch(function (e) { bt.disabled = false; var er = $('aerr'); er.textContent = e.message; er.hidden = false; });
+          };
+          card.appendChild(bt); L.appendChild(card);
+        });
+      }).catch(function (e) { L.textContent = ''; var er = $('aerr'); er.textContent = 'Could not load Neon stock: ' + e.message; er.hidden = false; });
   }
 
   var handled = false;
