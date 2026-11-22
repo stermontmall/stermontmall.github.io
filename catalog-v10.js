@@ -105,7 +105,7 @@
       });
     });
   }
-  /* Supabase returns at most 1000 rows per request, so read big tables page by page (stable order, stop on a short page) */
+  /* Neon Data API returns at most 1,000 rows per request, so read big tables page by page (stable order, stop on a short page). */
   function callAll(path) {
     var rows = [], size = null;
     function page(off) {
@@ -132,7 +132,7 @@
     var b = bounds(), req = !b ? call('/rest/v1/product_stats?select=*') :
       call('/rest/v1/rpc/product_stats_range', { m: 'POST', body: { p_from: b[0].toISOString(), p_to: b[1] ? b[1].toISOString() : null } });
     /* if the sales view/function is missing, still show the items (sales figures just stay at 0) */
-    return req.catch(function (e) { S.warn = 'Sales figures could not load (' + e.message + '). Items are still shown. Run setup-catalog.sql and setup-catalog-2.sql in Supabase.'; return []; });
+    return req.catch(function (e) { S.warn = 'Sales figures could not load (' + e.message + '). Items are still shown. Check Neon product_stats, sales and stock ledger tables and admin permissions.'; return []; });
   }
   function logsCall() {
     var b = bounds(), f = b ? '&created_at=gte.' + encodeURIComponent(b[0].toISOString()) : '';
