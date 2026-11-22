@@ -1,7 +1,7 @@
 # Stermont Arcade - rebuilds every product page, category page and the product sitemap automatically.
 # Runs: every 30 minutes, when generate-products.mjs changes, on a repository_dispatch event of type catalog-changed (instant rebuild), and whenever you tap "Run workflow" in the Actions tab.
 # Why every 30 minutes: a product only has a /p/ page after a build, so a product activated between builds had a dead link until the next one (2026-11-06, Agrimec 018EC). 404.html now opens such links in the shop meanwhile, and check-product-pages.mjs fails the run if an active product is still missing a page.
-# Safety: catalogue-count-guard.mjs stops the build when the live catalogue is almost empty (for example while products are hidden during a database quota pause), because the build deletes every old page before it writes the new ones.
+# Safety: catalogue-count-guard.mjs stops the build when the live Neon catalogue is almost empty (for example while products are hidden during a database outage), because the build deletes every old page before it writes the new ones.
 name: Build product pages
 
 on:
@@ -172,8 +172,8 @@ jobs:
       - name: Speed - connect to the shop database early (preconnect)
         run: |
           # Safe and repeatable: adds one line to the home page head if it is not there yet.
-          if ! grep -q 'rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co"' index.html; then
-            sed -i '0,/<meta charset="UTF-8">/s##&\n  <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>#' index.html
+          if ! grep -q 'rel="preconnect" href="https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech"' index.html; then
+            sed -i '0,/<meta charset="UTF-8">/s##&\n  <link rel="preconnect" href="https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech" crossorigin>#' index.html
           fi
 
       - name: Warn about broken or placeholder links before saving (link-check.mjs)
