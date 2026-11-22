@@ -7,6 +7,13 @@ assert.equal(imageKitUrl('https://ik.imagekit.io/w6hxfnwmw/photo.jpg', 320), 'ht
 assert.equal(imageKitUrl('https://ik.imagekit.io/other/photo.jpg', 320), 'https://ik.imagekit.io/other/photo.jpg');
 assert.equal(imageKitUrl('', 320), '');
 assert.equal(imageKitUrl(null, 320), null);
+// Static HTML (built in Node): large images feed JSON-LD, og:image, the image sitemap and the hero photo, so they stay original.
+assert.equal(imageKitUrl('https://stermontmall.github.io/product-photos/test.jpg', 900), 'https://stermontmall.github.io/product-photos/test.jpg');
+// The original URL can always be recovered from a proxy URL (used for the one-time retry when ImageKit fails).
+assert.equal(imageKitUrl.original(imageKitUrl('https://stermontmall.github.io/product-photos/test.jpg', 480)), 'https://stermontmall.github.io/product-photos/test.jpg');
+assert.equal(imageKitUrl.original('https://stermontmall.github.io/product-photos/test.jpg'), null);
+assert.equal(imageKitUrl.original('https://ik.imagekit.io/other/photo.jpg'), null);
+assert.equal(imageKitUrl.original(null), null);
 console.log('ImageKit URL helper tests passed.');
 
 import { readFileSync } from 'node:fs';
