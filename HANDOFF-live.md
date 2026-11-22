@@ -1,28 +1,38 @@
-## 2026-11-23 (Africa/Nairobi) — Neon backend-control migration (branch `neon-backend-control-2026-11-23`, not merged)
+## 2026-11-23 (Africa/Nairobi) — Neon backend-control migration (PR #1047, draft; not merged)
 
 ### Implemented in Neon
-- Public read-only RPCs: `get_product_pages`, `get_approved_reviews`, `get_product_slug_redirects`, `get_products_by_ids`, and the existing `get_store_catalog` hardened as SECURITY DEFINER with a fixed search_path.
-- Guest order RPCs: `track_order`, `create_guest_order`, and `check_voucher`; search telemetry RPC: `log_search`. Anonymous role can execute these functions but cannot directly SELECT products or orders, or INSERT orders.
-- Added Neon `search_logs` and `vouchers` tables. `create_guest_order` validates the product IDs, live prices, stock, delivery fee, voucher and payment reference server-side before inserting a pending order.
-- Neon Data API refreshed for schema changes; anonymous role and CORS limited to the storefront origin; max response size 1,000.
+- Public RPCs: `get_store_catalog`, `get_product_pages`, `get_products_by_ids`, `get_approved_reviews`, `get_product_slug_redirects`, `recent_purchases`, `track_order`, `create_guest_order`, `check_voucher`, `log_search`, `submit_message`, and `submit_service_quote`.
+- Admin RPCs: `record_sale`, `reverse_sale`, `product_stats_range`; added `product_stats` view.
+- Added/extended tables: `search_logs`, `vouchers`, `messages`, `expenses`, `service_quotes`, `client_quotations`, `service_catalog`, `sales`, `loss_logs`, `stock_restocks`; `orders.sales_recorded` and unique payment-code index.
+- Public RPCs use SECURITY DEFINER with fixed search_path; PUBLIC execution revoked and only intended roles granted. Anonymous direct SELECT on products/orders and INSERT on orders are denied.
+- Admin tables are RLS-scoped through `is_store_admin()`. Admin reads/updates now cover orders, reviews, vouchers, expenses, messages, service quotes, client quotations, sales/stock ledger, blog posts and M-Pesa records.
+- Neon Data API schema cache refreshed; CORS limited to `https://stermontarcade.co.ke`; max response size 1,000.
+- Neon Auth sign-up disabled while existing admin sign-in remains enabled. Two active owner profiles are present.
 
-### GitHub branch changes (not deployed)
-- Storefront, homepage/SEO route prefetch, product page generator, approved review reads, search telemetry, SEO/catalogue guards, stock/data-health/product-watch reports and guest tracking now use Neon RPCs.
-- Checkout product handoff now uses Neon; guest order placement and voucher validation use Neon; customer account page redirects to guest order tracking and checkout's account panel was removed.
-- Product-page workflow preconnect now points to Neon.
+### GitHub branch changes (PR #1047, not deployed)
+- Storefront/mobile shell, homepage/SEO prefetch, classic storefront cards, category search, featured adverts and recent-order social proof read Neon.
+- SEO product generator/title overrides, approved reviews, slug redirects, search telemetry, SEO/catalogue guards, stock reports, product-watch and data-health checks use Neon.
+- Checkout cart lookup, guest order creation, voucher validation and guest order tracking use Neon RPCs.
+- Public service quote requests and product stock-alert messages write to Neon.
+- Admin sign-in/data API use Neon Auth; admin orders, stock, vouchers, messages, expenses, reviews, service quotes, quotations and sales ledger use Neon.
+- Bulk product photos call the deployed Neon `photoupload` function.
+- Customer account panel/sign-in removed; `/account.html` redirects to guest tracking.
+- Supabase-backed admin AI-photo, service-media and customer live-chat tabs are paused until Neon equivalents are built. Legacy image URLs are preserved as fallback.
+- Price-watch reads Neon but is report-only; price writes remain disabled until a restricted Neon price-writer credential is configured.
 
 ### Verified
-- Neon has 22 product rows, 0 active; 93 active categories.
-- Anonymous role has EXECUTE on the public RPCs; direct anonymous SELECT on products/orders and INSERT on orders are false.
-- A negative-path create-order call returned the expected "cart is empty or invalid" response without inserting an order; missing voucher check returned the expected invalid-code response.
-- No live order was placed and no product was activated.
+- Neon catalogue: 22 product rows, 0 active; 93 active categories.
+- Anonymous RPC grants verified; direct anonymous products/orders SELECT and orders INSERT denied.
+- Negative-path guest-order, invalid-voucher, invalid-message and invalid-quote checks returned expected responses without creating records.
+- Shell routing regression passed. Full mobile-shell and SEO quality workflows still need final confirmation.
+- No product activated, no live order placed, no browser-level admin/checkout/photo upload test performed.
 
-### Not yet migrated / not verified
-- Admin catalogue/order/review/chat/quotation screens and payment callbacks still have Supabase-era integrations; migrate these to Neon next.
-- Card payments remain disabled. M-Pesa checkout is still manual receipt entry pending staff verification; no Daraja callback was deployed.
-- Browser-level Neon Data API/CORS checks, actual checkout, public photo GET, and GitHub Actions CI still need verification. Do not merge or deploy until these pass.
-- Preserve Supabase and its legacy image URLs as a fallback until quota renewal; do not delete the Supabase project or its data.
-
+### Remaining / fallback policy
+- Migrate remaining report and service-media paths to Neon; preserve legacy Supabase image URLs and project data until quota renewal.
+- Card payments and Daraja callbacks are not migrated; checkout remains manual M-Pesa receipt entry pending staff verification.
+- Complete browser-level Data API/CORS, admin login, guest checkout, photo upload/public GET and CI checks before merge.
+- Do not merge/deploy while Neon has 0 active products; import and verify approved catalogue data first.
+- Do not delete, disable or overwrite Supabase during the two-week fallback period.
 
 ## 2026-11-22 22:30 (Africa/Nairobi) — Admin rulebook page now reads Neon `publish_products` (v5)
 
