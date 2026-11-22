@@ -111,7 +111,7 @@
       Promise.all([load(), csvIn.files[0].text()]).then(function (r) {
         var rows = parseCSV(r[1]); if (rows.length < 2) throw new Error('The spreadsheet has no product rows.');
         var m = mapHeaders(rows[0]); if (m.name == null) throw new Error('No "name" column found. Download the template to see the expected columns.');
-        var files = fileMap(phIn.files), seen = {}, exist = {}; prods.forEach(function (p) { exist[p.id] = p; });
+        var files = fileMap(phIn.files), seen = {}, exist = {}; prods.forEach(function (p) { exist[p.slug || slug(p.name + (p.variant_label ? ' ' + p.variant_label : ''))] = p; });
         var catBy = {}; cats.forEach(function (x) { catBy[norm(x.name)] = x; });
         rows.slice(1).forEach(function (r, i) {
           var g = function (k) { return m[k] == null ? '' : String(r[m[k]] == null ? '' : r[m[k]]).trim(); };
@@ -169,12 +169,13 @@
       }
       function one(o) {
         if (o.action === 'update') {
-          var p = Promise.resolve();
-          o.files.forEach(function (f) { p = p.then(function () { return photoUrl(f, o.existing.product_code); }); });
+          var p = Promise.resolve(); o.uploadedUrls = [];
+          o.files.forEach(function (f) { p = p.then(function () { return photoUrl(f, o.existing.product_code).then(function (u) { o.uploadedUrls.push(u); }); }); });
           return p.then(function () {
             var patch = {}; if (o.desc) patch.description = o.desc; if (o.old != null) patch.old_price = o.old; if (o.unit) patch.unit = o.unit;
+            if (o.uploadedUrls.length) patch.images = Array.from(new Set((o.existing.images || []).concat(o.uploadedUrls)));
             if (!Object.keys(patch).length) return null;
-            return req('/rest/v1/products?id=eq.' + encodeURIComponent(o.id), 'PATCH', patch, 'return=minimal');
+            return req('/rest/v1/products?id=eq.' + encodeURIComponent(o.existing.id), 'PATCH', patch, 'return=minimal');
           });
         }
         return catId(o).then(function (cid) {
@@ -183,9 +184,9 @@
           return req('/rest/v1/products', 'POST', row, 'return=representation').then(function (created) {
             var product = Array.isArray(created) ? created[0] : null;
             if (!product || !product.product_code) throw new Error('Draft was saved, but Neon did not return its permanent product code. Refresh the catalogue before attaching photos.');
-            var p = Promise.resolve();
-            o.files.forEach(function (f) { p = p.then(function () { return photoUrl(f, product.product_code); }); });
-            return p;
+            var urls = [], p = Promise.resolve();
+            o.files.forEach(function (f) { p = p.then(function () { return photoUrl(f, product.product_code).then(function (u) { urls.push(u); }); }); });
+            return p.then(function () { return urls.length ? req('/rest/v1/products?id=eq.' + encodeURIComponent(product.id), 'PATCH', { images: Array.from(new Set((product.images || []).concat(urls))) }, 'return=minimal') : null; });
           });
         });
       }
