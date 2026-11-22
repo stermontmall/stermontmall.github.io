@@ -682,6 +682,19 @@ with sync_playwright() as p:
     check('a fresh visit still starts on For you', p16.locator('#grid-title').inner_text() == 'Recommended for you')
     c16.close()
 
+    # Published SEO product pages are the read-only fallback when Supabase REST is restricted.
+    c17 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c17)
+    FAIL[0] = True  # simulate the Supabase 402 quota restriction for every REST request
+    fallback_html = '''<!doctype html><html><head><meta name="stm-id" content="static-fallback"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Static Fallback Sprayer","image":["https://img.test/ok.png"],"sku":"STM-TEST-402","offers":{"@type":"Offer","priceCurrency":"KES","price":1234,"availability":"https://schema.org/InStock"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"http://test/"},{"@type":"ListItem","position":2,"name":"Garden Tools","item":"http://test/c/garden-tools.html"},{"@type":"ListItem","position":3,"name":"Static Fallback Sprayer","item":"http://test/p/static-fallback.html"}]}</script></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Published description survives a database outage.</p></section></div></body></html>'''
+    c17.route('**/p/static-fallback.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=fallback_html))
+    p17 = c17.new_page(); e17 = []; p17.on('pageerror', lambda e: e17.append(str(e)))
+    p17.goto(f'{BASE}/?product=static-fallback'); p17.wait_for_selector('#page-product.open', timeout=15000); p17.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Published description survives')", timeout=5000)
+    check('product deep link opens from the published SEO page when Supabase REST returns 402', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
+    check('static fallback retains product code and full published description', 'STM-TEST-402' in p17.locator('#pp-meta').inner_text() and 'Published description survives a database outage.' in p17.locator('#pp-desc').inner_text())
+    check('static product fallback has no JavaScript errors', not e17, e17[:3])
+    FAIL[0] = False
+    c17.close()
+
     co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
     check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
     check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'failed_requests': failed_requests[:3]})
