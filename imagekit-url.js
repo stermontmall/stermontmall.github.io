@@ -29,9 +29,9 @@
     }, true);
   }
   return function imageKitUrl(source, width) {
-    if (typeof source !== 'string' || !/^https?:\\/\\//i.test(source)) return source;
+    if (typeof source !== 'string' || !/^https?:\/\//i.test(source)) return source;
     // Never proxy an ImageKit URL again; it may already belong to this account or another CDN.
-    if (/^https:\\/\\/ik\\.imagekit\\.io\\//i.test(source)) return source;
+    if (/^https:\/\/ik\.imagekit\.io\//i.test(source)) return source;
     var w = Math.max(1, Math.min(2400, Math.round(Number(width) || 800)));
     return ENDPOINT + '/tr:w-' + w + ',q-75,f-auto/' + source;
   };
