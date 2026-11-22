@@ -7,7 +7,8 @@ import process from "node:process";
 import { parseCSV } from "./csv.mjs";
 const arg=(name,def)=>{const i=process.argv.indexOf(name);return i>=0?process.argv[i+1]:def;};
 const onlyActive=process.argv.includes("--active-with-images");
-const statePath=path.resolve(arg("--state",".pocketbase-import-state.json"));
+const inputDir=path.resolve(arg("--input-dir","pocketbase"));
+const statePath=path.resolve(arg("--state","pocketbase/.pocketbase-import-state.json"));
 const base=(process.env.PB_URL||"").trim().replace(/\/+$/,"");
 const email=(process.env.PB_ADMIN_EMAIL||"").trim(), password=process.env.PB_ADMIN_PASSWORD||"";
 if(!base||!email||!password){console.error("Set PB_URL, PB_ADMIN_EMAIL and PB_ADMIN_PASSWORD. Never put these in the CSV or source files.");process.exit(2);}
@@ -92,7 +93,7 @@ async function main(){
  const state=await loadState();
  const tasks=[["categories","categories.csv"],["products","products.csv"],["vouchers","vouchers.csv"],["orders","orders.csv"]];
  for(const [collection,file] of tasks){
-  const rows=await readCSV(file);if(!rows.length)continue;
+  const rows=await readCSV(path.join(inputDir,file));if(!rows.length)continue;
   let clean=rows.map(r=>normalize(r,collection));
   if(collection==="orders"){
    const users=await existingMap("users");
