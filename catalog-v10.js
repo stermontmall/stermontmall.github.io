@@ -1,7 +1,7 @@
 /* Stermont Arcade · Catalog, Restock & Sales ledger module. Mount: STMCatalog.mount(containerEl)
    New items use the canonical four-tier KES rule; the database recalculates price and applies mandatory defaults. */
 (function () {
-  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
+  var PHOTO_UPLOAD = 'https://br-fancy-bird-bh01xcbs-photoupload.compute.c-10.eu-central-1.aws.neon.tech/upload';
   var S = { cats: [], prods: [], st: {}, cat: 'all', q: '', range: 'all' }, root, D = document, view = function () { render(); };
   var LIME = '#84cc16';
   /* crossed-out (previous) price: shows a discount between OLD_MIN% and OLD_MAX% (a random whole % per item unless pct is given),
@@ -64,29 +64,10 @@
   function el(t, c, h) { var e = D.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; }
   function toast(msg) { var e = $('cx-err'); if (e) { e.textContent = msg; e.hidden = false; } }
 
-  /* ---------- Supabase (re-uses the admin's saved session) ---------- */
-  function stored() { try { return JSON.parse(localStorage.getItem(SK)); } catch (e) { return null; } }
-  var renewing = null;
+  /* ---------- Neon Auth + Neon Data API (shares the main admin session) ---------- */
   function token() {
-    var s = stored();
-    if (!s) return Promise.reject(new Error('Signed out'));
-    if (Date.now() < s.exp) return Promise.resolve(s.access_token);
-    /* Use the admin page's shared refresh promise when available; do not race its refresh token. */
-    if (window.STMAdmin && STMAdmin.ready) {
-      return STMAdmin.ready().then(function () { var n = stored(); if (!n) throw new Error('Signed out'); return n.access_token; },
-        function () { throw new Error('Session expired, sign in again'); });
-    }
-    /* Standalone fallback: coalesce simultaneous catalog/stock requests into one token renewal. */
-    if (!renewing) {
-      renewing = fetch(SB + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: s.refresh_token }) })
-        .then(function (r) { if (!r.ok) throw new Error('Session expired, sign in again'); return r.json(); })
-        .then(function (j) {
-          s.access_token = j.access_token; s.refresh_token = j.refresh_token;
-          s.exp = Date.now() + (j.expires_in || 3600) * 1000 - 60000;
-          localStorage.setItem(SK, JSON.stringify(s)); renewing = null; return s.access_token;
-        }, function (e) { renewing = null; throw e; });
-    }
-    return renewing;
+    if (!window.STMAdmin || !STMAdmin.ready) return Promise.reject(new Error('Neon admin session is unavailable'));
+    return STMAdmin.ready();
   }
   function withTimeout(p, ms) {
     return new Promise(function (ok, no) {
@@ -97,10 +78,13 @@
   function call(path, o) {
     o = o || {};
     return token().then(function (t) {
-      var hd = Object.assign({ apikey: KEY, Authorization: 'Bearer ' + t }, o.h || {}), body = o.body;
-      if (body !== undefined && !(body instanceof Blob)) { hd['Content-Type'] = 'application/json'; body = JSON.stringify(body); }
-      return fetch(SB + path, { method: o.m || 'GET', headers: hd, body: body }).then(function (r) {
-        if (!r.ok) return r.text().then(function (x) { var m = x; try { m = JSON.parse(x).message || x; } catch (e) {} throw new Error(m); });
+      var hd = Object.assign({ Authorization: 'Bearer ' + t }, o.h || {}), body = o.body;
+      if (body !== undefined && !(body instanceof Blob) && !(body instanceof FormData)) {
+        hd['Content-Type'] = hd['Content-Type'] || 'application/json';
+        body = JSON.stringify(body);
+      }
+      return fetch(STMAdmin.base + path, { method: o.m || 'GET', headers: hd, body: body }).then(function (r) {
+        if (!r.ok) return r.text().then(function (x) { var m = x; try { m = JSON.parse(x).message || JSON.parse(x).hint || x; } catch (e) {} throw new Error(m); });
         return r.text().then(function (x) { return x ? JSON.parse(x) : null; });
       });
     });
@@ -197,7 +181,7 @@
   function v(id) { return $(id).value; }
   function num(id) { return Number(v(id)); }
 
-  /* ---------- image upload (resized client-side, stored in Supabase Storage) ---------- */
+  /* ---------- product photos: authenticated upload to Neon Object Storage ---------- */
   function shrink(file) {
     return new Promise(function (res, rej) {
       var img = new Image(); img.onload = function () {
@@ -207,11 +191,27 @@
       }; img.onerror = function () { rej(new Error('Not an image')); }; img.src = URL.createObjectURL(file);
     });
   }
-  function upload(file, base) {
-    return shrink(file).then(function (b) {
-      var path = base + '-' + Date.now() + Math.floor(Math.random() * 99) + '.jpg';
-      return call('/storage/v1/object/product-images/' + path, { m: 'POST', body: b, h: { 'Content-Type': 'image/jpeg' } }).then(function () { return SB + '/storage/v1/object/public/product-images/' + path; });
+  function upload(file, productCode) {
+    if (!productCode) return Promise.reject(new Error('Save the product draft first so Neon can assign its permanent product code.'));
+    return shrink(file).then(function (blob) {
+      var fd = new FormData(); fd.append('product_code', productCode); fd.append('source_name', 'Admin catalogue upload');
+      fd.append('file', blob, file.name.replace(/\\.[^.]+$/, '') + '.jpg');
+      return token().then(function (jwt) { return fetch(PHOTO_UPLOAD, { method: 'POST', headers: { Authorization: 'Bearer ' + jwt }, body: fd }); })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok || !j.ok) throw new Error(j.error || ('Neon photo upload failed (' + r.status + ')'));
+          return j.image_url;
+        }); });
     });
+  }
+  function uploadLink(url, productCode) {
+    if (!productCode) return Promise.reject(new Error('Save the product draft first so Neon can assign its permanent product code.'));
+    return token().then(function (jwt) {
+      return fetch(PHOTO_UPLOAD, { method: 'POST', headers: { Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_code: productCode, image_url: url, source_url: url, source_name: 'Admin catalogue photo link' }) });
+    }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) {
+      if (!r.ok || !j.ok) throw new Error(j.error || ('Neon photo fetch failed (' + r.status + ')'));
+      return j.image_url;
+    }); });
   }
 
   /* ---------- Add / Edit item ---------- */
