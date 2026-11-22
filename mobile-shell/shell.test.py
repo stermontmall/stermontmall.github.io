@@ -713,6 +713,24 @@ with sync_playwright() as p:
     FAIL[0] = False
     c18.close()
 
+    # Multi-pack products publish a ProductGroup page; the pack-size URL is a stub whose canonical link points at the group page.
+    c19 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c19)
+    FAIL[0] = True
+    group_html = '''<!doctype html><html><head><meta name="stm-id" content="multi-pack-test"><script type="application/ld+json">{"@context":"https://schema.org","@type":"ProductGroup","name":"Multi Pack Test Insecticide","productGroupID":"multi-pack-test","variesBy":"https://schema.org/size","hasVariant":[{"@type":"Product","name":"Multi Pack Test Insecticide \\u2013 50 ml","sku":"STM-TEST-050","size":"50 ml","image":["https://img.test/a.png"],"offers":{"@type":"Offer","url":"http://test/p/multi-pack-test.html#multi-pack-test-50-ml","priceCurrency":"KES","price":450,"availability":"https://schema.org/InStock"}},{"@type":"Product","name":"Multi Pack Test Insecticide \\u2013 100 ml","sku":"STM-TEST-100","size":"100 ml","image":["https://img.test/b.png"],"offers":{"@type":"Offer","url":"http://test/p/multi-pack-test.html#multi-pack-test-100-ml","priceCurrency":"KES","price":800,"availability":"https://schema.org/InStock"}}]}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"http://test/"},{"@type":"ListItem","position":2,"name":"Crop Insecticides","item":"http://test/c/crop-insecticides.html"},{"@type":"ListItem","position":3,"name":"Multi Pack Test Insecticide","item":"http://test/p/multi-pack-test.html"}]}</script></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Group description survives a database outage.</p></section></div></body></html>'''
+    stub_html = '<head><meta charset="utf-8"><link rel="canonical" href="http://test/p/multi-pack-test.html"><meta http-equiv="refresh" content="0;url=http://test/p/multi-pack-test.html"></head><body><p>This product moved.</p></body>'
+    c19.route('**/p/multi-pack-test.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=group_html))
+    c19.route('**/p/multi-pack-test-100-ml.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=stub_html))
+    p19 = c19.new_page(); e19 = []; p19.on('pageerror', lambda e: e19.append(str(e)))
+    p19.goto(f'{BASE}/?product=multi-pack-test'); p19.wait_for_selector('#page-product.open', timeout=15000); p19.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Group description survives')", timeout=5000)
+    check('multi-pack (ProductGroup) deep link opens from the published page when Supabase REST returns 402', p19.locator('#pp-name').inner_text() == 'Multi Pack Test Insecticide' and p19.locator('#pp-price').inner_text() == 'KSh 450', p19.locator('#pp-price').inner_text())
+    check('ProductGroup fallback keeps every pack size', p19.locator('#page-product').inner_text().count('100 ml') >= 1 and p19.locator('#page-product').inner_text().count('50 ml') >= 1, p19.locator('#page-product').inner_text()[:200])
+    p19.close(); p19 = c19.new_page(); p19.on('pageerror', lambda e: e19.append(str(e)))
+    p19.goto(f'{BASE}/?product=multi-pack-test-100-ml'); p19.wait_for_selector('#page-product.open', timeout=15000); p19.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Group description survives')", timeout=5000)
+    check('a pack-size stub link follows its canonical to the group page and selects that pack', p19.locator('#pp-price').inner_text() == 'KSh 800', p19.locator('#pp-price').inner_text())
+    check('ProductGroup fallback has no JavaScript errors', not e19, e19[:3])
+    FAIL[0] = False
+    c19.close()
+
     co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
     check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
     check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'failed_requests': failed_requests[:3]})

@@ -1,3 +1,24 @@
+## 2026-11-22 23:00 (Africa/Nairobi) — Multi-pack (ProductGroup) fallback fixed; /post-product aligned to Neon v5
+
+### Done (branch `wip-productgroup-fallback-2026-11-22`, NOT merged)
+- `openStaticProductFallback` in `mobile-shell/app.js` now accepts `ProductGroup` pages: it builds one pack size per `hasVariant` (label from `size`, price/availability/sku/images from each variant offer, pack slug from the offer URL fragment), keeps the group description for every pack, and follows the canonical link of a pack-size stub (`/p/<group>-100-ml.html`) once to the group page, then selects that pack. Single `Product` pages behave as before. Still read-only: no redirects, no writes.
+- `app.js?v=46` bumped to `?v=47` in `index.html` and `shell-route-loader.js`.
+- 5 regression checks added to `mobile-shell/shell.test.py` (group deep link under 402, all pack sizes kept, stub link selects its pack, no JS errors). Local result: 182/183; the 1 failure is the same sandbox-only one as before (3 hard-coded home-page photos on stermontarcade.co.ke cannot load with no internet), expected green in CI.
+- `.claude/commands/post-product.md` rewritten to the Neon `publish_products` v5 rule (it still pointed at Supabase `autonomous_bulk_product_publishing`, 800+ word guides and Supabase Storage uploads, which `publish_products` supersedes).
+- Neon audit of STM-001838 to STM-001844: price equals `price_4tier(cost)` on all 7, stock 1000, low_at 20, featured false, active false, cost basis `retail_x0.85` with source URL and retail reference recorded, all 5 products triggers enabled. No photos, no `pcpb_reg`, no `photo_source` on any (correctly inactive).
+
+### Found, not changed
+- STM-001841 description is 59 words by whitespace count; v5 asks for 60 to 120. All other drafts are 60 to 66. Add one sourced sentence from its imaginecare.co.ke page before activation.
+- Nothing was activated, repriced or photographed. Photos need written reuse permission (v5); rodenticides and the cockroach gel also need confirmed PCPB registration.
+
+### Blocked (owner)
+- Supabase billing (`exceed_cached_egress_quota`, HTTP 402) for org munfmuvialgwzxwgthtw: until restored, the SEO gate fails at `node generate-products.mjs` and product photos stay broken. After restoring: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+- 13 of the 20-product batch are not yet sourced; STM-001838 to STM-001844 are the 7 inserted.
+
+### Next
+1. Open the PR, check CI (the mobile-shell regression should be green; the SEO gate fails only on Supabase 402 until billing is back), merge when green.
+2. On a phone: open /?product=abasi-5-ec and /?product=abasi-5-ec-100-ml and confirm the page opens with pack sizes.
+
 
 ## 2026-11-22 22:30 (Africa/Nairobi) — Admin rulebook page now reads Neon `publish_products` (v5)
 
