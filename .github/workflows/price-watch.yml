@@ -1,6 +1,5 @@
 # Stermont Arcade - price watch. Compares product prices with competitor listings and opens a report issue.
-# All scheduled runs are report-only. A manual run changes prices only when you explicitly tick "Apply price changes".
-# Changes still require the SUPABASE_SERVICE_KEY repository secret and are limited by price-watch.config.json.
+# All runs are report-only until a restricted Neon price-writer role and CI credential are configured.
 # Do not treat weak or single-source competitor matches as permission to change product prices.
 name: Price watch
 
@@ -8,11 +7,6 @@ on:
   schedule:
     - cron: '0 5 * * *'
   workflow_dispatch:
-    inputs:
-      apply_changes:
-        description: 'Apply price changes (leave unchecked for report only)'
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -36,8 +30,7 @@ jobs:
       - name: Check prices
         id: rep
         env:
-          APPLY: ${{ inputs.apply_changes && '1' || '0' }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          APPLY: '0'
         run: node price-watch.mjs > price-watch.md
       - uses: actions/upload-artifact@v7
         if: always()
