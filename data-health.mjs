@@ -4,19 +4,17 @@
 // missing photos, missing descriptions, suspicious stock numbers, and (as a backstop) price/duplicate problems.
 import { writeFileSync } from 'node:fs';
 
-const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
-const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7'; // publishable key, designed to be public
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
 const STOCK_SUSPICIOUS = 5000;
 
-const res = await fetch(
-  `${SB}/rest/v1/products?select=id,name,variant_label,price,stock,images,description&active=eq.true&limit=2000`,
-  { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }
-);
+const res = await fetch(NEON_REST + 'rpc/get_product_pages', { signal: AbortSignal.timeout(30000) });
 if (!res.ok) {
-  console.error('Could not read the catalog:', res.status, await res.text());
+  console.error('Could not read the Neon catalog:', res.status, await res.text());
   process.exit(1);
 }
 const rows = await res.json();
+if (!Array.isArray(rows)) throw new Error('Neon catalog returned an invalid response');
+
 const label = (p) => `${p.name}${p.variant_label ? ' (' + p.variant_label + ')' : ''}`;
 const norm = (p) => `${p.name || ''} ${p.variant_label || ''}`.toLowerCase().replace(/[^a-z0-9]/g, '');
 const hasImg = (p) => Array.isArray(p.images) ? p.images.length > 0 : !!p.images;
