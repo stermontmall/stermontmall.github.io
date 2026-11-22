@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#5b21b6">
+<title>Stermont Arcade — Temporary Neon Admin</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#211936;background:#f7f5fb}*{box-sizing:border-box}body{margin:0}header{background:#321064;color:white;padding:16px max(16px,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px}main{max-width:1100px;margin:24px auto;padding:0 16px}.card{background:#fff;border:1px solid #e7e1f1;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px #2410440a}h1{font-size:18px;margin:0}h2{font-size:20px;margin:0 0 12px}.muted{color:#716982;font-size:14px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}label{display:block;font-weight:650;font-size:13px;margin:10px 0 5px}input,textarea,select{width:100%;padding:11px;border:1px solid #d9d2e5;border-radius:9px;font:inherit;background:white}textarea{min-height:120px;resize:vertical}.wide{grid-column:1/-1}button{border:0;border-radius:9px;background:#6d28d9;color:white;padding:11px 16px;font:inherit;font-weight:650;cursor:pointer}button.secondary{background:#eee9f6;color:#30234a}button:disabled{opacity:.55}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.status{padding:10px 12px;border-radius:9px;background:#f0ebf8;margin:10px 0;white-space:pre-wrap}.ok{background:#e6f7ec;color:#176536}.err{background:#fff0f0;color:#a11}.hidden{display:none!important}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:10px;border-bottom:1px solid #eee;vertical-align:top}th{color:#655b76}.pill{display:inline-block;border-radius:30px;padding:3px 8px;background:#eee9f6;font-size:12px}.pill.draft{background:#fff3d7;color:#805300}.pill.live{background:#e3f8e9;color:#176536}@media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}main{margin:14px auto;padding:0 12px}.card{padding:14px}}
+</style></head>
+<body>
+<header><h1>Stermont Arcade · Temporary Admin</h1><button id="logout" class="secondary hidden">Forget admin key</button></header>
+<main>
+<section id="login" class="card"><h2>Admin access</h2><p class="muted">Enter the temporary private admin key. It is held only in this browser tab and sent over HTTPS to the Neon API.</p><label for="key">Admin key</label><input id="key" type="password" autocomplete="current-password"><div class="row" style="margin-top:12px"><button id="connect">Connect</button></div><div id="loginmsg" class="status hidden"></div></section>
+<div id="app" class="hidden">
+<div class="card"><div class="row" style="justify-content:space-between"><div><h2>Neon catalogue</h2><div class="muted">New products are saved as drafts. No product goes live until its exact image and SEO content are checked.</div></div><button id="refresh" class="secondary">Refresh catalogue</button></div><div id="notice" class="status hidden"></div></div>
+<section class="card"><h2>Add a product draft</h2>
+<form id="productform" class="grid">
+<div><label>Product name *</label><input name="name" required placeholder="Exact product name and pack size"></div>
+<div><label>Slug</label><input name="slug" placeholder="Generated from product name if blank"></div>
+<div><label>Category</label><select name="category_id" id="category"><option value="">Choose category</option></select></div>
+<div><label>Baseline cost (KES) *</label><input name="cost" type="number" min="1" step="0.01" required></div>
+<div><label>Pack size / unit</label><input name="unit" placeholder="e.g. 1 litre, 500 ml, 20 litres"></div>
+<div><label>Product code</label><input name="product_code" placeholder="Permanent unique code"></div>
+<div><label>Variant group</label><input name="variant_group" placeholder="Optional shared group identifier"></div>
+<div><label>Variant label</label><input name="variant_label" placeholder="e.g. 500 ml"></div>
+<div class="wide"><label>ImageKit photo URL</label><input name="image" type="url" placeholder="https://ik.imagekit.io/..."></div>
+<div class="wide"><label>Product description / buyer guide</label><textarea name="description" placeholder="Use the approved seven-section format. Target 800+ useful, verified words."></textarea><div class="muted" id="wordcount">0 words</div></div>
+<div><label>SEO meta title</label><input name="meta_title"></div>
+<div><label>SEO meta description (max 160 chars)</label><input name="meta_description" maxlength="160"></div>
+<div class="wide"><label>Image alt text</label><input name="alt_text"></div>
+<div class="wide row"><button type="submit" id="save">Save as draft in Neon</button><span class="muted">Price is calculated from the approved four-tier KES rule.</span></div>
+</form></section>
+<section class="card"><h2>Products</h2><div class="tablewrap"><table><thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Status</th><th>Photos</th></tr></thead><tbody id="products"><tr><td colspan="5" class="muted">Connect to load products.</td></tr></tbody></table></div></section>
+<section class="card"><h2>Categories</h2><form id="categoryform" class="row"><input name="name" required placeholder="New category name" style="flex:1;min-width:180px"><input name="slug" placeholder="slug (optional)" style="flex:1;min-width:140px"><button>Add category</button></form></section>
+</div></main>
+<script>
+(function(){
+'use strict';
+const API='https://br-fancy-bird-bh01xcbs-storeapi.compute.c-10.eu-central-1.aws.neon.tech';
+const $=s=>document.querySelector(s), keyStore='stm.neon.admin.key';
+let key=sessionStorage.getItem(keyStore)||'';
+function msg(el,text,ok){el.textContent=text;el.className='status '+(ok?'ok':'err');el.classList.remove('hidden')}
+function authHeaders(){return {'Content-Type':'application/json','X-Admin-Key':key}}
+async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{...authHeaders(),...(opts.headers||{})}});const d=await r.json().catch(()=>({error:'Invalid API response'}));if(!r.ok)throw new Error(d.error||('HTTP '+r.status));return d}
+function words(s){return String(s||'').trim().split(/\s+/).filter(Boolean).length}
+function updateWords(){$('#wordcount').textContent=words($('[name=description]').value)+' words'}
+$('[name=description]').addEventListener('input',updateWords);
+function price(cost){const c=Number(cost),m=c<20000?1.30:c<=39999?1.25:c<=60000?1.20:1.175;return Math.max(200,Math.round(Math.max(c*m,c*1.15)/50)*50)}
+async function load(){
+ const [cats,prods]=await Promise.all([api('/api/categories'),api('/api/admin/products')]);
+ $('#category').innerHTML='<option value="">Choose category</option>'+cats.map(c=>'<option value="'+c.id+'">'+esc(c.name)+'</option>').join('');
+ $('#products').innerHTML=prods.length?prods.map(p=>'<tr><td><b>'+esc(p.name)+'</b><br><span class="muted">'+esc(p.slug)+'</span><br><span class="muted">'+esc(p.product_code||'No product code')+'</span></td><td>KSh '+Number(p.price).toLocaleString('en-KE')+'</td><td>'+p.stock+'</td><td><span class="pill '+(p.active?'live':'draft')+'">'+(p.active?'Live':'Draft')+'</span></td><td>'+((p.images||[]).length)+' photo(s)</td></tr>').join(''):'<tr><td colspan="5" class="muted">No products yet. Add the first product draft above.</td></tr>';
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function connected(){ $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#logout').classList.remove('hidden');load().catch(e=>{msg($('#notice'),e.message,false)})}
+$('#connect').onclick=async()=>{key=$('#key').value.trim();if(!key)return;sessionStorage.setItem(keyStore,key);try{await api('/api/admin/products');connected()}catch(e){sessionStorage.removeItem(keyStore);key='';msg($('#loginmsg'),e.message,false)}};
+$('#logout').onclick=()=>{sessionStorage.removeItem(keyStore);key='';location.reload()};
+$('#refresh').onclick=()=>load().catch(e=>msg($('#notice'),e.message,false));
+$('#productform').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),cost=Number(f.get('cost'));const image=String(f.get('image')||'').trim();if(image&&!/^https:\/\/ik\.imagekit\.io\//i.test(image)){msg($('#notice'),'Use a valid HTTPS ImageKit URL for product photos.',false);return}
+const b={name:f.get('name'),slug:f.get('slug'),category_id:f.get('category_id')||null,cost,unit:f.get('unit'),product_code:f.get('product_code')||null,variant_group:f.get('variant_group')||null,variant_label:f.get('variant_label')||null,images:image?[image]:[],description:f.get('description'),meta_title:f.get('meta_title'),meta_description:f.get('meta_description'),alt_text:f.get('alt_text')};
+$('#save').disabled=true;try{const p=await api('/api/admin/products',{method:'POST',body:JSON.stringify(b)});msg($('#notice'),'Saved draft: '+p.name+' · calculated price KSh '+Number(p.price).toLocaleString('en-KE')+'. It is not live yet.',true);e.currentTarget.reset();updateWords();await load()}catch(err){msg($('#notice'),err.message,false)}finally{$('#save').disabled=false}};
+$('#categoryform').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{await api('/api/admin/categories',{method:'POST',body:JSON.stringify({name:f.get('name'),slug:f.get('slug')})});e.currentTarget.reset();await load();msg($('#notice'),'Category added.',true)}catch(err){msg($('#notice'),err.message,false)}};
+if(key){$('#key').value=key;connected()}
+})();
+</script></body></html>
