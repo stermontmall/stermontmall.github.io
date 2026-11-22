@@ -1614,13 +1614,13 @@ try { if (localStorage.getItem('stm_handoff')) { document.documentElement.classN
     d.style.cssText = 'position:fixed;left:8px;right:8px;top:8px;z-index:99999;background:#7c2d12;color:#fff;padding:12px 14px;border-radius:10px;font:600 14px/1.4 system-ui,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3)';
     d.textContent = text + ' (tap to close)'; d.onclick = function () { d.remove(); }; document.body.appendChild(d);
   }
-  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+  var NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
   var wanted = items.map(function (i) { return String(i && i.rowId || ''); }).filter(function (id) { return /^[a-z0-9][a-z0-9-]{0,120}$/i.test(id); });
   var fast = Promise.resolve(false);
   if (wanted.length && wanted.length === items.length) {
-    var url = SB + '/rest/v1/products?active=eq.true&id=in.%28' + wanted.map(encodeURIComponent).join('%2C') + '%29&select=id,name,price,stock,images';
+    var url = NEON_REST + 'rpc/get_products_by_ids';
     var fastCtl = window.AbortController ? new AbortController() : null, fastTimer = setTimeout(function () { if (fastCtl) fastCtl.abort(); }, 8000);
-    fast = fetch(url, { headers: { apikey: KEY }, cache: 'no-store', credentials: 'omit', signal: fastCtl ? fastCtl.signal : undefined }).then(function (r) {
+    fast = fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_ids: wanted }), cache: 'no-store', credentials: 'omit', signal: fastCtl ? fastCtl.signal : undefined }).then(function (r) {
       clearTimeout(fastTimer); if (!r.ok) throw new Error('Product lookup ' + r.status); return r.json();
     }).then(function (rows) {
       if (!Array.isArray(rows)) throw new Error('Invalid product response');
