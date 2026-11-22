@@ -1,6 +1,6 @@
 
 ### 2026-11-22 PR / CI checkpoint
-- Opened PR #1026: https://github.com/stermontmall/stermontmall.github.io/pull/1026 (head 4b9d83bf4d367f18bd3fcc4b49c1213e498eee5).
+- Opened PR #1026: https://github.com/stermontmall/stermontmall.github.io/pull/1026.
 - GitHub Actions started: Full mobile-shell route regression run 45002208966 and SEO pull request quality gate run 45002208943. At checkpoint both browser-suite steps were still running; no result has been claimed.
 - Exact validation to inspect next: fetch jobs for run IDs 45002208966 and 45002208943; if either browser test fails, fetch job logs and fix before merge. If the SEO gate later fails only at the product build because REST returns 402, record that separately from the product fallback regression.
 
@@ -609,3 +609,5 @@ The Build product pages GitHub Actions workflow is scheduled every 30 minutes; t
 - Done: PR #989 failed route-regression because committed /p/ and /c/ pages had no shell-route-loader. Ran `node seo-shell-redirect.mjs` and pushed the result to the PR branch (commit 2f723e7). All PR #989 checks are green.
 - NOTE: that commit touches generated pages (p/, c/); product-pages.yml regenerates them anyway after merge.
 - Next: owner merges #989 and #991, then `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`, then open /p/darvin-50ew-insecticide-28-ml.html on a phone and confirm the full shell loads. #987 duplicates #989 and can be closed.
+
+- The handoff-only checkpoint advanced the PR branch head after the first CI start; the SEO gate run 45002208943 was cancelled during that update, and route run 45002208966 was still executing against the earlier code-identical app/test state. A final app-path commit is being pushed to retrigger both workflows against the latest PR head; merge only after those final-head runs complete.
