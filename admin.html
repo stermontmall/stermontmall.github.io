@@ -531,12 +531,12 @@
       if (needsCode) { patch.pay_code = code; patch.pay_amount = amt; }
       if (patch.status) { patch.handled_by = action === 'pending' ? null : (sess.email || null); patch.handled_at = action === 'pending' ? null : new Date().toISOString(); }
       ready().then(function () { return api('/rest/v1/orders?ref=eq.' + encodeURIComponent(o.ref) + '&select=ref,status', { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: patch }); })
-        .then(function (r) { if (!r.ok) throw r.status; return r.json(); })
+        .then(function (r) { if (!r.ok) { var error = new Error('Order update failed.'); error.status = r.status; throw error; } return r.json(); })
         .then(function (rows) {
           if (!rows.length) throw 0; $('cf').hidden = true;
           var rpc = (action === 'approve') ? 'record_sale' : (action === 'pending' && o.status === 'paid') ? 'reverse_sale' : null;
           var done = rpc ? ready().then(function () { return api('/rest/v1/rpc/' + rpc, { method: 'POST', body: { p_ref: o.ref } }); })
-            .then(function (r) { if (!r.ok) throw 0; }).catch(function () { note('Order updated, but the sales ledger could not be updated. Run setup-catalog.sql and setup-catalog-2.sql in Supabase.', false); })
+            .then(function (r) { if (!r.ok) { var error = new Error('Sales ledger update failed.'); error.status = r.status; throw error; } }).catch(function (error) { note(error && error.status ? adminErrorMessage(error) : 'Order updated, but the sales ledger could not be updated. Please investigate the ledger operation before retrying.', false); })
             .then(fetchOrders) : fetchOrders();
           if (action === 'approve') {
             var paid = Object.assign({}, o, { status: 'paid', handled_at: new Date().toISOString(), pay_code: code, pay_amount: amt });
@@ -549,10 +549,10 @@
         })
         .catch(function (e) {
           $('cf').hidden = true; var er = $('aerr');
-          if (e === 401) { sess = null; save(null); show('login'); var le = $('lerr'); le.textContent = 'Your session expired. Please sign in again.'; le.hidden = false; return; }
+          if (e === 401 || (e && e.status === 401)) { sess = null; save(null); show('login'); var le = $('lerr'); le.textContent = 'Your admin session has expired or been revoked. Please sign in again.'; le.hidden = false; return; }
           er.textContent = e === 409 ? 'That M-Pesa code is already used on another order.'
             : (e === 400 && needsCode) ? 'Could not save the payment code. Run setup-receipts.sql in Supabase first.'
-            : 'Could not update the order. You may not have staff access.';
+            : adminErrorMessage(e);
           er.hidden = false;
         });
     };
