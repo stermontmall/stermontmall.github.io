@@ -10,6 +10,7 @@ Decision (2026-11-23): remove ALL Supabase from the site, with no replacement, n
 ## This cleanup commit
 - Removed `removed/daraja-20261112/` and its six files (including the archived setup SQL).
 - Removed `.github/workflows/keep-supabase-alive.yml`; it only existed to ping the deleted project.
+- Deleted the remaining root Supabase SQL setup scripts: `setup-admin-extras.sql`, `setup-chat.sql`, `setup-client-quotations.sql`, `setup-search.sql`, and `setup-service-quotes.sql`.
 
 ## Remaining work — inventory and removal in progress
 - Repo-wide branch-specific content scan for: `supabase`, `sb_publishable`, `oewvtbnmyombbtggamor`, `sb-*-auth-token`, `createClient`, `/functions/v1/`, and `/rest/v1/`.
