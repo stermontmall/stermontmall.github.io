@@ -63,4 +63,26 @@ Date: 2026-11-22. Status: NOT safe to merge yet.
 - Open one Supabase Storage product image through https://ik.imagekit.io/w6hxfnwmw/supabase/tr:w-480,q-75,f-auto/<storage image URL> in a browser; only a GitHub Pages photo has been confirmed through the proxy so far.
 - Not changed, harmless: storefront-live.js renderThumbs() assigns t.onerror twice, so the first (retry the original) is overwritten by the second (drop the thumbnail); the window-level listener in imagekit-url.js normally handles the retry first.
 
-- 2026-11-22: PR #1030 merged (dc89ec4b): product descriptions fall back to the published /p/ page when Supabase REST returns 402; app.js v=46. Outage cause: Supabase exceed_cached_egress_quota; see HANDOFF-live.md.
+- 2026-11-22: PR #1030 merged (dc89ec4b): product descriptions fall back to the published /p/ page when Supabase REST returns 402 (app.js v=46). Outage cause: Supabase exceed_cached_egress_quota; see HANDOFF-live.md.
+
+---
+
+# PR #1037 (feat/neon-temporary-admin-2026-11-22): repair of mobile-shell/shell.test.py
+
+Date: 2026-11-22.
+
+## Problem
+mobile-shell/shell.test.py on the PR branch was corrupted: many line breaks were collapsed, so code ended up inside `#` comments or glued onto the previous statement (e.g. `pack_card = ...    check(...)`), and the file was cut off in the middle of the c18 test (no closing checks, `b.close()` or `sys.exit`). That makes the `validate` and `route-regression` jobs fail on a syntax error rather than on the Neon change itself.
+
+## Done
+- Rebuilt shell.test.py from main's version, keeping the PR's intent: `on_neon` mock for /api/products and /api/categories (pagination via limit/offset, one-row details via ?id=), Neon routes registered in mock_network, Supabase REST fixtures kept for generated SEO-page checks.
+- on_neon honours FAIL[0] (HTTP 503) so the retry-link and published-page-fallback tests exercise the Neon API being down instead of Supabase 402.
+- The held first catalogue request now parks `**/api/products*` and is released with on_neon.
+- One-row details mock now uses real newlines (`\n`) like main, not a literal backslash-n.
+- Not run: no Playwright/network in the session; CI is the first real run.
+
+## Left
+- Watch `validate` and `route-regression` on this commit; if a test fails, the first failing assertion is the next fix.
+- PR description says the Supabase storefront is untouched, but mobile-shell/app.js now reads the catalogue from the Neon Store API (host in NEON_API) and index.html's catalogue prefetch block still targets Supabase URLs (only its comment changed). Decide whether the storefront switch belongs in this PR; the prefetch hand-off to app.js will no longer match the new URLs.
+- neon-admin.html imports https://esm.sh/@neon/auth without a pinned version.
+- Owner's Neon Auth account still has to be approved in admin_profiles before the admin works.
