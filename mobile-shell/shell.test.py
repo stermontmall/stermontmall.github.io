@@ -97,8 +97,7 @@ def mock_network(ctx):
     ctx.add_init_script("window.shellProductLink = s => location.origin + '/?product=' + encodeURIComponent(s);")
     ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/?product=' + encodeURIComponent(v) : '/'); };"))
     def serve_product_page(rt):
-        # Match the requested fixture slug to the generated SEO page's early shell bootstrap.        # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
-        match = re.search(r'/p/([^/?#]+)\.html', rt.request.url)
+        # Match the requested fixture slug to the generated SEO page's early shell bootstrap.        # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.        match = re.search(r'/p/([^/?#]+)\.html', rt.request.url)
         slug = match.group(1) if match else ''
         page = re.sub(r'(var p=)["\'][^"\']*["\']', lambda m: m.group(1) + json.dumps(slug), REAL, count=1)
         page = run_node('inject', page, slug)
@@ -196,9 +195,9 @@ with sync_playwright() as p:
     pg.wait_for_timeout(200)
     check('broken photo falls back to the neutral unavailable-photo label', pg.locator('#grid .card[data-id="outdoor-broken"] img').count() == 0 and pg.locator('#grid .card[data-id="outdoor-broken"] .photo-unavailable').count() == 1)
     pg.evaluate("document.querySelector('#chips [data-chip=\\\"home-living\\\"]').click()")
-    pg.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)    pg.wait_for_function("document.querySelector('#grid .card[data-id=\\\"garden-set\\\"]')?.textContent.includes('4 sizes')", timeout=10000)
-    pack_card = pg.locator('#grid .card[data-id="garden-set"]')
-    check('pack sizes fold into ONE card with a From price', pack_card.count() == 1 and 'From KSh 390' in pack_card.inner_text() and '4 sizes' in pack_card.inner_text(), pack_card.inner_text() if pack_card.count() else 'card missing')
+    pg.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
+    pg.wait_for_function("document.querySelector('#grid .card[data-id=\\\"garden-set\\\"]')?.textContent.includes('4 sizes')", timeout=10000)
+    pack_card = pg.locator('#grid .card[data-id="garden-set"]')    check('pack sizes fold into ONE card with a From price', pack_card.count() == 1 and 'From KSh 390' in pack_card.inner_text() and '4 sizes' in pack_card.inner_text(), pack_card.inner_text() if pack_card.count() else 'card missing')
     pg.locator('#chips [data-chip="all"]').click()
     pg.wait_for_selector('#grid .card[data-id]')
     pg.wait_for_timeout(300)
@@ -297,8 +296,7 @@ with sync_playwright() as p:
     check('grid shows only that category', names and set(names) == {'phone'}, set(names))
 
     # tabs + history    h1 = pg.evaluate('history.length')
-    pg.locator('#bottom-nav [data-tab="categories"]').click()
-    check('Categories tab active (aria-current)', pg.locator('#bottom-nav [data-tab="categories"][aria-current="page"]').count() == 1 and pg.locator('#view-categories').is_visible())
+    pg.locator('#bottom-nav [data-tab="categories"]').click()    check('Categories tab active (aria-current)', pg.locator('#bottom-nav [data-tab="categories"][aria-current="page"]').count() == 1 and pg.locator('#view-categories').is_visible())
     check('leaving Home pushed an entry for the tab', pg.evaluate('history.state.tab') == 'categories')
     check('chips hidden off Home', not pg.locator('#chips-wrap').is_visible())
     pg.screenshot(path=f'{OUT}/shot-categories.png')
@@ -397,8 +395,7 @@ with sync_playwright() as p:
     check('home page keeps the SEO head (brand-first title, canonical, index robots, JSON-LD)', re.search(r'<title>Stermont Arcade \|[^<]*</title>', html) and 'rel="canonical" href="https://stermontarcade.co.ke/"' in html and 'index, follow' in html and html.count('application/ld+json') >= 2 and 'noindex' not in html)
     check('home page carries the seo-links markers the build bot fills (crawlable category + product links)', html.count('<!-- seo-links:start -->') == 1 and html.count('<!-- seo-links:end -->') == 1 and '/c/' in html and '?product=' in html)    cls = open(os.path.join(ROOT, 'classic.html'), encoding='utf-8').read()
     chk = open(os.path.join(ROOT, 'checkout.html'), encoding='utf-8').read()
-    check('checkout.html (the checkout surface) is noindex so only / is indexed', 'content="noindex, follow"' in chk and 'index, follow, max-image' not in chk)
-    check('classic.html is only a tiny forwarder: noindex, no shop code, no script files', len(cls) < 3000 and 'content="noindex, follow"' in cls and '<script src' not in cls, len(cls))
+    check('checkout.html (the checkout surface) is noindex so only / is indexed', 'content="noindex, follow"' in chk and 'index, follow, max-image' not in chk)    check('classic.html is only a tiny forwarder: noindex, no shop code, no script files', len(cls) < 3000 and 'content="noindex, follow"' in cls and '<script src' not in cls, len(cls))
 
     def chain(path):   # every address the main frame passes through, in order
         cx = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cx)
@@ -497,8 +494,7 @@ with sync_playwright() as p:
     p9.on('pageerror', lambda e: e9.append(str(e)))    p9.goto(URL); p9.wait_for_selector('#grid .card[data-id]')
     p9.locator('#chips [data-chip="home-living"]').click()
     p9.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
-    p9.wait_for_selector('#grid .card[data-id="garden-set"]', timeout=10000)
-    base_title = p9.title()
+    p9.wait_for_selector('#grid .card[data-id="garden-set"]', timeout=10000)    base_title = p9.title()
     check('address: selected Home & Living category keeps its clean category address', p9.evaluate('location.pathname + location.search') == '/c/home-living.html', p9.url)
     p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#page-product.open')
     check('address: tapping a product opens the full product page in the shell', p9.evaluate("location.pathname === '/' && new URLSearchParams(location.search).has('product')") and 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text(), p9.url)
@@ -597,8 +593,7 @@ with sync_playwright() as p:
     c13 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c13)
     p13 = c13.new_page(); e13 = []; p13.on('pageerror', lambda e: e13.append(str(e)))
     bad = []
-    for nm in PAGES:
-        p13.goto(f'{BASE}/{nm}.html'); p13.wait_for_selector('#stm-nav', state='attached', timeout=10000)
+    for nm in PAGES:        p13.goto(f'{BASE}/{nm}.html'); p13.wait_for_selector('#stm-nav', state='attached', timeout=10000)
         ok = p13.locator('#stm-bar').is_visible() and p13.locator('#stm-nav a').count() == 5 and p13.locator('body > header').first.is_hidden() and p13.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
         if not ok: bad.append(nm)
     check('static pages: every page shows the shell top bar + bottom nav on a phone, its own header is hidden, no sideways scroll', not bad, bad)
@@ -697,8 +692,7 @@ with sync_playwright() as p:
     check('a fresh visit still starts on For you', p16.locator('#grid-title').inner_text() == 'Recommended for you')
     c16.close()
 
-    # Published SEO product pages are the read-only fallback when Supabase REST is restricted.
-    c17 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c17)
+    # Published SEO product pages are the read-only fallback when Supabase REST is restricted.    c17 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c17)
     FAIL[0] = True  # simulate the Supabase 402 quota restriction for every REST request
     fallback_html = '''<!doctype html><html><head><meta name="stm-id" content="static-fallback"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Static Fallback Sprayer","image":["https://img.test/ok.png"],"sku":"STM-TEST-402","offers":{"@type":"Offer","priceCurrency":"KES","price":1234,"availability":"https://schema.org/InStock"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"http://test/"},{"@type":"ListItem","position":2,"name":"Garden Tools","item":"http://test/c/garden-tools.html"},{"@type":"ListItem","position":3,"name":"Static Fallback Sprayer","item":"http://test/p/static-fallback.html"}]}</script></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Published description survives a database outage.</p></section></div></body></html>'''
     c17.route('**/p/static-fallback.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=fallback_html))
