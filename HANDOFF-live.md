@@ -1,4 +1,16 @@
 
+## 2026-11-22 17:20 (Africa/Nairobi) — PRIORITY: permanent product photo restoration (branch wip-product-photos-restore-20261122)
+
+### Findings (Supabase SQL, 17:05)
+- products.images: 1,621 images / 1,481 products (1,459 active) exist ONLY as Supabase Storage URLs (bucket product-images: 1,693 objects, 211.7 MB). 172 images / 161 products are on GitHub Pages (product-photos/). 4 are third-party ImageKit hotlinks (girnar). 208 images / 111 products are third-party hotlinks (wikimedia 52, sokowise 15, ...). 90 products have no images (0 active).
+- Copy workflow (#1023) ran once: run 44998826030, dry run, FAILED reading the catalogue with HTTP 402 => 0 found / 0 uploaded / 0 skipped / 0 missing / 0 failed. Nothing was copied to ImageKit by it.
+- Sandbox cannot reach ik.imagekit.io, stermontmall.github.io or supabase.co (proxy 403), so endpoint probing runs in GitHub Actions: workflow image-source-audit.yml (read-only).
+
+### Next
+1. Read the audit run artifact image-audit.json (gh api repos/stermontmall/stermontmall.github.io/actions/runs?branch=wip-product-photos-restore-20261122).
+2. Fix imagekit-url.js/app.js: never fall back to known-broken Supabase URL; photo-unavailable state; tests.
+3. Do not merge until tests pass.
+
 ## 2026-11-22 16:50 (Africa/Nairobi) — PR #1030 MERGED to main (merge commit dc89ec4b, 13:47:39Z); Supabase still 402
 
 ### Done

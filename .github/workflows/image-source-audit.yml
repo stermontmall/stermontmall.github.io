@@ -1,0 +1,24 @@
+# Read-only: probes every image URL referenced by the generated site and uploads image-audit.json.
+name: Image source audit
+on:
+  workflow_dispatch:
+  push:
+    branches: ['wip-product-photos-restore-*']
+    paths: ['scripts/audit-image-sources.mjs', '.github/workflows/image-source-audit.yml']
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - run: node scripts/audit-image-sources.mjs
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: image-audit
+          path: image-audit.json
