@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 const SITE = 'https://stermontarcade.co.ke';
 const mode = process.argv[2] || 'content';
 const dbUrl = process.env.NEON_DATABASE_URL;
-if (!dbUrl) { console.log('NEON_DATABASE_URL is not configured; Neon sync skipped. Add it as a GitHub Actions secret.'); process.exit(0); }
+if (!dbUrl) { console.error('NEON_DATABASE_URL is missing. Add it as a GitHub Actions secret; this automation must not report success without a Neon connection.'); process.exit(1); }
 const sql = neon(dbUrl);
 const read = p => existsSync(p) ? readFileSync(p, 'utf8') : '';
 const unescape = s => String(s || '').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
@@ -66,6 +66,11 @@ if (mode === 'content') {
       google_canonical=excluded.google_canonical,inspected_at=now(),raw=excluded.raw`;
   }
   console.log(`Neon Google indexing report stored: ${checked} checked, ${indexed} indexed, ${notIndexed} not indexed. Per-URL records cover URLs Google reported as not indexed.`);
+} else if (mode === 'sitemap') {
+  const rows = JSON.parse(read('google-sitemap-results.json') || '[]');
+  for (const r of rows) await sql`INSERT INTO public.google_sitemap_submissions (sitemap_url,http_status,response_text)
+    VALUES (${r.sitemap_url},${r.http_status},${r.response_text || ''})`;
+  console.log(`Neon sitemap submission history stored: ${rows.length} results.`);
 } else {
   throw new Error(`Unknown sync mode: ${mode}`);
 }
