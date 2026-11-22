@@ -1,3 +1,19 @@
+## 2026-11-22 16:45 (Africa/Nairobi) — "Site not working": root cause = Supabase HTTP 402 (quota/billing restriction)
+
+### Done
+- Branch `wip-site-not-working-20261122` created from main c12312d (note-only so far; no code changed).
+- Supabase project oewvtbnmyombbtggamor is ACTIVE_HEALTHY and the database is fine (1,828 products, 1,716 active, queried directly).
+- Supabase edge logs 2026-11-22 13:25-13:26 UTC show every public request failing with HTTP 402 (Payment Required): `/rest/v1/rpc/get_store_catalog`, `/rest/v1/categories`, and `/storage/v1/object/public/product-images/*` (product photos). Googlebot gets 402 too. OPTIONS preflights return 200, so the browser shows a generic failure.
+- This explains the spinner/blank shop, missing product photos, and the recent CI runs titled "Supabase REST is quota-restricted" and "admin Supabase outage" (branches wip-static-product-fallback-2026-11-22, fix-product-deep-links-static-fallback-2026-11-22, fix/admin-supabase-outage-2026-11-22).
+
+### Blocked (owner action, cannot be fixed in code)
+- Supabase org munfmuvialgwzxwgthtw is restricted for exceeding free-plan quota (or unpaid invoice). Owner must open Supabase Dashboard > Organization > Billing, check Usage (egress / storage egress), and upgrade to Pro or raise/disable the spend cap. Access normally returns shortly after the plan change.
+
+### Next
+1. After the owner fixes billing, re-check: query edge logs for 402 (`select event_message from logs where source='edge_logs' and event_message like '%| 402 |%' limit 5`); open https://stermontarcade.co.ke/ and one /?product= link.
+2. Reduce egress so it does not recur: product photos are served straight from Supabase Storage; PR #1022 ImageKit delivery (CDN in front of Storage) is the planned fix but `validate` and `route-regression` still fail on it. Read the first failing assertion in Actions and fix before merging.
+3. Review the static-fallback PRs (wip-static-product-fallback-2026-11-22, fix-product-deep-links-static-fallback-2026-11-22): they keep product links working during a 402, but CI was red; do not merge until green.
+
 ## 2026-11-21 08:59 (Africa/Nairobi) — Pricing admin merged; Pages deployed; product-page save blocker identified
 
 ### Done
