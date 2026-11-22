@@ -42,7 +42,7 @@ const ls = {
   set(k, v) { try { localStorage.setItem('shell.' + k, JSON.stringify(v)); } catch {} }
 };
 
-/* ---------- 1. Data: live Neon catalog ----------
+/* ---------- 1. Data: live Neon catalog (Supabase is retained only for legacy image URLs) ----------
    One fetch of every active product row + the category tree (small: ~225 rows). Pack sizes of one product are separate
    rows that share `variant_group`; they are folded into ONE card with a `sizes` list, each size carrying its own price.
    Names come from /product-names.json (the heading each product page shows, rebuilt with the site); if that file is
