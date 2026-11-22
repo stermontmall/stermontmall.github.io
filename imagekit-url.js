@@ -6,6 +6,11 @@
  *   before any gallery fallback in app.js / img-protect.js runs.
  * - Node (static page generator): only small card thumbnails (<= BUILD_MAX_WIDTH) are proxied. Large images
  *   feed Product JSON-LD, og:image, the image sitemap and the hero photo, so they keep the original URL.
+ * - Supabase Storage photos are NOT proxied yet (PROXY_SUPABASE below). ImageKit's Web Proxy only fetches from
+ *   origins added in the ImageKit dashboard, and https://oewvtbnmyombbtggamor.supabase.co has not been confirmed there
+ *   (a proxied Supabase photo returned "Not found" on 2026-11-22). Until it works, every Supabase photo would make one
+ *   failed ImageKit request before the original loads. After adding that origin to the "supabase" URL endpoint and
+ *   checking a proxied Supabase image in a browser, change PROXY_SUPABASE to true.
  */
 (function (root, factory) {
   var helper = factory(root);
@@ -14,6 +19,8 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
   var ENDPOINT = 'https://ik.imagekit.io/w6hxfnwmw/supabase';
   var PROXIED = /^https:\/\/ik\.imagekit\.io\/w6hxfnwmw\/supabase\/tr:[^\/]+\/(https?:\/\/.+)$/i;
+  var SUPABASE = /^https:\/\/[a-z0-9-]+\.supabase\.co\//i;
+  var PROXY_SUPABASE = false;
   var BUILD_MAX_WIDTH = 640;
   var inBrowser = !!(root && root.document);
 
@@ -27,6 +34,7 @@
     if (typeof source !== 'string' || !/^https?:\/\//i.test(source)) return source;
     // Never proxy an ImageKit URL again; it may already belong to this account or another CDN.
     if (/^https:\/\/ik\.imagekit\.io\//i.test(source)) return source;
+    if (!PROXY_SUPABASE && SUPABASE.test(source)) return source;
     var w = Math.max(1, Math.min(2400, Math.round(Number(width) || 800)));
     if (!inBrowser && w > BUILD_MAX_WIDTH) return source;
     return ENDPOINT + '/tr:w-' + w + ',q-75,f-auto/' + source;
