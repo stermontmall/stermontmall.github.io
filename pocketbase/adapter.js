@@ -18,7 +18,7 @@ async function api(url,options={}){
  if(!res.ok){const e=new Error(body.message||("PocketBase HTTP "+res.status));e.status=res.status;e.data=body.data;throw e;}
  return body;
 }
-function emit(event){for(const fn of listeners){try{fn(event,auth.record||null);}catch(e){console.error(e);}}}
+function emit(event){const session=auth.token?{access_token:auth.token,user:auth.record}:null;for(const fn of listeners){try{fn(event,session);}catch(e){console.error(e);}}}
 function fieldName(name){return name==="id"?"supabase_id":name;}
 function encodeFilter(filters){return filters.map(f=>{const k=fieldName(f.field);if(f.op==="__in")return "("+f.value.map(v=>k+" = "+(typeof v==="string"?JSON.stringify(v):String(v))).join(" || ")+")";const v=(f.value!==null&&typeof f.value==="object")?JSON.stringify(f.value):typeof f.value==="string"?JSON.stringify(f.value):String(f.value);return k+" "+f.op+" "+v;}).join(" && ");}
 function toQuery(q){
@@ -82,9 +82,9 @@ const authApi={
  getUser:async()=>({data:{user:auth.record||null},error:null}),
  signInWithPassword:async({email,password})=>{try{const r=await api("/api/collections/users/auth-with-password",{method:"POST",body:JSON.stringify({identity:email,password})});auth={token:r.token,record:r.record};persist();emit("SIGNED_IN");return {data:{user:r.record,session:{access_token:r.token,user:r.record}},error:null};}catch(error){return {data:{user:null,session:null},error};}},
  signUp:async({email,password,options={}})=>{try{const r=await api("/api/collections/users/records",{method:"POST",body:JSON.stringify({email,password,passwordConfirm:password,role:"customer",...(options.data||{})})});return {data:{user:r,session:null},error:null};}catch(error){return {data:{user:null,session:null},error};}},
- updateUser:async(data)=>{try{if(!auth.record?.id)throw new Error("Sign in first");const r=await api("/api/collections/users/records/"+auth.record.id,{method:"PATCH",body:JSON.stringify(data)});auth.record=r;persist();return {data:{user:r},error:null};}catch(error){return {data:{user:null},error};}},
+ updateUser:async(data)=>{try{if(!auth.record?.id)throw new Error("Sign in first");const payload={...data};if(payload.password&&!payload.passwordConfirm)payload.passwordConfirm=payload.password;const r=await api("/api/collections/users/records/"+auth.record.id,{method:"PATCH",body:JSON.stringify(payload)});auth.record=r;persist();return {data:{user:r},error:null};}catch(error){return {data:{user:null},error};}},
  signOut:async()=>{auth={token:"",record:null};persist();emit("SIGNED_OUT");return {error:null};},
- onAuthStateChange:callback=>{listeners.add(callback);return {data:{subscription:{unsubscribe:()=>listeners.delete(callback)}}};}
+ onAuthStateChange:callback=>{listeners.add(callback);callback("INITIAL_SESSION",auth.token?{access_token:auth.token,user:auth.record}:null);return {data:{subscription:{unsubscribe:()=>listeners.delete(callback)}}};}
 };
 const client={from:table=>new Query(table),auth:authApi,
  rpc:async()=>({data:null,error:new Error("RPCs are not implemented in the interim PocketBase adapter; use a server-side PocketBase hook for privileged operations.")}),
