@@ -1,3 +1,23 @@
+
+## 2026-11-22 — Product deep-link fallback for Supabase REST quota restriction
+
+### Done (on review branch)
+- Root cause confirmed: both the one-product deep-link lookup and the full catalogue load depend on Supabase REST; when REST returns HTTP 402 (exceed_cached_egress_quota), the product overlay never opens. The generated /p/<slug>.html pages remain published and contain Product JSON-LD, generated price, product code and full description.
+- Added a read-only fallback in mobile-shell/app.js: if the live product lookup fails or returns no row, fetch the matching published /p/<slug>.html, parse its Product/Breadcrumb JSON-LD and generated description, then open the same mobile-shell product view. When Supabase works, the live row path remains first choice. Static fallback details are held in memory only; no database writes or stale snapshot sync occur.
+- Added a Playwright regression case simulating Supabase HTTP 402 and asserting that the product page, price, product code and description still open from the published SEO page.
+- Bumped the mobile-shell app URL to ?v=45 in both index.html and shell-route-loader.js to avoid stale browser/service-worker copies.
+
+### In progress / validation
+- Branch: wip-static-product-fallback-2026-11-22.
+- GitHub Actions validation has not yet run; do not merge until the mobile-shell browser test and route/SEO checks pass.
+
+### Next
+1. Open a PR from wip-static-product-fallback-2026-11-22 into main and inspect CI.
+2. After CI passes, merge and verify all three customer product URLs in a real browser, including product photo, description and price.
+3. This fallback uses each already-published product page; products without a generated /p/ page still need the normal successful page build.
+
+### Blocked
+- Supabase REST quota restriction remains external to this code fix. The fallback restores read-only product viewing and does not restore live catalogue edits, cart/order writes or checkout API calls while REST remains restricted.
 ## 2026-11-21 08:59 (Africa/Nairobi) — Pricing admin merged; Pages deployed; product-page save blocker identified
 
 ### Done
