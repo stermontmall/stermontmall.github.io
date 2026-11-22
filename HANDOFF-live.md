@@ -584,3 +584,16 @@ The Build product pages GitHub Actions workflow is scheduled every 30 minutes; t
 - Done: PR #989 failed route-regression because committed /p/ and /c/ pages had no shell-route-loader. Ran `node seo-shell-redirect.mjs` and pushed the result to the PR branch (commit 2f723e7). All PR #989 checks are green.
 - NOTE: that commit touches generated pages (p/, c/); product-pages.yml regenerates them anyway after merge.
 - Next: owner merges #989 and #991, then `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`, then open /p/darvin-50ew-insecticide-28-ml.html on a phone and confirm the full shell loads. #987 duplicates #989 and can be closed.
+
+
+## 2026-11-22 — Interim PocketBase backend scaffold (branch: wip-pocketbase-interim-backend)
+- Added /pocketbase/setup.mjs: Node 20/no-dependency PocketBase v0.23+ schema bootstrap using _superusers auth and the collections API. It is designed to be idempotent and non-destructive; it does not delete collections or records.
+- Added /pocketbase/import.mjs and /pocketbase/csv.mjs: CSV import for categories, products, vouchers and orders; multiline/quoted CSV, Postgres arrays, JSONB, booleans and blank cells; batches of up to 50; 429 backoff; restart-safe upsert by original Supabase IDs; separate staff-only product_costs.
+- Added /pocketbase/csv.test.mjs for CSV parser edge cases.
+- Added /pocketbase/adapter.js: browser-side window.STM_DB Supabase-js-like subset and compatibility window.supabase.createClient() bridge. It is not loaded by the live site and no current caller files were edited.
+- Added /pocketbase/README.md with owner setup, security notes, CSV steps, account migration limitations, site cutover review list and return-to-Supabase procedure.
+- Security decisions: public products only when active; categories and slug redirects public-read; product_costs and vouchers staff-only; order creation blocks client-supplied workflow/payment/staff fields; customer order reads scoped to PocketBase user ID; reviews pending-on-create and approved-public; users cannot self-assign staff role or legacy Supabase user mapping.
+- Supabase cost is not copied into public products; importer writes it to product_costs. No Supabase records, Auth users, RLS policies, Storage objects, generated pages or workflows were changed.
+- Important account caveat: Supabase Auth password hashes/tokens are not imported. Staff accounts must be created manually. Existing order owners are preserved as supabase_user_id; customer visibility requires a verified PocketBase user mapping.
+- Validation status: code has not been run against PocketHost; no PB URL or credentials were supplied. Parser tests are committed but still need to be run locally with node pocketbase/csv.test.mjs. Setup, access rules, imports, storefront adapter compatibility and checkout remain unverified until tested against the actual instance.
+- Scope: this is a WIP scaffold only. The adapter is not activated, live site callers are unchanged, and the branch must not be merged until tests and a separate cutover review are complete.
