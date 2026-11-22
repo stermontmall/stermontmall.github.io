@@ -25,11 +25,19 @@ export function checkCatalogueCount({ active, baseline, allowSmall = false, minR
 }
 
 async function activeCount() {
-  const r = await fetch(NEON_REST + 'rpc/get_product_pages', { signal: AbortSignal.timeout(30000) });
-  if (!r.ok) throw new Error(`Could not count active Neon products: HTTP ${r.status}`);
-  const rows = await r.json();
-  if (!Array.isArray(rows)) throw new Error('Neon product count returned an invalid response');
-  return rows.length;
+  const pageSize = 200;
+  let count = 0;
+  for (let offset = 0; ; offset += pageSize) {
+    const r = await fetch(NEON_REST + 'rpc/get_product_pages', {
+      headers: { Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
+      signal: AbortSignal.timeout(30000)
+    });
+    if (!r.ok) throw new Error(`Could not count active Neon products: HTTP ${r.status}`);
+    const rows = await r.json();
+    if (!Array.isArray(rows)) throw new Error('Neon product count returned an invalid response');
+    count += rows.length;
+    if (rows.length < pageSize) return count;
+  }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
