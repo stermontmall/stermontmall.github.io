@@ -4,7 +4,7 @@
    checkout.html itself gives up after about 15 s, so this waits 16 s, then lifts the cover and shows a message with ways forward.
    It does nothing on any other page, and nothing when the checkout opened normally (the cover class is already gone by then).
 
-   SELF-HEAL: checkout.html looks the cart items up in Supabase ONCE. On a weak mobile connection that single request can
+   SELF-HEAL: checkout.html looks the cart items up in Neon ONCE. On a weak mobile connection that single request can
    fail or hang, and then the checkout gave up even though the products are fine. If the cart cards are still missing about
    2.5 s after the page loads, this script repeats the lookup (short timeout, up to 5 tries, inside the same 15 s window) and
    adds the same hidden cards, so checkout.html's own poll finds them and opens normally. Cards that already exist are never
@@ -17,7 +17,7 @@
     /* ---- self-heal: retry the cart lookup if the first one did not produce the cards ---- */
     try {
       (function () {
-        var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+        var NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
         var items; try { items = JSON.parse(localStorage.getItem('stm_handoff') || 'null'); } catch (e) { items = null; }
         if (!Array.isArray(items) || !items.length) return;
         var ids = items.map(function (i) { return String(i && i.rowId || ''); }).filter(function (id) { return /^[a-z0-9][a-z0-9-]{0,120}$/i.test(id); });
@@ -39,8 +39,8 @@
             var miss = missing(); if (!miss.length) return;                  /* all cards present: nothing to heal */
             if (++tries > 5 || Date.now() - t0 > 14000) return;
             var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function () { if (ctl) ctl.abort(); }, 6000);
-            var url = SB + '/rest/v1/products?active=eq.true&id=in.%28' + miss.map(encodeURIComponent).join('%2C') + '%29&select=id,name,price,stock,images';
-            fetch(url, { headers: { apikey: KEY }, cache: 'no-store', credentials: 'omit', signal: ctl ? ctl.signal : undefined }).then(function (r) {
+            var url = NEON_REST + 'rpc/get_products_by_ids';
+            fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_ids: miss }), cache: 'no-store', credentials: 'omit', signal: ctl ? ctl.signal : undefined }).then(function (r) {
               clearTimeout(to); if (!r.ok) throw new Error('Product lookup ' + r.status); return r.json();
             }).then(function (rows) {
               if (!Array.isArray(rows)) throw new Error('Invalid product response');
