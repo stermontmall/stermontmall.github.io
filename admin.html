@@ -177,6 +177,7 @@
 </div>
 
 <script src="receipt.js?v=13"></script>
+<script src="admin-http.js?v=1"></script>
 <script src="admin-suggest.js?v=1"></script>
 <script src="catalog-v10.js?v=15"></script>
 <script src="admin-extras.js?v=6"></script>
@@ -204,6 +205,12 @@
   var STAGES = ['packed', 'out_for_delivery', 'delivered'];
   function fmt(d) { try { return new Date(d).toLocaleString('en-KE'); } catch (e) { return ''; } }
   var LABEL = { pending: 'Pending', paid: 'Order confirmed ✅', declined: 'Declined' };
+  var pollBackoff = new STMAdminHttp.Backoff({ baseMs: 30000, maxMs: 300000 });
+  function adminErrorMessage(error) {
+    var info = STMAdminHttp.classifyStatus(error && error.status ? error.status : 0);
+    if (info.kind === 'quota') return 'Supabase quota exceeded (HTTP 402). Your admin session is preserved. Database-backed admin data and changes may be unavailable until Supabase restores access.';
+    return info.message;
+  }
 
   function $(id) { return D.getElementById(id); }
   function h(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
@@ -220,20 +227,26 @@
   }
   function setSession(j) { sess = { access_token: j.access_token, refresh_token: j.refresh_token, email: (j.user && j.user.email) || (sess && sess.email) || '', exp: Date.now() + (j.expires_in || 3600) * 1000 - 60000 }; save(sess); }
   function refresh() {
-    if (!sess || !sess.refresh_token) return Promise.reject();
+    if (!sess || !sess.refresh_token) return Promise.reject(new Error('No refresh token is available.'));
     return fetch(SB + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: sess.refresh_token }) })
-      .then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(setSession);
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (payload) {
+        if (!r.ok) { var error = new Error('Supabase token refresh failed.'); error.status = r.status; error.payload = payload; throw error; }
+        return payload;
+      }); }).then(setSession);
   }
-  /* One renewal at a time (several callers can ask at once; reusing a refresh token can revoke the session).
-     If the login cannot be renewed, go back to the sign-in screen instead of leaving dead buttons. */
+  /* Share one refresh request; only an explicit invalid-token response ends the session. */
   var renewing = null;
   function ready() {
     if (!(sess && Date.now() > sess.exp)) return Promise.resolve();
     if (!renewing) {
-      renewing = refresh().then(function () { renewing = null; }, function () {
-        renewing = null; sess = null; save(null); show('login');
-        var le = $('lerr'); if (le) { le.textContent = 'Your session expired. Please sign in again.'; le.hidden = false; }
-        throw new Error('expired');
+      renewing = refresh().then(function () { renewing = null; }, function (error) {
+        renewing = null;
+        if (STMAdminHttp.isInvalidSessionError(error)) {
+          sess = null; save(null); show('login');
+          var le = $('lerr'); if (le) { le.textContent = 'Your admin session has expired or been revoked. Please sign in again.'; le.hidden = false; }
+          throw new Error('expired');
+        }
+        throw error;
       });
     }
     return renewing;
@@ -244,33 +257,48 @@
   $('lf').addEventListener('submit', function (e) {
     e.preventDefault(); var b = $('lb'), er = $('lerr'); er.hidden = true; b.disabled = true; b.textContent = 'Signing in...';
     fetch(SB + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: $('em').value.trim(), password: $('pw').value }) })
-      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error('bad'); return j; }); })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (payload) {
+        if (!r.ok) { var error = new Error('Sign-in request failed.'); error.status = r.status; error.payload = payload; throw error; }
+        return payload;
+      }); })
       .then(function (j) { setSession(j); $('pw').value = ''; start(); })
-      .catch(function () { er.textContent = 'Could not sign in. Check your email and password.'; er.hidden = false; })
+      .catch(function (error) {
+        var kind = STMAdminHttp.classifyStatus(error && error.status ? error.status : 0).kind;
+        er.textContent = kind === 'quota' ? 'Supabase is quota-restricted (HTTP 402). Sign-in is temporarily unavailable; this is not a password or staff-setup error.'
+          : kind === 'unauthorized' ? 'Sign-in was rejected. Check your email and password.'
+          : kind === 'forbidden' ? 'Supabase denied this sign-in request (HTTP 403). Ask the site administrator to check project access.'
+          : adminErrorMessage(error);
+        er.hidden = false;
+      })
       .then(function () { b.disabled = false; b.textContent = 'Sign in'; });
   });
   $('out').addEventListener('click', function () { if (window.STMServices) STMServices.stop(); sess = null; save(null); show('login'); });
-  $('refresh').addEventListener('click', function () { q = ''; $('q').value = ''; fetchOrders(); if (window.STMServices) STMServices.badge(renderTabs); });
+  $('refresh').addEventListener('click', function () { q = ''; $('q').value = ''; fetchOrders(true); });
   setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && !D.hidden && EXTRA.indexOf(tab) < 0) fetchOrders(); }, 30000);
 
-  function fetchOrders() {
+  function fetchOrders(force) {
+    if (!force && pollBackoff.waiting()) return Promise.resolve();
     var er = $('aerr'); er.hidden = true;
     return ready().then(function () { return api('/rest/v1/orders?select=*&order=created_at.desc&limit=500'); })
       .then(function (r) {
         if (r.status === 401) throw new Error('expired');
-        if (!r.ok) throw new Error('load');
+        if (!r.ok) { var error = new Error('Could not load orders.'); error.status = r.status; throw error; }
         return r.json();
       })
       .then(function (rows) {
+        pollBackoff.success();
         orders = rows; window.STM_orders = rows;
         if (rows.length && !rows.some(function (o) { return o.status === 'pending' || o.status === 'paid' || o.status === 'declined'; })) {
           /* status column missing or no staff access */
         }
         render(); handleDeepLink();
+        if (window.STMServices) STMServices.badge(renderTabs);
       })
       .catch(function (e) {
         if (e && e.message === 'expired') { sess = null; save(null); show('login'); return; }
-        er.textContent = 'Could not load orders. Make sure setup.sql was run in Supabase and your email is in the staff table.'; er.hidden = false;
+        if (e && e.status === 401) { sess = null; save(null); show('login'); var le = $('lerr'); le.textContent = 'Your admin session has expired or been revoked. Please sign in again.'; le.hidden = false; return; }
+        pollBackoff.fail();
+        er.textContent = adminErrorMessage(e); er.hidden = false;
       });
   }
 
@@ -573,13 +601,13 @@
 
   function start() {
     show('app');
-    if (window.STMServices) { STMServices.onBadge = function () { renderTabs(); }; STMServices.badge(renderTabs); }   /* nav badge: new quote requests */
+    if (window.STMServices) { STMServices.onBadge = function () { renderTabs(); }; }   /* badge polling waits until the primary Supabase request succeeds */
     fetchOrders();
   }
   sess = load();
   if (sess) start(); else show('login');
   setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && EXTRA.indexOf(tab) < 0) fetchOrders(); }, 60000);
-  setInterval(function () { if (sess && !$('app').hidden && !D.hidden && tab !== 'quotes' && window.STMServices) STMServices.badge(renderTabs); }, 60000);
+  setInterval(function () { if (sess && !$('app').hidden && !D.hidden && tab !== 'quotes' && window.STMServices && !pollBackoff.waiting()) STMServices.badge(renderTabs); }, 60000);
 
   /* ---- signature pad ---- */
   (function () {
