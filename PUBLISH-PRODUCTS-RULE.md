@@ -21,7 +21,7 @@ If the owner says "publish products", "run the publish rule", or asks you to add
 
 ---
 
-## The rule (mirror of Neon `publish_products`, version 5: v3 rule plus the photo-sourcing addendum)
+## The rule (mirror of Neon `publish_products`, version 6: v3 rule plus the photo-sourcing addendum and photo policy v6)
 
 ```
 PUBLISH-PRODUCTS RULE v3 - FULLY AUTONOMOUS - PERMANENT STANDING INSTRUCTION
@@ -101,3 +101,18 @@ If no exact, qualifying photo can be verified, leave images empty, keep the prod
 
 VENDOR PHOTO FALLBACK CLARIFICATION (owner-approved 2026-11-22): Search manufacturer, authorized distributor, Kenyan vendor, and reputable retailer product pages for exact product/pack photos. A vendor listing is a discovery/source lead, not by itself a reuse license. Before copying, downloading, hotlinking, or storing an image, require written permission, an explicit reuse license, or clear platform terms authorizing commercial reuse. Record the source page, direct asset URL, permission/license evidence, retrieval date, dimensions, and exact-pack verification in product attributes/audit log. If permission is absent or unclear, request permission or use an authorized manufacturer/distributor asset; do not attach the image and do not activate the product. Never substitute search thumbnails, generated previews, similar products, or different pack sizes. All existing photo quality, regulatory, cost, SEO, and activation checks remain mandatory.
 ```
+
+
+## PHOTO POLICY v6 — supersedes the "Vendor photo fallback clarification" above (owner-approved 2026-11-22)
+
+Photos may be taken from the official manufacturer's or an authorized distributor's own product page for the exact product and exact pack size, to advertise that product for sale. No separate written permission is required for these sources.
+
+Not allowed as a photo source: retailer-only or competitor pages (Jumia, Kilimall, other shops), search-result thumbnails, AI-generated or stretched images, and any image carrying a competitor's name, logo, watermark or contact details. A retailer page is acceptable only when the image is clearly the manufacturer's or distributor's own asset.
+
+Record in attributes for every photo: `photo_source` (product page URL), `photo_asset_url`, `photo_basis` (`manufacturer` or `authorized_distributor`), `photo_retrieved_on`, `photo_dimensions`, and a short `pack_match_note`. Quality checks stay mandatory: at least 500 x 500 px, loads as a real image, and the visible brand, product and pack size match the listing. Store a copy at the configured image host (Neon Object Storage or ImageKit) at a stable public HTTPS URL; never a presigned URL. If a manufacturer or distributor objects, remove the image and set the product inactive.
+
+All other gates are unchanged: baseline cost, description and SEO, duplicate check, and the PCPB / veterinary registration check for pesticides, rodenticides and veterinary products. A found photo alone never activates a product.
+
+## GO-LIVE NOTE v6 (checked 2026-11-22)
+
+Neon is the database new products are posted to. The public storefront (`mobile-shell/app.js`) and the page generator (`generate-products.mjs`) still read Supabase, so `active = true` in Neon does not by itself show a product on the website. Do not switch the storefront to Neon until Neon holds the full live catalogue with images (about 1,700 active products at the time of writing; Neon held 7 inactive drafts), or the shop will go blank. That migration is a separate, tested PR.

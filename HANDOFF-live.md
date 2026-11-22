@@ -1,3 +1,20 @@
+## 2026-11-22 23:10 (Africa/Nairobi) — Rule `publish_products` is now v6 (photo policy); storefront switch to Neon NOT done
+
+### Owner decisions (2026-11-22)
+- Website source: switch the site to Neon (recommended option chosen). Photos: allow official manufacturer or authorized distributor images for the exact product and pack, recorded with source URL.
+
+### Done
+- Neon `publish_products` updated v5 -> v6 (v5 text backed up under key `publish_products_v5_backup`). v6 adds photo policy v6 (manufacturer/authorized-distributor images allowed without separate written permission; retailer-only, thumbnails, watermarked and generated images not allowed; attributes to record) and a go-live note. Cost, description/SEO, duplicate and PCPB gates are unchanged.
+- Mirrored in `PUBLISH-PRODUCTS-RULE.md`, `.claude/commands/post-product.md`; version reference updated in `CLAUDE.md`, `AGENTS.md`, `PUBLISHING.md`.
+
+### Finding: the site cannot be switched to Neon yet
+- Neon holds 7 products, 0 active; the live shop shows about 1,700 active Supabase products. `mobile-shell/app.js` and `generate-products.mjs` read only Supabase (no Neon reference). Switching now would blank the shop.
+- Needed first, as separate tested PRs: (1) copy the full catalogue, categories and product images from Supabase to Neon (Supabase Storage is under the 402 restriction); (2) add public read access in Neon (anonymous select on active products and categories only); (3) change the storefront, generator, ImageKit/photo URLs, index.html prefetch and `mobile-shell/shell.test.py` together; (4) only then merge.
+
+### Next
+1. Owner: confirm the migration plan above (needs Supabase readable once to export; billing or an owner-run export).
+2. Source the remaining 13 products into Neon as inactive drafts, with manufacturer/distributor photos recorded per policy v6.
+
 ## 2026-11-22 23:00 (Africa/Nairobi) — Owner decision: Neon only for now; Supabase not needed for about two weeks
 
 - Owner: "I am using Neon. I don't need Supabase for now. It will be used in two weeks." Do NOT chase Supabase billing (HTTP 402 `exceed_cached_egress_quota`) until about 2026-12-06. Products are posted to Neon only (project restless-shape-79120240).
