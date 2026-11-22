@@ -1,7 +1,7 @@
 # Headless-mobile test of the shell. Needs: pip install playwright && playwright install chromium
 # Run: python3 mobile-shell/shell.test.py   (screenshots go to the system temp folder)
 import re, sys, threading, http.server, socketserver, functools, os, tempfile, json, base64, time
-from urllib.parse import unquote, urlparse, parse_qs
+from urllib.parse import unquote
 from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root: the shell reads /product-names.json
@@ -15,8 +15,7 @@ threading.Thread(target=srv.serve_forever, daemon=True).start()
 URL = f'http://127.0.0.1:{port}/'
 
 
-# ---- Store API fixture: the shell talks to the Neon Store API in production; here its requests are answered locally.
-# The old Supabase REST fixtures are kept below only for the generated SEO-page checks. ----
+# ---- Supabase fixture: the shell talks to the real REST API in production; here the three requests it makes are answered locally ----
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 OK, BROKEN = 'https://img.test/ok.png', 'https://img.test/broken.jpg'
 CATS_FIX = [
@@ -52,25 +51,6 @@ DEALS_EXPECTED = 19
 def serve(route, body, ctype='application/json'):
     time.sleep(0.4)   # a real network round trip, so the skeleton state is observable
     route.fulfill(status=200, content_type=ctype, body=body if isinstance(body, (bytes, str)) else json.dumps(body), headers={'access-control-allow-origin': '*'})
-def on_neon(route):
-    """Mock the Neon Store API used by the current mobile shell (/api/categories, /api/products)."""
-    if FAIL[0]: return route.fulfill(status=503, body='neon_unavailable', headers={'access-control-allow-origin': '*'})
-    url = route.request.url
-    if '/api/categories' in url:
-        return serve(route, CATS_FIX)
-    if '/api/products' in url:
-        q = parse_qs(urlparse(url).query)
-        rid = (q.get('id') or [''])[0]
-        if rid:   # details of one row, fetched when a product is opened
-            r = next((x for x in ROWS if x['id'] == rid), None)
-            return serve(route, [] if not r else [dict(id=r['id'], slug=r['slug'], name=r['name'],
-                description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'],
-                low_at=5, images=[OK, OK], cover_image=OK, product_code=r['product_code'])])
-        rows = [dict(**r, cover_image=(r['images'][0] if r['images'] else '')) for r in ROWS]
-        limit = int((q.get('limit') or [len(rows)])[0])
-        offset = int((q.get('offset') or ['0'])[0])
-        return serve(route, rows[offset:offset + limit])
-    return serve(route, [])
 def on_rest(route):
     if FAIL[0]: return route.fulfill(status=402, body='exceed_cached_egress_quota', headers={'access-control-allow-origin': '*'})
     url = route.request.url
@@ -105,11 +85,7 @@ def mock_network(ctx):
         page = run_node('inject', page, slug)
         rt.fulfill(status=200, content_type='text/html', body=page)
     ctx.route('**/p/*.html*', serve_product_page)
-    # Current storefront uses the Neon Store API.
-    ctx.route('**/api/products*', on_neon)
-    ctx.route('**/api/categories*', on_neon)
-    # Retain the REST fixtures for generated SEO-page compatibility checks.
-    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)
+    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
     for host in ('https://www.googletagmanager.com/**', 'https://cdn.jsdelivr.net/**', 'https://www.google-analytics.com/**', 'https://*.google-analytics.com/**'):
@@ -173,7 +149,7 @@ with sync_playwright() as p:
     # A parked request leaves the shell waiting on the network while the test thread stays free. times=1 means every later request
     # (and every other test on this page) falls through to mock_network's normal handler; the shell fetches the catalogue only once per load.
     parked = []
-    pg.route('**/api/products*', lambda route: parked.append(route), times=1)
+    pg.route('**/rest/v1/rpc/get_store_catalog*', lambda route: parked.append(route), times=1)
     pg.goto(URL, wait_until='domcontentloaded')
     for _ in range(200):   # up to ~10 s for the shell to ask for the catalogue; it is then held, so no hydration can have happened yet
         if parked: break
@@ -181,7 +157,7 @@ with sync_playwright() as p:
 
     # Keep the server-rendered cards in place until the first live catalogue response arrives.
     check('SSR fallback cards remain visible while the live catalogue is loading', pg.locator('#grid .ssr-product-card').count() >= 6, pg.locator('#grid .ssr-product-card').count())
-    if parked: on_neon(parked.pop(0))   # release the held catalogue response: hydration may proceed now
+    if parked: on_rest(parked.pop(0))   # release the held catalogue response: hydration may proceed now
     pg.wait_for_selector('#grid .card[data-id]')
     check('live catalogue replaces SSR fallback cards after hydration', pg.locator('#grid .ssr-product-card').count() == 0)
     check('skeleton cards were shown while loading', pg.evaluate('window.__sawSkeleton'))
@@ -355,11 +331,11 @@ with sync_playwright() as p:
     check('reload while sheet open lands clean', pg.locator('#sheet-quickbuy.open').count() == 0)
     check('deals badge stays cleared after reload (nothing new since the visit to Deals)', pg.locator('#bottom-nav [data-badge="deals"]').is_hidden())
 
-    # Store API down: the grid offers a retry instead of hanging on skeletons, and recovers
+    # Supabase down: the grid offers a retry instead of hanging on skeletons, and recovers
     FAIL[0] = True
     p2 = ctx.new_page()
     # The previous page intentionally populated the catalogue prefetch cache. Remove it so
-    # this scenario exercises a real API outage instead of replaying cached products.
+    # this scenario exercises a real Supabase outage instead of replaying cached products.
     p2.add_init_script("localStorage.removeItem('shell.catalogPrefetch.v1')")
     p2.goto(URL)
     p2.wait_for_selector('#grid-empty:not([hidden])', timeout=8000)
@@ -709,29 +685,29 @@ with sync_playwright() as p:
     check('a fresh visit still starts on For you', p16.locator('#grid-title').inner_text() == 'Recommended for you')
     c16.close()
 
-    # Published SEO product pages are the read-only fallback when the database API is unavailable.
+    # Published SEO product pages are the read-only fallback when Supabase REST is restricted.
     c17 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c17)
-    FAIL[0] = True  # simulate the store API being unavailable for every data request
+    FAIL[0] = True  # simulate the Supabase 402 quota restriction for every REST request
     fallback_html = '''<!doctype html><html><head><meta name="stm-id" content="static-fallback"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Static Fallback Sprayer","image":["https://img.test/ok.png"],"sku":"STM-TEST-402","offers":{"@type":"Offer","priceCurrency":"KES","price":1234,"availability":"https://schema.org/InStock"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"http://test/"},{"@type":"ListItem","position":2,"name":"Garden Tools","item":"http://test/c/garden-tools.html"},{"@type":"ListItem","position":3,"name":"Static Fallback Sprayer","item":"http://test/p/static-fallback.html"}]}</script></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Published description survives a database outage.</p></section></div></body></html>'''
     c17.route('**/p/static-fallback.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=fallback_html))
     p17 = c17.new_page(); e17 = []; p17.on('pageerror', lambda e: e17.append(str(e)))
     p17.goto(f'{BASE}/?product=static-fallback'); p17.wait_for_selector('#page-product.open', timeout=15000); p17.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Published description survives')", timeout=5000)
-    check('product deep link opens from the published SEO page when the store API is unavailable', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
+    check('product deep link opens from the published SEO page when Supabase REST returns 402', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
     check('static fallback retains product code and full published description', 'STM-TEST-402' in p17.locator('#pp-meta').inner_text() and 'Published description survives a database outage.' in p17.locator('#pp-desc').inner_text())
     check('static product fallback has no JavaScript errors', not e17, e17[:3])
     FAIL[0] = False
     c17.close()
 
-    # Tapping a product card loads its description from the store API; when that is unavailable it must come from the card's published /p/ page instead.
+    # Tapping a product card loads its description over REST; with HTTP 402 it must come from the card's published /p/ page instead.
     c18 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c18)
     card_html = '''<!doctype html><html><head></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Card description comes from the published page.</p><ul><li>Second line item</li></ul></section></div><script type="application/ld+json">{"@type":"Product","offers":{"availability":"https://schema.org/InStock"}}</script></body></html>'''
     c18.route('**/p/home-1.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=card_html))
     p18 = c18.new_page(); e18 = []; p18.on('pageerror', lambda e: e18.append(str(e)))
     p18.goto(URL); p18.wait_for_selector('#grid .card[data-id="home-1"]')
-    FAIL[0] = True  # the store API now fails the details request
+    FAIL[0] = True  # Supabase REST now returns 402 for the details request
     p18.locator('#grid .card[data-id="home-1"]').click(); p18.wait_for_selector('#page-product.open', timeout=15000)
     p18.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Card description comes from the published page.')", timeout=8000)
-    check('tapping a card shows its description from the published page when the store API is unavailable', 'Card description comes from the published page.' in p18.locator('#pp-desc').inner_text() and 'Second line item' in p18.locator('#pp-desc').inner_text(), p18.locator('#pp-desc').inner_text()[:80])
+    check('tapping a card shows its description from the published page when Supabase REST returns 402', 'Card description comes from the published page.' in p18.locator('#pp-desc').inner_text() and 'Second line item' in p18.locator('#pp-desc').inner_text(), p18.locator('#pp-desc').inner_text()[:80])
     check('card-tap fallback marks the product in stock and shows no load error', 'In stock' in p18.locator('#pp-meta').inner_text() and 'Could not load' not in p18.locator('#pp-desc').inner_text(), p18.locator('#pp-meta').inner_text())
     check('card-tap description fallback has no JavaScript errors', not e18, e18[:3])
     FAIL[0] = False
