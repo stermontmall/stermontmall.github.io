@@ -511,7 +511,7 @@
         doneCode = ''; doneAmt = 0;
         var s = session(), method = form.method, code = cleanCode(), paid = Number(form.payAmt);
         if (!codeOk() || !amtOk(T)) { sending = false; sendErr = 'Enter your payment code and the amount you paid before placing the order.'; render(); return; }
-        var ref = newRef();
+        ref = newRef();
         var row = {
           ref: ref, customer_name: form.name.trim().slice(0, 120), phone: '+' + normPhone(form.phone),
           email: (form.email || '').trim().toLowerCase().slice(0, 150) || null,
