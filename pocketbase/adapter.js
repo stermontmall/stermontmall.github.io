@@ -20,7 +20,7 @@ async function api(url,options={}){
 }
 function emit(event){for(const fn of listeners){try{fn(event,auth.record||null);}catch(e){console.error(e);}}}
 function fieldName(name){return name==="id"?"supabase_id":name;}
-function encodeFilter(filters){return filters.map(f=>{const k=fieldName(f.field),v=(f.value!==null&&typeof f.value==="object")?JSON.stringify(f.value):typeof f.value==="string"?JSON.stringify(f.value):String(f.value);return k+" "+f.op+" "+v;}).join(" && ");}
+function encodeFilter(filters){return filters.map(f=>{const k=fieldName(f.field);if(f.op==="__in")return "("+f.value.map(v=>k+" = "+(typeof v==="string"?JSON.stringify(v):String(v))).join(" || ")+")";const v=(f.value!==null&&typeof f.value==="object")?JSON.stringify(f.value):typeof f.value==="string"?JSON.stringify(f.value):String(f.value);return k+" "+f.op+" "+v;}).join(" && ");}
 function toQuery(q){
  const p=new URLSearchParams();if(q.filter.length)p.set("filter",encodeFilter(q.filter));
  if(q.sort.length)p.set("sort",q.sort.map(x=>(x.desc?"-":"")+fieldName(x.field)).join(","));
@@ -46,7 +46,7 @@ class Query{
  lte(k,v){this.filter.push({field:k,op:"<=",value:v});return this;}
  like(k,v){this.filter.push({field:k,op:"~",value:v});return this;}
  ilike(k,v){this.filter.push({field:k,op:"~",value:v});return this;}
- in(k,values){this.filter.push({field:k,op:"?=",value:values});return this;}
+ in(k,values){this.filter.push({field:k,op:"__in",value:values});return this;}
  is(k,v){this.filter.push({field:k,op:v===null?"=":"=",value:v});return this;}
  order(k,{ascending=true}={}){this.sort.push({field:k,desc:!ascending});return this;}
  limit(n){this.limitValue=n;return this;}
