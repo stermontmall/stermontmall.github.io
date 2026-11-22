@@ -1,7 +1,21 @@
 // Fail the catalogue build when active products are missing essential SEO identity or page data.
 // This is a structural guard, not a claim that copy, prices, images or rankings are perfect.
-const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
-const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
+const PAGE_SIZE = 200;
+async function getActiveProducts() {
+  const rows = [];
+  for (let offset = 0; ; offset += PAGE_SIZE) {
+    const r = await fetch(NEON_REST + 'rpc/get_product_pages', {
+      headers: { Range: offset + '-' + (offset + PAGE_SIZE - 1), 'Range-Unit': 'items' },
+      signal: AbortSignal.timeout(30000)
+    });
+    if (!r.ok) throw new Error('Neon catalogue read failed: HTTP ' + r.status);
+    const batch = await r.json();
+    if (!Array.isArray(batch)) throw new Error('Neon catalogue returned a non-array response');
+    rows.push(...batch);
+    if (batch.length < PAGE_SIZE) return rows;
+  }
+}
 
 export function auditProducts(rows) {
   const errors = [], warnings = [];
@@ -24,20 +38,9 @@ export function auditProducts(rows) {
 }
 
 async function main() {
-  const rows = [];
-  let offset = 0;
-  while (true) {
-    const url = `${SB}/rest/v1/products?active=eq.true&select=id,name,seo_name,seo_title,variant_label,category_id,images&order=created_at.asc&limit=1000&offset=${offset}`;
-    const response = await fetch(url, { headers: { apikey: KEY, accept: 'application/json' } });
-    if (!response.ok) throw new Error(`Supabase catalogue audit failed: HTTP ${response.status}`);
-    const batch = await response.json();
-    if (!Array.isArray(batch)) throw new Error('Supabase catalogue audit returned an invalid response');
-    rows.push(...batch);
-    if (batch.length < 1000) break;
-    offset += batch.length;
-  }
+  const rows = await getActiveProducts();
   const result = auditProducts(rows);
-  console.log(`SEO catalogue guard: checked ${result.count} active products.`);
+  console.log(`SEO catalogue guard: checked ${result.count} active Neon products.`);
   for (const warning of result.warnings) console.warn('WARNING:', warning);
   if (result.errors.length) {
     for (const error of result.errors) console.error('ERROR:', error);
