@@ -12,8 +12,21 @@
     var P = location.pathname, D = document;
     var isC = /^\/c\//.test(P), isP = /^\/p\//.test(P), isAll = P === '/products.html';
     if (!isC && !isP && !isAll) return;
-    var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
-    function api(q) { return fetch(SB + '/rest/v1/' + q, { headers: { apikey: KEY } }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }); }
+    var NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/', productsPromise = null;
+    function api(q) {
+      if (!productsPromise) productsPromise = fetch(NEON_REST + 'rpc/get_product_pages', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
+      return productsPromise.then(function (rows) {
+        rows = Array.isArray(rows) ? rows : [];
+        var m = String(q || '').match(/name=ilike\.([^&]+)/);
+        if (m) {
+          var term = decodeURIComponent(m[1]).replace(/\*/g, ' ').trim().toLowerCase();
+          rows = rows.filter(function (p) { return String(p.name || '').toLowerCase().indexOf(term) >= 0; })
+            .sort(function (a, b) { return String(a.name || '').localeCompare(String(b.name || '')); }).slice(0, 12);
+        }
+        return rows;
+      });
+    }
     function money(n) { return 'KSh ' + Math.round(Number(n) || 0).toLocaleString('en-KE'); }
     function el(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
     function idOf(h) { try { return decodeURIComponent(String(h).replace(/^.*\/p\//, '').replace(/\.html.*$/, '')); } catch (e) { return ''; } }
