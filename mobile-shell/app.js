@@ -47,25 +47,34 @@ const ls = {
    rows that share `variant_group`; they are folded into ONE card with a `sizes` list, each size carrying its own price.
    Names come from /product-names.json (the heading each product page shows, rebuilt with the site); if that file is
    missing the plain database name is used. Filtering, sorting and paging then run in memory, so every filter is instant. */
-const SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
-const api = path => fetch(SB + '/rest/v1/' + path, { headers: { apikey: KEY }, cache: 'no-store' })
-  .then(r => { if (!r.ok) throw new Error('Supabase HTTP ' + r.status); return r.json(); });
+const NEON_API = 'https://br-fancy-bird-bh01xcbs-storeapi.compute.c-10.eu-central-1.aws.neon.tech';
+const api = path => {
+  let endpoint = path;
+  if (path.startsWith('categories')) endpoint = '/api/categories';
+  else if (path.startsWith('products?')) {
+    const query = path.slice(path.indexOf('?') + 1);
+    let match = query.match(/(?:^|&)id=eq\.([^&]+)/);
+    if (match) endpoint = '/api/products?id=' + encodeURIComponent(decodeURIComponent(match[1]));
+    else if ((match = query.match(/slug\.eq\.([^,)&]+)/))) endpoint = '/api/products?slug=' + encodeURIComponent(decodeURIComponent(match[1]));
+    else if ((match = query.match(/variant_group=eq\.([^&]+)/))) endpoint = '/api/products?variant_group=' + encodeURIComponent(decodeURIComponent(match[1]));
+    else endpoint = '/api/products';
+  } else if (!path.startsWith('/')) endpoint = '/api/' + path;
+  return fetch(NEON_API + endpoint, { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error('Neon API HTTP ' + r.status); return r.json(); });
+};
 // Columns the product-link fast path (quickDeepLink, section 9b) reads from public.products. They match what buildCatalog needs; `cost` is never read.
 // The catalogue RPC returns images[1] as cover_image, so the fast path asks for `images` and withCover() takes the first photo from it.
 const PRODUCT_COLS = 'id,slug,name,category_id,price,old_price,stock,featured,images,unit,variant_group,variant_label';
 const withCover = r => ({ ...r, cover_image: Array.isArray(r.images) && r.images.length ? r.images[0] : r.cover_image });
 // PostgREST caps a response at 1,000 rows. Page the public catalogue RPC so new listings
 // remain visible after the shop grows beyond that cap.
-async function apiAll(path, pageSize = 1000) {
+async function apiAll(_path, pageSize = 100) {
   const all = [];
   for (let offset = 0; ; offset += pageSize) {
-    const r = await fetch(SB + '/rest/v1/' + path, {
-      headers: { apikey: KEY, Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
-      cache: 'no-store'
-    });
-    if (!r.ok) throw new Error('Supabase HTTP ' + r.status + ' while loading catalogue page ' + (offset / pageSize + 1));
+    const r = await fetch(NEON_API + '/api/products?limit=' + pageSize + '&offset=' + offset, { cache: 'no-store' });
+    if (!r.ok) throw new Error('Neon API HTTP ' + r.status + ' while loading catalogue page ' + (offset / pageSize + 1));
     const batch = await r.json();
-    if (!Array.isArray(batch)) throw new Error('Supabase returned an invalid catalogue page');
+    if (!Array.isArray(batch)) throw new Error('Neon API returned an invalid catalogue page');
     all.push(...batch);
     if (batch.length < pageSize) break;
   }
@@ -111,8 +120,8 @@ let fullCatalog = false;   // true once the WHOLE catalog is in PRODUCTS (the pr
 function loadCatalog() {
   if (!catalogP) {
     catalogP = Promise.all([
-      apiAll('rpc/get_store_catalog'),
-      api('categories?select=id,name,slug,parent_id,sort_order,is_promo&order=sort_order.asc,id.asc'),
+      apiAll('/api/products'),
+      api('/api/categories'),
       fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}))
     ]).then(([rows, cats, names]) => { buildCatalog(rows, cats, names); fullCatalog = true; }).catch(e => { catalogP = null; throw e; });  // a failed load can be retried
   }
