@@ -5,6 +5,7 @@
 //   GSC_PROPERTY              your property exactly as Search Console shows it, e.g. sc-domain:stermontarcade.co.ke
 //                             or https://stermontarcade.co.ke/  (URL-prefix properties must end with a slash)
 import { createSign } from 'node:crypto';
+import { writeFileSync } from 'node:fs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SITEMAPS = [`${SITE}/sitemap.xml`, `${SITE}/sitemap-products.xml`, `${SITE}/sitemap-images.xml`, `${SITE}/services/sitemap-services.xml`, `${SITE}/pest-control/sitemap.xml`];
@@ -27,10 +28,14 @@ const tok = await fetch('https://oauth2.googleapis.com/token', { method: 'POST',
 if (!tok.access_token) { console.error('Google sign-in failed:', JSON.stringify(tok)); process.exit(1); }
 
 let failed = 0;
+const outcomes = [];
 for (const sm of SITEMAPS) {
   const url = `https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(property)}/sitemaps/${encodeURIComponent(sm)}`;
   const r = await fetch(url, { method: 'PUT', headers: { authorization: `Bearer ${tok.access_token}`, 'content-length': '0' } });
-  console.log(r.ok ? `Submitted ${sm}` : `FAILED ${sm}: ${r.status} ${await r.text()}`);
+  const responseText = await r.text();
+  outcomes.push({ sitemap_url: sm, http_status: r.status, response_text: responseText.slice(0, 1000) });
+  console.log(r.ok ? `Submitted ${sm}` : `FAILED ${sm}: ${r.status} ${responseText}`);
   if (!r.ok) failed++;
 }
+writeFileSync('google-sitemap-results.json', JSON.stringify(outcomes, null, 2) + '\\n');
 process.exit(failed ? 1 : 0);
