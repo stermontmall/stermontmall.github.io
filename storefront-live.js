@@ -9,7 +9,7 @@
   /* small copy of a product photo for cards (about 400 px instead of 1600 px): same file name under product-images/thumbs/.
      Made by scripts/make-thumbs.mjs. If the small copy does not exist (yet) the full photo is shown, so nothing ever goes blank. */
   function thumbUrl(u) { return typeof u === 'string' ? u.replace('/object/public/product-images/', '/object/public/product-images/thumbs/') : u; }
-  function smallSrc(img, full) { img.onerror = function () { img.onerror = null; img.src = full; }; img.src = thumbUrl(full); }
+  function smallSrc(img, full) { var delivered = window.STM_IMAGE_URL ? window.STM_IMAGE_URL(full, 420) : thumbUrl(full); img.onerror = function () { img.onerror = null; img.src = full; }; img.src = delivered; }
   /* discount helpers: a product has a deal when old_price (previous price) is higher than price (current price) */
   function disc(p) { var o = Number(p.old_price), n = Number(p.price); if (!(o > n) || !(n >= 0)) return null; return { was: o, now: n, pct: Math.max(1, Math.round((o - n) / o * 100)), save: o - n }; }
   function badge(d) { return mk('span', 'dbadge', '-' + d.pct + '%'); }
@@ -158,7 +158,7 @@
   function renderThumbs() {
     var th = pd.querySelector('.thumbs'); th.textContent = ''; th.hidden = imgs.length < 2;
     imgs.forEach(function (u, k) {
-      var t = new Image(); t.src = u; t.alt = 'Photo ' + (k + 1) + ' of ' + (cur ? cur._p.name : 'product');
+      var t = new Image(); t.src = window.STM_IMAGE_URL ? window.STM_IMAGE_URL(u, 120) : u; t.onerror = function () { t.onerror = null; t.src = u; }; t.alt = 'Photo ' + (k + 1) + ' of ' + (cur ? cur._p.name : 'product');
       t.onerror = function () { var at = imgs.indexOf(u); if (at > -1) { imgs.splice(at, 1); if (at <= idx) idx = Math.max(0, idx - 1); renderGallery(); } };
       t.onclick = function () { show(k); }; th.appendChild(t);
     });
@@ -175,7 +175,7 @@
       if (at >= 0 && at < idx) idx--;
       renderGallery();
     };
-    i.src = current; m.appendChild(i); renderThumbs();
+    i.src = window.STM_IMAGE_URL ? window.STM_IMAGE_URL(current, 900) : current; i.onerror = function () { i.onerror = null; i.src = current; }; m.appendChild(i); renderThumbs();
     [].forEach.call(pd.querySelectorAll('.thumbs img'), function (t, k) { t.classList.toggle('on', k === idx); });
   }
   function show(n) {

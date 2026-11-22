@@ -126,8 +126,10 @@ const thumb = (p, eager = false) => {
   if (!photos.length) return '<span class="photo-unavailable" role="img" aria-label="Product photo unavailable" style="display:grid;place-items:center;width:100%;height:100%;padding:8px;color:#64748b;background:#f8fafc;font:12px/1.4 system-ui;text-align:center">Photo unavailable</span>';
   // Use a real src on every product image. The old data-src + custom IntersectionObserver path
   // could leave cards blank on some mobile-shell render/restore paths; native lazy loading is enough.
-  const source = eager ? `src="${esc(photos[0])}" fetchpriority="high" loading="eager"` : `src="${esc(photos[0])}" loading="lazy"`;
-  return `<img ${source} alt="${esc(p.name)} product photo" decoding="async" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
+  const original = photos[0];
+  const delivered = window.STM_IMAGE_URL ? window.STM_IMAGE_URL(original, 480) : original;
+  const source = eager ? `src="${esc(delivered)}" fetchpriority="high" loading="eager"` : `src="${esc(delivered)}" loading="lazy"`;
+  return `<img ${source} alt="${esc(p.name)} product photo" decoding="async" data-imagekit-original="${esc(original)}" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
 };
 
 /* Resolves {items, hasMore}; rejects when Supabase cannot be reached (the grid shows a retry link). */

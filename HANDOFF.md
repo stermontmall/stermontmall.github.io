@@ -46,3 +46,19 @@ Date: 2026-11-21. Owner report: the website loads for a long time and lags. Owne
 - After merge and green Actions: on a phone open https://stermontarcade.co.ke/ and check category chips appear quickly; open a /p/ product link and a /c/ category link; open two different product links in a row; reload once to confirm service worker v7 takes over.
 - Prices and stock can be up to 5 minutes old for a visitor who loaded the shop within the last 5 minutes. After changing a price in the admin portal, reload twice (or wait 5 minutes) before checking the live shop.
 - Possible next steps, not done: one-call catalogue (a single RPC returning everything in one response, or fewer columns), fold product-names.json into the RPC, doctype fix with a build run, tidy the products SELECT policies.
+
+Status update 2026-11-22: PRs #1013 (spinner + site speed) and #1020 (product card opens full page) are merged into main. PR #1020 was merged while `validate` and `route-regression` were failing; the cause was not read (Actions logs not reachable from the session).
+
+---
+
+# ImageKit product images (PR #1022, branch imagekit-product-image-delivery-2026-11-22)
+
+Date: 2026-11-22. Status: NOT safe to merge yet.
+
+## Done (this session)
+- shell-route-loader.js: generated /p/ and /c/ pages now load /imagekit-url.js before /mobile-shell/app.js?v=44 (commit 5111c50). Before this, window.STM_IMAGE_URL was undefined on those pages (the loader skips the homepage's scripts), so shell product cards there silently kept the original photo URLs. A failed load of the helper is ignored, so app.js still falls back to originals.
+
+## Left
+- `validate` and `route-regression` fail on #1022 (they also failed on #1020). The logs were not readable from this session: open the failed job in Actions, copy the first failing assertion or error, and fix that before merging. Re-run after commit 5111c50 first; it may change the result for tests of the /p/ and /c/ shell pages.
+- Open one Supabase Storage product image through https://ik.imagekit.io/w6hxfnwmw/supabase/tr:w-480,q-75,f-auto/<storage image URL> in a browser; only a GitHub Pages photo has been confirmed through the proxy so far.
+- Not changed, harmless: storefront-live.js renderThumbs() assigns t.onerror twice, so the first (retry the original) is overwritten by the second (drop the thumbnail); the window-level listener in imagekit-url.js normally handles the retry first.

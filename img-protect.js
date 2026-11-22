@@ -17,6 +17,11 @@
   // If a lead product photo fails, try the next genuine photo from that product's own gallery. Never show an emoji placeholder.
   document.addEventListener('error', function (e) {
     var img = e.target;
+    // A photo delivered through the ImageKit proxy failed: retry the untouched original URL once, before any gallery fallback.
+    if (img && img.tagName === 'IMG') {
+      var ik = /^https:\/\/ik\.imagekit\.io\/w6hxfnwmw\/supabase\/tr:[^\/]+\/(https?:\/\/.+)$/i.exec(img.getAttribute('src') || '');
+      if (ik) { e.stopImmediatePropagation(); img.src = ik[1]; return; }
+    }
     if (!img || img.tagName !== 'IMG' || !img.hasAttribute('data-fallbacks')) return;
     var next = [];
     try { next = JSON.parse(img.getAttribute('data-fallbacks') || '[]'); } catch (err) {}

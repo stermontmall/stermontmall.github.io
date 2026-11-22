@@ -20,6 +20,7 @@
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
+const imageKitUrl = createRequire(import.meta.url)('./imagekit-url.js');
 import { createHash } from 'node:crypto';
 import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
@@ -97,22 +98,54 @@ async function getProducts() {
                 'id,product_code,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
                 'id,product_code,created_at,name,price,old_price,unit,stock,images,description,categories(name,slug)',
                 'id,product_code,created_at,name,price,stock,images,description,categories(name,slug)'];
+  // Keep each REST response small enough for constrained hosted runners and retry transient
+  // gateway/rate-limit failures. The previous 1,000-row response could be several megabytes.
+  const PAGE_SIZE = 200;
+  const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+  let lastError = 'No request attempted';
   for (const c of cols) {
     const all = [];
     let offset = 0;
     let failed = false;
     while (true) {
-      const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=${c}&order=created_at.asc&limit=1000&offset=${offset}`, { headers: { apikey: KEY } });
-      if (!r.ok) { failed = true; break; }
-      const batch = await r.json();
-      if (!Array.isArray(batch)) { failed = true; break; }
+      const url = `${SB}/rest/v1/products?active=eq.true&select=${c}&order=created_at.asc&limit=${PAGE_SIZE}&offset=${offset}`;
+      let batch = null;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const r = await fetch(url, { headers: { apikey: KEY, accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
+          if (!r.ok) {
+            const detail = (await r.text()).replace(/\\s+/g, ' ').slice(0, 350);
+            lastError = `HTTP ${r.status} at offset ${offset}: ${detail || r.statusText}`;
+            // Authentication/permission failures affect every select shape; don't hide them by retrying variants.
+            if (r.status === 401 || r.status === 403) throw new Error(lastError);
+            if (![408, 425, 429, 500, 502, 503, 504].includes(r.status)) break;
+            if (attempt < 3) await pause(700 * attempt);
+            continue;
+          }
+          const payload = await r.json();
+          if (!Array.isArray(payload)) {
+            lastError = `Unexpected JSON response at offset ${offset}: ${JSON.stringify(payload).slice(0, 350)}`;
+            break;
+          }
+          batch = payload;
+          break;
+        } catch (error) {
+          if (error?.message?.startsWith('HTTP 401') || error?.message?.startsWith('HTTP 403')) throw error;
+          lastError = `Request error at offset ${offset}: ${String(error?.message || error).slice(0, 350)}`;
+          if (attempt < 3) await pause(700 * attempt);
+        }
+      }
+      if (batch === null) { failed = true; break; }
       all.push(...batch);
-      if (batch.length < 1000) break;
+      if (batch.length < PAGE_SIZE) break;
       offset += batch.length;
     }
-    if (!failed) return fixProducts(all);
+    if (!failed) {
+      console.log(`Loaded ${all.length} active products from Supabase using ${PAGE_SIZE}-row pages.`);
+      return fixProducts(all);
+    }
   }
-  throw new Error('Could not read products from Supabase');
+  throw new Error(`Could not read products from Supabase after trying all compatible select shapes. Last API error: ${lastError}`);
 }
 
 function productContentHtml(p) {
@@ -178,34 +211,8 @@ const tidy = n => String(n).replace(/\s*\|.*$/, '').replace(/\s+/g, ' ').trim();
 const SIZE_END = /\s+\d+(?:\.\d+)?\s?(?:ml|l|ltr|litres?|liters?|g|kg)\s*$/i;
 const rawRows = (await getProducts()).filter(p => p && p.id && p.name).map(p => ({ ...p, name: tidy(p.name) }));
 
-// Use Supabase's image proxy only when this project confirms that transformations
-// are enabled. The HEAD probe is deliberately fail-open: free-tier/disabled
-// transformations leave every original photo URL untouched.
-const transformedStorageUrl = (source, width) => {
-  try {
-    const u = new URL(source);
-    if (u.origin !== SB || !u.pathname.includes('/storage/v1/object/public/')) return source;
-    u.pathname = u.pathname.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-    u.searchParams.set('width', String(width));
-    u.searchParams.set('quality', '75');
-    return u.toString();
-  } catch { return source; }
-};
-let storageImageTransformsEnabled = false;
-const imageTransformsRequested = process.env.SUPABASE_IMAGE_TRANSFORMS === 'true';
-const imageProbe = imageTransformsRequested ? rawRows.flatMap(p => Array.isArray(p.images) ? p.images : []).find(u => typeof u === 'string' && u.includes('/storage/v1/object/public/')) : null;
-if (imageProbe) {
-  try {
-    const probe = await fetch(transformedStorageUrl(imageProbe, 720), { method: 'HEAD', headers: { Accept: 'image/webp,image/*;q=0.8' } });
-    storageImageTransformsEnabled = probe.ok && /^image\//i.test(probe.headers.get('content-type') || '');
-    console.log('[image-optimization] Supabase transformations ' + (storageImageTransformsEnabled ? 'enabled; resized images use automatic WebP negotiation.' : 'unavailable; retaining original image URLs.'));
-  } catch {
-    console.log('[image-optimization] Probe failed; retaining original image URLs.');
-  }
-} else if (!imageTransformsRequested) {
-  console.log('[image-optimization] Transformations are opt-in to avoid unexpected Storage transformation charges; existing WebP/AVIF assets and intrinsic dimensions remain in use.');
-}
-const optimizedImageUrl = (source, width) => storageImageTransformsEnabled ? transformedStorageUrl(source, width) : source;
+// Use ImageKit Web Proxy for rendered images; keep original source URLs in catalogue data.
+const optimizedImageUrl = (source, width) => imageKitUrl(source, width);
 const rows = rawRows;
 // Approved customer reviews (public read). Failure or a missing table just means no review markup.
 async function getReviews() {
@@ -927,7 +934,7 @@ ${B}`;
         picked.push(bucket.shift());
       }
       const cards = renderHomeGridFallback(picked.map(p => ({
-        id: p.id, name: p.name, price: p.price, stock: p.stock, image: p.images?.[0], href: shellProductLink(sl(p.id))
+        id: p.id, name: p.name, price: p.price, stock: p.stock, image: optimizedImageUrl(p.images?.[0], 320), href: shellProductLink(sl(p.id))
       })), { limit: 8 });
       const updated = current.slice(0, start) + OPEN + cards + current.slice(close);
       if (updated !== current) writeFileSync(HOME, updated);

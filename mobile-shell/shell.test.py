@@ -1,6 +1,7 @@
 # Headless-mobile test of the shell. Needs: pip install playwright && playwright install chromium
 # Run: python3 mobile-shell/shell.test.py   (screenshots go to the system temp folder)
 import re, sys, threading, http.server, socketserver, functools, os, tempfile, json, base64, time
+from urllib.parse import unquote
 from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root: the shell reads /product-names.json
@@ -85,6 +86,25 @@ def mock_network(ctx):
         ctx.route(host, lambda r: r.fulfill(status=200, content_type='application/javascript', body=''))   # analytics.js loads these in production; the sandbox has no internet
     ctx.route('**/rest/v1/stock*', lambda r: serve(r, []))
     ctx.route('**/product-names.json*', lambda r: serve(r, NAMES_FIX))
+    # ImageKit Web Proxy wraps the original source URL; emulate successful and missing upstream photos.
+    def imagekit_proxy(route):
+        url = unquote(route.request.url)
+        if url.endswith('https://img.test/ok.png'):
+            return route.fulfill(status=200, content_type='image/png', body=PNG)
+        if url.endswith('https://img.test/broken.jpg'):
+            return route.abort()
+        # Static homepage/product fixtures can contain real catalogue image URLs.
+        # Keep those requests deterministic in CI while still exercising the actual
+        # ImageKit proxy URL shape and browser fallback logic. Any public Supabase
+        # Storage bucket counts (product-images, service-media, ...): the shell wraps
+        # every Supabase photo, and an unmocked one would abort and fail the
+        # "unexpected failed requests" check at the end of this script.
+        if 'supabase.co/storage/v1/object/public/' in url:
+            return route.fulfill(status=200, content_type='image/png', body=PNG)
+        return route.abort()
+    ctx.route('https://ik.imagekit.io/**', imagekit_proxy)
+    ctx.route('https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/**',
+              lambda r: r.fulfill(status=200, content_type='image/png', body=PNG))
     ctx.route('https://img.test/ok.png', lambda r: r.fulfill(status=200, content_type='image/png', body=PNG))
     ctx.route('https://img.test/broken.jpg', lambda r: r.abort())
 
@@ -110,7 +130,12 @@ with sync_playwright() as p:
     pg = ctx.new_page()
     errors = []
     pg.on('pageerror', lambda e: errors.append(str(e)))
-    pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and 'broken.jpg' not in (m.location or {}).get('url', '') else None)   # the aborted photo is the fixture's deliberate failure
+    # Browser console resource errors do not expose the failed URL in message.location.
+    # Track failed requests separately so the deliberately broken photo fixture is excluded
+    # by its actual request URL, while every unexpected failed resource still fails the test.
+    failed_requests = []
+    pg.on('requestfailed', lambda r: failed_requests.append(r.url) if 'broken.jpg' not in r.url else None)
+    pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and not m.text.startswith('Failed to load resource:') else None)
     pg.add_init_script("window.__sawSkeleton = false; new MutationObserver(() => { if (document.querySelector('#grid .card[aria-hidden=\"true\"]')) window.__sawSkeleton = true; }).observe(document, { childList: true, subtree: true });")
     # Park (do not sleep on) the FIRST live catalogue request so the pre-hydration assertion is deterministic.
     # The old handler called time.sleep() inside the synchronous route callback, which froze Playwright's event loop: goto() could not
@@ -135,7 +160,7 @@ with sync_playwright() as p:
     check('2-column grid', pg.evaluate("getComputedStyle(document.querySelector('#grid')).gridTemplateColumns.split(' ').length") == 2)
     check('discount badge renders, no invented star ratings', pg.locator('#grid .bg-sale').count() > 0 and pg.locator('#grid .stars').count() == 0)
     check('name comes from product-names.json when present', pg.locator('#grid .card[data-id="home-0"] p').first.inner_text() == 'Heavy-Duty Hot Plate Pro')
-    check('real product photo is rendered', pg.locator('#grid .card[data-id="home-0"] img').evaluate_all("(els) => els.some(img => img.getAttribute('src') === 'https://img.test/ok.png' || img.getAttribute('data-src') === 'https://img.test/ok.png')"))
+    check('real product photo is rendered through ImageKit', pg.locator('#grid .card[data-id="home-0"] img').evaluate_all("(els) => els.some(img => img.src.includes('ik.imagekit.io/w6hxfnwmw/supabase/tr:') && img.src.endsWith('https://img.test/ok.png'))"))
     # Isolate the garden fixture category so its complete eight-item page is available without relying on scroll timing.
     pg.locator('#chips [data-chip="garden-outdoors"]').click()
     pg.wait_for_selector('#grid .card[data-id="outdoor-broken"]', timeout=10000)
@@ -163,13 +188,13 @@ with sync_playwright() as p:
     # quick buy + back button
     h0 = pg.evaluate('history.length')
     pg.locator('#grid .card[data-id]').nth(1).locator('p').first.click()
-    check('quick buy sheet opens', pg.locator('#sheet-quickbuy.open').count() == 1)
-    check('opening pushed one history entry', pg.evaluate('history.length') == h0 + 1)
+    check('tapping a product opens its full product page directly', pg.locator('#page-product.open').count() == 1)
+    check('opening product pushed one history entry', pg.evaluate('history.length') == h0 + 1)
     check('body scroll locked', pg.evaluate("document.body.classList.contains('no-scroll')"))
-    pg.wait_for_timeout(450); pg.screenshot(path=f'{OUT}/shot-quickbuy.png')
+    pg.wait_for_timeout(450); pg.screenshot(path=f'{OUT}/shot-product.png')
     pg.go_back()
     pg.wait_for_timeout(350)
-    check('Back closes quick buy and stays on page', pg.locator('#sheet-quickbuy.open').count() == 0 and pg.url == URL, pg.url)
+    check('Back closes product page and stays on shop', pg.locator('#page-product.open').count() == 0 and pg.url == URL, pg.url)
     check('scroll unlocked after close', not pg.evaluate("document.body.classList.contains('no-scroll')"))
 
     # multi-size product: select its top-level category because the home feed is paginated
@@ -264,12 +289,13 @@ with sync_playwright() as p:
     check('Back from a tab returns to Home and restores the selected category address', pg.locator('#view-home').is_visible() and pg.url == URL.rstrip('/') + '/c/phones-accessories.html', pg.url)
     check('nav highlight follows Back', pg.locator('#bottom-nav [data-tab="home"][aria-current="page"]').count() == 1)
 
-    # buy now flow
+    # buy now flow from the full product page (the current card-tap behaviour)
     pg.locator('#grid .card[data-id]').first.locator('p').first.click()
-    pg.locator('#qb-plus').click()
-    pg.locator('#qb-buy').click()
+    pg.wait_for_selector('#page-product.open')
+    pg.locator('#pp-plus').click()
+    pg.locator('#pp-buy').click()
     pg.wait_for_timeout(500)
-    check('Buy now closes sheet and opens Cart tab', pg.locator('#sheet-quickbuy.open').count() == 0 and pg.locator('#view-cart').is_visible())
+    check('Buy now closes product page and opens Cart tab', pg.locator('#page-product.open').count() == 0 and pg.locator('#view-cart').is_visible())
     check('cart total shown', pg.locator('#cart-total').inner_text().startswith('KSh'))
     pg.screenshot(path=f'{OUT}/shot-cart.png')
     pg.go_back(); pg.wait_for_timeout(300)
@@ -301,7 +327,11 @@ with sync_playwright() as p:
 
     # Supabase down: the grid offers a retry instead of hanging on skeletons, and recovers
     FAIL[0] = True
-    p2 = ctx.new_page(); p2.goto(URL)
+    p2 = ctx.new_page()
+    # The previous page intentionally populated the catalogue prefetch cache. Remove it so
+    # this scenario exercises a real Supabase outage instead of replaying cached products.
+    p2.add_init_script("localStorage.removeItem('shell.catalogPrefetch.v1')")
+    p2.goto(URL)
     p2.wait_for_selector('#grid-empty:not([hidden])', timeout=8000)
     check('network failure shows a retry link, no stuck skeletons', 'Could not load products' in p2.locator('#grid-empty').inner_text() and p2.locator('#grid-empty a[href="/"]').count() == 1 and p2.locator('#grid .card[aria-hidden="true"]').count() == 0)
     FAIL[0] = False
@@ -448,18 +478,11 @@ with sync_playwright() as p:
     p9.wait_for_selector('#grid .card[data-id="garden-set"]', timeout=10000)
     base_title = p9.title()
     check('address: selected Home & Living category keeps its clean category address', p9.evaluate('location.pathname + location.search') == '/c/home-living.html', p9.url)
-    p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#sheet-quickbuy.open')
-    check('address: opening a product records the internal quick-buy overlay state', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-50ml', p9.url)
-    check('address: internal quick-buy state does not add a query string', p9.evaluate('location.search') == '', p9.url)
-    check('address: tab title shows the product', 'Garden Hose Connector Set' in p9.title() and p9.title().endswith('| Stermont Arcade'), p9.title())
-    p9.locator('#qb-sizes [data-size="250 ml"]').click()
-    check('address: choosing another size updates the internal overlay state (no extra history entry)', p9.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml', p9.url)
-    p9.locator('#qb-page').click(); p9.wait_for_selector('#page-product.open')
-    check('address: opening the product detail view uses the shareable shell URL', p9.evaluate('location.pathname + location.search') == '/?product=garden-set-250ml', p9.url)
+    p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#page-product.open')
+    check('address: tapping a product opens the full product page in the shell', p9.evaluate("location.pathname === '/' && new URLSearchParams(location.search).has('product')") and 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text(), p9.url)
+    check('address: product page title identifies the product', 'Garden Hose Connector Set' in p9.title() and p9.title().endswith('| Stermont Arcade'), p9.title())
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
-    check('address: Back from the page returns to the sheet, address unchanged', p9.locator('#sheet-quickbuy.open').count() == 1 and p9.evaluate('location.hash') == '#garden-set-250ml')
-    p9.go_back(); p9.wait_for_function("!document.querySelector('#sheet-quickbuy.open')")
-    check('address: closing the product restores the selected category address and title', p9.evaluate('location.pathname + location.search') == '/c/home-living.html' and p9.title() == base_title, p9.url + ' | ' + p9.title())
+    check('address: Back returns to the selected category address and title', p9.evaluate('location.pathname') == '/c/home-living.html' and p9.title() == base_title, p9.url + ' | ' + p9.title())
     p9.goto(f'{BASE}/?product=garden-set-250ml'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: opening the address shows that product page with that size', 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
     check('address: the address stays after load and the tab title shows the product', p9.evaluate('location.pathname + location.search') == '/?product=garden-set-250ml' and 'Garden Hose Connector Set' in p9.title())
@@ -661,7 +684,7 @@ with sync_playwright() as p:
 
     co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
     check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
-    check('no console/page errors', not errors, errors[:3])
+    check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'failed_requests': failed_requests[:3]})
     b.close()
 
 fails = [n for n, ok in results if not ok]
