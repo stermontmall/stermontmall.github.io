@@ -135,7 +135,9 @@
       }
 
       window.__STM_PRODUCT_ROUTE_PATH = isProductRoute ? path : '';
-      return loadScript('/mobile-shell/app.js?v=44').then(function () {
+      // The ImageKit helper (imagekit-url.js) must be present before app.js renders its first product card; the homepage loads it as a script tag, but this loader skips the homepage's scripts.
+      // A failed helper load is harmless: app.js falls back to the original photo URLs when window.STM_IMAGE_URL is missing.
+      return loadScript('/imagekit-url.js').catch(function () {}).then(function () { return loadScript('/mobile-shell/app.js?v=44'); }).then(function () {
         if (isProductRoute) {
           var checkProductReady = function () {
             var page = document.getElementById('page-product');
