@@ -85,6 +85,15 @@ def mock_network(ctx):
         ctx.route(host, lambda r: r.fulfill(status=200, content_type='application/javascript', body=''))   # analytics.js loads these in production; the sandbox has no internet
     ctx.route('**/rest/v1/stock*', lambda r: serve(r, []))
     ctx.route('**/product-names.json*', lambda r: serve(r, NAMES_FIX))
+    # ImageKit Web Proxy wraps the original source URL; emulate successful and missing upstream photos.
+    def imagekit_proxy(route):
+        url = route.request.url
+        if url.endswith('https://img.test/ok.png'):
+            return route.fulfill(status=200, content_type='image/png', body=PNG)
+        if url.endswith('https://img.test/broken.jpg'):
+            return route.abort()
+        return route.abort()
+    ctx.route('https://ik.imagekit.io/**', imagekit_proxy)
     ctx.route('https://img.test/ok.png', lambda r: r.fulfill(status=200, content_type='image/png', body=PNG))
     ctx.route('https://img.test/broken.jpg', lambda r: r.abort())
 
@@ -163,13 +172,13 @@ with sync_playwright() as p:
     # quick buy + back button
     h0 = pg.evaluate('history.length')
     pg.locator('#grid .card[data-id]').nth(1).locator('p').first.click()
-    check('quick buy sheet opens', pg.locator('#sheet-quickbuy.open').count() == 1)
-    check('opening pushed one history entry', pg.evaluate('history.length') == h0 + 1)
+    check('tapping a product opens its full product page directly', pg.locator('#page-product.open').count() == 1)
+    check('opening product pushed one history entry', pg.evaluate('history.length') == h0 + 1)
     check('body scroll locked', pg.evaluate("document.body.classList.contains('no-scroll')"))
-    pg.wait_for_timeout(450); pg.screenshot(path=f'{OUT}/shot-quickbuy.png')
+    pg.wait_for_timeout(450); pg.screenshot(path=f'{OUT}/shot-product.png')
     pg.go_back()
     pg.wait_for_timeout(350)
-    check('Back closes quick buy and stays on page', pg.locator('#sheet-quickbuy.open').count() == 0 and pg.url == URL, pg.url)
+    check('Back closes product page and stays on shop', pg.locator('#page-product.open').count() == 0 and pg.url == URL, pg.url)
     check('scroll unlocked after close', not pg.evaluate("document.body.classList.contains('no-scroll')"))
 
     # multi-size product: select its top-level category because the home feed is paginated
@@ -264,12 +273,13 @@ with sync_playwright() as p:
     check('Back from a tab returns to Home and restores the selected category address', pg.locator('#view-home').is_visible() and pg.url == URL.rstrip('/') + '/c/phones-accessories.html', pg.url)
     check('nav highlight follows Back', pg.locator('#bottom-nav [data-tab="home"][aria-current="page"]').count() == 1)
 
-    # buy now flow
+    # buy now flow from the full product page (the current card-tap behaviour)
     pg.locator('#grid .card[data-id]').first.locator('p').first.click()
-    pg.locator('#qb-plus').click()
-    pg.locator('#qb-buy').click()
+    pg.wait_for_selector('#page-product.open')
+    pg.locator('#pp-plus').click()
+    pg.locator('#pp-buy').click()
     pg.wait_for_timeout(500)
-    check('Buy now closes sheet and opens Cart tab', pg.locator('#sheet-quickbuy.open').count() == 0 and pg.locator('#view-cart').is_visible())
+    check('Buy now closes product page and opens Cart tab', pg.locator('#page-product.open').count() == 0 and pg.locator('#view-cart').is_visible())
     check('cart total shown', pg.locator('#cart-total').inner_text().startswith('KSh'))
     pg.screenshot(path=f'{OUT}/shot-cart.png')
     pg.go_back(); pg.wait_for_timeout(300)
