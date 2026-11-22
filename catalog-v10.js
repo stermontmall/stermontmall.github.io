@@ -335,7 +335,9 @@
         var fs = [].slice.call(e.target.files), up = c.querySelector('#cx-up'); if (!fs.length) return;
         if (edit && p.product_code) {
           up.textContent = 'Uploading ' + fs.length + ' photo(s) to Neon…';
-          Promise.all(fs.map(function (f) { return upload(f, p.product_code); })).then(function (us) { imgs.push.apply(imgs, us); up.textContent = ''; thumbs(); })
+          var chain = Promise.resolve();
+          fs.forEach(function (file) { chain = chain.then(function () { return upload(file, p.product_code).then(function (url) { imgs.push(url); }); }); });
+          chain.then(function () { up.textContent = ''; thumbs(); })
             .catch(function (er) { up.textContent = ''; var x = c.querySelector('#cx-me'); x.textContent = 'Neon upload failed: ' + er.message; x.hidden = false; });
         } else {
           pendingFiles.push.apply(pendingFiles, fs);
