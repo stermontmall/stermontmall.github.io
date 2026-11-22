@@ -1,0 +1,52 @@
+name: Deploy photoupload to Neon
+
+# Runs on every push to this branch that touches the function (or this file).
+# Needs a repository secret named NEON_API_KEY (Neon Console > Account settings > API keys).
+on:
+  push:
+    branches: [wip-photoupload-bundle]
+    paths:
+      - "neon-functions/photoupload/**"
+      - ".github/workflows/deploy-photoupload.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      NEON_PROJECT_ID: restless-shape-79120240
+      NEON_BRANCH_ID: br-fancy-bird-bh01xcbs
+    defaults:
+      run:
+        working-directory: neon-functions/photoupload
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Check the Neon API key secret exists
+        run: |
+          if [ -z "$NEON_API_KEY" ]; then
+            echo "::error::Add a repository secret named NEON_API_KEY, then re-run this job."
+            exit 1
+          fi
+      - run: npm install
+      - run: npm run build
+      - name: Bundle sanity check (imports resolve and no bare 'pg' import remains)
+        run: |
+          ls -l dist/index.mjs
+          ! grep -E "from ['\"]pg['\"]" dist/index.mjs
+      - name: Install Neon CLI
+        run: npm install -g neonctl
+      - name: Deploy function
+        run: |
+          neonctl functions deploy photoupload --src dist --project-id "$NEON_PROJECT_ID" --branch "$NEON_BRANCH_ID" || {
+            echo "::warning::Deploy command failed. CLI help follows so the command can be corrected."
+            neonctl --help || true
+            neonctl functions --help || true
+            exit 1
+          }
