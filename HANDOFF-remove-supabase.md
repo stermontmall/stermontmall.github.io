@@ -28,6 +28,8 @@
 - Deployed function: `photoupload` (deployment 5). Its end-to-end authenticated storefront/admin integration has not yet been verified.
 - Neon Auth is enabled (Better Auth); trusted origin includes `https://stermontarcade.co.ke`; email/password auth is enabled but public sign-up is disabled.
 - Both storage buckets currently contain zero objects (`product-photos`, `service-media`).
+- Neon Data API is already active at the database level, configured for Neon Auth and CORS restricted to the store origin.
+- Added an additive `public.storefront_products` security-barrier view exposing only storefront fields (not `cost`, admin fields, or exact stock counts); it filters to active products and maps stock to an in-stock flag. Granted the `anonymous` role SELECT on this view only. Verified the view exists and anonymous SELECT privilege is present. This is a safe read API foundation; HTTP-level Data API verification and client integration remain pending.
 - Archived catalogue: 22 rows in `archive.products_backup_20261123`; 6 active, 6 with image URLs. Do not publish automatically; verify product details, images, prices, stock, and category before restoration.
 
 ## Migration requirements
