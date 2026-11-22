@@ -1,3 +1,17 @@
+## 2026-11-22 11:14 (Africa/Nairobi) — Page-build test unblocked after ImageKit PR; 3 pest-control products activated
+
+### Done
+- Activated 3 hidden drafts in Supabase (active=true): kensil-guard-diatomaceous-earth-insecticide-dust-3kg (KSh 5,850), pymos-0-6ec-adult-mosquito-insecticide-250ml (KSh 448.50 -> 450), cockrakill-paste-cockroach-bait-50g (KSh 1,038.70 -> 1,050). PCPB registrations present (CR1216, CR0911, CR0528); no restricted actives. Stock 1000, low_at 20.
+- Build product pages failed in 13s (runs 45001754911, 44999073945, 44985434967) at "Test Google indexing safeguards": seo-indexing-guard.test.mjs still expected the removed Supabase image-transform code after PR #1022 switched to the ImageKit Web Proxy. Updated those assertions to check imageKitUrl/optimizedImageUrl instead. All 16 page-build tests pass locally (node <name>.test.mjs).
+
+### Known
+- Product photos for these 3 are still Supabase Storage URLs; the Supabase project is over its egress quota (HTTP 402), support ticket SU-563776. ImageKit proxy fetches from Supabase, so photos may stay broken until the restriction lifts or the photos are re-uploaded to ImageKit.
+- Earlier P0 (2026-11-21): the save step in product-pages.yml can fail with "cannot rebase: You have unstaged changes". Needs the owner's explicit exception to edit that workflow.
+
+### Next
+- Merge this PR, then: gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main
+- Check the run, then confirm /p/ pages exist for the 3 products.
+
 ## 2026-11-21 08:59 (Africa/Nairobi) — Pricing admin merged; Pages deployed; product-page save blocker identified
 
 ### Done
