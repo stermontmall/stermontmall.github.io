@@ -1,6 +1,6 @@
 /* Stermont Arcade · admin Quotations: create, save, edit, duplicate and send quotations to different clients.
    Mounted by admin.html through STMQuotations.mount(containerEl). The PDF, email and WhatsApp text are built by receipt.js
-   (STM_RECEIPT.quote) so a quotation looks exactly like the receipt. Saved in Supabase table public.client_quotations
+   (STM_RECEIPT.quote) so a quotation looks exactly like the receipt. Saved in Neon table public.client_quotations
    (setup-client-quotations.sql). Uses window.STMAdmin (api, ready, money, fmt, email). All text is set with textContent. */
 (function () {
   var D = document;
