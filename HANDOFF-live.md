@@ -10,8 +10,13 @@
 - Local result (`python3 mobile-shell/shell.test.py`, Chromium OK): 178/179 passed, including all 3 new checks and the existing 402 deep-link checks. The 1 failure is `no console/page errors or unexpected failed requests`: three home-page static card photos (`https://stermontarcade.co.ke/product-photos/jacto-hd-550-...jpg`, `...pruning-shears...jpg`, `...popvet-total-dog-dewormer...jpg`, hard-coded in index.html) could not load because this sandbox has no internet (curl to the site returns HTTP 000). Not caused by this change (index.html diff is only the ?v= bump); expected to pass in CI. Verify in the Actions run.
 - Photos still come from Supabase Storage and stay broken until billing is fixed (or PR #1022 ImageKit lands).
 
+### CI result for PR #1030 (head cf57892, 2026-11-22 ~16:50 Nairobi)
+- Full mobile-shell route regression (run 45028995674): PASSED (includes the 3 new card-tap checks).
+- SEO pull request quality gate (run 45028995709): FAILED at step "Build product and category pages from the live public catalogue" (`node generate-products.mjs`): `HTTP 402 ... restricted due to the following violations: exceed_cached_egress_quota. The project owner must upgrade their plan or remove spend caps to restore service.` This is the Supabase billing restriction, not the code in this PR; any branch fails this step until billing is fixed.
+- Exact cause of the outage is now confirmed: Supabase `exceed_cached_egress_quota`.
+
 ### Next
-1. Check the CI run on the PR for this branch (SEO pull request quality gate + Full mobile-shell route regression): `gh run list --branch wip-product-description-fallback-20261122`.
+1. Owner decides whether to merge #1030 now (code check green; the gate fails only on Supabase 402) or after Supabase billing is restored and the gate is re-run.
 2. Fix the `ProductGroup` gap in `openStaticProductFallback` (multi-pack products' deep links) in a follow-up commit on this branch.
 3. Merge only when CI is green; then open a product card and a shared /?product= link on a phone and confirm the description appears.
 
