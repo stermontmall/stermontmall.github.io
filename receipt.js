@@ -468,20 +468,32 @@
 
   function email(o) {
     try { needCode(o); } catch (e) { return Promise.reject(e); }
-    if (!EMAILJS.serviceId || !EMAILJS.templateId || !EMAILJS.publicKey) return Promise.reject(new Error('Email is not set up yet'));
+    if (!EMAILJS.serviceId || !EMAILJS.statusTemplateId || !EMAILJS.publicKey) return Promise.reject(new Error('Order email template is not configured'));
     if (!o.email) return Promise.reject(new Error('This order has no customer email.'));
+    var itemRows = lines(o).map(function (line) {
+      return '<tr><td style="padding:10px 0;border-bottom:1px solid #eee7fb;color:#28213b;font-size:14px;">' + hx(line) + '</td></tr>';
+    }).join('');
+    var htmlBody = '<div style="background:#f3edff;padding:24px 12px;font-family:Arial,sans-serif;">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:auto;background:#fff;border-radius:18px;overflow:hidden;">' +
+      '<tr><td style="background:#5b21b6;color:#fff;padding:26px;text-align:center;"><div style="font-size:13px;letter-spacing:2px;font-weight:bold;">STERMONT ARCADE</div><h1 style="font-size:25px;margin:14px 0 4px;">Your order receipt</h1><div>Order ' + hx(o.ref) + '</div></td></tr>' +
+      '<tr><td style="padding:24px;color:#28213b;"><p>Hello ' + hx(o.customer_name || 'Customer') + ',</p><p>Thank you for shopping with Stermont Arcade. Here is your order receipt.</p>' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + itemRows + '</table>' +
+      '<p style="font-size:19px;font-weight:bold;color:#5b21b6;text-align:right;">Total: ' + hx(money(paidAmount(o))) + '</p>' +
+      '<div style="background:#f6f1ff;padding:14px;border-radius:12px;"><b>M-Pesa code:</b> ' + hx(code(o)) + '<br><b>Paybill:</b> ' + hx(BIZ.paybill) + '<br><b>Account:</b> ' + hx(BIZ.account) +
+      '<br><b>Delivery:</b> ' + hx(o.method === 'delivery' ? [o.address, o.county].filter(Boolean).join(', ') : 'Store pickup') + '</div>' +
+      '<p style="font-size:13px;color:#665d78;">Need help? Call ' + hx(BIZ.phone) + ' or reply to this email.</p></td></tr>' +
+      '<tr><td style="background:#2a0e5c;color:#d9cafa;text-align:center;padding:16px;font-size:12px;">' + hx(BIZ.name) + ' · ' + hx(BIZ.web) + '</td></tr></table></div>';
     var params = {
-      to_email: o.email, reply_to: BIZ.email, from_email: BIZ.email, support_email: BIZ.email, to_name: o.customer_name || 'Customer', name: o.customer_name || 'Customer', customer_name: o.customer_name || 'Customer', user_name: o.customer_name || 'Customer', email: o.email, order_id: o.ref, order_number: o.ref, business: BIZ.name, phone: BIZ.phone, receipt_no: receiptNo(o), order_ref: o.ref,
-      date: when(o.handled_at || o.created_at), items: lines(o).join('\n'), total: money(paidAmount(o)), subtotal: money(o.subtotal), balance: money(balance(o)),
-      paybill: BIZ.paybill, account: BIZ.account, pay_code: code(o), amount_words: words(paidAmount(o)),
-      delivery: o.method === 'delivery' ? [o.address, o.county].filter(Boolean).join(', ') : 'Store pickup'
+      to_email: o.email, reply_to: BIZ.email, to_name: o.customer_name || 'Customer',
+      subject: 'Your Stermont Arcade receipt - ' + o.ref, order_ref: o.ref, order_id: o.ref,
+      customer_name: o.customer_name || 'Customer', total: money(paidAmount(o)), pay_code: code(o),
+      html_body: htmlBody, message: 'Your order receipt for ' + o.ref + ' is included below.'
     };
     return fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ service_id: EMAILJS.serviceId, template_id: EMAILJS.templateId, user_id: EMAILJS.publicKey, template_params: params })
+      body: JSON.stringify({ service_id: EMAILJS.serviceId, template_id: EMAILJS.statusTemplateId, user_id: EMAILJS.publicKey, template_params: params })
     }).then(function (r) { if (!r.ok) return r.text().then(function (t) { throw new Error('EmailJS: ' + (t || r.status)); }); });
   }
-
   /* ---- Order status notification emails (Confirmed, Packed, On the way, Delivered) ---- */
   var STATUS_MSG = {
     confirmed: { label: 'Payment confirmed', head: 'Payment confirmed',

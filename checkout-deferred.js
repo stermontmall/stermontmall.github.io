@@ -450,7 +450,9 @@
           if (custEmail) ejs(CFG.ejsCustTpl, Object.assign({ to_email: custEmail, subject: 'We received your order ' + ref }, base, {
             html_body: htmlBody,
             business: 'Stermont Arcade', name: form.name.trim(), headline: 'We received your order', message: custMsg, items: lines.join('\n'), total: money(due(T)),
-            phone: '+254 748 888 230', web: 'stermontarcade.co.ke', buttons: custBtn }));
+            phone: '+254 748 888 230', web: 'stermontarcade.co.ke', buttons: custBtn })).then(function (ok) {
+              if (!ok) console.warn('Customer confirmation email was not accepted by EmailJS for order ' + ref);
+            });
           /* Styled staff alert (EmailJS). If it fails, fall back to the plain Web3Forms alert. */
           var enc = encodeURIComponent(ref);
           function mkBtn(href, label, bg, fg) { return '<a href="' + href + '" style="display:inline-block;background:' + bg + ';color:' + fg + ';font-weight:bold;font-size:15px;text-decoration:none;padding:13px 20px;border-radius:12px;margin:4px;">' + label + '</a>'; }
@@ -501,10 +503,9 @@
           var staffParams = { to_email: CFG.staffEmail, reply_to: custEmail || CFG.staffEmail, subject: 'New order ' + money(due(T)) + ' - ' + form.name.trim() + ' (' + ref + ')', business: 'Stermont Arcade', order_ref: ref, name: 'Stermont team',
             headline: 'New order to verify', message: staffMsg, items: lines.join('\n'), total: money(due(T)), delivery: form.method === 'pickup' ? 'Collection: ' + where() : 'Deliver to: ' + where(),
             phone: '+254 748 888 230', web: 'stermontarcade.co.ke', buttons: buttons, html_body: staffHtml };
-          ejs(CFG.ejsCustTpl, staffParams).then(function (ok) {
-            if (ok) return true;
-            return ejs(CFG.ejsStaffTpl, staffParams);   /* old staff template as second try */
-          }).then(function (ok) { if (!ok) web3(); });
+          ejs(CFG.ejsStaffTpl, staffParams).then(function (ok) {
+            if (!ok) web3();
+          });
         } catch (e) { web3(); }
       }
       function newRef() {
