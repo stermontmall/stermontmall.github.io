@@ -67,22 +67,16 @@ Date: 2026-11-22. Status: NOT safe to merge yet.
 
 ---
 
-# PR #1037 (feat/neon-temporary-admin-2026-11-22): repair of mobile-shell/shell.test.py
+# PR #1037 (merged 2026-11-22, squash 26c2881): temporary Neon admin page
 
-Date: 2026-11-22.
+Date: 2026-11-22. Status: MERGED. Only `neon-admin.html` (new, noindex) and this file changed; the storefront, mobile shell, index.html and tests are the same as main.
 
-## Problem
-mobile-shell/shell.test.py on the PR branch was corrupted: many line breaks were collapsed, so code ended up inside `#` comments or glued onto the previous statement (e.g. `pack_card = ...    check(...)`), and the file was cut off in the middle of the c18 test (no closing checks, `b.close()` or `sys.exit`). That makes the `validate` and `route-regression` jobs fail on a syntax error rather than on the Neon change itself.
-
-## Done
-- Rebuilt shell.test.py from main's version, keeping the PR's intent: `on_neon` mock for /api/products and /api/categories (pagination via limit/offset, one-row details via ?id=), Neon routes registered in mock_network, Supabase REST fixtures kept for generated SEO-page checks.
-- on_neon honours FAIL[0] (HTTP 503) so the retry-link and published-page-fallback tests exercise the Neon API being down instead of Supabase 402.
-- The held first catalogue request now parks `**/api/products*` and is released with on_neon.
-- One-row details mock now uses real newlines (`\n`) like main, not a literal backslash-n.
-- Not run: no Playwright/network in the session; CI is the first real run.
+## What happened
+- Earlier commits on the PR branch corrupted mobile-shell/shell.test.py and switched the storefront to the Neon API. Both were reverted to main's versions before the merge, so neither is in main. (An earlier version of this section described a shell.test.py repair; that repair is not in main.)
+- The `validate` check on the PR failed at "Build product and category pages" (`node generate-products.mjs`): HTTP 402 from Supabase, `exceed_cached_egress_quota` (see the 2026-11-22 outage note above). Not caused by the PR; main fails the same way until Supabase is restored. The PR was merged with that check red, on the owner's decision.
 
 ## Left
-- Watch `validate` and `route-regression` on this commit; if a test fails, the first failing assertion is the next fix.
-- PR description says the Supabase storefront is untouched, but mobile-shell/app.js now reads the catalogue from the Neon Store API (host in NEON_API) and index.html's catalogue prefetch block still targets Supabase URLs (only its comment changed). Decide whether the storefront switch belongs in this PR; the prefetch hand-off to app.js will no longer match the new URLs.
-- neon-admin.html imports https://esm.sh/@neon/auth without a pinned version.
-- Owner's Neon Auth account still has to be approved in admin_profiles before the admin works.
+- Restore Supabase (upgrade the plan or remove the spend cap), then re-run `validate` on main and confirm it is green.
+- Owner's Neon Auth account still has to be approved in `admin_profiles` before /neon-admin.html works: open the page, use "Create first admin account", send the Neon user ID it shows.
+- neon-admin.html imports https://esm.sh/@neon/auth without a pinned version. Pin it after checking in a browser which published version the sign-in works with (not done: no browser in the session, and the package name/versions on npm were unclear).
+- Storefront catalogue reads are still on Supabase. Switching them to Neon needs its own PR, with index.html's prefetch block and mobile-shell/shell.test.py updated together.
