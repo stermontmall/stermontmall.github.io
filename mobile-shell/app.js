@@ -787,11 +787,14 @@ async function openStaticProductFallback(slug) {
       const data = JSON.parse(node.textContent || 'null');
       for (const item of (Array.isArray(data) ? data : [data])) {
         const types = Array.isArray(item && item['@type']) ? item['@type'] : [item && item['@type']];
-        if (!product && types.includes('Product')) product = item;
+        if (!product && (types.includes('Product') || types.includes('ProductGroup'))) product = item;
         if (!breadcrumb && types.includes('BreadcrumbList')) breadcrumb = item;
       }
     } catch {}
   }
+  // Multi-pack products publish ProductGroup JSON-LD: offers/sku/image live on hasVariant[], so borrow the first variant.
+  const variant = product && Array.isArray(product.hasVariant) ? product.hasVariant[0] : null;
+  if (variant) product = { ...product, offers: product.offers || variant.offers, sku: product.sku || variant.sku, image: product.image || variant.image };
   const offer = Array.isArray(product && product.offers) ? product.offers[0] : product && product.offers;
   const price = Number(offer && offer.price);
   if (!product || !product.name || !(price > 0)) throw new Error('Published page has no usable Product schema');

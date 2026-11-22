@@ -1,4 +1,15 @@
 
+## 2026-11-22 17:10 (Africa/Nairobi) — ProductGroup gap in static deep-link fallback (branch wip-productgroup-fallback-20261122, not pushed/merged)
+
+### Done
+- `openStaticProductFallback` now accepts `ProductGroup` JSON-LD (multi-pack pages such as p/abasi-5-ec.html) and borrows offers/sku/image from `hasVariant[0]`. `node --check` passes. app.js bumped to ?v=47 (index.html, shell-route-loader.js).
+- Supabase SQL API works (1,828 products, 1,716 active at 17:00); REST 402 status not re-verified from this sandbox.
+
+### Next
+1. Add a Playwright case in mobile-shell/shell.test.py: 402 + /?product=abasi-5-ec with a mocked ProductGroup page; run `python3 mobile-shell/shell.test.py`.
+2. Push branch, open PR, check CI; merge only when green.
+3. Owner: restore Supabase billing, then `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+
 ## 2026-11-22 16:50 (Africa/Nairobi) — PR #1030 MERGED to main (merge commit dc89ec4b, 13:47:39Z); Supabase still 402
 
 ### Done
