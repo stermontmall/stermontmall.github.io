@@ -7,7 +7,7 @@
   window.__stmFullShellLoading = true;
 
   /* Catalogue prefetch (2026-11-21, site speed). Same block as the inline script at the top of index.html (this page never runs that one: the homepage is only parsed
-     below, not executed). The shell has to download the homepage, then app.js, and only then asks Supabase for the categories and the whole catalogue; this starts those
+     below, not executed). The shell has to download the homepage, then app.js, and only then asks Neon for the categories and the whole catalogue; this starts those
      requests now, in parallel with that, and hands the answers to app.js's own fetch() calls (identical URLs and headers). Kept in localStorage for 5 minutes. Anything
      unexpected falls through to the normal fetch. To undo: delete this block (and the one in index.html). */
   (function () {
