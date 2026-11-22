@@ -1,0 +1,45 @@
+# Stermont Arcade - ONE-TIME copy of Supabase Storage photos into the ImageKit Media Library.
+# Run it by hand: Actions tab > "Copy photos to ImageKit (one-time)" > Run workflow.
+#   1) First run with the defaults (dry run) to see how many photos it finds. Nothing is copied.
+#   2) Then run with dry_run off and limit 5 to copy a small test batch, and look at them in ImageKit > Media library.
+#   3) Then run with dry_run off and limit 0 to copy everything. Re-running is safe: photos already copied are skipped.
+# It needs the repository secret IMAGEKIT_PRIVATE_KEY (ImageKit > Developer options > Private key).
+# It never deletes anything and never changes the database or the live website.
+name: Copy photos to ImageKit (one-time)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: only list the photos, copy nothing. Untick to really copy.'
+        type: boolean
+        default: true
+      limit:
+        description: 'Copy only the first N photos (0 = all). Use 5 for a first test.'
+        type: string
+        default: '0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: copy-images-to-imagekit
+  cancel-in-progress: false
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      - name: Copy photos
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          LIMIT: ${{ inputs.limit }}
+          IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
+        run: node scripts/copy-images-to-imagekit.mjs
