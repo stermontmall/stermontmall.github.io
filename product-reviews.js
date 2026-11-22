@@ -3,7 +3,7 @@
    Reads only reviews you approved in admin > Customers > Reviews (public read, row security allows approved rows only).
    Adds a small star line to each product card and a reviews block to the product popup. All text is set with textContent. */
 (function () {
-  var D = document, SBU = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
+  var D = document, NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
   var by = {}, ready = false;
 
   function el(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
@@ -58,7 +58,7 @@
     sec.appendChild(g); anchor.parentNode.insertBefore(sec, anchor);
   }
 
-  fetch(SBU + '/rest/v1/reviews?select=product_name,rating,body,reviewer,created_at&status=eq.approved&order=created_at.desc&limit=1000', { headers: { apikey: KEY } })
+  fetch(NEON_REST + 'rpc/get_approved_reviews')
     .then(function (r) { if (!r.ok) throw 0; return r.json(); })
     .then(function (rows) {
       (rows || []).forEach(function (r) { var k = key(r.product_name), n = Number(r.rating); if (!k || !(n >= 1 && n <= 5)) return; r.rating = n; (by[k] = by[k] || []).push(r); });
