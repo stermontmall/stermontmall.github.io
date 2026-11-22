@@ -11,7 +11,7 @@
     return A().ready().then(function () { return A().api(path, { method: method || 'GET', body: body, headers: prefer ? { Prefer: prefer } : {} }); })
       .then(function (r) {
         if (r.status === 401) throw new Error('Your session expired. Sign in again.');
-        if (r.status === 404) throw new Error('Table missing. Run setup-admin-extras.sql in Supabase.');
+        if (r.status === 404) throw new Error('Table missing. Check the Neon admin tables and permissions.');
         if (!r.ok) return r.text().then(function (t) { var m = ''; try { m = JSON.parse(t).message; } catch (e) {} throw new Error(m || 'Request failed (' + r.status + ')'); });
         return r.status === 204 ? null : r.text().then(function (t) { return t ? JSON.parse(t) : null; });
       });
@@ -102,7 +102,7 @@
 
   /* ---------------- inbox ---------------- */
   function inbox(root) {
-    var c = shell(root, 'Customer messages 💬', 'Questions sent from the shop. Your reply shows in the customer’s account.');
+    var c = shell(root, 'Customer messages 💬', 'Questions sent from the shop. Replies are saved in the Neon customer messages inbox.');
     var list = h('div'), show = 'open'; c.appendChild(list);
     var bar = h('div', 'tabs'); c.insertBefore(bar, list); var rows = [], firstLoad = true;
     function draw() {
@@ -231,7 +231,7 @@
       return req('/rest/v1/chat_messages?select=*&order=created_at.desc&limit=1000').then(function (r) {
         rows = (r || []).slice().reverse();
         if (force || !typing()) { draw(); if (cur) markRead(groups().filter(function (x) { return x.id === cur; })[0]); }
-      }).catch(function (e) { msg(c, e.message.indexOf('Table missing') > -1 ? 'Chat table missing. Run setup-chat.sql in Supabase.' : e.message); });
+      }).catch(function (e) { msg(c, e.message.indexOf('Table missing') > -1 ? 'Live customer chat is paused because customer accounts are disabled; use guest order tracking for order updates.' : e.message); });
     }
     load(true);
     var live = setInterval(function () { if (!c.isConnected) { clearInterval(live); return; } if (!D.hidden) load(false); }, 6000);
