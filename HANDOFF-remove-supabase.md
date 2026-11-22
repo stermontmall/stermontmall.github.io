@@ -14,6 +14,12 @@ Updated: 2026-11-23. Work is strictly sequential: complete Phase 1 removal and p
 - Commit `d84b4a1d913cb436542d9e1c8c8248ef55b7b81e`: deleted `removed/daraja-20261112/` (six files) and `.github/workflows/keep-supabase-alive.yml`.
 - Commit `5ee53016eff10a66bb2eb293b4bedc6ed5157fdc`: deleted remaining root Supabase setup SQL files: `setup-admin-extras.sql`, `setup-chat.sql`, `setup-client-quotations.sql`, `setup-search.sql`, and `setup-service-quotes.sql`.
 
+## M-Pesa functions (owner asked to remove all, 2026-11-23)
+- All M-Pesa function source is deleted on this branch: supabase/functions/{stk-push, stk-status, mpesa-mode, mpesa-callback, payments-in} and removed/daraja-20261112/*.
+- Neon: no M-Pesa database functions and no deployed M-Pesa functions (only `photoupload` is deployed, not M-Pesa).
+- Not touched: Neon tables mpesa_payments, mpesa_c2b_payments, payment_settings (tables, not functions), and M-Pesa references in client checkout code.
+- Main still contains the old function files until this branch is merged.
+
 ## Branch-specific references confirmed so far
 
 ### Client scripts
