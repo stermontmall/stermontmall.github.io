@@ -902,7 +902,7 @@ ${B}`;
         picked.push(bucket.shift());
       }
       const cards = renderHomeGridFallback(picked.map(p => ({
-        id: p.id, name: p.name, price: p.price, stock: p.stock, image: p.images?.[0], href: shellProductLink(sl(p.id))
+        id: p.id, name: p.name, price: p.price, stock: p.stock, image: optimizedImageUrl(p.images?.[0], 320), href: shellProductLink(sl(p.id))
       })), { limit: 8 });
       const updated = current.slice(0, start) + OPEN + cards + current.slice(close);
       if (updated !== current) writeFileSync(HOME, updated);
