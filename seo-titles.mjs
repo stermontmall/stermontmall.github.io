@@ -1,7 +1,7 @@
 // Stermont Arcade - puts the owner's exact Google titles AND names (products.seo_title / products.seo_name) on the built product pages.
-// Source: "Master Catalog SEO Mapping" PDF, loaded into Supabase on 2026-10-29 (columns products.seo_name and products.seo_title).
+// Source: "Master Catalog SEO Mapping" PDF, loaded into Neon (columns products.seo_name and products.seo_title).
 // Runs in .github/workflows/product-pages.yml right after seo-overrides.mjs, so the owner's wording wins over the generated one
-// (description, FAQ and everything else stay as generated). Edit a title by changing products.seo_title in Supabase, the next rebuild applies it.
+// (description, FAQ and everything else stay as generated). Edit a title by changing products.seo_title in Neon, the next rebuild applies it.
 //
 // What is changed on a matched page:
 //   - <title>, og:title, twitter:title      = the owner's title
@@ -19,8 +19,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { buyName } from './seo-meta.mjs';   // "Buy" before the visible name: the H1 and product-names.json get it, <title>, breadcrumb and JSON-LD keep the plain name
 
-const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
-const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';   // public anon key, same one generate-products.mjs uses
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
 const DIR = process.env.P_DIR || 'p';
 const NAMES_FILE = process.env.NAMES_FILE || 'product-names.json';
 const SEP = ' \u2013 ';
@@ -87,9 +86,18 @@ export function applyPage(h, title, name) {
 
 async function getRows() {
   if (process.env.SEO_TITLES_JSON) return JSON.parse(readFileSync(process.env.SEO_TITLES_JSON, 'utf8'));   // local testing only
-  const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=id,variant_group,variant_label,seo_name,seo_title,created_at&order=created_at.asc`, { headers: { apikey: KEY } });
-  if (!r.ok) throw new Error('Supabase answered ' + r.status);
-  return r.json();
+  const all = [], pageSize = 200;
+  for (let offset = 0; ; offset += pageSize) {
+    const r = await fetch(NEON_REST + 'rpc/get_product_pages', {
+      headers: { Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
+      signal: AbortSignal.timeout(30000)
+    });
+    if (!r.ok) throw new Error('Neon answered ' + r.status);
+    const batch = await r.json();
+    if (!Array.isArray(batch)) throw new Error('Neon returned an invalid SEO title list');
+    all.push(...batch);
+    if (batch.length < pageSize) return all;
+  }
 }
 
 async function main() {
