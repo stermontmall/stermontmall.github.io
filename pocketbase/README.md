@@ -57,7 +57,7 @@ The script logs in as a PocketBase superuser, then creates or updates these coll
 - product_slug_redirects
 - users (PocketBase auth collection with role and legacy Supabase user ID mapping fields)
 
-The setup is idempotent and does not delete collections or records. It preserves unrelated fields and indexes when updating a collection. Review the PocketBase dashboard after setup. If the API rejects a rule or field for your installed version, stop and share the exact error; do not weaken the rules to make setup pass.
+The setup is idempotent and does not delete collections or records. It preserves unrelated fields and indexes when updating a collection. Review the PocketBase dashboard after setup. PocketBase has no native PostgreSQL text[] field, so images and keywords are stored as JSON arrays. A root category's null parent_id is stored as 0 and translated back to null by the adapter. If the API rejects a rule or field for your installed version, stop and share the exact error; do not weaken the rules to make setup pass.
 
 ## Step 5 — create staff accounts
 
