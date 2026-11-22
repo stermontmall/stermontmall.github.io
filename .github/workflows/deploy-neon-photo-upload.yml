@@ -45,6 +45,7 @@ jobs:
             echo "::error::Repository secret NEON_API_KEY is not configured."
             exit 1
           fi
+          neon set-context --project-id "$NEON_PROJECT_ID" --branch-id br-fancy-bird-bh01xcbs
           neon functions deploy photoupload \
             --src neon-functions/photoupload \
             --branch br-fancy-bird-bh01xcbs \
@@ -52,3 +53,18 @@ jobs:
 
       - name: Verify deployment status
         run: neon functions get photoupload --branch br-fancy-bird-bh01xcbs
+
+      - name: Smoke-test the deployed HTTP endpoint
+        env:
+          PHOTO_UPLOAD_URL: https://br-fancy-bird-bh01xcbs-photoupload.compute.c-10.eu-central-1.aws.neon.tech/
+        run: |
+          response="$(curl --fail --silent --show-error --retry 5 --retry-delay 3 --retry-connrefused "${PHOTO_UPLOAD_URL}health")"
+          printf '%s' "$response" | node -e '
+            let s = "";
+            process.stdin.on("data", c => s += c);
+            process.stdin.on("end", () => {
+              const body = JSON.parse(s);
+              if (body.ok !== true || body.service !== "stermont-photo-upload") process.exit(1);
+              process.stdout.write("Photo upload function health check passed.\\n");
+            });
+          '
