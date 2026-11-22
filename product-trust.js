@@ -4,7 +4,7 @@
    admin > Customers > Reviews. Nothing is invented. All text is set with textContent. */
 (function () {
   'use strict';
-  var D = document, SBU = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', WA = '254748888230';
+  var D = document, NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/', WA = '254748888230';
   if (/^\/(admin|account|upload-photos)/.test(location.pathname) || D.getElementById('stt-style')) return;
 
   function mk(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
@@ -46,7 +46,7 @@
   function loadReviews(cb) {
     if (by) return cb(by);
     waiters.push(cb); if (loading) return; loading = true;
-    fetch(SBU + '/rest/v1/reviews?select=product_name,rating,body,reviewer,created_at&status=eq.approved&order=created_at.desc&limit=1000', { headers: { apikey: KEY } })
+    fetch(NEON_REST + 'rpc/get_approved_reviews')
       .then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
       .then(function (rows) {
         by = {};
