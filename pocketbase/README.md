@@ -71,7 +71,7 @@ Staff can read/write the protected collections. Public visitors can read active 
 
 ## Step 6 — put the CSV files in the import folder
 
-Put the four exports beside the repository's pocketbase folder, or run the importer from the folder containing the CSVs and pass their paths by changing the file names in the script. The default names are categories.csv, products.csv, vouchers.csv, and orders.csv.
+Put the four exports directly inside the repository's pocketbase folder. The folder .gitignore excludes these private exports and the import checkpoint from Git. The default names are categories.csv, products.csv, vouchers.csv, and orders.csv. If you keep the CSVs elsewhere, use --input-dir /path/to/csv-folder.
 
 The importer supports quoted commas, escaped quotes, multiline descriptions, PostgreSQL text[] values such as {"one","two"}, JSON/JSONB values, booleans and blank/null CSV cells.
 
@@ -90,7 +90,7 @@ The importer:
 - falls back to individual requests if a batch fails;
 - backs off and retries HTTP 429 responses;
 - upserts by the original Supabase ID, so rerunning after a failure is safe;
-- writes a local progress report to .pocketbase-import-state.json;
+- writes a local progress report to pocketbase/.pocketbase-import-state.json;
 - moves product cost into staff-only product_costs records;
 - keeps product IDs in supabase_id fields because PocketBase has its own short record IDs.
 
