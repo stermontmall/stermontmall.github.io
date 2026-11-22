@@ -52,5 +52,6 @@ jobs:
       - name: Install Chromium
         run: python -m playwright install --with-deps chromium
 
+      # The browser fixture mocks the Neon Data API RPCs used by the live storefront and guest checkout.
       - name: Test full shell on direct product and category URLs
         run: python mobile-shell/shell.test.py
