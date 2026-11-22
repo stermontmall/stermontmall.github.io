@@ -1,4 +1,9 @@
 
+### 2026-11-22 PR / CI checkpoint
+- Opened PR #1026: https://github.com/stermontmall/stermontmall.github.io/pull/1026 (head 4b9d83bf4d367f18bd3fcc4b49c1213e498eee5).
+- GitHub Actions started: Full mobile-shell route regression run 45002208966 and SEO pull request quality gate run 45002208943. At checkpoint both browser-suite steps were still running; no result has been claimed.
+- Exact validation to inspect next: fetch jobs for run IDs 45002208966 and 45002208943; if either browser test fails, fetch job logs and fix before merge. If the SEO gate later fails only at the product build because REST returns 402, record that separately from the product fallback regression.
+
 ## 2026-11-22 — Product deep-link fallback for Supabase REST quota restriction
 
 ### Done (on review branch)
