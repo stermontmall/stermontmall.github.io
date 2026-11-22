@@ -45,7 +45,7 @@
     return A().ready().then(function () { return A().api(path); }).then(function (r) {
       if (r.status === 401) throw new Error('Your session expired. Sign in again.');
       if (r.status === 404) throw new Error('missing');
-      if (!r.ok) throw new Error('Request failed (' + r.status + ')');
+      if (!r.ok) { var e = new Error('Request failed (' + r.status + ')'); e.status = r.status; throw e; }
       return r.json();
     });
   }
@@ -307,7 +307,7 @@
       Promise.all([payments(force), A().api('/rest/v1/orders?select=ref,status,subtotal,phone,pay_code,created_at,customer_name&order=created_at.desc&limit=500').then(function (r) { return r.ok ? r.json() : []; })])
         .then(function (r) { rowsData = r[0]; window.__siOrders = r[1]; draw(); })
         .catch(function (e) {
-          errBox(body, e.message === 'missing' ? 'The payments table is not set up yet. In Supabase, run supabase-mpesa.sql, then deploy the payments-in function (steps are in supabase/functions/payments-in/README.md).' : e.message);
+          errBox(body, e.message === 'missing' ? 'The payments table is not set up yet. In Supabase, run supabase-mpesa.sql, then deploy the payments-in function (steps are in supabase/functions/payments-in/README.md).' : (A().errorMessage ? A().errorMessage(e) : e.message));
         });
     }
     function draw() {
