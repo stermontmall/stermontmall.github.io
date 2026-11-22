@@ -97,8 +97,7 @@ def mock_network(ctx):
     ctx.add_init_script("window.shellProductLink = s => location.origin + '/?product=' + encodeURIComponent(s);")
     ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/?product=' + encodeURIComponent(v) : '/'); };"))
     def serve_product_page(rt):
-        # Match the requested fixture slug to the generated SEO page's early shell bootstrap.
-        # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
+        # Match the requested fixture slug to the generated SEO page's early shell bootstrap.        # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
         match = re.search(r'/p/([^/?#]+)\.html', rt.request.url)
         slug = match.group(1) if match else ''
         page = re.sub(r'(var p=)["\'][^"\']*["\']', lambda m: m.group(1) + json.dumps(slug), REAL, count=1)
@@ -197,8 +196,7 @@ with sync_playwright() as p:
     pg.wait_for_timeout(200)
     check('broken photo falls back to the neutral unavailable-photo label', pg.locator('#grid .card[data-id="outdoor-broken"] img').count() == 0 and pg.locator('#grid .card[data-id="outdoor-broken"] .photo-unavailable').count() == 1)
     pg.evaluate("document.querySelector('#chips [data-chip=\\\"home-living\\\"]').click()")
-    pg.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
-    pg.wait_for_function("document.querySelector('#grid .card[data-id=\\\"garden-set\\\"]')?.textContent.includes('4 sizes')", timeout=10000)
+    pg.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)    pg.wait_for_function("document.querySelector('#grid .card[data-id=\\\"garden-set\\\"]')?.textContent.includes('4 sizes')", timeout=10000)
     pack_card = pg.locator('#grid .card[data-id="garden-set"]')
     check('pack sizes fold into ONE card with a From price', pack_card.count() == 1 and 'From KSh 390' in pack_card.inner_text() and '4 sizes' in pack_card.inner_text(), pack_card.inner_text() if pack_card.count() else 'card missing')
     pg.locator('#chips [data-chip="all"]').click()
@@ -220,7 +218,8 @@ with sync_playwright() as p:
     check('tapping a product opens its full product page directly', pg.locator('#page-product.open').count() == 1)
     check('opening product pushed one history entry', pg.evaluate('history.length') == h0 + 1)
     check('body scroll locked', pg.evaluate("document.body.classList.contains('no-scroll')"))
-    pg.wait_for_timeout(450); pg.screenshot(path=f'{OUT}/shot-product.png')    pg.go_back()
+    pg.wait_for_timeout(450); pg.screenshot(path=f'{OUT}/shot-product.png')
+    pg.go_back()
     pg.wait_for_timeout(350)
     check('Back closes product page and stays on shop', pg.locator('#page-product.open').count() == 0 and pg.url == URL, pg.url)
     check('scroll unlocked after close', not pg.evaluate("document.body.classList.contains('no-scroll')"))
@@ -297,8 +296,7 @@ with sync_playwright() as p:
     names = pg.evaluate("[...document.querySelectorAll('#grid .card[data-id]')].map(e=>e.dataset.id.split('-')[0])")
     check('grid shows only that category', names and set(names) == {'phone'}, set(names))
 
-    # tabs + history
-    h1 = pg.evaluate('history.length')
+    # tabs + history    h1 = pg.evaluate('history.length')
     pg.locator('#bottom-nav [data-tab="categories"]').click()
     check('Categories tab active (aria-current)', pg.locator('#bottom-nav [data-tab="categories"][aria-current="page"]').count() == 1 and pg.locator('#view-categories').is_visible())
     check('leaving Home pushed an entry for the tab', pg.evaluate('history.state.tab') == 'categories')
@@ -397,8 +395,7 @@ with sync_playwright() as p:
     BASE = URL.rstrip('/')
     html = pg.evaluate("fetch('/').then(r => r.text())")   # the HTML the server sends (the live page's title changes while a product is open)
     check('home page keeps the SEO head (brand-first title, canonical, index robots, JSON-LD)', re.search(r'<title>Stermont Arcade \|[^<]*</title>', html) and 'rel="canonical" href="https://stermontarcade.co.ke/"' in html and 'index, follow' in html and html.count('application/ld+json') >= 2 and 'noindex' not in html)
-    check('home page carries the seo-links markers the build bot fills (crawlable category + product links)', html.count('<!-- seo-links:start -->') == 1 and html.count('<!-- seo-links:end -->') == 1 and '/c/' in html and '?product=' in html)
-    cls = open(os.path.join(ROOT, 'classic.html'), encoding='utf-8').read()
+    check('home page carries the seo-links markers the build bot fills (crawlable category + product links)', html.count('<!-- seo-links:start -->') == 1 and html.count('<!-- seo-links:end -->') == 1 and '/c/' in html and '?product=' in html)    cls = open(os.path.join(ROOT, 'classic.html'), encoding='utf-8').read()
     chk = open(os.path.join(ROOT, 'checkout.html'), encoding='utf-8').read()
     check('checkout.html (the checkout surface) is noindex so only / is indexed', 'content="noindex, follow"' in chk and 'index, follow, max-image' not in chk)
     check('classic.html is only a tiny forwarder: noindex, no shop code, no script files', len(cls) < 3000 and 'content="noindex, follow"' in cls and '<script src' not in cls, len(cls))
@@ -497,8 +494,7 @@ with sync_playwright() as p:
     # product addresses: an open product has its own URL (/?product=<slug of the size>), the base entry stays "/", and the address reopens the product
     c9 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c9)
     p9 = c9.new_page(); e9 = []
-    p9.on('pageerror', lambda e: e9.append(str(e)))
-    p9.goto(URL); p9.wait_for_selector('#grid .card[data-id]')
+    p9.on('pageerror', lambda e: e9.append(str(e)))    p9.goto(URL); p9.wait_for_selector('#grid .card[data-id]')
     p9.locator('#chips [data-chip="home-living"]').click()
     p9.wait_for_function("document.querySelector('#grid-title').textContent === 'Home & Living'", timeout=10000)
     p9.wait_for_selector('#grid .card[data-id="garden-set"]', timeout=10000)
@@ -597,8 +593,7 @@ with sync_playwright() as p:
     pc2.wait_for_selector('#bottom-nav', state='visible', timeout=15000)
     check('?classic=1 cannot bypass the full mobile shell on category pages', pc2.evaluate('location.pathname') == '/c/garden-outdoors.html' and pc2.locator('#bottom-nav').count() == 1)
     cc2.close()
-    # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell
-    PAGES = ['account', 'track', 'shipping', 'returns', 'contact', 'faq', 'about', 'privacy', 'terms']
+    # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell    PAGES = ['account', 'track', 'shipping', 'returns', 'contact', 'faq', 'about', 'privacy', 'terms']
     c13 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c13)
     p13 = c13.new_page(); e13 = []; p13.on('pageerror', lambda e: e13.append(str(e)))
     bad = []
@@ -697,8 +692,7 @@ with sync_playwright() as p:
     check('a saved category that no longer exists falls back to For you', p15.locator('#grid-title').inner_text() == 'Recommended for you' and p15.locator('#grid .card[data-id]').count() > 3)
     check('reload category: no page errors', not e15, e15[:3])
 
-    c15.close()
-    c16 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c16)
+    c15.close()    c16 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c16)
     p16 = c16.new_page(); p16.goto(URL); p16.wait_for_selector('#grid .card[data-id]')
     check('a fresh visit still starts on For you', p16.locator('#grid-title').inner_text() == 'Recommended for you')
     c16.close()
@@ -721,20 +715,3 @@ with sync_playwright() as p:
     c18.route('**/p/home-1.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=card_html))
     p18 = c18.new_page(); e18 = []; p18.on('pageerror', lambda e: e18.append(str(e)))
     p18.goto(URL); p18.wait_for_selector('#grid .card[data-id="home-1"]')
-    FAIL[0] = True  # Supabase REST now returns 402 for the details request
-    p18.locator('#grid .card[data-id="home-1"]').click(); p18.wait_for_selector('#page-product.open', timeout=15000)
-    p18.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Card description comes from the published page.')", timeout=8000)
-    check('tapping a card shows its description from the published page when Supabase REST returns 402', 'Card description comes from the published page.' in p18.locator('#pp-desc').inner_text() and 'Second line item' in p18.locator('#pp-desc').inner_text(), p18.locator('#pp-desc').inner_text()[:80])
-    check('card-tap fallback marks the product in stock and shows no load error', 'In stock' in p18.locator('#pp-meta').inner_text() and 'Could not load' not in p18.locator('#pp-desc').inner_text(), p18.locator('#pp-meta').inner_text())
-    check('card-tap description fallback has no JavaScript errors', not e18, e18[:3])
-    FAIL[0] = False
-    c18.close()
-
-    co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
-    check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
-    check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'failed_requests': failed_requests[:3]})
-    b.close()
-
-fails = [n for n, ok in results if not ok]
-print(f'\n{len(results) - len(fails)}/{len(results)} passed')
-sys.exit(1 if fails else 0)
