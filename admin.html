@@ -218,12 +218,38 @@
   function load() { try { return JSON.parse(localStorage.getItem(SK)); } catch (e) { return null; } }
   function save(s) { try { if (s) localStorage.setItem(SK, JSON.stringify(s)); else localStorage.removeItem(SK); } catch (e) {} }
 
-  window.STMAdmin = { base: SB, raw: function (path, o) { o = o || {}; return ready().then(function () { var hd = { apikey: KEY }; if (sess) hd.Authorization = 'Bearer ' + sess.access_token; return fetch(SB + path, { method: o.method || 'GET', headers: Object.assign(hd, o.headers || {}), body: o.body }); }); }, api: function (p, o) { return api(p, o); }, ready: function () { return ready(); }, money: function (n) { return money(n); }, fmt: function (d) { return fmt(d); }, email: function () { return (sess && sess.email) || ''; }, approveWith: function (ref, code, amt) { approveWith(ref, code, amt); } };
+  var sharedReadBackoff = new STMAdminHttp.Backoff({ baseMs: 30000, maxMs: 300000 });
+  function trackedFetch(url, options) {
+    options = options || {};
+    var method = String(options.method || 'GET').toUpperCase(), readOnly = method === 'GET' || method === 'HEAD';
+    return fetch(url, options).then(function (response) {
+      if (readOnly) {
+        if (response.ok) sharedReadBackoff.success();
+        else if (response.status === 402 || response.status === 429 || response.status >= 500) sharedReadBackoff.fail();
+      }
+      return response;
+    }, function (error) {
+      if (readOnly) sharedReadBackoff.fail();
+      throw error;
+    });
+  }
+  window.STMAdmin = {
+    base: SB,
+    raw: function (path, o) { o = o || {}; return ready().then(function () { var hd = { apikey: KEY }; if (sess) hd.Authorization = 'Bearer ' + sess.access_token; return trackedFetch(SB + path, { method: o.method || 'GET', headers: Object.assign(hd, o.headers || {}), body: o.body }); }); },
+    api: function (p, o) { return api(p, o); },
+    ready: function () { return ready(); },
+    money: function (n) { return money(n); },
+    fmt: function (d) { return fmt(d); },
+    email: function () { return (sess && sess.email) || ''; },
+    shouldPoll: function () { return !sharedReadBackoff.waiting(); },
+    errorMessage: function (error) { return adminErrorMessage(error); },
+    approveWith: function (ref, code, amt) { approveWith(ref, code, amt); }
+  };
   function api(path, opt) {
     opt = opt || {};
     var hd = { apikey: KEY, 'Content-Type': 'application/json' };
     if (sess) hd.Authorization = 'Bearer ' + sess.access_token;
-    return fetch(SB + path, { method: opt.method || 'GET', headers: Object.assign(hd, opt.headers || {}), body: opt.body ? JSON.stringify(opt.body) : undefined });
+    return trackedFetch(SB + path, { method: opt.method || 'GET', headers: Object.assign(hd, opt.headers || {}), body: opt.body ? JSON.stringify(opt.body) : undefined });
   }
   function setSession(j) { sess = { access_token: j.access_token, refresh_token: j.refresh_token, email: (j.user && j.user.email) || (sess && sess.email) || '', exp: Date.now() + (j.expires_in || 3600) * 1000 - 60000 }; save(sess); }
   function refresh() {
@@ -274,7 +300,7 @@
   });
   $('out').addEventListener('click', function () { if (window.STMServices) STMServices.stop(); sess = null; save(null); show('login'); });
   $('refresh').addEventListener('click', function () { q = ''; $('q').value = ''; fetchOrders(true); });
-  setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && !D.hidden && EXTRA.indexOf(tab) < 0) fetchOrders(); }, 30000);
+  setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && !D.hidden && EXTRA.indexOf(tab) < 0 && !sharedReadBackoff.waiting()) fetchOrders(); }, 30000);
 
   function fetchOrders(force) {
     if (!force && pollBackoff.waiting()) return Promise.resolve();
@@ -606,8 +632,8 @@
   }
   sess = load();
   if (sess) start(); else show('login');
-  setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && EXTRA.indexOf(tab) < 0) fetchOrders(); }, 60000);
-  setInterval(function () { if (sess && !$('app').hidden && !D.hidden && tab !== 'quotes' && window.STMServices && !pollBackoff.waiting()) STMServices.badge(renderTabs); }, 60000);
+  setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && EXTRA.indexOf(tab) < 0 && !sharedReadBackoff.waiting()) fetchOrders(); }, 60000);
+  setInterval(function () { if (sess && !$('app').hidden && !D.hidden && tab !== 'quotes' && window.STMServices && !pollBackoff.waiting() && !sharedReadBackoff.waiting()) STMServices.badge(renderTabs); }, 60000);
 
   /* ---- signature pad ---- */
   (function () {
