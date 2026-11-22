@@ -62,6 +62,12 @@ def on_rest(route):
     serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
 REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
+
+def run_node(fn, html, slug):
+    # Shared at module scope because Playwright route callbacks can run before h() reaches its later test section.
+    import subprocess
+    js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1],process.argv[2])))" % fn
+    return subprocess.run(['node', '-e', js, html, slug], cwd=ROOT, capture_output=True, text=True, check=True).stdout
 def mock_network(ctx):
     # Keep shell product URLs on the local fixture origin. Generated SEO pages expose
     # the production-domain helper, which would otherwise send the headless test away
@@ -506,9 +512,6 @@ with sync_playwright() as p:
 
     # Product/category pages hydrate the real app in place while preserving canonical SEO HTML.
     import subprocess, re as _re
-    def run_node(fn, html, slug):
-        js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1],process.argv[2])))" % fn
-        return subprocess.run(['node', '-e', js, html, slug], cwd=ROOT, capture_output=True, text=True, check=True).stdout
     check('generated product pages have the in-place full-shell loader', '/shell-route-loader.js?v=2' in run_node('inject', REAL, 'abasi-5-ec'))
     page = '<!doctype html><html><head><title>t</title><link rel="canonical" href="https://stermontarcade.co.ke/p/t.html"></head><body>x</body></html>'
     new_page = run_node('inject', page, 'termidor-96-sc-1-litre')
