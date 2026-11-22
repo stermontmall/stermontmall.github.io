@@ -4,7 +4,7 @@
       var CFG = { paybill: '714777', payAcct: '0748888230', wa: '254748888230',
         /* Card payments (Paystack). Keep hidden until a verified live PAYSTACK_SECRET_KEY is configured. */
         card: false,
-        sbUrl: 'https://oewvtbnmyombbtggamor.supabase.co', sbKey: 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', sbRef: 'oewvtbnmyombbtggamor',
+        neonRest: 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/',
         /* Free key from https://web3forms.com (enter the email that should receive order alerts) */
         mailKey: '2c55cbd0-5ec1-4603-a6a0-293b8a68faab',
         /* Optional second inbox: paste a key made with the other email here */
@@ -20,17 +20,12 @@
       function money(n) { return 'KSh ' + n.toLocaleString('en-KE'); }
       var cart = ls('stm_cart') || {}, cust = ls('stm_cust') || {}, step = 'cart', isOpen = false, opener = null, ref = '', lastMsg = '', lastUrl = '', sending = false, sendErr = '', doneRef = '', doneTotal = 0, doneCode = '', doneAmt = 0, doneVia = '';
       /* Saved checkout details belong to one person. If a different account (or a guest) is now using this phone, drop them so nobody sees the previous customer's details. */
-      function myUid() { try { var x = JSON.parse(localStorage.getItem('sb-' + CFG.sbRef + '-auth-token')); return x && x.user && x.user.id ? x.user.id : null; } catch (e) { return null; } }
+      function myUid() { return null; }
       var lastUid = myUid();
       if (!cust || cust.uid === undefined || cust.uid !== lastUid) { cust = {}; ls('stm_cust', null); }
       var form = { method: 'delivery', name: cust.name || '', phone: cust.phone || '', email: cust.email || '', county: cust.county || '', addr: cust.addr || '', notes: '', payCode: '', payAmt: '', payTouched: false, payVia: '' }, errs = {};
-      function session() {
-        try {
-          var x = JSON.parse(localStorage.getItem('sb-' + CFG.sbRef + '-auth-token'));
-          if (x && x.access_token && x.user && (!x.expires_at || x.expires_at * 1000 > Date.now() + 30000)) return x;
-        } catch (e) {}
-        return null;
-      }
+      function session() { return null; }
+
       (function () { var u = (session() || {}).user; if (u) { var md = u.user_metadata || {}; if (!form.name) form.name = md.full_name || ''; if (!form.phone) form.phone = md.phone || ''; if (!form.email) form.email = u.email || ''; } })();
       /* If the signed-in account changes while the page is open (sign out / sign in as someone else), clear everything typed or saved for the previous person. */
       function checkWho() {
@@ -183,7 +178,7 @@
         var c = (inp.value || '').trim().toUpperCase(); form.vcode = c;
         if (c.length < 3) { er.textContent = 'Enter your voucher code.'; return; }
         ab.disabled = true; er.textContent = '';
-        fetch(CFG.sbUrl + '/rest/v1/rpc/check_voucher', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.sbKey }, body: JSON.stringify({ p_code: c, p_subtotal: T.s, p_phone: form.phone || null }) })
+        fetch(CFG.neonRest + 'rpc/check_voucher', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_code: c, p_subtotal: T.s, p_phone: form.phone || null }) })
           .then(function (r) { return r.json(); })
           .then(function (j) {
             if (j && j.ok && Number(j.discount) > 0) { form.vc = { code: String(j.code), discount: Math.round(Number(j.discount)), base: T.s }; form.vcode = ''; form.payTouched = false; render(); }
@@ -204,11 +199,8 @@
         }
         b.appendChild(w);
       }
-      /* Small helper that posts JSON to a Supabase edge function (used by the card flow). */
-      function stkFn(name, body) {
-        return fetch(CFG.sbUrl + '/functions/v1/' + name, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.sbKey }, body: JSON.stringify(body) })
-          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || ('Error ' + r.status)); return j; }); });
-      }
+      /* Card payments remain disabled until the Neon Paystack function and secret are configured. */
+      function stkFn() { return Promise.reject(new Error('Card payments are currently unavailable. Please use M-Pesa.')); }
       /* ---- Card payments (Paystack). Card details are typed in Paystack's own window; this page only gets a payment reference back. ---- */
       var cardBusy = false, cardMsg = '', cardRefLast = '', keepObs = null;
       /* FIX (2026-11-03): in checkout mode checkout.html hides every <body> child except the drawer
@@ -520,33 +512,40 @@
         var s = session(), method = form.method, code = cleanCode(), paid = Number(form.payAmt);
         if (!codeOk() || !amtOk(T)) { sending = false; sendErr = 'Enter your payment code and the amount you paid before placing the order.'; render(); return; }
         var row = {
-          ref: ref, user_id: s ? s.user.id : null, customer_name: form.name.trim().slice(0, 120), phone: '+' + normPhone(form.phone),
-          email: (form.email || '').trim().toLowerCase().slice(0, 150) || (s && s.user.email) || null, method: method, county: method === 'delivery' ? form.county : null,
-          address: method === 'delivery' ? form.addr.trim().slice(0, 200) : null, notes: form.notes && form.notes.trim() ? form.notes.trim().slice(0, 500) : null,
-          items: T.L.map(function (i) { return { name: i.name, qty: i.qty, price: i.price, total: i.total }; }).concat(feeOf() ? [{ name: 'Delivery fee (' + form.county + ')', qty: 1, price: feeOf(), total: feeOf() }] : []), subtotal: due(T), pay_code: code, pay_amount: paid,
+          ref: ref, customer_name: form.name.trim().slice(0, 120), phone: '+' + normPhone(form.phone),
+          email: (form.email || '').trim().toLowerCase().slice(0, 150) || null,
+          method: method, county: method === 'delivery' ? form.county : null,
+          address: method === 'delivery' ? form.addr.trim().slice(0, 200) : null,
+          notes: form.notes && form.notes.trim() ? form.notes.trim().slice(0, 500) : null,
+          items: T.L.map(function (i) { return { product_id: String(i.id || '').replace(/^p-/, ''), name: i.name, qty: i.qty, price: i.price, total: i.total }; }),
+          subtotal: due(T), pay_code: code, pay_amount: paid,
           voucher_code: vOff(T) ? form.vc.code : null, discount: vOff(T)
         };
-        var hd = { 'Content-Type': 'application/json', apikey: CFG.sbKey, Prefer: 'return=minimal' };
-        if (s) hd.Authorization = 'Bearer ' + s.access_token;
         var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function () { if (ctl) ctl.abort(); }, 20000);
-        function post(rw) {
-          return fetch(CFG.sbUrl + '/rest/v1/orders', { method: 'POST', headers: hd, body: JSON.stringify(rw), signal: ctl ? ctl.signal : undefined })
-            .then(function (r) { if (r.ok) return; return r.text().then(function (t) { var e = new Error('status ' + r.status + ' ' + t); e.status = r.status; e.body = t; throw e; }); });
-        }
-        post(row)
-          .catch(function (err) {   /* payment columns not set up yet: keep the code in the order notes instead */
-            if (err && err.status === 400 && /pay_code|pay_amount/.test(err.body || '')) {
-              var r2 = Object.assign({}, row); delete r2.pay_code; delete r2.pay_amount;
-              r2.notes = ((form.payVia === 'card' ? 'Card reference ' : 'M-Pesa code ') + code + ', paid KSh ' + paid + (row.notes ? ' | ' + row.notes : '')).slice(0, 500); return post(r2);
+        var payload = {
+          p_ref: ref, p_customer_name: row.customer_name, p_phone: row.phone, p_email: row.email,
+          p_method: row.method, p_county: row.county, p_address: row.address, p_notes: row.notes,
+          p_items: row.items.map(function (i) { return { product_id: i.product_id, qty: i.qty }; }),
+          p_pay_code: code, p_pay_amount: paid, p_voucher_code: row.voucher_code
+        };
+        fetch(CFG.neonRest + 'rpc/create_guest_order', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+          signal: ctl ? ctl.signal : undefined
+        }).then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (j) {
+            if (!r.ok || !j || !j.ok) {
+              var error = new Error((j && j.reason) || ('Order request failed with HTTP ' + r.status));
+              if (error.message.toLowerCase().indexOf('already been used') >= 0) error.status = 409;
+              throw error;
             }
-            throw err;
-          })
-          .then(function () {
+            return j;
+          });
+        })          .then(function (orderResult) {
             clearTimeout(to); doneCode = code; doneAmt = paid; doneVia = form.payVia || '';
             lastMsg = message(T); lastUrl = 'https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(lastMsg);
             notify(T, s);
             ls('stm_cust', { uid: myUid(), name: form.name.trim(), phone: form.phone, email: (form.email || '').trim(), county: form.county, addr: form.addr, method: form.method });
-            doneRef = ref; doneTotal = due(T); form.vc = null; form.vcode = ''; ref = ''; cart = {}; store(); sending = false; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.payVia = ''; cardRefLast = ''; cardMsg = ''; step = 'done'; sync(); if (!isOpen) render();
+            doneRef = ref; doneTotal = Number(orderResult && orderResult.subtotal) || due(T); form.vc = null; form.vcode = ''; ref = ''; cart = {}; store(); sending = false; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.payVia = ''; cardRefLast = ''; cardMsg = ''; step = 'done'; sync(); if (!isOpen) render();
           })
           .catch(function (err) {
             clearTimeout(to); sending = false;
@@ -592,14 +591,16 @@
       if (ob) { var sp = h('span', 'cb', '0'); sp.hidden = true; ob.appendChild(sp); ob.addEventListener('click', function (e) { e.preventDefault(); openDr('cart'); }); }
       /* Sold-out products (set by customer care in the admin page) */
       try {
-        fetch(CFG.sbUrl + '/rest/v1/stock?select=product&in_stock=eq.false', { headers: { apikey: CFG.sbKey } })
+        fetch(CFG.neonRest + 'rpc/get_product_pages')
           .then(function (r) { return r.ok ? r.json() : []; })
           .then(function (rows) {
-            rows.forEach(function (x) {
-              var c = D.getElementById('p-' + x.product); if (!c) return;
+            rows.filter(function (x) { return Number(x.stock) <= 0; }).forEach(function (x) {
+              var ids = [x.id, x.slug].filter(Boolean), c = null;
+              ids.some(function (id) { c = D.getElementById('p-' + id); return !!c; });
+              if (!c) return;
               var b = c.querySelector('button.btn-main'); if (b) { b.dataset.sold = '1'; b.disabled = true; b.textContent = 'Sold out'; b.style.opacity = '.55'; }
               var im = c.querySelector('.img'); if (im && !im.querySelector('.soldtag')) { var t = h('span', 'soldtag', 'Sold out'); t.style.cssText = 'position:absolute;top:.5rem;left:.5rem;background:#b91c1c;color:#fff;font-weight:800;font-size:.75rem;padding:.2rem .6rem;border-radius:999px'; if (getComputedStyle(im).position === 'static') im.style.position = 'relative'; im.appendChild(t); }
-              delete cart['p-' + x.product];
+              ids.forEach(function (id) { delete cart['p-' + id]; });
             });
             store(); sync();
           }).catch(function () {});
