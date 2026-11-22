@@ -31,6 +31,13 @@ jobs:
           GSC_PROPERTY: ${{ secrets.GSC_PROPERTY }}
           MAX_MINUTES: '20'
         run: node seo-index-status.mjs > index-status.md
+      - name: Store Google indexing report in Neon
+        if: steps.inspect.outcome == 'success'
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          npm install --no-save @neondatabase/serverless
+          node neon-automation-sync.mjs index
       - name: Publish as an issue
         env:
           GH_TOKEN: ${{ github.token }}
