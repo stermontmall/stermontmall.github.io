@@ -625,7 +625,35 @@ function renderProductDescription(target, source) {
 }
 /* @render-end */
 const details = new Map(); // Cache product-detail requests by variant row ID; renderDetails() and renderPP() share this cache.
-const detailsFor = rowId => { if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images,product_code`).then(r => r[0] || null).catch(() => { details.delete(rowId); return null; })); return details.get(rowId); };
+let fallbackDataPromise;
+function loadProductFallbacks() {
+  if (!fallbackDataPromise) fallbackDataPromise = fetch('/mobile-shell/product-fallbacks.json', { cache: 'no-cache' })
+    .then(r => { if (!r.ok) throw new Error('Product fallback HTTP ' + r.status); return r.json(); })
+    .then(data => {
+      if (!data || data.version !== 1 || !Array.isArray(data.products) || !Array.isArray(data.categories)) throw new Error('Invalid product fallback snapshot');
+      return data;
+    });
+  return fallbackDataPromise;
+}
+const fallbackRow = async slug => {
+  const data = await loadProductFallbacks();
+  const row = data.products.find(x => x.slug === slug || x.id === slug);
+  return row ? { ...row, cover_image: Array.isArray(row.images) && row.images.length ? row.images[0] : '' } : null;
+};
+const fallbackDetail = async rowId => {
+  const data = await loadProductFallbacks();
+  const row = data.products.find(x => x.id === rowId || x.slug === rowId);
+  return row ? { description: row.description || '', unit: row.unit || '', stock: row.stock, low_at: row.low_at || 5, slug: row.slug, images: row.images || [], product_code: row.product_code || '' } : null;
+};
+const detailsFor = rowId => {
+  if (!details.has(rowId)) details.set(rowId,
+    api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images,product_code`)
+      .then(r => r[0] || null)
+      .catch(async () => { try { return await fallbackDetail(rowId); } catch { return null; } })
+      .then(value => { if (!value) details.delete(rowId); return value; })
+  );
+  return details.get(rowId);
+};
 async function renderDetails(rowId) {
   const box = $('#qb-details'); if (!box) return;                  // an older cached index.html has no details block: leave the sheet as it was
   box.hidden = false;
@@ -763,7 +791,21 @@ async function quickDeepLink(slug) {
     buildCatalog(rows, cats, {});   // Use the database name immediately; the full catalog replaces it when it arrives
     if (!PRODUCTS.some(x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug))) { PRODUCTS = []; CATS = []; return; }
     openDeepLink(slug);
-  } catch (e) { if (!deepOpen && !fullCatalog) { PRODUCTS = []; CATS = []; } }
+  } catch (e) {
+    // Supabase REST can be temporarily restricted (for example, cached-egress quota).
+    // Keep direct product links usable from the versioned, read-only GitHub Pages snapshot.
+    if (deepOpen || fullCatalog) return;
+    try {
+      const data = await loadProductFallbacks();
+      const row = data.products.find(x => x.slug === slug || x.id === slug);
+      if (!row) throw new Error('Product not present in fallback snapshot');
+      buildCatalog(data.products.map(x => ({ ...x, cover_image: Array.isArray(x.images) && x.images.length ? x.images[0] : '' })), data.categories, {});
+      openDeepLink(slug);
+    } catch {
+      PRODUCTS = []; CATS = [];
+      toast('Product could not be loaded. Please try again shortly.');
+    }
+  }
 }
 function refreshDeep() {   // the full catalog is in: swap in the full product entry and redraw the open product page (related products, any size changes)
   if (!qb.p) return;
