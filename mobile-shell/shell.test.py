@@ -52,7 +52,7 @@ def serve(route, body, ctype='application/json'):
     time.sleep(0.4)   # a real network round trip, so the skeleton state is observable
     route.fulfill(status=200, content_type=ctype, body=body if isinstance(body, (bytes, str)) else json.dumps(body), headers={'access-control-allow-origin': '*'})
 def on_rest(route):
-    if FAIL[0]: return route.fulfill(status=503, body='down', headers={'access-control-allow-origin': '*'})
+    if FAIL[0]: return route.fulfill(status=402, body='exceed_cached_egress_quota', headers={'access-control-allow-origin': '*'})
     url = route.request.url
     if '/rest/v1/products' in url and 'id=eq.' in url:   # details of one row, fetched when a product is opened
         rid = url.split('id=eq.')[1].split('&')[0]
