@@ -1,6 +1,7 @@
 # Headless-mobile test of the shell. Needs: pip install playwright && playwright install chromium
 # Run: python3 mobile-shell/shell.test.py   (screenshots go to the system temp folder)
 import re, sys, threading, http.server, socketserver, functools, os, tempfile, json, base64, time
+from urllib.parse import unquote
 from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root: the shell reads /product-names.json
@@ -87,7 +88,7 @@ def mock_network(ctx):
     ctx.route('**/product-names.json*', lambda r: serve(r, NAMES_FIX))
     # ImageKit Web Proxy wraps the original source URL; emulate successful and missing upstream photos.
     def imagekit_proxy(route):
-        url = route.request.url
+        url = unquote(route.request.url)
         if url.endswith('https://img.test/ok.png'):
             return route.fulfill(status=200, content_type='image/png', body=PNG)
         if url.endswith('https://img.test/broken.jpg'):
@@ -311,7 +312,11 @@ with sync_playwright() as p:
 
     # Supabase down: the grid offers a retry instead of hanging on skeletons, and recovers
     FAIL[0] = True
-    p2 = ctx.new_page(); p2.goto(URL)
+    p2 = ctx.new_page()
+    # The previous page intentionally populated the catalogue prefetch cache. Remove it so
+    # this scenario exercises a real Supabase outage instead of replaying cached products.
+    p2.add_init_script("localStorage.removeItem('shell.catalogPrefetch.v1')")
+    p2.goto(URL)
     p2.wait_for_selector('#grid-empty:not([hidden])', timeout=8000)
     check('network failure shows a retry link, no stuck skeletons', 'Could not load products' in p2.locator('#grid-empty').inner_text() and p2.locator('#grid-empty a[href="/"]').count() == 1 and p2.locator('#grid .card[aria-hidden="true"]').count() == 0)
     FAIL[0] = False
