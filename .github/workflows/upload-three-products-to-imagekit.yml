@@ -1,0 +1,30 @@
+name: Upload three pilot product photos to ImageKit
+
+on:
+  push:
+    branches:
+      - imagekit-upload-three-product-pilot-2026-11-22
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Upload verified GitHub product photos to ImageKit Media Library
+        env:
+          IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
+        run: node scripts/upload-three-products-to-imagekit.mjs
+      - name: Save ImageKit URLs for catalogue update
+        uses: actions/upload-artifact@v4
+        with:
+          name: imagekit-three-product-urls
+          path: imagekit-upload-results/three-products.json
+          if-no-files-found: error
+          retention-days: 7
