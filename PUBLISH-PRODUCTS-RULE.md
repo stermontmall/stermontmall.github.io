@@ -1,80 +1,90 @@
 # READ THIS FIRST — Product publishing rule (Claude + ChatGPT)
 
-If the owner says "publish products", "run the publish rule", or asks you to add products to the website, follow the rule below exactly.
+If the owner says "publish products", "run the publish rule", or asks you to add products to the website, follow the rule below exactly. It is a permanent, fully autonomous standing instruction: the owner does not supply photos, descriptions, prices or SEO. Find everything online and publish directly.
 
 ## Where the rule lives
 - **Source of truth:** Neon project `restless-shape-79120240`, database `stermont`, table `public.publishing_rules`, key `publish_products`.
   Load it with: `select content from public.publishing_rules where key = 'publish_products';`
 - **This file** is a mirror so the rule is visible the moment GitHub is connected. If the two ever differ, the Neon row wins (check its `version` and `updated_at`).
-- Also run `select key, version, title from public.publishing_rules;` to see any other rules.
+- Also run `select key, version, title from public.publishing_rules;` to see the other rules (`00_read_me_first`, `supabase_legacy_rules`).
 
 ## How to connect
 - **Claude:** connect the GitHub and Neon connectors, then say "publish products".
 - **ChatGPT:** connect GitHub and Neon, ask it to read this file and the Neon rule, then say "publish products".
-- Never use Supabase for new products. Supabase is quota-restricted; its hidden products are restored separately.
+- Never use Supabase to add products. Supabase is quota-restricted; its hidden products are restored separately.
 - Never put passwords, connection strings or API keys in this repo or in chat.
 
 ## Notes for assistants
 - `rules/publishing-rule.json` and `AGENTS.md` / `CLAUDE.md` describe the older Supabase workflow. For posting to Neon, the rule below governs.
-- Business focus: **Pest Control & Fumigation** and **Agrovet**. Spread other categories only if the owner asks.
-- Pesticides and veterinary products: do not invent doses, dilution rates, approved uses or registration numbers. If the PCPB status cannot be verified, say so in the report and keep the product inactive.
+- Business focus: **Pest Control & Fumigation** and **Agrovet**.
+- Check duplicates against Neon **and** this repo's `sitemap-products.xml` / `product-names.json` (the old Supabase catalogue returns when its quota resumes).
 
 ---
 
-## The rule (mirror of Neon `publish_products`, version 2)
+## The rule (mirror of Neon `publish_products`, version 3)
 
 ```
-PUBLISH-PRODUCTS RULE v1 (owner: ntanamoupdates@gmail.com)
+PUBLISH-PRODUCTS RULE v3 - FULLY AUTONOMOUS - PERMANENT STANDING INSTRUCTION
+Owner: ntanamoupdates@gmail.com. Approved 2026-11-22.
 When the owner says "publish products", "run the publish rule" or similar, follow this rule exactly. It works the same in Claude and ChatGPT.
 
+THE OWNER DOES NOT SUPPLY ANYTHING
+The owner does NOT upload photos, write descriptions, set prices or write SEO text. Find every detail online, write it, insert it and publish it directly. Do not ask the owner for photos, descriptions, prices or SEO. Ask only if the owner has not said how many products or which department, and then just use the defaults below. Report only at the end.
+
 TARGET
-Neon project restless-shape-79120240, database stermont, schema public, table products. Never use Supabase. Default batch: 20 products per run, unless the owner gives another number.
+Neon project restless-shape-79120240, database stermont, schema public, table products. Never use Supabase to add products. Default batch: 20 products per run, unless the owner gives another number. Business focus: Pest Control & Fumigation and Agrovet. Use General Merchandise only if the owner asks.
 
 CATEGORIES (exact IDs)
 - Agrovet & Farm Supplies: 43dbe459-0749-4a9e-8f59-12bbb0026be2
 - Pest Control & Fumigation: 8782c41a-6cd5-4e08-b7a9-ea51c940d972
 - General Merchandise: 6371a3e2-2d70-4967-a6f1-6c6c5f9d623f
 - Cars for Sale: c1739dd5-19a5-45c0-80ea-3676258b746a
+Sub-categories exist in public.categories (92 copied from the old shop, with legacy_id and parent_id). If a better sub-category fits, use its id; otherwise use the department id above.
 
-STEP 1 - RESEARCH ONLINE (Nairobi demand)
-- Search the web for products that sell fast and are searched often in Nairobi, Kenya. Use current sources: Jumia Kenya and Kilimall best-sellers, Google Trends for Kenya, Nairobi agrovet and hardware shop listings, supermarket and wholesaler catalogues, and local classifieds.
-- Favour products with repeat demand, small to mid pack sizes, and easy availability: for example common farm inputs, animal health, feeds, pest and fumigation products, household and general merchandise.
-- Mix the categories according to what the owner asks for. If none is asked for, spread across Agrovet, Pest Control and General Merchandise.
-- For each pick, record why it sells fast (the source or search signal) in attributes.demand_note.
-- Skip any product whose name contains "Syngenta" unless the owner explicitly says otherwise in this chat. List what was skipped.
-- Check the products table first and skip duplicates or near-duplicates.
+STEP 1 - CHOOSE PRODUCTS (Nairobi demand) AND AVOID DUPLICATES
+- Search the web for fast-selling, often-searched products in Nairobi, Kenya: Jumia Kenya and Kilimall best-sellers, Google Trends Kenya, Nairobi agrovet and pest-control shop listings, wholesaler catalogues, local classifieds. Favour repeat-demand products in small to mid pack sizes. One pack size = one product.
+- Record why each sells in attributes.demand_note.
+- Skip any product whose name contains "Syngenta" unless the owner explicitly says otherwise in this chat. Skip SCUD 5 WP until its concentration discrepancy (50 g/kg vs 50 g/L) is resolved. List what was skipped.
+- Duplicate check against ALL of these before inserting: (a) public.products in Neon; (b) the old shop catalogue in GitHub repo stermontmall/stermontmall.github.io, files sitemap-products.xml and product-names.json (about 1,800 products, currently hidden but coming back); (c) the Supabase products table, read-only, if that connector is available. Skip duplicates and near-duplicates (same brand, product and pack size).
 
-STEP 2 - BASELINE COST (KES)
-The database requires a verified positive KES baseline cost and sets the selling price from it.
-- Use the owner's cost if the owner supplied one.
-- Otherwise use a wholesale or trade price in KES from a named Nairobi/Kenya supplier, distributor or manufacturer page. Store its URL in attributes.cost_source.
-- Never use a retail shelf price as the cost, because the 4-tier markup would be applied on top of it. Never invent or estimate a cost.
-- If no wholesale or owner cost can be found, keep that product out of the batch and tell the owner which ones need a cost.
+STEP 2 - BASELINE COST (KES), FOUND ONLINE
+The database needs a positive KES baseline cost and sets the selling price from it.
+- Use the owner's cost only if the owner volunteers one.
+- Otherwise use the lowest wholesale or trade price in KES for the exact pack from a named Kenyan supplier, distributor or manufacturer page. Store the URL in attributes.cost_source and set attributes.cost_basis to 'wholesale'.
+- If no wholesale price exists, use the lowest reputable in-stock Kenyan retail price for the exact pack x 0.85 as the baseline (owner-approved fallback). Store the URL in attributes.cost_source, the retail price in attributes.retail_reference_kes, and set attributes.cost_basis to 'retail_x0.85'.
+- Never use a price range, an out-of-stock listing, an old price or an estimate. If there is no exact-pack price at all, leave that product out and report it.
 
-STEP 3 - PHOTOS (straight from online)
-- Photos may be taken straight from the web. Use direct https image URLs from the manufacturer, distributor, supplier or retailer product page for that exact product.
-- The image must clearly show the exact product, brand and pack size. No stock photos of a different item, no competitor watermarks, no tiny or blurry images.
-- Put the URLs in images (array), the first one being the main image. Write alt_text describing the photo. Store the page URL in attributes.photo_source.
-- Check each URL opens before saving it. If no verified photo is found, the product stays inactive and is reported.
+STEP 3 - PHOTOS, FOUND ONLINE
+- Take direct https image URLs from the manufacturer, distributor, supplier or retailer page for that exact product and pack. The image must clearly show the exact brand, product and pack size, be at least 500 x 500 px, and not a logo, stock photo of a different item, or competitor-watermarked picture.
+- Check each URL opens and returns an image before saving. Put URLs in images (array), main image first. Write alt_text describing the photo. Store the page URL in attributes.photo_source.
+- No verified photo = the product stays inactive and is reported.
 
-STEP 4 - DESCRIPTIONS AND SEO
-- description: 60 to 120 words, plain English: what it is, main use, pack size, who it suits. Only facts from the source pages. No invented specs, certifications or claims.
-- meta_title under 60 characters. meta_description under 155 characters. keywords: 5 to 8 search terms people in Nairobi would use. unit: the pack size, for example "1 kg" or "50 ml".
+STEP 4 - DESCRIPTION AND SEO, WRITTEN BY YOU
+- description: 60 to 120 words, plain English: what it is, main use, pack size, who it suits. Only facts from the source pages. Never invent specs, certifications, warranty or claims.
+- meta_title under 60 characters (include "Price in Kenya"). meta_description under 155 characters. keywords: 5 to 8 search terms Nairobi buyers use. unit: the pack size, for example "1 kg" or "50 ml".
+
+STEP 4B - REGULATORY GATE FOR PESTICIDES AND VET PRODUCTS
+For pesticides, insecticides, herbicides, fungicides, fumigants, rodenticides and veterinary medicines:
+- Look up the current registration online (PCPB register at pcpb.go.ke; for vet medicines the Kenya Veterinary Board / KEVEVAPI listings). Store the number in attributes.pcpb_reg and the page in attributes.pcpb_source.
+- Never write dilution rates, doses, approved crops/pests, PPE or label directions unless they appear on a manufacturer or regulator page; otherwise say "follow the product label".
+- If registration cannot be confirmed online, the product is inserted as inactive and listed in the report. Do not publish it.
 
 STEP 5 - INSERT (rules enforced by the database triggers)
 - In one run_sql_transaction, insert only: name, category_id, description, cost, unit, images, meta_title, meta_description, alt_text, keywords, attributes.
 - Do NOT set price, old_price, stock, low_at, featured, active, slug or product_code. The triggers set them: price from price_4tier(cost), stock 1000, low-stock alert 20, featured false, active false, slug from the name, product_code STM-######.
-- Slugs must not end in a date or month. If rejected, set a clean slug in the form brand-model-pack, or add a real differentiator (size, colour, pack count).
-- product_code is permanent and is never changed. Never edit price after insert unless the owner asks.
+- Slugs must not end in a date or month. If rejected, set a clean slug in the form brand-model-pack. product_code is permanent. Never edit price after insert unless the owner asks.
 
-STEP 6 - PUBLISH
-- Only products with at least one verified photo in images may be set active = true. Run the update in a separate transaction for those products only.
-- Anything without a photo stays inactive and is listed for the owner.
+STEP 6 - PUBLISH DIRECTLY
+- Without asking the owner, set active = true, in a separate transaction, for every product that has: a verified photo in images, a cost, a written description and SEO, and (if Step 4B applies) a confirmed registration.
+- Everything else stays inactive and is listed with the reason.
 
 STEP 7 - VERIFY AND LOG
 - Select name, slug, product_code, cost, price, stock, low_at, active, cardinality(images). Confirm: price equals price_4tier(cost), stock is 1000, low_at is 20, and no active product has zero images.
-- Write one admin_audit_log row per product: actor_email ntanamoupdates@gmail.com, action 'publish_product', entity_type 'product', entity_id the product id, details with cost, price and image count.
+- Write one admin_audit_log row per product: actor_email ntanamoupdates@gmail.com, action 'publish_product', entity_type 'product', entity_id the product id, details with cost, cost_basis, price and image count.
 
 OUTPUT
-A short table: name, product code, cost, price, status (published or draft with the reason). Then list anything skipped, duplicated or missing a cost or photo. If any step errors, stop and report it. Do not retry blindly, and do not work around a trigger.
+A short table: name, product code, cost, price, status (published, or inactive with the reason). Then list anything skipped, duplicated, missing a price or photo, or lacking a registration. If any step errors, stop and report it. Do not retry blindly, and do not work around a trigger.
+
+LEGACY NOTE
+Key supabase_legacy_rules holds the older Supabase-era rules. This rule (publish_products) governs on any conflict.
 ```
