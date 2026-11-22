@@ -9,11 +9,19 @@ const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.a
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));
-  const r = await fetch(NEON_REST + 'rpc/get_product_pages', { signal: AbortSignal.timeout(30000) });
-  if (!r.ok) throw new Error('Could not read products from Neon: HTTP ' + r.status);
-  const rows = await r.json();
-  if (!Array.isArray(rows)) throw new Error('Neon returned an invalid product-watch dataset');
-  return rows;
+  const all = [];
+  const pageSize = 200;
+  for (let offset = 0; ; offset += pageSize) {
+    const r = await fetch(NEON_REST + 'rpc/get_product_pages', {
+      headers: { Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
+      signal: AbortSignal.timeout(30000)
+    });
+    if (!r.ok) throw new Error('Could not read products from Neon: HTTP ' + r.status);
+    const batch = await r.json();
+    if (!Array.isArray(batch)) throw new Error('Neon returned an invalid product-watch dataset');
+    all.push(...batch);
+    if (batch.length < pageSize) return all;
+  }
 }
 
 export function fingerprint(products) {
