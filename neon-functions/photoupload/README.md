@@ -19,7 +19,7 @@ neon functions deploy photoupload --src neon-functions/photoupload
 neon functions get photoupload
 ```
 
-The Neon Functions deployment API expects a bundled function. Uploading the entrypoint without resolving its npm dependencies causes a runtime import failure. The current live deployment was checked on 2026-11-22 and is **failed** with `Cannot find package 'pg'`; do not treat it as production-ready until the CLI deployment succeeds and HTTP tests pass.
+The Neon Functions deployment API expects a bundled function. Uploading the entrypoint without resolving its npm dependencies causes a runtime import failure. The current live deployment was checked on 2026-11-22: deployment **4** is `completed` on Node.js 24. The `/health` route confirms that the process starts, but does not prove an authenticated upload or Object Storage write.
 
 Neon injects `DATABASE_URL`, `NEON_AUTH_JWKS_URL`, and the branch Object Storage credentials/endpoint at runtime.
 
@@ -33,4 +33,4 @@ Admin page: `/admin-photo-upload.html` (linked from the admin header). It uses M
 
 Function URL: `https://br-fancy-bird-bh01xcbs-photoupload.compute.c-10.eu-central-1.aws.neon.tech/`.
 
-End-to-end browser upload remains unverified. No product photos have been uploaded by this workflow yet.
+End-to-end browser upload remains unverified. The `product-photos` bucket was checked on 2026-11-22 and contained zero objects. The admin uploader page is introduced by PR #1045 and becomes available on the public site only after that PR is merged and deployed. Verify sign-in, one real authorized upload, public object GET, and the matching `products.images` row before treating the photo pipeline as operational.
