@@ -755,7 +755,8 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
    still runs, so the behaviour is never worse than before. To undo: delete this function and the call to it in section 11. */
 async function openStaticProductFallback(slug) {
   // Published /p/ pages are generated from the catalogue and remain available on GitHub Pages
-  // even while Supabase REST is returning 402 (egress quota exceeded). Treat them as read-only.
+  // even while Supabase REST is returning 402 (egress quota exceeded). Treat them as read-only;
+  // this fetch hydrates the in-app view without redirecting or modifying the canonical SEO document.
   const response = await fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' });
   if (!response.ok) throw new Error('Published product page returned HTTP ' + response.status);
   const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
