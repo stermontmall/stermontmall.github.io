@@ -193,7 +193,14 @@
 <script src="seo-market.js?v=1"></script>
 <script>
 (function () {
-  var D = document, SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', SK = 'stm_admin_session';
+  var D = document, AUTH = 'https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth', DATA = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont', authClient = null;
+  function getAuth() {
+    if (authClient) return Promise.resolve(authClient);
+    return import('https://esm.sh/@neon/auth').then(function (m) {
+      authClient = m.createAuthClient(AUTH, { fetchOptions: { credentials: 'include' } });
+      return authClient;
+    });
+  }
   var TABS_OK = ['dashboard', 'pending', 'paid', 'declined', 'all', 'stock', 'catalog', 'bulk', 'photo-ai', 'vouchers', 'expenses', 'inbox', 'livechat', 'reviews', 'sales', 'mpesa', 'searches', 'blogs', 'quotes', 'quotations', 'services', 'media', 'market-research', 'pricing-rules'], TK = 'stm_admin_tab';
   function savedTab() { try { var t = (location.hash || '').replace('#', '') || localStorage.getItem(TK); return TABS_OK.indexOf(t) > -1 ? t : 'dashboard'; } catch (e) { return 'pending'; } }
   function rememberTab(t) { try { localStorage.setItem(TK, t); history.replaceState(null, '', location.pathname + location.search + '#' + t); } catch (e) {} }
@@ -208,48 +215,49 @@
   function $(id) { return D.getElementById(id); }
   function h(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function money(n) { return 'KSh ' + Number(n || 0).toLocaleString('en-KE'); }
-  function load() { try { return JSON.parse(localStorage.getItem(SK)); } catch (e) { return null; } }
-  function save(s) { try { if (s) localStorage.setItem(SK, JSON.stringify(s)); else localStorage.removeItem(SK); } catch (e) {} }
-
-  window.STMAdmin = { base: SB, raw: function (path, o) { o = o || {}; return ready().then(function () { var hd = { apikey: KEY }; if (sess) hd.Authorization = 'Bearer ' + sess.access_token; return fetch(SB + path, { method: o.method || 'GET', headers: Object.assign(hd, o.headers || {}), body: o.body }); }); }, api: function (p, o) { return api(p, o); }, ready: function () { return ready(); }, money: function (n) { return money(n); }, fmt: function (d) { return fmt(d); }, email: function () { return (sess && sess.email) || ''; }, approveWith: function (ref, code, amt) { approveWith(ref, code, amt); } };
+  function save() {}
+  window.STMAdmin = { base: DATA, raw: function (path, o) {
+    o = o || {};
+    return ready().then(function (jwt) {
+      var hd = Object.assign({ Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' }, o.headers || {});
+      var body = o.body;
+      if (body && typeof body !== 'string') body = JSON.stringify(body);
+      return fetch(DATA + path, { method: o.method || 'GET', headers: hd, body: body });
+    });
+  }, api: function (p, o) { return api(p, o); }, ready: function () { return ready(); }, money: function (n) { return money(n); }, fmt: function (d) { return fmt(d); }, email: function () { return (sess && sess.email) || ''; }, approveWith: function (ref, code, amt) { approveWith(ref, code, amt); } };
   function api(path, opt) {
     opt = opt || {};
-    var hd = { apikey: KEY, 'Content-Type': 'application/json' };
-    if (sess) hd.Authorization = 'Bearer ' + sess.access_token;
-    return fetch(SB + path, { method: opt.method || 'GET', headers: Object.assign(hd, opt.headers || {}), body: opt.body ? JSON.stringify(opt.body) : undefined });
+    return ready().then(function (jwt) {
+      var hd = Object.assign({ Authorization: 'Bearer ' + jwt, 'Content-Type': 'application/json' }, opt.headers || {});
+      return fetch(DATA + path, { method: opt.method || 'GET', headers: hd, body: opt.body ? JSON.stringify(opt.body) : undefined });
+    });
   }
-  function setSession(j) { sess = { access_token: j.access_token, refresh_token: j.refresh_token, email: (j.user && j.user.email) || (sess && sess.email) || '', exp: Date.now() + (j.expires_in || 3600) * 1000 - 60000 }; save(sess); }
-  function refresh() {
-    if (!sess || !sess.refresh_token) return Promise.reject();
-    return fetch(SB + '/auth/v1/token?grant_type=refresh_token', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: sess.refresh_token }) })
-      .then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(setSession);
-  }
-  /* One renewal at a time (several callers can ask at once; reusing a refresh token can revoke the session).
-     If the login cannot be renewed, go back to the sign-in screen instead of leaving dead buttons. */
-  var renewing = null;
   function ready() {
-    if (!(sess && Date.now() > sess.exp)) return Promise.resolve();
-    if (!renewing) {
-      renewing = refresh().then(function () { renewing = null; }, function () {
-        renewing = null; sess = null; save(null); show('login');
-        var le = $('lerr'); if (le) { le.textContent = 'Your session expired. Please sign in again.'; le.hidden = false; }
-        throw new Error('expired');
+    return getAuth().then(function (a) {
+      return a.token().then(function (r) {
+        var jwt = r && r.data && r.data.token;
+        if (jwt) { if (!sess) sess = {}; sess.access_token = jwt; return jwt; }
+        return a.getSession().then(function (x) {
+          var t = x && x.data && x.data.session && x.data.session.token;
+          if (!t) throw new Error('expired');
+          if (!sess) sess = {};
+          sess.access_token = t;
+          return t;
+        });
       });
-    }
-    return renewing;
+    });
   }
 
   function show(which) { $('login').hidden = which !== 'login'; $('app').hidden = which !== 'app'; $('out').hidden = $('refresh').hidden = which !== 'app'; $('who').textContent = (which === 'app' && sess && sess.email) || ''; }
 
   $('lf').addEventListener('submit', function (e) {
     e.preventDefault(); var b = $('lb'), er = $('lerr'); er.hidden = true; b.disabled = true; b.textContent = 'Signing in...';
-    fetch(SB + '/auth/v1/token?grant_type=password', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: $('em').value.trim(), password: $('pw').value }) })
-      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error('bad'); return j; }); })
-      .then(function (j) { setSession(j); $('pw').value = ''; start(); })
-      .catch(function () { er.textContent = 'Could not sign in. Check your email and password.'; er.hidden = false; })
+    getAuth().then(function (a) { return a.signIn.email({ email: $('em').value.trim(), password: $('pw').value }); })
+      .then(function (r) { if (r && r.error) throw new Error(r.error.message || 'Sign in failed'); $('pw').value = ''; return start(); })
+      .catch(function (err) { er.textContent = (err && err.message) || 'Could not sign in. Check your email and password.'; er.hidden = false; })
       .then(function () { b.disabled = false; b.textContent = 'Sign in'; });
   });
-  $('out').addEventListener('click', function () { if (window.STMServices) STMServices.stop(); sess = null; save(null); show('login'); });
+  $('out').addEventListener('click', function () { if (window.STMServices) STMServices.stop(); getAuth().then(function (a) { return a.signOut(); }).finally(function () { sess = null; show('login'); }); });
   $('refresh').addEventListener('click', function () { q = ''; $('q').value = ''; fetchOrders(); if (window.STMServices) STMServices.badge(renderTabs); });
   setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && !D.hidden && EXTRA.indexOf(tab) < 0) fetchOrders(); }, 30000);
 
@@ -270,7 +278,7 @@
       })
       .catch(function (e) {
         if (e && e.message === 'expired') { sess = null; save(null); show('login'); return; }
-        er.textContent = 'Could not load orders. Make sure setup.sql was run in Supabase and your email is in the staff table.'; er.hidden = false;
+        er.textContent = 'Could not load orders. Check that the Neon orders table and your active Neon admin profile are configured.'; er.hidden = false;
       });
   }
 
@@ -508,7 +516,7 @@
           if (!rows.length) throw 0; $('cf').hidden = true;
           var rpc = (action === 'approve') ? 'record_sale' : (action === 'pending' && o.status === 'paid') ? 'reverse_sale' : null;
           var done = rpc ? ready().then(function () { return api('/rest/v1/rpc/' + rpc, { method: 'POST', body: { p_ref: o.ref } }); })
-            .then(function (r) { if (!r.ok) throw 0; }).catch(function () { note('Order updated, but the sales ledger could not be updated. Run setup-catalog.sql and setup-catalog-2.sql in Supabase.', false); })
+            .then(function (r) { if (!r.ok) throw 0; }).catch(function () { note('Order updated, but the sales ledger could not be updated. Check the Neon sales ledger functions and permissions.', false); })
             .then(fetchOrders) : fetchOrders();
           if (action === 'approve') {
             var paid = Object.assign({}, o, { status: 'paid', handled_at: new Date().toISOString(), pay_code: code, pay_amount: amt });
@@ -523,7 +531,7 @@
           $('cf').hidden = true; var er = $('aerr');
           if (e === 401) { sess = null; save(null); show('login'); var le = $('lerr'); le.textContent = 'Your session expired. Please sign in again.'; le.hidden = false; return; }
           er.textContent = e === 409 ? 'That M-Pesa code is already used on another order.'
-            : (e === 400 && needsCode) ? 'Could not save the payment code. Run setup-receipts.sql in Supabase first.'
+            : (e === 400 && needsCode) ? 'Could not save the payment code. Check the Neon order table permissions.'
             : 'Could not update the order. You may not have staff access.';
           er.hidden = false;
         });
@@ -553,7 +561,7 @@
         b.onclick = function () {
           b.disabled = true;
           api('/rest/v1/stock?on_conflict=product', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: { product: id, in_stock: sold } })
-            .then(function (r) { if (!r.ok) throw 0; render(); }).catch(function () { b.disabled = false; var er = $('aerr'); er.textContent = 'Could not update stock. Run setup-extras.sql in Supabase first.'; er.hidden = false; });
+            .then(function (r) { if (!r.ok) throw 0; render(); }).catch(function () { b.disabled = false; var er = $('aerr'); er.textContent = 'Could not update stock. Check the Neon products table permissions.'; er.hidden = false; });
         };
         card.appendChild(b); L.appendChild(card);
       });
@@ -572,12 +580,31 @@
   }
 
   function start() {
-    show('app');
-    if (window.STMServices) { STMServices.onBadge = function () { renderTabs(); }; STMServices.badge(renderTabs); }   /* nav badge: new quote requests */
-    fetchOrders();
+    return getAuth().then(function (a) { return a.getSession(); }).then(function (r) {
+      var user = r && r.data && r.data.user;
+      if (!user) { sess = null; show('login'); return; }
+      sess = { email: user.email || '', user_id: user.id };
+      return ready().then(function () {
+        return api('/rest/v1/admin_profiles?select=role,active&user_id=eq.' + encodeURIComponent(user.id));
+      }).then(function (response) {
+        if (!response.ok) throw new Error('Could not verify Neon admin access (' + response.status + ').');
+        return response.json();
+      }).then(function (profiles) {
+        if (!profiles || !profiles.length || profiles[0].active !== true) {
+          sess = null; show('login');
+          var le = $('lerr'); le.textContent = 'This Neon account is not approved as a Stermont store administrator.'; le.hidden = false;
+          return;
+        }
+        show('app');
+        if (window.STMServices) { STMServices.onBadge = function () { renderTabs(); }; STMServices.badge(renderTabs); }
+        fetchOrders();
+      });
+    }).catch(function (err) {
+      sess = null; show('login');
+      var le = $('lerr'); if (le) { le.textContent = err.message === 'expired' ? 'Please sign in again.' : err.message; le.hidden = false; }
+    });
   }
-  sess = load();
-  if (sess) start(); else show('login');
+  start();
   setInterval(function () { if (sess && !$('app').hidden && $('cf').hidden && EXTRA.indexOf(tab) < 0) fetchOrders(); }, 60000);
   setInterval(function () { if (sess && !$('app').hidden && !D.hidden && tab !== 'quotes' && window.STMServices) STMServices.badge(renderTabs); }, 60000);
 
