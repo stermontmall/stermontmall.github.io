@@ -1,5 +1,7 @@
 # Instructions for any Claude session on this repo
 
+> **PRECEDENCE (2026-11-22, owner-approved):** New products are posted to **Neon**, not Supabase. The governing rule is Neon `public.publishing_rules` key `publish_products` (currently version 5; mirror: `PUBLISH-PRODUCTS-RULE.md`). The admin tab `/admin.html#pricing-rules` now reads that Neon row. Where this file's Supabase-era text (800+ word descriptions, Supabase Storage photo upload, Supabase duplicate check) conflicts with `publish_products`, `publish_products` wins.
+
 ## Product posting — mandatory
 If the owner asks to add/post/list an advert or product, or attach product photos:
 1. Read `PUBLISHING.md` FIRST and follow it.
