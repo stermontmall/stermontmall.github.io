@@ -8,3 +8,12 @@ assert.equal(imageKitUrl('https://ik.imagekit.io/other/photo.jpg', 320), 'https:
 assert.equal(imageKitUrl('', 320), '');
 assert.equal(imageKitUrl(null, 320), null);
 console.log('ImageKit URL helper tests passed.');
+
+import { readFileSync } from 'node:fs';
+const generator = readFileSync(new URL('./generate-products.mjs', import.meta.url), 'utf8');
+const mobileShell = readFileSync(new URL('./mobile-shell/app.js', import.meta.url), 'utf8');
+assert.match(generator, /imageKitUrl\(source, width\)/);
+assert.match(generator, /optimizedImageUrl\(p\.images\?\.\[0\], 320\)/);
+assert.match(mobileShell, /window\.STM_IMAGE_URL\(original, 480\)/);
+assert.match(mobileShell, /data-imagekit-original=/);
+console.log('ImageKit storefront integration checks passed.');
