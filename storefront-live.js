@@ -3,7 +3,7 @@
 (function () {
   // Checkout has its own lightweight cart flow. Do not start the full catalogue fetch or product UI there.
   if (document.documentElement.classList.contains('stm-co')) return;
-  var SB = 'https://oewvtbnmyombbtggamor.supabase.co', KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', D = document, WA = '254748888230';
+  var NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/', D = document, WA = '254748888230';
   function money(n) { return 'KSh ' + Math.round(n).toLocaleString('en-KE'); }
   function mk(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   /* small copy of a product photo for cards (about 400 px instead of 1600 px): same file name under product-images/thumbs/.
@@ -345,7 +345,17 @@
   /* ---------- put items into their category sections ---------- */
   function bump(m) { var c = m.querySelector('.cnt'); if (c) c.textContent = m.querySelectorAll('.pcard:not(.vhide)').length; }
   /* cache:'no-store' = always ask the database, never reuse a copy the browser kept (fresh names, prices and stock on every load) */
-  function getProducts(sel) { return fetch(SB + '/rest/v1/products?active=eq.true&select=' + sel + '&order=created_at.asc', { headers: { apikey: KEY }, cache: 'no-store' }); }
+  function getProducts() {
+    return fetch(NEON_REST + 'rpc/get_product_pages', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
+      .then(function (rows) {
+        var data = (Array.isArray(rows) ? rows : []).map(function (p) {
+          p.categories = p.category_name ? { name: p.category_name, slug: p.category_slug } : null;
+          return p;
+        });
+        return { ok: true, json: function () { return Promise.resolve(data); } };
+      });
+  }
   /* product-names.json (written by every site rebuild) = the heading each product page shows, with its ranking words ("Original ...", "#1 Top ...").
      The list and the product view use it so they read exactly like the page; if it cannot be loaded the plain database name is shown. */
   var NAMES = {}, namesP = fetch('product-names.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
