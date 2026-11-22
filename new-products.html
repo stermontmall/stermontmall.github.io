@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New Pest Control &amp; Agrovet Products in Kenya | Stermont Arcade</title>
+<meta name="description" content="Latest pest control, fumigation and agrovet products at Stermont Arcade. Order on WhatsApp, pay with M-Pesa, Nairobi pickup and delivery across Kenya.">
+<link rel="canonical" href="https://stermontarcade.co.ke/new-products.html">
+<meta name="theme-color" content="#321064">
+<link rel="icon" href="/favicon.png">
+<style>
+:root{--bg:#f7f5fb;--card:#fff;--ink:#211936;--mut:#716982;--line:#e7e1f1;--brand:#6d28d9;--brand-d:#321064;--ok:#176536;--wa:#128c4a;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#14101f;--card:#1e1830;--ink:#f1edf9;--mut:#a79fba;--line:#322a4a;--brand:#a78bfa;--brand-d:#241a40;--ok:#6ee7a0;--wa:#1fa35c}}
+*{box-sizing:border-box}
+html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--brand-d);color:#fff;padding:14px 16px}
+header a{color:#fff;text-decoration:none}
+header h1{margin:0;font-size:18px}
+header p{margin:4px 0 0;font-size:13px;opacity:.85}
+main{max-width:1100px;margin:0 auto;padding:14px 12px 40px}
+.tools{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+input[type=search]{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--card);color:var(--ink)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;text-align:left;padding:0;color:inherit;font:inherit}
+.card img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#fff;display:block}
+.cb{padding:10px;display:flex;flex-direction:column;gap:4px;flex:1}
+.nm{font-size:14px;font-weight:650;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.un{font-size:12px;color:var(--mut)}
+.pr{font-weight:750;font-size:16px;margin-top:auto}
+.old{font-size:12px;color:var(--mut);text-decoration:line-through;margin-left:6px;font-weight:400}
+.msg{padding:24px 12px;text-align:center;color:var(--mut)}
+.btn{border:0;border-radius:10px;padding:12px 16px;font:inherit;font-weight:650;cursor:pointer;background:var(--brand);color:#fff;text-decoration:none;display:inline-block;text-align:center}
+.btn.wa{background:var(--wa)}
+.btn.sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+#more{display:block;margin:16px auto 0}
+.ov{position:fixed;inset:0;background:rgba(10,6,20,.6);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.ov.open{display:flex}
+.sheet{background:var(--card);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+@media(min-width:700px){.ov{align-items:center}.sheet{border-radius:18px}}
+.sheet img.main{width:100%;max-height:340px;object-fit:contain;background:#fff;border-radius:12px}
+.thumbs{display:flex;gap:8px;margin:8px 0;overflow-x:auto}
+.thumbs img{width:56px;height:56px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.sheet h2{font-size:19px;margin:10px 0 4px}
+.big{font-size:22px;font-weight:800}
+.ok{color:var(--ok);font-size:13px;font-weight:650}
+.desc{white-space:pre-line;line-height:1.55;font-size:15px;margin:12px 0}
+.meta{font-size:12px;color:var(--mut)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.row .btn{flex:1}
+</style>
+</head>
+<body>
+<header>
+<h1><a href="/">Stermont Arcade</a> &middot; New Pest Control &amp; Agrovet</h1>
+<p>Pay with M-Pesa &middot; Pickup at Sarit Centre, Westlands &middot; Delivery across Kenya</p>
+</header>
+<main>
+<div class="tools">
+<input id="q" type="search" placeholder="Search products" aria-label="Search products" autocomplete="off">
+<div class="chips" id="chips"></div>
+</div>
+<div id="grid" class="grid"></div>
+<div id="msg" class="msg">Loading products&hellip;</div>
+<button id="more" class="btn sec" hidden>Show more</button>
+</main>
+<div id="ov" class="ov" role="dialog" aria-modal="true" aria-label="Product details"><div class="sheet" id="sheet"></div></div>
+<script>
+(function () {
+  'use strict';
+  var DATA = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1';
+  var WA = '254748888230', PAGE = 200;
+  var COLS = 'id,slug,name,category_id,description,price,old_price,stock,images,unit,product_code,alt_text,created_at';
+  var $ = function (s) { return document.querySelector(s); };
+  var products = [], cats = {}, dept = 'all', term = '', offset = 0, hasMore = false;
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function money(n) { return 'KSh ' + Number(n).toLocaleString('en-KE'); }
+  function okImg(u) { return typeof u === 'string' && /^https:\/\//i.test(u) ? u : '/placeholder.svg'; }
+  function root(id) { var c = cats[id], g = 0; while (c && c.parent_id && cats[c.parent_id] && g++ < 6) c = cats[c.parent_id]; return c ? c.name : 'Other'; }
+  function get(path) {
+    return fetch(DATA + '/' + path, { headers: { Accept: 'application/json' } }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  function imgTag(src, alt, cls) {
+    return '<img ' + (cls ? 'class="' + cls + '" ' : '') + 'src="' + esc(okImg(src)) + '" alt="' + esc(alt) + '" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/placeholder.svg\'">';
+  }
+
+  function visible() {
+    var t = term.trim().toLowerCase();
+    return products.filter(function (p) {
+      if (dept !== 'all' && p._dept !== dept) return false;
+      return !t || (p.name + ' ' + (p.unit || '')).toLowerCase().indexOf(t) !== -1;
+    });
+  }
+  function renderChips() {
+    var counts = {};
+    products.forEach(function (p) { counts[p._dept] = (counts[p._dept] || 0) + 1; });
+    var names = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
+    $('#chips').innerHTML = ['all'].concat(names).map(function (n) {
+      return '<button class="chip" type="button" data-d="' + esc(n) + '" aria-pressed="' + (n === dept) + '">' + (n === 'all' ? 'All' : esc(n)) + '</button>';
+    }).join('');
+  }
+  function renderGrid() {
+    var list = visible();
+    $('#grid').innerHTML = list.map(function (p) {
+      var old = Number(p.old_price) > Number(p.price) ? '<span class="old">' + money(p.old_price) + '</span>' : '';
+      return '<button class="card" type="button" data-s="' + esc(p.slug) + '">' + imgTag((p.images || [])[0], p.alt_text || p.name) +
+        '<div class="cb"><div class="nm">' + esc(p.name) + '</div><div class="un">' + esc(p.unit || '') + '</div><div class="pr">' + money(p.price) + old + '</div></div></button>';
+    }).join('');
+    var m = $('#msg');
+    if (!products.length) { m.hidden = false; m.textContent = 'New products are being added. Please check back soon.'; }
+    else if (!list.length) { m.hidden = false; m.textContent = 'No products match your search.'; }
+    else m.hidden = true;
+    $('#more').hidden = !hasMore;
+  }
+  function open(slug) {
+    var p = products.filter(function (x) { return x.slug === slug; })[0];
+    if (!p) return;
+    var imgs = (p.images || []).filter(function (u) { return /^https:\/\//i.test(u); });
+    var link = 'https://stermontarcade.co.ke/new-products.html#' + p.slug;
+    var text = 'Hello Stermont Arcade, I want to order: ' + p.name + (p.unit ? ' (' + p.unit + ')' : '') + ' - ' + money(p.price) + (p.product_code ? '. Code: ' + p.product_code : '') + '. ' + link;
+    var old = Number(p.old_price) > Number(p.price) ? '<span class="old">' + money(p.old_price) + '</span>' : '';
+    $('#sheet').innerHTML = imgTag(imgs[0], p.alt_text || p.name, 'main') +
+      (imgs.length > 1 ? '<div class="thumbs">' + imgs.map(function (u) { return '<img src="' + esc(u) + '" alt="" referrerpolicy="no-referrer" data-big="' + esc(u) + '">'; }).join('') + '</div>' : '') +
+      '<h2>' + esc(p.name) + '</h2><div class="big">' + money(p.price) + old + '</div>' +
+      (Number(p.stock) > 0 ? '<div class="ok">In stock</div>' : '') +
+      (p.unit ? '<div class="meta">Pack: ' + esc(p.unit) + '</div>' : '') +
+      '<div class="desc">' + esc(p.description || '') + '</div>' +
+      (p.product_code ? '<div class="meta">Product code: ' + esc(p.product_code) + '</div>' : '') +
+      '<div class="row"><a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/' + WA + '?text=' + encodeURIComponent(text) + '">Order on WhatsApp</a><button class="btn sec" type="button" id="close">Close</button></div>';
+    $('#ov').classList.add('open');
+    if (location.hash !== '#' + slug) history.replaceState(null, '', '#' + slug);
+  }
+  function close() { $('#ov').classList.remove('open'); history.replaceState(null, '', location.pathname); }
+
+  function load() {
+    var m = $('#msg'); m.hidden = false; m.textContent = 'Loading products\u2026';
+    return Promise.all([
+      Object.keys(cats).length ? Promise.resolve(null) : get('categories?select=id,name,parent_id&active=eq.true&limit=200'),
+      get('products?select=' + COLS + '&active=eq.true&order=created_at.desc&limit=' + PAGE + '&offset=' + offset)
+    ]).then(function (res) {
+      if (res[0]) res[0].forEach(function (c) { cats[c.id] = c; });
+      var rows = res[1] || [];
+      rows.forEach(function (p) { p._dept = root(p.category_id); });
+      products = products.concat(rows);
+      hasMore = rows.length === PAGE;
+      offset += rows.length;
+      renderChips(); renderGrid();
+      var h = location.hash.slice(1);
+      if (h) open(h);
+    }).catch(function () {
+      m.hidden = false;
+      m.innerHTML = 'Could not load products. <button class="btn sec" type="button" id="retry">Try again</button>';
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (t.closest('#retry')) { load(); return; }
+    var chip = t.closest('.chip'); if (chip) { dept = chip.getAttribute('data-d'); renderChips(); renderGrid(); return; }
+    var card = t.closest('.card'); if (card) { open(card.getAttribute('data-s')); return; }
+    var th = t.closest('[data-big]'); if (th) { var im = document.querySelector('#sheet img.main'); if (im) im.src = th.getAttribute('data-big'); return; }
+    if (t.closest('#close') || t === $('#ov')) close();
+    if (t.closest('#more')) load();
+  });
+  $('#q').addEventListener('input', function (e) { term = e.target.value; renderGrid(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (h) open(h); else $('#ov').classList.remove('open'); });
+  load();
+})();
+</script>
+<script src="/analytics.js" defer></script>
+</body>
+</html>
