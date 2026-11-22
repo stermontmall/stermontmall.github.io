@@ -8,7 +8,7 @@
   'use strict';
   if (window.STMQuote) return;
   var D = document;
-  var C = { sb: 'https://oewvtbnmyombbtggamor.supabase.co', key: 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', ref: 'oewvtbnmyombbtggamor',
+  var C = { neonRest: 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/',
     ejsKey: 'PayiXKhM6gVQLHYAE', ejsService: 'service_zoho', tpl: 'template_n60yao4', tpl2: 'template_cv2qjgm', staff: 'info@stermontarcade.co.ke',
     web3: '2c55cbd0-5ec1-4603-a6a0-293b8a68faab', wa: '254748888230', site: 'https://stermontarcade.co.ke' };
   var COUNTIES = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Uasin Gishu', 'Kiambu', 'Machakos', 'Kajiado', 'Nyeri', 'Meru', 'Kisii', 'Kakamega', 'Kilifi', 'Baringo', 'Bomet', 'Bungoma', 'Busia', 'Elgeyo-Marakwet', 'Embu', 'Garissa', 'Homa Bay', 'Isiolo', 'Kericho', 'Kirinyaga', 'Kitui', 'Kwale', 'Laikipia', 'Lamu', 'Makueni', 'Mandera', 'Marsabit', 'Migori', "Murang'a", 'Nandi', 'Narok', 'Nyamira', 'Nyandarua', 'Samburu', 'Siaya', 'Taita-Taveta', 'Tana River', 'Tharaka-Nithi', 'Trans Nzoia', 'Turkana', 'Vihiga', 'Wajir', 'West Pokot'];
@@ -28,7 +28,7 @@
   function el(t, c, x) { var e = D.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function slug(t) { return String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'other'; }
   function normPhone(p) { var d = String(p || '').replace(/[\s\-().]/g, ''), m = d.match(/^(?:\+?254|0)([17]\d{8})$/); return m ? '254' + m[1] : null; }
-  function session() { try { var x = JSON.parse(localStorage.getItem('sb-' + C.ref + '-auth-token')); if (x && x.access_token && x.user && (!x.expires_at || x.expires_at * 1000 > Date.now() + 30000)) return x; } catch (e) {} return null; }
+  function session() { return null; }
   function ls(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k)); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} return null; }
   function newRef() {
     var A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', out = '', i, b = new Uint8Array(6);
@@ -129,14 +129,19 @@
     if (trap) { showDone({ ref: newRef(), fake: true }); return; }   /* honeypot filled: act as if sent, store nothing */
     var last = ls('stm_quote_last'); if (last && Date.now() - last < 30000) { banner('You just sent a request. Please wait about 30 seconds before sending another.'); return; }
     var s = session(), ph = normPhone(F.phone), id = String(F.svc), name = svcName(id) || id;
-    var row = { ref: newRef(), user_id: s ? s.user.id : null, service_id: slug(id), service_name: name.slice(0, 160), customer_name: String(F.name).trim().slice(0, 120), phone: '+' + ph,
+    var row = { ref: newRef(), service_id: slug(id), service_name: name.slice(0, 160), customer_name: String(F.name).trim().slice(0, 120), phone: '+' + ph,
       email: String(F.email || '').trim().toLowerCase().slice(0, 150) || (s && s.user.email) || null, county: F.county, location: String(F.town).trim().slice(0, 200),
       property_type: F.prop || null, preferred_date: F.date || null, preferred_slot: F.slot || null, details: String(F.details || '').trim().slice(0, 1000) || null };
     busy = true; var go = D.getElementById('stmq-go'); go.disabled = true; go.textContent = 'Sending...';
-    var hd = { 'Content-Type': 'application/json', apikey: C.key, Prefer: 'return=minimal' }; if (s) hd.Authorization = 'Bearer ' + s.access_token;
     var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function () { if (ctl) ctl.abort(); }, 20000);
-    fetch(C.sb + '/rest/v1/service_quotes', { method: 'POST', headers: hd, body: JSON.stringify(row), signal: ctl ? ctl.signal : undefined })
-      .then(function (r) { if (r.ok) return; return r.text().then(function (t) { var e = new Error('status ' + r.status + ' ' + t); e.status = r.status; throw e; }); })
+    fetch(C.neonRest + 'rpc/submit_service_quote', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_ref: row.ref, p_service_id: row.service_id, p_service_name: row.service_name, p_customer_name: row.customer_name,
+        p_phone: row.phone, p_email: row.email, p_county: row.county, p_location: row.location, p_property_type: row.property_type,
+        p_preferred_date: row.preferred_date, p_preferred_slot: row.preferred_slot, p_details: row.details }),
+      signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) {
+        if (!r.ok || !j || !j.ok) { var e = new Error((j && j.reason) || ('Neon request failed (' + r.status + ')')); e.status = r.status; throw e; }
+      }); })
       .then(function () {
         clearTimeout(to); busy = false; ls('stm_quote_last', Date.now());
         ls('stm_quote_cust', { uid: s ? s.user.id : null, name: row.customer_name, phone: F.phone, email: row.email || '', county: F.county });
