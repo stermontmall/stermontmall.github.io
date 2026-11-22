@@ -27,7 +27,7 @@
 import { createAuthClient } from "https://esm.sh/@neon/auth";
 const AUTH="https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth";
 const DATA="https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1";
-const auth=createAuthClient(AUTH);
+const auth=createAuthClient(AUTH,{fetchOptions:{credentials:"include"}});
 const $=s=>document.querySelector(s);
 let sessionUser=null, bearer=null;
 function notice(el,text,ok=false){el.textContent=text;el.className="status "+(ok?"ok":"err");el.classList.remove("hidden")}
@@ -35,7 +35,7 @@ function hide(el){el.classList.add("hidden")}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function wordCount(s){return String(s||"").trim().split(/\s+/).filter(Boolean).length}
 $('[name=description]').addEventListener("input",()=>$("#wordcount").textContent=wordCount($('[name=description]').value)+" words");
-async function token(){const r=await auth.token();if(r.error||!r.data?.token)throw new Error(r.error?.message||"Your login session expired. Sign in again.");bearer=r.data.token;return bearer}
+async function token(){let t=null,msg="";try{const r=await auth.token();t=r.data?.token||null;msg=r.error?.message||""}catch(e){msg=e.message}if(!t){try{const s=await auth.getSession();t=s.data?.session?.token||null;msg=msg||s.error?.message||""}catch(e){msg=msg||e.message}}if(!t)throw new Error(msg||"Your login session expired. Sign in again.");bearer=t;return t}
 async function data(path,opts={}){const jwt=await token();const r=await fetch(DATA+"/"+path,{...opts,headers:{Authorization:"Bearer "+jwt,"Content-Type":"application/json",Prefer:"return=representation",...(opts.headers||{})}});const body=await r.json().catch(()=>null);if(!r.ok)throw new Error(body?.message||body?.hint||body?.details||("Data API returned HTTP "+r.status));return body}
 function slugify(s){return String(s).normalize("NFKD").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,110)}
 function price(cost){const c=Number(cost);const multiplier=c<20000?1.30:c<=39999?1.25:c<=60000?1.20:1.175;return Math.max(200,Math.round(Math.max(c*multiplier,c*1.15)/50)*50)}
