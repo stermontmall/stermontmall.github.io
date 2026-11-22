@@ -614,7 +614,7 @@ with sync_playwright() as p:
     check('static pages: every page shows the shell top bar + bottom nav on a phone, its own header is hidden, no sideways scroll', not bad, bad)
     p13.goto(f'{BASE}/shipping.html'); p13.wait_for_selector('#stm-nav', state='attached')
     check('static pages: the page text is unchanged (still has its H1 and the delivery facts)', 'Shipping and delivery' in p13.locator('h1').first.inner_text() and '47 counties' in p13.locator('main').inner_text())
-    check('static pages: the bottom nav marks Account as the current section', p13.locator('#stm-nav a[aria-current="page"]').inner_text().strip() == 'Account')
+    check('static pages: the bottom nav marks Track order as the current section', p13.locator('#stm-nav a[aria-current="page"]').inner_text().strip() == 'Track order')
     p13.evaluate("localStorage.setItem('shell.cart', JSON.stringify([{qty:2},{qty:1}]))"); p13.reload(); p13.wait_for_selector('#stm-nav', state='attached')
     check('static pages: the cart badge shows the shell cart quantity (3)', p13.locator('#stm-nav .stm-badge').inner_text() == '3' and p13.locator('#stm-bar .stm-badge').inner_text() == '3')
     p13.locator('#stm-nav a', has_text='Cart').click(); p13.wait_for_selector('#view-cart:not([hidden])', timeout=15000)
