@@ -93,8 +93,15 @@ def mock_network(ctx):
             return route.fulfill(status=200, content_type='image/png', body=PNG)
         if url.endswith('https://img.test/broken.jpg'):
             return route.abort()
+        # Static homepage/product fixtures can contain real catalogue image URLs.
+        # Keep those requests deterministic in CI while still exercising the actual
+        # ImageKit proxy URL shape and browser fallback logic.
+        if 'supabase.co/storage/v1/object/public/product-images/' in url:
+            return route.fulfill(status=200, content_type='image/png', body=PNG)
         return route.abort()
     ctx.route('https://ik.imagekit.io/**', imagekit_proxy)
+    ctx.route('https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/product-images/**',
+              lambda r: r.fulfill(status=200, content_type='image/png', body=PNG))
     ctx.route('https://img.test/ok.png', lambda r: r.fulfill(status=200, content_type='image/png', body=PNG))
     ctx.route('https://img.test/broken.jpg', lambda r: r.abort())
 
