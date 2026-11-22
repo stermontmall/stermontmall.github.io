@@ -1,3 +1,9 @@
+## 2026-11-22 23:00 (Africa/Nairobi) — Owner decision: Neon only for now; Supabase not needed for about two weeks
+
+- Owner: "I am using Neon. I don't need Supabase for now. It will be used in two weeks." Do NOT chase Supabase billing (HTTP 402 `exceed_cached_egress_quota`) until about 2026-12-06. Products are posted to Neon only (project restless-shape-79120240).
+- Expected while Supabase is off: the SEO quality gate fails at `node generate-products.mjs` on any branch; the mobile-shell route regression is the meaningful check. Do not treat that SEO failure as a regression from a code change.
+- When Supabase is wanted again: restore billing for org munfmuvialgwzxwgthtw, then dispatch `product-pages.yml` (`gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`) and re-run the SEO gate.
+
 ## 2026-11-22 23:00 (Africa/Nairobi) — Multi-pack (ProductGroup) fallback fixed; /post-product aligned to Neon v5
 
 ### Done (branch `wip-productgroup-fallback-2026-11-22`, NOT merged)
