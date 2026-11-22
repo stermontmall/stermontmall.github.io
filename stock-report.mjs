@@ -7,11 +7,19 @@ const DEFAULT_LOW = 5;                                           // used when an
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));
-  const r = await fetch(NEON_REST + 'rpc/get_product_pages', { signal: AbortSignal.timeout(30000) });
-  if (!r.ok) throw new Error('Could not read products from Neon: HTTP ' + r.status);
-  const rows = await r.json();
-  if (!Array.isArray(rows)) throw new Error('Neon returned an invalid stock report dataset');
-  return rows;
+  const all = [];
+  const pageSize = 200;
+  for (let offset = 0; ; offset += pageSize) {
+    const r = await fetch(NEON_REST + 'rpc/get_product_pages', {
+      headers: { Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
+      signal: AbortSignal.timeout(30000)
+    });
+    if (!r.ok) throw new Error('Could not read products from Neon: HTTP ' + r.status);
+    const batch = await r.json();
+    if (!Array.isArray(batch)) throw new Error('Neon returned an invalid stock report dataset');
+    all.push(...batch);
+    if (batch.length < pageSize) return all;
+  }
 }
 
 const rows = (await getProducts()).filter(p => p && p.id && p.name);
