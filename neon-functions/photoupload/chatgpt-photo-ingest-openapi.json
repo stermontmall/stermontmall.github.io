@@ -1,0 +1,55 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Stermont product photo ingest",
+    "version": "1.0.0",
+    "description": "Downloads a vendor product photo from a public HTTPS URL, validates it, stores the real bytes in Neon Object Storage, verifies the stored object, and attaches it to one product. Never changes active, price, stock, slug or product_code."
+  },
+  "servers": [
+    { "url": "https://br-fancy-bird-bh01xcbs-photoupload.compute.c-10.eu-central-1.aws.neon.tech" }
+  ],
+  "paths": {
+    "/ingest": {
+      "post": {
+        "operationId": "ingestProductPhoto",
+        "summary": "Store a vendor photo for one product and attach it",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["product_code", "image_url", "source_page_url", "source_name", "photo_basis", "rights_note", "pack_match_note", "alt_text"],
+                "properties": {
+                  "product_code": { "type": "string", "description": "Permanent product code, for example STM-001845" },
+                  "image_url": { "type": "string", "description": "Direct public HTTPS URL of a JPEG, PNG or WebP image, at least 500x500 px and over 15 KB" },
+                  "source_page_url": { "type": "string", "description": "HTTPS product page the image came from" },
+                  "source_name": { "type": "string", "description": "Business or site name of the source" },
+                  "photo_basis": { "type": "string", "enum": ["manufacturer", "authorized_distributor", "kenyan_vendor"] },
+                  "rights_note": { "type": "string", "description": "What the source terms or permission allow (at least 15 characters)" },
+                  "pack_match_note": { "type": "string", "description": "How the photo matches the exact product and pack size (at least 10 characters)" },
+                  "alt_text": { "type": "string", "description": "Accurate alt text describing the photo" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Stored, verified and attached" },
+          "400": { "description": "Missing or invalid field" },
+          "401": { "description": "Invalid ingest key" },
+          "404": { "description": "Product code not found" },
+          "415": { "description": "Not a JPEG, PNG or WebP image" },
+          "422": { "description": "Image too small" },
+          "502": { "description": "Download, storage or verification failed; product not changed" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer" }
+    }
+  }
+}

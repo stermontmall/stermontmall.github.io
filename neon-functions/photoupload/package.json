@@ -6,7 +6,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "build": "esbuild index.mjs --bundle --platform=node --format=esm --target=node24 --external:pg-native --banner:js=\"import { createRequire as __cr } from 'node:module'; const require = __cr(import.meta.url);\" --outfile=dist/index.mjs",
+    "build": "esbuild entry.mjs --bundle --platform=node --format=esm --target=node24 --external:pg-native --banner:js=\"import { createRequire as __cr } from 'node:module'; const require = __cr(import.meta.url);\" --outfile=dist/index.mjs",
     "deploy": "npm run build && neon functions deploy photoupload --src dist"
   },
   "dependencies": {
