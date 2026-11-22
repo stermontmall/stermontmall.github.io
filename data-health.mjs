@@ -7,13 +7,22 @@ import { writeFileSync } from 'node:fs';
 const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
 const STOCK_SUSPICIOUS = 5000;
 
-const res = await fetch(NEON_REST + 'rpc/get_product_pages', { signal: AbortSignal.timeout(30000) });
-if (!res.ok) {
-  console.error('Could not read the Neon catalog:', res.status, await res.text());
-  process.exit(1);
+const pageSize = 200;
+const rows = [];
+for (let offset = 0; ; offset += pageSize) {
+  const res = await fetch(NEON_REST + 'rpc/get_product_pages', {
+    headers: { Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
+    signal: AbortSignal.timeout(30000)
+  });
+  if (!res.ok) {
+    console.error('Could not read the Neon catalog:', res.status, await res.text());
+    process.exit(1);
+  }
+  const batch = await res.json();
+  if (!Array.isArray(batch)) throw new Error('Neon catalog returned an invalid response');
+  rows.push(...batch);
+  if (batch.length < pageSize) break;
 }
-const rows = await res.json();
-if (!Array.isArray(rows)) throw new Error('Neon catalog returned an invalid response');
 
 const label = (p) => `${p.name}${p.variant_label ? ' (' + p.variant_label + ')' : ''}`;
 const norm = (p) => `${p.name || ''} ${p.variant_label || ''}`.toLowerCase().replace(/[^a-z0-9]/g, '');
