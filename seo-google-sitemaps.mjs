@@ -37,5 +37,5 @@ for (const sm of SITEMAPS) {
   console.log(r.ok ? `Submitted ${sm}` : `FAILED ${sm}: ${r.status} ${responseText}`);
   if (!r.ok) failed++;
 }
-writeFileSync('google-sitemap-results.json', JSON.stringify(outcomes, null, 2) + '\\n');
+writeFileSync('google-sitemap-results.json', JSON.stringify(outcomes, null, 2) + '\n');
 process.exit(failed ? 1 : 0);
