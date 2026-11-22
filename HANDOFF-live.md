@@ -1,3 +1,28 @@
+## 2026-11-23 (Africa/Nairobi) — Neon backend-control migration (branch `neon-backend-control-2026-11-23`, not merged)
+
+### Implemented in Neon
+- Public read-only RPCs: `get_product_pages`, `get_approved_reviews`, `get_product_slug_redirects`, `get_products_by_ids`, and the existing `get_store_catalog` hardened as SECURITY DEFINER with a fixed search_path.
+- Guest order RPCs: `track_order`, `create_guest_order`, and `check_voucher`; search telemetry RPC: `log_search`. Anonymous role can execute these functions but cannot directly SELECT products or orders, or INSERT orders.
+- Added Neon `search_logs` and `vouchers` tables. `create_guest_order` validates the product IDs, live prices, stock, delivery fee, voucher and payment reference server-side before inserting a pending order.
+- Neon Data API refreshed for schema changes; anonymous role and CORS limited to the storefront origin; max response size 1,000.
+
+### GitHub branch changes (not deployed)
+- Storefront, homepage/SEO route prefetch, product page generator, approved review reads, search telemetry, SEO/catalogue guards, stock/data-health/product-watch reports and guest tracking now use Neon RPCs.
+- Checkout product handoff now uses Neon; guest order placement and voucher validation use Neon; customer account page redirects to guest order tracking and checkout's account panel was removed.
+- Product-page workflow preconnect now points to Neon.
+
+### Verified
+- Neon has 22 product rows, 0 active; 93 active categories.
+- Anonymous role has EXECUTE on the public RPCs; direct anonymous SELECT on products/orders and INSERT on orders are false.
+- A negative-path create-order call returned the expected "cart is empty or invalid" response without inserting an order; missing voucher check returned the expected invalid-code response.
+- No live order was placed and no product was activated.
+
+### Not yet migrated / not verified
+- Admin catalogue/order/review/chat/quotation screens and payment callbacks still have Supabase-era integrations; migrate these to Neon next.
+- Card payments remain disabled. M-Pesa checkout is still manual receipt entry pending staff verification; no Daraja callback was deployed.
+- Browser-level Neon Data API/CORS checks, actual checkout, public photo GET, and GitHub Actions CI still need verification. Do not merge or deploy until these pass.
+- Preserve Supabase and its legacy image URLs as a fallback until quota renewal; do not delete the Supabase project or its data.
+
 
 ## 2026-11-22 22:30 (Africa/Nairobi) — Admin rulebook page now reads Neon `publish_products` (v5)
 
