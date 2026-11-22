@@ -98,22 +98,54 @@ async function getProducts() {
                 'id,product_code,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
                 'id,product_code,created_at,name,price,old_price,unit,stock,images,description,categories(name,slug)',
                 'id,product_code,created_at,name,price,stock,images,description,categories(name,slug)'];
+  // Keep each REST response small enough for constrained hosted runners and retry transient
+  // gateway/rate-limit failures. The previous 1,000-row response could be several megabytes.
+  const PAGE_SIZE = 200;
+  const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+  let lastError = 'No request attempted';
   for (const c of cols) {
     const all = [];
     let offset = 0;
     let failed = false;
     while (true) {
-      const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=${c}&order=created_at.asc&limit=1000&offset=${offset}`, { headers: { apikey: KEY } });
-      if (!r.ok) { failed = true; break; }
-      const batch = await r.json();
-      if (!Array.isArray(batch)) { failed = true; break; }
+      const url = `${SB}/rest/v1/products?active=eq.true&select=${c}&order=created_at.asc&limit=${PAGE_SIZE}&offset=${offset}`;
+      let batch = null;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const r = await fetch(url, { headers: { apikey: KEY, accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
+          if (!r.ok) {
+            const detail = (await r.text()).replace(/\\s+/g, ' ').slice(0, 350);
+            lastError = `HTTP ${r.status} at offset ${offset}: ${detail || r.statusText}`;
+            // Authentication/permission failures affect every select shape; don't hide them by retrying variants.
+            if (r.status === 401 || r.status === 403) throw new Error(lastError);
+            if (![408, 425, 429, 500, 502, 503, 504].includes(r.status)) break;
+            if (attempt < 3) await pause(700 * attempt);
+            continue;
+          }
+          const payload = await r.json();
+          if (!Array.isArray(payload)) {
+            lastError = `Unexpected JSON response at offset ${offset}: ${JSON.stringify(payload).slice(0, 350)}`;
+            break;
+          }
+          batch = payload;
+          break;
+        } catch (error) {
+          if (error?.message?.startsWith('HTTP 401') || error?.message?.startsWith('HTTP 403')) throw error;
+          lastError = `Request error at offset ${offset}: ${String(error?.message || error).slice(0, 350)}`;
+          if (attempt < 3) await pause(700 * attempt);
+        }
+      }
+      if (batch === null) { failed = true; break; }
       all.push(...batch);
-      if (batch.length < 1000) break;
+      if (batch.length < PAGE_SIZE) break;
       offset += batch.length;
     }
-    if (!failed) return fixProducts(all);
+    if (!failed) {
+      console.log(`Loaded ${all.length} active products from Supabase using ${PAGE_SIZE}-row pages.`);
+      return fixProducts(all);
+    }
   }
-  throw new Error('Could not read products from Supabase');
+  throw new Error(`Could not read products from Supabase after trying all compatible select shapes. Last API error: ${lastError}`);
 }
 
 function productContentHtml(p) {
