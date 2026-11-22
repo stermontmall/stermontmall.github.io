@@ -65,7 +65,8 @@ async function loadState(){try{return JSON.parse(await fs.readFile(statePath,"ut
 async function saveState(s){await fs.writeFile(statePath,JSON.stringify(s,null,2)+"\n",{mode:0o600});}
 async function existingMap(collection){
  const map=new Map();let page=1;
- for(;;){const r=await request("/api/collections/"+collection+"/records?perPage=500&page="+page+"&fields=id,supabase_id,supabase_user_id,pid");for(const x of r.items||[]){const key=x.supabase_id??x.supabase_user_id??x.pid;if(key!=null)map.set(String(key),x.id);}if(page>=r.totalPages)break;page++;}
+ const selectFields=collection==="users"?"id,supabase_user_id":collection==="product_costs"?"id,pid":"id,supabase_id";
+ for(;;){const r=await request("/api/collections/"+collection+"/records?perPage=500&page="+page+"&fields="+selectFields);for(const x of r.items||[]){const key=x.supabase_id??x.supabase_user_id??x.pid;if(key!=null)map.set(String(key),x.id);}if(page>=r.totalPages)break;page++;}
  return map;
 }
 async function sequential(collection,ops,onDone){
