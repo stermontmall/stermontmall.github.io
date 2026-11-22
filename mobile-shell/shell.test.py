@@ -120,7 +120,12 @@ with sync_playwright() as p:
     pg = ctx.new_page()
     errors = []
     pg.on('pageerror', lambda e: errors.append(str(e)))
-    pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and 'broken.jpg' not in (m.location or {}).get('url', '') else None)   # the aborted photo is the fixture's deliberate failure
+    # Browser console resource errors do not expose the failed URL in message.location.
+    # Track failed requests separately so the deliberately broken photo fixture is excluded
+    # by its actual request URL, while every unexpected failed resource still fails the test.
+    failed_requests = []
+    pg.on('requestfailed', lambda r: failed_requests.append(r.url) if 'broken.jpg' not in r.url else None)
+    pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and not m.text.startswith('Failed to load resource:') else None)
     pg.add_init_script("window.__sawSkeleton = false; new MutationObserver(() => { if (document.querySelector('#grid .card[aria-hidden=\"true\"]')) window.__sawSkeleton = true; }).observe(document, { childList: true, subtree: true });")
     # Park (do not sleep on) the FIRST live catalogue request so the pre-hydration assertion is deterministic.
     # The old handler called time.sleep() inside the synchronous route callback, which froze Playwright's event loop: goto() could not
