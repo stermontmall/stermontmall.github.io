@@ -9,7 +9,7 @@
 //   - Only acts on prices backed by at least minMatches matching listings. A wrong match is worse than no match, so matching is strict.
 //   - At most maxChangesPerRun products per run (biggest gaps first), a backup CSV is written first, and a product whose price
 //     was edited by hand while the check was running is skipped.
-//   - Needs the SUPABASE_SERVICE_KEY secret. Without it the run is report-only.
+//   - Reads product data from Neon; price writes are disabled until a restricted Neon price-writer credential is configured.
 //
 // Keeping a run from hanging:
 //   - All sites are searched AT THE SAME TIME for each product (each site is still asked one request at a time, with a pause,
@@ -21,13 +21,12 @@
 //   - Progress is printed to the log (stderr) as it goes.
 //
 // Env: APPLY=1 (force apply) / APPLY=0 (force report-only), otherwise config "autoApply" decides.
-//      SUPABASE_SERVICE_KEY, PRODUCTS_JSON (local test file), FIXTURE_DIR (local test pages), LIMIT (first N products)
+//      PRODUCTS_JSON (local test file), FIXTURE_DIR (local test pages), LIMIT (first N products)
 import { readFileSync, writeFileSync, appendFileSync, existsSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
-const SB = process.env.SUPABASE_URL || 'https://oewvtbnmyombbtggamor.supabase.co';   // SUPABASE_URL only exists so the tests can point at a fake server
-const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';   // public read key, same one stock-report.mjs uses
 
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
 const DEFAULTS = {
   tolerancePct: 10,       // we are "clearly above market" when more than this % over the market price
   raiseGapPct: 10,        // we are "clearly below market" (room to raise) when this % or more under it
@@ -40,7 +39,7 @@ const DEFAULTS = {
   marketBasis: 'median',  // 'range' = one price per site (its cheapest), stay inside their range; 'lowest' = cheapest listing; 'median' = middle
   minMatches: 2,          // matching listings needed (all sites together) before a price is trusted enough to change
   maxChangesPerRun: 40,   // biggest gaps first; the rest wait for the next run
-  autoApply: true,        // change prices automatically (still needs the SUPABASE_SERVICE_KEY secret)
+  autoApply: false,       // report-only until the Neon price-writer role is configured
   delayMs: 1200,          // pause between requests to the same site, to be polite to it
   requestTimeoutMs: 8000, // give up on a single request after this long (a slow site holds up every product, so keep this short)
   skipSourceAfter: 5,     // skip a site for the rest of the run after this many searches in a row that could not load
@@ -296,14 +295,18 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const progress = m => console.error(`[${new Date().toISOString().slice(11, 19)}] ${m}`);   // stderr, so it shows in the Actions log and stays out of the report
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8'));
-  const all = [];
-  for (let from = 0; ; from += 1000) {
-    const r = await fetch(`${SB}/rest/v1/products?active=eq.true&select=id,name,price,cost,old_price,variant_label,unit&order=name.asc&limit=1000&offset=${from}`, { headers: { apikey: KEY }, signal: AbortSignal.timeout(30000) });
-    if (!r.ok) throw new Error(`Could not read products from Supabase (${r.status})`);
-    const page = await r.json(); all.push(...page);
-    if (page.length < 1000) break;
+  const all = [], pageSize = 200;
+  for (let from = 0; ; from += pageSize) {
+    const r = await fetch(NEON_REST + 'rpc/get_product_pages', {
+      headers: { Range: from + '-' + (from + pageSize - 1), 'Range-Unit': 'items' },
+      signal: AbortSignal.timeout(30000)
+    });
+    if (!r.ok) throw new Error(`Could not read products from Neon (${r.status})`);
+    const page = await r.json();
+    if (!Array.isArray(page)) throw new Error('Neon returned an invalid price-watch catalogue');
+    all.push(...page);
+    if (page.length < pageSize) return all;
   }
-  return all;
 }
 
 const health = {};    // per source: searches asked, searches that loaded, searches that gave readable listings
@@ -397,39 +400,12 @@ async function main() {
   }
   md += `\n_${nomatch.length} items had no confident match (specialist or locally sourced products are common here). Matching is strict on sizes and model names, so a missing match is safer than a wrong one._\n`;
 
-  /* apply step */
-  const applyMode = process.env.APPLY === '1' ? true : process.env.APPLY === '0' ? false : !!CFG.autoApply;
-  if (applyMode && actionable.length) {
-    const svc = process.env.SUPABASE_SERVICE_KEY;
-    let note = '';
-    if (!svc) note = 'Auto-apply is on but the SUPABASE_SERVICE_KEY secret is not set, so nothing was changed. Add it under Settings → Secrets and variables → Actions.';
-    else {
-      writeFileSync('price-watch-backup.csv', 'id,name,previous_price,new_price,previous_old_price\n' + batch.map(r => [r.p.id, r.p.name, r.p.price, r.target, r.p.old_price ?? ''].map(csvCell).join(',')).join('\n') + '\n');
-      const lines = [];
-      for (const r of batch) {
-        const body = { price: r.target };
-        if (r.p.old_price != null && Number(r.p.old_price) <= r.target) body.old_price = null;   // no "was" price below the new price
-        // the price=eq filter makes sure nobody edited this price by hand while the check was running
-        let res;
-        try {
-          res = await fetch(`${SB}/rest/v1/products?id=eq.${encodeURIComponent(r.p.id)}&price=eq.${encodeURIComponent(r.p.price)}`, { method: 'PATCH', headers: { apikey: svc, authorization: `Bearer ${svc}`, 'content-type': 'application/json', prefer: 'return=representation' }, body: JSON.stringify(body), signal: AbortSignal.timeout(30000) });
-        } catch (e) {
-          lines.push(`- could not update **${label(r.p)}** (${String(e.message || e)})`);
-          continue;
-        }
-        let rows = [];
-        if (res.ok) { try { rows = await res.json(); } catch { rows = []; } }
-        if (res.ok && rows.length) { r.applied = true; lines.push(`- ${r.direction === 'cut' ? '⬇️ cut' : '⬆️ raised'} **${label(r.p)}**: ${kes(r.p.price)} → ${kes(r.target)} (market ${kes(r.market)}${r.note ? `, ${r.note}` : ''})`); }
-        else if (res.ok) lines.push(`- skipped **${label(r.p)}**: its price changed while the check was running`);
-        else lines.push(`- could not update **${label(r.p)}** (HTTP ${res.status})`);
-      }
-      const n = batch.filter(r => r.applied).length;
-      note = `Changed **${n}** price${n === 1 ? '' : 's'}. Previous prices are in the price-watch-backup.csv file attached to this run.\n\n${lines.join('\n')}`;
-      if (deferred) note += `\n\n${deferred} more ${deferred === 1 ? 'change is' : 'changes are'} waiting for the next run (limit ${CFG.maxChangesPerRun} per run).`;
-    }
-    md += `\n### Prices changed\n${note}\n`;
-  } else if (!applyMode && actionable.length) {
-    md += `\n**${actionable.length} trusted change${actionable.length === 1 ? '' : 's'} were not applied** because this run was report-only. Auto-apply is ${CFG.autoApply ? 'on, so the next scheduled run will apply them' : 'off: set "autoApply": true in price-watch.config.json'}.\n`;
+  /* Price writes are disabled until a restricted Neon price-writer credential is configured. */
+  const applyMode = false;
+  if (process.env.APPLY === '1' && actionable.length) {
+    md += `\n### Price changes not applied\nFound ${actionable.length} suggested change(s), but no prices were changed. The write path is intentionally disabled until a restricted Neon price-writer role and CI secret are verified.\n`;
+  } else if (actionable.length) {
+    md += `\n**${actionable.length} trusted change${actionable.length === 1 ? '' : 's'} were not applied** because this Neon price-watch run is report-only.\n`;
   }
 
   writeFileSync('price-watch.csv', 'id,name,status,our_price,cost,market_median,gap_pct,suggested,applied,matches\n' + results.map(r => [r.p.id, label(r.p), r.status, r.p.price, r.p.cost ?? '', r.market ? Math.round(r.market) : '', r.gapPct != null ? r.gapPct.toFixed(1) : '', r.target ?? '', r.applied ? 'yes' : '', (r.matches || []).map(m => `${m.source}:${m.price}:${m.name}`).join(' | ')].map(csvCell).join(',')).join('\n') + '\n');
