@@ -1,0 +1,54 @@
+name: Remove all products (one-off)
+
+# Runs once when this file is pushed to wip-remove-supabase.
+# Counts, then deletes every product page and product data/feed file, and commits the result.
+# It never runs on main. Delete this workflow file after it has run.
+
+on:
+  push:
+    branches: [wip-remove-supabase]
+    paths:
+      - '.github/workflows/remove-products-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  remove-products:
+    if: github.ref == 'refs/heads/wip-remove-supabase'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: wip-remove-supabase
+
+      - name: Count what will be removed
+        run: |
+          {
+            echo "## Before removal"
+            echo "- Product pages in p/: $(find p -type f -name '*.html' 2>/dev/null | wc -l)"
+            echo "- Files in p/ (all types): $(find p -type f 2>/dev/null | wc -l)"
+            for f in product-names.json product-content.json sitemap-products.xml sitemap-images.xml merchant-feed.xml; do
+              [ -f "$f" ] && echo "- $f: present" || echo "- $f: not present"
+            done
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove product pages and product data files
+        run: |
+          git rm -r -q --ignore-unmatch p
+          git rm -q --ignore-unmatch product-names.json product-content.json sitemap-products.xml sitemap-images.xml merchant-feed.xml
+
+      - name: Commit and push
+        run: |
+          if git diff --cached --quiet; then
+            echo "Nothing to remove." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Remove all product pages and product data files [skip ci]"
+          git push origin HEAD:wip-remove-supabase
+          {
+            echo "## After removal"
+            echo "- Product pages in p/: $(find p -type f -name '*.html' 2>/dev/null | wc -l)"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
