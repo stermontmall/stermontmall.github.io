@@ -21,7 +21,7 @@ If the owner says "publish products", "run the publish rule", or asks you to add
 
 ---
 
-## The rule (mirror of Neon `publish_products`, version 5: v3 rule plus the photo-sourcing addendum)
+## The rule (mirror of Neon `publish_products`, version 7: v3 rule plus Kenyan third-party photo policy)
 
 ```
 PUBLISH-PRODUCTS RULE v3 - FULLY AUTONOMOUS - PERMANENT STANDING INSTRUCTION
@@ -100,4 +100,16 @@ Use manufacturer/distributor/retailer assets only where their product/reseller u
 If no exact, qualifying photo can be verified, leave images empty, keep the product inactive, and report the exact blocker. A near-match is not a match. Never activate a product solely because a photo was found; all v3 price, description, SEO, duplicate, and regulatory checks still apply. Photo-only updates must not change active status, price, stock, slug, or product code.
 
 VENDOR PHOTO FALLBACK CLARIFICATION (owner-approved 2026-11-22): Search manufacturer, authorized distributor, Kenyan vendor, and reputable retailer product pages for exact product/pack photos. A vendor listing is a discovery/source lead, not by itself a reuse license. Before copying, downloading, hotlinking, or storing an image, require written permission, an explicit reuse license, or clear platform terms authorizing commercial reuse. Record the source page, direct asset URL, permission/license evidence, retrieval date, dimensions, and exact-pack verification in product attributes/audit log. If permission is absent or unclear, request permission or use an authorized manufacturer/distributor asset; do not attach the image and do not activate the product. Never substitute search thumbnails, generated previews, similar products, or different pack sizes. All existing photo quality, regulatory, cost, SEO, and activation checks remain mandatory.
+
+ 
+KENYAN THIRD-PARTY PRODUCT PHOTO RULE v7 — OWNER-APPROVED 2026-11-22
+
+The owner authorizes sourcing product photos from other websites operating in Kenya, not only manufacturers or authorized distributors. Eligible sources now include Kenyan agrovets, pest-control suppliers, wholesalers, retailers, marketplaces (including Jumia Kenya and Kilimall), and other Kenyan commercial product listings, provided the image shows the exact product and exact pack size sold by Stermont Arcade.
+
+For every candidate: verify exact brand/product/pack/formulation, confirm the image loads and is at least 500 x 500 px, and record the original product-page URL, direct asset URL, source business/site, retrieval date, dimensions, and exact-pack match note in product attributes. Use source basis 'kenyan_vendor'. Prefer clean genuine images without seller watermarks, contact details, price overlays or competitor branding. Never use logos, generic images, search thumbnails, AI mockups, relabelled images or near-matches.
+
+Store qualifying images on Stermont's configured stable public image host (Neon Object Storage or ImageKit) and use the stable HTTPS URL in images. Do not invent URLs or hotlink temporary URLs. Check source-site terms and applicable image rights before copying or republishing. The owner's instruction authorizes this sourcing workflow but does not transfer copyright or override site terms. If reuse is prohibited, expressly restricted or materially unclear, seek permission or use another source. Do not remove watermarks or ownership notices; retain source attribution.
+
+This v7 rule supersedes the v6 restriction against retailer-only/competitor pages, subject to the checks above. Manufacturer and authorized-distributor images remain preferred. All cost, description, SEO, duplicate and regulatory checks remain mandatory. No qualifying photo means inactive product. A photo-only update must not change active status, price, stock, slug or product code.
+
 ```
