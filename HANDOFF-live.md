@@ -7,12 +7,13 @@
 - Neon `publish_products` updated v5 -> v6 (v5 text backed up under key `publish_products_v5_backup`). v6 adds photo policy v6 (manufacturer/authorized-distributor images allowed without separate written permission; retailer-only, thumbnails, watermarked and generated images not allowed; attributes to record) and a go-live note. Cost, description/SEO, duplicate and PCPB gates are unchanged.
 - Mirrored in `PUBLISH-PRODUCTS-RULE.md`, `.claude/commands/post-product.md`; version reference updated in `CLAUDE.md`, `AGENTS.md`, `PUBLISHING.md`.
 
-### Finding: the site cannot be switched to Neon yet
-- Neon holds 7 products, 0 active; the live shop shows about 1,700 active Supabase products. `mobile-shell/app.js` and `generate-products.mjs` read only Supabase (no Neon reference). Switching now would blank the shop.
-- Needed first, as separate tested PRs: (1) copy the full catalogue, categories and product images from Supabase to Neon (Supabase Storage is under the 402 restriction); (2) add public read access in Neon (anonymous select on active products and categories only); (3) change the storefront, generator, ImageKit/photo URLs, index.html prefetch and `mobile-shell/shell.test.py` together; (4) only then merge.
+### Finding (corrected 23:20): the storefront still reads Supabase, but Supabase has 0 active products
+- CORRECTION: an earlier version of this entry said the live shop shows about 1,700 active products and that switching to Neon would blank it. That figure came from the 2026-11-21 snapshot and was not re-checked. Checked 2026-11-22: Supabase `products` has 1,828 rows, 0 active; `get_store_catalog()` returns 0 rows. The shop already shows no products, so switching to Neon cannot blank it.
+- `mobile-shell/app.js` and `generate-products.mjs` read only Supabase (no Neon reference), so `active = true` in Neon does not show a product on the website yet.
+- Switch plan (separate tested PR): (1) public read-only access in Neon (anonymous select on active products and categories only); (2) point the storefront, generator, image URLs, index.html prefetch and `mobile-shell/shell.test.py` at Neon together; (3) copy the 92 categories from Supabase to Neon if they differ; (4) the old 1,828 hidden Supabase products stay hidden unless the owner decides to bring them back.
 
 ### Next
-1. Owner: confirm the migration plan above (needs Supabase readable once to export; billing or an owner-run export).
+1. Build the Neon storefront switch on a wip- branch (do not merge until a phone check shows Neon products).
 2. Source the remaining 13 products into Neon as inactive drafts, with manufacturer/distributor photos recorded per policy v6.
 
 ## 2026-11-22 23:00 (Africa/Nairobi) — Owner decision: Neon only for now; Supabase not needed for about two weeks

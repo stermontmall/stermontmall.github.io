@@ -23,7 +23,7 @@ Before any product work read `HANDOFF-live.md`, then the live `publish_products`
 
 ## Go-live note
 
-The public storefront and page generator still read Supabase (checked 2026-11-22), so `active = true` in Neon does not show a product on the website yet. Do not switch the storefront to Neon until Neon holds the full live catalogue with images.
+The public storefront and page generator still read Supabase (checked 2026-11-22), so `active = true` in Neon does not show a product on the website yet. Checked 2026-11-22: the Supabase catalogue has 0 active products (all hidden), so the shop shows no products at the moment. Switching the storefront to read Neon is a separate, tested PR.
 
 ## Admin posting routes
 
