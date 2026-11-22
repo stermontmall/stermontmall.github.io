@@ -632,19 +632,28 @@ const staticDetails = new Map(); // Read-only details parsed from the published 
 async function staticDetailsFor(rowId) {
   try {
     const p = PRODUCTS.find(x => x.sizes.some(s => s.rowId === rowId));
-    const slug = p && p.slug;
-    if (!slug || !/^[A-Za-z0-9._%~-]+$/.test(slug)) return null;
-    const res = await fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' });
-    if (!res.ok) return null;
-    const html = await res.text();
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const sections = [...doc.querySelectorAll('.product-description .pd-sec')].map(sec => {
-      const heading = sec.querySelector('h3')?.textContent.trim() || '';
-      const lines = [...sec.querySelectorAll('p,li')].map(n => n.textContent.trim()).filter(Boolean);
-      return [heading, ...lines].filter(Boolean).join('\n');
-    }).filter(Boolean);
-    if (!sections.length) return null;
-    return { description: sections.join('\n\n'), unit: null, stock: /InStock/.test(html) ? 1000 : 0, low_at: 5, slug, images: [], product_code: '' };
+    if (!p) return null;
+    /* A multi-pack card is keyed to one pack's slug, and that pack's /p/ page is a small redirect stub (canonical link to the group page, no description).
+       So follow the stub's canonical link, and finally try the group id, until a page with the description is found. */
+    const queue = [p.slug, p.id], seen = new Set();
+    while (queue.length && seen.size < 4) {
+      const slug = queue.shift();
+      if (!slug || seen.has(slug) || !/^[A-Za-z0-9._%~-]+$/.test(slug)) continue;
+      seen.add(slug);
+      const res = await fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' });
+      if (!res.ok) continue;
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const sections = [...doc.querySelectorAll('.product-description .pd-sec')].map(sec => {
+        const heading = sec.querySelector('h3')?.textContent.trim() || '';
+        const lines = [...sec.querySelectorAll('p,li')].map(n => n.textContent.trim()).filter(Boolean);
+        return [heading, ...lines].filter(Boolean).join('\n');
+      }).filter(Boolean);
+      if (sections.length) return { description: sections.join('\n\n'), unit: null, stock: /InStock/.test(html) ? 1000 : 0, low_at: 5, slug, images: [], product_code: '' };
+      const canon = (doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || '').match(/\/p\/([^/?#]+)\.html/i);
+      if (canon) queue.unshift(decodeURIComponent(canon[1]));
+    }
+    return null;
   } catch (e) { return null; }
 }
 const detailsFor = rowId => {
