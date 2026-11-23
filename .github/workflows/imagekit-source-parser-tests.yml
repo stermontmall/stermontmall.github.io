@@ -1,0 +1,34 @@
+name: ImageKit source parser tests
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/imagekit-source-parser.mjs'
+      - 'scripts/imagekit-source-parser.test.mjs'
+      - 'scripts/upload-product-photos-to-imagekit.mjs'
+      - '.github/workflows/imagekit-source-parser-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/imagekit-source-parser.mjs'
+      - 'scripts/imagekit-source-parser.test.mjs'
+      - 'scripts/upload-product-photos-to-imagekit.mjs'
+      - '.github/workflows/imagekit-source-parser-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Check JavaScript syntax
+        run: |
+          node --check scripts/imagekit-source-parser.mjs
+          node --check scripts/upload-product-photos-to-imagekit.mjs
+      - name: Test supplier JSON image extraction
+        run: node --test scripts/imagekit-source-parser.test.mjs
