@@ -69,15 +69,15 @@ assert.ok(!generator.includes('<a href="${to}">'),
   'alias redirect stubs must not render a visible anchor to the static /p/ canonical URL');
 assert.match(readFileSync('mobile-shell/app.js', 'utf8'), /const productUrl = .*shellProductLink/, 'mobile shell share URL must use shellProductLink');
 const homepageHtml = readFileSync('index.html', 'utf8');
-assert.doesNotMatch(homepageHtml, /<a\\b[^>]*href=["'][^"']*\\?product=/i, 'homepage must not emit legacy query product anchors');
+assert.doesNotMatch(homepageHtml, /<a\b[^>]*href=["'][^"']*\?product=/i, 'homepage must not emit legacy query product anchors');
 const shellApp = readFileSync('mobile-shell/app.js', 'utf8');
-assert.doesNotMatch(shellApp, /(?:href\\s*=|\\.href\\s*=|Link:\\s*|window\\.open\\()[^\\n]*\\?product=/i, 'mobile shell must not emit legacy query product links');
+assert.doesNotMatch(shellApp, /(?:href\s*=|\.href\s*=|Link:\s*|window\.open\()[^\n]*\?product=/i, 'mobile shell must not emit legacy query product links');
 // These older modules were removed during the Neon migration on this branch. If any are restored,
 // keep their product links on the canonical /p/ route rather than the retired ?product= route.
 for (const file of ['site-links.js', 'storefront-live.js', 'recent-orders.js', 'product-trust.js', 'kili-pages.js']) {
   if (!existsSync(file)) continue;
   const source = readFileSync(file, 'utf8');
-  assert.match(source, /shellProductLink|\\/p\\//, file + ' must recognise canonical /p/ product links');
+  assert.match(source, /shellProductLink|\/p\//, file + ' must recognise canonical /p/ product links');
   assert.doesNotMatch(source, /(?:href\\s*=|\\.href\\s*=|Link:\\s*|window\\.open\\()[^\\n]*\\?product=/i, file + ' must not emit legacy ?product= links');
 }
 
