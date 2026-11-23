@@ -23,7 +23,7 @@ function collect(dir) {
     else if (entry.isFile() && entry.name.endsWith('.html')) files.add(path);
   }
 }
-for (const dir of ['blog', 'guides', 'services', 'pest-control']) collect(dir);
+for (const dir of ['c', 'blog', 'guides', 'services', 'pest-control']) collect(dir);
 const categoryAnchors = html => html.match(/<a\b[^>]*\bhref=["'][^"']*\/c\/[a-z0-9-]+\.html["']/gi) || [];
 let changedFiles = 0, repairedLinks = 0;
 for (const file of files) {
