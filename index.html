@@ -90,7 +90,7 @@
     try {
       if (location.pathname !== '/') return;
       var q = new URLSearchParams(location.search);
-      var slug = q.get('product');
+      var slug = q.get('product') || q.get('item');
       if (slug && /^[a-z0-9][a-z0-9-]*$/i.test(slug)) location.replace('/p/' + encodeURIComponent(slug) + '.html' + location.hash);
     } catch (e) {}
   })();
