@@ -197,7 +197,7 @@ with sync_playwright() as p:
 
     # Keep the server-rendered cards in place until the first live catalogue response arrives.
     check('SSR fallback cards remain visible while the live catalogue is loading', pg.locator('#grid .ssr-product-card').count() >= 6, pg.locator('#grid .ssr-product-card').count())
-    if parked: on_rest(parked.pop(0))   # release the held catalogue response: hydration may proceed now
+    if parked: on_neon(parked.pop(0))   # release the held catalogue response: hydration may proceed now
     pg.wait_for_selector('#grid .card[data-id]')
     check('live catalogue replaces SSR fallback cards after hydration', pg.locator('#grid .ssr-product-card').count() == 0)
     check('skeleton cards were shown while loading', pg.evaluate('window.__sawSkeleton'))
