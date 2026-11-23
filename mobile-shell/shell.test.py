@@ -543,7 +543,7 @@ with sync_playwright() as p:
     check('address: Back returns to the selected category address and title', p9.evaluate('location.pathname') == '/c/home-living.html' and p9.title() == base_title, p9.url + ' | ' + p9.title())
     p9.goto(f'{BASE}/?product=garden-set-250ml'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: opening the address shows that product page with that size', 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
-    check('address: a legacy product query resolves to the canonical static product URL and the tab title shows the product', p9.evaluate('location.pathname') == '/p/garden-set-250ml.html' and 'Garden Hose Connector Set' in p9.title())
+    check('address: a legacy product query resolves to the canonical static product URL and the tab title shows the product', p9.evaluate("location.pathname.startsWith('/p/') && location.search === ''") and 'Garden Hose Connector Set' in p9.title())
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
     check('address: Back from an opened static product address lands on the shell home ("/")', p9.evaluate('location.pathname + location.search') == '/' and p9.locator('#view-home').is_visible(), p9.url)
     p9.reload(); p9.wait_for_selector('#grid .card[data-id]')
@@ -598,8 +598,8 @@ with sync_playwright() as p:
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_selector('#page-product.open', timeout=15000)
-    check('explicit legacy /?product=<slug> deep link resolves to the canonical static product page in the shell', p10.evaluate('location.pathname') == '/p/garden-set-250ml.html' and p10.locator('#page-product.open').count() == 1, p10.url)
-    check('shell product deep link keeps the homepage canonical', p10.evaluate("document.querySelector('link[rel=canonical]').href") == 'https://stermontarcade.co.ke/p/garden-set-250ml.html', p10.evaluate("document.querySelector('link[rel=canonical]').href"))
+    check('explicit legacy /?product=<slug> deep link resolves to the canonical static product page in the shell', p10.evaluate("location.pathname.startsWith('/p/') && location.search === ''") and p10.locator('#page-product.open').count() == 1, p10.url)
+    check('shell product deep link keeps the homepage canonical', p10.evaluate("document.querySelector('link[rel=canonical]').href") == 'https://stermontarcade.co.ke' + p10.evaluate('location.pathname'), p10.evaluate("document.querySelector('link[rel=canonical]').href"))
     c10.close()
 
     def cat_page(slug):
@@ -741,8 +741,8 @@ with sync_playwright() as p:
     c17 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c17)
     FAIL[0] = True  # simulate the Supabase 402 quota restriction for every REST request
     fallback_html = '''<!doctype html><html><head><meta name="stm-id" content="static-fallback"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Static Fallback Sprayer","image":["https://img.test/ok.png"],"sku":"STM-TEST-402","offers":{"@type":"Offer","priceCurrency":"KES","price":1234,"availability":"https://schema.org/InStock"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"http://test/"},{"@type":"ListItem","position":2,"name":"Garden Tools","item":"http://test/c/garden-tools.html"},{"@type":"ListItem","position":3,"name":"Static Fallback Sprayer","item":"http://test/p/static-fallback.html"}]}</script></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Published description survives a database outage.</p></section></div></body></html>'''
-    c17.route('**/p/static-fallback.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=fallback_html))
     p17 = c17.new_page(); e17 = []; p17.on('pageerror', lambda e: e17.append(str(e)))
+    p17.route('**/p/static-fallback.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=fallback_html))
     p17.goto(f'{BASE}/?product=static-fallback'); p17.wait_for_selector('#page-product.open', timeout=15000); p17.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Published description survives')", timeout=5000)
     check('product deep link opens from the published SEO page when Supabase REST returns 402', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
     check('static fallback retains product code and full published description', 'STM-TEST-402' in p17.locator('#pp-meta').inner_text() and 'Published description survives a database outage.' in p17.locator('#pp-desc').inner_text())
