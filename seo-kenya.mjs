@@ -11,9 +11,9 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 'node:fs';
 import { catTitle, catDescription } from './seo-meta.mjs';
 import { createRequire } from 'node:module';
-const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 import { normalizeGeneratedProductPages } from './product-link-normalizer.mjs';
 import { normalizeCategoryLinks } from './category-link-normalizer.mjs';
+const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const SITE = 'https://stermontarcade.co.ke';
 const WA = 'https://wa.me/254789514060';
