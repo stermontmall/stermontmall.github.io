@@ -79,7 +79,8 @@ const catName = slug => {
 const hasCat = slug => {
   try {
     const h = readFileSync(`c/${slug}.html`, 'utf8');
-    return /<li(?:\\s[^>]*)?><a href="(?:https:\\/\\/stermontarcade\\.co\\.ke)?\\/p\\/[^\"]+\\.html"[^>]*>\\s*<img/i.test(h);
+    const grid = (h.split('<ul class="g">')[1] || '').split('</ul>')[0] || '';
+    return grid.includes('href="/p/') || grid.includes('href="https://stermontarcade.co.ke/p/');
   } catch { return false; }
 };
 const hasBlog = href => existsSync(href.replace(/^\//, ''));
