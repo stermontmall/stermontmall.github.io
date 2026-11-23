@@ -85,31 +85,25 @@
   <style>/* the build bot rewrites the crawler links between the seo-links markers (generate-products.mjs); these variables style them */
   :root{--panel:#f3f4f6;--line:#e5e7eb;--ink:#1f2937}.seo-links .wrap{padding:0 12px 8px}.seo-links h2{color:var(--ink)}</style>
   <script>
-  /* Mobile shell is the sole customer storefront on phones, tablets and desktop.
-     Preserve old shared product links (#p-...) by translating them into the shell's product deep link.
-     SEO crawlers still read this canonical homepage normally. */
+  /* Preserve old query, item and #p- product links by sending them directly to the static sitemap URL.
+     The homepage's default canonical remains the root; query-product visits receive their product canonical before navigation. */
   (function () {
     try {
-      var m = /^#p-([a-z0-9-]+)$/i.exec(location.hash || '');
+      var hashProduct = /^#p-([a-z0-9][a-z0-9-]*)$/i.exec(location.hash || '');
       var q = new URLSearchParams(location.search);
-      var legacyProduct = q.get('product');
-      if (legacyProduct && /^[a-z0-9][a-z0-9-]*$/i.test(legacyProduct)) {
-        var productPath = '/p/' + encodeURIComponent(legacyProduct) + '.html';
-        var canonical = document.querySelector('link[rel="canonical"]');
-        if (canonical) canonical.href = 'https://stermontarcade.co.ke' + productPath;
-        q.delete('product');
-        var remaining = q.toString();
-        location.replace(productPath + (remaining ? '?' + remaining : '') + (location.hash || ''));
-        return;
-      }
-      var it = q.get('item');   /* /?item=<id>: legacy pre-shell share link */
-      if (!m && !(it && /^[a-z0-9][a-z0-9-]*$/i.test(it) && !q.has('product'))) return;
-      if (it) q.delete('item');
-      if (!q.has('product')) q.set('product', m ? m[1] : it);
-      location.replace('/?' + q.toString());
+      var legacyProduct = q.get('product') || q.get('item') || (hashProduct ? hashProduct[1] : '');
+      if (!legacyProduct || !/^[a-z0-9][a-z0-9-]*$/i.test(legacyProduct)) return;
+      var productPath = '/p/' + encodeURIComponent(legacyProduct) + '.html';
+      var canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) canonical.href = 'https://stermontarcade.co.ke' + productPath;
+      q.delete('product');
+      q.delete('item');
+      var remaining = q.toString();
+      var hash = hashProduct ? '' : (location.hash || '');
+      location.replace(productPath + (remaining ? '?' + remaining : '') + hash);
     } catch (e) {}
   })();
-  </script>
+  </script>t>
   <!-- Shared product links keep the storefront visible while the product overlay resolves. --></head><!DOCTYPE html>
 <html lang="en-KE">
 
