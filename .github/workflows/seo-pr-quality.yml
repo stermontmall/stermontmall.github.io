@@ -83,6 +83,8 @@ jobs:
       # (see "Report failing step output").
       - name: Prepare failure log directory
         run: mkdir -p "$RUNNER_TEMP/ci-logs"
+      - name: Test allowlisted safe-route accessibility overrides
+        run: node seo-safe-a11y.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/10b-seo-safe-a11y.log"
       - name: Install Playwright Chromium
         run: |
           {

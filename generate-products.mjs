@@ -27,6 +27,7 @@ import { productIdentifiers } from './seo-product-identifiers.mjs';
 import { productDescriptionHtml, extractProductFaq } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
 import { buildCategoryIntro, buildCategoryFaq } from './category-editorial.mjs';
+import { safeA11yStyle } from './seo-safe-a11y.mjs';
 import { renderHomeGridFallback } from './home-grid-ssr.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
@@ -200,7 +201,7 @@ const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = ''
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${SITE}${path}">
 <meta property="og:image" content="${esc(og || SITE + '/logo.png')}"><meta property="og:image:alt" content="${esc(og ? title + ' product photo' : BRAND + ' logo')}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(og || SITE + '/logo.png')}"><meta name="twitter:image:alt" content="${esc(og ? title + ' product photo' : BRAND + ' logo')}">${extra}
 ${path.startsWith('/p/') && og ? '<link rel="preload" as="image" href="' + esc(og) + '" fetchpriority="high">' : ''}
-<meta name="theme-color" content="#7c3aed"><style>${CSS}</style>${ld || ''}</head><body>
+<meta name="theme-color" content="#7c3aed"><style>${CSS}</style>${safeA11yStyle(path)}${ld || ''}</head><body>
 <header><a href="${SITE}/">${BRAND}</a></header><main>${normalizeCustomerProductLinks(body)}</main>
 <footer>${BRAND} · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 748 888 230</a>
 · <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/about.html">About</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns-warranty.html">Returns &amp; Warranty</a> · <a href="${SITE}/privacy-policy.html">Privacy</a> · <a href="${SITE}/terms.html">Terms</a></footer><script src="/product-links.js" defer></script><script src="/img-protect.js" defer></script><script src="/analytics.js" defer></script></body></html>`;
