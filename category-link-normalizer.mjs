@@ -15,7 +15,7 @@ function hasActiveProducts(slug) {
   const file = join(ROOT, 'c', slug + '.html');
   if (!existsSync(file)) { ACTIVE.set(slug, false); return false; }
   const html = readFileSync(file, 'utf8');
-  const found = /<a\b[^>]*\bhref\s*=\s*(['"])(?:https:\/\/stermontarcade\.co\.ke)?\/p\/[^'"?#]+\.html(?:#[^'"]*)?\1/i.test(html);
+  const found = /<a\b[^>]*\bhref\s*=\s*(['"])(?:https:\/\/stermontarcade\.co\.ke)?(?:\/p\/[^'"?#]+\.html(?:#[^'"]*)?|\/?\?product=[^'"]+)\1/i.test(html);
   ACTIVE.set(slug, found);
   return found;
 }
