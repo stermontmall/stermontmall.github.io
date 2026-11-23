@@ -61,6 +61,7 @@
   function close() { drawer.hidden = true; }
   function add(button) {
     var item = selected(button), qty = Math.max(1, Math.min(99, Number(($('[data-product-qty]') || {}).value) || 1));
+    if (button.dataset.productAvailable === 'false') { window.alert('This pack is currently sold out. Please contact us on WhatsApp to check availability.'); return; }
     if (!(item.price > 0) || !item.rowId) { window.alert('This product price is not available. Please contact us on WhatsApp.'); return; }
     var cart = read(), key = item.id + '|' + item.size, found = cart.find(function (x) { return x.key === key; });
     if (found) found.qty = Math.min(99, Number(found.qty || 0) + qty);
