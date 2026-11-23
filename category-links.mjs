@@ -21,7 +21,7 @@ export function resolveCategoryPath(slug, existingSlugs) {
 export function normalizeCategoryLinks(html, existingSlugs) {
   const existing = existingSlugs instanceof Set ? existingSlugs : new Set(existingSlugs || []);
   return String(html || '').replace(
-    /(<a\\b[^>]*\\bhref=)(["'])(https:\\/\\/stermontarcade\\.co\\.ke)?\\/c\\/([a-z0-9-]+)\\.html\\2([^>]*>)([\\s\\S]*?)(<\\/a>)/gi,
+    /(<a\b[^>]*\bhref=)(["'])(https:\/\/stermontarcade\.co\.ke)?\/c\/([a-z0-9-]+)\.html\2([^>]*>)([\s\S]*?)(<\/a>)/gi,
     (match, prefix, quote, host, slug, attrs, inner, close) => {
       const path = resolveCategoryPath(slug, existing);
       if (path === `/c/${slug}.html`) return match;
