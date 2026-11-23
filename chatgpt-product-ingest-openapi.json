@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Downloads an exact-product photo from a public HTTPS link, stores it in Stermont's image bucket and attaches it to an existing product. Photo only: never activates or reprices a product."
   },
-  "servers": [{ "url": "REPLACE_AFTER_DEPLOY" }],
+  "servers": [{ "url": "https://br-fancy-bird-bh01xcbs-productingest.compute.c-10.eu-central-1.aws.neon.tech" }],
   "paths": {
     "/ingest": {
       "post": {

@@ -1,0 +1,82 @@
+name: Deploy Neon product ingest function
+
+# Deploys neon-functions/productingest to Neon without a terminal. Same setup as deploy-neon-photo-upload.yml.
+# Needs two repository secrets (Settings > Secrets and variables > Actions):
+#   NEON_API_KEY       already used by the photo upload deploy
+#   INGEST_KEY_SHA256  the SHA-256 hash of your ingest key (64 characters), never the key itself
+# Run it from the Actions tab: Run workflow, then type DEPLOY.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: 'Type DEPLOY to deploy productingest to the Stermont main Neon branch'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: neon-productingest-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: ${{ inputs.confirm_deploy == 'DEPLOY' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Neon CLI and function dependencies
+        run: |
+          npm install --global neon@latest
+          npm install --prefix neon-functions/productingest --omit=dev
+
+      - name: Deploy bundled function to Neon
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          INGEST_KEY_SHA256: ${{ secrets.INGEST_KEY_SHA256 }}
+          NEON_PROJECT_ID: restless-shape-79120240
+        run: |
+          if [ -z "$NEON_API_KEY" ]; then
+            echo "::error::Repository secret NEON_API_KEY is not configured."
+            exit 1
+          fi
+          if ! printf '%s' "$INGEST_KEY_SHA256" | grep -Eq '^[0-9a-fA-F]{64}$'; then
+            echo "::error::Repository secret INGEST_KEY_SHA256 must be the 64-character SHA-256 hash of your ingest key (not the key itself)."
+            exit 1
+          fi
+          neon set-context --project-id "$NEON_PROJECT_ID" --branch-id br-fancy-bird-bh01xcbs
+          neon functions deploy productingest \
+            --src neon-functions/productingest \
+            --branch br-fancy-bird-bh01xcbs \
+            --env "INGEST_KEY_SHA256=$INGEST_KEY_SHA256" \
+            --wait
+
+      - name: Verify deployment status
+        run: neon functions get productingest --branch br-fancy-bird-bh01xcbs
+
+      - name: Smoke-test the deployed HTTP endpoint
+        env:
+          INGEST_URL: https://br-fancy-bird-bh01xcbs-productingest.compute.c-10.eu-central-1.aws.neon.tech/
+        run: |
+          response="$(curl --fail --silent --show-error --retry 5 --retry-delay 3 --retry-connrefused "${INGEST_URL}health")"
+          printf '%s' "$response" | node -e '
+            let s = "";
+            process.stdin.on("data", c => s += c);
+            process.stdin.on("end", () => {
+              const body = JSON.parse(s);
+              if (body.ok !== true || body.service !== "stermont-product-ingest") process.exit(1);
+              process.stdout.write("Product ingest function health check passed.\n");
+            });
+          '
