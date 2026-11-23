@@ -1,3 +1,4 @@
+# Re-run Version 6 photo queue with alternate product image sources for five failed items
 # Re-run photo upload with exact product gallery assets and fixed parser
 # Re-run 30-product batch through JPEG-normalizing Version 6 uploader (retry 2)
 atraprat-135g|https://media.zid.store/15485eed-a600-4863-bc02-195da3a0fd71/883a38d7-95c7-4e69-bd33-406241fe68f0.webp
@@ -6,20 +7,20 @@ protecta-mouse-bait-station|https://sokowise-api.b-cdn.net/media/v2/17871.webp?e
 protecta-micro-bait-station|https://veseris.ca/media/catalog/product/P/I/PIF785254_54142380-D2D3-D214-E7CB08CB6B7DC3D4.png?bg-color=255%2C255%2C255&canvas=700%3A700&fit=bounds&height=700&quality=80&width=700
 bipronex-cockroach-gel-bait-5g|https://shop.rafikipestcontrol.com/products/bipronex-cockroach-gel-bait
 cockrakill-paste-50g|https://sokowise-api.b-cdn.net/media/v2/10722.webp?etag=cb75b8a810f2019c4a60a6c171a8ebfd
-goliath-gel-35g|https://imaginecare.co.ke/wp-content/uploads/2018/01/GOLIATH.jpg
+goliath-gel-35g|https://shop.rafikipestcontrol.com/products/cockroach-goliath-gel-35g
 essie-mugo-cockroach-paste|https://sokowise-api.b-cdn.net/media/v2/10718.webp?etag=efa0fed95bc3d6089325de958adf7529&height=640&width=640
-bedlam-200sl-15ml|https://imaginecare.co.ke/wp-content/uploads/2019/05/BEDLAM-200SL-15ml.png
+bedlam-200sl-15ml|https://www.jumia.co.ke/greenlife-bedlam-200-sl-15ml-for-bed-bugs-150716818.html
 bedlam-200sl-50ml|https://sokowise-api.b-cdn.net/media/v2/4747.webp?etag=97f2b6149373f30a4834351e448a556b&height=640&width=640
 hygienic-75-sc-100ml|https://agropests.com/products/hygienic-75percent-sc-100ml
 panthenon-100cs-62-5ml|https://agropests.com/products/panthenon-100-cs-62-5ml
 trevin-dudu-dust-100g|https://agropests.com/products/trevin-dudu-dust-100g
 trevin-dudu-dust-200g|https://agropests.com/products/trevin-dudu-dust-200g
-supakill-aerosol-spray-450ml|https://agropests.com/products/supakill-aerosol-spray-450ml
+supakill-aerosol-spray-450ml|https://www.naivas.online/supakill-aerosol-insect-killer-450ml
 promax-20ec-25ml|https://agropests.com/products/promax-20-ec-25ml
 navigator-100sc-20ml|https://agropests.com/products/navigator-100sc-20ml
 navigator-100sc-50ml|https://agropests.com/products/navigator-100sc-50ml
 rodilon-wax-blocks-10g|https://sokowise-api.b-cdn.net/media/v2/10739.webp?etag=aca99b4a4ed1c942d31df727547ef83e
-baraki-pellets-10g|https://cdn.mafrservices.com/sys-master-root/he8/hf5/49734385860638/194532_main.jpg?im=Resize%3D480
+baraki-pellets-10g|https://imaginecare.co.ke/product/baraki-pellets-10g/
 rodirid-wax-blocks-20g|https://agriguardagrovet.co.ke/product/rodirid-wax-blocks/
 neocidal-600-ew-28ml|https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/42.-Neocidal-600-EW.jpg
 bugnil-20-ec-25ml|https://agriguardagrovet.co.ke/product/bugnil-20-ec/
@@ -29,5 +30,5 @@ mosthrin-2-5-ec-1l|https://agriguardagrovet.co.ke/product/mosthrin-2-5-ec/
 dudu-spray-2l|https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/11.-Dudu-Spray.jpg
 k-othrine-wg-250-20g|https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/35.-K-Othrine-WG-250.jpg
 sevin-dudu-dust-200g|https://agriguardagrovet.co.ke/product/sevin-dudu-dust/
-rat-kill-pellets-600g|https://cheapthings.co.ke/product/rat-kill-pellets-600g/
+rat-kill-pellets-600g|https://shop.rafikipestcontrol.com/products/rat-kill-pellets
 
