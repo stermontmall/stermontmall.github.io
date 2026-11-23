@@ -1,3 +1,19 @@
+## 2026-11-23 18:55 (Africa/Nairobi) - Publishing rule v3.1: no questions, photo ingest, one-step activation (branch `wip-chatgpt-publish-easy`)
+
+### Done
+- Neon `public.publishing_rules` key `publish_products` is now version 4 (v3.1). Backup of the previous row: `archive.publishing_rules_before_easy_20261123`. Changes: never ask the owner (defaults: Pest Control + Agrovet, 25 products); photos attach through the deployed `productingest` function (ChatGPT Action `ingestProductPhoto`, fallback workflow `upload-product-photos.yml`) after the insert; one SQL statement activates every product that passes the checks.
+- Kept: PCPB ban guard, exact-pack photo checks, four-tier pricing, stock 1000, low_at 50.
+- `PUBLISH-PRODUCTS-RULE.md` shortened to a summary that points at the Neon row (the old mirror contradicted it).
+
+### Needs the owner
+- In the ChatGPT Custom GPT: Actions -> import `chatgpt-product-ingest-openapi.json`, Authentication = API key (Bearer), paste the ingest key there. Without it photo ingest returns 401 and products stay inactive.
+
+### Not verified
+- `/ingest` was not called (no key, no network from the sandbox). First real photo should return 201.
+
+### Next
+1. Merge this branch (docs only). 2. Ask ChatGPT: "publish products" and check the first run's table.
+
 ## 2026-11-23 13:40 (Africa/Nairobi) — Indexing guard test updated for ImageKit (branch `wip-indexing-guard-imagekit`, NOT merged)
 
 ### Done
