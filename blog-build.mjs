@@ -6,6 +6,7 @@ import './seo-blog-chrome.mjs';   // 2026-11-05: shell top bar + bottom nav on e
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
+import { normalizeCategoryLinks } from './category-link-normalizer.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const START = '<!--BLOG-POSTS-START-->', END = '<!--BLOG-POSTS-END-->';
@@ -26,6 +27,7 @@ if (!existsSync('blog')) { console.log('No blog folder - nothing to do.'); proce
 // ---- read every published post ----
 const posts = [];
 const normalizePostProductLinks = html => {
+  html = normalizeCategoryLinks(html);
   const headEnd = html.indexOf('</head>');
   if (headEnd < 0) return html;
   const head = html.slice(0, headEnd + 7);
