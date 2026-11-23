@@ -7,6 +7,7 @@ const IK_UPLOAD = 'https://upload.imagekit.io/api/v1/files/upload';
 const IK_ENDPOINT = 'https://ik.imagekit.io/w6hxfnwmw';
 const FOLDER = '/products';
 const MIN_SIDE = 200;
+const MIN_SOURCE_SIDE = 150;
 const MAX_LINES = 40;
 const KEY = process.env.IMAGEKIT_PRIVATE_KEY || '';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
@@ -113,8 +114,10 @@ async function resolveSources(src, productName = '') {
 }
 
 async function uploadOne(name, src) {
+  let referer = '';
+  try { referer = new URL(src).origin + '/'; } catch { /* invalid URL is rejected below */ }
   const download = await fetch(src, {
-    headers: { 'User-Agent': UA, Accept: IMAGE_ACCEPT },
+    headers: { 'User-Agent': UA, Accept: IMAGE_ACCEPT, ...(referer ? { Referer: referer } : {}) },
     redirect: 'follow'
   });
   const contentType = (download.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
@@ -132,11 +135,20 @@ async function uploadOne(name, src) {
     if (!['jpeg','png','webp','heif','avif','tiff','gif'].includes(metadata.format)) {
       return { error: `unsupported raster image encoding: ${metadata.format || contentType}` };
     }
-    if ((metadata.width || 0) < MIN_SIDE || (metadata.height || 0) < MIN_SIDE) {
-      return { error: `source image is ${metadata.width || 0}x${metadata.height || 0}; minimum is ${MIN_SIDE}x${MIN_SIDE}` };
+    const rotated = await image.rotate().toBuffer({ resolveWithObject: true });
+    const width = Number(rotated.info.width) || 0;
+    const height = Number(rotated.info.height) || 0;
+    if (width < MIN_SOURCE_SIDE || height < MIN_SOURCE_SIDE) {
+      return { error: `source image is ${width}x${height}; both source sides must be at least ${MIN_SOURCE_SIDE}px` };
     }
-    converted = await sharp(input, { failOn: 'error', limitInputPixels: 40000000 })
-      .rotate()
+    const padX = Math.max(0, MIN_SIDE - width);
+    const padY = Math.max(0, MIN_SIDE - height);
+    converted = await sharp(rotated.data)
+      .extend({
+        left: Math.floor(padX / 2), right: Math.ceil(padX / 2),
+        top: Math.floor(padY / 2), bottom: Math.ceil(padY / 2),
+        background: '#ffffff'
+      })
       .flatten({ background: '#ffffff' })
       .jpeg({ quality: 88, mozjpeg: true })
       .toBuffer();
