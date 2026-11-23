@@ -3,13 +3,13 @@ name: Upload product photos to ImageKit
 # Used by Claude and ChatGPT when publishing products (Neon rule publish_products, Step 4).
 # Three ways to start it:
 #   1. Actions tab > Run workflow, filling in "photos".
-#   2. Automatically: an assistant commits a file named photo-queue.txt to main (directly, or by a merged pull request).
+#   2. Automatically: an assistant commits a file named data/photo-queue.txt to main (directly, or by a merged pull request).
 #      Same format as "photos" below. Lines starting with # are ignored. An empty or comment-only file does nothing.
 #   3. Let an assistant dispatch it, where its GitHub connection allows that.
 # Format: one per line. Each line can be a product PAGE address or a direct image address, with an optional "file-name|" first.
 # For a page, the job finds the product photo on it. ImageKit downloads the image, stores it in /products/,
-# and the job checks it loads and is at least 500 x 500. The "browser_url" for each photo is printed in the log and the run summary,
-# and the full results are saved to photo-results.json on main (RESULTS_JSON), so an assistant can read them without opening the log.
+# and the job checks it loads and is at least 200 x 200. The "browser_url" for each photo is printed in the log and the run summary,
+# and the full results are saved to data/photo-results.json on main (RESULTS_JSON), so an assistant can read them without opening the log.
 # Needs the repository secret IMAGEKIT_PRIVATE_KEY (ImageKit > Developer options > Private key). It never touches the database.
 
 on:
@@ -22,7 +22,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'photo-queue.txt'
+      - 'data/photo-queue.txt'
 
 permissions:
   contents: write
@@ -50,7 +50,7 @@ jobs:
           PHOTOS: ${{ inputs.photos }}
           IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
         run: |
-          if [ -z "$PHOTOS" ] && [ -f photo-queue.txt ]; then PHOTOS="$(cat photo-queue.txt)"; fi
+          if [ -z "$PHOTOS" ] && [ -f data/photo-queue.txt ]; then PHOTOS="$(cat data/photo-queue.txt)"; fi
           export PHOTOS
           if ! printf '%s\n' "$PHOTOS" | grep -qv '^[[:space:]]*\(#.*\)\?$'; then
             echo "Nothing to upload (the queue is empty or only comments)."
@@ -63,10 +63,10 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          grep '^RESULTS_JSON=' upload.log | tail -1 | sed 's/^RESULTS_JSON=//' > photo-results.json || true
-          if [ -s photo-results.json ]; then
+          grep '^RESULTS_JSON=' upload.log | tail -1 | sed 's/^RESULTS_JSON=//' > data/photo-results.json || true
+          if [ -s data/photo-results.json ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add photo-results.json
+            git add data/photo-results.json
             git diff --cached --quiet || { git commit -m "Record photo upload results"; git pull --rebase origin main; git push; }
           fi
