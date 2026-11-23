@@ -21,7 +21,7 @@
                 "required": ["product_code", "image_url", "source_page_url", "source_name", "rights_basis", "exact_pack_match", "alt_text"],
                 "properties": {
                   "product_code": { "type": "string", "description": "Existing product code, e.g. STM-000123" },
-                  "image_url": { "type": "string", "description": "Direct public HTTPS link to the image file (jpg, png, webp or gif, at least 500x500)" },
+                  "image_url": { "type": "string", "description": "Direct public HTTPS link to a JPG, JPEG, PNG, WebP or AVIF image (at least 200x200)" },
                   "source_page_url": { "type": "string", "description": "HTTPS product page the image came from" },
                   "source_name": { "type": "string", "description": "Business or site name" },
                   "rights_basis": { "type": "string", "enum": ["manufacturer", "authorized_distributor", "kenyan_vendor", "licensed", "own"] },
