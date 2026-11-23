@@ -30,6 +30,9 @@ on:
       - 'seo-indexing-guard.test.mjs'
       - 'category-hubs.mjs'
       - 'category-hubs.test.mjs'
+      - 'category-links.mjs'
+      - 'category-links.test.mjs'
+      - 'category-links-normalizer.mjs'
       - 'seo-catalog-guard.mjs'
       - 'seo-catalog-guard.test.mjs'
       - 'seo-product-identifiers.mjs'
@@ -135,6 +138,12 @@ jobs:
       - name: Kenya SEO titles, descriptions and price guides (seo-kenya.mjs)
         continue-on-error: true
         run: node seo-kenya.mjs
+
+      - name: Test links to existing category pages
+        run: node category-links.test.mjs
+
+      - name: Normalize links to built category pages
+        run: node category-links-normalizer.mjs
 
       - name: Normalize visible product links in generated pages
         run: node product-link-normalizer.mjs
