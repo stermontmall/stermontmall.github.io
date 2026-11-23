@@ -83,7 +83,7 @@ Do not activate a draft until the exact product and pack photo, source, price, d
 
 ## Customer-facing links
 
-Every link given to customers or staff must use `shellProductLink(slug)` and open `https://stermontarcade.co.ke/?product=<products.slug>`. Never use `/p/<slug>.html` or `/classic.html` as a human-facing link. The static `/p/` documents remain indexable for Google; preserve canonicals, sitemap and structured data. Run `node no-static-share-links.test.mjs`.
+Every link given to customers or staff must use `shellProductLink(slug)` and open `https://stermontarcade.co.ke/p/<slug>.html`. The `/p/` page is canonical and indexable, and hydrates the mobile shell in place for customers. Legacy `?product=<slug>` links redirect to the matching `/p/` page. Preserve canonicals, sitemap and structured data. Never use `/classic.html`. Run `node no-static-share-links.test.mjs`.
 
 ## Completion checklist
 
