@@ -13,6 +13,7 @@ import { catTitle, catDescription } from './seo-meta.mjs';
 import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 import { normalizeGeneratedProductPages } from './product-link-normalizer.mjs';
+import { activeCategorySlugsFromPages, normalizeCategoryLinks } from './category-links.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const WA = 'https://wa.me/254789514060';
@@ -175,12 +176,14 @@ console.log(`Kenya titles and descriptions set on ${pDone} product page(s).`);
 // ---------- 2) category pages + 3) guides ----------
 const ITEM = /<li(?:\s[^>]*)?><a href="([^"]+)"><img[^>]*?>([^<]*)<\/a><span>(?:From )?KSh ([\d,]+)<\/span><\/li>/g;
 const cats = [];
+const activeCategorySlugs = new Set();
 let cDone = 0;
 if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.html') && f !== 'index.html')) {
   try {
     const slug = f.replace(/\.html$/, ''), file = `c/${f}`; let h = readFileSync(file, 'utf8');
     const h1 = unesc(((h.match(/<h1>([\s\S]*?)<\/h1>/) || [])[1] || '').replace(/<[^>]+>/g, '').trim());
     const items = [...h.matchAll(ITEM)].map(m => { const raw = m[1]; const slug = raw.startsWith(SITE + '/?product=') ? new URL(raw).searchParams.get('product') : raw.slice(3).replace('.html', ''); return { url: '/p/' + encodeURIComponent(slug) + '.html', slug, name: m[2], price: Number(m[3].replace(/,/g, '')) }; }).filter(i => i.price > 0 && i.slug);
+    if (items.length > 0) activeCategorySlugs.add(slug);
     const guide = CATEGORY_GUIDES[slug];
     if (guide && !h.includes(`data-seo-guide="${slug}"`)) {
       h = h.replace(/<ul class="g">/, `${guide}
@@ -276,7 +279,7 @@ ${faq.map(([q, a]) => `<h3>${esc(q)}</h3>\n<p>${esc(a)}</p>`).join('\n')}
 <div class='box'><a href='${WA}?text=${encodeURIComponent(`Hello Stermont Arcade, what is your best price on ${label.toLowerCase()}?`)}'>Ask for the best price on WhatsApp</a></div>
 <p class='meta'>Check each product page for current price and stock. Read <a href='/blog/how-to-order-and-pay-by-mpesa-online-kenya.html'>how to order and pay by M-Pesa</a>.</p>`
     });
-    stamp(path, `guides/cheapest-${slug}-kenya.html`, build);
+    stamp(path, `guides/cheapest-${slug}-kenya.html`, (pub, mod) => normalizeCategoryLinks(build(pub, mod), activeCategorySlugs));
   } catch (e) { console.log('skip guide', c.slug, e.message); }
 }
 
