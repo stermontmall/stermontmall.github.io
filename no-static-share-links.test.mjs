@@ -78,7 +78,7 @@ for (const file of ['site-links.js', 'storefront-live.js', 'recent-orders.js', '
   if (!existsSync(file)) continue;
   const source = readFileSync(file, 'utf8');
   assert.match(source, /shellProductLink|\/p\//, file + ' must recognise canonical /p/ product links');
-  assert.doesNotMatch(source, /(?:href\\s*=|\\.href\\s*=|Link:\\s*|window\\.open\\()[^\\n]*\\?product=/i, file + ' must not emit legacy ?product= links');
+  assert.doesNotMatch(source, /(?:href\s*=|\.href\s*=|Link:\s*|window\.open\()[^\n]*\?product=/i, file + ' must not emit legacy ?product= links');
 }
 
 assert.ok(readFileSync('mobile-shell/pp-whatsapp.js', 'utf8').includes("BASE + '/p/'"), 'product-page WhatsApp messages must use canonical product URLs');
