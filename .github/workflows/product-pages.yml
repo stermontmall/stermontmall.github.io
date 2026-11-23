@@ -41,6 +41,8 @@ on:
       - 'seo-safe-meta.test.mjs'
       - 'seo-safe-category-meta.mjs'
       - 'seo-safe-category-meta.test.mjs'
+      - 'seo-safe-consumer-copy.mjs'
+      - 'seo-safe-consumer-copy.test.mjs'
       - 'seo-overrides.mjs'
       - 'seo-overrides.json'
       - 'seo-titles.mjs'
@@ -119,6 +121,9 @@ jobs:
       - name: Test allowlisted ordinary-category meta descriptions
         run: node seo-safe-category-meta.test.mjs
 
+      - name: Test allowlisted ordinary-product copy corrections
+        run: node seo-safe-consumer-copy.test.mjs
+
       - name: Test hand-written product content
         run: node product-content.test.mjs
 
@@ -167,6 +172,9 @@ jobs:
       - name: Top up related-product links on pages in small categories (seo-related-fill.mjs)
         continue-on-error: true
         run: node seo-related-fill.mjs
+
+      - name: Apply allowlisted ordinary-product copy corrections only
+        run: node seo-safe-consumer-copy.mjs
 
       - name: Test canonical responsive product-page routing and legacy redirect removal
         run: node seo-shell-chrome.test.mjs
