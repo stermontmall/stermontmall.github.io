@@ -32,6 +32,7 @@ const loader = readFileSync('shell-route-loader.js', 'utf8');
 assert.ok(loader.includes("fetch('/',"), 'loader fetches the actual homepage shell');
 assert.ok(loader.includes("querySelector('#appbar')") && loader.includes("querySelector('#bottom-nav')"), 'loader verifies the full shell, not just navigation chrome');
 assert.ok(loader.includes("originalMain.cloneNode(true)") && loader.includes("document.createElement('details')"), 'loader preserves server-rendered SEO content as an accessible fallback');
+assert.ok(loader.includes("loadScript('/product-links.js')"), 'loader loads the canonical product URL helper before the app');
 assert.ok(loader.includes("loadScript('/mobile-shell/app.js"), 'loader starts the actual mobile-shell application');
 const app = readFileSync('mobile-shell/app.js', 'utf8');
 assert.ok(app.includes('PRODUCT_PATH') && app.includes('CATEGORY_PATH'), 'the shell recognizes direct product and category paths without query redirects');
