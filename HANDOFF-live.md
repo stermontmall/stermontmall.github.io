@@ -1,3 +1,15 @@
+## 2026-11-23 10:58 (Africa/Nairobi) — Neon deploy workflows: verify step now gets NEON_API_KEY
+
+### Done (branch `wip-neon-verify-api-key`, NOT merged)
+- `deploy-productingest.yml` and `deploy-neon-photo-upload.yml`: the "Verify deployment status" step ran `neon functions get` without `NEON_API_KEY`, so it failed in CI ("Cannot run interactive auth"). Added `env: NEON_API_KEY: ${{ secrets.NEON_API_KEY }}` to that step in both. The secret already exists in the repo.
+- Deploy step itself had succeeded (function deployed); only verification failed.
+
+### Not verified
+- Workflow not re-run yet.
+
+### Next
+1. Merge when ready, then run Actions > Deploy Neon product ingest function > Run workflow, type DEPLOY, and confirm Verify and Smoke-test steps pass.
+
 
 ## 2026-11-22 22:30 (Africa/Nairobi) — Admin rulebook page now reads Neon `publish_products` (v5)
 
