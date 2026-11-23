@@ -19,6 +19,25 @@ export function activeCategorySlugsFromPages(pages) {
   return active;
 }
 
+// Join the checked-in catalogue snapshot to generated product pages by immutable product ID.
+// Breadcrumb category URLs are counted only for products whose snapshot stock is greater than zero.
+export function activeCategorySlugsFromCatalogSnapshot(snapshot, productPages) {
+  const activeProductIds = new Set(
+    (snapshot?.products || []).filter(product => Number(product.stock) > 0).map(product => String(product.id))
+  );
+  const active = new Set();
+  for (const page of productPages || []) {
+    const html = String(page.html || '');
+    const id = (html.match(/<meta\\s+name=["']stm-id["']\\s+content=["']([^"']+)["']/i) || [])[1];
+    if (!id || !activeProductIds.has(id)) continue;
+    const crumbs = (html.match(/<nav\\b[^>]*class=["'][^"']*\\bbc\\b[^"']*["'][^>]*>([\\s\\S]*?)<\\/nav>/i) || [])[1] || '';
+    for (const match of crumbs.matchAll(/href=["'](?:https:\\/\\/stermontarcade\\.co\\.ke)?\\/c\\/([a-z0-9-]+)\\.html["']/gi)) {
+      active.add(match[1]);
+    }
+  }
+  return active;
+}
+
 export function resolveCategorySlug(slug, activeSlugs) {
   const active = activeSlugs instanceof Set ? activeSlugs : new Set(activeSlugs || []);
   let current = String(slug || '').replace(/\.html$/i, '').replace(/^\/c\//, '');
