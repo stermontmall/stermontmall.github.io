@@ -19,7 +19,7 @@ URL = f'http://127.0.0.1:{port}/'
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 OK, BROKEN = 'https://img.test/ok.png', 'https://img.test/broken.jpg'
 CATS_FIX = [
-    dict(id=31, name='Outdoor & Garden', slug='garden-outdoors', parent_id=None, sort_order=15, is_promo=False),
+    dict(id=31, name='Outdoor & Garden', slug='farm-garden-tools', parent_id=None, sort_order=15, is_promo=False),
     dict(id=32, name='Garden Care', slug='garden-care', parent_id=31, sort_order=0, is_promo=False),
     dict(id=1, name='Home & Living', slug='home-living', parent_id=None, sort_order=16, is_promo=False),
     dict(id=71, name='Garden Tools', slug='garden-tools', parent_id=1, sort_order=0, is_promo=False),
@@ -114,8 +114,8 @@ def mock_network(ctx):
     # from this local shell before it can exercise the in-shell product overlay.
     # index.html also loads /product-links.js (deferred), which would overwrite an init-script stub with the
     # production-domain helper, so answer that request with a local-origin version of the same helper.
-    ctx.add_init_script("window.shellProductLink = s => location.origin + '/?product=' + encodeURIComponent(s);")
-    ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/?product=' + encodeURIComponent(v) : '/'); };"))
+    ctx.add_init_script("window.shellProductLink = s => location.origin + '/p/' + encodeURIComponent(s) + '.html';")
+    ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/p/' + encodeURIComponent(v) + '.html' : '/'); };"))
     def serve_product_page(rt):
         # Match the requested fixture slug to the generated SEO page's early shell bootstrap.
         # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
@@ -213,7 +213,7 @@ with sync_playwright() as p:
     check('name comes from product-names.json when present', pg.locator('#grid .card[data-id="home-0"] p').first.inner_text() == 'Heavy-Duty Hot Plate Pro')
     check('real product photo is rendered through ImageKit', pg.locator('#grid .card[data-id="home-0"] img').evaluate_all("(els) => els.some(img => img.src.includes('ik.imagekit.io/w6hxfnwmw/supabase/tr:') && img.src.endsWith('https://img.test/ok.png'))"))
     # Isolate the garden fixture category so its complete eight-item page is available without relying on scroll timing.
-    pg.locator('#chips [data-chip="garden-outdoors"]').click()
+    pg.locator('#chips [data-chip="farm-garden-tools"]').click()
     pg.wait_for_selector('#grid .card[data-id="outdoor-broken"]', timeout=10000)
     check('database name used when the heading file has no entry', 'Garden Hose Nozzle 1' in pg.locator('#grid').inner_text())
     pg.wait_for_timeout(200)
@@ -493,8 +493,8 @@ with sync_playwright() as p:
     p5.add_init_script("if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('stm_handoff', JSON.stringify([{rowId:'home-0',qty:1,price:1999,name:'Hot Plate',size:'Standard'},{rowId:'home-2',qty:1,price:1800,name:'Kettle 1.8L',size:'Standard'}])); }")
     p5.route('**/rpc/create_guest_order', lambda rt: rt.fulfill(status=409, content_type='application/json', body=json.dumps({'message': 'The price for Hot Plate has changed. Please refresh the shop and try again.'})))
     p5.goto(f'{BASE}/checkout.html?checkout=1'); p5.wait_for_selector('#items .item', timeout=15000)
-    check('checkout displays the handed-off product lines and their quoted prices', 'Hot Plate' in p5.locator('#items').inner_text() and 'Kettle' in p5.locator('#items').inner_text() and '2,500' in p5.locator('#items').inner_text() and '1,800' in p5.locator('#items').inner_text())
-    p5.fill('#name', 'Test Customer'); p5.fill('#phone', '0712345678'); p5.locator('input[name="method"][value="pickup"]').check(); p5.fill('#paycode', 'ABCD1234'); p5.fill('#payamount', '4300'); p5.locator('#submit').click()
+    check('checkout displays the handed-off product lines and their quoted prices', 'Hot Plate' in p5.locator('#items').inner_text() and 'Kettle' in p5.locator('#items').inner_text() and '1,999' in p5.locator('#items').inner_text() and '1,800' in p5.locator('#items').inner_text())
+    p5.fill('#name', 'Test Customer'); p5.fill('#phone', '0712345678'); p5.locator('input[name="method"][value="pickup"]').check(); p5.fill('#paycode', 'ABCD1234'); p5.fill('#payamount', '3799'); p5.locator('#submit').click()
     p5.wait_for_function("document.querySelector('#error').textContent.includes('price for Hot Plate has changed')", timeout=10000)
     check('changed price: server rejection is shown and checkout does not report success', 'price for Hot Plate has changed' in p5.locator('#error').inner_text() and p5.locator('#success').is_hidden())
     c5.close()
@@ -551,11 +551,11 @@ with sync_playwright() as p:
     p9.evaluate("window.__shared = null; navigator.share = d => { window.__shared = d; return Promise.resolve(); }")
     p9.locator('#pp-share').click(); p9.wait_for_function('window.__shared')
     sh = p9.evaluate('window.__shared')
-    check('share: shares the exact mobile-shell product link', sh['url'] == f'{BASE}/?product=home-1' and 'shell=1' not in sh['url'] and 'Air Fryer' in sh['title'], sh)
+    check('share: shares the exact mobile-shell product link', sh['url'] == f'{BASE}/p/home-1.html' and 'shell=1' not in sh['url'] and 'Air Fryer' in sh['title'], sh)
     p9.evaluate("navigator.share = undefined; window.__copied = null; Object.defineProperty(navigator, 'clipboard', { value: { writeText: t => { window.__copied = t; return Promise.resolve(); } }, configurable: true })")
     p9.locator('#pp-share').click(); p9.wait_for_function('window.__copied')
-    check('share: without the share sheet the clean link is copied and a notice shows', p9.evaluate('window.__copied') == f'{BASE}/?product=home-1' and 'Link copied' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
-    check('share: the address bar remains the shell product URL', p9.evaluate('location.pathname') == '/' and p9.evaluate('location.search') == '?product=home-1')
+    check('share: without the share sheet the clean link is copied and a notice shows', p9.evaluate('window.__copied') == f'{BASE}/p/home-1.html' and 'Link copied' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
+    check('share: the address bar remains the shell product URL', p9.evaluate('location.pathname') == '/p/home-1.html' and p9.evaluate('location.search') == '')
     p9.goto(f'{BASE}/?product=does-not-exist'); p9.wait_for_selector('#grid .card[data-id]'); p9.wait_for_timeout(600)
     check('address: an unknown product shows a notice and the normal home', p9.locator('#page-product.open').count() == 0 and 'no longer available' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
     check('address: no page errors', not e9, e9[:3])
@@ -570,9 +570,9 @@ with sync_playwright() as p:
     check('product shell bootstrap preserves SEO page metadata and is idempotent', '<title>t</title>' in new_page and run_node('inject', new_page, 'termidor-96-sc-1-litre') == new_page)
     stub = '<html><head><meta http-equiv="refresh" content="0;url=/p/x.html"></head></html>'
     check('redirect stubs (meta refresh) are left alone', run_node('inject', stub, 'extra-pack') == stub)
-    new_cat = run_node('injectCat', page, 'garden-outdoors')
+    new_cat = run_node('injectCat', page, 'farm-garden-tools')
     check('category page stays canonical and receives in-place shell hydration', '/shell-route-loader.js?v=2' in new_cat and 'location.replace' not in new_cat and 'rel="canonical"' in new_cat, new_cat)
-    check('category route cleanup is idempotent', run_node('injectCat', new_cat, 'garden-outdoors') == new_cat)
+    check('category route cleanup is idempotent', run_node('injectCat', new_cat, 'farm-garden-tools') == new_cat)
 
     def serve_p(ctx): pass
     c11 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c11); serve_p(c11)
@@ -608,26 +608,26 @@ with sync_playwright() as p:
             m = _re.search(r'/c/([a-z0-9-]+)\.html', rt.request.url)
             rt.fulfill(status=200, content_type='text/html', body=run_node('injectCat', cat_page(m.group(1)), m.group(1)))
         ctx.route('**/c/*.html*', h)
-    check('generated category pages receive the in-place full-shell loader', '/shell-route-loader.js?v=2' in run_node('injectCat', cat_page('garden-outdoors'), 'garden-outdoors'))
+    check('generated category pages receive the in-place full-shell loader', '/shell-route-loader.js?v=2' in run_node('injectCat', cat_page('farm-garden-tools'), 'farm-garden-tools'))
     c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12); serve_c(c12)
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
-    p12.goto(f'{BASE}/c/garden-outdoors.html', wait_until='domcontentloaded'); p12.wait_for_timeout(1200)
+    p12.goto(f'{BASE}/c/farm-garden-tools.html', wait_until='domcontentloaded'); p12.wait_for_timeout(1200)
     p12.wait_for_selector('#bottom-nav', state='visible', timeout=15000)
-    check('direct category URL opens the full shell at its canonical URL', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('#bottom-nav').count() == 1 and p12.locator('#stm-nav').count() == 0 and p12.locator('#grid-title').inner_text() == 'Outdoor & Garden', p12.url)
+    check('direct category URL opens the full shell at its canonical URL', p12.evaluate('location.pathname') == '/c/farm-garden-tools.html' and p12.locator('#bottom-nav').count() == 1 and p12.locator('#stm-nav').count() == 0 and p12.locator('#grid-title').inner_text() == 'Outdoor & Garden', p12.url)
     check('category shell page has no page errors', not e12, e12[:3])
     c12.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
                       ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_c(cx)
-        px = cx.new_page(); px.goto(f'{BASE}/c/garden-outdoors.html', wait_until='domcontentloaded'); px.wait_for_timeout(1200)
+        px = cx.new_page(); px.goto(f'{BASE}/c/farm-garden-tools.html', wait_until='domcontentloaded'); px.wait_for_timeout(1200)
         px.wait_for_selector('#bottom-nav', state='visible', timeout=15000)
-        check(f'{label} receives the same full-shell category view at the canonical URL', px.evaluate('location.pathname') == '/c/garden-outdoors.html' and px.locator('#bottom-nav').count() == 1 and px.locator('#stm-nav').count() == 0, px.url)
+        check(f'{label} receives the same full-shell category view at the canonical URL', px.evaluate('location.pathname') == '/c/farm-garden-tools.html' and px.locator('#bottom-nav').count() == 1 and px.locator('#stm-nav').count() == 0, px.url)
         cx.close()
     cc2 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc2); serve_c(cc2)
-    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1', wait_until='domcontentloaded'); pc2.wait_for_timeout(1200)
+    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/farm-garden-tools.html?classic=1', wait_until='domcontentloaded'); pc2.wait_for_timeout(1200)
     pc2.wait_for_selector('#bottom-nav', state='visible', timeout=15000)
-    check('?classic=1 cannot bypass the full mobile shell on category pages', pc2.evaluate('location.pathname') == '/c/garden-outdoors.html' and pc2.locator('#bottom-nav').count() == 1)
+    check('?classic=1 cannot bypass the full mobile shell on category pages', pc2.evaluate('location.pathname') == '/c/farm-garden-tools.html' and pc2.locator('#bottom-nav').count() == 1)
     cc2.close()
     # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell
     PAGES = ['account', 'track', 'shipping', 'returns', 'contact', 'faq', 'about', 'privacy', 'terms']
@@ -666,7 +666,7 @@ with sync_playwright() as p:
     # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
     c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)
     p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_selector('#page-product.open', timeout=15000); p6.wait_for_timeout(500)
-    check('legacy /#p-... link opens the product in the mobile shell at a shareable address', p6.evaluate('location.pathname + location.search') == '/?product=home-0' and p6.locator('#bottom-nav').is_visible() and 'Hot Plate' in p6.locator('#pp-name').inner_text(), p6.url)
+    check('legacy /#p-... link opens the product in the mobile shell at a shareable address', p6.evaluate('location.pathname + location.search') == '/p/home-0.html' and p6.locator('#bottom-nav').is_visible() and 'Hot Plate' in p6.locator('#pp-name').inner_text(), p6.url)
     p6.goto(f'{BASE}/mobile-shell/'); p6.wait_for_function("location.pathname === '/'", timeout=15000)
     check('/mobile-shell/ forwards to the home page', p6.url == BASE + '/', p6.url)
     c6.close()
