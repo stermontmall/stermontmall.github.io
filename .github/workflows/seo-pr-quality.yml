@@ -89,6 +89,12 @@ jobs:
             python -m pip install --upgrade pip playwright
             python -m playwright install --with-deps chromium
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/01-playwright-install.log"
+      - name: Test allowlisted safe consumer metadata early
+        run: |
+          node seo-safe-meta.test.mjs
+          node seo-safe-category-meta.test.mjs
+          node seo-safe-blog-meta.test.mjs
+          node seo-safe-consumer-copy.test.mjs
       # Exercise the mobile shell with harmless fixtures, not live catalogue data.
       # Keep this check alongside the existing product and SEO quality gates.
       # Reset per-test tab state when asserting the default landing view.
@@ -130,6 +136,7 @@ jobs:
             node --check recent-orders.js
             node --check product-content.test.mjs
             node --check seo-meta.mjs
+            node --check seo-safe-consumer-copy.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-syntax.log"
       - name: Test canonical admin pricing and posting rules
         run: node pricing-rule-defaults.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/07b-pricing-rule-defaults.log"
@@ -141,10 +148,6 @@ jobs:
         run: node seo-product-extras.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/08-product-extras.log"
       - name: Test product and category SEO metadata
         run: node seo-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/09-seo-meta.log"
-      - name: Test allowlisted ordinary-product meta descriptions
-        run: node seo-safe-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/10-seo-safe-meta.log"
-      - name: Test safe consumer-guide meta descriptions
-        run: node seo-safe-blog-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/11-seo-safe-blog-meta.log"
       - name: Test hand-written product content
         run: node product-content.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/12-product-content.log"
       - name: Normalize blog titles and rebuild blog index and sitemap
@@ -185,6 +188,8 @@ jobs:
             node seo-overrides.mjs
             node seo-titles.mjs
             node seo-safe-meta.mjs
+            node seo-safe-category-meta.mjs
+            node seo-safe-consumer-copy.mjs
             node seo-shell-redirect.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
       - name: Build service pages for the generated-link guard
