@@ -1,0 +1,1 @@
+CREATE OR REPLACE VIEW public.storefront_products AS SELECT id, slug, name, category_id, price, old_price, CASE WHEN stock > 0 THEN 1 ELSE 0 END AS stock, featured, images, unit, variant_group, variant_label, description, low_at, product_code FROM public.products WHERE active = true;
