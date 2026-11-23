@@ -699,3 +699,10 @@ The Build product pages GitHub Actions workflow is scheduled every 30 minutes; t
 - Done: Supabase connector already connected, but `list_projects` returned no projects on this account.
 - Blocked: Neon connector (https://mcp.neon.tech/mcp) not installed; owner must connect it in claude.ai connector settings.
 - Next: after Neon is connected, verify `public.publishing_rules` key `publish_products` is readable, then continue from the "Next" entries above.
+
+## 2026-11-23 12:25 Africa/Nairobi — Claude: rebuild catalog in Neon from repo (owner: "Rebuild from repo. Use neon, no Supabase")
+- Done: Neon connector now works (project restless-shape-79120240). `public.products` has 22 rows, all inactive; 93 categories.
+- Done: parsed all 2059 `p/*.html` pages: 1,590 products have sku (STM-xxxxxx), name, category, price in Product JSON-LD (plus 36 ProductGroup pages without price). Staging file (scratchpad, not committed): products_from_pages.json.
+- Findings: (1) trigger `trg_2_posting_rules` forces `active=false`, reprices from `cost` via `price_4tier`, and requires cost > 0 on INSERT, so a restore of published prices needs an owner-approved bypass; (2) 1,374 image URLs point at the deleted Supabase storage (dead); 14+14 point at stermontarcade.co.ke/product-photos; `product-photos/` has 170 files; (3) no cost data in the pages.
+- Blocked: waiting for owner decision on how to bypass the pricing trigger and whether to load as inactive.
+- Next: after the decision, load in batches via `run_sql_transaction`, verify counts, update this file after each batch.
