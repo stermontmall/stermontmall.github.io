@@ -39,6 +39,15 @@ jobs:
       - name: Test SEO canonical and sitemap safeguards
         run: node seo-indexing-guard.test.mjs
 
+      - name: Check changed JavaScript syntax
+        run: |
+          node --check generate-products.mjs
+          node --check static-product-purchase.js
+          node --check product-link-normalizer.mjs
+          node --check mobile-shell/app.js
+          node --check seo-kenya.mjs
+          node --check blog-write.mjs
+
       - name: Test product page design and descriptions
         run: |
           node product-page-design.test.mjs
