@@ -6,9 +6,12 @@
 //   osho-rat-glue-trap-large|https://example.co.ke/product/osho-rat-glue-trap/
 //   https://example.co.ke/product/osho-rat-glue-trap/        (file name is taken from the page address)
 // When the address is a web page, the script finds the product photo on it (Open Graph, Twitter, image_src and Product
-// JSON-LD, like the old Supabase upload-photos function) and tries each candidate until one is at least 500 x 500.
+// JSON-LD, like the old Supabase upload-photos function) and tries each candidate until one passes the size check.
 // ImageKit downloads the image itself (upload-by-URL), stores it in the folder /products/, and this script then checks that
-// the stored file loads, is an image, and is at least 500 x 500 px.
+// the stored file loads, is an image, and is big enough.
+// Size rule: at least 500 x 500 px in general. For photos taken from a TRUSTED shop (TRUSTED_HOSTS below) the rule is
+// relaxed to at least 400 px on BOTH sides, so tall bottle shots such as 469 x 1000 or 424 x 600 are accepted.
+// Tiny thumbnails (under 400 px) are still rejected because they look blurry on the product page.
 // Any common format is accepted (JPEG, PNG, WebP, AVIF, GIF, HEIC, TIFF, BMP). Formats that browsers may not show are
 // delivered as WebP through an ImageKit transformation URL; always save "browser_url" as the product image.
 // Needs the GitHub secret IMAGEKIT_PRIVATE_KEY. It never deletes anything and never touches the database.
@@ -18,6 +21,9 @@ const IK_UPLOAD = 'https://upload.imagekit.io/api/v1/files/upload';
 const IK_ENDPOINT = 'https://ik.imagekit.io/w6hxfnwmw';
 const FOLDER = '/products';
 const MIN_SIDE = 500;
+const MIN_SIDE_TRUSTED = 400;
+// Reliable Kenyan shops whose product photos are accepted at the relaxed size. Add more hostnames here.
+const TRUSTED_HOSTS = ['agriguardagrovet.co.ke', 'agrijibu.co.ke'];
 const MAX_LINES = 40;
 const BROWSER_SAFE = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif']);
 const KEY = process.env.IMAGEKIT_PRIVATE_KEY || '';
@@ -40,6 +46,13 @@ const auth = 'Basic ' + Buffer.from(KEY + ':').toString('base64');
 const cleanName = (s) => s.toLowerCase().replace(/\.[a-z0-9]{2,5}$/i, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90);
 
 const UA = 'Mozilla/5.0 (compatible; StermontPhotoBot/1.0; +https://stermontarcade.co.ke)';
+
+export function isTrustedSource(u) {
+  try {
+    const h = new URL(u).hostname.toLowerCase();
+    return TRUSTED_HOSTS.some((t) => h === t || h.endsWith('.' + t));
+  } catch { return false; }
+}
 
 // Own-site shell links (/?product=slug) are JavaScript pages; the static product page /p/slug.html has the real tags.
 export function normalizePageUrl(u) {
@@ -126,6 +139,8 @@ async function one(line) {
   if (!name) name = nameFromUrl(src);
   if (!name) return { name, source: src, ok: false, error: 'could not make a file name; put a name before the | sign' };
   const res = { name, source: src, ok: false };
+  const trusted = isTrustedSource(src);
+  const minSide = trusted ? MIN_SIDE_TRUSTED : MIN_SIDE;
   try {
     const { list, from } = await resolveSources(src);
     let lastError = 'no candidate worked';
@@ -139,8 +154,8 @@ async function one(line) {
       const safe = BROWSER_SAFE.has(ext);
       const browserUrl = safe ? plain : `${IK_ENDPOINT}/tr:f-webp${filePath}`;
       const w = Number(body.width) || 0, h = Number(body.height) || 0;
-      const out = { ...res, image_found_via: from, image_source: cand, original_format: ext || 'unknown', width: w, height: h, bytes: body.size, original_url: plain, browser_url: browserUrl, converted_to_webp: !safe };
-      if (w < MIN_SIDE || h < MIN_SIDE) { lastError = `image is ${w}x${h}; at least ${MIN_SIDE}x${MIN_SIDE} is required`; continue; }
+      const out = { ...res, image_found_via: from, image_source: cand, original_format: ext || 'unknown', width: w, height: h, bytes: body.size, original_url: plain, browser_url: browserUrl, converted_to_webp: !safe, trusted_source: trusted, relaxed_size: trusted && (w < MIN_SIDE || h < MIN_SIDE) };
+      if (w < minSide || h < minSide) { lastError = `image is ${w}x${h}; at least ${minSide}x${minSide} is required${trusted ? ' (trusted shop)' : ''}`; continue; }
       const check = await fetch(browserUrl);
       const type = check.headers.get('content-type') || '';
       if (!check.ok || !type.startsWith('image/')) { lastError = `stored file did not load as an image (HTTP ${check.status}, ${type || 'no type'})`; continue; }
