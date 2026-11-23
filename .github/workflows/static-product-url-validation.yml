@@ -56,7 +56,6 @@ jobs:
           node product-page-design.test.mjs
           node product-description-html.test.mjs
           node home-grid-ssr.test.mjs
-          node seo-pest/blog.test.mjs
 
       - name: Test source product links and shared checkout integration
         run: node no-static-share-links.test.mjs
@@ -70,6 +69,12 @@ jobs:
 
       - name: Normalize generated product links
         run: node product-link-normalizer.mjs
+
+      - name: Build pest-control blog pages with static product links
+        run: node seo-pest/blog-build.mjs
+
+      - name: Verify pest-control blog product links
+        run: node seo-pest/blog.test.mjs
 
       - name: Install full mobile-shell product and category routing
         run: node seo-shell-redirect.mjs
