@@ -54,10 +54,19 @@ def serve(route, body, ctype='application/json'):
 def on_rest(route):
     if FAIL[0]: return route.fulfill(status=402, body='exceed_cached_egress_quota', headers={'access-control-allow-origin': '*'})
     url = route.request.url
-    if '/rest/v1/products' in url and 'id=eq.' in url:   # details of one row, fetched when a product is opened
+    if ('/rest/v1/products' in url or '/rest/v1/storefront_products' in url) and 'id=eq.' in url:   # details of one row, fetched when a product is opened
         rid = url.split('id=eq.')[1].split('&')[0]
         r = next((x for x in ROWS if x['id'] == rid), None)
-        return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK], product_code=r['product_code'])])
+        return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\\n- line one\\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK], product_code=r['product_code'])])
+    if '/rest/v1/storefront_products' in url and 'variant_group=eq.' in url:
+        group = url.split('variant_group=eq.')[1].split('&')[0]
+        selected = [r for r in ROWS if r['variant_group'] == group]
+        return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in selected])
+    if '/rest/v1/storefront_products' in url and 'or=(' in url:
+        match = re.search(r'(?:slug|id)\\.eq\\.([^,)&]+)', url)
+        slug = unquote(match.group(1)) if match else ''
+        selected = [r for r in ROWS if r['slug'] == slug or r['id'] == slug]
+        return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in selected])
     if '/rest/v1/rpc/get_store_catalog' in url or '/rest/v1/storefront_products' in url: return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in ROWS])
     serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
 # The fixture slugs have no committed /p/ build artifacts; serve a deterministic server-rendered SEO page for every local /p/*.html route.
