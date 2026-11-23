@@ -34,3 +34,8 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Done: PR #1076 squash-merged to `main` (40fb333). Old WhatsApp number replaced by 254789514060 everywhere in the repo. PR checks `validate` (needs checkout.html) and `route-regression` (needs shell-route-loader.js) were already failing on every PR today; neither file exists on main. Merged over them at owner request.
 - Next: update Neon (54 `products` descriptions + 1 `publishing_rules` row still hold the old number; back up first), then re-run product pages build: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
 - Check: `grep -rIlE "748 ?888 ?230" --exclude-dir=.git . | wc -l` should print 0.
+
+## 2026-11-23 14:15 (Africa/Nairobi) - Neon WhatsApp number updated
+- Done: Neon `public.products.description` (54 rows) and `public.publishing_rules.content` (key `publish_products`) now use 254789514060 / +254 789 514 060. Zero old-number matches left in products, rules, blog_posts, service_posts. Backups: `archive.products_whatsapp_backup_20261123` (54 rows), `archive.publishing_rules_whatsapp_backup_20261123` (1 row).
+- In progress: product-pages rebuild dispatched on main (run 45162737985).
+- Rollback if needed: update `public.products`/`public.publishing_rules` from the two archive tables by id/key.
