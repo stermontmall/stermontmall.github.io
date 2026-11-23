@@ -1,0 +1,35 @@
+name: Restore catalogue into Neon (one-time)
+
+# Owner-approved 2026-11-23: rebuild public.products in Neon from the generated /p/*.html pages.
+# Run manually: Actions > Restore catalogue into Neon (one-time) > Run workflow.
+# Leave "confirm" empty for a dry run (reads the pages, prints counts, touches no database).
+# Type RESTORE to load. The load is one transaction and never overwrites rows that already exist.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type RESTORE to write to Neon. Leave empty for a dry run.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Dry run (no database)
+        run: node scripts/restore-catalog-from-pages.mjs --dry-run
+      - name: Load into Neon
+        if: ${{ github.event.inputs.confirm == 'RESTORE' }}
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund pg
+          node scripts/restore-catalog-from-pages.mjs --apply
