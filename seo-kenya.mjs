@@ -13,6 +13,7 @@ import { catTitle, catDescription } from './seo-meta.mjs';
 import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 import { normalizeGeneratedProductPages } from './product-link-normalizer.mjs';
+import { normalizeCategoryLinks } from './category-link-normalizer.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const WA = 'https://wa.me/254789514060';
@@ -313,6 +314,19 @@ try {
     if (sm !== sm0) { writeFileSync('sitemap.xml', sm); console.log('Updated sitemap.xml with guide pages.'); }
   }
 } catch (e) { console.log('sitemap not updated', e.message); }
+
+// Normalize legacy links in every existing guide, including old guide URLs whose category page is no longer built.
+// Keep the guide URL itself live; point to an active parent category or render the label as plain text.
+if (existsSync('guides')) {
+  for (const f of readdirSync('guides').filter(f => f.endsWith('.html'))) {
+    const file = `guides/${f}`;
+    try {
+      const old = readFileSync(file, 'utf8');
+      const next = normalizeCategoryLinks(old);
+      if (next !== old) writeFileSync(file, next);
+    } catch (e) { console.log('skip guide category-link normalization', f, e.message); }
+  }
+}
 
 // Final shared pass catches legacy links in every price-guide page generated above.
 normalizeGeneratedProductPages();
