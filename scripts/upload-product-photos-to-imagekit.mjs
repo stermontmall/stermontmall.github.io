@@ -152,7 +152,7 @@ async function one(line) {
       const browserUrl = plain;
       const w = Number(body.width) || 0, h = Number(body.height) || 0;
       const out = { ...res, image_found_via: from, image_source: cand, original_format: ext, width: w, height: h, bytes: body.size, original_url: plain, browser_url: browserUrl, trusted_source: false, relaxed_size: false };
-      if (w < minSide || h < minSide) { lastError = `image is ${w}x${h}; at least ${minSide}x${minSide} is required${trusted ? ' (trusted shop)' : ''}`; continue; }
+      if (w < minSide || h < minSide) { lastError = `image is ${w}x${h}; at least ${minSide}x${minSide} is required`; continue; }
       const check = await fetch(browserUrl, { headers: { 'User-Agent': UA } });
       const type = check.headers.get('content-type') || '';
       if (!check.ok || !type.startsWith('image/')) { lastError = `stored file did not load as an image (HTTP ${check.status}, ${type || 'no type'})`; continue; }
