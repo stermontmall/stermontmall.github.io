@@ -60,7 +60,24 @@ if (existsSync(`blog/${topic.slug}.html`)) { console.error(`blog/${topic.slug}.h
 
 // Pages the writer may link to. Category pages (/c/<name>.html) are included, which fixes the dropped category links.
 const allowed = new Set(['/products.html', '/c/', '/shipping.html', '/returns.html']);
-if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.html') && f !== 'index.html')) allowed.add(`/c/${f}`);
+const categoryHtml = slug => { try { return readFileSync(`c/${slug}.html`, 'utf8'); } catch { return ''; } };
+const activeCategory = slug => {
+  const html = categoryHtml(slug);
+  return /<li(?:\\s[^>]*)?><a href="(?:https:\\/\\/stermontarcade\\.co\\.ke)?\\/p\\/[^\"]+\\.html"[^>]*>\\s*<img/i.test(html);
+};
+const categoryTarget = href => {
+  const slug = String(href || '').match(/^\\/c\\/([^/]+)\\.html$/)?.[1];
+  if (!slug) return null;
+  if (activeCategory(slug)) return href;
+  const html = categoryHtml(slug);
+  const parents = [...html.matchAll(/<a href="\\/c\\/([^\"]+)\\.html"/g)].map(m => m[1]).filter(p => p !== slug);
+  const parent = parents.find(activeCategory);
+  return parent ? `/c/${parent}.html` : null;
+};
+if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.html') && f !== 'index.html')) {
+  const href = `/c/${f}`;
+  if (activeCategory(f.replace(/\\.html$/, ''))) allowed.add(href);
+}
 if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.html')))
   if (!/http-equiv="refresh"/i.test(readFileSync(`p/${f}`, 'utf8'))) { allowed.add(`/p/${f}`); allowed.add(`/?product=${f.replace(/\.html$/i, '')}`); }
 for (const p of posts) allowed.add(p.path);
