@@ -9,6 +9,12 @@ on:
     paths:
       - 'seo-meta.mjs'
       - 'seo-meta.test.mjs'
+      - 'seo-safe-meta.mjs'
+      - 'seo-safe-meta.test.mjs'
+      - 'seo-safe-category-meta.mjs'
+      - 'seo-safe-category-meta.test.mjs'
+      - 'seo-safe-blog-meta.mjs'
+      - 'seo-safe-blog-meta.test.mjs'
       - 'seo-check.mjs'
       - 'seo-description-check.mjs'
       - 'seo-description-check.test.mjs'
@@ -41,6 +47,11 @@ jobs:
           node-version: 20
       - name: Test shared SEO metadata rules
         run: node seo-meta.test.mjs
+      - name: Test allowlisted safe consumer metadata
+        run: |
+          node seo-safe-meta.test.mjs
+          node seo-safe-category-meta.test.mjs
+          node seo-safe-blog-meta.test.mjs
       - name: Test product description extraction against current and legacy layouts
         run: node seo-description-check.test.mjs
       # Build the same catalogue output that customers and Google see before auditing it.
@@ -58,6 +69,10 @@ jobs:
         run: node seo-titles.mjs
       - name: Apply allowlisted product meta descriptions
         run: node seo-safe-meta.mjs
+      - name: Apply allowlisted ordinary-category meta descriptions
+        run: node seo-safe-category-meta.mjs
+      - name: Apply allowlisted ordinary buying-guide meta descriptions
+        run: node seo-safe-blog-meta.mjs
       - name: Apply product description layout
         continue-on-error: true
         run: node seo-description-layout.mjs

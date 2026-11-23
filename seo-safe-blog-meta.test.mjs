@@ -31,5 +31,13 @@ runSafeBlogMeta({ dir });
 const saved = readFileSync(join(dir, file), 'utf8');
 assert.ok(saved.includes("name='description' content='" + item.description + "'")); n++;
 assert.ok(saved.includes('<title>Keep title</title>')); n++;
-assert.equal(Object.keys(SAFE_BLOG_META).length, 4); n++;
+const fridgeFile = 'how-to-choose-a-fridge-in-kenya.html';
+const fridge = SAFE_BLOG_META[fridgeFile];
+const fridgePage = "<meta name='description' content='old'><meta property='og:description' content='old og'>" +
+  "<link rel='canonical' href='" + fridge.canonical + "'><title>Keep fridge guide title</title>";
+const fridgeOut = applySafeBlogMeta(fridgePage, fridge.canonical, fridge.description);
+assert.ok(fridgeOut.includes("name='description' content='" + fridge.description + "'")); n++;
+assert.ok(fridgeOut.includes("property='og:description' content='" + fridge.description + "'")); n++;
+assert.ok(fridgeOut.includes('<title>Keep fridge guide title</title>')); n++;
+assert.equal(Object.keys(SAFE_BLOG_META).length, 5); n++;
 console.log('OK: ' + n + ' safe-blog meta checks, 0 violations');

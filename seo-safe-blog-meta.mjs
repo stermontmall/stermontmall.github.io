@@ -18,6 +18,10 @@ export const SAFE_BLOG_META = Object.freeze({
   'washing-machine-buying-guide-kenya.html': {
     canonical: 'https://stermontarcade.co.ke/blog/washing-machine-buying-guide-kenya.html',
     description: 'Choose a washing machine in Kenya: compare twin tub vs automatic, load size, water use and how it handles rationing or power cuts.'
+  },
+  'how-to-choose-a-fridge-in-kenya.html': {
+    canonical: 'https://stermontarcade.co.ke/blog/how-to-choose-a-fridge-in-kenya.html',
+    description: 'Choosing a fridge in Kenya? Compare size, direct-cool and frost-free options, and plan for KPLC outages and voltage changes. Check delivery details.'
   }
 });
 
