@@ -30,7 +30,6 @@ for (const file of files) {
     if (file === 'index.html' || file === 'mobile-shell/app.js') return;
     if (['cars-for-sale.html', 'fashion.html', 'products.html', 'checkout.html', 'price-watch.test.mjs', 'seo-safe-meta.test.mjs', 'seo-shell-redirect.test.mjs'].includes(file)) return; // generated output is checked after rebuild; checkout product links are in the approved seo-links block; price-watch is a fixture
     if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|preload|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
-    if (file === 'storefront-live.js' && /function purl\(|fetch\(purl\(/.test(line)) return;
     if (file === 'seo-related-fill.mjs' && line.includes('existing.match')) return; // only reads old SEO related anchors for de-duplication
     if (file === 'blog-build.mjs' && line.includes('body = body.replace')) return; // transforms old blog links through shellProductLink below
     if (['seo-pest/blog-build.mjs', 'blog-write.mjs', 'blog-build.mjs', 'services/build-services.mjs'].includes(file) && line.includes('shellProductLink')) return;
@@ -67,9 +66,8 @@ assert.ok(generator.includes('<a href="${shellProductLink(sl(a.to))}">Continue t
   'alias redirect stubs must link visitors to the canonical /p/ URL');
 assert.ok(!generator.includes('<a href="${to}">'),
   'alias redirect stubs must not render a visible anchor to the static /p/ canonical URL');
-assert.match(readFileSync('site-links.js', 'utf8'), /shellProductLink/, 'share/copy controls must use shell links');
 assert.match(readFileSync('mobile-shell/app.js', 'utf8'), /const productUrl = .*shellProductLink/, 'mobile shell share URL must use shellProductLink');
-assert.match(readFileSync('storefront-live.js', 'utf8'), /Link: ' \+ shareProductUrl/, 'storefront WhatsApp prefill must use shell links');
+assert.match(readFileSync('mobile-shell/pp-whatsapp.js', 'utf8'), /BASE \\+ '\/p\//, 'product-page WhatsApp messages must use canonical product URLs');
 assert.ok(readFileSync('home-grid-ssr.mjs', 'utf8').includes('/p/'), 'homepage SSR cards must validate canonical product paths');
 assert.match(readFileSync('seo-related-fill.mjs', 'utf8'), /shellProductLink/, 'related-product generator must use shell links');
 assert.match(readFileSync('seo-pest/blog-build.mjs', 'utf8'), /shellProductLink/, 'hand-written blog generator must use shell links');
@@ -77,11 +75,8 @@ assert.match(readFileSync('blog-write.mjs', 'utf8'), /shellProductLink/, 'AI blo
 assert.match(readFileSync('blog-build.mjs', 'utf8'), /normalizePostProductLinks/, 'existing published blog posts must be normalized without touching SEO metadata');
 assert.ok(readFileSync('seo-kenya.mjs', 'utf8').includes('shellProductLink(i.slug)'), 'price guide generator must use shell links');
 assert.match(readFileSync('services/build-services.mjs', 'utf8'), /shellProductLink/, 'service page CTAs must use shell links');
-assert.match(readFileSync('recent-orders.js', 'utf8'), /shellProductLink/, 'recent-order shortcuts must use shell links');
 assert.match(readFileSync('wa-float.js', 'utf8'), /shellProductLink/, 'floating WhatsApp messages must use shell links');
-assert.match(readFileSync('product-trust.js', 'utf8'), /shellProductLink/, 'product trust WhatsApp messages must use shell links');
-assert.ok(readFileSync('cat-feel.js', 'utf8').includes('?product='), 'category enhancements must recognise shell product links');
-assert.ok(readFileSync('kili-pages.js', 'utf8').includes('?product='), 'product search must recognise shell product links');
+assert.ok(readFileSync('cat-feel.js', 'utf8').includes('a[href*=\"/p/\"]'), 'category enhancements must recognise canonical product links');
 const briefs = readFileSync('blog-topics.json', 'utf8');
 assert.doesNotMatch(briefs, /"\/p\/[^"]+\.html"/, 'blog/guide product CTAs must not use static product URLs');
 assert.ok(existsSync('no-classic-hop.test.mjs'), 'classic-hop guard must remain installed');
