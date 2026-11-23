@@ -1,3 +1,12 @@
+## 2026-11-23 11:30 (Africa/Nairobi) — Photo upload workflow now accepts product page URLs
+
+### Done (branch `wip-imagekit-accept-page-urls`)
+- First test run failed because the owner entered a page URL / a name with no address. `scripts/upload-product-photos-to-imagekit.mjs` now accepts a product PAGE address or a direct image address, with an optional `file-name|` prefix (name is taken from the address if omitted). For pages it extracts Open Graph / Twitter / image_src / Product JSON-LD images and tries each until one is >= 500x500. `stermontarcade.co.ke/?product=<slug>` links are rewritten to `/p/<slug>.html`.
+- Parsing helpers unit-tested offline. Real upload test: run `gh workflow run upload-product-photos.yml --ref wip-imagekit-accept-page-urls -f photos='<page url>'`.
+
+### Next
+1. Check the test run result, then merge to main.
+
 ## 2026-11-23 11:20 (Africa/Nairobi) — ImageKit product photo upload workflow added
 
 ### Done (branch `wip-imagekit-photo-upload`, NOT merged)

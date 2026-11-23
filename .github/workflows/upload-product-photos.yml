@@ -2,7 +2,8 @@ name: Upload product photos to ImageKit
 
 # Used by Claude and ChatGPT when publishing products (Neon rule publish_products, Step 4).
 # Run it from the Actions tab (Run workflow) or let the assistant dispatch it.
-# Input "photos": one photo per line, "file-name|https://image-url". ImageKit downloads each image, stores it in /products/,
+# Input "photos": one per line. Each line can be a product PAGE address or a direct image address, with an optional "file-name|" first.
+# For a page, the job finds the product photo on it. ImageKit downloads the image, stores it in /products/,
 # and the job checks it loads and is at least 500 x 500. The "browser_url" for each photo is printed in the log and the run summary.
 # Needs the repository secret IMAGEKIT_PRIVATE_KEY (ImageKit > Developer options > Private key). It never touches the database.
 
@@ -10,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       photos:
-        description: 'One per line: file-name|https://image-url (max 40 lines)'
+        description: 'One per line: a product page or image address, optionally file-name|address (max 40 lines)'
         required: true
         type: string
 
