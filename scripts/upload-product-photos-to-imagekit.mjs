@@ -113,16 +113,20 @@ async function uploadOne(name, src) {
   const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
   if (!download.ok || !allowedTypes.has(contentType)) return { error: `source download failed or unsupported format (HTTP ${download.status}, ${contentType || 'no image content type'})` };
   const bytes = await download.arrayBuffer();
+  const extension = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif' })[contentType];
+  if (!extension) return { error: `unsupported source image format (${contentType})` };
+  const fileName = `${name}.${extension}`;
   const form = new FormData();
-  form.append('file', new Blob([bytes], { type: contentType }), name);
-  form.append('fileName', name);
+  form.append('file', new Blob([bytes], { type: contentType }), fileName);
+  form.append('fileName', fileName);
   form.append('folder', FOLDER);
   form.append('useUniqueFileName', 'true');
   form.append('tags', 'product-photo,auto-upload');
   const r = await fetch(IK_UPLOAD, { method: 'POST', headers: { Authorization: auth }, body: form });
   const body = await r.json().catch(() => ({}));
   if (!r.ok) return { error: `ImageKit ${r.status}: ${body.message || 'upload failed'}` };
-  return { body };
+  if (body.fileType && body.fileType !== 'image') return { error: `ImageKit classified the uploaded file as ${body.fileType}` };
+  return { body, extension, contentType };
 }
 
 async function one(line) {
@@ -141,14 +145,13 @@ async function one(line) {
       const up = await uploadOne(name, cand);
       if (up.error) { lastError = up.error; continue; }
       const body = up.body;
-      const ext = String(body.fileType === 'image' ? (body.name || '').split('.').pop() : body.fileType || '').toLowerCase();
+      const ext = String(up.extension || '').toLowerCase();
       const filePath = body.filePath || `${FOLDER}/${body.name}`;
       const plain = `${IK_ENDPOINT}${filePath}`;
-      const safe = BROWSER_SAFE.has(ext);
-      if (!safe) { lastError = `ImageKit returned unsupported format (${ext || 'unknown'})`; continue; }
+      if (!BROWSER_SAFE.has(ext)) { lastError = `unsupported verified image format (${ext || 'unknown'})`; continue; }
       const browserUrl = plain;
       const w = Number(body.width) || 0, h = Number(body.height) || 0;
-      const out = { ...res, image_found_via: from, image_source: cand, original_format: ext || 'unknown', width: w, height: h, bytes: body.size, original_url: plain, browser_url: browserUrl, trusted_source: trusted, relaxed_size: trusted && (w < MIN_SIDE || h < MIN_SIDE) };
+      const out = { ...res, image_found_via: from, image_source: cand, original_format: ext, width: w, height: h, bytes: body.size, original_url: plain, browser_url: browserUrl, trusted_source: false, relaxed_size: false };
       if (w < minSide || h < minSide) { lastError = `image is ${w}x${h}; at least ${minSide}x${minSide} is required${trusted ? ' (trusted shop)' : ''}`; continue; }
       const check = await fetch(browserUrl, { headers: { 'User-Agent': UA } });
       const type = check.headers.get('content-type') || '';
