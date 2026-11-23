@@ -203,6 +203,9 @@ jobs:
       - name: Normalize all generated customer-facing product links
         if: steps.live_catalogue.outputs.required == 'true'
         run: node product-link-normalizer.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-normalize-generated-links.log"
+      - name: Verify all generated HTML links resolve
+        if: steps.live_catalogue.outputs.required == 'true'
+        run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-category-link-check.log"
       - name: Verify generated pages contain no static human-facing product links
         if: steps.live_catalogue.outputs.required == 'true'
         env:
