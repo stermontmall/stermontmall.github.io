@@ -1,6 +1,6 @@
 # Instructions for any Claude session on this repo
 
-> **PRECEDENCE (2026-11-22, owner-approved):** New products are posted to **Neon**, not Supabase. The governing rule is Neon `public.publishing_rules` key `publish_products` (currently version 5; mirror: `PUBLISH-PRODUCTS-RULE.md`). The admin tab `/admin.html#pricing-rules` now reads that Neon row. Where this file's Supabase-era text (800+ word descriptions, Supabase Storage photo upload, Supabase duplicate check) conflicts with `publish_products`, `publish_products` wins.
+> **PRECEDENCE (2026-11-22, owner-approved):** New products are posted to **Neon**, not Supabase. The governing rule is Neon `public.publishing_rules` key `publish_products` (currently version 6; mirror: `PUBLISH-PRODUCTS-RULE.md`). The admin tab `/admin.html#pricing-rules` now reads that Neon row. Where this file's Supabase-era text (800+ word descriptions, Supabase Storage photo upload, Supabase duplicate check) conflicts with `publish_products`, `publish_products` wins.
 
 ## Product posting — mandatory
 If the owner asks to add/post/list an advert or product, or attach product photos:
@@ -89,11 +89,11 @@ Always source baseline prices and specifications from legitimate Kenyan business
 - **Low-stock alert (`products.low_at`):** `20` pieces on every new product and pack variant.
 - (The database defaults for these two columns are set at schema level. The columns are named `stock` and `low_at`; there are no `stock_quantity` / `low_stock_threshold` columns.)
 
-#### 6. ZERO-CRACKING IMAGE UPLOAD (`add_product_photo`)
-- Find clean, high-resolution, exact-pack-size product images (no competitor watermarks, no blurry thumbnails).
-- Download locally, verify `HTTP 200`, valid image MIME type (`image/jpeg`, `image/png`, `image/webp`), intact dimensions, and `> 15KB` file size so zero images crack or break.
-- Never hotlink external URLs—upload directly to Supabase storage via **`add_product_photo`**.
-- **Automated image verification and activation (owner-approved 2026-11-18):** Human visual inspection is NOT required. When the image is fetched from a legitimate Kenyan supplier/manufacturer product page whose page title or URL explicitly matches the exact product name/model and pack size, and the source download passes HTTP 200, allowed image MIME (JPEG/PNG/WebP), dimensions at least 500x500, and file size greater than 15KB, upload it with `add_product_photo`. After the Storage object exists and the exact URL is present in `products.images`, treat the image as verified and immediately set `active=true` once price/SEO and regulatory gates also pass. A successful upload by itself does not waive the exact-source/title/pack match or other gates. Never wait for human visual review. Generic, mismatched, untraceable, or missing images remain inactive.
+#### 6. VERSION 6 IMAGEKIT PHOTO PIPELINE
+- The only supported photo publisher is `.github/workflows/upload-product-photos.yml`, triggered by a push to `data/photo-queue.txt` on `main`.
+- Queue format: one `file-name|https://source-url` line per product. The workflow uploads to ImageKit, verifies the returned browser URL, and commits mappings to `data/photo-results.json`.
+- Accept only JPG, JPEG, PNG, WebP and AVIF images with minimum dimensions of 200 x 200 pixels. Vendor downloads use a standard browser User-Agent.
+- Use only successful `ok=true` entries and their verified ImageKit `browser_url` values. Do not use Supabase Storage photo upload, manual workflow dispatch, legacy copy scripts, 500 x 500 limits, or WebP-only conversion rules.
 
 #### 7. KENYAN REGULATORY & PCPB SAFETY GUARD
 - Cross-check `HANDOFF-live.md` and `docs/photo-upload-queue-2026-11-18.md`. Never publish withdrawn active ingredients (e.g., Acephate) or restricted actives (Chlorpyrifos, Imidacloprid, 2,4-D Amine, Mancozeb) without label-accurate Kenyan restrictions, and never invent pesticide dilution rates.
