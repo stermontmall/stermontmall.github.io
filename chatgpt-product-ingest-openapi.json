@@ -1,0 +1,54 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Stermont product photo ingest",
+    "version": "1.0.0",
+    "description": "Downloads an exact-product photo from a public HTTPS link, stores it in Stermont's image bucket and attaches it to an existing product. Photo only: never activates or reprices a product."
+  },
+  "servers": [{ "url": "REPLACE_AFTER_DEPLOY" }],
+  "paths": {
+    "/ingest": {
+      "post": {
+        "operationId": "ingestProductPhoto",
+        "summary": "Attach one verified photo to a product",
+        "x-openai-isConsequential": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["product_code", "image_url", "source_page_url", "source_name", "rights_basis", "exact_pack_match", "alt_text"],
+                "properties": {
+                  "product_code": { "type": "string", "description": "Existing product code, e.g. STM-000123" },
+                  "image_url": { "type": "string", "description": "Direct public HTTPS link to the image file (jpg, png, webp or gif, at least 500x500)" },
+                  "source_page_url": { "type": "string", "description": "HTTPS product page the image came from" },
+                  "source_name": { "type": "string", "description": "Business or site name" },
+                  "rights_basis": { "type": "string", "enum": ["manufacturer", "authorized_distributor", "kenyan_vendor", "licensed", "own"] },
+                  "rights_evidence": { "type": "string", "description": "Which terms or permission were checked. Required unless basis is manufacturer or own." },
+                  "exact_pack_match": { "type": "string", "description": "Brand, product and pack size visible in the photo" },
+                  "alt_text": { "type": "string" },
+                  "main": { "type": "boolean", "description": "Make this the main photo" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Photo stored, verified and attached" },
+          "200": { "description": "Duplicate photo, nothing changed" },
+          "400": { "description": "Missing or invalid field" },
+          "401": { "description": "Wrong ingest key" },
+          "404": { "description": "No product with this code" },
+          "415": { "description": "Not a supported image" },
+          "422": { "description": "Image too small" },
+          "502": { "description": "Download, storage or verification failed; product unchanged" }
+        },
+        "security": [{ "ingestKey": [] }]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": { "ingestKey": { "type": "http", "scheme": "bearer" } }
+  }
+}
