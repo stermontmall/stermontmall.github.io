@@ -8,6 +8,8 @@ on:
     paths:
       - 'blog/*.html'
       - 'blog-build.mjs'
+      - 'category-link-normalizer.mjs'
+      - 'category-parent-map.json'
       - 'seo-blog-titles.mjs'
       - 'seo-safe-blog-meta.mjs'
       - 'seo-safe-blog-meta.test.mjs'
@@ -17,7 +19,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: blog-build
+  group: product-pages-v3
   cancel-in-progress: false
 
 jobs:
