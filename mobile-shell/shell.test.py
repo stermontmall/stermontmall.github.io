@@ -82,7 +82,7 @@ def mock_network(ctx):
         match = re.search(r'/p/([^/?#]+)\.html', rt.request.url)
         slug = match.group(1) if match else ''
         schema = '' if slug == 'does-not-exist' else '<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Fixture Product","description":"Published description survives a database outage.","image":["https://img.test/ok.png"],"sku":"STM-TEST-FIXTURE","offers":{"@type":"Offer","priceCurrency":"KES","price":1234,"availability":"https://schema.org/InStock"}}</script>'
-        page = REAL.replace('<!--PRODUCT_SCHEMA-->', schema).replace('/p/fixture.html', '/p/' + slug + '.html').replace('content="fixture"', 'content="' + slug + '"')
+        page = run_node('inject', REAL.replace('<!--PRODUCT_SCHEMA-->', schema).replace('/p/fixture.html', '/p/' + slug + '.html').replace('content="fixture"', 'content="' + slug + '"'), slug)
         rt.fulfill(status=200, content_type='text/html', body=page)
     ctx.route('**/p/*.html*', serve_product_page)
     ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
