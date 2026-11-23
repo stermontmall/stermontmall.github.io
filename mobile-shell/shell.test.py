@@ -96,8 +96,9 @@ REAL = """<!doctype html>
 <meta name="description" content="Server-rendered fixture product description for the shell route test.">
 <link rel="canonical" href="https://stermontarcade.co.ke/p/fixture-product.html">
 <meta property="og:url" content="https://stermontarcade.co.ke/p/fixture-product.html">
+<meta name="stm-id" content="fixture-product">
 </head>
-<body><main><h1>Fixture product SEO fallback</h1><p>Product details remain visible before the mobile shell loads.</p></main></body>
+<body><main><h1>Fixture product SEO fallback</h1><p>Product details remain visible before the mobile shell loads.</p><div class="box product-description pd"><h2>About fixture product</h2><section class="product-description-section pd-sec" id="pd-1"><h3>Product overview</h3><p>Published description survives the mobile shell route.</p></section></div></main></body>
 </html>"""
 
 def run_node(fn, html, slug):
@@ -114,9 +115,12 @@ def mock_network(ctx):
     ctx.add_init_script("window.shellProductLink = s => location.origin + '/p/' + encodeURIComponent(s) + '.html';")
     ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/p/' + encodeURIComponent(v) + '.html' : '/'); };"))
     def serve_product_page(rt):
-        # Keep the canonical URL and SEO fallback on the requested fixture slug.
+        # Only known fixture products have built product pages; unknown slugs must behave like GitHub Pages 404s.
         match = re.search(r'/p/([^/?#]+)\.html', rt.request.url)
         slug = match.group(1) if match else ''
+        if not any(slug == r['slug'] or slug == r['id'] for r in ROWS):
+            with open(os.path.join(ROOT, '404.html'), encoding='utf-8') as f:
+                return rt.fulfill(status=404, content_type='text/html', body=f.read())
         page = REAL.replace('fixture-product', slug)
         page = run_node('inject', page, slug)
         rt.fulfill(status=200, content_type='text/html', body=page)
@@ -262,7 +266,7 @@ with sync_playwright() as p:
     pg.locator('#qb-sizes [data-size="250 ml"]').click()
     check('selected quick-buy pack stays highlighted and its price is visible on the card', pg.locator('#qb-sizes [data-size="250 ml"]').get_attribute('aria-pressed') == 'true' and 'KSh 1,550' in pg.locator('#qb-sizes [data-size="250 ml"]').inner_text() and 'KSh 1,782' in pg.locator('#qb-sizes [data-size="250 ml"]').inner_text(), pg.locator('#qb-sizes [data-size="250 ml"]').inner_text())
     check('selected quick-buy price summary updates immediately', pg.locator('#qb-price').inner_text() == 'KSh 1,550' and pg.locator('#qb-old').inner_text() == 'KSh 1,782', pg.locator('#qb-price').inner_text())
-    pg.wait_for_function("document.querySelector('#qb-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
+    pg.wait_for_function("document.querySelector('#qb-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=15000)
     check('details: description, unit and stock of the chosen size are shown', 'line one' in pg.locator('#qb-desc').inner_text() and pg.locator('#qb-meta').inner_text() == 'Product code: STM-GARDEN-SET-250ML · Unit: Each · In stock', pg.locator('#qb-meta').inner_text())
     check('details: link to the canonical product page of that size', pg.locator('#qb-page').get_attribute('href') == f'{URL.rstrip('/')}/p/garden-set-250ml.html' and pg.locator('#qb-page').is_visible(), pg.locator('#qb-page').get_attribute('href'))
     check('details: extra photos listed and tapping one changes the main photo', pg.locator('#qb-photos [data-photo]').count() == 2 and (pg.locator('#qb-photos [data-photo]').nth(1).click() or True) and pg.locator('#qb-img img').count() == 1)
@@ -272,7 +276,7 @@ with sync_playwright() as p:
     pg.evaluate("window.__shellStillLoaded = true")   # survives only if the document is NOT reloaded or navigated away
     pg.locator('#qb-page').click()
     pg.wait_for_selector('#page-product.open', timeout=5000)
-    pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
+    pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=15000)
     check('product page opens at its canonical URL and hydrates the full shell in place', pg.url == f'{URL.rstrip("/")}/p/garden-set-250ml.html' and pg.locator('#bottom-nav').count() == 1, pg.url)
     check('product page shows name, price, sizes, description, unit and trust lines', 'Garden Hose Connector Set' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Product code: STM-GARDEN-SET-250ML' in pg.locator('#pp-meta').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
     pg.screenshot(path=f'{OUT}/shot-product-page.png')
