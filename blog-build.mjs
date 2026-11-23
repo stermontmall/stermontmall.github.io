@@ -6,7 +6,7 @@ import './seo-blog-chrome.mjs';   // 2026-11-05: shell top bar + bottom nav on e
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
-import { normalizeCategoryLinks } from './category-links.mjs';
+import { activeCategorySlugsFromPages, normalizeCategoryLinks } from './category-links.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const START = '<!--BLOG-POSTS-START-->', END = '<!--BLOG-POSTS-END-->';
@@ -50,7 +50,7 @@ const normalizePostProductLinks = html => {
     } catch { return m; }
   });
   body = body.replace(/__STM_PRESERVED_(\d+)__/g, (m, index) => preserved[Number(index)] || m);
-  return normalizeCategoryLinks(head + body, existingCategorySlugs);
+  return normalizeCategoryLinks(head + body, activeCategorySlugs);
 };
 for (const f of readdirSync('blog').filter(f => f.endsWith('.html') && f !== 'index.html').sort()) {
   const file = `blog/${f}`;
