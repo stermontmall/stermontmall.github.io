@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Stermont Arcade – Shop online in Kenya</title>
+<style>
+:root{--or:#f6821f;--or2:#e5600a;--bg:#f3f3f3;--card:#fff;--tx:#222;--mu:#6f6f6f;--ln:#e6e6e6;--gr:#0f9b4e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141414;--card:#212121;--tx:#eee;--mu:#a0a0a0;--ln:#333}}
+:root[data-theme="dark"]{--bg:#141414;--card:#212121;--tx:#eee;--mu:#a0a0a0;--ln:#333}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 "Segoe UI",Roboto,Arial,sans-serif}
+a{color:inherit;text-decoration:none}
+.w{max-width:1200px;margin:0 auto;padding:0 12px}
+.top{background:var(--card);font-size:12px;color:var(--mu);border-bottom:1px solid var(--ln)}
+.top .w{display:flex;justify-content:space-between;gap:12px;padding:6px 12px;overflow-x:auto;white-space:nowrap}
+header{background:var(--or);position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+header .w{display:flex;align-items:center;gap:14px;padding:10px 12px}
+.logo{color:#fff;font-weight:800;font-size:20px;line-height:1;letter-spacing:-.5px}
+.logo small{display:block;font-size:10px;font-weight:500;letter-spacing:0;opacity:.9}
+.search{flex:1;display:flex;min-width:0}
+.search input{flex:1;min-width:0;border:2px solid #fff;border-right:0;border-radius:4px 0 0 4px;padding:10px 12px;font-size:14px;background:#fff;color:#222}
+.search button{border:0;background:var(--or2);color:#fff;padding:0 18px;font-weight:700;border-radius:0 4px 4px 0;cursor:pointer}
+.act{display:flex;gap:16px;color:#fff;font-size:12px}
+.act span{display:flex;flex-direction:column;align-items:center}.act b{font-size:18px;font-weight:400}
+.main{display:grid;grid-template-columns:240px 1fr;gap:12px;margin:12px auto}
+.cats{background:var(--card);border-radius:4px;position:relative;align-self:start}
+.cats h3{margin:0;padding:10px 14px;background:var(--or);color:#fff;font-size:14px;border-radius:4px 4px 0 0}
+.cats ul{margin:0;padding:0;max-height:430px;overflow-y:auto}
+.cats li{list-style:none;padding:8px 14px;display:flex;justify-content:space-between;gap:8px;cursor:pointer;border-bottom:1px solid var(--ln)}
+.cats li::after{content:"›";color:var(--mu)}
+.cats li:hover,.cats li.on{background:var(--bg);color:var(--or2)}
+.fly{position:absolute;left:100%;top:0;width:480px;max-height:430px;overflow-y:auto;background:var(--card);border:1px solid var(--ln);border-radius:0 4px 4px 0;padding:16px;display:none;z-index:15;box-shadow:4px 4px 14px rgba(0,0,0,.18)}
+.fly.on{display:block}
+.fly h4{margin:0 0 10px;color:var(--or2)}
+.fly a{display:inline-block;margin:0 8px 8px 0;padding:6px 10px;border:1px solid var(--ln);border-radius:16px;font-size:13px}
+.fly a:hover{border-color:var(--or);color:var(--or2)}
+.hero{position:relative;border-radius:4px;overflow:hidden;min-height:320px}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:32px 40px;color:#fff;opacity:0;transition:opacity .5s}
+.slide.on{opacity:1}
+.slide h2{margin:0 0 8px;font-size:34px;line-height:1.1;max-width:430px}
+.slide p{margin:0 0 16px;max-width:400px}
+.slide a{align-self:flex-start;background:#fff;color:var(--or2);padding:9px 22px;border-radius:20px;font-weight:700}
+.slide i{position:absolute;right:30px;bottom:14px;font-size:110px;font-style:normal}
+.dots{position:absolute;bottom:10px;left:40px;display:flex;gap:6px}
+.dots button{width:9px;height:9px;border-radius:50%;border:0;background:rgba(255,255,255,.5);padding:0;cursor:pointer}
+.dots button.on{background:#fff;width:22px;border-radius:5px}
+.perks{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+.perks div{background:var(--card);border-radius:4px;padding:12px;display:flex;gap:10px;align-items:center}
+.perks b{display:block;font-size:13px}.perks small{color:var(--mu)}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:var(--card);border-radius:4px 4px 0 0;border-bottom:1px solid var(--ln)}
+.tabs button{flex:none;border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:18px;padding:7px 14px;cursor:pointer;font-size:13px}
+.tabs button.on{background:var(--or);border-color:var(--or);color:#fff}
+.sec{background:var(--card);border-radius:4px;margin-bottom:12px}
+.sh{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--ln)}.sh h2{margin:0;font-size:17px}
+.cg{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--ln)}
+.cg a{background:var(--card);padding:16px 8px;text-align:center;font-size:13px;min-height:100px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.cg a:hover{color:var(--or2)}
+.cg b{font-size:32px;font-weight:400}
+.empty{padding:20px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.sk{aspect-ratio:3/4;border-radius:4px;background:linear-gradient(90deg,var(--bg),var(--ln),var(--bg));background-size:200% 100%;animation:sh 1.6s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.note{padding:0 20px 20px;color:var(--mu)}
+.note b{color:var(--tx)}
+footer{background:#2b2b2b;color:#bbb;margin-top:20px;padding:26px 0 20px;font-size:13px}
+footer .w{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+footer h4{color:#fff;margin:0 0 8px}footer a,footer p{display:block;margin:2px 0}
+:focus-visible{outline:3px solid #1a73e8;outline-offset:2px}
+@media(max-width:1000px){.main{grid-template-columns:1fr}.cats{display:none}.cg{grid-template-columns:repeat(3,1fr)}.perks{grid-template-columns:repeat(2,1fr)}.empty{grid-template-columns:repeat(2,1fr)}.act span:nth-child(-n+2){display:none}.slide h2{font-size:26px}.slide i{font-size:70px}footer .w{grid-template-columns:1fr}.hero{min-height:260px}.slide{padding:22px}.dots{left:22px}}
+@media(prefers-reduced-motion:reduce){.slide{transition:none}.sk{animation:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="w"><span>Pickup: Sarit Centre, Westlands, Nairobi</span><span>Delivery to all 47 counties · M-Pesa checkout · WhatsApp +254 748 888 230</span></div></div>
+<header><div class="w">
+<a class="logo" href="#">Stermont Arcade<small>stermontarcade.co.ke</small></a>
+<form class="search" onsubmit="return false"><input aria-label="Search" placeholder="Search products, brands and categories"><button>Search</button></form>
+<div class="act"><span><b>👤</b>Account</span><span><b>♡</b>Wishlist</span><span><b>🛒</b>Cart</span></div>
+</div></header>
+
+<div class="w main">
+<nav class="cats" id="cats"><h3>☰ All Categories</h3><ul id="cl"></ul><div class="fly" id="fly"></div></nav>
+<div class="hero" id="hero"></div>
+</div>
+
+<div class="w">
+<div class="perks">
+<div><span style="font-size:26px">📱</span><span><b>M-Pesa checkout</b><small>Pay in seconds</small></span></div>
+<div><span style="font-size:26px">🚚</span><span><b>47 counties</b><small>Delivery across Kenya</small></span></div>
+<div><span style="font-size:26px">🏬</span><span><b>Nairobi pickup</b><small>Sarit Centre, Westlands</small></span></div>
+<div><span style="font-size:26px">💬</span><span><b>WhatsApp help</b><small>+254 748 888 230</small></span></div>
+</div>
+
+<section class="sec"><div class="sh"><h2>Shop by department</h2></div><div class="cg" id="dg"></div></section>
+
+<section class="sec"><div class="tabs" id="tabs" role="tablist"></div><div id="dept"></div></section>
+</div>
+
+<footer><div class="w">
+<div><h4>Stermont Arcade</h4><p>Sarit Centre, Westlands, Nairobi</p><p>WhatsApp +254 748 888 230</p></div>
+<div><h4>Help</h4><a href="#">Shipping</a><a href="#">Returns &amp; warranty</a><a href="#">FAQ</a><a href="#">Contact</a></div>
+<div><h4>Legal</h4><a href="#">Terms</a><a href="#">Privacy policy</a><a href="#">Bulk quotes</a></div>
+</div></footer>
+
+<script>
+/* Category tree snapshot from Neon public.categories (93 rows, all active). Products load from public.storefront_products once the table has rows. */
+const D=[
+["🏠","Home & Kitchen",["Electrical & Lighting","Home Storage","Home & Office","Furniture","Kitchen & Dining","Solar & Power","Bedding & Home Decor","Cleaning & Laundry"]],
+["📱","Phones & Accessories",["Phone Accessories","Refurbished Phones","Phones & Tablets","Earphones & Headset"]],
+["📺","TV, Audio & Video",["Televisions","TVs & Audio","Music & Audio","Bluetooth Speakers","Woofers","Home Theatre & Sound Systems","Cameras & Photography","TV Mounts & Accessories"]],
+["💻","Computers & Accessories",["Computing","Gaming","Printers & Office Machines","Networking & Smart Home","Security & CCTV"]],
+["🔌","Appliances",["Fridges & Freezers","Washing Machines"]],
+["👗","Clothes",["Men's Fashion","Women's Fashion","Kids' Fashion"]],
+["👟","Shoes",["Ladies Sandals","Men's Sneakers","Women's Sneakers"]],
+["👜","Bags",[]],
+["⌚","Watches & Jewellery",[]],
+["🧒","Kids & Baby Products",["Toys & Games"]],
+["💄","Health & Beauty",["Medical Supplies & Wellness"]],
+["🌾","Agrovet & Farm Supplies",["Agrochemicals","Herbicides","Fungicides","Crop Insecticides","Fertilizers","Seeds & Seedlings","Animal Feeds","Veterinary Drugs & Vaccines","Poultry & Dairy Equipment","Fish Farming","Beekeeping","Water Tanks & Irrigation","Farm & Garden Tools","Adjuvants & Growth Regulators","Disinfectants & Farm Hygiene"]],
+["🐜","Pest Control & Fumigation",["Fogging & ULV Machines","Insect Light Traps & UV Lamps","Fumigation Chemicals","Mosquito & Fly Control","Cockroach & Ant Killers","Rodent Control","Termite Control","Bed Bug Killers","Sprayers & Equipment","Pest Monitoring & Inspection Tools"]],
+["🚗","Automotive",["Car Accessories & Spare Parts","Motorcycle Accessories","Motorcycle Spare Parts"]],
+["🚙","Cars for Sale",[]],
+["🛒","Others",["Supermarket","Tools & Machinery","Building & Hardware","Garden & Outdoors","Protective Wear & Safety","Pet Supplies","Packaging & Shop Supplies","Sporting Goods & Fitness","School & Office Supplies","Books & Stationery","Gifts & Custom Printing","Wedding & Events"]],
+["🎁","General Merchandise",[]]];
+const $=id=>document.getElementById(id),cl=$("cl"),fly=$("fly");
+const chips=(d)=>d[2].length?d[2].map(s=>`<a href="#">${s}</a>`).join(""):`<a href="#">All ${d[1]}</a>`;
+D.forEach(d=>{const li=document.createElement("li");li.textContent=d[0]+" "+d[1];
+li.onmouseenter=()=>{[...cl.children].forEach(x=>x.classList.remove("on"));li.classList.add("on");fly.innerHTML=`<h4>${d[1]}</h4>${chips(d)}`;fly.classList.add("on")};cl.appendChild(li)});
+$("cats").onmouseleave=()=>{fly.classList.remove("on");[...cl.children].forEach(x=>x.classList.remove("on"))};
+$("dg").innerHTML=D.map((d,i)=>`<a href="#dept" data-i="${i}"><b>${d[0]}</b>${d[1]}</a>`).join("");
+
+const S=[["Agrovet & farm supplies","Agrochemicals, seeds, feeds and farm tools delivered across Kenya.","🌾","linear-gradient(120deg,#0f9b4e,#6cc04a)",11],
+["Pest control & fumigation","Sprayers, fogging machines, traps and fumigation products.","🐜","linear-gradient(120deg,#f6821f,#e63a2e)",12],
+["TVs, audio & computing","Televisions, speakers, laptops and CCTV for home and office.","📺","linear-gradient(120deg,#2b6cb0,#6b46c1)",2]];
+const hero=$("hero");let cur=0;
+hero.innerHTML=S.map((s,i)=>`<div class="slide${i?"":" on"}" style="background:${s[3]}"><h2>${s[0]}</h2><p>${s[1]}</p><a href="#dept" data-i="${s[4]}">Browse</a><i>${s[2]}</i></div>`).join("")+`<div class="dots">${S.map((_,i)=>`<button aria-label="Slide ${i+1}" class="${i?"":"on"}"></button>`).join("")}</div>`;
+const sl=[...hero.querySelectorAll(".slide")],dt=[...hero.querySelectorAll(".dots button")];
+function go(n){cur=n%S.length;sl.forEach((s,i)=>s.classList.toggle("on",i==cur));dt.forEach((d,i)=>d.classList.toggle("on",i==cur))}
+dt.forEach((d,i)=>d.onclick=()=>go(i));setInterval(()=>go(cur+1),5000);
+
+const tabs=$("tabs"),dept=$("dept");
+function show(i){[...tabs.children].forEach((b,j)=>b.classList.toggle("on",j==i));const d=D[i];
+dept.innerHTML=`<div class="sh"><h2>${d[0]} ${d[1]}</h2></div><div class="cg">${(d[2].length?d[2]:[d[1]]).map(s=>`<a href="#"><b>${d[0]}</b>${s}</a>`).join("")}</div><div class="empty">${'<div class="sk"></div>'.repeat(5)}</div><p class="note"><b>No products published in this department yet.</b> Products appear here automatically once they are active in the Neon <code>products</code> table with a verified photo.</p>`}
+D.forEach((d,i)=>{const b=document.createElement("button");b.textContent=d[1];b.setAttribute("role","tab");b.onclick=()=>show(i);tabs.appendChild(b)});
+document.addEventListener("click",e=>{const a=e.target.closest("[data-i]");if(a){e.preventDefault();show(+a.dataset.i);dept.scrollIntoView({behavior:"smooth"})}});
+show(0);
+</script>
+</body>
+</html>
