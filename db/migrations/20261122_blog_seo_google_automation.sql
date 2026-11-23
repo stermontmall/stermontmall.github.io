@@ -33,4 +33,9 @@ CREATE TABLE IF NOT EXISTS public.google_sitemap_submissions (
 CREATE INDEX IF NOT EXISTS seo_audits_date_idx ON public.seo_audits (audit_date DESC);
 CREATE INDEX IF NOT EXISTS google_index_inspections_state_idx ON public.google_index_inspections (verdict, inspected_at DESC);
 CREATE INDEX IF NOT EXISTS content_topics_status_idx ON public.content_topics (status, slug);
-REVOKE ALL ON TABLE public.content_topics, public.blog_posts, public.seo_audits, public.google_index_inspections, public.google_sitemap_submissions FROM PUBLIC, anonymous, authenticated;
+ALTER TABLE public.content_topics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blog_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.seo_audits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.google_index_inspections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.google_sitemap_submissions ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE public.content_topics, public.blog_posts, public.seo_audits, public.google_index_inspections, public.google_sitemap_submissions FROM PUBLIC, anonymous;
