@@ -49,7 +49,7 @@ export function extractImageCandidates(html, baseUrl) {
       if (/^https:/i.test(abs) && !out.includes(abs)) out.push(abs);
     } catch {}
   };
-  const attr = (tag, key) => (tag.match(new RegExp('\\b' + key + '\\s*=\\s*["\\']([^"\\']+)["\\']', 'i')) || [])[1] || '';
+  const attr = (tag, key) => (tag.match(new RegExp("\\b" + key + "\\s*=\\s*(['\\\"])(.*?)\\1", "i")) || [])[2] || "";
   // Actual product/gallery images first, excluding logos and UI artwork.
   for (const tag of html.match(/<img\b[^>]*>/gi) || []) {
     const alt = attr(tag, 'alt');
