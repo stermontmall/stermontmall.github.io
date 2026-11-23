@@ -196,7 +196,7 @@ with sync_playwright() as p:
         # Neon Authenticated Data API sends an OPTIONS preflight before its GET.
         # Continue the preflight and hold only the first actual catalogue GET.
         if route.request.method != 'GET' or parked_once[0]:
-            return route.continue_()
+            return route.fallback()  # let the next registered handler mock Neon data and CORS preflights
         parked_once[0] = True
         parked.append(route)
     pg.route('**/*storefront_products*', park_first_catalog_get)
