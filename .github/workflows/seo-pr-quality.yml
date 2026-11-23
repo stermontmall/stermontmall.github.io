@@ -94,6 +94,7 @@ jobs:
           node seo-safe-meta.test.mjs
           node seo-safe-category-meta.test.mjs
           node seo-safe-blog-meta.test.mjs
+          node seo-safe-consumer-copy.test.mjs
       # Exercise the mobile shell with harmless fixtures, not live catalogue data.
       # Keep this check alongside the existing product and SEO quality gates.
       # Reset per-test tab state when asserting the default landing view.
@@ -135,6 +136,7 @@ jobs:
             node --check recent-orders.js
             node --check product-content.test.mjs
             node --check seo-meta.mjs
+            node --check seo-safe-consumer-copy.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-syntax.log"
       - name: Test canonical admin pricing and posting rules
         run: node pricing-rule-defaults.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/07b-pricing-rule-defaults.log"
@@ -187,6 +189,7 @@ jobs:
             node seo-titles.mjs
             node seo-safe-meta.mjs
             node seo-safe-category-meta.mjs
+            node seo-safe-consumer-copy.mjs
             node seo-shell-redirect.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
       - name: Build service pages for the generated-link guard
