@@ -748,7 +748,7 @@ with sync_playwright() as p:
     p17.on('requestfailed', lambda r: p17_requests.append('failed ' + r.url + ' ' + str(r.failure)) if '/p/static-fallback.html' in r.url else None)
     p17.route('**/p/static-fallback.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=fallback_html))
     p17.goto(f'{BASE}/?product=static-fallback'); p17.wait_for_timeout(1200)
-    print('STATIC FALLBACK DEBUG', p17_requests, p17.locator('#toast').inner_text(), p17.evaluate('window.STM_LAST_ERROR'), p17.locator('#page-product.open').count())
+    print('STATIC FALLBACK DEBUG', p17_requests, (p17.locator('#toast').inner_text() if p17.locator('#toast').count() else '<no toast element>'), p17.evaluate('window.STM_LAST_ERROR'), p17.locator('#page-product.open').count(), p17.locator('#appbar').count())
     p17.wait_for_selector('#page-product.open', timeout=15000); p17.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Published description survives')", timeout=5000)
     check('product deep link opens from the published SEO page when Supabase REST returns 402', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
     check('static fallback retains product code and full published description', 'STM-TEST-402' in p17.locator('#pp-meta').inner_text() and 'Published description survives a database outage.' in p17.locator('#pp-desc').inner_text())
