@@ -136,6 +136,12 @@ jobs:
         continue-on-error: true
         run: node seo-kenya.mjs
 
+      - name: Test links to existing category pages
+        run: node category-links.test.mjs
+
+      - name: Normalize links to built category pages
+        run: node category-links-normalizer.mjs
+
       - name: Normalize visible product links in generated pages
         run: node product-link-normalizer.mjs
 
