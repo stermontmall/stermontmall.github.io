@@ -178,7 +178,7 @@ export function productDescriptionHtml(source) {
   if (!hits.length) {
     const paragraphs = raw.split(/\n\s*\n/).map(x => x.trim()).filter(Boolean);
     const source = paragraphs.length ? paragraphs.join(' ') : raw;
-    const parts = source.match(/[^.!?]+(?:[.!?]+|$)/g) || [source];
+    const parts = source.match(/(?:\[[^\]]*\]\([^)]*\)|[^.!?]|\.(?=\d))+(?:[.!?]+|$)/g) || [source];
     const sentences = [];
     for (const part of parts.map(x => x.trim()).filter(Boolean)) {
       const prev = sentences[sentences.length - 1] || '';
