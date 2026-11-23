@@ -1,4 +1,4 @@
-// Tests the script in 404.html: an unbuilt /p/<slug>.html or /c/<slug>.html opens the shop at /?product=<slug> or /?cat=<slug>; anything else stays on the 404 page.
+// Tests the script in 404.html: legacy .htm aliases and unbuilt category pages may redirect; unknown product pages stay on the noindex 404 page and never loop through ?product=.
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
@@ -14,12 +14,13 @@ const run = pathname => { let to = null; vm.runInNewContext(code, { location: { 
 const cases = [
   ['/p/alto-100-sl-fungicide-250ml.htm', '/p/alto-100-sl-fungicide-250ml.html?ref=share#pack'],
   ['/p/Some-Slug-2.HTM', '/p/Some-Slug-2.html?ref=share#pack'],
-  ['/p/agrimec-018ec-insecticide-100ml.html', '/?product=agrimec-018ec-insecticide-100ml'],
-  ['/p/confidor-200sl-insecticide-250ml.html', '/?product=confidor-200sl-insecticide-250ml'],
+  ['/p/agrimec-018ec-insecticide-100ml.html', null],
+  ['/p/confidor-200sl-insecticide-250ml.html', null],
   ['/c/crop-insecticides.html', '/?cat=crop-insecticides'],
-  ['/p/Some-Slug-2.html', '/?product=Some-Slug-2'],
+  ['/p/Some-Slug-2.html', null],
   ['/p/', null], ['/p/x/y.html', null], ['/blog/missing.html', null], ['/random.html', null],
   ['/p/..%2f..%2fevil.html', null], ['/p/a b.html', null], ['/p/<script>.html', null], ['/p/evil.html?x=1', null],
 ];
 for (const [path, want] of cases) assert.equal(run(path), want, `${path} -> ${want}`);
-console.log(`OK: ${cases.length} 404 fallback cases`);
+assert.equal(run('/p/unknown-product.html'), null, 'unknown product must remain on the 404 page and never redirect to ?product=');
+console.log(`OK: ${cases.length + 1} 404 fallback cases`);
