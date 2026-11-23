@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#172554"><title>Checkout | Stermont Arcade</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#172033;background:#f3f5f9}*{box-sizing:border-box}body{margin:0}.wrap{max-width:680px;margin:auto;padding:18px 14px 42px}.top{display:flex;align-items:center;gap:12px;margin:0 0 18px}.back{border:0;background:#e7ebf3;border-radius:50%;width:40px;height:40px;font-size:22px}.brand{font-weight:800;font-size:18px}.muted{color:#64748b;font-size:13px}.card{background:#fff;border:1px solid #e5eaf2;border-radius:16px;padding:18px;margin:12px 0;box-shadow:0 4px 18px #15294b0a}h1{font-size:23px;margin:0 0 5px}h2{font-size:16px;margin:0 0 14px}.items{display:grid;gap:10px}.item{display:flex;justify-content:space-between;gap:12px;font-size:14px}.item small{display:block;color:#64748b}.total{border-top:1px solid #e8edf4;padding-top:12px;margin-top:12px;font-weight:800;font-size:18px;display:flex;justify-content:space-between}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px;margin:11px 0}.field.full{grid-column:1/-1}label{font-size:13px;font-weight:700}input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;background:#fff}textarea{min-height:76px;resize:vertical}.choice{display:flex;gap:10px;flex-wrap:wrap}.choice label{border:1px solid #d5dce8;padding:10px 12px;border-radius:10px;font-weight:600}.pay{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px;font-size:14px;line-height:1.6}.btn{width:100%;border:0;border-radius:12px;padding:15px;background:#173b80;color:#fff;font-size:16px;font-weight:800;margin-top:12px}.btn:disabled{opacity:.5}.err{color:#b91c1c;font-size:13px;white-space:pre-wrap}.success{background:#ecfdf5;border:1px solid #a7f3d0}.hidden{display:none!important}@media(max-width:520px){.grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+</style></head>
+<body><main class="wrap">
+<header class="top"><button class="back" id="back" aria-label="Back">‹</button><div><div class="brand">STERМONT ARCADE</div><div class="muted">Secure checkout</div></div></header>
+<section><h1>Complete your order</h1><p class="muted">Confirm your items, delivery details and M-Pesa payment.</p></section>
+<section class="card"><h2>Your order</h2><div id="items" class="items"><p class="muted">Loading your cart…</p></div><div class="total"><span>Order total</span><span id="total">—</span></div><p class="muted" id="fee-note">Delivery fees are calculated using the selected county.</p></section>
+<form id="form">
+<section class="card"><h2>Contact details</h2><div class="grid">
+<div class="field full"><label for="name">Full name</label><input id="name" maxlength="120" autocomplete="name" required></div>
+<div class="field"><label for="phone">Phone number</label><input id="phone" inputmode="tel" autocomplete="tel" placeholder="07XX XXX XXX" required></div>
+<div class="field"><label for="email">Email (optional)</label><input id="email" type="email" maxlength="200" autocomplete="email"></div>
+</div></section>
+<section class="card"><h2>Delivery or pickup</h2><div class="choice"><label><input type="radio" name="method" value="delivery" checked> Delivery</label><label><input type="radio" name="method" value="pickup"> Pickup</label></div>
+<div id="delivery-fields" class="grid">
+<div class="field"><label for="county">County</label><select id="county" required><option value="">Choose county</option></select></div>
+<div class="field"><label for="address">Estate, building and delivery address</label><input id="address" maxlength="200" placeholder="Street, estate, building" required></div>
+</div>
+<p id="pickup-note" class="muted hidden">Collect from Stermont Arcade, Sarit Centre, Westlands. Open daily 8:00 AM–8:00 PM.</p>
+<div class="field"><label for="notes">Order notes (optional)</label><textarea id="notes" maxlength="500" placeholder="Landmark or delivery instructions"></textarea></div>
+</section>
+<section class="card"><h2>M-Pesa payment</h2><div class="pay"><b>Paybill: 714777</b><br>Account number: <b>0789514060</b><br>Enter the exact amount shown above. After paying, enter the M-Pesa transaction code below. Your order remains pending until staff verify payment.</div>
+<div class="grid"><div class="field"><label for="paycode">M-Pesa transaction code</label><input id="paycode" maxlength="120" autocapitalize="characters" required placeholder="e.g. QAB12CD34"></div><div class="field"><label for="payamount">Amount paid (KSh)</label><input id="payamount" type="number" min="1" step="1" inputmode="numeric" required></div></div>
+</section>
+<p id="error" class="err" role="alert"></p><button id="submit" class="btn" type="submit">Place order</button>
+</form>
+<section id="success" class="card success hidden"><h2>Order received</h2><p>Your order reference is <b id="ref"></b>.</p><p class="muted">Payment is pending verification. Keep your M-Pesa message and use the tracking page to check progress.</p><a id="track" class="btn" style="display:block;text-align:center;text-decoration:none" href="/track.html">Track this order</a><button id="done" class="btn" type="button">Return to shop</button></section>
+</main>
+<script>
+(function(){
+'use strict';
+const API='https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
+const counties=['Nairobi','Kiambu','Machakos','Kajiado','Nakuru','Nyeri','Meru','Tharaka-Nithi','Embu','Kirinyaga',"Murang'a",'Nyandarua','Laikipia','Mombasa','Kisumu','Uasin Gishu','Kwale','Kilifi','Taita-Taveta','Garissa','Isiolo','Kitui','Makueni','Trans Nzoia','Elgeyo-Marakwet','Nandi','Baringo','Narok','Kericho','Bomet','Kakamega','Vihiga','Bungoma','Busia','Siaya','Homa Bay','Migori','Kisii','Nyamira'];
+const fees={Nairobi:300,Kiambu:400,Machakos:400,Kajiado:400,Nakuru:600,Nyeri:600,Meru:600,'Tharaka-Nithi':600,Embu:600,Kirinyaga:600,"Murang'a":600,Nyandarua:600,Laikipia:600,Mombasa:600,Kisumu:600,'Uasin Gishu':600,Kwale:800,Kilifi:800,'Taita-Taveta':800,Garissa:800,Isiolo:800,Kitui:800,Makueni:800,'Trans Nzoia':800,'Elgeyo-Marakwet':800,Nandi:800,Baringo:800,Narok:800,Kericho:800,Bomet:800,Kakamega:800,Vihiga:800,Bungoma:800,Busia:800,Siaya:800,'Homa Bay':800,Migori:800,Kisii:800,Nyamira:800};
+const $=id=>document.getElementById(id), money=n=>'KSh '+Number(n).toLocaleString('en-KE');
+let cart=[];
+try{cart=JSON.parse(localStorage.getItem('stm_handoff')||'[]')}catch{}
+const clean=cart.filter(x=>x&&typeof x.rowId==='string'&&Number.isInteger(Number(x.qty))&&Number(x.qty)>0).slice(0,59);
+if(!clean.length){$('items').textContent='Your cart is empty. Return to the shop and add products.';$('submit').disabled=true}
+counties.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;$('county').append(o)});
+function method(){return document.querySelector('input[name=method]:checked').value}
+function total(){const sub=clean.reduce((s,i)=>s+Number(i.price||0)*Number(i.qty),0);return sub+(method()==='delivery'?(fees[$('county').value]||0):0)}
+function paint(){ $('items').replaceChildren();clean.forEach(i=>{const row=document.createElement('div');row.className='item';const left=document.createElement('span');left.textContent=i.name+(i.size?' · '+i.size:'');const right=document.createElement('b');right.textContent=Number(i.qty)+' × '+money(i.price);row.append(left,right);$('items').append(row)});$('total').textContent=money(total());$('payamount').value=total()||'';const delivery=method()==='delivery';$('delivery-fields').classList.toggle('hidden',!delivery);$('pickup-note').classList.toggle('hidden',delivery);$('county').required=delivery;$('address').required=delivery;$('fee-note').textContent=delivery?($('county').value&&!fees[$('county').value]?'Delivery fee for this county will be confirmed on WhatsApp.':'Delivery fee is included where listed.'):'Pickup at Sarit Centre, Westlands.'}
+document.querySelectorAll('input[name=method]').forEach(x=>x.addEventListener('change',paint));$('county').addEventListener('change',paint);paint();
+$('back').addEventListener('click',()=>{if(history.length>1)history.back();else location.href='/'});
+function ref(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const b=new Uint8Array(8);crypto.getRandomValues(b);return 'STM-'+Array.from(b,x=>a[x%a.length]).join('')}
+function phone(){const d=$('phone').value.replace(/\D/g,'');return d.length===9?'+254'+d:d.length===10&&d.startsWith('0')?'+254'+d.slice(1):d.length===12&&d.startsWith('254')?'+'+d:$('phone').value.trim()}
+$('form').addEventListener('submit',async e=>{
+ e.preventDefault();$('error').textContent='';
+ if(!clean.length){$('error').textContent='Your cart is empty. Return to the shop.';return}
+ const name=$('name').value.trim(),ph=phone(),code=$('paycode').value.trim().toUpperCase(),amount=Number($('payamount').value),county=$('county').value,delivery=method()==='delivery';
+ if(name.length<2||!/^\+254[17]\d{8}$/.test(ph)){ $('error').textContent='Enter your full name and a valid Kenyan phone number.';return}
+ if(delivery&&(!county||!$('address').value.trim())){$('error').textContent='Enter your county and delivery address.';return}
+ if(code.length<4||code.length>120||!amount||amount<total()){$('error').textContent='Enter the M-Pesa code and pay at least the displayed total.';return}
+ const btn=$('submit');btn.disabled=true;btn.textContent='Submitting order…';
+ const orderRef=ref(),payload={p_ref:orderRef,p_customer_name:name,p_phone:ph,p_email:$('email').value.trim()||null,p_method:method(),p_county:delivery?county:null,p_address:delivery?$('address').value.trim():null,p_notes:$('notes').value.trim()||null,p_items:clean.map(i=>({product_id:i.rowId,qty:Number(i.qty)})),p_pay_code:code,p_pay_amount:amount,p_voucher_code:null};
+ try{
+  const res=await fetch(API+'rpc/create_guest_order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(data.message||data.reason||('Checkout failed ('+res.status+').'));
+  if(!data.ok)throw new Error(data.reason||'We could not create your order.');
+  if(Number(data.subtotal)>amount)throw new Error('The database-calculated total is higher than the amount entered. Please contact us before paying again.');
+  try{localStorage.setItem('shell.cart','[]');localStorage.setItem('stm_cart','{}');localStorage.removeItem('stm_handoff')}catch{}
+  $('form').classList.add('hidden');$('ref').textContent=data.ref||orderRef;$('track').href='/track.html?ref='+encodeURIComponent(data.ref||orderRef);$('success').classList.remove('hidden');
+ }catch(err){$('error').textContent=err.message||'Could not place order. Check your connection and try again.';btn.disabled=false;btn.textContent='Place order'}
+});
+$('done').addEventListener('click',()=>{try{parent.postMessage({stmCheckout:'closed'},location.origin)}catch{}location.href='/'});
+})();
+</script></body></html>
