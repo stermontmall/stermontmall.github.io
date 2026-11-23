@@ -21,7 +21,7 @@ const rewriteBody = html => {
     const match = href.match(/^(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/p\/([^/?#]+)\.html(?:[?#].*)?$/i);
     if (!match) return all;
     let slug = match[1]; try { slug = decodeURIComponent(slug); } catch {}
-    return `<a${before}href=${quote}${'/p/' + encodeURIComponent(slug) + '.html'}${quote}${after}>`;
+    return `<a${before}href=${quote}${shellProductLink(slug)}${quote}${after}>`;
   });
   body = body.replace(/<!-- stm-preserved-(\d+) -->/g, (_m, i) => preserved[Number(i)]);
   return head.join('') + body;
