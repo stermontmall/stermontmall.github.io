@@ -1,3 +1,18 @@
+## 2026-11-23 16:25 (Africa/Nairobi) — Product link "no longer available": stale snapshot (branch `wip-product-link-snapshot`)
+
+### Found
+- Neon is correct: view `storefront_products` has 153 rows = 153 active products; all have an active category, stock > 0, a valid slug and an image; role `anonymous` has SELECT on the view and `categories` (policy `categories_public_read`).
+- `catalog-snapshot.json` (the fallback app.js uses whenever the browser cannot read Neon) had only 136 products. The 17 newest (nets, aerator, test strips, created 2026-11-23 15:54) were missing, so `openDeepLink` showed "That product is no longer available" for them whenever the live Neon read failed. `/p/<slug>.html` fallback cannot help: pages are not rebuilt (product-pages.yml fails).
+- NOT found / not verified: why the live browser read fails (sandbox proxy blocks the Neon REST host, so CORS/origin could not be tested here). Neon Data API CORS allows only https://stermontarcade.co.ke (not www., not stermontmall.github.io).
+
+### Done
+- catalog-snapshot.json: added the 17 missing products (153 total, same shape as the others).
+- mobile-shell/app.js v=52: when the snapshot is in use and the slug is not in it, the toast now says "Could not load the latest products. Check your connection and reload this page." instead of "no longer available".
+
+### Next
+1. Merge PR, hard-reload, open `/?product=happa-net-30m-x-1m`. If it still shows the new "Could not load" message, the live Neon read is failing: open the browser console, read `window.STM_LAST_ERROR` and check the Neon Data API allowed origins.
+2. The snapshot goes stale after every product post: regenerate it (SQL on `storefront_products` / `categories`) or fix the live read.
+
 ## 2026-11-23 13:00 (Africa/Nairobi) — Shell falls back to catalog-snapshot.json when Neon is unreachable (branch `wip-neon-diag`)
 
 Home page still showed no Neon products after #1067/#1069. Headless test (stubbed Neon) renders fine, so the failure is the real browser->Neon request. app.js v=50: tries Neon first; on any failure loads same-site `/catalog-snapshot.json` (136 active products + 93 categories exported from Neon 2026-11-23) so the shop is never empty; the real error is shown/logged (`window.STM_LAST_ERROR`). Verified headless with Neon blocked: 8 real cards render.

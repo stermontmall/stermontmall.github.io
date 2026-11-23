@@ -107,6 +107,7 @@ function buildCatalog(rows, cats, names) {
       subs: cats.filter(s => s.parent_id === c.id && subHave.has(c.slug + '|' + s.name)).sort(byOrder).map(s => s.name) }));
 }
 let catalogP = null;
+let usingSnapshot = false;   // true when Neon could not be read and PRODUCTS came from the (possibly older) same-site catalog-snapshot.json
 let fullCatalog = false;   // true once the WHOLE catalog is in PRODUCTS (the product link fast path in section 9b must never overwrite it)
 function loadCatalog() {
   if (!catalogP) {
@@ -115,8 +116,8 @@ function loadCatalog() {
     const live = Promise.all([apiAll('storefront_products?select=' + PRODUCT_COLS + '&order=id.asc').then(r => r.map(withCover)), api(CAT_Q)]);
     const snap = () => fetch('/catalog-snapshot.json').then(r => { if (!r.ok) throw new Error('snapshot HTTP ' + r.status); return r.json(); })
       .then(d => [d.products.map(withCover), d.categories]);
-    catalogP = live.catch(e => { console.warn('Neon unavailable, using catalog-snapshot.json:', e); window.STM_LAST_ERROR = String(e && e.message || e); return snap().catch(() => { throw e; }); })
-      .then(async ([rows, cats]) => { buildCatalog(rows, cats, await names); fullCatalog = true; })
+    catalogP = live.catch(e => { console.warn('Neon unavailable, using catalog-snapshot.json:', e); window.STM_LAST_ERROR = String(e && e.message || e); usingSnapshot = true; return snap().catch(() => { throw e; }); })
+      .then(async ([rows, cats]) => { buildCatalog(rows, cats, await names); fullCatalog = true; if (!usingSnapshot) window.STM_LAST_ERROR = ''; })
       .catch(e => { catalogP = null; throw e; });  // a failed load can be retried
   }
   return catalogP;
@@ -765,7 +766,7 @@ function openProductDirect(id) {
 function openDeepLink(slug) {   // the full product page for a /?product=<slug> or direct /p/<slug>.html address
   const hit = x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug);   // /p/<id>.html pages are named by the row id, which differs from the slug on some products
   const p = PRODUCTS.find(hit);
-  if (!p) { toast('That product is no longer available'); return; }
+  if (!p) { toast(usingSnapshot ? 'Could not load the latest products. Check your connection and reload this page.' : 'That product is no longer available'); return; }   // a snapshot can be older than the shop: never call a product gone just because it is missing from it
   let hashSize = '';
   try { hashSize = decodeURIComponent(location.hash.replace(/^#/, '')); } catch { hashSize = location.hash.replace(/^#/, ''); }
   const chosen = hashSize || slug;
