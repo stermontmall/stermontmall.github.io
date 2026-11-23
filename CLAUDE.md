@@ -106,7 +106,7 @@ Write a **unique, non-templated 800+ word SEO product guide** for every item tai
 - **Key Features, Technical Specs & Pack Details (150+ words)**
 - **Practical Applications & Usage Guide in Kenya (200+ words)**
 - **Buying & Pack-Size Comparison Guide (150+ words)** with 2–3 natural internal links to relevant categories, guides, or `/services/` pages on `stermontarcade.co.ke`.
-- **Kenyan Ordering, Pickup & Delivery Block (80+ words):** M-Pesa checkout, pickup at Sarit Centre (Westlands, Nairobi), delivery to all 47 counties, and WhatsApp `+254 748 888 230`.
+- **Kenyan Ordering, Pickup & Delivery Block (80+ words):** M-Pesa checkout, pickup at Sarit Centre (Westlands, Nairobi), delivery to all 47 counties, and WhatsApp `+254 789 514 060`.
 - **4 Buyer-Focused FAQs (150+ words)** synced 1:1 with `FAQPage` JSON-LD alongside valid `Product` / `ProductGroup` JSON-LD (`priceCurrency: "KES"`, exact numeric `price`, `https://schema.org`, and 1-year `priceValidUntil`).
 
 #### 9. FINAL LIVE SYNC & SINGLE SUMMARY TABLE
@@ -122,7 +122,7 @@ Required buyer-guide sections, in this order where relevant:
 3. Where & How to Use in Kenya (practical context and label-compliant steps; never invent pesticide rates or authorised uses).
 4. Safety, Storage & Handling Guidelines (PPE, storage, first aid and disposal only from authoritative label/regulatory guidance).
 5. Buying & Pack-Size Guide (pack comparison and 2–3 natural internal links to relevant category or `/services/` pages).
-6. Delivery across Kenya & Nairobi Pickup (M-Pesa checkout, pickup coordination at Sarit Centre Westlands, delivery across all 47 counties, WhatsApp +254 748 888 230; do not imply walk-in availability without confirmation).
+6. Delivery across Kenya & Nairobi Pickup (M-Pesa checkout, pickup coordination at Sarit Centre Westlands, delivery across all 47 counties, WhatsApp +254 789 514 060; do not imply walk-in availability without confirmation).
 7. Frequently Asked Questions (exactly four buyer Q&As for product guides; each question and answer must be separately rendered and synchronised 1:1 with Product FAQPage JSON-LD when FAQ structured data is emitted).
 
 Use only verified product-specific facts. Keep any additional source, pricing, registration, listing-status or disclaimer notes under clearly named subsections. Do not fabricate content or pad word counts: the 800+ word target applies to complete, useful, verified buyer guides, and unresolved facts must be stated as unverified rather than guessed. Preserve exact pack-size identity for every SKU.
@@ -142,6 +142,6 @@ Store each section title as a Markdown `## Heading` on its own line, followed by
 
 Under section 7, include exactly four detailed buyer questions and answers. Product FAQPage JSON-LD must match those four authored pairs 1:1.
 
-Use paragraphs of no more than 2–3 sentences and real bullet lists for verified specifications/checklists. Include 2–3 relevant internal links to category pages, commercial buying guides, or `/services/` pages. Delivery copy may state M-Pesa checkout, coordinated pickup at Sarit Centre Westlands, delivery across all 47 counties subject to stock/courier coverage, and WhatsApp +254 748 888 230.
+Use paragraphs of no more than 2–3 sentences and real bullet lists for verified specifications/checklists. Include 2–3 relevant internal links to category pages, commercial buying guides, or `/services/` pages. Delivery copy may state M-Pesa checkout, coordinated pickup at Sarit Centre Westlands, delivery across all 47 counties subject to stock/courier coverage, and WhatsApp +254 789 514 060.
 
 Maintain 800+ useful words only where supported by verified sources; never pad or invent pesticide dilution rates, approved uses, PPE, label instructions, registration, efficacy, warranty or safety claims. For pesticide products, the current approved Kenyan label takes precedence. Never publish a wall of plain text.

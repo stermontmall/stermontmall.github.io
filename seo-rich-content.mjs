@@ -8,7 +8,7 @@
 // Safe by design: every page is wrapped in try/catch, a page that already has the marker is skipped. To switch it off, delete the import line in seo-overrides.mjs.
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 
-const WA = '254748888230', PHONE = '+254 748 888 230';
+const WA = '254789514060', PHONE = '+254 789 514 060';
 const MARK = '<!--stm-rich-->';
 const PCPB = new Set(['pest-control-fumigation', 'bed-bug-killers', 'cockroach-ant-killers', 'mosquito-fly-control', 'rodent-control', 'termite-control', 'fumigation-chemicals',
   'agrochemicals', 'herbicides', 'fungicides', 'crop-insecticides', 'adjuvants-growth-regulators']);

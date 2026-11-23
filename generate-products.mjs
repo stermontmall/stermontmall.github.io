@@ -32,7 +32,7 @@ import { renderHomeGridFallback } from './home-grid-ssr.mjs';
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
 const KEY = 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7';
-const WHATSAPP = '254748888230';
+const WHATSAPP = '254789514060';
 const BRAND = 'Stermont Arcade';
 // Hand-written, model-specific buying guidance. Only add entries after checking the live catalogue description.
 const PRODUCT_CONTENT = existsSync('product-content.json') ? JSON.parse(readFileSync('product-content.json', 'utf8')) : {};
@@ -49,7 +49,7 @@ const STORE_LD = {
   '@id': `${SITE}/#store`,
   name: BRAND,
   url: SITE + '/',
-  telephone: '+254748888230',
+  telephone: '+254789514060',
   email: 'support@stermontarcade.co.ke',
   address: {
     '@type': 'PostalAddress',
@@ -202,7 +202,7 @@ const shell = ({ title, desc, path, og, body, ld, ogType = 'website', extra = ''
 ${path.startsWith('/p/') && og ? '<link rel="preload" as="image" href="' + esc(og) + '" fetchpriority="high">' : ''}
 <meta name="theme-color" content="#7c3aed"><style>${CSS}</style>${ld || ''}</head><body>
 <header><a href="${SITE}/">${BRAND}</a></header><main>${normalizeCustomerProductLinks(body)}</main>
-<footer>${BRAND} · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 748 888 230</a>
+<footer>${BRAND} · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href="https://wa.me/${WHATSAPP}">WhatsApp +254 789 514 060</a>
 · <a href="${SITE}/c/">All categories</a> · <a href="${SITE}/about.html">About</a> · <a href="${SITE}/shipping.html">Shipping</a> · <a href="${SITE}/returns-warranty.html">Returns &amp; Warranty</a> · <a href="${SITE}/privacy-policy.html">Privacy</a> · <a href="${SITE}/terms.html">Terms</a></footer><script src="/product-links.js" defer></script><script src="/img-protect.js" defer></script><script src="/analytics.js" defer></script></body></html>`;
 
 // Tidy names: drop any "| Stermont Arcade Kenya" / "| Buy in Kenya" tail (the page title adds its own wording).

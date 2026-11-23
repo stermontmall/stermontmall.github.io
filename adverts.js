@@ -2,7 +2,7 @@
    Reads adverts.json (written by advert-poster.html) and shows each advert as a slide at the top of the home page.
    Loaded from index.html right after advert-banner.js. */
 (function () {
-  var D = document, WA = '254748888230', MAX = 5;
+  var D = document, WA = '254789514060', MAX = 5;
   var CSS = '.slide.adx{color:#fff;padding:0;min-height:230px;flex-direction:row;align-items:stretch;justify-content:flex-start;border:2px solid rgba(200,243,29,.55);box-shadow:0 8px 24px rgba(91,33,182,.35);cursor:pointer;text-align:left}' +
     '.slide.adx .adx-t{flex:1 1 54%;min-width:0;padding:1.1rem 0 1.1rem 1.1rem;display:flex;flex-direction:column;justify-content:center;gap:.35rem}' +
     '.slide.adx .adx-b{align-self:flex-start;background:#c8f31d;color:#1a2e05;font-size:.7rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:.25rem .65rem}' +

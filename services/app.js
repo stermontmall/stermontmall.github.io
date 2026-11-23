@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 const $ = (s, r = document) => r.querySelector(s);
-const WA = '254748888230';
+const WA = '254789514060';
 
 const S = [
 { c: 'Pest control and fumigation', items: [
