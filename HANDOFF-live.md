@@ -706,3 +706,11 @@ The Build product pages GitHub Actions workflow is scheduled every 30 minutes; t
 - Findings: (1) trigger `trg_2_posting_rules` forces `active=false`, reprices from `cost` via `price_4tier`, and requires cost > 0 on INSERT, so a restore of published prices needs an owner-approved bypass; (2) 1,374 image URLs point at the deleted Supabase storage (dead); 14+14 point at stermontarcade.co.ke/product-photos; `product-photos/` has 170 files; (3) no cost data in the pages.
 - Blocked: waiting for owner decision on how to bypass the pricing trigger and whether to load as inactive.
 - Next: after the decision, load in batches via `run_sql_transaction`, verify counts, update this file after each batch.
+
+## 2026-11-23 13:05 Africa/Nairobi — Claude: Neon catalogue restore ready (branch `wip-restore-catalog-neon`, NOT merged)
+- Owner decision (chat): bypass the posting trigger, go live where a working photo exists.
+- Done: `scripts/restore-catalog-from-pages.mjs` + `.github/workflows/restore-catalog-neon.yml` (manual, confirm = RESTORE; empty = dry run). The sandbox cannot reach Neon over the network, so the load has to run in GitHub Actions using the existing `NEON_DATABASE_URL` secret.
+- Dry run here: 2059 pages, 1,590 products restored (1,454 inactive, 136 active: photo hosted on stermontarcade.co.ke/product-photos and present in repo). 36 ProductGroup pages and other pages without price/sku are skipped (469 files).
+- Tested on Neon inside a rolled-back transaction: triggers off/on works, page price 699 kept (not rounded to 700), stock 1000, low_at 20, code kept, all 5 triggers re-enabled, no rows left behind.
+- Not restored: cost (not in pages, stays NULL), dead Supabase image URLs (1,374 products stay inactive until photos are re-uploaded), third-party hotlinks.
+- Next: merge this branch to main (workflow must be on main to appear in Actions), run the workflow once with confirm empty, then once with RESTORE, then check `select count(*), count(*) filter (where active) from public.products` = 22 + 1,590 and 136 active.
