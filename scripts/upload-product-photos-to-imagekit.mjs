@@ -13,6 +13,7 @@
 // delivered as WebP through an ImageKit transformation URL; always save "browser_url" as the product image.
 // Needs the GitHub secret IMAGEKIT_PRIVATE_KEY. It never deletes anything and never touches the database.
 import { appendFileSync } from 'node:fs';
+import { extractJsonImageCandidates } from './imagekit-source-parser.mjs';
 
 const IK_UPLOAD = 'https://upload.imagekit.io/api/v1/files/upload';
 const IK_ENDPOINT = 'https://ik.imagekit.io/w6hxfnwmw';
@@ -98,7 +99,13 @@ async function resolveSources(src) {
   const type = (r.headers.get('content-type') || '').toLowerCase();
   if (!r.ok) throw new Error(`could not open the address (HTTP ${r.status})`);
   if (type.startsWith('image/')) return { list: [r.url], from: 'direct' };
-  if (!/html|xml/.test(type)) throw new Error(`address is not an image or a web page (${type || 'unknown type'})`);
+  if (type.includes('json')) {
+    const data = await r.json();
+    const list = extractJsonImageCandidates(data, r.url).slice(0, 6);
+    if (!list.length) throw new Error('JSON response contains no usable product image field; send the supplier product page or a direct image address');
+    return { list, from: 'json-api' };
+  }
+  if (!/html|xml/.test(type)) throw new Error(`address is not an image, web page or JSON image feed (${type || 'unknown type'})`);
   const html = await r.text();
   const list = extractImageCandidates(html, r.url).slice(0, 6);
   if (!list.length) throw new Error('no product photo found on that page; send a direct image address instead');
