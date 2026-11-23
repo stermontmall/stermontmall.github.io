@@ -50,7 +50,16 @@ DEALS_EXPECTED = 19
 
 def serve(route, body, ctype='application/json'):
     time.sleep(0.4)   # a real network round trip, so the skeleton state is observable
-    route.fulfill(status=200, content_type=ctype, body=body if isinstance(body, (bytes, str)) else json.dumps(body), headers={'access-control-allow-origin': '*'})
+    headers = {
+        'access-control-allow-origin': URL.rstrip('/'),
+        'access-control-allow-credentials': 'true',
+        'access-control-allow-methods': 'GET, POST, OPTIONS',
+        'access-control-allow-headers': 'authorization, content-type, accept, apikey, x-client-info',
+    }
+    if route.request.method == 'OPTIONS':
+        route.fulfill(status=204, body='', headers=headers)
+    else:
+        route.fulfill(status=200, content_type=ctype, body=body if isinstance(body, (bytes, str)) else json.dumps(body), headers=headers)
 def on_rest(route):
     if FAIL[0]: return route.fulfill(status=402, body='exceed_cached_egress_quota', headers={'access-control-allow-origin': '*'})
     url = route.request.url
@@ -171,7 +180,15 @@ with sync_playwright() as p:
     # A parked request leaves the shell waiting on the network while the test thread stays free. times=1 means every later request
     # (and every other test on this page) falls through to mock_network's normal handler; the shell fetches the catalogue only once per load.
     parked = []
-    pg.route('**/rest/v1/storefront_products*', lambda route: parked.append(route), times=1)
+    parked_once = [False]
+    def park_first_catalog_get(route):
+        # Neon Authenticated Data API sends an OPTIONS preflight before its GET.
+        # Continue the preflight and hold only the first actual catalogue GET.
+        if route.request.method != 'GET' or parked_once[0]:
+            return route.continue_()
+        parked_once[0] = True
+        parked.append(route)
+    pg.route('**/*storefront_products*', park_first_catalog_get)
     pg.goto(URL, wait_until='domcontentloaded')
     for _ in range(200):   # up to ~10 s for the shell to ask for the catalogue; it is then held, so no hydration can have happened yet
         if parked: break
