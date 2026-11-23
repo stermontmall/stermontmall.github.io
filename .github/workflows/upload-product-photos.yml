@@ -35,6 +35,9 @@ jobs:
         with:
           node-version: 24
 
+      - name: Test ImageKit source parser
+        run: node --test scripts/imagekit-source-parser.test.mjs
+
       - name: Upload photos to ImageKit and verify them
         env:
           PHOTOS: ${{ inputs.photos }}
