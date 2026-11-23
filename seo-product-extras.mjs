@@ -76,7 +76,12 @@ const FORM = { EC: 'Emulsifiable concentrate (EC)', SL: 'Soluble liquid (SL)', S
 const catName = slug => {
   try { const h = readFileSync(`c/${slug}.html`, 'utf8'); const m = h.match(/<h1>([\s\S]*?)<\/h1>/); return m ? unesc(m[1].replace(/<[^>]+>/g, '').trim()).replace(/\s+in Kenya$/i, '') : HUB_NAME[slug] || slug; } catch { return HUB_NAME[slug] || slug; }
 };
-const hasCat = slug => existsSync(`c/${slug}.html`);
+const hasCat = slug => {
+  try {
+    const h = readFileSync(`c/${slug}.html`, 'utf8');
+    return /<li(?:\\s[^>]*)?><a href="(?:https:\\/\\/stermontarcade\\.co\\.ke)?\\/p\\/[^\"]+\\.html"[^>]*>\\s*<img/i.test(h);
+  } catch { return false; }
+};
 const hasBlog = href => existsSync(href.replace(/^\//, ''));
 
 const isHead = s => /^[A-Z][A-Z0-9 &'’,\/()%.+:\-]{2,70}$/.test(s) && (s.match(/[A-Z]/g) || []).length >= 3;
