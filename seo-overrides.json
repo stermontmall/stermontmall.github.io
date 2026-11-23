@@ -2839,5 +2839,45 @@
   },
   "nilzan-plus-drench-1-litre": {
     "desc": "Nilzan Plus Drench 1L costs {price}. Confirm species, dose and withdrawal periods with a vet; pay by M-Pesa for delivery across Kenya."
+  },
+  "brilliant-liquid-foliar-fertilizer-1l": {
+    "title": "Brilliant Fertilizer 1L Price in Kenya | {price}",
+    "desc": "Buy Brilliant Fertilizer 1L in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
+  },
+  "agrofeed-plus-foliar-fertilizer-1l": {
+    "title": "Agrofeed Plus 1L Price in Kenya | {price}",
+    "desc": "Buy Agrofeed Plus 1L in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
+  },
+  "maxigrow-high-n-foliar-fertilizer-1l": {
+    "title": "Maxigrow High N 1L Price in Kenya | {price}",
+    "desc": "Buy Maxigrow High N 1L in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
+  },
+  "maxigrow-calmag-liquid-foliar-feed-1l": {
+    "title": "Maxigrow Calmag 1L Price in Kenya | {price}",
+    "desc": "Buy Maxigrow Calmag 1L in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
+  },
+  "agrofeed-plus-foliar-fertilizer-500ml": {
+    "title": "Agrofeed Plus 500ml Price in Kenya | {price}",
+    "desc": "Buy Agrofeed Plus 500ml in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
+  },
+  "maxigrow-high-k-foliar-fertilizer-200ml": {
+    "title": "Maxigrow High K 200ml Price in Kenya | {price}",
+    "desc": "Buy Maxigrow High K 200ml in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
+  },
+  "maxigrow-high-p-foliar-fertilizer-500ml": {
+    "title": "Maxigrow High P 500ml Price in Kenya | {price}",
+    "desc": "Buy Maxigrow High P 500ml in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
+  },
+  "farm-booster-foliar-fertilizer-1l": {
+    "title": "Farm Booster 1L Price in Kenya | {price}",
+    "desc": "Buy Farm Booster 1L in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
+  },
+  "omex-foliar-feed-fertilizer-1l": {
+    "title": "Omex Foliar Feed 1L Price in Kenya | {price}",
+    "desc": "Buy Omex Foliar Feed 1L in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
+  },
+  "maxigrow-high-p-foliar-fertilizer-200ml": {
+    "title": "Maxigrow High P 200ml Price in Kenya | {price}",
+    "desc": "Buy Maxigrow High P 200ml in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
   }
 }
