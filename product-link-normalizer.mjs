@@ -1,5 +1,5 @@
 // Shared final pass for generated customer-facing product links.
-// Rewrites visible /p/<slug>.html anchors to the mobile shell while preserving
+// Normalizes visible /p/<slug>.html anchors to the canonical product URL helper while preserving
 // canonical/OG metadata, JSON-LD, breadcrumbs and SEO-only crawl-link blocks.
 import fs from 'node:fs';
 import path from 'node:path';
