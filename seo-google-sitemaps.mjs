@@ -32,7 +32,10 @@ const outcomes = [];
 for (const sm of SITEMAPS) {
   const url = `https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(property)}/sitemaps/${encodeURIComponent(sm)}`;
   const r = await fetch(url, { method: 'PUT', headers: { authorization: `Bearer ${tok.access_token}`, 'content-length': '0' } });
-  console.log(r.ok ? `Submitted ${sm}` : `FAILED ${sm}: ${r.status} ${await r.text()}`);
+  const text = await r.text();
+  console.log(r.ok ? `Submitted ${sm}` : `FAILED ${sm}: ${r.status} ${text}`);
+  // neon-automation-sync.mjs (sitemap mode) reads exactly these three fields.
+  outcomes.push({ sitemap_url: sm, http_status: r.status, response_text: text.slice(0, 500) });
   if (!r.ok) failed++;
 }
 writeFileSync('google-sitemap-results.json', JSON.stringify(outcomes, null, 2) + '\n');
