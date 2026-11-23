@@ -1,3 +1,4 @@
+
 STERMONT ARCADE — FULLY AUTONOMOUS PRODUCT DISCOVERY & LIVE PUBLISHING
 PERMANENT STANDING INSTRUCTION — NEON PUBLISHING RULES VERSION 6 (PHOTO QUEUE PIPELINE)
 
@@ -26,7 +27,9 @@ CRITICAL EXECUTION MANDATE (NO STOPPING / NO QUESTIONS):
 
 5. VERSION 6 IMAGEKIT PHOTO PIPELINE
 - Source genuine, clear product photos matching the exact brand, product, and pack size from reliable manufacturers, distributors, or trusted Kenyan e-commerce sites (Jumia, Kilimall, Agropests, AgriGuard, ProCapital, etc.).
-- Accept only JPG, JPEG, PNG, WebP and AVIF images with a minimum dimension of 200 x 200 pixels.
+- Accept genuine JPG, JPEG, PNG, WebP and AVIF source images with a minimum dimension of 200 x 200 pixels. Non-JPEG source URLs are allowed; do not reject a source merely because its URL extension or source format is not .jpg.
+- AUTOMATIC MIME VALIDATION + JPEG NORMALIZATION: The GitHub Action .github/workflows/upload-product-photos.yml installs sharp and runs scripts/upload-product-photos-to-imagekit.mjs. The uploader downloads each candidate with a browser User-Agent and Accept: image/*, checks the HTTP response and image/* Content-Type (rejecting text/html and other non-image responses), decodes/validates the actual image bytes with sharp, and converts every supported valid raster source (JPG, JPEG, PNG, WebP, AVIF) to a standard .jpg JPEG binary before uploading to ImageKit. It verifies the uploaded ImageKit browser_url returns HTTP 200 and image/jpeg. Never reject a valid image only because the source is not JPEG; never manually convert files. If a source is blocked, returns HTML, is corrupt, or fails the minimum image checks, automatically try another image candidate/vendor URL.
+- This conversion is automatic in the GitHub uploader; operators must not perform manual format conversion.
 - Primary Upload Path: Commit one "file-name|https://image-url" line per product to GitHub data/photo-queue.txt on main. This push triggers .github/workflows/upload-product-photos.yml. Read data/photo-results.json after the workflow completes and use only successful, verified ImageKit browser_url values.
 - Creative Barrier Bypass: If an image URL fails or blocks hotlinking, immediately grab an alternate image URL from another trusted retailer/manufacturer and re-dispatch, or process/convert the image in your execution environment so ImageKit ingests it cleanly.
 - Store the verified HTTPS browser_url from ImageKit in Neon's images field alongside alt_text, source_page, and retrieval_date.
