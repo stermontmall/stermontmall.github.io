@@ -19,7 +19,7 @@ on:
       - 'admin-bulk.js'
       - 'admin-photo-ai.js'
       - 'admin-publishing-rules.js'
-      - 'PUBLISHING.md'
+      - 'PUBLISHING_RULES.md'
       - 'CLAUDE.md'
       - 'AGENTS.md'
       - 'rules/publishing-rule.json'
