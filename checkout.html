@@ -84,6 +84,6 @@ $('form').addEventListener('submit',async e=>{
   $('form').classList.add('hidden');$('ref').textContent=data.ref||orderRef;$('track').href='/track.html?ref='+encodeURIComponent(data.ref||orderRef);$('success').classList.remove('hidden');
  }catch(err){$('error').textContent=err.message||'Could not place order. Check your connection and try again.';btn.disabled=false;btn.textContent='Place order'}
 });
-$('done').addEventListener('click',()=>{try{parent.postMessage({stmCheckout:'closed'},location.origin)}catch{}location.href='/'});
+$('done').addEventListener('click',()=>{if(window.parent!==window){try{parent.postMessage({stmCheckout:'closed'},location.origin)}catch{}}else location.href='/'});
 })();
 </script><script src="/analytics.js" defer></script></body></html>
