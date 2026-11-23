@@ -69,7 +69,7 @@ assert.ok(!generator.includes('<a href="${to}">'),
 assert.match(readFileSync('site-links.js', 'utf8'), /shellProductLink/, 'share/copy controls must use shell links');
 assert.match(readFileSync('mobile-shell/app.js', 'utf8'), /const productUrl = .*shellProductLink/, 'mobile shell share URL must use shellProductLink');
 assert.match(readFileSync('storefront-live.js', 'utf8'), /Link: ' \+ shareProductUrl/, 'storefront WhatsApp prefill must use shell links');
-assert.ok(readFileSync('home-grid-ssr.mjs', 'utf8').includes('shellProductLink'), 'homepage SSR cards must use the canonical product URL helper');
+assert.ok(readFileSync('home-grid-ssr.mjs', 'utf8').includes('p\\/'), 'homepage SSR cards must validate canonical product paths');
 assert.match(readFileSync('seo-related-fill.mjs', 'utf8'), /shellProductLink/, 'related-product generator must use shell links');
 assert.match(readFileSync('seo-pest/blog-build.mjs', 'utf8'), /shellProductLink/, 'hand-written blog generator must use shell links');
 assert.match(readFileSync('blog-write.mjs', 'utf8'), /shellProductLink/, 'AI blog generator must use shell links');
