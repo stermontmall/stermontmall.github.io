@@ -1,3 +1,16 @@
+## 2026-11-23 13:40 (Africa/Nairobi) — Indexing guard test updated for ImageKit (branch `wip-indexing-guard-imagekit`, NOT merged)
+
+### Done
+- `seo-indexing-guard.test.mjs`: removed the Supabase-era asserts (`SUPABASE_IMAGE_TRANSFORMS`, `storageImageTransformsEnabled = probe.ok`, `quality', '75'`). The generator now uses `imageKitUrl` via `optimizedImageUrl(source, width)` (imagekit-url.js). The test now asserts the ImageKit require, the `optimizedImageUrl` definition and the 320/900 widths. Canonical, robots, noindex and sitemap asserts are unchanged. Commit 66bbae5.
+
+### Not verified
+- Not run (no network/clone in this session). Re-run: `node seo-indexing-guard.test.mjs`.
+
+### Next
+1. Open a PR, run `node seo-indexing-guard.test.mjs`, merge.
+2. Re-dispatch the rebuild: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`
+3. Then: broken Supabase photos on 4 static home cards; Neon Data API read from the browser (CORS/origin); run `node link-check.mjs` and `node seo-check.mjs`.
+
 ## 2026-11-23 13:00 (Africa/Nairobi) — Shell falls back to catalog-snapshot.json when Neon is unreachable (branch `wip-neon-diag`)
 
 Home page still showed no Neon products after #1067/#1069. Headless test (stubbed Neon) renders fine, so the failure is the real browser->Neon request. app.js v=50: tries Neon first; on any failure loads same-site `/catalog-snapshot.json` (136 active products + 93 categories exported from Neon 2026-11-23) so the shop is never empty; the real error is shown/logged (`window.STM_LAST_ERROR`). Verified headless with Neon blocked: 8 real cards render.
@@ -43,4 +56,4 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 ## 2026-11-23 14:20 (Africa/Nairobi) - product-pages rebuild failed (not caused by number change)
 - Blocked: `product-pages.yml` runs #866-#871 all fail since 09:30 today (last success #849, 2026-11-21) at step "Test Google indexing safeguards": `node seo-indexing-guard.test.mjs` line 38 expects `imageTransformsRequested = process.env.SUPABASE_IMAGE_TRANSFORMS === 'true'` in the generator; that Supabase-era string is gone after the Neon migration. Fails identically before the WhatsApp change.
 - Impact: none for the number. PR #1076 already replaced it inside the generated pages in `p/`, `c/`, `guides/`, `blog/`, `services/`, `pest-control/`; Neon rows updated. A rebuild from Neon would also produce the new number.
-- Next: owner/Neon-migration session updates `seo-indexing-guard.test.mjs` (or the generator) to the Neon-era code, then re-dispatch: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+- Next: owner/Neon-migration session updates `seo-indexing-guard.test.mjs` (or the generator), then re-dispatch: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
