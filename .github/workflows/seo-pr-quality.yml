@@ -94,10 +94,12 @@ jobs:
       # Reset per-test tab state when asserting the default landing view.
       - name: Nothing may go through /classic.html (guard)
         run: node no-classic-hop.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02-no-classic-hop.log"
-      - name: No human-facing static product share links (guard)
+      - name: Canonical static product links guard
         run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/02b-no-static-share-links.log"
       - name: Test server-rendered homepage product cards
         run: node home-grid-ssr.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-home-grid-ssr.log"
+      - name: Test legacy product URL fallback behaviour
+        run: node not-found-fallback.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03b-not-found-fallback.log"
       - name: Prepare generated product/category fixtures with the production mobile-shell routing
         run: |
           node seo-shell-chrome.mjs
@@ -125,6 +127,12 @@ jobs:
             node --check seo-check.mjs
             node --check data-health.mjs
             node --check blog-write.mjs
+            node --check seo-pest/blog-build.mjs
+            node --check seo-product-extras.mjs
+            node --check product-link-normalizer.mjs
+            node --check home-grid-ssr.mjs
+            node --check no-static-share-links.test.mjs
+            node --check not-found-fallback.test.mjs
             node --check generate-products.mjs
             node --check kili-pages.js
             node --check recent-orders.js
@@ -193,7 +201,7 @@ jobs:
       - name: Normalize all generated customer-facing product links
         if: steps.live_catalogue.outputs.required == 'true'
         run: node product-link-normalizer.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-normalize-generated-links.log"
-      - name: Verify generated pages contain no static human-facing product links
+      - name: Verify generated pages use canonical static product links
         if: steps.live_catalogue.outputs.required == 'true'
         env:
           STM_CHECK_GENERATED_PRODUCT_PAGES: '1'
