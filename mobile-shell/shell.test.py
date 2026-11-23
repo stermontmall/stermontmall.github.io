@@ -151,7 +151,7 @@ def mock_network(ctx):
         # Storage bucket counts (product-images, service-media, ...): the shell wraps
         # every Supabase photo, and an unmocked one would abort and fail the
         # "unexpected failed requests" check at the end of this script.
-        if 'supabase.co/storage/v1/object/public/' in url:
+        if 'supabase.co/storage/v1/object/public/' in url or 'https://stermontarcade.co.ke/product-photos/' in url:
             return route.fulfill(status=200, content_type='image/png', body=PNG)
         return route.abort()
     ctx.route('https://ik.imagekit.io/**', imagekit_proxy)
@@ -186,7 +186,9 @@ with sync_playwright() as p:
     # Track failed requests separately so the deliberately broken photo fixture is excluded
     # by its actual request URL, while every unexpected failed resource still fails the test.
     failed_requests = []
+    script_404s = []
     pg.on('requestfailed', lambda r: failed_requests.append(r.url) if 'broken.jpg' not in r.url else None)
+    pg.on('response', lambda r: script_404s.append(r.url) if r.status == 404 and r.request.resource_type == 'script' else None)
     pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and not m.text.startswith('Failed to load resource:') else None)
     pg.add_init_script("window.__sawSkeleton = false; new MutationObserver(() => { if (document.querySelector('#grid .card[aria-hidden=\"true\"]')) window.__sawSkeleton = true; }).observe(document, { childList: true, subtree: true });")
     # Park (do not sleep on) the FIRST live catalogue request so the pre-hydration assertion is deterministic.
@@ -770,7 +772,7 @@ with sync_playwright() as p:
 
     co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
     check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
-    check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'failed_requests': failed_requests[:3]})
+    check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'script_404s': script_404s[:5], 'failed_requests': failed_requests[:5]})
     b.close()
 
 fails = [n for n, ok in results if not ok]
