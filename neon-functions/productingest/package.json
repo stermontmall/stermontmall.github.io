@@ -1,0 +1,10 @@
+{
+  "name": "stermont-productingest",
+  "private": true,
+  "type": "module",
+  "description": "Server-side product photo ingestion for the Stermont publish-products rule",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.700.0",
+    "pg": "^8.13.0"
+  }
+}
