@@ -119,7 +119,6 @@ jobs:
             node --check generate-products.mjs
             node --check seo-shell-redirect.mjs
             node --check seo-shell-redirect.test.mjs
-            node --check catalog-v10.js
             node --check admin-bulk.js
             node --check admin-photo-ai.js
             node --check admin-publishing-rules.js
