@@ -1,6 +1,6 @@
 # Instructions for any Claude session on this repo
 
-> **PRECEDENCE (2026-11-22, owner-approved):** New products are posted to **Neon**, not Supabase. The governing rule is Neon `public.publishing_rules` key `publish_products` (currently version 6; mirror: `PUBLISH-PRODUCTS-RULE.md`). The admin tab `/admin.html#pricing-rules` now reads that Neon row. Where this file's Supabase-era text (800+ word descriptions, Supabase Storage photo upload, Supabase duplicate check) conflicts with `publish_products`, `publish_products` wins.
+> **PRODUCT PUBLISHING SOURCE OF TRUTH (Version 6):** Use Neon `stermont.public.publishing_rules` key `publish_products`; the exact repository mirror is `PUBLISHING_RULES.md`. Do not follow superseded product/photo instructions or Supabase publishing paths. Read the live Neon rule first for every publishing task.
 
 ## Product posting — mandatory
 
