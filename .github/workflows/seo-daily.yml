@@ -70,6 +70,14 @@ jobs:
         run: node seo-shell-redirect.mjs
       - name: Run technical SEO check against generated output
         run: node seo-check.mjs > seo-report.md
+      - name: Publish the report as an issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --search "SEO check in:title" --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Superseded by today's report." || true
+          done
+          gh issue create --title "Daily technical SEO check $(date +%F)" --body-file seo-report.md
       - name: Check Neon sync script syntax
         run: node --check neon-automation-sync.mjs
       - name: Install Neon database driver
@@ -82,11 +90,3 @@ jobs:
         env:
           NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
         run: node neon-automation-sync.mjs seo
-      - name: Publish the report as an issue
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          for n in $(gh issue list --state open --search "SEO check in:title" --json number --jq '.[].number'); do
-            gh issue close "$n" --comment "Superseded by today's report." || true
-          done
-          gh issue create --title "Daily technical SEO check $(date +%F)" --body-file seo-report.md
