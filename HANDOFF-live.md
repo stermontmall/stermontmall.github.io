@@ -714,3 +714,9 @@ The Build product pages GitHub Actions workflow is scheduled every 30 minutes; t
 - Tested on Neon inside a rolled-back transaction: triggers off/on works, page price 699 kept (not rounded to 700), stock 1000, low_at 20, code kept, all 5 triggers re-enabled, no rows left behind.
 - Not restored: cost (not in pages, stays NULL), dead Supabase image URLs (1,374 products stay inactive until photos are re-uploaded), third-party hotlinks.
 - Next: merge this branch to main (workflow must be on main to appear in Actions), run the workflow once with confirm empty, then once with RESTORE, then check `select count(*), count(*) filter (where active) from public.products` = 22 + 1,590 and 136 active.
+
+## 2026-11-23 13:40 Africa/Nairobi — Claude: Neon catalogue loaded; storefront-neon.html now shows Neon products (branch `wip-storefront-neon`, NOT merged)
+- Done: owner ran the restore workflow with RESTORE. Neon `public.products` = 1,612 rows, 136 active (all with photo on stermontarcade.co.ke/product-photos). `public.storefront_products` shows 136 rows; anonymous role can read it.
+- Done: `storefront-neon.html` now loads `storefront_products` + `categories` from the Neon Data API (anonymous, CORS allows only https://stermontarcade.co.ke), groups products by department tab, supports search, product links via `shellProductLink(slug)` (`/?product=<slug>`). Page is still noindex; index.html and generated pages untouched.
+- Tested: script syntax check plus simulated render with fake rows (cards, price format, links, empty/error states). NOT yet opened in a real browser, which needs the page on stermontarcade.co.ke because of CORS.
+- Next: merge to main, open https://stermontarcade.co.ke/storefront-neon.html on a phone and confirm 136 products show; then decide whether index.html generation should use this layout. Remaining Supabase removal: see HANDOFF-remove-supabase.md.
