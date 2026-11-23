@@ -1,5 +1,5 @@
-/* Canonical human-facing product URL helper.
- * Google-facing /p/<slug>.html URLs remain reserved for SEO documents only.
+/* Canonical public product URL helper.
+ * Product links use the indexable /p/<slug>.html page; that page hydrates the mobile shell in place.
  */
 (function (root, factory) {
   var helper = factory();
@@ -9,6 +9,6 @@
   return function shellProductLink(slug) {
     var value = String(slug == null ? '' : slug).trim();
     if (!value) return 'https://stermontarcade.co.ke/';
-    return 'https://stermontarcade.co.ke/?product=' + encodeURIComponent(value);
+    return 'https://stermontarcade.co.ke/p/' + encodeURIComponent(value) + '.html';
   };
 }));
