@@ -91,32 +91,53 @@ const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.imag
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
-  const cols = ['id,product_code,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
-                'id,product_code,created_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,product_code,created_at,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,product_code,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
-                'id,product_code,created_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
-                'id,product_code,created_at,name,price,old_price,unit,stock,images,description,categories(name,slug)',
-                'id,product_code,created_at,name,price,stock,images,description,categories(name,slug)'];
-  // Keep each REST response small enough for constrained hosted runners and retry transient
-  // gateway/rate-limit failures. The previous 1,000-row response could be several megabytes.
+  // The storefront now reads the live Neon catalogue. Keep this build on the same
+  // anonymous Neon Auth + Data API path used by mobile-shell/app.js; do not call
+  // the retired Supabase project.
+  const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
+  const NEON_AUTH = 'https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth';
+  const cols = ['id,product_code,created_at,updated_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
+                'id,product_code,created_at,updated_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,product_code,created_at,updated_at,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,product_code,created_at,updated_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
+                'id,product_code,created_at,updated_at,name,price,old_price,unit,variant_group,variant_label,stock,images,description,categories(name,slug)',
+                'id,product_code,created_at,updated_at,name,price,old_price,unit,stock,images,description,categories(name,slug)',
+                'id,product_code,created_at,updated_at,name,price,stock,images,description,categories(name,slug)'];
   const PAGE_SIZE = 200;
   const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
   let lastError = 'No request attempted';
+  let token = '';
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const response = await fetch(NEON_AUTH + '/token/anonymous', { signal: AbortSignal.timeout(30000) });
+      if (!response.ok) throw new Error(`Neon Auth HTTP ${response.status}: ${(await response.text()).slice(0, 250)}`);
+      const payload = await response.json();
+      if (typeof payload?.token !== 'string' || !payload.token) throw new Error('Neon Auth returned no anonymous token');
+      token = payload.token;
+      break;
+    } catch (error) {
+      lastError = String(error?.message || error).slice(0, 350);
+      if (attempt < 3) await pause(700 * attempt);
+    }
+  }
+  if (!token) throw new Error(`Could not obtain anonymous Neon Auth token: ${lastError}`);
+
   for (const c of cols) {
     const all = [];
     let offset = 0;
     let failed = false;
     while (true) {
-      const url = `${SB}/rest/v1/products?active=eq.true&select=${c}&order=created_at.asc&limit=${PAGE_SIZE}&offset=${offset}`;
+      const url = `${NEON_REST}products?active=eq.true&select=${encodeURIComponent(c)}&order=created_at.asc&limit=${PAGE_SIZE}&offset=${offset}`;
       let batch = null;
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          const r = await fetch(url, { headers: { apikey: KEY, accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
+          const r = await fetch(url, {
+            headers: { Authorization: 'Bearer ' + token, accept: 'application/json' },
+            signal: AbortSignal.timeout(30000)
+          });
           if (!r.ok) {
             const detail = (await r.text()).replace(/\\s+/g, ' ').slice(0, 350);
             lastError = `HTTP ${r.status} at offset ${offset}: ${detail || r.statusText}`;
-            // Authentication/permission failures affect every select shape; don't hide them by retrying variants.
             if (r.status === 401 || r.status === 403) throw new Error(lastError);
             if (![408, 425, 429, 500, 502, 503, 504].includes(r.status)) break;
             if (attempt < 3) await pause(700 * attempt);
@@ -141,11 +162,11 @@ async function getProducts() {
       offset += batch.length;
     }
     if (!failed) {
-      console.log(`Loaded ${all.length} active products from Supabase using ${PAGE_SIZE}-row pages.`);
+      console.log(`Loaded ${all.length} active products from Neon using ${PAGE_SIZE}-row pages.`);
       return fixProducts(all);
     }
   }
-  throw new Error(`Could not read products from Supabase after trying all compatible select shapes. Last API error: ${lastError}`);
+  throw new Error(`Could not read products from Neon after trying all compatible select shapes. Last API error: ${lastError}`);
 }
 
 function productContentHtml(p) {
