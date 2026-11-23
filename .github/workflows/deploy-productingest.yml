@@ -1,0 +1,69 @@
+name: Deploy productingest (Neon Function)
+
+# Deploys neon-functions/productingest to Neon without needing a terminal.
+# Runs when you merge changes to that folder, or by hand from the Actions tab (Run workflow).
+# Needs two repository secrets (Settings > Secrets and variables > Actions):
+#   NEON_API_KEY       a Neon API key from the Neon console
+#   INGEST_KEY_SHA256  the SHA-256 hash of your ingest key (64 characters), never the key itself
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "neon-functions/productingest/**"
+      - ".github/workflows/deploy-productingest.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-productingest
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+      INGEST_KEY_SHA256: ${{ secrets.INGEST_KEY_SHA256 }}
+      NEON_PROJECT_ID: restless-shape-79120240
+      NEON_BRANCH_ID: br-fancy-bird-bh01xcbs
+    steps:
+      - name: Check secrets
+        run: |
+          missing=""
+          [ -z "$NEON_API_KEY" ] && missing="$missing NEON_API_KEY"
+          [ -z "$INGEST_KEY_SHA256" ] && missing="$missing INGEST_KEY_SHA256"
+          if [ -n "$missing" ]; then
+            echo "::error::Add these repository secrets, then run this workflow again:$missing"
+            exit 1
+          fi
+          if ! printf '%s' "$INGEST_KEY_SHA256" | grep -Eq '^[0-9a-fA-F]{64}$'; then
+            echo "::error::INGEST_KEY_SHA256 must be 64 hex characters (the SHA-256 hash of your key, not the key)."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install function dependencies
+        run: npm install --omit=dev --no-audit --no-fund --prefix neon-functions/productingest
+
+      - name: Install Neon CLI
+        run: npm install -g neonctl
+
+      - name: Deploy function
+        run: >
+          neonctl functions deploy productingest
+          --src neon-functions/productingest
+          --project-id "$NEON_PROJECT_ID"
+          --branch "$NEON_BRANCH_ID"
+          --env "INGEST_KEY_SHA256=$INGEST_KEY_SHA256"
+          --wait
+
+      - name: Show function details
+        run: neonctl functions get productingest --project-id "$NEON_PROJECT_ID" --branch "$NEON_BRANCH_ID"
