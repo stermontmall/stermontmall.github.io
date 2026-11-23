@@ -16,6 +16,9 @@ on:
       - 'blog-write.mjs'
       - 'blog-topics.json'
       - 'cat-feel.js'
+      - 'products.html'
+      - 'seo-pest/blog.test.mjs'
+      - 'mobile-shell/shell.test.py'
       - 'shell-route-loader.js'
       - 'no-static-share-links.test.mjs'
       - '.github/workflows/static-product-url-validation.yml'
@@ -53,6 +56,7 @@ jobs:
           node product-page-design.test.mjs
           node product-description-html.test.mjs
           node home-grid-ssr.test.mjs
+          node seo-pest/blog.test.mjs
 
       - name: Test source product links and shared checkout integration
         run: node no-static-share-links.test.mjs
