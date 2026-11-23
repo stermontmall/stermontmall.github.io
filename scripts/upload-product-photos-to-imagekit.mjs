@@ -9,11 +9,8 @@
 // JSON-LD, like the old Supabase upload-photos function) and tries each candidate until one passes the size check.
 // ImageKit downloads the image itself (upload-by-URL), stores it in the folder /products/, and this script then checks that
 // the stored file loads, is an image, and is big enough.
-// Size rule: at least 500 x 500 px in general. For photos taken from a TRUSTED shop (TRUSTED_HOSTS below) the rule is
-// relaxed to at least 400 px on BOTH sides, so tall bottle shots such as 469 x 1000 or 424 x 600 are accepted.
-// Tiny thumbnails (under 400 px) are still rejected because they look blurry on the product page.
-// Any common format is accepted (JPEG, PNG, WebP, AVIF, GIF, HEIC, TIFF, BMP). Formats that browsers may not show are
-// delivered as WebP through an ImageKit transformation URL; always save "browser_url" as the product image.
+// Size rule: every accepted image must be at least 200 x 200 pixels.
+// Accepted formats: JPG, JPEG, PNG, WebP and AVIF. Save the verified ImageKit browser_url.
 // Needs the GitHub secret IMAGEKIT_PRIVATE_KEY. It never deletes anything and never touches the database.
 import { appendFileSync } from 'node:fs';
 
@@ -21,9 +18,6 @@ const IK_UPLOAD = 'https://upload.imagekit.io/api/v1/files/upload';
 const IK_ENDPOINT = 'https://ik.imagekit.io/w6hxfnwmw';
 const FOLDER = '/products';
 const MIN_SIDE = 200;
-const MIN_SIDE_TRUSTED = 200;
-// Reliable Kenyan shops whose product photos are accepted at the relaxed size. Add more hostnames here.
-const TRUSTED_HOSTS = ['agriguardagrovet.co.ke', 'agrijibu.co.ke'];
 const MAX_LINES = 40;
 const BROWSER_SAFE = new Set(['jpg', 'jpeg', 'png', 'webp', 'avif']);
 const KEY = process.env.IMAGEKIT_PRIVATE_KEY || '';
@@ -108,9 +102,11 @@ export function extractImageCandidates(html, baseUrl) {
 async function resolveSources(src) {
   const page = normalizePageUrl(src);
   const r = await fetch(page, { headers: { 'User-Agent': UA, Accept: 'text/html,image/*;q=0.8,*/*;q=0.5' }, redirect: 'follow' });
-  const type = (r.headers.get('content-type') || '').toLowerCase();
+  const type = (r.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
   if (!r.ok) throw new Error(`could not open the address (HTTP ${r.status})`);
-  if (type.startsWith('image/')) return { list: [r.url], from: 'direct' };
+  const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
+  if (allowedTypes.has(type)) return { list: [r.url], from: 'direct' };
+  if (type.startsWith('image/')) throw new Error(`unsupported image format (${type})`);
   if (!/html|xml/.test(type)) throw new Error(`address is not an image or a web page (${type || 'unknown type'})`);
   const html = await r.text();
   const list = extractImageCandidates(html, r.url).slice(0, 6);
@@ -120,8 +116,9 @@ async function resolveSources(src) {
 
 async function uploadOne(name, src) {
   const download = await fetch(src, { headers: { 'User-Agent': UA, Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8' }, redirect: 'follow' });
-  const contentType = (download.headers.get('content-type') || '').toLowerCase();
-  if (!download.ok || !contentType.startsWith('image/')) return { error: `source download failed (HTTP ${download.status}, ${contentType || 'no image content type'})` };
+  const contentType = (download.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+  const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
+  if (!download.ok || !allowedTypes.has(contentType)) return { error: `source download failed or unsupported format (HTTP ${download.status}, ${contentType || 'no image content type'})` };
   const bytes = await download.arrayBuffer();
   const form = new FormData();
   form.append('file', new Blob([bytes], { type: contentType }), name);
@@ -143,8 +140,7 @@ async function one(line) {
   if (!name) name = nameFromUrl(src);
   if (!name) return { name, source: src, ok: false, error: 'could not make a file name; put a name before the | sign' };
   const res = { name, source: src, ok: false };
-  const trusted = isTrustedSource(src);
-  const minSide = trusted ? MIN_SIDE_TRUSTED : MIN_SIDE;
+  const minSide = MIN_SIDE;
   try {
     const { list, from } = await resolveSources(src);
     let lastError = 'no candidate worked';
@@ -156,9 +152,10 @@ async function one(line) {
       const filePath = body.filePath || `${FOLDER}/${body.name}`;
       const plain = `${IK_ENDPOINT}${filePath}`;
       const safe = BROWSER_SAFE.has(ext);
-      const browserUrl = safe ? plain : `${IK_ENDPOINT}/tr:f-webp${filePath}`;
+      if (!safe) { lastError = `ImageKit returned unsupported format (${ext || 'unknown'})`; continue; }
+      const browserUrl = plain;
       const w = Number(body.width) || 0, h = Number(body.height) || 0;
-      const out = { ...res, image_found_via: from, image_source: cand, original_format: ext || 'unknown', width: w, height: h, bytes: body.size, original_url: plain, browser_url: browserUrl, converted_to_webp: !safe, trusted_source: trusted, relaxed_size: trusted && (w < MIN_SIDE || h < MIN_SIDE) };
+      const out = { ...res, image_found_via: from, image_source: cand, original_format: ext || 'unknown', width: w, height: h, bytes: body.size, original_url: plain, browser_url: browserUrl, trusted_source: trusted, relaxed_size: trusted && (w < MIN_SIDE || h < MIN_SIDE) };
       if (w < minSide || h < minSide) { lastError = `image is ${w}x${h}; at least ${minSide}x${minSide} is required${trusted ? ' (trusted shop)' : ''}`; continue; }
       const check = await fetch(browserUrl, { headers: { 'User-Agent': UA } });
       const type = check.headers.get('content-type') || '';
