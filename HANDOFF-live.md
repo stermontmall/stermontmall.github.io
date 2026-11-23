@@ -39,3 +39,8 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Done: Neon `public.products.description` (54 rows) and `public.publishing_rules.content` (key `publish_products`) now use 254789514060 / +254 789 514 060. Zero old-number matches left in products, rules, blog_posts, service_posts. Backups: `archive.products_whatsapp_backup_20261123` (54 rows), `archive.publishing_rules_whatsapp_backup_20261123` (1 row).
 - In progress: product-pages rebuild dispatched on main (run 45162737985).
 - Rollback if needed: update `public.products`/`public.publishing_rules` from the two archive tables by id/key.
+
+## 2026-11-23 14:20 (Africa/Nairobi) - product-pages rebuild failed (not caused by number change)
+- Blocked: `product-pages.yml` runs #866-#871 all fail since 09:30 today (last success #849, 2026-11-21) at step "Test Google indexing safeguards": `node seo-indexing-guard.test.mjs` line 38 expects `imageTransformsRequested = process.env.SUPABASE_IMAGE_TRANSFORMS === 'true'` in the generator; that Supabase-era string is gone after the Neon migration. Fails identically before the WhatsApp change.
+- Impact: none for the number. PR #1076 already replaced it inside the generated pages in `p/`, `c/`, `guides/`, `blog/`, `services/`, `pest-control/`; Neon rows updated. A rebuild from Neon would also produce the new number.
+- Next: owner/Neon-migration session updates `seo-indexing-guard.test.mjs` (or the generator) to the Neon-era code, then re-dispatch: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
