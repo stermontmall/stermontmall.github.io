@@ -67,14 +67,17 @@ export function extractImageCandidates(html, baseUrl) {
     try { const abs = new URL(v.trim().replace(/&amp;/g, '&'), baseUrl).href; if (/^https:/i.test(abs) && !out.includes(abs)) out.push(abs); } catch { /* skip */ }
   };
   // Prefer actual product-gallery images over generic Open Graph store banners.
-  const attr = (tag, key) => (tag.match(new RegExp('\\\\b' + key + '\\\\s*=\\\\s*["\\\\']([^"\\\\']+)["\\\\']', 'i')) || [])[1] || '';
-  for (const tag of html.match(/<img\\b[^>]*>/gi) || []) {
+  const attr = (tag, key) => {
+    const match = tag.match(new RegExp(key + "\\s*=\\s*[\"']([^\"']+)[\"']", 'i'));
+    return match ? match[1] : '';
+  };
+  for (const tag of html.match(/<img\b[^>]*>/gi) || []) {
     const alt = attr(tag, 'alt');
     if (!alt || /logo|payment|visa|mastercard|facebook|instagram|whatsapp|twitter|tiktok|avatar|icon/i.test(alt)) continue;
     for (const key of ['data-zoom-image', 'data-original', 'data-src', 'data-lazy-src', 'src']) add(attr(tag, key));
     for (const key of ['data-srcset', 'srcset']) {
       const srcset = attr(tag, key);
-      for (const part of srcset.split(',')) add(part.trim().split(/\\s+/)[0]);
+      for (const part of srcset.split(',')) add(part.trim().split(/\s+/)[0]);
     }
   }
   const metaRe = /<meta\\s+[^>]*>/gi;
