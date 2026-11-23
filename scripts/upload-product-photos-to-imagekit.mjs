@@ -1,7 +1,7 @@
 // Stermont Arcade — fetch, validate, JPEG-normalize and upload product photos to ImageKit.
 // Queue: data/photo-queue.txt. Results: data/photo-results.json (written by the workflow).
 // Requires IMAGEKIT_PRIVATE_KEY and the sharp package installed by the workflow.
-import { appendFileSync } from 'node:fs';
+import { appendFileSync, readFileSync } from 'node:fs';
 
 const IK_UPLOAD = 'https://upload.imagekit.io/api/v1/files/upload';
 const IK_ENDPOINT = 'https://ik.imagekit.io/w6hxfnwmw';
@@ -24,6 +24,9 @@ if (!lines.length) { console.error('::error::No photos given.'); process.exit(1)
 if (lines.length > MAX_LINES) { console.error(`::error::Too many photos (${lines.length}); maximum is ${MAX_LINES}.`); process.exit(1); }
 const auth = 'Basic ' + Buffer.from(KEY + ':').toString('base64');
 const cleanName = (s) => s.toLowerCase().replace(/\.[a-z0-9]{2,5}$/i, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90);
+let previousResults = [];
+try { previousResults = JSON.parse(readFileSync('data/photo-results.json', 'utf8')); } catch {}
+const previousByName = new Map(previousResults.filter((x) => x && x.ok && x.browser_url).map((x) => [x.name, x]));
 
 export function normalizePageUrl(u) {
   try {
@@ -182,6 +185,15 @@ async function one(line) {
   if (!name) return { name, source: src, ok: false, error: 'could not determine product photo filename' };
   const result = { name, source: src, ok: false };
   try {
+    // Reuse earlier verified JPEGs when a retry only needs to replace blocked sources.
+    const cached = previousByName.get(name);
+    if (cached && cached.content_type === 'image/jpeg' && cached.http_status === 200) {
+      const check = await fetch(cached.browser_url, { headers: { 'User-Agent': UA, Accept: 'image/jpeg,*/*;q=0.8' }, redirect: 'follow' });
+      const type = (check.headers.get('content-type') || '').split(';')[0].toLowerCase();
+      if (check.status === 200 && type === 'image/jpeg') {
+        return { ...cached, ...result, ok: true, browser_url: cached.browser_url, original_url: cached.browser_url, content_type: type, http_status: 200, reused: true };
+      }
+    }
     const { list, from } = await resolveSources(src, name);
     const failures = [];
     for (const candidate of list) {
@@ -202,7 +214,7 @@ summary('| Result | Product | Dimensions | Verified ImageKit URL / error |');
 summary('|---|---|---|---|');
 for (const result of results) {
   summary(`| ${result.ok ? 'OK' : 'FAILED'} | ${result.name} | ${result.width && result.height ? result.width + 'x' + result.height : '-'} | ${result.ok ? result.browser_url : result.error} |`);
-  say(`${result.ok ? 'OK' : 'FAILED'} ${result.name}: ${result.ok ? result.browser_url : result.error}`);
+  say(`${result.ok ? (result.reused ? 'REUSED' : 'OK') : 'FAILED'} ${result.name}: ${result.ok ? result.browser_url : result.error}`);
 }
 say('RESULTS_JSON=' + JSON.stringify(results));
 const failed = results.filter((x) => !x.ok).length;
