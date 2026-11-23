@@ -61,7 +61,7 @@ def on_rest(route):
     if '/rest/v1/rpc/get_store_catalog' in url: return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in ROWS])
     serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
-REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
+REAL = '''<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Product fixture</title><link rel="canonical" href="https://stermontarcade.co.ke/p/abasi-5-ec.html"><script>var p="abasi-5-ec";</script></head><body><main><h1>Abasi 5 EC</h1><section class="product-description"><p>Generated-page fixture for direct product route regression tests.</p></section></main></body></html>'''
 
 def run_node(fn, html, slug):
     # Shared at module scope because Playwright route callbacks can run before h() reaches its later test section.
