@@ -1,4 +1,4 @@
-# Re-run Version 6 photo queue with verified alternate vendor product pages
+# Version 6 pack-size selections: Essie Mugo 200g, Mos-N-Roach 100ml, Nexal 100ml
 # Re-run photo upload with exact product gallery assets and fixed parser
 # Re-run 30-product batch through JPEG-normalizing Version 6 uploader (retry 2)
 atraprat-135g|https://media.zid.store/15485eed-a600-4863-bc02-195da3a0fd71/883a38d7-95c7-4e69-bd33-406241fe68f0.webp
@@ -8,7 +8,7 @@ protecta-micro-bait-station|https://veseris.ca/media/catalog/product/P/I/PIF7852
 bipronex-cockroach-gel-bait-5g|https://shop.rafikipestcontrol.com/products/bipronex-cockroach-gel-bait
 cockrakill-paste-50g|https://sokowise-api.b-cdn.net/media/v2/10722.webp?etag=cb75b8a810f2019c4a60a6c171a8ebfd
 goliath-gel-35g|https://procapital.co.ke/agrochemicals/insecticides/goliath-gel-35g/
-essie-mugo-cockroach-paste|https://sokowise-api.b-cdn.net/media/v2/10718.webp?etag=efa0fed95bc3d6089325de958adf7529&height=640&width=640
+essie-mugo-cockroach-paste-200g|https://sokowise-api.b-cdn.net/media/v2/10718.webp?etag=efa0fed95bc3d6089325de958adf7529&height=640&width=640
 bedlam-200sl-15ml|https://kuzaagrochem.com/products/bedlam-200sl--15ml-125
 bedlam-200sl-50ml|https://sokowise-api.b-cdn.net/media/v2/4747.webp?etag=97f2b6149373f30a4834351e448a556b&height=640&width=640
 hygienic-75-sc-100ml|https://agropests.com/products/hygienic-75percent-sc-100ml
@@ -24,8 +24,8 @@ baraki-pellets-10g|https://shop.rafikipestcontrol.com/products/baraki-pellets
 rodirid-wax-blocks-20g|https://agriguardagrovet.co.ke/product/rodirid-wax-blocks/
 neocidal-600-ew-28ml|https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/42.-Neocidal-600-EW.jpg
 bugnil-20-ec-25ml|https://agriguardagrovet.co.ke/product/bugnil-20-ec/
-mos-n-roach-100-ec|https://agriguardagrovet.co.ke/product/mos-n-roach-100-ec/
-nexal-100-sc|https://agriguardagrovet.co.ke/product/nexal-100-sc/
+mos-n-roach-100-ec-100ml|https://imaginecare.co.ke/product-category/cockroach-solutions/
+nexal-100-sc-100ml|https://imaginecare.co.ke/product/nexal-100-sc/
 mosthrin-2-5-ec-1l|https://agriguardagrovet.co.ke/product/mosthrin-2-5-ec/
 dudu-spray-2l|https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/11.-Dudu-Spray.jpg
 k-othrine-wg-250-20g|https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/35.-K-Othrine-WG-250.jpg
