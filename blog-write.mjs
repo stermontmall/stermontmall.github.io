@@ -60,6 +60,7 @@ if (existsSync(`blog/${topic.slug}.html`)) { console.error(`blog/${topic.slug}.h
 
 // Pages the writer may link to. Category pages (/c/<name>.html) are included, which fixes the dropped category links.
 const allowed = new Set(['/products.html', '/c/', '/shipping.html', '/returns.html']);
+const categoryParents = JSON.parse(readFileSync('category-parent-map.json', 'utf8'));
 const categoryHtml = slug => { try { return readFileSync('c/' + slug + '.html', 'utf8'); } catch { return ''; } };
 const activeCategory = slug => {
   const html = categoryHtml(slug);
@@ -74,8 +75,10 @@ const categoryTarget = href => {
   const html = categoryHtml(slug);
   const breadcrumb = (html.match(/<nav class="bc">([\s\S]*?)<\/nav>/i) || [])[1] || '';
   const parents = [...breadcrumb.matchAll(/href="\/c\/([^"]+)\.html"/g)].map(m => m[1]).filter(p => p !== slug);
-  const parent = parents.find(activeCategory);
-  return parent ? '/c/' + parent + '.html' : null;
+  let parent = parents.find(activeCategory) || categoryParents[slug];
+  const seen = new Set([slug]);
+  while (parent && !seen.has(parent)) { if (activeCategory(parent)) return '/c/' + parent + '.html'; seen.add(parent); parent = categoryParents[parent]; }
+  return null;
 };
 if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.html') && f !== 'index.html')) {
   if (activeCategory(f.replace(/\.html$/, ''))) allowed.add('/c/' + f);
