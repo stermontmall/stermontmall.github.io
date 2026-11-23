@@ -7,6 +7,6 @@
   return function shellProductLink(slug) {
     var value = String(slug == null ? '' : slug).trim();
     if (!/^[a-z0-9][a-z0-9-]*$/i.test(value)) return 'https://stermontarcade.co.ke/';
-    return '/p/' + encodeURIComponent(value) + '.html';
+    return 'https://stermontarcade.co.ke/p/' + encodeURIComponent(value) + '.html';
   };
 }));
