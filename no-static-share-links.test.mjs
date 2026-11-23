@@ -84,7 +84,7 @@ if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
   for (const file of files) {
     const html = readFileSync(file, 'utf8');
     if (/\bhref=["'][^"']*\?product=/i.test(html)) bad.push(file);
-    if (/^p\//.test(file) && !/http-equiv=["']refresh["']/i.test(html) && !html.includes('<link rel="canonical" href="https://stermontarcade.co.ke' + file.replace(/^p/, '') + '">')) bad.push(file + ' (missing self canonical)');
+    if (/^p\//.test(file) && !/http-equiv=["']refresh["']/i.test(html) && !html.includes('<link rel="canonical" href="https://stermontarcade.co.ke/' + file + '">')) bad.push(file + ' (missing self canonical)');
   }
   assert.deepEqual(bad, [], 'Generated pages contain query product links or missing static canonicals: ' + bad.join(', '));
 }
