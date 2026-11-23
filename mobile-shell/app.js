@@ -250,7 +250,7 @@ const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
    a copied or shared link then previews as this product, from that page's head, and a phone that opens it goes straight into this same product view inside
    the shell (shell-route-loader.js opens the product view in place on /p/<slug>.html).
    Crawlers get the static page, whose canonical is this same clean address. Older links that still end in ?shell=1 keep working (same two scripts). */
-const productUrl = () => { if (!qb.p) return undefined; const z = sizeOf(qb.p, qb.size).slug || qb.p.slug; if (stack.includes('page-product')) { if (PRODUCT_PATH && DEEP) return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); return (window.shellProductLink || (s => '/?product=' + encodeURIComponent(s)))(z); } return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); };
+const productUrl = () => { if (!qb.p) return undefined; const z = sizeOf(qb.p, qb.size).slug || qb.p.slug; if (stack.includes('page-product')) { if (PRODUCT_PATH && DEEP) return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); return (window.shellProductLink || (s => '/p/' + encodeURIComponent(s) + '.html'))(z); } return '/p/' + encodeURIComponent(qb.p.slug) + '.html' + (z !== qb.p.slug ? '#' + encodeURIComponent(z) : ''); };
 /* A category has its own address too (owner 2026-11-09: "when I tap on categories, make a direct link"): /c/<slug>.html, the clean address of the generated category page
    (a sub-category uses its own slug). A copied or shared link previews as that category, and a phone that opens it goes straight back into the same category in the shell
    (the inline script of seo-shell-chrome.mjs sends /c/<slug>.html to /?cat=<slug>, handled by openCatLink in section 9b). The address only changes in place (replaceState):
@@ -695,7 +695,7 @@ async function renderDetails(rowId) {
   renderProductDescription('#qb-desc', d.description || '');
   const imgs = (d.images || []).filter(Boolean);
   $('#qb-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: qb.p.emoji })}</button>`).join('') : '';
-  if (d.slug) { $('#qb-page').href = (window.shellProductLink || (s => '/?product=' + encodeURIComponent(s)))(d.slug); $('#qb-page').hidden = false; }
+  if (d.slug) { $('#qb-page').href = (window.shellProductLink || (s => '/p/' + encodeURIComponent(s) + '.html'))(d.slug); $('#qb-page').hidden = false; }
 }
 document.addEventListener('click', e => {
   const ph = e.target.closest('[data-photo]');
@@ -746,7 +746,7 @@ document.addEventListener('click', e => {
 $('#pp-share').addEventListener('click', async () => {
   if (!qb.p) return;
   const shareSlug = sizeOf(qb.p, qb.size).slug || qb.p.slug;
-      const url = (window.shellProductLink || (s => '/?product=' + encodeURIComponent(s)))(shareSlug), title = qb.p.name + ' | Stermont Arcade';
+      const url = (window.shellProductLink || (s => '/p/' + encodeURIComponent(s) + '.html'))(shareSlug), title = qb.p.name + ' | Stermont Arcade';
   try { if (navigator.share) { await navigator.share({ title, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { toast(url); }
 });
