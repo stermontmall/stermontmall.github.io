@@ -88,7 +88,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     fs.writeFileSync(path.join(root, 'blog', `${a.slug}.html`), renderPost(a));
     let t = data.topics.find(x => x.slug === a.slug);
     if (!t) { t = { slug: a.slug }; data.topics.push(t); }
-    Object.assign(t, { title: a.title, angle: `Product guide for ${a.product} (hand-written, ${words(allText(a))} words).`, keywords: [], facts: ['Facts come from the catalog text of the product page.'], links: [shellProductLink(a.product), ...(resolvedCategory ? [`/c/${resolvedCategory}.html`] : []), ...a.related.map(r => `/blog/${r}.html`)], status: 'drafted', drafted: DATE });
+    Object.assign(t, { title: a.title, angle: `Product guide for ${a.product} (hand-written, ${words(allText(a))} words).`, keywords: [], facts: ['Facts come from the catalog text of the product page.'], links: [shellProductLink(a.product), ...(categoryTarget(a.cat) ? [`/c/${categoryTarget(a.cat)}.html`] : []), ...a.related.map(r => `/blog/${r}.html`)], status: 'drafted', drafted: DATE });
     console.log(`blog/${a.slug}.html  ${words(allText(a))} words`);
   }
   fs.writeFileSync(topicsFile, JSON.stringify(data, null, 2) + '\n');
