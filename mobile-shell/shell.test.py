@@ -1,7 +1,7 @@
 # Headless-mobile test of the shell. Needs: pip install playwright && playwright install chromium
 # Run: python3 mobile-shell/shell.test.py   (screenshots go to the system temp folder)
 import re, sys, threading, http.server, socketserver, functools, os, tempfile, json, base64, time
-from urllib.parse import unquote
+from urllib.parse import unquote, urlsplit, parse_qs
 from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root: the shell reads /product-names.json
@@ -68,6 +68,42 @@ def run_node(fn, html, slug):
     import subprocess
     js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1],process.argv[2])))" % fn
     return subprocess.run(['node', '-e', js, html, slug], cwd=ROOT, capture_output=True, text=True, check=True).stdout
+def on_neon(route):
+    # The production storefront now reads from Neon's PostgREST-compatible Data API.
+    # Mock both the anonymous-auth token and the catalogue endpoints so this test
+    # remains deterministic and does not silently fall back to the production snapshot.
+    origin = URL.rstrip('/')
+    if route.request.method == 'OPTIONS':
+        return route.fulfill(status=204, headers={
+            'access-control-allow-origin': origin,
+            'access-control-allow-credentials': 'true',
+            'access-control-allow-methods': 'GET, OPTIONS',
+            'access-control-allow-headers': 'Authorization, Content-Type',
+            'vary': 'Origin'
+        })
+    url = route.request.url
+    if '/categories?' in url:
+        return route.fulfill(status=200, content_type='application/json', body=json.dumps(CATS_FIX), headers={
+            'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'vary': 'Origin'
+        })
+    query = parse_qs(urlsplit(url).query)
+    selected = ROWS
+    if 'id' in query:
+        row_id = query['id'][0].removeprefix('eq.')
+        selected = [r for r in ROWS if r['id'] == row_id]
+        if 'description' in query.get('select', [''])[0]:
+            selected = [dict(description=f"ABOUT {r['name']}\\n- line one\\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=r['images'], product_code=r['product_code']) for r in selected]
+    elif 'or' in query:
+        match = re.search(r'slug\\.eq\\.([^,]+)', query['or'][0])
+        slug = unquote(match.group(1)) if match else ''
+        selected = [r for r in ROWS if r['slug'] == slug or r['id'] == slug]
+    elif 'variant_group' in query:
+        group = query['variant_group'][0].removeprefix('eq.')
+        selected = [r for r in ROWS if r.get('variant_group') == group]
+    return route.fulfill(status=200, content_type='application/json', body=json.dumps(selected), headers={
+        'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'vary': 'Origin'
+    })
+
 def mock_network(ctx):
     # Keep shell product URLs on the local fixture origin. Generated SEO pages expose
     # the production-domain helper, which would otherwise send the headless test away
@@ -85,7 +121,11 @@ def mock_network(ctx):
         page = run_node('inject', page, slug)
         rt.fulfill(status=200, content_type='text/html', body=page)
     ctx.route('**/p/*.html*', serve_product_page)
-    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
+    ctx.route('**/ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth/token/anonymous', lambda r: r.fulfill(
+        status=200, content_type='application/json', body=json.dumps({'token': 'test-anonymous-token', 'expires_at': int(time.time()) + 3600}),
+        headers={'access-control-allow-origin': URL.rstrip('/'), 'access-control-allow-credentials': 'true', 'vary': 'Origin'}))
+    ctx.route('**/ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/**', on_neon)
+    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # legacy fixture compatibility
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
     for host in ('https://www.googletagmanager.com/**', 'https://cdn.jsdelivr.net/**', 'https://www.google-analytics.com/**', 'https://*.google-analytics.com/**'):
@@ -127,7 +167,7 @@ with sync_playwright() as p:
     mock_network(c0)
     c0.route('**/mobile-shell/app.js*', lambda rt: rt.fulfill(status=200, content_type='application/javascript', body=''))
     p0 = c0.new_page(); p0.goto(URL, wait_until='domcontentloaded')
-    check('server-rendered home grid exposes crawlable product links before hydration', p0.locator('#grid a[href*="?product="]').count() >= 6, p0.locator('#grid a[href*="?product="]').count())
+    check('server-rendered home grid exposes crawlable product links before hydration', p0.locator('#grid a[href*="/p/"]').count() >= 6, p0.locator('#grid a[href*="/p/"]').count())
     check('initial empty-state message stays hidden before hydration', p0.locator('#grid-empty').is_hidden())
     c0.close()
 
@@ -149,7 +189,7 @@ with sync_playwright() as p:
     # A parked request leaves the shell waiting on the network while the test thread stays free. times=1 means every later request
     # (and every other test on this page) falls through to mock_network's normal handler; the shell fetches the catalogue only once per load.
     parked = []
-    pg.route('**/rest/v1/rpc/get_store_catalog*', lambda route: parked.append(route), times=1)
+    pg.route('**/ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/storefront_products*', lambda route: parked.append(route), times=1)
     pg.goto(URL, wait_until='domcontentloaded')
     for _ in range(200):   # up to ~10 s for the shell to ask for the catalogue; it is then held, so no hydration can have happened yet
         if parked: break
