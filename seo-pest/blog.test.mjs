@@ -34,7 +34,6 @@ for (const f of fs.readdirSync(dir).filter(f => /^blogs-\d+\.json$/.test(f))) {
     for (const re of BANNED) ok(!re.test(t), `${id}: banned phrase ${re}`);
     ok(!slugs.has(a.slug), `${id}: duplicate slug`); slugs.add(a.slug);
     ok(!fs.existsSync(path.join(root, 'blog', a.slug + '.html')) || fs.readFileSync(path.join(root, 'blog', a.slug + '.html'), 'utf8') === renderPost(a), `${id}: blog file exists and differs`);
-    const h = renderPost(a);
     const productExists = fs.existsSync(path.join(root, 'p', a.product + '.html'));
     ok(productExists ? h.includes('href="https://stermontarcade.co.ke/p/' + a.product + '.html"') : !h.includes('href="https://stermontarcade.co.ke/p/' + a.product + '.html"'), `${id}: rendered CTA must only link to an existing static product page`);
     for (const m of h.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)) { try { JSON.parse(m[1].replace(/\\u003c/g, '<')); checks++; } catch { checks++; bad.push(`${id}: invalid JSON-LD`); } }
