@@ -34,7 +34,10 @@ jobs:
         with:
           node-version: 24
 
-      - name: Upload photos to ImageKit and verify them
+      - name: Install sharp image conversion library
+        run: npm install --no-save --package-lock=false sharp@0.34.3
+
+      - name: Upload photos to ImageKit and verify them as JPEG
         shell: bash
         env:
           IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
