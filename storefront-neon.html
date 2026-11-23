@@ -62,6 +62,15 @@ header .w{display:flex;align-items:center;gap:14px;padding:10px 12px}
 .cg b{font-size:32px;font-weight:400}
 .empty{padding:20px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 .sk{aspect-ratio:3/4;border-radius:4px;background:linear-gradient(90deg,var(--bg),var(--ln),var(--bg));background-size:200% 100%;animation:sh 1.6s infinite}
+.pg{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:14px}
+.pc{background:var(--card);border:1px solid var(--ln);border-radius:4px;overflow:hidden;display:flex;flex-direction:column}
+.pc:hover{border-color:var(--or)}
+.pc img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#fff}
+.pc div{padding:8px 10px 12px}
+.pc h3{margin:0 0 6px;font-size:13px;font-weight:500;line-height:1.3;max-height:2.6em;overflow:hidden}
+.pc b{color:var(--or2);font-size:15px}.pc s{color:var(--mu);font-size:12px;margin-left:6px}
+.err{padding:20px;color:#b3261e}
+@media(max-width:1000px){.pg{grid-template-columns:repeat(2,1fr);padding:10px}}
 @keyframes sh{to{background-position:-200% 0}}
 .note{padding:0 20px 20px;color:var(--mu)}
 .note b{color:var(--tx)}
@@ -78,7 +87,7 @@ footer h4{color:#fff;margin:0 0 8px}footer a,footer p{display:block;margin:2px 0
 <div class="top"><div class="w"><span>Pickup: Sarit Centre, Westlands, Nairobi</span><span>Delivery to all 47 counties · M-Pesa checkout · WhatsApp +254 748 888 230</span></div></div>
 <header><div class="w">
 <a class="logo" href="#">Stermont Arcade<small>stermontarcade.co.ke</small></a>
-<form class="search" onsubmit="return false"><input aria-label="Search" placeholder="Search products, brands and categories"><button>Search</button></form>
+<form class="search"><input aria-label="Search" placeholder="Search products, brands and categories"><button>Search</button></form>
 <div class="act"><span><b>👤</b>Account</span><span><b>♡</b>Wishlist</span><span><b>🛒</b>Cart</span></div>
 </div></header>
 
@@ -106,6 +115,7 @@ footer h4{color:#fff;margin:0 0 8px}footer a,footer p{display:block;margin:2px 0
 <div><h4>Legal</h4><a href="#">Terms</a><a href="#">Privacy policy</a><a href="#">Bulk quotes</a></div>
 </div></footer>
 
+<script src="/product-links.js"></script>
 <script>
 /* Category tree snapshot from Neon public.categories (93 rows, all active). Products load from public.storefront_products once the table has rows. */
 const D=[
@@ -143,11 +153,31 @@ function go(n){cur=n%S.length;sl.forEach((s,i)=>s.classList.toggle("on",i==cur))
 dt.forEach((d,i)=>d.onclick=()=>go(i));setInterval(()=>go(cur+1),5000);
 
 const tabs=$("tabs"),dept=$("dept");
-function show(i){[...tabs.children].forEach((b,j)=>b.classList.toggle("on",j==i));const d=D[i];
-dept.innerHTML=`<div class="sh"><h2>${d[0]} ${d[1]}</h2></div><div class="cg">${(d[2].length?d[2]:[d[1]]).map(s=>`<a href="#"><b>${d[0]}</b>${s}</a>`).join("")}</div><div class="empty">${'<div class="sk"></div>'.repeat(5)}</div><p class="note"><b>No products published in this department yet.</b> Products appear here automatically once they are active in the Neon <code>products</code> table with a verified photo.</p>`}
-D.forEach((d,i)=>{const b=document.createElement("button");b.textContent=d[1];b.setAttribute("role","tab");b.onclick=()=>show(i);tabs.appendChild(b)});
-document.addEventListener("click",e=>{const a=e.target.closest("[data-i]");if(a){e.preventDefault();show(+a.dataset.i);dept.scrollIntoView({behavior:"smooth"})}});
-show(0);
+const API="https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1";
+let P=[],CAT=new Map(),state="loading",q="",cur_i=0;
+const esc=t=>String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const kes=n=>"KSh "+Number(n).toLocaleString("en-KE",{maximumFractionDigits:0});
+const card=p=>`<a class="pc" href="${esc(shellProductLink(p.slug))}"><img loading="lazy" src="${esc(p.images&&p.images[0]||"")}" alt="${esc(p.name)}"><div><h3>${esc(p.name)}</h3><b>${kes(p.price)}</b>${p.old_price&&p.old_price>p.price?`<s>${kes(p.old_price)}</s>`:""}</div></a>`;
+function deptProducts(d){const names=new Set([d[1],...d[2]].map(x=>x.toLowerCase()));return P.filter(p=>names.has((CAT.get(p.category_id)||"").toLowerCase()))}
+function show(i){cur_i=i;[...tabs.children].forEach((b,j)=>b.classList.toggle("on",j==i));const d=D[i];
+let list=q?P.filter(p=>p.name.toLowerCase().includes(q)):deptProducts(d);
+let body;
+if(state==="loading")body=`<div class="empty">${'<div class="sk"></div>'.repeat(5)}</div>`;
+else if(state==="error")body=`<p class="err">Products could not be loaded right now. Please refresh in a moment.</p>`;
+else if(!list.length)body=q?`<p class="note"><b>No products match "${esc(q)}".</b></p>`:`<p class="note"><b>No products published in this department yet.</b> Products appear here automatically once they are active in the Neon <code>products</code> table with a verified photo.</p>`;
+else body=`<div class="pg">${list.map(card).join("")}</div>`;
+dept.innerHTML=`<div class="sh"><h2>${q?`Search results for "${esc(q)}"`:`${d[0]} ${d[1]}`}</h2></div><div class="cg">${(d[2].length?d[2]:[d[1]]).map(s=>`<a href="#"><b>${d[0]}</b>${s}</a>`).join("")}</div>${body}`}
+D.forEach((d,i)=>{const b=document.createElement("button");b.textContent=d[1];b.setAttribute("role","tab");b.onclick=()=>{q="";document.querySelector(".search input").value="";show(i)};tabs.appendChild(b)});
+document.addEventListener("click",e=>{const a=e.target.closest("[data-i]");if(a){e.preventDefault();q="";show(+a.dataset.i);dept.scrollIntoView({behavior:"smooth"})}});
+document.querySelector(".search").onsubmit=e=>{e.preventDefault();q=e.target.querySelector("input").value.trim().toLowerCase();show(cur_i);dept.scrollIntoView({behavior:"smooth"});return false};
+document.querySelector(".search input").oninput=e=>{q=e.target.value.trim().toLowerCase();show(cur_i)};
+async function load(){try{
+const [pr,cr]=await Promise.all([fetch(API+"/storefront_products?select=id,slug,name,category_id,price,old_price,images&order=name.asc&limit=1000"),fetch(API+"/categories?select=id,name")]);
+if(!pr.ok||!cr.ok)throw new Error("HTTP "+pr.status+"/"+cr.status);
+P=(await pr.json()).filter(p=>p.images&&p.images.length);(await cr.json()).forEach(c=>CAT.set(c.id,c.name));state="ok";
+const first=D.findIndex(d=>deptProducts(d).length);show(first>=0?first:0);
+}catch(e){state="error";show(cur_i)}}
+show(0);load();
 </script>
 <script src="/analytics.js" defer></script></body>
 </html>
