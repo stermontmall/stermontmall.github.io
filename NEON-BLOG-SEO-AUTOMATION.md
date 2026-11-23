@@ -26,7 +26,7 @@ Tables:
 - `public.google_index_inspections`: URL Inspection status for URLs Google reports as not indexed.
 - `public.google_sitemap_submissions`: HTTP result for each submitted sitemap.
 
-The tables are private to the Neon database owner; public/anonymous/authenticated roles are explicitly denied access. GitHub Actions connects through a database connection string stored as a secret.
+All five tables have row-level security enabled. Anonymous and PUBLIC access is revoked. The `blog_posts` table retains its existing authenticated-admin policy (`is_store_admin()`); GitHub Actions writes through the Neon database connection string stored as a secret. The other reporting tables have no authenticated grants.
 
 ## One-time GitHub configuration required
 
