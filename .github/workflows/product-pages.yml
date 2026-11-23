@@ -172,6 +172,11 @@ jobs:
       - name: Route product and category pages into the full mobile shell
         run: node seo-shell-redirect.mjs
 
+      - name: Verify generated product URLs, cart actions and canonical tags
+        env:
+          STM_CHECK_GENERATED_PRODUCT_PAGES: '1'
+        run: node no-static-share-links.test.mjs
+
       - name: Speed - connect to the shop database early (preconnect)
         run: |
           # Safe and repeatable: adds one line to the home page head if it is not there yet.
