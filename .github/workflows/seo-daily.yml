@@ -13,6 +13,8 @@ on:
       - 'seo-safe-meta.test.mjs'
       - 'seo-safe-category-meta.mjs'
       - 'seo-safe-category-meta.test.mjs'
+      - 'seo-safe-consumer-copy.mjs'
+      - 'seo-safe-consumer-copy.test.mjs'
       - 'seo-safe-blog-meta.mjs'
       - 'seo-safe-blog-meta.test.mjs'
       - 'seo-check.mjs'
@@ -52,6 +54,7 @@ jobs:
           node seo-safe-meta.test.mjs
           node seo-safe-category-meta.test.mjs
           node seo-safe-blog-meta.test.mjs
+          node seo-safe-consumer-copy.test.mjs
       - name: Test product description extraction against current and legacy layouts
         run: node seo-description-check.test.mjs
       # Build the same catalogue output that customers and Google see before auditing it.
@@ -79,6 +82,8 @@ jobs:
       - name: Fill related product links
         continue-on-error: true
         run: node seo-related-fill.mjs
+      - name: Apply allowlisted ordinary-product copy corrections only
+        run: node seo-safe-consumer-copy.mjs
       - name: Apply crawler and phone routing rules
         continue-on-error: true
         run: node seo-shell-redirect.mjs
