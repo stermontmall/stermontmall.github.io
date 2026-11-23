@@ -52,6 +52,8 @@ jobs:
             --wait
 
       - name: Verify deployment status
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
         run: neon functions get photoupload --branch br-fancy-bird-bh01xcbs
 
       - name: Smoke-test the deployed HTTP endpoint
