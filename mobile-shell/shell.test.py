@@ -118,7 +118,7 @@ def mock_network(ctx):
         # Only known fixture products have built product pages; unknown slugs must behave like GitHub Pages 404s.
         match = re.search(r'/p/([^/?#]+)\.html', rt.request.url)
         slug = match.group(1) if match else ''
-        if not any(slug == r['slug'] or slug == r['id'] for r in ROWS):
+        if not any(slug == r['slug'] or slug == r['id'] or slug == r['variant_group'] for r in ROWS):
             with open(os.path.join(ROOT, '404.html'), encoding='utf-8') as f:
                 return rt.fulfill(status=404, content_type='text/html', body=f.read())
         page = REAL.replace('fixture-product', slug)
