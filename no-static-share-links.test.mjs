@@ -1,6 +1,6 @@
 // Guard: customer/staff-facing product links must use canonical /p/<slug>.html URLs.
 // The /p/ page hydrates the mobile shell in place while retaining server-rendered SEO metadata.
-// breadcrumbs and seo-links crawl links) are intentionally preserved.
+
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createRequire } from 'node:module';
@@ -25,7 +25,7 @@ for (const file of files) {
   lines.forEach((line, index) => {
 
     if (classicLinkPattern.test(line) && !['no-classic-hop.test.mjs', 'no-static-share-links.test.mjs'].includes(file)) offenders.push(file + ':' + (index + 1) + ': human-facing legacy-page link: ' + line.trim().slice(0, 220));
-    if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/p\//i.test(line)) return;
+    if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\?product=/i.test(line)) return;
     // Legacy query handling is tested separately; it is not an emitted product link.
     if (file === 'index.html' || file === 'mobile-shell/app.js') return;
     if (['cars-for-sale.html', 'fashion.html', 'products.html', 'checkout.html', 'price-watch.test.mjs', 'seo-safe-meta.test.mjs', 'seo-shell-redirect.test.mjs'].includes(file)) return; // generated output is checked after rebuild; checkout product links are in the approved seo-links block; price-watch is a fixture
@@ -46,11 +46,11 @@ assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), 'https://ster
 const homepage = readFileSync('index.html', 'utf8');
 const homeGrid = (homepage.match(/<ul id="grid"[\s\S]*?<\/ul>/) || [])[0] || '';
 assert.ok(homeGrid.includes('https://stermontarcade.co.ke/p/'), 'homepage SSR cards must expose canonical product URLs');
-assert.doesNotMatch(homeGrid, /\\?product=/, 'homepage SSR cards must not expose legacy query URLs');
+assert.doesNotMatch(homeGrid, /\?product=/, 'homepage SSR cards must not expose legacy query URLs');
 assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'), 'homepage SEO crawl links must remain present');
 const helper = readFileSync('product-links.js', 'utf8');
-assert.match(helper, /\\/p\\/.*\\.html/, 'helper must generate canonical /p/ links');
-assert.match(helper, /\\/p\\/.*\\.html/, 'helper must generate canonical /p/ links');
+assert.match(helper, /function shellProductLink\\(slug\\)/, 'shared helper must exist');
+assert.match(helper, /\/p\/.*\.html/, 'helper must generate canonical /p/ links');
 const generator = readFileSync('generate-products.mjs', 'utf8');
 assert.match(generator, /const normalizeCustomerProductLinks = html =>/,
   'final generated-page renderer must normalize legacy product anchors from imported content');
@@ -108,7 +108,7 @@ if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
         .replace(/<section[^>]*class=["'][^"']*\bseo-links\b[^"']*["'][^>]*>[\s\S]*?<\/section>/gi, '');
       const hrefs = [...html.matchAll(/\bhref=(['"])(.*?)\1/gi)].map(match => { try { return decodeURIComponent(match[2]); } catch { return match[2]; } });
       scanned++;
-      if (hrefs.some(href => /\\?product=|\\/classic\\.html/i.test(href))) generatedOffenders.push(file);
+      if (hrefs.some(href => /\?product=|\/classic\.html/i.test(href))) generatedOffenders.push(file);
     }
   assert.deepEqual(generatedOffenders, [], 'Generated customer-visible pages still emit static product/classic links: ' + generatedOffenders.join(', '));
   console.log('OK: inspected ' + scanned + ' generated product/category/guide/blog/service and landing pages; no static human-facing product links.');
