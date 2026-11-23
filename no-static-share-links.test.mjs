@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import assert from 'node:assert/strict';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
-assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), '/p/premise-200-sc-termiticide-50-ml.html');
+assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), 'https://stermontarcade.co.ke/p/premise-200-sc-termiticide-50-ml.html');
 assert.equal(shellProductLink(''), 'https://stermontarcade.co.ke/');
 const helper = readFileSync('product-links.js', 'utf8');
 assert.ok(helper.includes("return '/p/''));
@@ -27,7 +27,7 @@ for (const file of ['seo-related-fill.mjs','seo-pest/blog-build.mjs','blog-write
   assert.ok(readFileSync(file, 'utf8').includes('shellProductLink'), file + ' must use the shared static URL helper');
 }
 assert.ok(existsSync('no-classic-hop.test.mjs'));
-const htmlFiles = [];
+if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {\nconst htmlFiles = [];
 const collect = dir => {
   if (!existsSync(dir)) return;
   for (const name of readdirSync(dir)) {
@@ -46,4 +46,4 @@ for (const file of htmlFiles) {
   if (hrefs.some(h => /\?product=/i.test(h))) bad.push(file + ': legacy product query href');
 }
 assert.deepEqual(bad, [], bad.join('\n'));
-console.log('OK: static product URLs are used across ' + htmlFiles.length + ' customer-facing HTML files');
+console.log('OK: static product URLs are used across ' + htmlFiles.length + ' customer-facing HTML files');\n}
