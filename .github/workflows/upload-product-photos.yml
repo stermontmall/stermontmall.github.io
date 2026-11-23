@@ -18,7 +18,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: upload-product-photos
+  group: upload-product-photos-jpeg-normalized
   cancel-in-progress: false
 
 jobs:
