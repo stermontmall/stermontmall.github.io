@@ -220,9 +220,9 @@ if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.h
     if (h.includes(MARK) || !h.includes(BROWSE)) continue;
     const items = [];
     (GUIDES[slug] || []).filter(g => hasBlog(g[0])).forEach(g => items.push([g[0], esc(g[1])]));
-    (SIBLINGS[slug] || []).filter(hasCat).forEach(k => items.push([`/c/${k}.html`, `Shop ${esc(catName(k))}`]));
+    (SIBLINGS[slug] || []).map(categoryTarget).filter(Boolean).filter((k, i, a) => a.indexOf(k) === i).forEach(k => items.push([`/c/${k}.html`, `Shop ${esc(catName(k))}`]));
     const hub = PARENT[slug];
-    if (hub && hasCat(hub)) items.push([`/c/${hub}.html`, `All ${esc(HUB_NAME[hub] || catName(hub))}`]);
+    const activeHub = hub ? categoryTarget(hub) : null; if (activeHub) items.push([`/c/${activeHub}.html`, `All ${esc(HUB_NAME[activeHub] || catName(activeHub))}`]);
     if (!items.length) continue;
     h = h.replace(BROWSE, () => `${MARK}<div class="box rel"><h2 style="margin-top:0">Guides and related categories</h2><ul>${items.map(([u, t]) => `<li><a href="${u}">${t}</a></li>`).join('')}</ul></div>\n${BROWSE}`).replace('</head>', () => STYLE + '</head>');
     writeFileSync(file, h); cDone++;
