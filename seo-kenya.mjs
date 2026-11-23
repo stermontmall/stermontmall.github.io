@@ -180,7 +180,7 @@ if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.h
   try {
     const slug = f.replace(/\.html$/, ''), file = `c/${f}`; let h = readFileSync(file, 'utf8');
     const h1 = unesc(((h.match(/<h1>([\s\S]*?)<\/h1>/) || [])[1] || '').replace(/<[^>]+>/g, '').trim());
-    const items = [...h.matchAll(ITEM)].map(m => { const raw = m[1]; const slug = raw.startsWith(SITE + '/?product=') ? new URL(raw).searchParams.get('product') : raw.slice(3).replace('.html', ''); return { url: '/p/' + encodeURIComponent(slug) + '.html', slug, name: m[2], price: Number(m[3].replace(/,/g, '')) }; }).filter(i => i.price > 0 && i.slug);
+    const items = [...h.matchAll(ITEM)].map(m => { const raw = m[1], u = new URL(raw, SITE), rawSlug = u.searchParams.get('product') || ((u.pathname.match(/^\\/p\\/([^/]+)\\.html$/i) || [])[1] || ''); let slug = rawSlug; try { slug = decodeURIComponent(rawSlug); } catch {} return { url: '/p/' + encodeURIComponent(slug) + '.html', slug, name: m[2], price: Number(m[3].replace(/,/g, '')) }; }).filter(i => i.price > 0 && i.slug);
     const guide = CATEGORY_GUIDES[slug];
     if (guide && !h.includes(`data-seo-guide="${slug}"`)) {
       h = h.replace(/<ul class="g">/, `${guide}
