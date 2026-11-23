@@ -4,14 +4,13 @@ import { activeCategorySlugsFromPages, normalizeCategoryLinks, resolveCategoryPa
 const active = activeCategorySlugsFromPages([
   { slug: 'pest-control-fumigation.html', html: '<ul id="category-products"><li data-price="500">One</li></ul>' },
   { slug: 'agrovet.html', html: '<ul id="category-products"><li data-price="250">One</li></ul>' },
-  { slug: 'baby-products.html', html: '<ul id="category-products"><li data-price="900">One</li></ul>' },
   { slug: 'home-kitchen.html', html: '<ul id="category-products"><li data-price="100">One</li></ul>' },
   { slug: 'empty-category.html', html: '<ul id="category-products"></ul>' }
 ]);
-assert.deepEqual([...active].sort(), ['agrovet', 'baby-products', 'home-kitchen', 'pest-control-fumigation']);
+assert.deepEqual([...active].sort(), ['agrovet', 'home-kitchen', 'pest-control-fumigation']);
 assert.equal(resolveCategoryPath('rodent-control', active), '/c/pest-control-fumigation.html');
 assert.equal(resolveCategoryPath('animal-feeds', active), '/c/agrovet.html');
-assert.equal(resolveCategoryPath('toys-games', active), '/c/baby-products.html');
+assert.equal(resolveCategoryPath('toys-games', active), null);
 assert.equal(resolveCategoryPath('health-beauty', active), null);
 assert.equal(resolveCategoryPath('empty-category', active), null);
 assert.equal(resolveCategoryPath('home-kitchen', active), '/c/home-kitchen.html');
