@@ -39,6 +39,13 @@ jobs:
             gh issue close "$n" --comment "Superseded by the newer report." || true
           done
           gh issue create --title "Google indexing status $(date +%F)" --body-file index-status.md
+      - name: Store Google indexing report in Neon
+        if: steps.inspect.outcome == 'success'
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          npm install --no-save @neondatabase/serverless
+          node neon-automation-sync.mjs index
       - name: Mark incomplete inspection as failed
         if: steps.inspect.outcome == 'failure'
         run: exit 1
