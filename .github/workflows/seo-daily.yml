@@ -18,6 +18,7 @@ on:
       - 'products.html'
       - 'sitemap*.xml'
       - 'blog/**'
+      - 'blog-topics.json'
       - 'guides/**'
       - 'services/**'
       - 'pest-control/**'
@@ -69,6 +70,16 @@ jobs:
         run: node seo-shell-redirect.mjs
       - name: Run technical SEO check against generated output
         run: node seo-check.mjs > seo-report.md
+      - name: Install Neon database driver
+        run: npm install --no-save @neondatabase/serverless
+      - name: Sync blog topics and published posts to Neon
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: node neon-automation-sync.mjs content
+      - name: Store daily SEO audit in Neon
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: node neon-automation-sync.mjs seo
       - name: Publish the report as an issue
         env:
           GH_TOKEN: ${{ github.token }}
