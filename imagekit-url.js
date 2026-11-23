@@ -29,6 +29,10 @@
   var PROBE_OK_TTL = 6 * 60 * 60 * 1000;
   var PROBE_FAIL_TTL = 10 * 60 * 1000;
   var PROBE_TIMEOUT = 8000;
+  var PLACEHOLDER = '/placeholder.svg'; // same-origin "Photo coming soon" image: the clear photo-unavailable state
+  var DOWN_KEY = 'stm.supabase.photos.down.v1';
+  var DOWN_TTL = 10 * 60 * 1000;
+  var supabaseDownMemo = false;
   var inBrowser = !!(root && root.document);
   var supabaseProxyWorks = false;
   var probeStarted = false;
@@ -65,6 +69,23 @@
     img.src = ENDPOINT + '/tr:w-16,q-50,f-auto/' + source;
   }
 
+  /* True while Supabase Storage originals are known to fail (HTTP 402 quota restriction, outage). Set the first time one
+     original photo errors, remembered for 10 minutes, so the page never keeps requesting a URL it already knows is broken. */
+  function supabaseDown() {
+    if (!inBrowser) return false;
+    if (supabaseDownMemo) return true;
+    try {
+      var t = Number(root.localStorage.getItem(DOWN_KEY));
+      if (t && Date.now() - t < DOWN_TTL) { supabaseDownMemo = true; return true; }
+    } catch (e) {}
+    return false;
+  }
+  function markSupabaseDown() {
+    supabaseDownMemo = true;
+    try { root.localStorage.setItem(DOWN_KEY, String(Date.now())); } catch (e) {}
+    root.setTimeout && root.setTimeout(function () { supabaseDownMemo = false; }, DOWN_TTL);
+  }
+
   function supabaseAllowed(source) {
     if (SUPABASE_MODE === 'off' || !inBrowser) return false;
     if (SUPABASE_MODE === 'on' || supabaseProxyWorks) return true;
@@ -78,12 +99,14 @@
     if (typeof source !== 'string' || !/^https?:\/\//i.test(source)) return source;
     // Never proxy an ImageKit URL again; it may already belong to this account or another CDN.
     if (/^https:\/\/ik\.imagekit\.io\//i.test(source)) return source;
-    if (SUPABASE.test(source) && !supabaseAllowed(source)) return source;
+    if (SUPABASE.test(source) && !supabaseAllowed(source)) return supabaseDown() ? PLACEHOLDER : source;
     var w = Math.max(1, Math.min(2400, Math.round(Number(width) || 800)));
     if (!inBrowser && w > BUILD_MAX_WIDTH) return source;
     return ENDPOINT + '/tr:w-' + w + ',q-75,f-auto/' + source;
   }
   imageKitUrl.original = original;
+  imageKitUrl.placeholder = PLACEHOLDER;
+  imageKitUrl.supabaseDown = supabaseDown;
 
   if (inBrowser && root.addEventListener && !root.__STM_IMAGE_FALLBACK_INSTALLED) {
     root.__STM_IMAGE_FALLBACK_INSTALLED = true;
@@ -93,10 +116,24 @@
     root.addEventListener('error', function (event) {
       var img = event.target;
       if (!img || img.tagName !== 'IMG') return;
-      var fallback = original(img.getAttribute('src'));
-      if (!fallback) return;
+      var src = img.getAttribute('src') || '';
+      if (src === PLACEHOLDER) { event.stopImmediatePropagation(); return; } // never loop on the placeholder itself
+      var fallback = original(src);
+      var failed = fallback || src;
+      if (!SUPABASE.test(failed)) { if (!fallback) return; event.stopImmediatePropagation(); img.src = fallback; return; }
+      // The failing photo lives in Supabase Storage. A failed proxy request is retried against the original only while
+      // Supabase is not known to be down; otherwise (or when the original itself failed) remember that it is down and use a
+      // verified non-Supabase gallery photo if the product has one, else the photo-unavailable placeholder.
+      if (fallback && !supabaseDown()) { event.stopImmediatePropagation(); img.src = fallback; return; }
+      markSupabaseDown();
       event.stopImmediatePropagation();
-      img.src = fallback;
+      var next = [];
+      try { next = JSON.parse(img.getAttribute('data-fallbacks') || '[]'); } catch (e) {}
+      var i = 0; while (i < next.length && SUPABASE.test(next[i] || '')) i++;
+      if (i < next.length) { img.setAttribute('data-fallbacks', JSON.stringify(next.slice(i + 1))); img.src = next[i]; return; }
+      img.setAttribute('data-fallbacks', '[]');
+      img.setAttribute('data-photo-unavailable', 'true');
+      img.src = PLACEHOLDER;
     }, true);
   }
   return imageKitUrl;
