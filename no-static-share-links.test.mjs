@@ -13,6 +13,7 @@ assert.ok(homepage.includes("var legacyProduct = q.get('product')"), 'legacy que
 assert.ok(homepage.includes("location.replace(productPath"), 'legacy query product links replace to the static product URL');
 assert.ok(homepage.includes("canonical.href = 'https://stermontarcade.co.ke' + productPath"), 'legacy query redirect sets the product canonical before navigating');
 assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'), 'homepage SEO crawl links remain present');
+assert.ok(homepage.includes('id="pp-whatsapp"'), 'the full mobile-shell product page includes a WhatsApp order action');
 const homeGrid = (homepage.match(/<ul id="grid"[\s\S]*?<\/ul>/) || [])[0] || '';
 assert.ok(homeGrid.includes('https://stermontarcade.co.ke/p/'), 'homepage SSR cards use static product URLs');
 assert.doesNotMatch(homeGrid, /\?product=/, 'homepage SSR cards contain no query product URLs');
@@ -43,6 +44,7 @@ assert.ok(checkout.includes('714777') && checkout.includes('0789514060'), 'M-Pes
 const app = readFileSync('mobile-shell/app.js', 'utf8');
 assert.ok(app.includes("localStorage.getItem('shell.' + k)"), 'mobile shell reads the shared shell cart');
 assert.ok(app.includes("const productUrl ="), 'mobile shell keeps the static product URL in the address bar');
+assert.ok(app.includes("https://wa.me/254789514060?text="), 'mobile-shell product WhatsApp orders use +254 789 514 060');
 assert.doesNotMatch(app, /s => '\/\?product='/, 'mobile shell fallback links no longer generate query product URLs');
 
 const normalizer = readFileSync('product-link-normalizer.mjs', 'utf8');
