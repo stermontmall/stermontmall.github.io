@@ -18,6 +18,7 @@ on:
       - 'cat-feel.js'
       - 'products.html'
       - 'seo-pest/blog.test.mjs'
+      - 'seo-pest/blog-build.mjs'
       - 'mobile-shell/shell.test.py'
       - 'shell-route-loader.js'
       - 'no-static-share-links.test.mjs'
