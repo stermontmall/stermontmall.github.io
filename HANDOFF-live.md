@@ -693,3 +693,9 @@ The Build product pages GitHub Actions workflow is scheduled every 30 minutes; t
 - Next: owner merges #989 and #991, then `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`, then open /p/darvin-50ew-insecticide-28-ml.html on a phone and confirm the full shell loads. #987 duplicates #989 and can be closed.
 
 - The handoff-only checkpoint advanced the PR branch head after the first CI start; the SEO gate run 45002208943 was cancelled during that update, and route run 45002208966 was still executing against the earlier code-identical app/test state. A final app-path commit is being pushed to retrigger both workflows against the latest PR head; merge only after those final-head runs complete.
+
+## 2026-11-23 11:58 Africa/Nairobi — Claude: connect GitHub, Supabase, Neon
+- Done: GitHub repo stermontmall/stermontmall.github.io attached with push access and cloned to /home/claude/stermontmall.github.io.
+- Done: Supabase connector already connected, but `list_projects` returned no projects on this account.
+- Blocked: Neon connector (https://mcp.neon.tech/mcp) not installed; owner must connect it in claude.ai connector settings.
+- Next: after Neon is connected, verify `public.publishing_rules` key `publish_products` is readable, then continue from the "Next" entries above.
