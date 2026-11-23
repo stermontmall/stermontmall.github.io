@@ -110,11 +110,14 @@ let catalogP = null;
 let fullCatalog = false;   // true once the WHOLE catalog is in PRODUCTS (the product link fast path in section 9b must never overwrite it)
 function loadCatalog() {
   if (!catalogP) {
-    catalogP = Promise.all([
-      apiAll('storefront_products?select=' + PRODUCT_COLS + '&order=id.asc').then(r => r.map(withCover)),
-      api(CAT_Q),
-      fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}))
-    ]).then(([rows, cats, names]) => { buildCatalog(rows, cats, names); fullCatalog = true; }).catch(e => { catalogP = null; throw e; });  // a failed load can be retried
+    const names = fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}));
+    // Live read from Neon; if the browser cannot reach Neon (CORS, network, outage) use the same-site snapshot so the shop is never empty.
+    const live = Promise.all([apiAll('storefront_products?select=' + PRODUCT_COLS + '&order=id.asc').then(r => r.map(withCover)), api(CAT_Q)]);
+    const snap = () => fetch('/catalog-snapshot.json').then(r => { if (!r.ok) throw new Error('snapshot HTTP ' + r.status); return r.json(); })
+      .then(d => [d.products.map(withCover), d.categories]);
+    catalogP = live.catch(e => { console.warn('Neon unavailable, using catalog-snapshot.json:', e); window.STM_LAST_ERROR = String(e && e.message || e); return snap().catch(() => { throw e; }); })
+      .then(async ([rows, cats]) => { buildCatalog(rows, cats, await names); fullCatalog = true; })
+      .catch(e => { catalogP = null; throw e; });  // a failed load can be retried
   }
   return catalogP;
 }
