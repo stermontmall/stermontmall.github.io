@@ -271,6 +271,7 @@ function syncProductMeta() {   // tab title + address follow the open product (a
   if (open) { const u = productUrl(); if (u && location.pathname + location.search + location.hash !== u) history.replaceState(history.state, '', u); }
   else if (cu !== '/') { if (location.pathname + location.search + location.hash !== cu) history.replaceState(history.state, '', cu); }
   else if (/^\/c\/[^/]+\.html$/.test(location.pathname)) history.replaceState(history.state, '', '/');   // only an address this code set is reset: other parameters (campaign tags) stay
+  else if (!PRODUCT_PATH && /^\/p\/[^/]+\.html$/i.test(location.pathname)) history.replaceState(history.state, '', '/');   // a legacy query/hash alias returns to the shell home when Back closes its product overlay
   else if (location.pathname === '/' && new URLSearchParams(location.search).has('cat')) {
     const params = new URLSearchParams(location.search); params.delete('cat');
     const rest = params.toString();
