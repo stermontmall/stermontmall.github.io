@@ -1,3 +1,15 @@
+## 2026-11-23 11:20 (Africa/Nairobi) — ImageKit product photo upload workflow added
+
+### Done (branch `wip-imagekit-photo-upload`, NOT merged)
+- New workflow `.github/workflows/upload-product-photos.yml` + `scripts/upload-product-photos-to-imagekit.mjs`. Input `photos`: one `file-name|https://image-url` per line (max 40). ImageKit downloads each image (upload-by-URL) into /products/ on account w6hxfnwmw; the script checks the stored file loads as an image and is at least 500x500, converts non-browser formats (AVIF/HEIC/TIFF/BMP) to WebP via an ImageKit transformation URL, and prints `browser_url` per photo in the log and run summary. Uses secret `IMAGEKIT_PRIVATE_KEY`.
+- Neon rule `publish_products` is v2 (four-tier price_4tier markup, stock 1000, low_at 50 via post-insert update, 600-800 word SEO, ImageKit photos, PCPB ban guard). Old rule deleted today.
+
+### Not verified
+- Not run yet: needs the secret to exist and a real run. HEIC/AVIF conversion is untested.
+
+### Next
+1. Merge the branch, confirm secret `IMAGEKIT_PRIVATE_KEY` exists, then run Actions > Upload product photos to ImageKit with one test line and check the run summary.
+
 ## 2026-11-23 10:58 (Africa/Nairobi) — Neon deploy workflows: verify step now gets NEON_API_KEY
 
 ### Done (branch `wip-neon-verify-api-key`, NOT merged)

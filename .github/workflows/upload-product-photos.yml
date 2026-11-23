@@ -1,0 +1,41 @@
+name: Upload product photos to ImageKit
+
+# Used by Claude and ChatGPT when publishing products (Neon rule publish_products, Step 4).
+# Run it from the Actions tab (Run workflow) or let the assistant dispatch it.
+# Input "photos": one photo per line, "file-name|https://image-url". ImageKit downloads each image, stores it in /products/,
+# and the job checks it loads and is at least 500 x 500. The "browser_url" for each photo is printed in the log and the run summary.
+# Needs the repository secret IMAGEKIT_PRIVATE_KEY (ImageKit > Developer options > Private key). It never touches the database.
+
+on:
+  workflow_dispatch:
+    inputs:
+      photos:
+        description: 'One per line: file-name|https://image-url (max 40 lines)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: upload-product-photos
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Upload photos to ImageKit and verify them
+        env:
+          PHOTOS: ${{ inputs.photos }}
+          IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
+        run: node scripts/upload-product-photos-to-imagekit.mjs
