@@ -2879,5 +2879,19 @@
   "maxigrow-high-p-foliar-fertilizer-200ml": {
     "title": "Maxigrow High P 200ml Price in Kenya | {price}",
     "desc": "Buy Maxigrow High P 200ml in Kenya at {price}. M-Pesa checkout, Nairobi pickup and nationwide delivery."
+  },
+  "familly-insect-killer-super-strength-aerosol-spray": {
+    "title": "Family Insect Killer Aerosol Spray Price in Kenya | {price}",
+    "desc": "Family Insect Killer Super Strength aerosol spray, {price} per can. M-Pesa checkout and delivery across Kenya; follow the label directions.",
+    "faq": [
+      [
+        "Where can I buy Family Insect Killer in Kenya?",
+        "Order Family Insect Killer Super Strength Aerosol Spray from Stermont Arcade for {price} per can. Pay by M-Pesa and confirm delivery options before payment."
+      ],
+      [
+        "What insects does Family Insect Killer aerosol target?",
+        "It is listed as a ready-to-use aerosol for flying and crawling insects, including mosquitoes, flies and cockroaches. Check the can label for approved uses and follow all safety directions."
+      ]
+    ]
   }
 }
