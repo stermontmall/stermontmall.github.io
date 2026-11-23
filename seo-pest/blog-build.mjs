@@ -39,7 +39,7 @@ function categoryTarget(slug) {
 };
 export function renderPost(a) {
   const resolvedCategory = categoryTarget(a.cat);
-  const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, p, t) => `<a href="${p.startsWith('/p/') ? shellProductLink(p.slice(3).replace(/\.html$/i, '')) : p}">${t}</a>`);
+  const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, p, t) => { const product = p.startsWith('/p/') ? shellProductLink(p.slice(3).replace(/\.html$/i, '')) : null; const cat = p.startsWith('/c/') ? categoryTarget(p.slice(3).replace(/\.html$/i, '')) : null; const href = product || (cat ? '/c/' + cat + '.html' : (p.startsWith('/c/') ? '' : p)); return href ? '<a href="' + href + '">' + t + '</a>' : t; });
   const para = s => `<p>${inline(s)}</p>`;
   const total = words(allText(a));
   const url = `${SITE}/blog/${a.slug}.html`;
