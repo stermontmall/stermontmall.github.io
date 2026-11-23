@@ -13,6 +13,8 @@ on:
       - 'product-trust.js'
       - 'cat-feel.js'
       - 'blog-build.mjs'
+      - 'category-link-normalizer.mjs'
+      - 'category-parent-map.json'
       - 'seo-pest/**'
       - 'catalog-v10.js'
       - 'admin.html'
@@ -107,14 +109,13 @@ jobs:
           node seo-shell-redirect.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/03-shell-route-fixtures.log"
       - name: Run mobile shell browser regression suite
         run: timeout --signal=TERM --kill-after=30s 12m python3 -u mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
-      - name: Broken and placeholder links (link-check.mjs)
-        run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/05-link-check.log"
       - name: Test permanent product-code display and admin integration
         run: node product-codes.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/06-product-codes.log"
       - name: Check JavaScript syntax
         run: |
           {
             node --check category-editorial.mjs
+            node --check category-link-normalizer.mjs
             node --check generate-products.mjs
             node --check seo-shell-redirect.mjs
             node --check seo-shell-redirect.test.mjs
@@ -155,13 +156,6 @@ jobs:
         run: node seo-safe-blog-meta.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/11-seo-safe-blog-meta.log"
       - name: Test hand-written product content
         run: node product-content.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/12-product-content.log"
-      - name: Normalize blog titles and rebuild blog index and sitemap
-        run: |
-          {
-            node seo-blog-titles.mjs
-            node blog-build.mjs
-            node seo-safe-blog-meta.mjs
-          } 2>&1 | tee "$RUNNER_TEMP/ci-logs/13-blog-build.log"
       # Do not make unrelated admin/backend PRs depend on the legacy live Supabase catalogue.
       # The deterministic shell/SEO unit tests above always run. Build live generated pages only
       # when this PR changes catalogue or page-generation inputs (or on manual dispatch).
@@ -185,11 +179,12 @@ jobs:
       - name: Build product and category pages from the live public catalogue
         if: steps.live_catalogue.outputs.required == 'true'
         run: node generate-products.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/14-generate-products.log"
-      - name: Apply the same SEO enrichment passes used by production
+      - name: Build Kenya price guides and normalize their category links
+        run: node seo-kenya.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-kenya.log"
+      - name: Apply the remaining SEO enrichment passes used by production
         if: steps.live_catalogue.outputs.required == 'true'
         run: |
           {
-            node seo-kenya.mjs
             node seo-overrides.mjs
             node seo-titles.mjs
             node seo-safe-meta.mjs
@@ -201,6 +196,15 @@ jobs:
       - name: Normalize all generated customer-facing product links
         if: steps.live_catalogue.outputs.required == 'true'
         run: node product-link-normalizer.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-normalize-generated-links.log"
+      - name: Normalize blog titles, category links and sitemap entries
+        run: |
+          {
+            node seo-blog-titles.mjs
+            node blog-build.mjs
+            node seo-safe-blog-meta.mjs
+          } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15c-blog-build.log"
+      - name: Broken and placeholder links (link-check.mjs)
+        run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/16-link-check.log"
       - name: Verify generated pages use canonical static product links
         if: steps.live_catalogue.outputs.required == 'true'
         env:
