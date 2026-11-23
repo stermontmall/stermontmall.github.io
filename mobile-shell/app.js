@@ -48,7 +48,7 @@ const ls = {
    Names come from /product-names.json (the heading each product page shows, rebuilt with the site); if that file is
    missing the plain database name is used. Filtering, sorting and paging then run in memory, so every filter is instant. */
 const NEON = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';  // Neon Data API, anonymous read-only, CORS limited to https://stermontarcade.co.ke
-const api = path => fetch(NEON + path, { cache: 'no-store' })
+const api = path => fetch(NEON + path)
   .then(r => { if (!r.ok) throw new Error('Neon HTTP ' + r.status); return r.json(); });
 const CAT_Q = 'categories?select=id,name,slug,parent_id,sort_order,is_promo&active=eq.true&order=sort_order.asc,name.asc';
 const byOrder = (a, b) => (a.sort_order - b.sort_order) || String(a.name).localeCompare(String(b.name));
@@ -61,10 +61,8 @@ const withCover = r => ({ ...r, cover_image: Array.isArray(r.images) && r.images
 async function apiAll(path, pageSize = 1000) {
   const all = [];
   for (let offset = 0; ; offset += pageSize) {
-    const r = await fetch(NEON + path, {
-      headers: { Range: offset + '-' + (offset + pageSize - 1), 'Range-Unit': 'items' },
-      cache: 'no-store'
-    });
+    // Query-string paging, no custom headers: a header such as Range or cache:'no-store' forces a CORS preflight that the Neon Data API may refuse.
+    const r = await fetch(NEON + path + (path.includes('?') ? '&' : '?') + 'limit=' + pageSize + '&offset=' + offset);
     if (!r.ok) throw new Error('Neon HTTP ' + r.status + ' while loading catalogue page ' + (offset / pageSize + 1));
     const batch = await r.json();
     if (!Array.isArray(batch)) throw new Error('Neon returned an invalid catalogue page');
