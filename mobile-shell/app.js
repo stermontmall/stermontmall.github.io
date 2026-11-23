@@ -710,9 +710,9 @@ async function renderPP() {
   const p = qb.p; if (!p) return;
   const sz = sizeOf(p, qb.size), off = sz.old ? Math.round((1 - sz.price / sz.old) * 100) : 0, rowId = sz.rowId;
   $('#pp-title').textContent = p.name; $('#pp-name').textContent = p.name;
-  const productSharePath = '/p/' + encodeURIComponent(p.slug || p.id) + '.html' + (sz.slug && sz.slug !== p.slug ? '#' + encodeURIComponent(sz.slug) : '');
-  const whatsappText = 'Hello Stermont Arcade, I want to order: ' + p.name + ' – ' + sz.label + ' (' + money(sz.price) + ') ' + location.origin + productSharePath;
-  const whatsapp = $('#pp-whatsapp'); if (whatsapp) whatsapp.href = 'https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(whatsappText);
+  const productSharePath = productUrl() || ('/p/' + encodeURIComponent(p.slug || p.id) + '.html');
+  const whatsappText = 'Hello Stermont Arcade, I want to order: ' + p.name + ' – ' + sz.label + ' (KSh ' + fmt(sz.price) + ') ' + location.origin + productSharePath;
+  const whatsapp = $('#pp-whatsapp'); if (whatsapp) whatsapp.href = 'https://wa.me/254789514060?text=' + encodeURIComponent(whatsappText);
   $('#pp-add').textContent = editingCartKey ? 'Update cart item' : 'Add to cart';
   $('#pp-buy').hidden = !!editingCartKey;
   $('#pp-img').style.background = '#fff'; $('#pp-img').innerHTML = thumb({ img: pp.img || p.img, emoji: p.emoji }, true);
