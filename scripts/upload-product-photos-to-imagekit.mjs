@@ -40,13 +40,17 @@ export function nameFromUrl(u) {
     return cleanName(x.searchParams.get('product') || x.pathname.split('/').filter(Boolean).pop() || x.hostname);
   } catch { return ''; }
 }
-export function extractImageCandidates(html, baseUrl) {
-  const out = [];
-  const add = (v) => {
+export function extractImageCandidates(html, baseUrl, productName = '') {
+  const ranked = new Map();
+  const tokens = String(productName).toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 2 && !['product','spray','bait','insecticide','pellets'].includes(t));
+  const add = (v, score = 0) => {
     if (!v || typeof v !== 'string') return;
     try {
       const abs = new URL(v.trim().replace(/&amp;/g, '&'), baseUrl).href;
-      if (/^https:/i.test(abs) && !out.includes(abs)) out.push(abs);
+      if (/^https:/i.test(abs)) {
+        const prior = ranked.get(abs);
+        if (!prior || score > prior.score) ranked.set(abs, { url: abs, score });
+      }
     } catch {}
   };
   const attr = (tag, key) => (tag.match(new RegExp("\\b" + key + "\\s*=\\s*(['\\\"])(.*?)\\1", "i")) || [])[2] || "";
@@ -55,18 +59,21 @@ export function extractImageCandidates(html, baseUrl) {
     const alt = attr(tag, 'alt');
     const context = (alt + ' ' + attr(tag, 'class') + ' ' + attr(tag, 'itemprop')).toLowerCase();
     if (/logo|payment|visa|mastercard|facebook|instagram|whatsapp|twitter|tiktok|avatar|icon|banner/i.test(context)) continue;
-    for (const key of ['data-zoom-image','data-original','data-src','data-lazy-src','src']) add(attr(tag, key));
+    const values = ['data-zoom-image','data-original','data-src','data-lazy-src','src'].map((key) => attr(tag, key)).filter(Boolean);
+    const imageText = (alt + ' ' + attr(tag, 'title') + ' ' + values.join(' ')).toLowerCase();
+    const score = tokens.reduce((n, token) => n + (imageText.includes(token) ? 5 : 0), 0);
+    for (const value of values) add(value, score);
     for (const key of ['data-srcset','srcset']) {
       const srcset = attr(tag, key);
-      for (const part of srcset.split(',')) add(part.trim().split(/\s+/)[0]);
+      for (const part of srcset.split(',')) add(part.trim().split(/\s+/)[0], score);
     }
   }
   for (const tag of html.match(/<meta\s+[^>]*>/gi) || []) {
     const key = (tag.match(/(?:property|name)\s*=\s*["']([^"']+)["']/i) || [])[1] || '';
-    if (/^(og:image(:secure_url|:url)?|twitter:image(:src)?)$/i.test(key)) add((tag.match(/content\s*=\s*["']([^"']+)["']/i) || [])[1]);
+    if (/^(og:image(:secure_url|:url)?|twitter:image(:src)?)$/i.test(key)) add((tag.match(/content\s*=\s*["']([^"']+)["']/i) || [])[1], 1);
   }
   for (const tag of html.match(/<link\s+[^>]*>/gi) || []) {
-    if (/rel\s*=\s*["']image_src["']/i.test(tag)) add((tag.match(/href\s*=\s*["']([^"']+)["']/i) || [])[1]);
+    if (/rel\s*=\s*["']image_src["']/i.test(tag)) add((tag.match(/href\s*=\s*["']([^"']+)["']/i) || [])[1], 1);
   }
   for (const m of html.matchAll(/<script[^>]+type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
     try {
@@ -74,17 +81,17 @@ export function extractImageCandidates(html, baseUrl) {
         if (!n || typeof n !== 'object') return;
         if (Array.isArray(n)) { n.forEach(walk); return; }
         if ([].concat(n['@type'] || []).some((t) => /Product/i.test(t)) && n.image) {
-          for (const i of [].concat(n.image)) add(typeof i === 'string' ? i : i && (i.url || i.contentUrl));
+          for (const i of [].concat(n.image)) add(typeof i === 'string' ? i : i && (i.url || i.contentUrl), 8);
         }
         Object.values(n).forEach(walk);
       };
       walk(JSON.parse(m[1]));
     } catch {}
   }
-  return out;
+  return [...ranked.values()].sort((a, b) => b.score - a.score).map((x) => x.url);
 }
 
-async function resolveSources(src) {
+async function resolveSources(src, productName = '') {
   const page = normalizePageUrl(src);
   const r = await fetch(page, {
     headers: { 'User-Agent': UA, Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,' + IMAGE_ACCEPT },
@@ -95,7 +102,7 @@ async function resolveSources(src) {
   if (type.startsWith('image/')) return { list: [r.url], from: 'direct' };
   if (type === 'text/html' || type === 'application/xhtml+xml' || type.includes('xml')) {
     const html = await r.text();
-    const list = extractImageCandidates(html, r.url).slice(0, 12);
+    const list = extractImageCandidates(html, r.url, productName).slice(0, 12);
     if (!list.length) throw new Error('source page returned HTML but no product image was found');
     return { list, from: 'product-page' };
   }
@@ -175,7 +182,7 @@ async function one(line) {
   if (!name) return { name, source: src, ok: false, error: 'could not determine product photo filename' };
   const result = { name, source: src, ok: false };
   try {
-    const { list, from } = await resolveSources(src);
+    const { list, from } = await resolveSources(src, name);
     const failures = [];
     for (const candidate of list) {
       const uploaded = await uploadOne(name, candidate);
