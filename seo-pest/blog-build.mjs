@@ -33,6 +33,7 @@ function categoryTarget(slug) {
   return parents.find(hasProducts) || null;
 }
 export function renderPost(a) {
+  const resolvedCategory = categoryTarget(a.cat);
   const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, p, t) => `<a href="${p.startsWith('/p/') ? shellProductLink(p.slice(3).replace(/\.html$/i, '')) : p}">${t}</a>`);
   const para = s => `<p>${inline(s)}</p>`;
   const total = words(allText(a));
@@ -41,7 +42,7 @@ export function renderPost(a) {
   const nice = new Date(DATE + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
   const section = s => `<h2>${esc(s.heading)}</h2>\n${s.paragraphs.map(para).join('\n')}${s.bullets && s.bullets.length ? `\n<ul>${s.bullets.map(b => `<li>${inline(b)}</li>`).join('')}</ul>` : ''}`;
   const faqHtml = `<h2>Frequently asked questions</h2>\n${a.faq.map(([q, an]) => `<h3>${esc(q)}</h3>\n<p>${esc(an)}</p>`).join('\n')}`;
-  const catTitle = (() => { try { const m = fs.readFileSync(path.join(root, 'c', a.cat + '.html'), 'utf8').match(/<h1[^>]*>([^<]*)<\/h1>/i); return m ? unesc(m[1].trim()) : 'Browse the category'; } catch { return 'Browse the category'; } })();
+  const catTitle = (() => { try { const m = fs.readFileSync(path.join(root, 'c', resolvedCategory + '.html'), 'utf8').match(/<h1[^>]*>([^<]*)<\/h1>/i); return m ? unesc(m[1].trim()) : 'Browse the category'; } catch { return 'Browse the category'; } })();
   const relTitle = r => { try { const m = fs.readFileSync(path.join(root, 'blog', r + '.html'), 'utf8').match(/<h1[^>]*>([\s\S]*?)<\/h1>/i); return m ? unesc(m[1].replace(/<[^>]+>/g, '').trim()) : r; } catch { return r; } };
   const catHtml = `<div class="box"><strong>Shop this category</strong><ul class="rel">${resolvedCategory ? `<li><a href="/c/${resolvedCategory}.html">${esc(catTitle)}</a></li>` : ''}<li><a href="${shellProductLink(a.product)}">See the product and its sizes</a></li></ul></div>`;
   const relHtml = a.related.length ? `<h2>Related guides</h2>\n<ul class="rel">${a.related.map(r => `<li><a href="/blog/${r}.html">${esc(relTitle(r))}</a></li>`).join('')}</ul>` : '';
