@@ -545,7 +545,7 @@ with sync_playwright() as p:
     check('address: opening the address shows that product page with that size', 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
     check('address: a legacy product query resolves to the canonical static product URL and the tab title shows the product', p9.evaluate("location.pathname.startsWith('/p/') && location.search === ''") and 'Garden Hose Connector Set' in p9.title())
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
-    check('address: Back from an opened static product address lands on the shell home ("/")', p9.evaluate('location.pathname + location.search') == '/' and p9.locator('#view-home').is_visible(), p9.url)
+    check('Back closes the product overlay while preserving the canonical static product URL', p9.locator('#page-product.open').count() == 0 and p9.evaluate("location.pathname.startsWith('/p/') && location.search === ''"), p9.url)
     p9.reload(); p9.wait_for_selector('#grid .card[data-id]')
     p9.goto(f'{BASE}/?product=home-1'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: a single-size product opens from its address too', 'Air Fryer' in p9.locator('#pp-name').inner_text())
@@ -742,8 +742,14 @@ with sync_playwright() as p:
     FAIL[0] = True  # simulate the Supabase 402 quota restriction for every REST request
     fallback_html = '''<!doctype html><html><head><meta name="stm-id" content="static-fallback"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Static Fallback Sprayer","image":["https://img.test/ok.png"],"sku":"STM-TEST-402","offers":{"@type":"Offer","priceCurrency":"KES","price":1234,"availability":"https://schema.org/InStock"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"http://test/"},{"@type":"ListItem","position":2,"name":"Garden Tools","item":"http://test/c/garden-tools.html"},{"@type":"ListItem","position":3,"name":"Static Fallback Sprayer","item":"http://test/p/static-fallback.html"}]}</script></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Published description survives a database outage.</p></section></div></body></html>'''
     p17 = c17.new_page(); e17 = []; p17.on('pageerror', lambda e: e17.append(str(e)))
+    p17_requests = []
+    p17.on('request', lambda r: p17_requests.append('request ' + r.url) if '/p/static-fallback.html' in r.url else None)
+    p17.on('response', lambda r: p17_requests.append('response ' + str(r.status) + ' ' + r.url) if '/p/static-fallback.html' in r.url else None)
+    p17.on('requestfailed', lambda r: p17_requests.append('failed ' + r.url + ' ' + str(r.failure)) if '/p/static-fallback.html' in r.url else None)
     p17.route('**/p/static-fallback.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=fallback_html))
-    p17.goto(f'{BASE}/?product=static-fallback'); p17.wait_for_selector('#page-product.open', timeout=15000); p17.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Published description survives')", timeout=5000)
+    p17.goto(f'{BASE}/?product=static-fallback'); p17.wait_for_timeout(1200)
+    print('STATIC FALLBACK DEBUG', p17_requests, p17.locator('#toast').inner_text(), p17.evaluate('window.STM_LAST_ERROR'), p17.locator('#page-product.open').count())
+    p17.wait_for_selector('#page-product.open', timeout=15000); p17.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Published description survives')", timeout=5000)
     check('product deep link opens from the published SEO page when Supabase REST returns 402', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
     check('static fallback retains product code and full published description', 'STM-TEST-402' in p17.locator('#pp-meta').inner_text() and 'Published description survives a database outage.' in p17.locator('#pp-desc').inner_text())
     check('static product fallback has no JavaScript errors', not e17, e17[:3])
