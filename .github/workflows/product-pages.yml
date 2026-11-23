@@ -1,7 +1,11 @@
 # Stermont Arcade - rebuilds every product page, category page and the product sitemap automatically.
 # Runs: every 30 minutes, when generate-products.mjs changes, on a repository_dispatch event of type catalog-changed (instant rebuild), and whenever you tap "Run workflow" in the Actions tab.
 # Why every 30 minutes: a product only has a /p/ page after a build, so a product activated between builds had a dead link until the next one (2026-11-06, Agrimec 018EC). 404.html now opens such links in the shop meanwhile, and check-product-pages.mjs fails the run if an active product is still missing a page.
-# Safety: catalogue-count-guard.mjs stops the build when the live catalogue is almost empty (for example while products are hidden during a database quota pause), because the build deletes every old page before it writes the new ones.
+# Safety: catalogue-count-guard.mjs stops the build when the live catalogue is almost empty, because the build deletes every old page before it writes the new ones.
+# 2026-11-23 (Neon): the catalogue now comes from Neon (scripts/export-neon-catalog.mjs -> .build/*.json, read by generate-products.mjs through its PRODUCTS_JSON / REVIEWS_JSON / SLUG_REDIRECTS_JSON hooks).
+# Pages of inactive products stay public: scripts/preserve-legacy-pages.mjs snapshots the old pages and sitemaps before the generator runs, puts back whatever the generator deleted, and fails the build if any old /p/ or /c/ URL is missing afterwards.
+# On any branch other than main the build does NOT commit or push; it uploads a "build-report" artifact (sitemaps + every product page title) to compare with main.
+# Needs the repository secret NEON_DATABASE_URL (project restless-shape-79120240, database stermont).
 name: Build product pages
 
 on:
@@ -21,6 +25,8 @@ on:
       - 'generate-products.mjs'
       - 'catalogue-count-guard.mjs'
       - 'catalogue-count-guard.test.mjs'
+      - 'scripts/export-neon-catalog.mjs'
+      - 'scripts/preserve-legacy-pages.mjs'
       - 'mobile-shell/app.js'
       - 'mobile-shell/description.test.mjs'
       - 'product-description-html.mjs'
@@ -79,6 +85,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install the Postgres client (pg)
+        run: npm install --no-save pg
+
       - name: Test parent category hub aggregation
         run: node category-hubs.test.mjs
 
@@ -103,12 +112,20 @@ jobs:
       - name: Test the empty-catalogue guard
         run: node catalogue-count-guard.test.mjs
 
+      - name: Read the active catalogue from Neon (.build/*.json)
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: node scripts/export-neon-catalog.mjs
+
       - name: Guard - refuse to rebuild from an almost empty catalogue
         env:
           ALLOW_SMALL_CATALOGUE: ${{ github.event.inputs.allow_small_catalogue }}
+          PRESERVE_LEGACY_PAGES: '1'
         run: node catalogue-count-guard.mjs
 
       - name: Audit active catalogue before page generation
+        env:
+          REQUIRE_SEO_TITLES: '0'
         run: node seo-catalog-guard.mjs
 
       - name: Test allowlisted ordinary-product meta descriptions
@@ -132,8 +149,18 @@ jobs:
       - name: Test homepage server-rendered product cards
         run: node home-grid-ssr.test.mjs
 
-      - name: Build pages and sitemap from the live catalog
+      - name: Snapshot the current pages and sitemaps (before the generator deletes anything)
+        run: node scripts/preserve-legacy-pages.mjs snapshot
+
+      - name: Build pages and sitemap from the Neon catalogue
+        env:
+          PRODUCTS_JSON: .build/products.json
+          REVIEWS_JSON: .build/reviews.json
+          SLUG_REDIRECTS_JSON: .build/slug-redirects.json
         run: node generate-products.mjs
+
+      - name: Put back the pages of inactive products and re-add them to the sitemaps (fails if any old URL is missing)
+        run: node scripts/preserve-legacy-pages.mjs restore
 
       - name: Kenya SEO titles, descriptions and price guides (seo-kenya.mjs)
         continue-on-error: true
@@ -169,18 +196,30 @@ jobs:
       - name: Route product and category pages into the full mobile shell
         run: node seo-shell-redirect.mjs
 
-      - name: Speed - connect to the shop database early (preconnect)
-        run: |
-          # Safe and repeatable: adds one line to the home page head if it is not there yet.
-          if ! grep -q 'rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co"' index.html; then
-            sed -i '0,/<meta charset="UTF-8">/s##&\n  <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>#' index.html
-          fi
-
       - name: Warn about broken or placeholder links before saving (link-check.mjs)
         continue-on-error: true
         run: node link-check.mjs --warn
 
-      - name: Save changes (only if something changed)
+      - name: Build report (branches other than main - nothing is committed)
+        if: github.ref != 'refs/heads/main'
+        run: |
+          mkdir -p build-report
+          cp sitemap-products.xml sitemap.xml sitemap-state.json build-report/ 2>/dev/null || true
+          grep -o '<title>[^<]*</title>' p/*.html | sort > build-report/titles.txt || true
+          grep -o '<loc>[^<]*</loc>' sitemap-products.xml | sort > build-report/product-urls.txt || true
+          echo "Product pages: $(ls p/*.html | wc -l)"
+          echo "Category pages: $(ls c/*.html | wc -l)"
+          echo "URLs in sitemap-products.xml: $(wc -l < build-report/product-urls.txt)"
+
+      - name: Upload build report (branches other than main)
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-report
+          path: build-report/
+
+      - name: Save changes (only if something changed; main only)
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "bot"
           git config user.email "bot@users.noreply.github.com"
@@ -230,6 +269,7 @@ jobs:
         run: node check-product-pages.mjs
 
       - name: Tell Bing and other search engines about changed pages (IndexNow)
+        if: github.ref == 'refs/heads/main'
         timeout-minutes: 1
         continue-on-error: true
         run: |
