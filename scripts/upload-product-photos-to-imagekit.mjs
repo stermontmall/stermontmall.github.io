@@ -41,13 +41,6 @@ const cleanName = (s) => s.toLowerCase().replace(/\.[a-z0-9]{2,5}$/i, '').replac
 
 const UA = 'Mozilla/5.0 (compatible; StermontPhotoBot/1.0; +https://stermontarcade.co.ke)';
 
-export function isTrustedSource(u) {
-  try {
-    const h = new URL(u).hostname.toLowerCase();
-    return TRUSTED_HOSTS.some((t) => h === t || h.endsWith('.' + t));
-  } catch { return false; }
-}
-
 // Own-site shell links (/?product=slug) are JavaScript pages; the static product page /p/slug.html has the real tags.
 export function normalizePageUrl(u) {
   try {
