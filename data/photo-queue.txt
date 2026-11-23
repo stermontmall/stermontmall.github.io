@@ -1,3 +1,4 @@
+# Re-run Version 6 photo uploads after adding explicit file extensions
 atraprat-135g|https://shop.rafikipestcontrol.com/products/atraprat-135g
 sticky-mouse-box|https://sokowise-api.b-cdn.net/media/13616.jpg?etag=8f8b95c1d3227adbb0615b424a783477&height=640&width=640
 protecta-mouse-bait-station|https://sokowise-api.b-cdn.net/media/v2/17871.webp?etag=eb140c3ee0cebf4528fae3293c00dca9&height=640&width=640
