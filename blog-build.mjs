@@ -6,7 +6,7 @@ import './seo-blog-chrome.mjs';   // 2026-11-05: shell top bar + bottom nav on e
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
-import { activeCategorySlugsFromPages, normalizeCategoryLinks } from './category-links.mjs';
+import { activeCategorySlugsFromCatalogSnapshot, normalizeCategoryLinks } from './category-links.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const START = '<!--BLOG-POSTS-START-->', END = '<!--BLOG-POSTS-END-->';
@@ -18,7 +18,7 @@ const GROUPS = [
 ];
 const OTHER = 'More guides';
 const today = new Date().toISOString().slice(0, 10);
-const activeCategorySlugs = activeCategorySlugsFromPages(existsSync('c') ? readdirSync('c').filter(f => f.endsWith('.html') && f !== 'index.html').map(f => ({ slug: f, html: readFileSync('c/' + f, 'utf8') })) : []);
+const activeCategorySlugs = activeCategorySlugsFromCatalogSnapshot(existsSync('catalog-snapshot.json') ? JSON.parse(readFileSync('catalog-snapshot.json', 'utf8')) : null, existsSync('p') ? readdirSync('p').filter(f => f.endsWith('.html')).map(f => ({ slug: f, html: readFileSync('p/' + f, 'utf8') })) : []);
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const unesc = s => String(s).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
 const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; };
