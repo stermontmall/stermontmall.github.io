@@ -94,7 +94,7 @@ def on_neon(route):
         if 'description' in query.get('select', [''])[0]:
             selected = [dict(description=f"ABOUT {r['name']}\\n- line one\\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=r['images'], product_code=r['product_code']) for r in selected]
     elif 'or' in query:
-        match = re.search(r'slug\\.eq\\.([^,]+)', query['or'][0])
+        match = re.search(r'slug\.eq\.([^,]+)', query['or'][0])
         slug = unquote(match.group(1)) if match else ''
         selected = [r for r in ROWS if r['slug'] == slug or r['id'] == slug]
     elif 'variant_group' in query:
