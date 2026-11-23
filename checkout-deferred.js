@@ -4,7 +4,7 @@
       var CFG = { paybill: '714777', payAcct: '0789514060', wa: '254789514060',
         /* Card payments (Paystack). Keep hidden until a verified live PAYSTACK_SECRET_KEY is configured. */
         card: false,
-        sbUrl: 'https://oewvtbnmyombbtggamor.supabase.co', sbKey: 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', sbRef: 'oewvtbnmyombbtggamor',
+        neonUrl: 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1', pickup: 'The Sarit Centre, Karuna Road, Westlands, Nairobi (confirm stock on WhatsApp first)',
         /* Free key from https://web3forms.com (enter the email that should receive order alerts) */
         mailKey: '2c55cbd0-5ec1-4603-a6a0-293b8a68faab',
         /* Optional second inbox: paste a key made with the other email here */
@@ -20,26 +20,12 @@
       function money(n) { return 'KSh ' + n.toLocaleString('en-KE'); }
       var cart = ls('stm_cart') || {}, cust = ls('stm_cust') || {}, step = 'cart', isOpen = false, opener = null, ref = '', lastMsg = '', lastUrl = '', sending = false, sendErr = '', doneRef = '', doneTotal = 0, doneCode = '', doneAmt = 0, doneVia = '';
       /* Saved checkout details belong to one person. If a different account (or a guest) is now using this phone, drop them so nobody sees the previous customer's details. */
-      function myUid() { try { var x = JSON.parse(localStorage.getItem('sb-' + CFG.sbRef + '-auth-token')); return x && x.user && x.user.id ? x.user.id : null; } catch (e) { return null; } }
+      function myUid() { return null; }
       var lastUid = myUid();
       if (!cust || cust.uid === undefined || cust.uid !== lastUid) { cust = {}; ls('stm_cust', null); }
       var form = { method: 'delivery', name: cust.name || '', phone: cust.phone || '', email: cust.email || '', county: cust.county || '', addr: cust.addr || '', notes: '', payCode: '', payAmt: '', payTouched: false, payVia: '' }, errs = {};
-      function session() {
-        try {
-          var x = JSON.parse(localStorage.getItem('sb-' + CFG.sbRef + '-auth-token'));
-          if (x && x.access_token && x.user && (!x.expires_at || x.expires_at * 1000 > Date.now() + 30000)) return x;
-        } catch (e) {}
-        return null;
-      }
-      (function () { var u = (session() || {}).user; if (u) { var md = u.user_metadata || {}; if (!form.name) form.name = md.full_name || ''; if (!form.phone) form.phone = md.phone || ''; if (!form.email) form.email = u.email || ''; } })();
-      /* If the signed-in account changes while the page is open (sign out / sign in as someone else), clear everything typed or saved for the previous person. */
-      function checkWho() {
-        var u = myUid(); if (u === lastUid) return; lastUid = u;
-        cust = {}; ls('stm_cust', null); ref = ''; errs = {}; if (step === 'done') step = 'cart';
-        form.name = ''; form.phone = ''; form.email = ''; form.county = ''; form.addr = ''; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.payVia = ''; form.vc = null; form.vcode = '';
-        var us = (session() || {}).user; if (us) { var m2 = us.user_metadata || {}; form.name = m2.full_name || ''; form.phone = m2.phone || ''; form.email = us.email || ''; }
-      }
-      window.addEventListener('storage', function (e) { if (e.key && e.key.indexOf('-auth-token') > -1) { checkWho(); if (isOpen) render(); } });
+      function session() { return null; }
+      function checkWho() {}
       var counties = [].map.call(D.querySelectorAll('.counties li'), function (l) { return l.textContent; });
 
       /* FIX (2026-11-11): checkout.html's fast cart hand-off adds hidden .stm-checkout-fast-card elements (no button, id = the real product id)
@@ -183,7 +169,7 @@
         var c = (inp.value || '').trim().toUpperCase(); form.vcode = c;
         if (c.length < 3) { er.textContent = 'Enter your voucher code.'; return; }
         ab.disabled = true; er.textContent = '';
-        fetch(CFG.sbUrl + '/rest/v1/rpc/check_voucher', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.sbKey }, body: JSON.stringify({ p_code: c, p_subtotal: T.s, p_phone: form.phone || null }) })
+        fetch(CFG.neonUrl + '/rpc/check_voucher', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_code: c, p_subtotal: T.s, p_phone: form.phone || null }) })
           .then(function (r) { return r.json(); })
           .then(function (j) {
             if (j && j.ok && Number(j.discount) > 0) { form.vc = { code: String(j.code), discount: Math.round(Number(j.discount)), base: T.s }; form.vcode = ''; form.payTouched = false; render(); }
@@ -204,11 +190,8 @@
         }
         b.appendChild(w);
       }
-      /* Small helper that posts JSON to a Supabase edge function (used by the card flow). */
-      function stkFn(name, body) {
-        return fetch(CFG.sbUrl + '/functions/v1/' + name, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.sbKey }, body: JSON.stringify(body) })
-          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || ('Error ' + r.status)); return j; }); });
-      }
+      /* Card payments remain disabled until a verified provider is configured. */
+      function stkFn() { return Promise.reject(new Error('Card payments are not enabled. Please use M-Pesa Paybill.')); }
       /* ---- Card payments (Paystack). Card details are typed in Paystack's own window; this page only gets a payment reference back. ---- */
       var cardBusy = false, cardMsg = '', cardRefLast = '', keepObs = null;
       /* FIX (2026-11-03): in checkout mode checkout.html hides every <body> child except the drawer
@@ -517,48 +500,61 @@
         if (sending) return;
         sending = true; sendErr = ''; render();
         doneCode = ''; doneAmt = 0;
-        var s = session(), method = form.method, code = cleanCode(), paid = Number(form.payAmt);
-        if (!codeOk() || !amtOk(T)) { sending = false; sendErr = 'Enter your payment code and the amount you paid before placing the order.'; render(); return; }
-        var row = {
-          ref: ref, user_id: s ? s.user.id : null, customer_name: form.name.trim().slice(0, 120), phone: '+' + normPhone(form.phone),
-          email: (form.email || '').trim().toLowerCase().slice(0, 150) || (s && s.user.email) || null, method: method, county: method === 'delivery' ? form.county : null,
-          address: method === 'delivery' ? form.addr.trim().slice(0, 200) : null, notes: form.notes && form.notes.trim() ? form.notes.trim().slice(0, 500) : null,
-          items: T.L.map(function (i) { return { name: i.name, qty: i.qty, price: i.price, total: i.total }; }).concat(feeOf() ? [{ name: 'Delivery fee (' + form.county + ')', qty: 1, price: feeOf(), total: feeOf() }] : []), subtotal: due(T), pay_code: code, pay_amount: paid,
-          voucher_code: vOff(T) ? form.vc.code : null, discount: vOff(T)
+        var code = cleanCode(), paid = Number(form.payAmt);
+        if (!codeOk() || !amtOk(T)) { sending = false; sendErr = 'Enter your M-Pesa code and the amount you paid before placing the order.'; render(); return; }
+        var payload = {
+          p_ref: ref, p_customer_name: form.name.trim().slice(0, 120), p_phone: '+' + normPhone(form.phone),
+          p_email: (form.email || '').trim().toLowerCase().slice(0, 150) || null, p_method: form.method,
+          p_county: form.method === 'delivery' ? form.county : null,
+          p_address: form.method === 'delivery' ? form.addr.trim().slice(0, 200) : null,
+          p_notes: form.notes && form.notes.trim() ? form.notes.trim().slice(0, 500) : null,
+          p_items: T.L.map(function (i) { return { product_id: String(i.id).replace(/^p-/, ''), qty: i.qty }; }),
+          p_pay_code: code, p_pay_amount: paid, p_voucher_code: vOff(T) ? form.vc.code : null
         };
-        var hd = { 'Content-Type': 'application/json', apikey: CFG.sbKey, Prefer: 'return=minimal' };
-        if (s) hd.Authorization = 'Bearer ' + s.access_token;
-        var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function () { if (ctl) ctl.abort(); }, 20000);
-        function post(rw) {
-          return fetch(CFG.sbUrl + '/rest/v1/orders', { method: 'POST', headers: hd, body: JSON.stringify(rw), signal: ctl ? ctl.signal : undefined })
-            .then(function (r) { if (r.ok) return; return r.text().then(function (t) { var e = new Error('status ' + r.status + ' ' + t); e.status = r.status; e.body = t; throw e; }); });
-        }
-        post(row)
-          .catch(function (err) {   /* payment columns not set up yet: keep the code in the order notes instead */
-            if (err && err.status === 400 && /pay_code|pay_amount/.test(err.body || '')) {
-              var r2 = Object.assign({}, row); delete r2.pay_code; delete r2.pay_amount;
-              r2.notes = ((form.payVia === 'card' ? 'Card reference ' : 'M-Pesa code ') + code + ', paid KSh ' + paid + (row.notes ? ' | ' + row.notes : '')).slice(0, 500); return post(r2);
-            }
-            throw err;
-          })
-          .then(function () {
-            clearTimeout(to); doneCode = code; doneAmt = paid; doneVia = form.payVia || '';
-            lastMsg = message(T); lastUrl = 'https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(lastMsg);
-            notify(T, s);
-            ls('stm_cust', { uid: myUid(), name: form.name.trim(), phone: form.phone, email: (form.email || '').trim(), county: form.county, addr: form.addr, method: form.method });
-            doneRef = ref; doneTotal = due(T); form.vc = null; form.vcode = ''; ref = ''; cart = {}; store(); sending = false; form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.payVia = ''; cardRefLast = ''; cardMsg = ''; step = 'done'; sync(); if (!isOpen) render();
-          })
-          .catch(function (err) {
-            clearTimeout(to); sending = false;
-            try { console.error('Order failed:', err && err.message); } catch (e) {}
-            sendErr = err && err.status === 409 ? 'This payment code has already been used on another order. Check the code in your SMS or receipt, or message us on WhatsApp.' : 'We could not place your order. Check your connection and try again, or send it on WhatsApp instead.' + (err && err.status ? ' (Error ' + err.status + ')' : ' (Network)'); render();
+        var ctl = window.AbortController ? new AbortController() : null;
+        var to = setTimeout(function () { if (ctl) ctl.abort(); }, 20000);
+        fetch(CFG.neonUrl + '/rpc/create_guest_order', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+          signal: ctl ? ctl.signal : undefined
+        }).then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (j) {
+            if (!r.ok) { var e = new Error(j.message || j.error || ('Neon returned HTTP ' + r.status)); e.status = r.status; throw e; }
+            return j;
           });
+        }).then(function (result) {
+          if (!result || result.ok !== true) { var e = new Error((result && result.reason) || 'Neon could not create this order.'); e.status = 422; throw e; }
+          clearTimeout(to); doneCode = code; doneAmt = paid; doneVia = 'mpesa';
+          if (Array.isArray(result.items)) {
+            var liveLines = result.items.filter(function (x) { return x && x.product_id; });
+            if (liveLines.length) {
+              T.L = liveLines.map(function (x) {
+                var old = T.L.find(function (i) { return String(i.id).replace(/^p-/, '') === String(x.product_id); }) || {};
+                return { id: x.product_id, name: x.name, qty: Number(x.qty), price: Number(x.price), total: Number(x.total), img: old.img || '' };
+              });
+              T.s = T.L.reduce(function (sum, x) { return sum + x.total; }, 0);
+            }
+          }
+          doneTotal = Number(result.subtotal || due(T));
+          lastMsg = message(T); lastUrl = 'https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(lastMsg);
+          notify(T, null);
+          ls('stm_cust', { uid: myUid(), name: form.name.trim(), phone: form.phone, email: (form.email || '').trim(), county: form.county, addr: form.addr, method: form.method });
+          doneRef = ref; form.vc = null; form.vcode = ''; ref = ''; cart = {}; store(); sending = false;
+          form.notes = ''; form.payCode = ''; form.payAmt = ''; form.payTouched = false; form.payVia = ''; cardRefLast = ''; cardMsg = '';
+          step = 'done'; sync(); if (!isOpen) render();
+        }).catch(function (err) {
+          clearTimeout(to); sending = false;
+          try { console.error('Neon order failed:', err && err.message); } catch (e) {}
+          sendErr = err && err.status === 409 ? 'This M-Pesa code has already been used on another order. Check your SMS or receipt.' :
+            (err && err.message && err.status === 422 ? err.message : 'We could not place your order. Check your connection and try again, or send it on WhatsApp instead.');
+          render();
+        });
       }
       function rDone(b, f) {
         var c = h('div', 'center'); c.appendChild(h('div', 'done-ic', '✓')); c.appendChild(h('h3', null, 'Order received')); c.appendChild(h('p', 'note', 'Reference ' + doneRef));
         c.appendChild(h('p', null, 'Thank you! We have your ' + (doneVia === 'card' ? 'card payment' : 'M-Pesa code') + '. We will verify the payment and contact you on WhatsApp to confirm your order and delivery.')); b.appendChild(c);
-        box(b, 'Payment submitted', [[doneVia === 'card' ? 'Card reference' : 'M-Pesa code', doneCode], ['Amount', money(doneAmt)]]);
+        box(b, 'Order payment', [['Order total', money(doneTotal)], ['M-Pesa code', doneCode], ['Amount entered', money(doneAmt)]]);
         var a = h('a', 'btn btn-main', 'Message us on WhatsApp'); a.href = lastUrl; a.target = '_blank'; a.rel = 'noopener'; f.appendChild(a);
+        var track = h('a', 'btn btn-alt', 'Track your order'); track.href = '/track.html?ref=' + encodeURIComponent(doneRef); f.appendChild(track);
         btn(f, 'Copy order details', function () { try { navigator.clipboard.writeText(lastMsg).then(function () { toast('Copied'); }); } catch (e) {} }, 'btn-alt');
         if (session()) { var mo = h('a', 'btn btn-alt', 'View my orders'); mo.href = 'account.html'; f.appendChild(mo); }
         btn(f, 'Close', function () { step = 'cart'; closeDr(); }, 'btn-alt');
@@ -579,6 +575,7 @@
       }
       function closeDr(pop) {
         if (!isOpen) return; isOpen = false; D.getElementById('dr').classList.remove('on'); D.body.style.overflow = ''; sync();
+        if (window.parent && window.parent !== window) window.parent.postMessage({ stmCheckout: 'closed' }, location.origin);
         if (pop !== true && history.state && history.state.dr) history.back(); if (opener && opener.focus) opener.focus();
       }
       D.getElementById('cartbtn').addEventListener('click', function () { openDr('cart'); });
@@ -590,16 +587,16 @@
       window.addEventListener('popstate', function () { if (isOpen) closeDr(true); });
       var ob = D.querySelector('#bar a[href="#order"]');
       if (ob) { var sp = h('span', 'cb', '0'); sp.hidden = true; ob.appendChild(sp); ob.addEventListener('click', function (e) { e.preventDefault(); openDr('cart'); }); }
-      /* Sold-out products (set by customer care in the admin page) */
+      /* Read sold-out status from Neon. */
       try {
-        fetch(CFG.sbUrl + '/rest/v1/stock?select=product&in_stock=eq.false', { headers: { apikey: CFG.sbKey } })
+        fetch(CFG.neonUrl + '/products?select=id&active=eq.true&stock=eq.0')
           .then(function (r) { return r.ok ? r.json() : []; })
           .then(function (rows) {
             rows.forEach(function (x) {
-              var c = D.getElementById('p-' + x.product); if (!c) return;
+              var c = D.getElementById(x.id) || D.getElementById('p-' + x.id); if (!c) return;
               var b = c.querySelector('button.btn-main'); if (b) { b.dataset.sold = '1'; b.disabled = true; b.textContent = 'Sold out'; b.style.opacity = '.55'; }
               var im = c.querySelector('.img'); if (im && !im.querySelector('.soldtag')) { var t = h('span', 'soldtag', 'Sold out'); t.style.cssText = 'position:absolute;top:.5rem;left:.5rem;background:#b91c1c;color:#fff;font-weight:800;font-size:.75rem;padding:.2rem .6rem;border-radius:999px'; if (getComputedStyle(im).position === 'static') im.style.position = 'relative'; im.appendChild(t); }
-              delete cart['p-' + x.product];
+              delete cart[x.id]; delete cart['p-' + x.id];
             });
             store(); sync();
           }).catch(function () {});
