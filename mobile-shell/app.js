@@ -384,7 +384,8 @@ async function loadPage(reset) {
   catch (e) {
     if (token !== feed.token) return;
     $$('.card[aria-hidden="true"]', grid).forEach(n => n.remove());
-    feed.loading = false; feed.hasMore = false; showGridError(); return;
+    feed.loading = false; feed.hasMore = false; showGridError(); window.STM_LAST_ERROR = String(e && e.message || e); console.error('Catalogue load failed:', e);
+    const eb = $('#grid-empty'); if (eb) eb.insertAdjacentHTML('beforeend', '<br><small style="color:#64748b">Details: ' + esc(window.STM_LAST_ERROR) + '</small>'); return;
   }
   if (token !== feed.token) return;            // a newer query started: drop this stale answer
   const { items, hasMore } = res;
