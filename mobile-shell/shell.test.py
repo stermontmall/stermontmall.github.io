@@ -106,7 +106,7 @@ def mock_network(ctx):
         rt.fulfill(status=200, content_type='text/html', body=page)
     ctx.route('**/p/*.html*', serve_product_page)
     ctx.route('**/token/anonymous', lambda r: serve(r, {'token': 'fixture-anonymous-token'}))  # Neon Auth anonymous JWT
-    ctx.route('**/rest/v1/storefront_products*', on_rest)  # current Neon storefront catalogue endpoint
+    ctx.route('**/*storefront_products*', on_rest)  # current Neon storefront catalogue endpoint
     ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # legacy fixture compatibility
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
