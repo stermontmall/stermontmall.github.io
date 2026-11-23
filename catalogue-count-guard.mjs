@@ -4,7 +4,7 @@
 // Baseline = number of product pages already listed in sitemap-state.json (the last good build).
 //
 // Restored 2026-11-23 from d04b94e (deleted in 8123c4c). Data source changed from Supabase to the Neon export
-// (.build/products.json, written by scripts/export-neon-catalogue.mjs). Set PRODUCTS_JSON to use another file.
+// (.build/products.json, written by scripts/export-neon-catalog.mjs). Set PRODUCTS_JSON to use another file.
 //
 // PRESERVE_LEGACY_PAGES=1: scripts/preserve-legacy-pages.mjs puts back the old pages of inactive products after the
 // generator runs, so the "at least half of the built pages" ratio no longer applies (only ~136 of ~1,600 products are
@@ -32,7 +32,7 @@ export function checkCatalogueCount({ active, baseline, allowSmall = false, minR
 
 function activeCount() {
   const file = process.env.PRODUCTS_JSON || '.build/products.json';
-  if (!existsSync(file)) throw new Error(`Could not count active products: ${file} not found (run scripts/export-neon-catalogue.mjs first).`);
+  if (!existsSync(file)) throw new Error(`Could not count active products: ${file} not found (run scripts/export-neon-catalog.mjs first).`);
   const rows = JSON.parse(readFileSync(file, 'utf8'));
   if (!Array.isArray(rows)) throw new Error(`Could not count active products: ${file} is not a JSON array.`);
   return rows.length;   // the exporter only writes active products

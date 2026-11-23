@@ -12,7 +12,7 @@ const DIR = process.env.P_DIR || 'p';
 
 function rows() {
   const file = process.env.PRODUCTS_JSON || '.build/products.json';
-  if (!existsSync(file)) throw new Error(`${file} not found (run scripts/export-neon-catalogue.mjs first)`);
+  if (!existsSync(file)) throw new Error(`${file} not found (run scripts/export-neon-catalog.mjs first)`);
   return JSON.parse(readFileSync(file, 'utf8'));
 }
 
