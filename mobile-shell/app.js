@@ -629,8 +629,8 @@ function renderProductDescription(target, source) {
 }
 /* @render-end */
 const details = new Map(); // Cache product-detail requests by variant row ID; renderDetails() and renderPP() share this cache.
-const staticDetails = new Map(); // Read-only details parsed from the published SEO page when Supabase REST is restricted.
-/* Read-only description fallback for opening a product from a card while Supabase REST is restricted (HTTP 402). The card's slug has a generated
+const staticDetails = new Map(); // Read-only details parsed from the published SEO page when the public Neon read path is unavailable.
+/* Read-only description fallback for opening a product from a card when the public Neon read path is unavailable. The card's slug has a generated
    /p/<slug>.html page on GitHub Pages with the full buyer guide in .product-description > .pd-sec blocks; read the text from there. Nothing is written
    or redirected. Returns null (the normal "Could not load the details" + retry) when the page is missing or has no description. */
 async function staticDetailsFor(rowId) {
@@ -653,7 +653,7 @@ async function staticDetailsFor(rowId) {
 }
 const detailsFor = rowId => {
   if (staticDetails.has(rowId)) return Promise.resolve(staticDetails.get(rowId));
-  if (!details.has(rowId)) details.set(rowId, api(`products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images,product_code`).then(r => r[0] || null).catch(() => null).then(d => d || staticDetailsFor(rowId)).then(d => { if (!d) details.delete(rowId); return d; }));
+  if (!details.has(rowId)) details.set(rowId, api(`storefront_products?id=eq.${encodeURIComponent(rowId)}&select=description,unit,stock,low_at,slug,images,product_code`).then(r => r[0] || null).catch(() => null).then(d => d || staticDetailsFor(rowId)).then(d => { if (!d) details.delete(rowId); return d; }));
   return details.get(rowId);
 };
 async function renderDetails(rowId) {
@@ -663,8 +663,8 @@ async function renderDetails(rowId) {
   const d = await detailsFor(rowId);
   if (!qb.p || sizeOf(qb.p, qb.size).rowId !== rowId) return;          // another size or product was chosen meanwhile
   if (!d) { $('#qb-desc').innerHTML = 'Could not load the details. <button class="underline text-brand" data-retry-details>Try again</button>'; return; }
-  const left = Number(d.stock), low = Number(d.low_at) || 5;
-  $('#qb-meta').textContent = [d.product_code ? 'Product code: ' + d.product_code : '', d.unit ? 'Unit: ' + d.unit : '', left > 0 ? (left <= low ? 'Only ' + left + ' left' : 'In stock') : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
+  const inStock = Number(d.stock) > 0;
+  $('#qb-meta').textContent = [d.product_code ? 'Product code: ' + d.product_code : '', d.unit ? 'Unit: ' + d.unit : '', inStock ? 'In stock' : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
   renderProductDescription('#qb-desc', d.description || '');
   const imgs = (d.images || []).filter(Boolean);
   $('#qb-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: qb.p.emoji })}</button>`).join('') : '';
@@ -696,8 +696,8 @@ async function renderPP() {
   const d = await detailsFor(rowId);
   if (!qb.p || sizeOf(qb.p, qb.size).rowId !== rowId) return;
   if (!d) { $('#pp-desc').innerHTML = 'Could not load the details. <button class="underline text-brand" data-pp-retry>Try again</button>'; return; }
-  const left = Number(d.stock), low = Number(d.low_at) || 5;
-  $('#pp-meta').textContent = [d.product_code ? 'Product code: ' + d.product_code : '', d.unit ? 'Unit: ' + d.unit : '', left > 0 ? (left <= low ? 'Only ' + left + ' left' : 'In stock') : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
+  const inStock = Number(d.stock) > 0;
+  $('#pp-meta').textContent = [d.product_code ? 'Product code: ' + d.product_code : '', d.unit ? 'Unit: ' + d.unit : '', inStock ? 'In stock' : 'Out of stock'].filter(Boolean).join(' \u00b7 ');
   renderProductDescription('#pp-desc', d.description || '');
   const imgs = (d.images || []).filter(Boolean);
   if (!pp.img && imgs[0]) $('#pp-img').innerHTML = thumb({ img: imgs[0], emoji: p.emoji }, true);
@@ -780,7 +780,7 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
    still runs, so the behaviour is never worse than before. To undo: delete this function and the call to it in section 11. */
 async function openStaticProductFallback(slug) {
   // Published /p/ pages are generated from the catalogue and remain available on GitHub Pages
-  // even while Supabase REST is returning 402 (egress quota exceeded). Treat them as read-only;
+  // if the public Neon read path is unavailable. Treat them as read-only;
   // this fetch hydrates the in-app view without redirecting or modifying the canonical SEO document.
   const response = await fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' });
   if (!response.ok) throw new Error('Published product page returned HTTP ' + response.status);
@@ -828,12 +828,12 @@ async function quickDeepLink(slug) {
   try {
     const [cats, rows0] = await Promise.all([
       api(CAT_Q),
-      api('products?active=eq.true&or=(slug.eq.' + encodeURIComponent(slug) + ',id.eq.' + encodeURIComponent(slug) + ')&select=' + PRODUCT_COLS).then(r => r.map(withCover))
+      api('storefront_products?or=(slug.eq.' + encodeURIComponent(slug) + ',id.eq.' + encodeURIComponent(slug) + ')&select=' + PRODUCT_COLS).then(r => r.map(withCover))
     ]);
     if (deepOpen || fullCatalog) return;
     if (!rows0.length) { await openStaticProductFallback(slug); return; }
     let rows = rows0; const g = rows0[0].variant_group;
-    if (g) { rows = (await api('products?active=eq.true&variant_group=eq.' + encodeURIComponent(g) + '&select=' + PRODUCT_COLS)).map(withCover); if (deepOpen || fullCatalog) return; }
+    if (g) { rows = (await api('storefront_products?variant_group=eq.' + encodeURIComponent(g) + '&select=' + PRODUCT_COLS)).map(withCover); if (deepOpen || fullCatalog) return; }
     buildCatalog(rows, cats, {});
     if (!PRODUCTS.some(x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug))) { await openStaticProductFallback(slug); return; }
     openDeepLink(slug);

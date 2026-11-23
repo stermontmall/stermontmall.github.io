@@ -15,7 +15,7 @@ const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 import { normalizeGeneratedProductPages } from './product-link-normalizer.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
-const WA = 'https://wa.me/254748888230';
+const WA = 'https://wa.me/254789514060';
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const unesc = s => String(s ?? '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s;
@@ -211,7 +211,7 @@ if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.h
 console.log(`Kenya titles and descriptions set on ${cDone} category page(s).`);
 
 const STYLE = `<style>.answer{background:#f1ebff;border-left:4px solid #7c3aed;border-radius:10px;padding:.8rem 1rem;margin:1rem 0}.tw{overflow-x:auto;margin:1rem 0}table{border-collapse:collapse;width:100%;font-size:.95rem}caption{text-align:left;font-weight:700;padding:.3rem 0}th,td{border:1px solid #e6e1f5;padding:.5rem .6rem;text-align:left;vertical-align:top}th{background:#f1ebff}h3{font-size:1.05rem;margin:1.1rem 0 .2rem}</style>`;
-const FOOT = `<footer>Stermont Arcade · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href='${WA}'>WhatsApp +254 748 888 230</a> · <a href='/shipping.html'>Shipping</a> · <a href='/returns.html'>Returns</a> · <a href='/privacy.html'>Privacy</a></footer><script src="/analytics.js" defer></script>`;
+const FOOT = `<footer>Stermont Arcade · Online store serving all of Kenya · Pay by M-Pesa · Delivery to all 47 counties · <a href='${WA}'>WhatsApp +254 789 514 060</a> · <a href='/shipping.html'>Shipping</a> · <a href='/returns.html'>Returns</a> · <a href='/privacy.html'>Privacy</a></footer><script src="/analytics.js" defer></script>`;
 const shell = ({ title, desc, path, ld, body }) => `<!doctype html>
 <html lang='en-KE'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
 <title>${esc(title)}</title><meta name='description' content='${esc(desc)}'>

@@ -47,7 +47,7 @@ for (const g of data.guides) {
   if (e.faqs) g.faqs = g.faqs.concat(e.faqs);
 }
 const SITE = 'https://stermontarcade.co.ke';
-const WA = '254748888230';
+const WA = '254789514060';
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const kes = n => 'KSh ' + Number(n).toLocaleString('en-US');
 const wa = t => `https://wa.me/${WA}?text=${encodeURIComponent(t)}`;
@@ -146,7 +146,7 @@ function head({ title, desc, url, extra = '' }) {
 <link rel="icon" href="/favicon.png">
 <style>${CSS}</style>${extra}<script src="/shell-chrome.js?v=1" defer></script><script src="/services/page.js?v=1" defer></script></head><body><main>`;
 }
-const foot = `<footer>Stermont Arcade, head office: The Sarit Centre, Karuna Road, Westlands, Nairobi. WhatsApp <a href="${wa('Hello Stermont Arcade, I need a service quote.')}">+254 748 888 230</a>. Pay by M-Pesa. Prices are estimates and are confirmed after inspection. <a href="/services/">All services</a> · <a href="/services/guides/">Guides</a> · <a href="/">Shop</a></footer></main></body></html>`;
+const foot = `<footer>Stermont Arcade, head office: The Sarit Centre, Karuna Road, Westlands, Nairobi. WhatsApp <a href="${wa('Hello Stermont Arcade, I need a service quote.')}">+254 789 514 060</a>. Pay by M-Pesa. Prices are estimates and are confirmed after inspection. <a href="/services/">All services</a> · <a href="/services/guides/">Guides</a> · <a href="/">Shop</a></footer></main></body></html>`;
 
 // Coverage (owner, 2026-10-31): services are bookable from ALL 47 counties; Nairobi and the big cities come first.
 // Order: Nairobi, then the counties of the big cities, then the other counties A to Z. The build fails unless there are exactly 47.
@@ -159,7 +159,7 @@ const coverageBlock = name => `<h2>${esc(name)} in all 47 counties</h2><p>We tak
 
 const business = {
   '@type': 'LocalBusiness', '@id': SITE + '/#business', name: 'Stermont Arcade', url: SITE + '/',
-  telephone: '+254748888230', priceRange: 'KES',
+  telephone: '+254789514060', priceRange: 'KES',
   areaServed: [{ '@type': 'City', name: 'Nairobi' }, ...COUNTIES.filter(c => c !== 'Nairobi').map(c => ({ '@type': 'AdministrativeArea', name: c + ' County' })), { '@type': 'Country', name: 'Kenya' }],
   address: { '@type': 'PostalAddress', streetAddress: 'The Sarit Centre, Karuna Road, Westlands', addressLocality: 'Nairobi', addressCountry: 'KE' }
 };

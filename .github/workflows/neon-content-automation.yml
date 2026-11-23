@@ -1,0 +1,43 @@
+name: Neon blog and SEO automation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'blog/**'
+      - 'blog-topics.json'
+      - 'blog-build.mjs'
+      - 'seo-check.mjs'
+      - 'seo-description-check.mjs'
+      - 'seo-description-check.test.mjs'
+      - '.github/workflows/neon-content-automation.yml'
+  schedule:
+    - cron: '15 6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: neon-content-automation
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - name: Check automation script syntax
+        run: node --check neon-automation-sync.mjs
+      - name: Install Neon serverless driver
+        run: npm install --no-save @neondatabase/serverless
+      - name: Sync blog topics and published posts into Neon
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: node neon-automation-sync.mjs content
+      - name: Run technical SEO audit
+        run: node seo-check.mjs > seo-report.md
+      - name: Store daily SEO audit in Neon
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: node neon-automation-sync.mjs seo

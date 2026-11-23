@@ -1,7 +1,7 @@
 (function () {
       var D = document;
       /* ---- Settings: put your M-Pesa Till or Paybill here ---- */
-      var CFG = { paybill: '714777', payAcct: '0748888230', wa: '254748888230',
+      var CFG = { paybill: '714777', payAcct: '0789514060', wa: '254789514060',
         /* Card payments (Paystack). Keep hidden until a verified live PAYSTACK_SECRET_KEY is configured. */
         card: false,
         sbUrl: 'https://oewvtbnmyombbtggamor.supabase.co', sbKey: 'sb_publishable_CQiZr-INuot9C4fbdJDz1Q_4OiWEQL7', sbRef: 'oewvtbnmyombbtggamor',
@@ -445,12 +445,12 @@
             '<tr><td style="padding:0 26px;"><p style="' + CF + 'font-size:13px;line-height:1.55;color:#6b5f8a;margin:6px 0 0;">The delivery fee, if any, is confirmed with you on WhatsApp.</p></td></tr>' +
             '<tr><td align="center" style="padding:18px 26px 24px;">' + custBtn + '</td></tr>' +
             '<tr><td align="center" bgcolor="#2a0e5c" style="background:#2a0e5c;padding:22px 24px;"><div style="' + CF + 'font-size:14px;font-weight:700;color:#ffffff;">Thank you for shopping with Stermont Arcade</div>' +
-              '<div style="' + CF + 'font-size:12px;line-height:1.7;color:#cdbdf3;padding-top:6px;">Questions? Call +254 748 888 230 or reply to this email.<br><a href="https://stermontarcade.co.ke" style="color:#c8f31d;text-decoration:none;">stermontarcade.co.ke</a></div></td></tr>' +
+              '<div style="' + CF + 'font-size:12px;line-height:1.7;color:#cdbdf3;padding-top:6px;">Questions? Call +254 789 514 060 or reply to this email.<br><a href="https://stermontarcade.co.ke" style="color:#c8f31d;text-decoration:none;">stermontarcade.co.ke</a></div></td></tr>' +
             '</table></div>';
           if (custEmail) ejs(CFG.ejsCustTpl, Object.assign({ to_email: custEmail, subject: 'We received your order ' + ref }, base, {
             html_body: htmlBody,
             business: 'Stermont Arcade', name: form.name.trim(), headline: 'We received your order', message: custMsg, items: lines.join('\n'), total: money(due(T)),
-            phone: '+254 748 888 230', web: 'stermontarcade.co.ke', buttons: custBtn }));
+            phone: '+254 789 514 060', web: 'stermontarcade.co.ke', buttons: custBtn }));
           /* Styled staff alert (EmailJS). If it fails, fall back to the plain Web3Forms alert. */
           var enc = encodeURIComponent(ref);
           function mkBtn(href, label, bg, fg) { return '<a href="' + href + '" style="display:inline-block;background:' + bg + ';color:' + fg + ';font-weight:bold;font-size:15px;text-decoration:none;padding:13px 20px;border-radius:12px;margin:4px;">' + label + '</a>'; }
@@ -500,7 +500,7 @@
             '</table></div>';
           var staffParams = { to_email: CFG.staffEmail, reply_to: custEmail || CFG.staffEmail, subject: 'New order ' + money(due(T)) + ' - ' + form.name.trim() + ' (' + ref + ')', business: 'Stermont Arcade', order_ref: ref, name: 'Stermont team',
             headline: 'New order to verify', message: staffMsg, items: lines.join('\n'), total: money(due(T)), delivery: form.method === 'pickup' ? 'Collection: ' + where() : 'Deliver to: ' + where(),
-            phone: '+254 748 888 230', web: 'stermontarcade.co.ke', buttons: buttons, html_body: staffHtml };
+            phone: '+254 789 514 060', web: 'stermontarcade.co.ke', buttons: buttons, html_body: staffHtml };
           ejs(CFG.ejsCustTpl, staffParams).then(function (ok) {
             if (ok) return true;
             return ejs(CFG.ejsStaffTpl, staffParams);   /* old staff template as second try */

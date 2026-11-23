@@ -96,3 +96,4 @@ On https://stermontarcade.co.ke/neon-admin.html the sign-in page showed "Your lo
 ## Left
 - Merge this branch (PR from wip-neon-admin-followups into main), wait for GitHub Pages, hard-reload /neon-admin.html and sign in. If the same message appears, the site's domains (stermontarcade.co.ke and stermontmall.github.io) probably have to be added as allowed/trusted origins in the Neon Auth settings in the Neon console.
 - Then approve the owner's Neon user ID in `admin_profiles` (see above).
+- 2026-11-23: PR #1076 merged - store WhatsApp number changed to 254789514060 (see HANDOFF-live.md).

@@ -9,7 +9,7 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 
 const SITE = 'https://stermontarcade.co.ke';
-const WA = '254748888230';
+const WA = '254789514060';
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const unesc = s => String(s ?? '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s;
