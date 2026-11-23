@@ -47,8 +47,35 @@ const ls = {
    rows that share `variant_group`; they are folded into ONE card with a `sizes` list, each size carrying its own price.
    Names come from /product-names.json (the heading each product page shows, rebuilt with the site); if that file is
    missing the plain database name is used. Filtering, sorting and paging then run in memory, so every filter is instant. */
-const NEON = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';  // Neon Data API, anonymous read-only, CORS limited to https://stermontarcade.co.ke
-const api = path => fetch(NEON + path)
+const NEON = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
+const NEON_AUTH = 'https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth';
+// The Data API is configured with Neon Auth. Public storefront reads must carry a short-lived
+// anonymous JWT; a bare fetch is not enough even though the anonymous role has SELECT grants.
+let anonymousTokenPromise = null;
+let anonymousToken = '';
+let anonymousTokenExpiresAt = 0;
+async function getStorefrontToken() {
+  if (anonymousToken && Date.now() < anonymousTokenExpiresAt - 30000) return anonymousToken;
+  if (!anonymousTokenPromise) {
+    anonymousTokenPromise = fetch(NEON_AUTH + '/token/anonymous', { credentials: 'include' })
+      .then(async response => {
+        if (!response.ok) throw new Error('Neon Auth HTTP ' + response.status + ' while requesting storefront access');
+        const payload = await response.json();
+        if (!payload || typeof payload.token !== 'string' || !payload.token) throw new Error('Neon Auth returned no anonymous token');
+        anonymousToken = payload.token;
+        anonymousTokenExpiresAt = Number(payload.expires_at) * 1000 || Date.now() + 10 * 60 * 1000;
+        return anonymousToken;
+      })
+      .catch(error => { anonymousToken = ''; anonymousTokenExpiresAt = 0; throw error; })
+      .finally(() => { anonymousTokenPromise = null; });
+  }
+  return anonymousTokenPromise;
+}
+async function storefrontFetch(path) {
+  const token = await getStorefrontToken();
+  return fetch(NEON + path, { headers: { Authorization: 'Bearer ' + token } });
+}
+const api = path => storefrontFetch(path)
   .then(r => { if (!r.ok) throw new Error('Neon HTTP ' + r.status); return r.json(); });
 const CAT_Q = 'categories?select=id,name,slug,parent_id,sort_order,is_promo&active=eq.true&order=sort_order.asc,name.asc';
 const byOrder = (a, b) => (a.sort_order - b.sort_order) || String(a.name).localeCompare(String(b.name));
@@ -61,8 +88,8 @@ const withCover = r => ({ ...r, cover_image: Array.isArray(r.images) && r.images
 async function apiAll(path, pageSize = 1000) {
   const all = [];
   for (let offset = 0; ; offset += pageSize) {
-    // Query-string paging, no custom headers: a header such as Range or cache:'no-store' forces a CORS preflight that the Neon Data API may refuse.
-    const r = await fetch(NEON + path + (path.includes('?') ? '&' : '?') + 'limit=' + pageSize + '&offset=' + offset);
+    // All catalogue pages use the same short-lived anonymous JWT as single-row lookups.
+    const r = await storefrontFetch(path + (path.includes('?') ? '&' : '?') + 'limit=' + pageSize + '&offset=' + offset);
     if (!r.ok) throw new Error('Neon HTTP ' + r.status + ' while loading catalogue page ' + (offset / pageSize + 1));
     const batch = await r.json();
     if (!Array.isArray(batch)) throw new Error('Neon returned an invalid catalogue page');
