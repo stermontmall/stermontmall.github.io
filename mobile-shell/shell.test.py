@@ -136,6 +136,7 @@ def mock_network(ctx):
         ctx.route(host, lambda r: r.fulfill(status=200, content_type='application/javascript', body=''))   # analytics.js loads these in production; the sandbox has no internet
     ctx.route('**/rest/v1/stock*', lambda r: serve(r, []))
     ctx.route('**/product-names.json*', lambda r: serve(r, NAMES_FIX))
+    ctx.route('**/catalog-snapshot.json*', lambda r: r.fulfill(status=503, body='simulated snapshot outage') if FAIL[0] else r.continue_())
     # ImageKit Web Proxy wraps the original source URL; emulate successful and missing upstream photos.
     def imagekit_proxy(route):
         url = unquote(route.request.url)
