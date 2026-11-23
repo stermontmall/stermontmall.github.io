@@ -70,6 +70,8 @@ jobs:
         run: node seo-shell-redirect.mjs
       - name: Run technical SEO check against generated output
         run: node seo-check.mjs > seo-report.md
+      - name: Check Neon sync script syntax
+        run: node --check neon-automation-sync.mjs
       - name: Install Neon database driver
         run: npm install --no-save @neondatabase/serverless
       - name: Sync blog topics and published posts to Neon
