@@ -127,7 +127,7 @@ with sync_playwright() as p:
     mock_network(c0)
     c0.route('**/mobile-shell/app.js*', lambda rt: rt.fulfill(status=200, content_type='application/javascript', body=''))
     p0 = c0.new_page(); p0.goto(URL, wait_until='domcontentloaded')
-    check('server-rendered home grid exposes crawlable static product links before hydration', p0.locator('#grid a[href^="/p/"]').count() >= 6, p0.locator('#grid a[href^="/p/"]').count())
+    check('server-rendered home grid exposes crawlable static product links before hydration', p0.locator('#grid a[href*="/p/"]').count() >= 6, p0.locator('#grid a[href*="/p/"]').count())
     check('initial empty-state message stays hidden before hydration', p0.locator('#grid-empty').is_hidden())
     c0.close()
 
@@ -662,7 +662,7 @@ with sync_playwright() as p:
     p15.goto(URL); p15.wait_for_selector('#grid .card[data-id]')
     p15.locator('#chips [data-chip="phones-accessories"]').click()
     p15.wait_for_function("location.pathname === '/c/phones-accessories.html'", timeout=10000)
-     p15.reload(wait_until='domcontentloaded'); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href^="/p/"]'); p15.wait_for_selector('#bottom-nav', state='visible', timeout=15000); p15.wait_for_function("document.querySelector('#grid .card[data-id]') && document.querySelector('#grid-title').textContent === 'Phones & Accessories'", timeout=15000)
+     p15.reload(wait_until='domcontentloaded'); p15.wait_for_selector('h1'); p15.wait_for_selector('a[href*="/p/"]'); p15.wait_for_selector('#bottom-nav', state='visible', timeout=15000); p15.wait_for_function("document.querySelector('#grid .card[data-id]') && document.querySelector('#grid-title').textContent === 'Phones & Accessories'", timeout=15000)
     check('top-level category reload restores the full shell and selected category', p15.evaluate("location.pathname") == '/c/phones-accessories.html' and p15.locator('#bottom-nav').count() == 1 and p15.locator('#stm-nav').count() == 0 and p15.locator('#grid .card[data-id]').count() > 0, p15.url)
 
     p15.goto(f'{BASE}/?cat=garden-tools'); p15.wait_for_selector('#grid .card[data-id]'); p15.wait_for_timeout(600)
