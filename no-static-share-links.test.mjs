@@ -1,116 +1,91 @@
-// Guard: customer/staff-facing product links must always open the mobile shell.
-// SEO-only /p/<slug>.html surfaces (canonical, og:url, sitemap, JSON-LD,
-// breadcrumbs and seo-links crawl links) are intentionally preserved.
+// Guard: all customer-facing product links use the sitemap's static /p/<slug>.html URL.
+import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createRequire } from 'node:module';
-import assert from 'node:assert/strict';
-
-const SKIP = new Set(['.git', 'node_modules', 'p', 'c', 'guides', 'blog', 'product-photos', 'assets', 'services', 'pest-control']);
-const walk = (dir, out = []) => {
-  for (const name of readdirSync(dir)) {
-    if (SKIP.has(name)) continue;
-    const path = join(dir, name), st = statSync(path);
-    if (st.isDirectory()) walk(path, out);
-    else if (/\.(html|js|mjs|ts|json|css|webmanifest)$/.test(name) && st.size < 3_000_000) out.push(path);
-  }
-  return out;
-};
-const files = walk('.');
-const offenders = [];
-const classicLinkPattern = /(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/classic(?:[.]html)/i;
-for (const file of files) {
-  const text = readFileSync(file, 'utf8');
-  const lines = text.split('\n');
-  lines.forEach((line, index) => {
-
-    if (classicLinkPattern.test(line) && !['no-classic-hop.test.mjs', 'no-static-share-links.test.mjs'].includes(file)) offenders.push(file + ':' + (index + 1) + ': human-facing legacy-page link: ' + line.trim().slice(0, 220));
-    if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/p\//i.test(line)) return;
-    // Internal SEO document fetches and explicitly defined Google crawl surfaces are not customer links.
-    if (file === 'index.html' && line.includes('href="/p/')) return; // owner-approved seo-links crawl block, not the visible product grid
-    if (['cars-for-sale.html', 'fashion.html', 'products.html', 'checkout.html', 'price-watch.test.mjs', 'seo-safe-meta.test.mjs', 'seo-shell-redirect.test.mjs'].includes(file)) return; // generated output is checked after rebuild; checkout product links are in the approved seo-links block; price-watch is a fixture
-    if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|preload|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
-    if (file === 'storefront-live.js' && /function purl\(|fetch\(purl\(/.test(line)) return;
-    if (file === 'seo-related-fill.mjs' && line.includes('existing.match')) return; // only reads old SEO related anchors for de-duplication
-    if (file === 'blog-build.mjs' && line.includes('body = body.replace')) return; // transforms old blog links through shellProductLink below
-    if (['seo-pest/blog-build.mjs', 'blog-write.mjs', 'blog-build.mjs', 'services/build-services.mjs'].includes(file) && line.includes('shellProductLink')) return;
-    if (/seo-links|seo-links\.mjs|seo-links\.js/.test(file)) return;
-    if (/no-static-share-links\.test\.mjs/.test(file)) return;
-    offenders.push(file + ':' + (index + 1) + ': ' + line.trim().slice(0, 220));
-  });
-}
-assert.deepEqual(offenders, [], 'Human-facing links still point to static product pages:\n' + offenders.join('\n'));
 
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
-assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), 'https://stermontarcade.co.ke/?product=premise-200-sc-termiticide-50-ml');
-const homepage = readFileSync('index.html', 'utf8');
-const homeGrid = (homepage.match(/<ul id="grid"[\s\S]*?<\/ul>/) || [])[0] || '';
-assert.ok(homeGrid.includes('https://stermontarcade.co.ke/?product='), 'homepage SSR cards must expose shell product URLs');
-assert.doesNotMatch(homeGrid, /href="\/p\//, 'homepage SSR cards must not expose static product URLs');
-assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'), 'homepage SEO crawl links must remain present');
-const helper = readFileSync('product-links.js', 'utf8');
-assert.match(helper, /function shellProductLink\(slug\)/, 'shared shellProductLink helper must exist');
-assert.match(helper, /\?product=/, 'helper must generate ?product= links');
-const generator = readFileSync('generate-products.mjs', 'utf8');
-assert.match(generator, /const normalizeCustomerProductLinks = html =>/,
-  'final generated-page renderer must normalize legacy product anchors from imported content');
-assert.ok(generator.includes('${normalizeCustomerProductLinks(body)}'),
-  'every generated page body must pass through the final customer-link normalizer');
+assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), 'https://stermontarcade.co.ke/p/premise-200-sc-termiticide-50-ml.html');
 
-for (const marker of ['href="${shellProductLink(sl(p.id))}"', '`Link: ${shellProductLink(sl(p.id))}`', '${shellProductLink(v.slug || p.slug || p.id)}']) {
-  assert.ok(generator.includes(marker), 'product generator must use shellProductLink for: ' + marker);
+const homepage = readFileSync('index.html', 'utf8');
+assert.match(homepage, /<link rel="canonical" href="https:\/\/stermontarcade\.co\.ke\/">/, 'homepage canonical stays on the root URL');
+assert.ok(homepage.includes("var legacyProduct = q.get('product')"), 'legacy query product links are recognized');
+assert.ok(homepage.includes("location.replace(productPath"), 'legacy query product links replace to the static product URL');
+assert.ok(homepage.includes("canonical.href = 'https://stermontarcade.co.ke' + productPath"), 'legacy query redirect sets the product canonical before navigating');
+assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'), 'homepage SEO crawl links remain present');
+assert.ok(homepage.includes('id="pp-whatsapp"'), 'the full mobile-shell product page includes a WhatsApp order action');
+const homeGrid = (homepage.match(/<ul id="grid"[\s\S]*?<\/ul>/) || [])[0] || '';
+assert.ok(homeGrid.includes('https://stermontarcade.co.ke/p/'), 'homepage SSR cards use static product URLs');
+assert.doesNotMatch(homeGrid, /\?product=/, 'homepage SSR cards contain no query product URLs');
+
+const helper = readFileSync('product-links.js', 'utf8');
+assert.match(helper, /\/p\/.*\.html/, 'shared product-link helper generates static URLs');
+assert.doesNotMatch(helper, /\?product=/, 'shared product-link helper never generates query product URLs');
+
+const generator = readFileSync('generate-products.mjs', 'utf8');
+assert.ok(generator.includes('<link rel="canonical" href="${SITE}${path}">'), 'generated product pages self-canonicalize to their static path');
+assert.ok(generator.includes('static-product-purchase.js'), 'generated product pages load the static purchase fallback');
+assert.ok(generator.includes('data-product-qty') && generator.includes('data-pack-cart'), 'generated product pages expose quantity and Add to Cart controls');
+assert.ok(generator.includes('data-product-row-id'), 'variant cart controls use the exact Neon product row ID');
+assert.ok(generator.includes("const WHATSAPP = '254789514060'"), 'product WhatsApp orders use +254 789 514 060');
+assert.doesNotMatch(generator, /data-pack-cart href="[^"]*\?product=/, 'Add to Cart does not navigate back to query product links');
+
+const purchase = readFileSync('static-product-purchase.js', 'utf8');
+assert.ok(purchase.includes("localStorage.getItem('shell.cart')") && purchase.includes("localStorage.setItem('shell.cart'"), 'static product pages share the mobile-shell cart state');
+assert.ok(purchase.includes("localStorage.setItem('stm_handoff'"), 'static product pages hand the shared cart to checkout');
+assert.ok(purchase.includes("location.href = '/checkout.html'"), 'static product pages open the M-Pesa checkout flow');
+assert.ok(purchase.includes('data-cart-checkout') && purchase.includes('data-cart-items'), 'static product pages provide a cart drawer');
+assert.ok(purchase.includes('data-qty-plus') && purchase.includes('data-qty-minus'), 'static product pages provide a quantity selector');
+
+const checkout = readFileSync('checkout.html', 'utf8');
+assert.ok(checkout.includes("localStorage.getItem('stm_handoff')"), 'checkout consumes the same handoff payload');
+assert.ok(checkout.includes('714777') && checkout.includes('0789514060'), 'M-Pesa Paybill details remain present');
+
+const app = readFileSync('mobile-shell/app.js', 'utf8');
+assert.ok(app.includes("localStorage.getItem('shell.' + k)"), 'mobile shell reads the shared shell cart');
+assert.ok(app.includes("const productUrl ="), 'mobile shell keeps the static product URL in the address bar');
+assert.ok(app.includes("https://wa.me/254789514060?text="), 'mobile-shell product WhatsApp orders use +254 789 514 060');
+assert.doesNotMatch(app, /s => '\/\?product='/, 'mobile shell fallback links no longer generate query product URLs');
+
+const normalizer = readFileSync('product-link-normalizer.mjs', 'utf8');
+assert.ok(normalizer.includes("u.searchParams.get('product')"), 'generated-page normalizer converts legacy query product links');
+assert.ok(normalizer.includes('shellProductLink(slug)'), 'generated-page normalizer emits static product links');
+
+const sourceFiles = [];
+const skip = new Set(['.git', 'node_modules', 'p', 'c', 'guides', 'blog', 'product-photos', 'assets', 'services', 'pest-control']);
+function walk(dir) {
+  for (const name of readdirSync(dir)) {
+    if (skip.has(name)) continue;
+    const file = join(dir, name), info = statSync(file);
+    if (info.isDirectory()) walk(file);
+    else if (/\.(html|js|mjs|ts|json|css|webmanifest)$/.test(name) && info.size < 3000000) sourceFiles.push(file);
+  }
 }
-// Pack-size alias stubs (e.g. p/abasi-5-ec-100-ml.html) keep the static canonical URL only in <head>
-// (canonical + meta refresh). Their visible "Continue" anchor must open the mobile shell.
-assert.ok(generator.includes('<a href="${shellProductLink(sl(a.to))}">Continue to the product page</a>'),
-  'alias redirect stubs must link visitors to the shell ?product= URL');
-assert.ok(!generator.includes('<a href="${to}">'),
-  'alias redirect stubs must not render a visible anchor to the static /p/ canonical URL');
-assert.match(readFileSync('site-links.js', 'utf8'), /shellProductLink/, 'share/copy controls must use shell links');
-assert.match(readFileSync('mobile-shell/app.js', 'utf8'), /const productUrl = .*shellProductLink/, 'mobile shell share URL must use shellProductLink');
-assert.match(readFileSync('storefront-live.js', 'utf8'), /Link: ' \+ shareProductUrl/, 'storefront WhatsApp prefill must use shell links');
-assert.ok(readFileSync('home-grid-ssr.mjs', 'utf8').includes('?product='), 'homepage SSR cards must accept shell links');
-assert.match(readFileSync('seo-related-fill.mjs', 'utf8'), /shellProductLink/, 'related-product generator must use shell links');
-assert.match(readFileSync('seo-pest/blog-build.mjs', 'utf8'), /shellProductLink/, 'hand-written blog generator must use shell links');
-assert.match(readFileSync('blog-write.mjs', 'utf8'), /shellProductLink/, 'AI blog generator must use shell links');
-assert.match(readFileSync('blog-build.mjs', 'utf8'), /normalizePostProductLinks/, 'existing published blog posts must be normalized without touching SEO metadata');
-assert.ok(readFileSync('seo-kenya.mjs', 'utf8').includes('shellProductLink(i.slug)'), 'price guide generator must use shell links');
-assert.match(readFileSync('services/build-services.mjs', 'utf8'), /shellProductLink/, 'service page CTAs must use shell links');
-assert.match(readFileSync('recent-orders.js', 'utf8'), /shellProductLink/, 'recent-order shortcuts must use shell links');
-assert.match(readFileSync('wa-float.js', 'utf8'), /shellProductLink/, 'floating WhatsApp messages must use shell links');
-assert.match(readFileSync('product-trust.js', 'utf8'), /shellProductLink/, 'product trust WhatsApp messages must use shell links');
-assert.ok(readFileSync('cat-feel.js', 'utf8').includes('?product='), 'category enhancements must recognise shell product links');
-assert.ok(readFileSync('kili-pages.js', 'utf8').includes('?product='), 'product search must recognise shell product links');
-const briefs = readFileSync('blog-topics.json', 'utf8');
-assert.doesNotMatch(briefs, /"\/p\/[^"]+\.html"/, 'blog/guide product CTAs must not use static product URLs');
-assert.ok(existsSync('no-classic-hop.test.mjs'), 'classic-hop guard must remain installed');
+walk('.');
+const offenders = [];
+for (const file of sourceFiles) {
+  const lines = readFileSync(file, 'utf8').split('\n');
+  lines.forEach((line, index) => {
+    if (/\b(?:href\s*=|\.href\s*=|Link:\s*|window\.open\s*\()[^\n]*\?product=/i.test(line) &&
+        !['no-static-share-links.test.mjs', 'product-link-normalizer.mjs', 'blog-build.mjs'].includes(file)) {
+      offenders.push(file + ':' + (index + 1) + ': ' + line.trim().slice(0, 220));
+    }
+  });
+}
+assert.deepEqual(offenders, [], 'Internal customer-facing links still contain ?product=:\n' + offenders.join('\n'));
+
 if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
-  let scanned = 0;
-  const generatedDirs = ['p', 'c', 'guides', 'blog', 'services'];
-  const generatedFiles = ['index.html', 'cars-for-sale.html', 'fashion.html', 'products.html', 'checkout.html'];
-  const generatedOffenders = [];
-  const pageFiles = generatedFiles.filter(file => existsSync(file));
-  const collectGeneratedHtml = dir => {
-    for (const name of readdirSync(dir)) {
-      const file = join(dir, name), info = statSync(file);
-      if (info.isDirectory()) collectGeneratedHtml(file);
-      else if (name.endsWith('.html')) pageFiles.push(file);
-    }
-  };
-  for (const dir of generatedDirs) if (existsSync(dir)) collectGeneratedHtml(dir);
-  for (const file of pageFiles) {
-      let html = readFileSync(file, 'utf8');
-      // Keep SEO-only /p/ references intact while inspecting the customer-visible page body.
-      html = html.replace(/<head\b[\s\S]*?<\/head>/gi, '')
-        .replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '')
-        .replace(/<nav[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi, '')
-        .replace(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi, '')
-        .replace(/<section[^>]*class=["'][^"']*\bseo-links\b[^"']*["'][^>]*>[\s\S]*?<\/section>/gi, '');
-      const hrefs = [...html.matchAll(/\bhref=(['"])(.*?)\1/gi)].map(match => { try { return decodeURIComponent(match[2]); } catch { return match[2]; } });
-      scanned++;
-      if (hrefs.some(href => /\/p\/[^?#\s]+\.html|\/classic\.html/i.test(href))) generatedOffenders.push(file);
-    }
-  assert.deepEqual(generatedOffenders, [], 'Generated customer-visible pages still emit static product/classic links: ' + generatedOffenders.join(', '));
-  console.log('OK: inspected ' + scanned + ' generated product/category/guide/blog/service and landing pages; no static human-facing product links.');
+  const generatedDirs = ['p', 'c', 'guides', 'blog', 'services', 'pest-control'];
+  const generatedFiles = ['index.html', 'products.html', 'fashion.html', 'cars-for-sale.html'];
+  const files = generatedFiles.filter(file => existsSync(file));
+  const collect = dir => { if (!existsSync(dir)) return; for (const name of readdirSync(dir)) { const file = join(dir, name), info = statSync(file); if (info.isDirectory()) collect(file); else if (name.endsWith('.html')) files.push(file); } };
+  generatedDirs.forEach(collect);
+  const bad = [];
+  for (const file of files) {
+    const html = readFileSync(file, 'utf8');
+    if (/\bhref=["'][^"']*\?product=/i.test(html)) bad.push(file);
+    if (/^p\//.test(file) && !/http-equiv=["']refresh["']/i.test(html) && !html.includes('<link rel="canonical" href="https://stermontarcade.co.ke/' + file + '">')) bad.push(file + ' (missing self canonical)');
+  }
+  assert.deepEqual(bad, [], 'Generated pages contain query product links or missing static canonicals: ' + bad.join(', '));
 }
-console.log('OK: human-facing product links use shellProductLink; SEO-only /p/ surfaces remain allowlisted.');
+console.log('OK: product links use static /p/<slug>.html URLs; shared cart, quantity, M-Pesa and WhatsApp purchase paths are present.');

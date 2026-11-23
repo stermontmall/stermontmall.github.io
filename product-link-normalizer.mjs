@@ -1,6 +1,5 @@
-// Shared final pass for generated customer-facing product links.
-// Rewrites visible /p/<slug>.html anchors to the mobile shell while preserving
-// canonical/OG metadata, JSON-LD, breadcrumbs and SEO-only crawl-link blocks.
+// Shared final pass for generated product links.
+// Rewrites legacy ?product= anchors to sitemap /p/<slug>.html URLs.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -18,10 +17,12 @@ const rewriteBody = html => {
   preserve(/<!--\s*seo-links:start\s*-->[\s\S]*?<!--\s*seo-links:end\s*-->/gi);
   preserve(/<section[^>]*class=["'][^"']*\bseo-links\b[^"']*["'][^>]*>[\s\S]*?<\/section>/gi);
   body = body.replace(/<a\b([^>]*?)\bhref=(["'])([^"']+)\2([^>]*)>/gi, (all, before, quote, href, after) => {
-    const match = href.match(/^(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/p\/([^/?#]+)\.html(?:[?#].*)?$/i);
-    if (!match) return all;
-    let slug = match[1]; try { slug = decodeURIComponent(slug); } catch {}
-    return `<a${before}href=${quote}${shellProductLink(slug)}${quote}${after}>`;
+    const staticMatch = href.match(/^(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/p\/([^/?#]+)\.html(?:[?#].*)?$/i);
+    let slug = staticMatch ? staticMatch[1] : '';
+    if (!slug) { try { const u = new URL(href, 'https://stermontarcade.co.ke'); if (u.origin === 'https://stermontarcade.co.ke' && u.pathname === '/') slug = u.searchParams.get('product') || ''; } catch {} }
+    if (!slug) return all;
+    try { slug = decodeURIComponent(slug); } catch {}
+    return '<a' + before + 'href=' + quote + shellProductLink(slug) + quote + after + '>';
   });
   body = body.replace(/<!-- stm-preserved-(\d+) -->/g, (_m, i) => preserved[Number(i)]);
   return head.join('') + body;
@@ -42,7 +43,7 @@ export function normalizeGeneratedProductPages() {
     const after = rewriteBody(before);
     if (after !== before) { fs.writeFileSync(file, after); changed++; }
   }
-  console.log(`Normalized visible product links on ${changed} generated page(s); canonical and SEO crawl URLs preserved.`);
+  console.log(`Normalized legacy product links on ${changed} generated page(s); canonical and SEO crawl URLs preserved.`);
   return changed;
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)) normalizeGeneratedProductPages();

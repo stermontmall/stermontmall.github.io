@@ -1,0 +1,95 @@
+name: Static product URL and checkout validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'generate-products.mjs'
+      - 'product-links.js'
+      - 'static-product-purchase.js'
+      - 'mobile-shell/app.js'
+      - 'index.html'
+      - 'home-grid-ssr.mjs'
+      - 'home-grid-ssr.test.mjs'
+      - 'product-link-normalizer.mjs'
+      - 'seo-kenya.mjs'
+      - 'blog-write.mjs'
+      - 'blog-topics.json'
+      - 'cat-feel.js'
+      - 'products.html'
+      - 'seo-pest/blog.test.mjs'
+      - 'seo-pest/blog-build.mjs'
+      - 'mobile-shell/shell.test.py'
+      - 'shell-route-loader.js'
+      - 'no-static-share-links.test.mjs'
+      - '.github/workflows/static-product-url-validation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      - name: Test SEO canonical and sitemap safeguards
+        run: node seo-indexing-guard.test.mjs
+
+      - name: Check changed JavaScript syntax
+        run: |
+          node --check generate-products.mjs
+          node --check static-product-purchase.js
+          node --check product-link-normalizer.mjs
+          node --check mobile-shell/app.js
+          node --check seo-kenya.mjs
+          node --check blog-write.mjs
+          node --check seo-pest/blog-build.mjs
+
+      - name: Test product page design and descriptions
+        run: |
+          node product-page-design.test.mjs
+          node product-description-html.test.mjs
+          node home-grid-ssr.test.mjs
+
+      - name: Test source product links and shared checkout integration
+        run: node no-static-share-links.test.mjs
+
+      - name: Rebuild all product and category pages from the live Neon catalogue
+        run: node generate-products.mjs
+
+      - name: Build Kenya price guides
+        continue-on-error: true
+        run: node seo-kenya.mjs
+
+      - name: Normalize generated product links
+        run: node product-link-normalizer.mjs
+
+      - name: Build pest-control blog pages with static product links
+        run: |
+          for pass in 1 2; do
+            for batch in blogs-05 blogs-06 blogs-07 blogs-08; do
+              node seo-pest/blog-build.mjs "$batch"
+            done
+          done
+
+      - name: Verify pest-control blog product links
+        run: node seo-pest/blog.test.mjs
+
+      - name: Install full mobile-shell product and category routing
+        run: node seo-shell-redirect.mjs
+
+      - name: Verify every generated page uses static product URLs and correct canonicals
+        env:
+          STM_CHECK_GENERATED_PRODUCT_PAGES: '1'
+        run: node no-static-share-links.test.mjs
+
+      - name: Verify every active Neon product has a static page
+        run: node check-product-pages.mjs

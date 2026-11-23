@@ -25,7 +25,7 @@ export function allText(a) {
 export function closingLinks(a) { return [...new Set(linksOf([a.intro, a.closing, ...a.sections.flatMap(s => s.paragraphs)].join(' ')))]; }
 
 export function renderPost(a) {
-  const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, p, t) => `<a href="${p.startsWith('/p/') ? shellProductLink(p.slice(3).replace(/\.html$/i, '')) : p}">${t}</a>`);
+  const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, p, t) => { const file = p.startsWith('/p/') ? path.join(root, 'p', p.slice(3)) : p.startsWith('/c/') ? path.join(root, 'c', p.slice(3)) : path.join(root, p.slice(1)); return fs.existsSync(file) ? `<a href="${p.startsWith('/p/') ? shellProductLink(p.slice(3).replace(/\.html$/i, '')) : p}">${t}</a>` : t; });
   const para = s => `<p>${inline(s)}</p>`;
   const total = words(allText(a));
   const url = `${SITE}/blog/${a.slug}.html`;
@@ -35,8 +35,11 @@ export function renderPost(a) {
   const faqHtml = `<h2>Frequently asked questions</h2>\n${a.faq.map(([q, an]) => `<h3>${esc(q)}</h3>\n<p>${esc(an)}</p>`).join('\n')}`;
   const catTitle = (() => { try { const m = fs.readFileSync(path.join(root, 'c', a.cat + '.html'), 'utf8').match(/<h1[^>]*>([^<]*)<\/h1>/i); return m ? unesc(m[1].trim()) : 'Browse the category'; } catch { return 'Browse the category'; } })();
   const relTitle = r => { try { const m = fs.readFileSync(path.join(root, 'blog', r + '.html'), 'utf8').match(/<h1[^>]*>([\s\S]*?)<\/h1>/i); return m ? unesc(m[1].replace(/<[^>]+>/g, '').trim()) : r; } catch { return r; } };
-  const catHtml = `<div class="box"><strong>Shop this category</strong><ul class="rel"><li><a href="/c/${a.cat}.html">${esc(catTitle)}</a></li><li><a href="${shellProductLink(a.product)}">See the product and its sizes</a></li></ul></div>`;
-  const relHtml = a.related.length ? `<h2>Related guides</h2>\n<ul class="rel">${a.related.map(r => `<li><a href="/blog/${r}.html">${esc(relTitle(r))}</a></li>`).join('')}</ul>` : '';
+  const categoryHref = fs.existsSync(path.join(root, 'c', a.cat + '.html')) ? `<li><a href="/c/${a.cat}.html">${esc(catTitle)}</a></li>` : '';
+  const productHref = fs.existsSync(path.join(root, 'p', a.product + '.html')) ? `<li><a href="${shellProductLink(a.product)}">See the product and its sizes</a></li>` : '';
+  const catHtml = categoryHref || productHref ? `<div class="box"><strong>Shop this category</strong><ul class="rel">${categoryHref}${productHref}</ul></div>` : '';
+  const related = a.related.filter(r => fs.existsSync(path.join(root, 'blog', r + '.html')));
+  const relHtml = related.length ? `<h2>Related guides</h2>\n<ul class="rel">${related.map(r => `<li><a href="/blog/${r}.html">${esc(relTitle(r))}</a></li>`).join('')}</ul>` : '';
   const serviceHtml = `<div class="box"><strong>Need professional help?</strong><p>Explore <a href="/pest-control/">professional pest control and fumigation services in Kenya</a> or visit the <a href="/pest-control/blog/">Pest Control Advice Centre</a>. For a quotation, share your town, property type and pest concern.</p></div>`;
   return `<!doctype html>
 <html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -78,7 +81,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     fs.writeFileSync(path.join(root, 'blog', `${a.slug}.html`), renderPost(a));
     let t = data.topics.find(x => x.slug === a.slug);
     if (!t) { t = { slug: a.slug }; data.topics.push(t); }
-    Object.assign(t, { title: a.title, angle: `Product guide for ${a.product} (hand-written, ${words(allText(a))} words).`, keywords: [], facts: ['Facts come from the catalog text of the product page.'], links: [shellProductLink(a.product), `/c/${a.cat}.html`, ...a.related.map(r => `/blog/${r}.html`)], status: 'drafted', drafted: DATE });
+    Object.assign(t, { title: a.title, angle: `Product guide for ${a.product} (hand-written, ${words(allText(a))} words).`, keywords: [], facts: ['Facts come from the catalog text of the product page.'], links: [...(fs.existsSync(path.join(root, 'p', a.product + '.html')) ? [shellProductLink(a.product)] : []), ...(fs.existsSync(path.join(root, 'c', a.cat + '.html')) ? [`/c/${a.cat}.html`] : []), ...a.related.filter(r => fs.existsSync(path.join(root, 'blog', r + '.html'))).map(r => `/blog/${r}.html`)], status: 'drafted', drafted: DATE });
     console.log(`blog/${a.slug}.html  ${words(allText(a))} words`);
   }
   fs.writeFileSync(topicsFile, JSON.stringify(data, null, 2) + '\n');
