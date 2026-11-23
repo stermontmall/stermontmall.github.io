@@ -15,7 +15,7 @@ threading.Thread(target=srv.serve_forever, daemon=True).start()
 URL = f'http://127.0.0.1:{port}/'
 
 
-# ---- Supabase fixture: the shell talks to the real REST API in production; here the three requests it makes are answered locally ----
+# ---- Neon fixture: mock anonymous auth and the catalogue REST/RPC reads used by the storefront ----
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 OK, BROKEN = 'https://img.test/ok.png', 'https://img.test/broken.jpg'
 CATS_FIX = [
@@ -85,6 +85,7 @@ def mock_network(ctx):
         page = run_node('inject', REAL.replace('<!--PRODUCT_SCHEMA-->', schema).replace('/p/fixture.html', '/p/' + slug + '.html').replace('content="fixture"', 'content="' + slug + '"'), slug)
         rt.fulfill(status=200, content_type='text/html', body=page)
     ctx.route('**/p/*.html*', serve_product_page)
+    ctx.route('**/auth/token/anonymous*', lambda r: serve(r, {'token': 'test-anon', 'expires_at': 9999999999}))
     ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
