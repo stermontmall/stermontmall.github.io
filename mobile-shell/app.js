@@ -299,7 +299,7 @@ window.addEventListener('popstate', e => {
   if (afterClose && !stack.length) { const f = afterClose; afterClose = null; f(); }
 });
 const PRODUCT_PATH = /^\/p\/([^/]+)\.html$/i.exec(window.__STM_PRODUCT_ROUTE_PATH || location.pathname);
-const DEEP = new URLSearchParams(location.search).get('product') || (PRODUCT_PATH ? decodeURIComponent(PRODUCT_PATH[1]) : null);   // Shared query links and direct /p/<slug>.html pages open the same in-shell product view
+const DEEP = new URLSearchParams(location.search).get('product') || new URLSearchParams(location.search).get('item') || (PRODUCT_PATH ? decodeURIComponent(PRODUCT_PATH[1]) : null);   // Shared query links and direct /p/<slug>.html pages open the same in-shell product view
 let deepOpen = false;   // the product page for DEEP has been opened (by the fast path in section 9b, or after the full catalog)
 /* /?cart=<product id>:<qty>,<product id>:<qty>: a shared cart link (the Share cart link button). The cart itself lives in each phone's own storage, so the link
    carries the lines. They are kept in sessionStorage until the catalog has added them, so a reload before that does not lose them. */
