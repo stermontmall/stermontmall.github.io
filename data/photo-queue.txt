@@ -7,7 +7,7 @@ protecta-mouse-bait-station|https://sokowise-api.b-cdn.net/media/v2/17871.webp?e
 protecta-micro-bait-station|https://veseris.ca/media/catalog/product/P/I/PIF785254_54142380-D2D3-D214-E7CB08CB6B7DC3D4.png?bg-color=255%2C255%2C255&canvas=700%3A700&fit=bounds&height=700&quality=80&width=700
 bipronex-cockroach-gel-bait-5g|https://shop.rafikipestcontrol.com/products/bipronex-cockroach-gel-bait
 cockrakill-paste-50g|https://sokowise-api.b-cdn.net/media/v2/10722.webp?etag=cb75b8a810f2019c4a60a6c171a8ebfd
-goliath-gel-35g|https://imaginecare.co.ke/product/cockroach-goliath-gel-35g/
+goliath-gel-35g|https://procapital.co.ke/agrochemicals/insecticides/goliath-gel-35g/
 essie-mugo-cockroach-paste|https://sokowise-api.b-cdn.net/media/v2/10718.webp?etag=efa0fed95bc3d6089325de958adf7529&height=640&width=640
 bedlam-200sl-15ml|https://kuzaagrochem.com/products/bedlam-200sl--15ml-125
 bedlam-200sl-50ml|https://sokowise-api.b-cdn.net/media/v2/4747.webp?etag=97f2b6149373f30a4834351e448a556b&height=640&width=640
@@ -20,7 +20,7 @@ promax-20ec-25ml|https://agropests.com/products/promax-20-ec-25ml
 navigator-100sc-20ml|https://agropests.com/products/navigator-100sc-20ml
 navigator-100sc-50ml|https://agropests.com/products/navigator-100sc-50ml
 rodilon-wax-blocks-10g|https://sokowise-api.b-cdn.net/media/v2/10739.webp?etag=aca99b4a4ed1c942d31df727547ef83e
-baraki-pellets-10g|https://agriguardagrovet.co.ke/product/baraki-pellets/
+baraki-pellets-10g|https://shop.rafikipestcontrol.com/products/baraki-pellets
 rodirid-wax-blocks-20g|https://agriguardagrovet.co.ke/product/rodirid-wax-blocks/
 neocidal-600-ew-28ml|https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/42.-Neocidal-600-EW.jpg
 bugnil-20-ec-25ml|https://agriguardagrovet.co.ke/product/bugnil-20-ec/
@@ -30,5 +30,5 @@ mosthrin-2-5-ec-1l|https://agriguardagrovet.co.ke/product/mosthrin-2-5-ec/
 dudu-spray-2l|https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/11.-Dudu-Spray.jpg
 k-othrine-wg-250-20g|https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/35.-K-Othrine-WG-250.jpg
 sevin-dudu-dust-200g|https://agriguardagrovet.co.ke/product/sevin-dudu-dust/
-rat-kill-pellets-600g|https://imaginecare.co.ke/shop/?product-page=6&product_order=desc&product_orderby=date&product_view=list
+rat-kill-pellets-600g|https://shop.rafikipestcontrol.com/products/rat-kill-pellets
 
