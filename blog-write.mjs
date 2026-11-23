@@ -87,7 +87,7 @@ for (const p of posts) allowed.add(p.path);
 const tt = tokens([topic.slug, ...(topic.keywords || [])].join(' '));
 const related = posts.map(p => ({ ...p, score: jaccard(tt, p.tok) })).filter(p => p.score > 0).sort((a, b) => b.score - a.score).slice(0, 3);
 const cats = [...new Set((topic.links || []).filter(l => /^\/c\//.test(l)).map(categoryTarget).filter(Boolean).filter(l => allowed.has(l)))].slice(0, 3);
-const offered = [...new Set([...(topic.links || []).map(p => p.startsWith('https://stermontarcade.co.ke/?product=') ? p.replace('https://stermontarcade.co.ke', '') : p), ...cats, ...related.map(r => r.path), '/products.html', '/blog/how-to-order-and-pay-by-mpesa-online-kenya.html'])].filter(p => allowed.has(p));
+const offered = [...new Set([...(topic.links || []).map(p => { const m = String(p).match(/[?&]product=([a-z0-9-]+)/i); return m ? '/p/' + m[1] + '.html' : p; }), ...cats, ...related.map(r => r.path), '/products.html', '/blog/how-to-order-and-pay-by-mpesa-online-kenya.html'])].filter(p => allowed.has(p));
 
 const SYSTEM = `You write buying guides and how-to articles for Stermont Arcade, an online store in Kenya (pest control, agrovet, appliances and electronics). Write plain, friendly English for Kenyan shoppers. The article must answer what a person typing the topic into Google actually wants to know, quickly and clearly.
 Rules:
