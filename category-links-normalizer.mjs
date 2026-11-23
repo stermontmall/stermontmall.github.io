@@ -1,6 +1,6 @@
 // Repair category links in published HTML using only category pages present in the current build.
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { normalizeCategoryLinks } from './category-links.mjs';
+import { activeCategorySlugsFromPages, normalizeCategoryLinks } from './category-links.mjs';
 
 const categories = new Set(
   existsSync('c')
@@ -8,7 +8,7 @@ const categories = new Set(
     : []
 );
 if (!categories.size) {
-  console.error('No built category pages found in c/; refusing to rewrite links.');
+  console.error('No active category pages found in c/; refusing to rewrite links.');
   process.exit(1);
 }
 
@@ -29,9 +29,9 @@ for (const file of files) {
   const before = readFileSync(file, 'utf8');
   const after = normalizeCategoryLinks(before, categories);
   if (after !== before) {
-    repairedLinks++;
+    repairedLinks += (before.match(/<a\\b[^>]*\\bhref=["'][^"']*\\/c\\/[a-z0-9-]+\\.html["']/gi) || []).length - (after.match(/<a\\b[^>]*\\bhref=["'][^"']*\\/c\\/[a-z0-9-]+\\.html["']/gi) || []).length;
     writeFileSync(file, after);
     changedFiles++;
   }
 }
-console.log(`Category link normalization: at least ${repairedLinks} file(s) repaired; ${categories.size} built categories available.`);
+console.log(`Category link normalization: links repaired: ${repairedLinks}; ${categories.size} built categories available.`);
