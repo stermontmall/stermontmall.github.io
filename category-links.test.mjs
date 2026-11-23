@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { activeCategorySlugsFromPages, normalizeCategoryLinks, resolveCategoryPath } from './category-links.mjs';
+import { activeCategorySlugsFromCatalogSnapshot, activeCategorySlugsFromPages, normalizeCategoryLinks, resolveCategoryPath } from './category-links.mjs';
 
 const active = activeCategorySlugsFromPages([
   { slug: 'pest-control-fumigation.html', html: '<ul id="category-products"><li data-price="500">One</li></ul>' },
@@ -14,6 +14,15 @@ assert.equal(resolveCategoryPath('toys-games', active), null);
 assert.equal(resolveCategoryPath('health-beauty', active), null);
 assert.equal(resolveCategoryPath('empty-category', active), null);
 assert.equal(resolveCategoryPath('home-kitchen', active), '/c/home-kitchen.html');
+
+const snapshotActive = activeCategorySlugsFromCatalogSnapshot(
+  { products: [{ id: 'active-1', stock: 2 }, { id: 'inactive-1', stock: 0 }] },
+  [
+    { slug: 'active-product.html', html: '<meta name="stm-id" content="active-1"><nav class="bc"><a href="/c/pest-control-fumigation.html">Pest Control</a><a href="/c/rodent-control.html">Rodent Control</a></nav>' },
+    { slug: 'inactive-product.html', html: '<meta name="stm-id" content="inactive-1"><nav class="bc"><a href="/c/health-beauty.html">Health &amp; Beauty</a></nav>' }
+  ]
+);
+assert.deepEqual([...snapshotActive].sort(), ['pest-control-fumigation', 'rodent-control']);
 
 const html = '<a href="/c/rodent-control.html">Rodent control products</a> <a href="https://stermontarcade.co.ke/c/health-beauty.html">Health &amp; Beauty</a>';
 const normalized = normalizeCategoryLinks(html, active);
