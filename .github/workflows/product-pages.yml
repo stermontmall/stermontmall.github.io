@@ -30,6 +30,12 @@ on:
       - 'seo-indexing-guard.test.mjs'
       - 'category-hubs.mjs'
       - 'category-hubs.test.mjs'
+      - 'category-links.mjs'
+      - 'category-links.test.mjs'
+      - 'category-links-normalizer.mjs'
+      - 'blog-build.mjs'
+      - 'nairobi.html'
+      - 'services/pests/rodents.html'
       - 'seo-catalog-guard.mjs'
       - 'seo-catalog-guard.test.mjs'
       - 'seo-product-identifiers.mjs'
@@ -136,6 +142,12 @@ jobs:
         continue-on-error: true
         run: node seo-kenya.mjs
 
+      - name: Test links to existing category pages
+        run: node category-links.test.mjs
+
+      - name: Normalize links to built category pages
+        run: node category-links-normalizer.mjs
+
       - name: Normalize visible product links in generated pages
         run: node product-link-normalizer.mjs
 
@@ -169,9 +181,8 @@ jobs:
             sed -i '0,/<meta charset="UTF-8">/s##&\n  <link rel="preconnect" href="https://oewvtbnmyombbtggamor.supabase.co" crossorigin>#' index.html
           fi
 
-      - name: Warn about broken or placeholder links before saving (link-check.mjs)
-        continue-on-error: true
-        run: node link-check.mjs --warn
+      - name: Verify all generated HTML links resolve (link-check.mjs)
+        run: node link-check.mjs
 
       - name: Save changes (only if something changed)
         run: |

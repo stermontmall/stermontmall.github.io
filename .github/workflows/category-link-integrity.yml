@@ -1,0 +1,59 @@
+name: Category link integrity
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'category-links.mjs'
+      - 'category-links.test.mjs'
+      - 'category-links-normalizer.mjs'
+      - 'category-hubs.mjs'
+      - 'catalog-snapshot.json'
+      - 'blog-build.mjs'
+      - 'seo-kenya.mjs'
+      - '404.html'
+      - 'nairobi.html'
+      - 'services/**'
+      - 'blog/**'
+      - 'guides/**'
+      - 'c/**'
+      - 'pest-control/**'
+      - 'link-check.mjs'
+      - '.github/workflows/category-link-integrity.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'category-links.mjs'
+      - 'category-links.test.mjs'
+      - 'category-links-normalizer.mjs'
+      - 'category-hubs.mjs'
+      - 'catalog-snapshot.json'
+      - 'blog-build.mjs'
+      - 'seo-kenya.mjs'
+      - '404.html'
+      - 'nairobi.html'
+      - 'services/**'
+      - 'blog/**'
+      - 'guides/**'
+      - 'c/**'
+      - 'pest-control/**'
+      - 'link-check.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Test active-category fallback rules
+        run: node category-links.test.mjs
+      - name: Normalize broken category links in generated HTML
+        run: node category-links-normalizer.mjs
+      - name: Verify all internal HTML links resolve
+        run: node link-check.mjs
