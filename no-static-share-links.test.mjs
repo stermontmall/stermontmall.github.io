@@ -49,7 +49,7 @@ assert.ok(homeGrid.includes('https://stermontarcade.co.ke/p/'), 'homepage SSR ca
 assert.doesNotMatch(homeGrid, /\?product=/, 'homepage SSR cards must not expose legacy query URLs');
 assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'), 'homepage SEO crawl links must remain present');
 const helper = readFileSync('product-links.js', 'utf8');
-assert.match(helper, /function shellProductLink\\(slug\\)/, 'shared helper must exist');
+assert.ok(helper.includes('function shellProductLink(slug)'), 'shared helper must exist');
 assert.match(helper, /\/p\/.*\.html/, 'helper must generate canonical /p/ links');
 const generator = readFileSync('generate-products.mjs', 'utf8');
 assert.match(generator, /const normalizeCustomerProductLinks = html =>/,
