@@ -1,11 +1,7 @@
 name: Upload product photos to ImageKit
 
 # Used by Claude and ChatGPT when publishing products (Neon rule publish_products, Step 4).
-# Three ways to start it:
-#   1. Actions tab > Run workflow, filling in "photos".
-#   2. Automatically: an assistant commits a file named data/photo-queue.txt to main (directly, or by a merged pull request).
-#      Same format as "photos" below. Lines starting with # are ignored. An empty or comment-only file does nothing.
-#   3. Let an assistant dispatch it, where its GitHub connection allows that.
+# The only trigger is a push to main that changes data/photo-queue.txt.
 # Format: one per line. Each line can be a product PAGE address or a direct image address, with an optional "file-name|" first.
 # For a page, the job finds the product photo on it. ImageKit downloads the image, stores it in /products/,
 # and the job checks it loads and is at least 200 x 200. The "browser_url" for each photo is printed in the log and the run summary,
@@ -13,12 +9,6 @@ name: Upload product photos to ImageKit
 # Needs the repository secret IMAGEKIT_PRIVATE_KEY (ImageKit > Developer options > Private key). It never touches the database.
 
 on:
-  workflow_dispatch:
-    inputs:
-      photos:
-        description: 'One per line: a product page or image address, optionally file-name|address (max 40 lines)'
-        required: true
-        type: string
   push:
     branches: [main]
     paths:
@@ -47,10 +37,9 @@ jobs:
       - name: Upload photos to ImageKit and verify them
         shell: bash
         env:
-          PHOTOS: ${{ inputs.photos }}
           IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
         run: |
-          if [ -z "$PHOTOS" ] && [ -f data/photo-queue.txt ]; then PHOTOS="$(cat data/photo-queue.txt)"; fi
+          PHOTOS="$(cat data/photo-queue.txt 2>/dev/null || true)"
           export PHOTOS
           if ! printf '%s\n' "$PHOTOS" | grep -qv '^[[:space:]]*\(#.*\)\?$'; then
             echo "Nothing to upload (the queue is empty or only comments)."
