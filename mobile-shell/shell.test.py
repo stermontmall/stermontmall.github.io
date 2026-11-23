@@ -60,8 +60,20 @@ def on_rest(route):
         return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK], product_code=r['product_code'])])
     if '/rest/v1/rpc/get_store_catalog' in url: return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in ROWS])
     serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
-# The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
-REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
+# The fixture slugs have no committed /p/ build artifacts; serve a deterministic server-rendered SEO page for every local /p/*.html route.
+# A small, deterministic SEO product-page fixture. Generated /p/ files are build artifacts
+# and are not committed to the source repository, so the browser test must not depend on one.
+REAL = """<!doctype html>
+<html lang="en-KE">
+<head>
+<meta charset="utf-8">
+<title>Fixture product | Stermont Arcade</title>
+<meta name="description" content="Server-rendered fixture product description for the shell route test.">
+<link rel="canonical" href="https://stermontarcade.co.ke/p/fixture-product.html">
+<meta property="og:url" content="https://stermontarcade.co.ke/p/fixture-product.html">
+</head>
+<body><main><h1>Fixture product SEO fallback</h1><p>Product details remain visible before the mobile shell loads.</p></main></body>
+</html>"""
 
 def run_node(fn, html, slug):
     # Shared at module scope because Playwright route callbacks can run before h() reaches its later test section.
@@ -77,8 +89,7 @@ def mock_network(ctx):
     ctx.add_init_script("window.shellProductLink = s => location.origin + '/?product=' + encodeURIComponent(s);")
     ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/?product=' + encodeURIComponent(v) : '/'); };"))
     def serve_product_page(rt):
-        # Match the requested fixture slug to the generated SEO page's early shell bootstrap.
-        # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
+        # Keep the canonical URL and SEO fallback on the requested fixture slug.
         match = re.search(r'/p/([^/?#]+)\.html', rt.request.url)
         slug = match.group(1) if match else ''
         page = re.sub(r'(var p=)["\'][^"\']*["\']', lambda m: m.group(1) + json.dumps(slug), REAL, count=1)
