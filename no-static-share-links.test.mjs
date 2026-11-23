@@ -1,5 +1,5 @@
-// Guard: customer/staff-facing product links must always open the mobile shell.
-// SEO-only /p/<slug>.html surfaces (canonical, og:url, sitemap, JSON-LD,
+// Guard: customer/staff-facing product links must use canonical /p/<slug>.html URLs.
+// The /p/ page hydrates the mobile shell in place while retaining server-rendered SEO metadata.
 // breadcrumbs and seo-links crawl links) are intentionally preserved.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -26,8 +26,8 @@ for (const file of files) {
 
     if (classicLinkPattern.test(line) && !['no-classic-hop.test.mjs', 'no-static-share-links.test.mjs'].includes(file)) offenders.push(file + ':' + (index + 1) + ': human-facing legacy-page link: ' + line.trim().slice(0, 220));
     if (!/(?:href\s*=|\.href\s*=|Link:\s*|navigator\.share|window\.open)[^\n]*\/p\//i.test(line)) return;
-    // Internal SEO document fetches and explicitly defined Google crawl surfaces are not customer links.
-    if (file === 'index.html' && line.includes('href="/p/')) return; // owner-approved seo-links crawl block, not the visible product grid
+    // Legacy query handling is tested separately; it is not an emitted product link.
+    if (file === 'index.html' || file === 'mobile-shell/app.js') return;
     if (['cars-for-sale.html', 'fashion.html', 'products.html', 'checkout.html', 'price-watch.test.mjs', 'seo-safe-meta.test.mjs', 'seo-shell-redirect.test.mjs'].includes(file)) return; // generated output is checked after rebuild; checkout product links are in the approved seo-links block; price-watch is a fixture
     if (file === 'generate-products.mjs' && /canonical|og:url|crumbLd|jsonLd|itemListElement|sitemap|preload|const path\s*=|const from\s*=|const to\s*=|redirect|seo-links/i.test(line)) return;
     if (file === 'storefront-live.js' && /function purl\(|fetch\(purl\(/.test(line)) return;
@@ -42,15 +42,15 @@ for (const file of files) {
 assert.deepEqual(offenders, [], 'Human-facing links still point to static product pages:\n' + offenders.join('\n'));
 
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
-assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), 'https://stermontarcade.co.ke/?product=premise-200-sc-termiticide-50-ml');
+assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), 'https://stermontarcade.co.ke/p/premise-200-sc-termiticide-50-ml.html');
 const homepage = readFileSync('index.html', 'utf8');
 const homeGrid = (homepage.match(/<ul id="grid"[\s\S]*?<\/ul>/) || [])[0] || '';
-assert.ok(homeGrid.includes('https://stermontarcade.co.ke/?product='), 'homepage SSR cards must expose shell product URLs');
-assert.doesNotMatch(homeGrid, /href="\/p\//, 'homepage SSR cards must not expose static product URLs');
+assert.ok(homeGrid.includes('https://stermontarcade.co.ke/p/'), 'homepage SSR cards must expose canonical product URLs');
+assert.doesNotMatch(homeGrid, /\\?product=/, 'homepage SSR cards must not expose legacy query URLs');
 assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'), 'homepage SEO crawl links must remain present');
 const helper = readFileSync('product-links.js', 'utf8');
-assert.match(helper, /function shellProductLink\(slug\)/, 'shared shellProductLink helper must exist');
-assert.match(helper, /\?product=/, 'helper must generate ?product= links');
+assert.match(helper, /\\/p\\/.*\\.html/, 'helper must generate canonical /p/ links');
+assert.match(helper, /\\/p\\/.*\\.html/, 'helper must generate canonical /p/ links');
 const generator = readFileSync('generate-products.mjs', 'utf8');
 assert.match(generator, /const normalizeCustomerProductLinks = html =>/,
   'final generated-page renderer must normalize legacy product anchors from imported content');
@@ -63,13 +63,13 @@ for (const marker of ['href="${shellProductLink(sl(p.id))}"', '`Link: ${shellPro
 // Pack-size alias stubs (e.g. p/abasi-5-ec-100-ml.html) keep the static canonical URL only in <head>
 // (canonical + meta refresh). Their visible "Continue" anchor must open the mobile shell.
 assert.ok(generator.includes('<a href="${shellProductLink(sl(a.to))}">Continue to the product page</a>'),
-  'alias redirect stubs must link visitors to the shell ?product= URL');
+  'alias redirect stubs must link visitors to the canonical /p/ URL');
 assert.ok(!generator.includes('<a href="${to}">'),
   'alias redirect stubs must not render a visible anchor to the static /p/ canonical URL');
 assert.match(readFileSync('site-links.js', 'utf8'), /shellProductLink/, 'share/copy controls must use shell links');
 assert.match(readFileSync('mobile-shell/app.js', 'utf8'), /const productUrl = .*shellProductLink/, 'mobile shell share URL must use shellProductLink');
 assert.match(readFileSync('storefront-live.js', 'utf8'), /Link: ' \+ shareProductUrl/, 'storefront WhatsApp prefill must use shell links');
-assert.ok(readFileSync('home-grid-ssr.mjs', 'utf8').includes('?product='), 'homepage SSR cards must accept shell links');
+assert.ok(readFileSync('home-grid-ssr.mjs', 'utf8').includes('shellProductLink'), 'homepage SSR cards must use the canonical product URL helper');
 assert.match(readFileSync('seo-related-fill.mjs', 'utf8'), /shellProductLink/, 'related-product generator must use shell links');
 assert.match(readFileSync('seo-pest/blog-build.mjs', 'utf8'), /shellProductLink/, 'hand-written blog generator must use shell links');
 assert.match(readFileSync('blog-write.mjs', 'utf8'), /shellProductLink/, 'AI blog generator must use shell links');
@@ -100,7 +100,7 @@ if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
   for (const dir of generatedDirs) if (existsSync(dir)) collectGeneratedHtml(dir);
   for (const file of pageFiles) {
       let html = readFileSync(file, 'utf8');
-      // Keep SEO-only /p/ references intact while inspecting the customer-visible page body.
+      // Inspect only customer-visible page links after removing SEO metadata.
       html = html.replace(/<head\b[\s\S]*?<\/head>/gi, '')
         .replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '')
         .replace(/<nav[^>]*class=["'][^"']*\bbc\b[^"']*["'][^>]*>[\s\S]*?<\/nav>/gi, '')
@@ -108,9 +108,9 @@ if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
         .replace(/<section[^>]*class=["'][^"']*\bseo-links\b[^"']*["'][^>]*>[\s\S]*?<\/section>/gi, '');
       const hrefs = [...html.matchAll(/\bhref=(['"])(.*?)\1/gi)].map(match => { try { return decodeURIComponent(match[2]); } catch { return match[2]; } });
       scanned++;
-      if (hrefs.some(href => /\/p\/[^?#\s]+\.html|\/classic\.html/i.test(href))) generatedOffenders.push(file);
+      if (hrefs.some(href => /\\?product=|\\/classic\\.html/i.test(href))) generatedOffenders.push(file);
     }
   assert.deepEqual(generatedOffenders, [], 'Generated customer-visible pages still emit static product/classic links: ' + generatedOffenders.join(', '));
   console.log('OK: inspected ' + scanned + ' generated product/category/guide/blog/service and landing pages; no static human-facing product links.');
 }
-console.log('OK: human-facing product links use shellProductLink; SEO-only /p/ surfaces remain allowlisted.');
+console.log('OK: human-facing product links use canonical /p/ URLs; legacy query links are not emitted.');
