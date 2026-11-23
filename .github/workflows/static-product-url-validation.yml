@@ -50,6 +50,7 @@ jobs:
           node --check mobile-shell/app.js
           node --check seo-kenya.mjs
           node --check blog-write.mjs
+          node --check seo-pest/blog-build.mjs
 
       - name: Test product page design and descriptions
         run: |
@@ -71,7 +72,12 @@ jobs:
         run: node product-link-normalizer.mjs
 
       - name: Build pest-control blog pages with static product links
-        run: node seo-pest/blog-build.mjs
+        run: |
+          for pass in 1 2; do
+            for batch in blogs-05 blogs-06 blogs-07 blogs-08; do
+              node seo-pest/blog-build.mjs "$batch"
+            done
+          done
 
       - name: Verify pest-control blog product links
         run: node seo-pest/blog.test.mjs
