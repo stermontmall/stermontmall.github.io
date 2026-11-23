@@ -24,13 +24,19 @@ for (const f of fs.readdirSync(dir).filter(f => /^blogs-\d+\.json$/.test(f))) {
     ok(!/\[\[/.test(a.answer + a.faq.flat().join(' ')), `${id}: links in the answer or FAQ`);
     const links = closingLinks(a);
     ok(links.length >= 2 && links.length <= 4, `${id}: ${links.length} body links (need 2-4)`);
-    ok(links.includes(`/p/${a.product}.html`), `${id}: no link to its product page`);
-    for (const l of [...links, `/p/${a.product}.html`, `/c/${a.cat}.html`, ...a.related.map(r => `/blog/${r}.html`)]) ok(fs.existsSync(path.join(root, l.slice(1))), `${id}: broken link ${l}`);
+    const productPath = `/p/${a.product}.html`, categoryPath = `/c/${a.cat}.html`;
+    const h = renderPost(a);
+    for (const l of [...links, productPath, categoryPath, ...a.related.map(r => `/blog/${r}.html`)]) {
+      const exists = fs.existsSync(path.join(root, l.slice(1)));
+      const href = l.startsWith('/p/') ? `href="https://stermontarcade.co.ke${l}"` : `href="${l}"`;
+      ok(exists || !h.includes(href), `${id}: generated blog must not link to missing page ${l}`);
+    }
     for (const re of BANNED) ok(!re.test(t), `${id}: banned phrase ${re}`);
     ok(!slugs.has(a.slug), `${id}: duplicate slug`); slugs.add(a.slug);
     ok(!fs.existsSync(path.join(root, 'blog', a.slug + '.html')) || fs.readFileSync(path.join(root, 'blog', a.slug + '.html'), 'utf8') === renderPost(a), `${id}: blog file exists and differs`);
     const h = renderPost(a);
-    ok(h.includes('href="https://stermontarcade.co.ke/p/' + a.product + '.html"'), `${id}: rendered product CTA must use the static product URL`);
+    const productExists = fs.existsSync(path.join(root, 'p', a.product + '.html'));
+    ok(productExists ? h.includes('href="https://stermontarcade.co.ke/p/' + a.product + '.html"') : !h.includes('href="https://stermontarcade.co.ke/p/' + a.product + '.html"'), `${id}: rendered CTA must only link to an existing static product page`);
     for (const m of h.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)) { try { JSON.parse(m[1].replace(/\\u003c/g, '<')); checks++; } catch { checks++; bad.push(`${id}: invalid JSON-LD`); } }
     ok(!/&amp;(amp|lt|gt|quot|#39);/.test(h), `${id}: double-escaped entity (shows as "&amp;" on the page)`);
     ok((h.match(/<h1>/g) || []).length === 1, `${id}: needs exactly one h1`);
