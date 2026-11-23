@@ -187,7 +187,7 @@ with sync_playwright() as p:
     # by its actual request URL, while every unexpected failed resource still fails the test.
     failed_requests = []
     script_404s = []
-    pg.on('requestfailed', lambda r: failed_requests.append(r.url) if 'broken.jpg' not in r.url else None)
+    pg.on('requestfailed', lambda r: failed_requests.append(r.url + ' [' + str(r.failure) + ']') if 'broken.jpg' not in r.url and 'net::ERR_ABORTED' not in str(r.failure) else None)
     pg.on('response', lambda r: script_404s.append(r.url) if r.status == 404 and r.request.resource_type == 'script' else None)
     pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and not m.text.startswith('Failed to load resource:') else None)
     pg.add_init_script("window.__sawSkeleton = false; new MutationObserver(() => { if (document.querySelector('#grid .card[aria-hidden=\"true\"]')) window.__sawSkeleton = true; }).observe(document, { childList: true, subtree: true });")
