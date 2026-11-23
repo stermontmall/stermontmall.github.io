@@ -20,12 +20,12 @@ import { appendFileSync } from 'node:fs';
 const IK_UPLOAD = 'https://upload.imagekit.io/api/v1/files/upload';
 const IK_ENDPOINT = 'https://ik.imagekit.io/w6hxfnwmw';
 const FOLDER = '/products';
-const MIN_SIDE = 500;
-const MIN_SIDE_TRUSTED = 400;
+const MIN_SIDE = 200;
+const MIN_SIDE_TRUSTED = 200;
 // Reliable Kenyan shops whose product photos are accepted at the relaxed size. Add more hostnames here.
 const TRUSTED_HOSTS = ['agriguardagrovet.co.ke', 'agrijibu.co.ke'];
 const MAX_LINES = 40;
-const BROWSER_SAFE = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif']);
+const BROWSER_SAFE = new Set(['jpg', 'jpeg', 'png', 'webp', 'avif']);
 const KEY = process.env.IMAGEKIT_PRIVATE_KEY || '';
 
 const summaryFile = process.env.GITHUB_STEP_SUMMARY;
@@ -119,8 +119,12 @@ async function resolveSources(src) {
 }
 
 async function uploadOne(name, src) {
+  const download = await fetch(src, { headers: { 'User-Agent': UA, Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8' }, redirect: 'follow' });
+  const contentType = (download.headers.get('content-type') || '').toLowerCase();
+  if (!download.ok || !contentType.startsWith('image/')) return { error: `source download failed (HTTP ${download.status}, ${contentType || 'no image content type'})` };
+  const bytes = await download.arrayBuffer();
   const form = new FormData();
-  form.append('file', src);
+  form.append('file', new Blob([bytes], { type: contentType }), name);
   form.append('fileName', name);
   form.append('folder', FOLDER);
   form.append('useUniqueFileName', 'true');
@@ -156,7 +160,7 @@ async function one(line) {
       const w = Number(body.width) || 0, h = Number(body.height) || 0;
       const out = { ...res, image_found_via: from, image_source: cand, original_format: ext || 'unknown', width: w, height: h, bytes: body.size, original_url: plain, browser_url: browserUrl, converted_to_webp: !safe, trusted_source: trusted, relaxed_size: trusted && (w < MIN_SIDE || h < MIN_SIDE) };
       if (w < minSide || h < minSide) { lastError = `image is ${w}x${h}; at least ${minSide}x${minSide} is required${trusted ? ' (trusted shop)' : ''}`; continue; }
-      const check = await fetch(browserUrl);
+      const check = await fetch(browserUrl, { headers: { 'User-Agent': UA } });
       const type = check.headers.get('content-type') || '';
       if (!check.ok || !type.startsWith('image/')) { lastError = `stored file did not load as an image (HTTP ${check.status}, ${type || 'no type'})`; continue; }
       return { ...out, ok: true, content_type: type };
