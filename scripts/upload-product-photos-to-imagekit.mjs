@@ -80,7 +80,7 @@ export function extractImageCandidates(html, baseUrl) {
       for (const part of srcset.split(',')) add(part.trim().split(/\s+/)[0]);
     }
   }
-  const metaRe = /<meta\\s+[^>]*>/gi;
+  const metaRe = /<meta\s+[^>]*>/gi;
   for (const m of html.match(metaRe) || []) {
     const key = (m.match(/(?:property|name)\s*=\s*["']([^"']+)["']/i) || [])[1] || '';
     if (/^(og:image(:secure_url|:url)?|twitter:image(:src)?)$/i.test(key)) add((m.match(/content\s*=\s*["']([^"']+)["']/i) || [])[1]);
