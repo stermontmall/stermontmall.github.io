@@ -10,7 +10,7 @@ assert.match(generator, /sku:\s*String\(p\.product_code\s*\|\|\s*p\.id\)/,
   'Single-product JSON-LD must use the permanent product code as SKU');
 assert.match(generator, /sku:\s*String\(v\.product_code\s*\|\|\s*v\.id\)/,
   'Variant JSON-LD must use each variant row product code as SKU');
-assert.match(generator, /Product code:<\\/b>/,
+assert.ok(generator.includes('Product code:</b>'),
   'Product pages must visibly display the permanent product code');
 assert.match(generator, /Code: \$\{esc\(v\.product_code/,
   'Each pack-size option must visibly display its own product code');
