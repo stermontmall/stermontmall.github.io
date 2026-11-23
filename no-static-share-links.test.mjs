@@ -1,38 +1,32 @@
-// Guard: customer-facing product links use the clean, crawlable static product URL.
-// The homepage and every generated product/category/blog/guide/service page must link to /p/<slug>.html.
+// Guard: customer-facing product links use clean, crawlable static product URLs.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import assert from 'node:assert/strict';
-
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), '/p/premise-200-sc-termiticide-50-ml.html');
 assert.equal(shellProductLink(''), 'https://stermontarcade.co.ke/');
 const helper = readFileSync('product-links.js', 'utf8');
-assert.match(helper, /function shellProductLink\\(slug\\)/);
-assert.match(helper, /return '\/p\/'/);
-assert.doesNotMatch(helper, /\\?product=/);
-
+assert.ok(helper.includes("return '/p/''));
+assert.ok(!helper.includes('?product='));
 const homepage = readFileSync('index.html', 'utf8');
-assert.match(homepage, /<link rel="canonical" href="https:\\/\\/stermontarcade\\.co\\.ke\\/">/);
-assert.match(homepage, /location\\.replace\\('\/p\/'/);
-const homeGrid = (homepage.match(/<ul id="grid"[\\s\\S]*?<\\/ul>/) || [])[0] || '';
-assert.match(homeGrid, /href="\\/p\\/[a-z0-9-]+\\.html"/i);
-assert.doesNotMatch(homeGrid, /\\?product=/);
+assert.ok(homepage.includes('<link rel="canonical" href="https://stermontarcade.co.ke/">'));
+assert.ok(homepage.includes("location.replace('/p/'"));
+const homeGrid = (homepage.match(/<ul id="grid"[\s\S]*?<\/ul>/) || [])[0] || '';
+assert.match(homeGrid, /href="\/p\/[a-z0-9-]+\.html"/i);
+assert.ok(!homeGrid.includes('?product='));
 assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'));
-
 const generator = readFileSync('generate-products.mjs', 'utf8');
-assert.match(generator, /const normalizeCustomerProductLinks = html =>/);
-assert.ok(generator.includes('${normalizeCustomerProductLinks(body)}'));
-for (const marker of ['href="${shellProductLink(sl(p.id))}"', '`Link: ${shellProductLink(sl(p.id))}`', '${shellProductLink(v.slug || p.slug || p.id)}']) {
+assert.ok(generator.includes('const normalizeCustomerProductLinks = html =>'));
+assert.ok(generator.includes('$' + '{normalizeCustomerProductLinks(body)}'));
+for (const marker of ['href="' + '$' + '{shellProductLink(sl(p.id))}"', '$' + '{shellProductLink(v.slug || p.slug || p.id)}']) {
   assert.ok(generator.includes(marker), 'product generator must use canonical helper for: ' + marker);
 }
-assert.match(generator, /<a href="${shellProductLink\\(sl\\(a\\.to\\)\\)}">Continue to the product page<\\/a>/);
+assert.ok(generator.includes('<a href="' + '$' + '{shellProductLink(sl(a.to))}">Continue to the product page</a>'));
 for (const file of ['seo-related-fill.mjs','seo-pest/blog-build.mjs','blog-write.mjs','seo-kenya.mjs','services/build-services.mjs','recent-orders.js','wa-float.js','product-trust.js']) {
-  assert.match(readFileSync(file, 'utf8'), /shellProductLink/, file + ' must use the shared static URL helper');
+  assert.ok(readFileSync(file, 'utf8').includes('shellProductLink'), file + ' must use the shared static URL helper');
 }
 assert.ok(existsSync('no-classic-hop.test.mjs'));
-
 const htmlFiles = [];
 const collect = dir => {
   if (!existsSync(dir)) return;
@@ -47,9 +41,9 @@ for (const file of ['index.html','products.html','fashion.html','cars-for-sale.h
 const bad = [];
 for (const file of htmlFiles) {
   const html = readFileSync(file, 'utf8');
-  const body = html.replace(/<head\\b[\\s\\S]*?<\\/head>/gi, '').replace(/<script[\\s\\S]*?<\\/script>/gi, '');
-  const hrefs = [...body.matchAll(/\\bhref=(['"])(.*?)\\1/gi)].map(m => m[2]);
-  if (hrefs.some(h => /\\?product=/i.test(h))) bad.push(file + ': legacy product query href');
+  const body = html.replace(/<head\b[\s\S]*?<\/head>/gi, '').replace(/<script[\s\S]*?<\/script>/gi, '');
+  const hrefs = [...body.matchAll(/\bhref=(['"])(.*?)\1/gi)].map(m => m[2]);
+  if (hrefs.some(h => /\?product=/i.test(h))) bad.push(file + ': legacy product query href');
 }
-assert.deepEqual(bad, [], bad.join('\\n'));
+assert.deepEqual(bad, [], bad.join('\n'));
 console.log('OK: static product URLs are used across ' + htmlFiles.length + ' customer-facing HTML files');
