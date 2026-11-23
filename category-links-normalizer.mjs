@@ -1,10 +1,12 @@
 // Repair category links in every customer-facing HTML page using active catalogue categories.
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { activeCategorySlugsFromPages, normalizeCategoryLinks, resolveCategorySlug } from './category-links.mjs';
+import { activeCategorySlugsFromCatalogSnapshot, normalizeCategoryLinks, resolveCategorySlug } from './category-links.mjs';
 
-const activeCategories = activeCategorySlugsFromPages(
-  readdirSync('c').filter(file => file.endsWith('.html') && file !== 'index.html')
-    .map(file => ({ slug: file, html: readFileSync('c/' + file, 'utf8') }))
+const snapshot = JSON.parse(readFileSync('catalog-snapshot.json', 'utf8'));
+const activeCategories = activeCategorySlugsFromCatalogSnapshot(
+  snapshot,
+  readdirSync('p').filter(file => file.endsWith('.html'))
+    .map(file => ({ slug: file, html: readFileSync('p/' + file, 'utf8') }))
 );
 if (!activeCategories.size) {
   console.error('No active category pages found in c/; refusing to rewrite links.');
