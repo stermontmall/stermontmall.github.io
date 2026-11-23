@@ -401,6 +401,8 @@ with sync_playwright() as p:
     p3.add_init_script("localStorage.setItem('shell.cart', JSON.stringify([{key:'outdoor-0|50 ml',id:'outdoor-0',name:'Mock',size:'50 ml',qty:2,price:100,emoji:'x',bg:'#fff'}]))")
     p3.goto(URL); p3.wait_for_selector('#grid .card[data-id]')
     check('stale mock-era cart lines are dropped', p3.locator('#bottom-nav [data-badge="cart"]').is_hidden())
+    unknown = p3.goto(URL.rstrip('/') + '/p/not-in-fixture.html')
+    check('unknown product slug returns 404 and stays off the legacy query route', unknown.status == 404 and p3.url.endswith('/p/not-in-fixture.html') and '?product=' not in p3.url, p3.url)
     c3.close()
 
     # a reload on a tab other than Home stays on that tab (owner bug 2026-10-31: refreshing the Categories tab went back to the home page)
