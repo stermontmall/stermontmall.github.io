@@ -83,6 +83,8 @@ jobs:
       # (see "Report failing step output").
       - name: Prepare failure log directory
         run: mkdir -p "$RUNNER_TEMP/ci-logs"
+      - name: Test missing-category link resolver
+        run: node category-links.test.mjs
       - name: Install Playwright Chromium
         run: |
           {
