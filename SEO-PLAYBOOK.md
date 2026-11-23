@@ -4,7 +4,7 @@ No one can guarantee the #1 spot on Google. These moves are ordered by how much 
 
 ## 1. Own "near me" in Nairobi (free, do this week)
 1. Create or claim your **Google Business Profile** for The Sarit Centre, Karuna Road, Westlands. Verify it (postcard, phone or video).
-2. Fill in everything: category "Online store" plus "Pest control supplier" if offered, hours 8 AM to 8 PM daily, phone +254 748 888 230, website `https://stermontarcade.co.ke/nairobi.html` (the Nairobi page is built for this).
+2. Fill in everything: category "Online store" plus "Pest control supplier" if offered, hours 8 AM to 8 PM daily, phone +254 789 514 060, website `https://stermontarcade.co.ke/nairobi.html` (the Nairobi page is built for this).
 3. Upload 10 or more real photos (shop front, shelves, packed orders, products). Add products to the profile.
 4. Post one update a week (a product, an offer, a tip). Posts keep the profile active.
 5. Keep your name, address and phone **identical** everywhere (site, Facebook, directories). Mismatches hurt local ranking.

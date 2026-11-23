@@ -216,9 +216,9 @@ ${art.closing ? para(art.closing) : ''}
 ${catHtml}
 ${relHtml}
 <a class="btn" href="/products.html">Browse all products</a>
-<div class="box"><a href="https://wa.me/254748888230?text=Hello%20Stermont%20Arcade">Questions? Chat with us on WhatsApp</a></div>
+<div class="box"><a href="https://wa.me/254789514060?text=Hello%20Stermont%20Arcade">Questions? Chat with us on WhatsApp</a></div>
 </main>
-<footer>Stermont Arcade \u00b7 Online store serving all of Kenya \u00b7 Pay by M-Pesa \u00b7 Delivery to all 47 counties \u00b7 <a href="https://wa.me/254748888230">WhatsApp +254 748 888 230</a> \u00b7 <a href="/shipping.html">Shipping</a> \u00b7 <a href="/returns.html">Returns</a> \u00b7 <a href="/privacy.html">Privacy</a></footer><script src="/analytics.js" defer></script></body></html>
+<footer>Stermont Arcade \u00b7 Online store serving all of Kenya \u00b7 Pay by M-Pesa \u00b7 Delivery to all 47 counties \u00b7 <a href="https://wa.me/254789514060">WhatsApp +254 789 514 060</a> \u00b7 <a href="/shipping.html">Shipping</a> \u00b7 <a href="/returns.html">Returns</a> \u00b7 <a href="/privacy.html">Privacy</a></footer><script src="/analytics.js" defer></script></body></html>
 `;
 writeFileSync(`blog/${topic.slug}.html`, html);
 topic.status = 'drafted'; topic.drafted = iso; dirty = true;

@@ -33,7 +33,7 @@
 (function () {
   if (document.getElementById('wa-float')) return;
   if (/admin|upload-photos/.test(location.pathname)) return;
-  var NUMBER = '254748888230';
+  var NUMBER = '254789514060';
   var page = document.title || 'your website';
   var pathSlug = location.pathname.match(/^\/p\/([^/]+)\.html$/i);
   var productLink = pathSlug && window.shellProductLink ? window.shellProductLink(decodeURIComponent(pathSlug[1])) : location.href;

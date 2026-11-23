@@ -17,12 +17,12 @@
   var BIZ = {
     name: 'Stermont Arcade',
     tag: 'Everything you need, one trusted store.',
-    phone: '+254 748 888 230',
+    phone: '+254 789 514 060',
     email: 'support@stermontarcade.co.ke',
     web: 'stermontarcade.co.ke',
     place: 'Nairobi, Kenya',
     paybill: '714777',
-    account: '0748888230',
+    account: '0789514060',
     logo: 'logo.png',            // put your logo in the repo root with this name
     signature: 'signature.png',  // optional: a scanned signature (transparent PNG) of the authorised person
     stamp: 'stamp.png',          // optional: company stamp image

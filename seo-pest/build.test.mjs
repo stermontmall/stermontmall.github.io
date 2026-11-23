@@ -19,7 +19,7 @@ for (const f of fs.readdirSync(dir).filter(f => /^batch-\d+\.json$/.test(f))) {
     const noStrength = (p.strength || []).reduce((s, x) => s.split(x).join(''), t);
     if (!p.dose) ok(!DOSE.test(noStrength), `${id}: contains a dose and the batch file has no label data (dose)`);
     ok(p.faq.length >= 3, `${id}: needs 3 or more FAQs`);
-    ok(/WhatsApp \+254 748 888 230/.test(t) && /M-Pesa/.test(t) && /47 counties/.test(t), `${id}: order line missing`);
+    ok(/WhatsApp \+254 789 514 060/.test(t) && /M-Pesa/.test(t) && /47 counties/.test(t), `${id}: order line missing`);
     ok(t.startsWith(p.name), `${id}: title line must start with the product name`);
     ok(!/\bAs an AI\b/i.test(t), `${id}: mentions AI`);
     ok(new Set(p.faq.map(x => x[0])).size === p.faq.length, `${id}: duplicate FAQ`);
