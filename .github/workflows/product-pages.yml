@@ -94,9 +94,6 @@ jobs:
       - name: Test shared SEO metadata rules
         run: node seo-meta.test.mjs
 
-      - name: Test owner-supplied product title length limits
-        run: node seo-titles.test.mjs
-
       - name: Test active catalogue SEO metadata quality guard
         run: node seo-catalog-guard.test.mjs
 
@@ -144,10 +141,6 @@ jobs:
 
       - name: Apply Google titles, descriptions and FAQs (seo-overrides.json)
         run: node seo-overrides.mjs
-
-      - name: Apply the owner's exact Google titles (products.seo_title, from the Master Catalog SEO Mapping PDF)
-        continue-on-error: true
-        run: node seo-titles.mjs
 
       - name: Apply allowlisted ordinary-product meta descriptions only
         run: node seo-safe-meta.mjs
