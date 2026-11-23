@@ -238,6 +238,8 @@ with sync_playwright() as p:
     check('product page: picking a size updates the price and highlights the pack', pg.locator('#pp-price').inner_text() == 'KSh 6,450' and pg.locator('#pp-sizes [data-pp-size="1 Litre"]').get_attribute('aria-pressed') == 'true', pg.locator('#pp-price').inner_text())
     pg.locator('#pp-sizes [data-pp-size="250 ml"]').click()
     check('product page: selected pack card keeps its own price visible', 'KSh 1,550' in pg.locator('#pp-sizes [data-pp-size="250 ml"]').inner_text(), pg.locator('#pp-sizes [data-pp-size="250 ml"]').inner_text())
+    wa_href = pg.locator('#pp-whatsapp').get_attribute('href') or ''
+    check('product WhatsApp action includes the selected pack and store number', 'wa.me/254789514060' in wa_href and 'Garden%20Hose%20Connector%20Set' in wa_href and '250%20ml' in wa_href and 'garden-set-250ml.html' in unquote(wa_href), wa_href)
     pg.go_back(); pg.wait_for_function("!document.querySelector('#page-product.open')", timeout=5000)
     check('Back from the product page returns to the sheet, still on the shell', pg.locator('#sheet-quickbuy.open').count() == 1 and pg.url == url_before, pg.url)
     pg.go_back(); pg.wait_for_timeout(350)
