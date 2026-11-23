@@ -82,6 +82,10 @@ def on_neon(route):
             'vary': 'Origin'
         })
     url = route.request.url
+    if FAIL[0]:
+        return route.fulfill(status=402, content_type='application/json', body='{"message":"simulated Neon outage"}', headers={
+            'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'vary': 'Origin'
+        })
     if '/categories?' in url:
         return route.fulfill(status=200, content_type='application/json', body=json.dumps(CATS_FIX), headers={
             'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'vary': 'Origin'
@@ -92,7 +96,7 @@ def on_neon(route):
         row_id = query['id'][0].removeprefix('eq.')
         selected = [r for r in ROWS if r['id'] == row_id]
         if 'description' in query.get('select', [''])[0]:
-            selected = [dict(description=f"ABOUT {r['name']}\\n- line one\\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=r['images'], product_code=r['product_code']) for r in selected]
+            selected = [dict(description=f"ABOUT {r['name']}\\n- line one\\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, 'https://img.test/extra.png'], product_code=r['product_code']) for r in selected]
     elif 'or' in query:
         match = re.search(r'slug\.eq\.([^,]+)', query['or'][0])
         slug = unquote(match.group(1)) if match else ''
@@ -135,7 +139,7 @@ def mock_network(ctx):
     # ImageKit Web Proxy wraps the original source URL; emulate successful and missing upstream photos.
     def imagekit_proxy(route):
         url = unquote(route.request.url)
-        if url.endswith('https://img.test/ok.png'):
+        if url.endswith('https://img.test/ok.png') or url.endswith('https://img.test/extra.png'):
             return route.fulfill(status=200, content_type='image/png', body=PNG)
         if url.endswith('https://img.test/broken.jpg'):
             return route.abort()
