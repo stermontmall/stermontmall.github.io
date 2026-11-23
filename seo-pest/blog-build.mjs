@@ -26,12 +26,13 @@ export function closingLinks(a) { return [...new Set(linksOf([a.intro, a.closing
 
 function categoryTarget(slug) {
   const read = key => { try { return fs.readFileSync(path.join(root, 'c', key + '.html'), 'utf8'); } catch { return ''; } };
-  const hasProducts = key => /<li(?:\\s[^>]*)?><a href="(?:https:\\/\\/stermontarcade\\.co\\.ke)?\\/p\\/[^\"]+\\.html"[^>]*>\\s*<img/i.test(read(key));
+  const hasProducts = key => { const html = read(key); const grid = (html.split('<ul class="g">')[1] || '').split('</ul>')[0] || ''; return grid.includes('href="/p/') || grid.includes('href="https://stermontarcade.co.ke/p/'); };
   if (hasProducts(slug)) return slug;
   const html = read(slug);
-  const parents = [...html.matchAll(/<a href="\\/c\\/([^\"]+)\\.html"/g)].map(m => m[1]).filter(p => p !== slug);
+  const breadcrumb = (html.split('<nav class="bc">')[1] || '').split('</nav>')[0] || '';
+  const parents = [...breadcrumb.matchAll(/href="\/c\/([^"]+)\.html"/g)].map(m => m[1]).filter(p => p !== slug);
   return parents.find(hasProducts) || null;
-}
+};
 export function renderPost(a) {
   const resolvedCategory = categoryTarget(a.cat);
   const inline = s => esc(s).replace(/\[\[(\/[^|\]]+)\|([^\]]+)\]\]/g, (m, p, t) => `<a href="${p.startsWith('/p/') ? shellProductLink(p.slice(3).replace(/\.html$/i, '')) : p}">${t}</a>`);
