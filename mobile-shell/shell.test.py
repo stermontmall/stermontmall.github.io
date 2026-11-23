@@ -54,12 +54,12 @@ def serve(route, body, ctype='application/json'):
 def on_rest(route):
     if FAIL[0]: return route.fulfill(status=402, body='exceed_cached_egress_quota', headers={'access-control-allow-origin': '*'})
     url = route.request.url
-    if '/rest/v1/products' in url and 'id=eq.' in url:   # details of one row, fetched when a product is opened
+    if ('/rest/v1/storefront_products' in url or '/rest/v1/products' in url) and 'id=eq.' in url:   # details of one row, fetched when a product is opened
         rid = url.split('id=eq.')[1].split('&')[0]
         r = next((x for x in ROWS if x['id'] == rid), None)
         return serve(route, [] if not r else [dict(description=f"ABOUT {r['name']}\n- line one\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, OK], product_code=r['product_code'])])
-    if '/rest/v1/rpc/get_store_catalog' in url: return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in ROWS])
-    serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
+    if '/rest/v1/rpc/get_store_catalog' in url or '/rest/v1/storefront_products' in url: return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in ROWS])
+    serve(route, ROWS if ('/rest/v1/storefront_products' in url or '/rest/v1/products' in url) else CATS_FIX)
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
 REAL = '''<!doctype html><html><head><title>Fixture Product</title><link rel="canonical" href="https://stermontarcade.co.ke/p/fixture.html"><meta name="stm-id" content="fixture"><!--PRODUCT_SCHEMA--></head><body><main><h1>Fixture Product</h1><div class="product-description"><section class="pd-sec"><h3>Product Overview</h3><p>Published description survives a database outage.</p></section></div></main></body></html>'''
 
@@ -86,7 +86,8 @@ def mock_network(ctx):
         rt.fulfill(status=200, content_type='text/html', body=page)
     ctx.route('**/p/*.html*', serve_product_page)
     ctx.route('**/auth/token/anonymous*', lambda r: serve(r, {'token': 'test-anon', 'expires_at': 9999999999}))
-    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
+    ctx.route('**/rest/v1/storefront_products*', on_rest)  # current Neon storefront product table
+    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # legacy catalogue RPC
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
     for host in ('https://www.googletagmanager.com/**', 'https://cdn.jsdelivr.net/**', 'https://www.google-analytics.com/**', 'https://*.google-analytics.com/**'):
@@ -150,7 +151,7 @@ with sync_playwright() as p:
     # A parked request leaves the shell waiting on the network while the test thread stays free. times=1 means every later request
     # (and every other test on this page) falls through to mock_network's normal handler; the shell fetches the catalogue only once per load.
     parked = []
-    pg.route('**/rest/v1/rpc/get_store_catalog*', lambda route: parked.append(route), times=1)
+    pg.route('**/rest/v1/storefront_products*', lambda route: parked.append(route), times=1)
     pg.goto(URL, wait_until='domcontentloaded')
     for _ in range(200):   # up to ~10 s for the shell to ask for the catalogue; it is then held, so no hydration can have happened yet
         if parked: break
