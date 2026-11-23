@@ -1,12 +1,3 @@
-agrofeed-plus-foliar-500ml|https://agriguardagrovet.co.ke/product/agrofeed-plus-foliar-500ml/
-agrofeed-plus-foliar-1l|https://agriguardagrovet.co.ke/product/agrofeed-plus-foliar-1l/
-maxigrow-high-n-1l|https://agriguardagrovet.co.ke/product/maxigrow-high-n-1l/
-maxigrow-high-p-200ml|https://agriguardagrovet.co.ke/product/maxigrow-high-p-200ml/
-maxigrow-high-p-500ml|https://agriguardagrovet.co.ke/product/maxigrow-high-p-500ml/
-maxigrow-high-k-200ml|https://agriguardagrovet.co.ke/product/maxigrow-high-k-200ml/
-calcibora-1l|https://agropests.com/products/calciborar-1l
-maxigrow-calmag-liquids-1l|https://agriguardagrovet.co.ke/product/maxigrow-calmag-liquids/
-omex-foliar-feed-1l|https://agriguardagrovet.co.ke/product/omex-foliar-feed/
-brilliant-liquid-fertilizer-1l|https://agriguardagrovet.co.ke/product/brilliant-liquid-fertilizer/
-foliboost-foliar-fertilizer-1l|https://agriguardagrovet.co.ke/product/foliboost-foliar-fertilizer/
-farm-booster-1l|https://agriguardagrovet.co.ke/product/farm-booster/
+kungunil-200sl-insecticide-100ml|https://agropests.com/products/kungunil-200sl-100ml
+bedlam-200sl-insecticide-100ml|https://agropests.com/products/bedlam-200sl-100ml
+kungunil-200sl-insecticide-1l|https://agropests.com/products/kungunil-1-l
