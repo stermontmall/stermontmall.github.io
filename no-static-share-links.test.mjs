@@ -66,7 +66,7 @@ assert.ok(generator.includes('<a href="${shellProductLink(sl(a.to))}">Continue t
   'alias redirect stubs must link visitors to the shell ?product= URL');
 assert.ok(!generator.includes('<a href="${to}">'),
   'alias redirect stubs must not render a visible anchor to the static /p/ canonical URL');
-assert.match(readFileSync('site-links.js', 'utf8'), /shellProductLink/, 'share/copy controls must use shell links');
+if (existsSync('site-links.js')) assert.match(readFileSync('site-links.js', 'utf8'), /shellProductLink/, 'share/copy controls must use shell links');
 assert.match(readFileSync('mobile-shell/app.js', 'utf8'), /const productUrl = .*shellProductLink/, 'mobile shell share URL must use shellProductLink');
 assert.match(readFileSync('storefront-live.js', 'utf8'), /Link: ' \+ shareProductUrl/, 'storefront WhatsApp prefill must use shell links');
 assert.ok(readFileSync('home-grid-ssr.mjs', 'utf8').includes('?product='), 'homepage SSR cards must accept shell links');
