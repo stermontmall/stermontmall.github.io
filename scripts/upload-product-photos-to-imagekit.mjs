@@ -43,6 +43,11 @@ const uniqueLines = [...latestLineByName.values()];
 let previousResults = [];
 try { previousResults = JSON.parse(readFileSync('data/photo-results.json', 'utf8')); } catch {}
 const previousByName = new Map(previousResults.filter((x) => x && x.ok && x.browser_url).map((x) => [x.name, x]));
+const pendingLines = uniqueLines.filter((line) => {
+  const sep = line.indexOf('|');
+  const name = cleanName(sep >= 0 ? line.slice(0, sep) : line);
+  return name && !previousByName.has(name);
+});
 
 export function normalizePageUrl(u) {
   try {
@@ -234,7 +239,7 @@ async function one(line) {
 }
 
 const results = [];
-for (const line of uniqueLines) results.push(await one(line));
+for (const line of pendingLines) results.push(await one(line));
 writeFileSync('data/photo-results.json', JSON.stringify(results, null, 2) + '\n');
 summary('## ImageKit photo upload — JPEG normalized');
 summary('| Result | Product | Dimensions | Verified ImageKit URL / error |');
@@ -247,5 +252,5 @@ say('RESULTS_JSON_BEGIN');
 say(JSON.stringify(results, null, 2));
 say('RESULTS_JSON_END');
 const failed = results.filter((x) => !x.ok).length;
-say(`Done: ${results.length - failed} verified JPEG uploads, ${failed} failed.`);
+say(`Done: ${results.length - failed} verified JPEG uploads, ${failed} failed. Skipped ${uniqueLines.length - pendingLines.length} previously verified product images.`);
 process.exit(failed ? 1 : 0);
