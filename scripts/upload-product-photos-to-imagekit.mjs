@@ -114,7 +114,7 @@ async function resolveSources(src, productName = '') {
   const page = normalizePageUrl(src);
   const r = await fetch(page, {
     headers: { 'User-Agent': UA, Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,' + IMAGE_ACCEPT, ...(refererFor(page) ? { Referer: refererFor(page) } : {}) },
-    redirect: 'follow'
+    redirect: 'follow', signal: AbortSignal.timeout(15000)
   });
   if (!r.ok) throw new Error(`source page HTTP ${r.status}`);
   const type = (r.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
@@ -132,7 +132,7 @@ async function uploadOne(name, src) {
   const referer = refererFor(src);
   const download = await fetch(src, {
     headers: { 'User-Agent': UA, Accept: IMAGE_ACCEPT, ...(referer ? { Referer: referer } : {}) },
-    redirect: 'follow'
+    redirect: 'follow', signal: AbortSignal.timeout(15000)
   });
   const contentType = (download.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
   if (!download.ok) return { error: `image download HTTP ${download.status} (${contentType || 'no content-type'})` };
@@ -180,7 +180,7 @@ async function uploadOne(name, src) {
   form.append('folder', FOLDER);
   form.append('useUniqueFileName', 'true');
   form.append('tags', 'product-photo,auto-upload,jpeg-normalized');
-  const response = await fetch(IK_UPLOAD, { method: 'POST', headers: { Authorization: auth }, body: form });
+  const response = await fetch(IK_UPLOAD, { method: 'POST', headers: { Authorization: auth }, body: form, signal: AbortSignal.timeout(30000) });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) return { error: `ImageKit ${response.status}: ${body.message || 'upload failed'}` };
   if (body.fileType && body.fileType !== 'image') return { error: `ImageKit classified upload as ${body.fileType}` };
@@ -189,7 +189,7 @@ async function uploadOne(name, src) {
   if (width < MIN_SIDE || height < MIN_SIDE) return { error: `ImageKit stored image is ${width}x${height}; minimum is ${MIN_SIDE}x${MIN_SIDE}` };
   const filePath = body.filePath || `${FOLDER}/${body.name}`;
   const browserUrl = `${IK_ENDPOINT}${filePath}`;
-  const verify = await fetch(browserUrl, { headers: { 'User-Agent': UA, Accept: 'image/jpeg,*/*;q=0.8' }, redirect: 'follow' });
+  const verify = await fetch(browserUrl, { headers: { 'User-Agent': UA, Accept: 'image/jpeg,*/*;q=0.8' }, redirect: 'follow', signal: AbortSignal.timeout(15000) });
   const verifiedType = (verify.headers.get('content-type') || '').split(';')[0].toLowerCase();
   if (verify.status !== 200 || verifiedType !== 'image/jpeg') {
     return { error: `ImageKit URL verification failed (HTTP ${verify.status}, ${verifiedType || 'no content-type'})` };
@@ -214,7 +214,7 @@ async function one(line) {
     // Reuse earlier verified JPEGs when a retry only needs to replace blocked sources.
     const cached = previousByName.get(name);
     if (cached && cached.content_type === 'image/jpeg' && cached.http_status === 200) {
-      const check = await fetch(cached.browser_url, { headers: { 'User-Agent': UA, Accept: 'image/jpeg,*/*;q=0.8' }, redirect: 'follow' });
+      const check = await fetch(cached.browser_url, { headers: { 'User-Agent': UA, Accept: 'image/jpeg,*/*;q=0.8' }, redirect: 'follow', signal: AbortSignal.timeout(10000) });
       const type = (check.headers.get('content-type') || '').split(';')[0].toLowerCase();
       if (check.status === 200 && type === 'image/jpeg') {
         return { ...cached, ...result, ok: true, browser_url: cached.browser_url, original_url: cached.browser_url, content_type: type, http_status: 200, reused: true };
