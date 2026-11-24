@@ -150,6 +150,9 @@ jobs:
           node seo-safe-blog-meta.mjs
           node blog-build.mjs
 
+      - name: Normalize internal category links in generated product pages
+        run: node category-link-normalizer.mjs
+
       - name: Normalize visible product links in generated pages
         run: node product-link-normalizer.mjs
 
