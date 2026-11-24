@@ -1,13 +1,10 @@
 name: Upload product photos to ImageKit
 
-# Used by Claude and ChatGPT when publishing products (Neon rule publish_products, Step 4).
+# Used by the V8 publishing workflow.
 # The only trigger is a push to main that changes data/photo-queue.txt.
-# Format: one per line. Each line can be a product PAGE address or a direct image address, with an optional "file-name|" first.
-# For a page, the job extracts candidate photos, rejects HTML/non-image downloads, converts valid raster input to JPEG,
-# uploads the JPEG binary to /products/, and verifies HTTP 200 image/jpeg plus minimum 200 x 200. The "browser_url" for each photo is printed in the log and the run summary,
-# and the full results are saved to data/photo-results.json on main (RESULTS_JSON), so an assistant can read them without opening the log.
-# Needs the repository secret IMAGEKIT_PRIVATE_KEY (ImageKit > Developer options > Private key). It never touches the database.
-
+# Queue lines may contain a product page URL or a direct image URL, with an optional "file-name|" prefix.
+# Product pages are inspected for matching product images; valid raster images are normalized to JPEG and verified on ImageKit.
+# Results are saved to data/photo-results.json. The workflow never changes Neon.
 on:
   push:
     branches: [main]
@@ -40,52 +37,18 @@ jobs:
       - name: Upload photos to ImageKit and verify them as JPEG
         shell: bash
         env:
-          IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
+          IMAGEKIT_PRIVATE_KEY: \${{ secrets.IMAGEKIT_PRIVATE_KEY }}
         run: |
           set -o pipefail
-          BEFORE="${{ github.event.before }}"
+          BEFORE="\${{ github.event.before }}"
           if [[ "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
             PHOTOS="$(cat data/photo-queue.txt 2>/dev/null || true)"
           else
-            # The queue is append-only: process only entries added by this push.
-            # This avoids retrying every historical failed photo on every new batch.
+            # The photo queue is append-only; process only lines added by this push.
             PHOTOS="$(git diff --no-ext-diff --unified=0 "$BEFORE" "$GITHUB_SHA" -- data/photo-queue.txt | awk '/^\+\+\+/{next} /^\+/{sub(/^\+/, ""); print}')"
           fi
           export PHOTOS
-          if ! printf '%s\n' "$PHOTOS" | grep -qv '^[[:space:]]*\(#.*\)\?
-          node scripts/upload-product-photos-to-imagekit.mjs | tee upload.log
-
-      - name: Save results for the assistant
-        if: always() && github.ref == 'refs/heads/main' && hashFiles('upload.log') != ''
-        continue-on-error: true
-        shell: bash
-        run: |
-          RESULTS_TMP="$(mktemp)"
-          if [ -f data/photo-results.json ]; then cp data/photo-results.json "$RESULTS_TMP"; fi
-          if [ -s "$RESULTS_TMP" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            # Rebase conflicts used to lose concurrent queue-run results. Rebase from the
-            # latest main on every retry, then restore this run's complete result payload.
-            for attempt in 1 2 3 4 5; do
-              git fetch origin main
-              git reset --hard origin/main
-              cp "$RESULTS_TMP" data/photo-results.json
-              git add data/photo-results.json
-              if git diff --cached --quiet; then
-                echo "Photo results already match main."
-                exit 0
-              fi
-              git commit -m "Record photo upload results"
-              if git push origin HEAD:main; then
-                exit 0
-              fi
-              echo "Push raced with another main update; retrying ($attempt/5)."
-            done
-            echo "::error::Could not save photo results after five attempts."
-            exit 1
-          fi
-; then
+          if [[ -z "$(printf '%s\n' "$PHOTOS" | sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d')" ]]; then
             echo "No new photo queue entries were added by this push."
             exit 0
           fi
@@ -101,8 +64,6 @@ jobs:
           if [ -s "$RESULTS_TMP" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            # Rebase conflicts used to lose concurrent queue-run results. Rebase from the
-            # latest main on every retry, then restore this run's complete result payload.
             for attempt in 1 2 3 4 5; do
               git fetch origin main
               git reset --hard origin/main
