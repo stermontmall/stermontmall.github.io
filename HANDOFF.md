@@ -97,3 +97,26 @@ On https://stermontarcade.co.ke/neon-admin.html the sign-in page showed "Your lo
 - Merge this branch (PR from wip-neon-admin-followups into main), wait for GitHub Pages, hard-reload /neon-admin.html and sign in. If the same message appears, the site's domains (stermontarcade.co.ke and stermontmall.github.io) probably have to be added as allowed/trusted origins in the Neon Auth settings in the Neon console.
 - Then approve the owner's Neon user ID in `admin_profiles` (see above).
 - 2026-11-23: PR #1076 merged - store WhatsApp number changed to 254789514060 (see HANDOFF-live.md).
+
+---
+
+# PR #1104 link-check failure (branch seo/internal-link-canonical-audit-2026-11-23)
+
+Date: 2026-11-24. Status: fix pushed (commit 182be48), CI result not yet seen.
+
+## Problem
+`validate` failed at "Broken and placeholder links (link-check.mjs)" on generated p/promax-20ec-insecticide-250ml.html: broken links /c/pest-control-and-fumigation, /c/agrovet-and-farm-supplies, /c/general-merchandise (and likely more above line 25 of the log).
+
+## Cause
+Neon `products.description` for the two Promax 20EC listings (and other products) contains Markdown links such as `[Pest Control and Fumigation category](https://stermontarcade.co.ke/c/pest-control-and-fumigation)`: extensionless and built from the category NAME, not the real slug (real: pest-control-fumigation, agrovet). general-merchandise is a real category with 0 active products, so no page is built. category-link-normalizer.mjs only matched `/c/<slug>.html`, and was never run on p/ pages.
+
+Neon scan of descriptions (2026-11-24): bad targets found: pest-control-and-fumigation (5 products), general-merchandise.html (5, empty category), bed-bug-killers without .html (3, real slug). Others already end in .html and exist.
+
+## Done
+- category-link-normalizer.mjs: accepts extensionless links, maps name-based slugs (pest-control-and-fumigation -> pest-control-fumigation, agrovet-and-farm-supplies -> agrovet), leaves /c/ and /c/index.html alone.
+- product-link-normalizer.mjs: runs the category normalizer on p/ pages only (after the generated pages and c/ exist, outside JSON-LD and breadcrumbs). Dead links become plain text.
+- Checked with a local simulation of the 3 failing links; not run against the real catalogue build.
+
+## Left
+- Read the new `validate` run on PR #1104. If other links still fail, copy the first lines of the "Broken and placeholder links" step (lines 1-24 were never seen).
+- Optional data clean-up (not done, needs owner OK): edit those product descriptions in Neon so they link to the real slugs.
