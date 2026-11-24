@@ -161,3 +161,21 @@ flower-mosquito-coil-perfumed-125g|https://www.epepea.com/public/item/9521065
 mos-kill-mat-vaporizer-direct-plug|https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-mat-vaporiser-direct-plug/p/23559
 # rerun after multiline results output change
 # trigger deduplicated photo retry with referer support
+doom-powergard-odourless-600ml|https://hypa.africa/mortein-doom-odourless-insecticide-600ml/
+bolt-odourless-400ml|https://cdn.mafrservices.com/pim-content/KEN/media/product/137144/1768586400/137144_main.jpg?im=Resize%3D480
+bolt-odourless-600ml|https://cdn.mafrservices.com/sys-master-root/hce/hbd/28761949667358/135717_main.jpg?im=Resize%3D480
+bolt-original-280ml|https://cdn.mafrservices.com/sys-master-root/hec/h65/16871994163230/16786_main.jpg?im=Resize%3D480
+fumakilla-vape-mosquito-mat-machine|https://cdn.mafrservices.com/sys-master-root/h1d/h8b/17290305634334/62076_main.jpg?im=Resize%3D376
+bolt-odourless-280ml|https://cdn.mafrservices.com/sys-master-root/h9e/hc6/52441593118750/131756_main.jpg?im=Resize%3D480
+doom-mosquito-repellant-refill|https://cdn.mafrservices.com/pim-content/KEN/media/product/13379/13379_main.jpg?im=Resize%3D480
+fumakilla-vape-mat-tablets-30pcs|https://cdn.mafrservices.com/sys-master-root/hc0/h28/17290215391262/34396_main.jpg?im=Resize%3D480
+doom-powergard-odourless-300ml|https://cdn.mafrservices.com/pim-content/KEN/media/product/13364/13364_main.jpg?im=Resize%3D480
+doom-powergard-lemon-180ml|https://cdn.mafrservices.com/sys-master-root/ha0/hdf/12453568872478/13354_Main.jpg?im=Resize%3D480
+bolt-lemon-280ml|https://cdn.mafrservices.com/sys-master-root/h5a/h13/16871993802782/16789_main.jpg?im=Resize%3D480
+bolt-lemon-600ml|https://cdn.mafrservices.com/sys-master-root/hac/h00/16871993245726/16791_main.jpg?im=Resize%3D480
+bolt-original-600ml|https://cdn.mafrservices.com/sys-master-root/h38/h87/26757581045790/16788_main.jpg?im=Resize%3D480
+raid-odourless-liquid-vaporizer-refill-22ml|https://cdn.mafrservices.com/sys-master-root/hfd/h25/49128566030366/187058_main.jpg?im=Resize%3D480
+bolt-original-400ml|https://cdn.mafrservices.com/sys-master-root/haf/hf2/16872123957278/72734_main.jpg?im=Resize%3D480
+mos-kill-dudu-powder-200g|https://cdn.mafrservices.com/sys-master-root/ha4/ha4/17556520370206/23562_main.jpg?im=Resize%3D480
+flower-mosquito-coil-perfumed-125g|https://cdn.mafrservices.com/sys-master-root/h06/haf/17290315366430/6952_main.jpg?im=Resize%3D480
+mos-kill-mat-vaporizer-direct-plug|https://cdn.mafrservices.com/sys-master-root/h2b/h5c/26799045247006/23559_main.jpg?im=Resize%3D480
