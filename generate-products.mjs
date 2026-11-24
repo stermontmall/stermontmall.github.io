@@ -1155,3 +1155,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // 2026-11-18: rebuild triggered after activating the final photo-backed pest-control product.
 
 // V8 catalogue batch refresh: keep generated product pages and sitemap in sync with the active Neon catalogue.
+
+// V8 catalogue refresh for product codes STM-002005 to STM-002033.
