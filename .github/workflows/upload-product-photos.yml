@@ -37,10 +37,10 @@ jobs:
       - name: Upload photos to ImageKit and verify them as JPEG
         shell: bash
         env:
-          IMAGEKIT_PRIVATE_KEY: \${{ secrets.IMAGEKIT_PRIVATE_KEY }}
+          IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
         run: |
           set -o pipefail
-          BEFORE="\${{ github.event.before }}"
+          BEFORE="${{ github.event.before }}"
           if [[ "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
             PHOTOS="$(cat data/photo-queue.txt 2>/dev/null || true)"
           else
