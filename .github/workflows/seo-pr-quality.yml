@@ -204,6 +204,10 @@ jobs:
             node blog-build.mjs
             node seo-safe-blog-meta.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15c-blog-build.log"
+      - name: Normalize internal category links in generated product pages
+        if: steps.live_catalogue.outputs.required == 'true'
+        run: node category-link-normalizer.mjs
+
       - name: Broken and placeholder links (link-check.mjs)
         run: node link-check.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/16-link-check.log"
       - name: Verify generated pages use canonical static product links
