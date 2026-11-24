@@ -1,14 +1,17 @@
 // Shared final pass for generated customer-facing product links.
 // Keeps visible /p/<slug>.html anchors canonical while preserving
 // canonical/OG metadata, JSON-LD, breadcrumbs and SEO-only crawl-link blocks.
+// On generated product pages (p/) it also resolves category links written inside catalogue descriptions
+// (extensionless or name-derived /c/ slugs) to a live category page, or removes the dead anchor.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
+import { normalizeCategoryLinks } from './category-link-normalizer.mjs';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const ROOTS = ['p', 'c', 'guides', 'blog', 'services', 'pest-control'];
 const ROOT_FILES = ['index.html', 'products.html', 'fashion.html', 'cars-for-sale.html', 'checkout.html'];
-const rewriteBody = html => {
+const rewriteBody = (html, categories = false) => {
   const head = [];
   let body = String(html || '').replace(/<head\b[\s\S]*?<\/head>/gi, block => { head.push(block); return ''; });
   const preserved = [];
@@ -23,6 +26,7 @@ const rewriteBody = html => {
     let slug = match[1]; try { slug = decodeURIComponent(slug); } catch {}
     return `<a${before}href=${quote}${shellProductLink(slug)}${quote}${after}>`;
   });
+  if (categories) body = normalizeCategoryLinks(body);
   body = body.replace(/<!-- stm-preserved-(\d+) -->/g, (_m, i) => preserved[Number(i)]);
   return head.join('') + body;
 };
@@ -39,7 +43,7 @@ export function normalizeGeneratedProductPages() {
   let changed = 0;
   for (const file of files) {
     const before = fs.readFileSync(file, 'utf8');
-    const after = rewriteBody(before);
+    const after = rewriteBody(before, file.split(path.sep)[0] === 'p');
     if (after !== before) { fs.writeFileSync(file, after); changed++; }
   }
   console.log(`Normalized visible product links on ${changed} generated page(s); canonical and SEO crawl URLs preserved.`);

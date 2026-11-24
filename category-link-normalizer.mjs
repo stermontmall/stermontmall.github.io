@@ -1,17 +1,20 @@
-// Normalize every category anchor in generated pages to an existing category page
-// that still contains active product links. Empty child categories fall back to a
-// verified parent; if no live parent exists, keep the label and remove the dead anchor.
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+// Resolve category links to an existing category page that still contains active product links.
+// Missing/empty child categories fall back through category-parent-map.json. If no live parent exists,
+// the anchor is removed but its visible label is kept as plain text.
+// Handles /c/<slug>.html, extensionless /c/<slug>, and name-derived slugs written by catalogue editors
+// (for example /c/pest-control-and-fumigation) through CATEGORY_ALIASES.
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PARENTS = JSON.parse(readFileSync(join(ROOT, 'category-parent-map.json'), 'utf8'));
+// Slugs typed from the visible category NAME ("Pest Control and Fumigation") that differ from the real category slug.
+const CATEGORY_ALIASES = {
+  'pest-control-and-fumigation': 'pest-control-fumigation',
+  'agrovet-and-farm-supplies': 'agrovet'
+};
 const ACTIVE = new Map();
-const ALIASES = new Map([
-  ['agrovet-and-farm-supplies', 'agrovet'],
-  ['pest-control-and-fumigation', 'pest-control-fumigation']
-]);
 
 function hasActiveProducts(slug) {
   if (!/^[a-z0-9-]+$/i.test(String(slug || ''))) return false;
@@ -25,8 +28,8 @@ function hasActiveProducts(slug) {
 }
 
 export function categoryTarget(slug) {
-  let current = String(slug || '').trim().replace(/\.html$/i, '');
-  current = ALIASES.get(current) || current;
+  let current = String(slug || '').trim().replace(/\.html$/i, '').toLowerCase();
+  current = CATEGORY_ALIASES[current] || current;
   const seen = new Set();
   while (current && !seen.has(current)) {
     seen.add(current);
@@ -43,27 +46,13 @@ export function normalizeCategoryLinks(input) {
     scripts.push(block);
     return token;
   });
-  html = html.replace(/<a\b([^>]*?)\bhref\s*=\s*(["'])(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/c\/([^/"'?#]+?)(?:\.html)?(?:#[^"']*)?\2([^>]*)>([\s\S]*?)<\/a>/gi,
-    (whole, before, quote, rawSlug, after, label) => {
-      const target = categoryTarget(rawSlug);
+  html = html.replace(/<a\b([^>]*?)\bhref\s*=\s*(["'])(?:https:\/\/stermontarcade\.co\.ke)?\/c\/([^"'?#\/]+?)(?:\.html)?(?:[?#][^"']*)?\2([^>]*)>([\s\S]*?)<\/a>/gi,
+    (whole, before, quote, slug, after, label) => {
+      if (slug.toLowerCase() === 'index') return whole;
+      const target = categoryTarget(slug);
       return target
         ? '<a' + before + 'href=' + quote + '/c/' + target + '.html' + quote + after + '>' + label + '</a>'
         : label;
     });
   return html.replace(/\u0000STM_CATEGORY_SCRIPT_(\d+)\u0000/g, (token, index) => scripts[Number(index)] || token);
 }
-
-function normalizeGeneratedProductPages() {
-  const dir = join(ROOT, 'p');
-  if (!existsSync(dir)) return;
-  let changed = 0;
-  for (const file of readdirSync(dir).filter(name => name.endsWith('.html'))) {
-    const path = join(dir, file);
-    const before = readFileSync(path, 'utf8');
-    const after = normalizeCategoryLinks(before);
-    if (after !== before) { writeFileSync(path, after); changed++; }
-  }
-  console.log(`Normalized category links in ${changed} generated product pages.`);
-}
-
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) normalizeGeneratedProductPages();
