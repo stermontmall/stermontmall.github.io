@@ -856,7 +856,7 @@ async function openStaticProductFallback(slug) {
 }
 async function quickDeepLink(slug) {
   if (!/^[A-Za-z0-9._%~-]+$/.test(slug)) return;
-  // Render the already-published, same-origin product document first. Waiting for Neon Auth,
+  // V7.2 / cache v53: render the already-published, same-origin product document first. Waiting for Neon Auth,
   // category metadata and a live product lookup made a shared product link appear to hang on
   // slow mobile connections. The complete catalogue still loads in parallel and refreshDeep()
   // enriches this view when it is ready.
