@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { slugifyNewProduct } from './product-slug.mjs';
 
 const require = createRequire(import.meta.url);
 const productLink = require('./product-links.js');
@@ -13,6 +14,10 @@ const workflow = readFileSync('.github/workflows/product-pages.yml', 'utf8');
 assert.equal(productLink('CoverMax-500-ML'), 'https://stermontarcade.co.ke/p/covermax-500-ml.html');
 assert.equal(productLink('covermax-500-ml'), 'https://stermontarcade.co.ke/p/covermax-500-ml.html');
 assert.equal(productLink('../bad slug'), 'https://stermontarcade.co.ke/');
+assert.equal(slugifyNewProduct('Termidor 96 SC Termiticide with 1 Litre', '1 litre'), 'termidor-96-sc-termiticide-1-litre');
+assert.equal(slugifyNewProduct('Zagro Ultraxide Disinfectant and Disinfectant 5 Litre', '5 litre'), 'zagro-ultraxide-disinfectant-5-litre');
+assert.ok(slugifyNewProduct('Acme Brand Model ABC Pest Control Concentrate', '500 ml').split('-').length <= 7);
+assert.match(admin, /slugifyNewProduct\(suppliedSlug\|\|name,suppliedSlug\?"":unit\)/);
 assert.ok(generator.includes('<link rel="canonical" href="${SITE}${path}">'));
 assert.match(generator, /'@type': 'Product', name: p\.name, url: SITE \+ path/);
 assert.match(generator, /offers: \{ '@type': 'Offer', url: SITE \+ path, priceCurrency: 'KES', price: Number\(Math\.round\(Number\(p\.price\)/);
