@@ -181,3 +181,4 @@ flower-mosquito-coil-perfumed-125g|https://cdn.mafrservices.com/sys-master-root/
 mos-kill-mat-vaporizer-direct-plug|https://cdn.mafrservices.com/sys-master-root/h2b/h5c/26799045247006/23559_main.jpg?im=Resize%3D480
 # restart photo pipeline with bounded requests
 # restart queue with direct results-file persistence
+# retry only products without previously verified photos
