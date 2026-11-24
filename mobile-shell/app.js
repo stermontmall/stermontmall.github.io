@@ -797,7 +797,7 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
   if (!p) { toast('That product is no longer available'); return; }
   // A direct static product visit gets a clean shell-home history entry underneath its product overlay.
   // The static URL is restored by openOverlay/productUrl; Back therefore returns to the shell home.
-  if (PRODUCT_PATH && DEEP && /^\\/p\\/[^/]+\\.html$/i.test(location.pathname)) history.replaceState(history.state, '', '/');
+  if (PRODUCT_PATH && DEEP && /^\/p\/[^/]+\.html$/i.test(location.pathname)) history.replaceState(history.state, '', '/');
   let hashSize = '';
   try { hashSize = decodeURIComponent(location.hash.replace(/^#/, '')); } catch { hashSize = location.hash.replace(/^#/, ''); }
   const chosen = hashSize || slug;
