@@ -8,7 +8,7 @@ const IK_ENDPOINT = 'https://ik.imagekit.io/w6hxfnwmw';
 const FOLDER = '/products';
 const MIN_SIDE = 200;
 const MIN_SOURCE_SIDE = 150;
-const MAX_LINES = 150;
+const MAX_LINES = 200;
 const KEY = process.env.IMAGEKIT_PRIVATE_KEY || '';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 const IMAGE_ACCEPT = 'image/avif,image/webp,image/apng,image/png,image/jpeg,image/*;q=0.9,*/*;q=0.5';
