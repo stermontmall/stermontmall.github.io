@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(path, 'utf8');
-const admin = read('admin.html');
 const rulesUi = read('admin-publishing-rules.js');
 const bulk = read('admin-bulk.js');
 const photoAi = read('admin-photo-ai.js');
@@ -13,9 +12,7 @@ const claude = read('CLAUDE.md');
 const agents = read('AGENTS.md');
 const publishing = read('PUBLISHING_RULES.md');
 
-assert.match(admin, /admin-publishing-rules\.js/);
-assert.match(admin, /'pricing-rules'/);
-assert.match(admin, /STMPublishingRules\.mount/);
+// admin.html is now a redirect stub to neon-admin.html, so it no longer loads or mounts the rules UI.
 assert.match(rulesUi, /apirest\.c-10\.eu-central-1\.aws\.neon\.tech/);
 assert.match(rulesUi, /publishing_rules\?select=key,version,title,content,updated_at/);
 assert.match(rulesUi, /GOVERNING_KEY = 'publish_products'/);
