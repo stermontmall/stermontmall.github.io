@@ -182,7 +182,12 @@ jobs:
         run: |
           {
             node seo-overrides.mjs
-            node seo-titles.mjs
+            # seo-daily.yml runs seo-titles.mjs as continue-on-error; skip it here only when the file is absent.
+            if [ -f seo-titles.mjs ]; then
+              node seo-titles.mjs
+            else
+              echo "seo-titles.mjs is not in the repo; skipping (same as production's continue-on-error)."
+            fi
             node seo-safe-meta.mjs
             node seo-shell-redirect.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/15-seo-enrichment.log"
