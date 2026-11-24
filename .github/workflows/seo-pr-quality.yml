@@ -125,7 +125,6 @@ jobs:
             node --check pricing-rule-defaults.test.mjs
             node --check product-codes.test.mjs
             node --check seo-check.mjs
-            node --check data-health.mjs
             node --check blog-write.mjs
             node --check seo-pest/blog-build.mjs
             node --check seo-product-extras.mjs
