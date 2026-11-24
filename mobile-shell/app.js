@@ -856,23 +856,30 @@ async function openStaticProductFallback(slug) {
 }
 async function quickDeepLink(slug) {
   if (!/^[A-Za-z0-9._%~-]+$/.test(slug)) return;
+  // Render the already-published, same-origin product document first. Waiting for Neon Auth,
+  // category metadata and a live product lookup made a shared product link appear to hang on
+  // slow mobile connections. The complete catalogue still loads in parallel and refreshDeep()
+  // enriches this view when it is ready.
+  try {
+    await openStaticProductFallback(slug);
+    return;
+  } catch (staticError) {
+    // A not-yet-generated page can still be opened from the live one-row Neon lookup below.
+  }
   try {
     const [cats, rows0] = await Promise.all([
       api(CAT_Q),
       api('storefront_products?or=(slug.eq.' + encodeURIComponent(slug) + ',id.eq.' + encodeURIComponent(slug) + ')&select=' + PRODUCT_COLS).then(r => r.map(withCover))
     ]);
     if (deepOpen || fullCatalog) return;
-    if (!rows0.length) { await openStaticProductFallback(slug); return; }
+    if (!rows0.length) { toast('That product page is not published yet. Please try again shortly.'); return; }
     let rows = rows0; const g = rows0[0].variant_group;
     if (g) { rows = (await api('storefront_products?variant_group=eq.' + encodeURIComponent(g) + '&select=' + PRODUCT_COLS)).map(withCover); if (deepOpen || fullCatalog) return; }
     buildCatalog(rows, cats, {});
-    if (!PRODUCTS.some(x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug))) { await openStaticProductFallback(slug); return; }
+    if (!PRODUCTS.some(x => x.slug === slug || x.id === slug || x.sizes.some(z => z.slug === slug || z.rowId === slug))) { toast('That product is not available right now'); return; }
     openDeepLink(slug);
   } catch (e) {
-    if (!deepOpen && !fullCatalog) {
-      try { await openStaticProductFallback(slug); }
-      catch (fallbackError) { toast('Product details are temporarily unavailable. Please try again shortly.'); }
-    }
+    if (!deepOpen && !fullCatalog) toast('Product details are temporarily unavailable. Please try again shortly.');
   }
 }
 function refreshDeep() {   // the full catalog is in: swap in the full product entry and redraw the open product page (related products, any size changes)
