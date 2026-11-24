@@ -1163,3 +1163,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // V8 product photo batch refresh STM-002008.
 
 // V8 verified ImageKit activation batch: STM-002009 through STM-002033; rebuild pages and sitemap.
+
+// V8 catalogue build trigger for verified ImageKit products STM-002034 through STM-002048 (14 activated; STM-002044 awaits image).
