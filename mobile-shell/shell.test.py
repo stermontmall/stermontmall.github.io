@@ -206,7 +206,19 @@ with sync_playwright() as p:
     # Keep the server-rendered cards in place until the first live catalogue response arrives.
     check('SSR fallback cards remain visible while the live catalogue is loading', pg.locator('#grid .ssr-product-card').count() >= 6, pg.locator('#grid .ssr-product-card').count())
     if parked: on_neon(parked.pop(0))   # release the held catalogue response: hydration may proceed now
-    pg.wait_for_selector('#grid .card[data-id]')
+    try:
+        pg.wait_for_function("document.querySelector('#grid .card[data-id]') || window.STM_LAST_ERROR", timeout=15000)
+    except Exception:
+        pass
+    if not pg.locator('#grid .card[data-id]').count():
+        print('CATALOGUE DIAGNOSTIC ' + json.dumps({
+            'last_error': pg.evaluate('window.STM_LAST_ERROR || null'),
+            'page_errors': errors,
+            'failed_requests': failed_requests,
+            'empty_text': pg.locator('#grid-empty').inner_text() if pg.locator('#grid-empty').count() else None,
+            'neon_requests': [u for u in failed_requests if 'neon' in u.lower()],
+        }, default=str), flush=True)
+        raise AssertionError('Neon catalogue fixture did not hydrate live product cards')
     check('live catalogue replaces SSR fallback cards after hydration', pg.locator('#grid .ssr-product-card').count() == 0)
     check('skeleton cards were shown while loading', pg.evaluate('window.__sawSkeleton'))
     n = pg.locator('#grid .card[data-id]').count()
