@@ -705,7 +705,7 @@ for (const p of products) {
     ...(p.variants ? [`Sizes: ${p.variants.map(v => v.variant_label).join(', ')}`] : []), `Availability: ${inStock ? 'In stock' : 'Currently sold out'}`, ...(cat ? [`Category: ${cat.name}`] : []), `Ref: ${p.id}`, `Link: ${shellProductLink(sl(p.id))}`, '', 'Please confirm availability and the delivery fee to my location.'];
   const ask = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(askLines.join('\n'))}`;
   const ldOne = jsonLd({
-    '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
+    '@context': 'https://schema.org', '@type': 'Product', name: p.name, url: SITE + path, image: img.length ? img : undefined,
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.product_code || p.id), category: cat?.name,
     brand: { '@type': 'Brand', name: brandOf(p.name) }, ...productIdentifiers(p),
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: Number(Math.round(Number(p.price) || 0)),
