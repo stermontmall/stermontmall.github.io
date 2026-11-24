@@ -228,7 +228,9 @@ for (const result of results) {
   summary(`| ${result.ok ? 'OK' : 'FAILED'} | ${result.name} | ${result.width && result.height ? result.width + 'x' + result.height : '-'} | ${result.ok ? result.browser_url : result.error} |`);
   say(`${result.ok ? (result.reused ? 'REUSED' : 'OK') : 'FAILED'} ${result.name}: ${result.ok ? result.browser_url : result.error}`);
 }
-say('RESULTS_JSON=' + JSON.stringify(results));
+say('RESULTS_JSON_BEGIN');
+say(JSON.stringify(results, null, 2));
+say('RESULTS_JSON_END');
 const failed = results.filter((x) => !x.ok).length;
 say(`Done: ${results.length - failed} verified JPEG uploads, ${failed} failed.`);
 process.exit(failed ? 1 : 0);
