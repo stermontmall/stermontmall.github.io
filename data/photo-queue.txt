@@ -179,3 +179,4 @@ bolt-original-400ml|https://cdn.mafrservices.com/sys-master-root/haf/hf2/1687212
 mos-kill-dudu-powder-200g|https://cdn.mafrservices.com/sys-master-root/ha4/ha4/17556520370206/23562_main.jpg?im=Resize%3D480
 flower-mosquito-coil-perfumed-125g|https://cdn.mafrservices.com/sys-master-root/h06/haf/17290315366430/6952_main.jpg?im=Resize%3D480
 mos-kill-mat-vaporizer-direct-plug|https://cdn.mafrservices.com/sys-master-root/h2b/h5c/26799045247006/23559_main.jpg?im=Resize%3D480
+# restart photo pipeline with bounded requests
