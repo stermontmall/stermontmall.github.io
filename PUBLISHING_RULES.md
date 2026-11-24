@@ -65,3 +65,10 @@ MANDATORY PHOTO QUEUE + ACTIVATION SAFETY (2026-11-23):
 - Queue file: data/photo-queue.txt in GitHub repository stermontmall/stermontmall.github.io, branch main. Format: file-name|https://source-image-or-product-page per line, max 40 lines. A push to this file starts the ImageKit workflow.
 - Wait for the workflow and read data/photo-results.json. Use only entries with ok=true and their verified browser_url; do not invent ImageKit URLs or infer success from a queue commit.
 - After the product INSERT transaction has completed successfully, execute a separate UPDATE public.products SET active = true, low_at = 50 WHERE id IN (...) for exactly the inserted product IDs. Then re-select and verify active=true, stock=1000, low_at=50, non-empty images, and ImageKit URL. If photo upload or source price verification fails, do not publish that product.
+
+11. INTERNAL CATEGORY LINK VALIDATION (VERSION 6 ADDENDUM — 2026-11-24)
+- Every internal category link in a product description MUST use the exact static-page format /c/<live-category-slug>.html. A bare /c/<slug> path is invalid; always include the .html suffix.
+- Category slugs must match an existing, live category page generated in c/. Never invent a category slug or use a display-name slug when it differs from the live route.
+- Canonical required examples: /c/pest-control-fumigation.html, /c/agrovet.html, and /c/general-merchandise.html. Map the obsolete /c/agrovet-and-farm-supplies path to /c/agrovet.html.
+- Before publishing, validate every relative or absolute internal category URL in description against the generated c/*.html files and ensure the target category contains active products. If a child category is empty, use its verified active parent category from category-parent-map.json; if no live parent exists, remove the link while preserving readable anchor text.
+- Apply the same normalization during product-page generation and to the stored Neon description so the catalogue source and generated /p/*.html pages remain consistent.
