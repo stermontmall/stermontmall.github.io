@@ -42,7 +42,7 @@ const rewriteBody = (html, categories = false, products = false) => {
     if (!query) return all;
     let slug = query[1]; try { slug = decodeURIComponent(slug); } catch {}
     return fs.existsSync(path.join('p', slug + '.html'))
-      ? \`<a\${before}href=\${quote}\${shellProductLink(slug)}\${quote}\${after}>\${label}</a>\`
+      ? '<a' + before + 'href=' + quote + shellProductLink(slug) + quote + after + '>' + label + '</a>'
       : label;
   });
   if (categories) body = normalizeCategoryLinks(body);
