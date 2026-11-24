@@ -20,6 +20,7 @@ on:
     paths:
       - 'generate-products.mjs'
       - 'neon-admin.html'
+      - 'product-slug.mjs'
       - 'product-links.js'
       - 'product-url-policy.test.mjs'
       - 'catalogue-count-guard.mjs'
