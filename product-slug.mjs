@@ -6,7 +6,7 @@ const tokens = value => String(value || '').normalize('NFKD').toLowerCase().matc
 export function slugifyNewProduct(name, unit = '') {
   const nameTokens = tokens(name).filter(word => !FILLER.has(word));
   const unitTokens = tokens(unit).filter(word => !FILLER.has(word));
-  const detectedSize = nameTokens.filter(word => /\\d/.test(word) || SIZE_UNITS.has(word));
+  const detectedSize = nameTokens.filter(word => /\d/.test(word) || SIZE_UNITS.has(word));
   const packTokens = [...new Set(unitTokens.length ? unitTokens : detectedSize)];
   const allUnique = [...new Set([...nameTokens, ...unitTokens])];
   const descriptive = allUnique.filter(word => !packTokens.includes(word));
