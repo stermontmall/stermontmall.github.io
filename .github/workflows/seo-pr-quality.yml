@@ -32,6 +32,7 @@ on:
       - 'product-url-policy.test.mjs'
       - 'product-links.js'
       - 'neon-admin.html'
+      - 'product-slug.mjs'
       - 'seo-overrides.json'
       - 'product-description-html.mjs'
       - 'product-description-html.test.mjs'
