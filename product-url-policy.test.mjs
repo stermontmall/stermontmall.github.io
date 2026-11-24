@@ -13,7 +13,7 @@ const workflow = readFileSync('.github/workflows/product-pages.yml', 'utf8');
 assert.equal(productLink('CoverMax-500-ML'), 'https://stermontarcade.co.ke/p/covermax-500-ml.html');
 assert.equal(productLink('covermax-500-ml'), 'https://stermontarcade.co.ke/p/covermax-500-ml.html');
 assert.equal(productLink('../bad slug'), 'https://stermontarcade.co.ke/');
-assert.match(generator, /<link rel="canonical" href="\\$\\{SITE\\}\\$\\{path\\}">/);
+assert.ok(generator.includes('<link rel="canonical" href="${SITE}${path}">'));
 assert.match(generator, /'@type': 'Product', name: p\.name, url: SITE \+ path/);
 assert.match(generator, /offers: \{ '@type': 'Offer', url: SITE \+ path, priceCurrency: 'KES', price: Number\(Math\.round\(Number\(p\.price\)/);
 assert.match(generator, /availability: 'https:\/\/schema\.org\/' \+ \(inStock \? 'InStock' : 'OutOfStock'\)/);
