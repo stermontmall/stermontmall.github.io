@@ -19,6 +19,10 @@ on:
     branches: [main]
     paths:
       - 'generate-products.mjs'
+      - 'neon-admin.html'
+      - 'product-slug.mjs'
+      - 'product-links.js'
+      - 'product-url-policy.test.mjs'
       - 'catalogue-count-guard.mjs'
       - 'catalogue-count-guard.test.mjs'
       - 'mobile-shell/app.js'
@@ -91,6 +95,9 @@ jobs:
 
       - name: Test Google indexing safeguards (canonical, robots and sitemap)
         run: node seo-indexing-guard.test.mjs
+
+      - name: Test canonical product URLs, Product JSON-LD and new-product slug policy
+        run: node product-url-policy.test.mjs
 
       - name: Test validated optional GTIN/MPN Product schema fields
         run: node seo-product-identifiers.test.mjs

@@ -705,7 +705,7 @@ for (const p of products) {
     ...(p.variants ? [`Sizes: ${p.variants.map(v => v.variant_label).join(', ')}`] : []), `Availability: ${inStock ? 'In stock' : 'Currently sold out'}`, ...(cat ? [`Category: ${cat.name}`] : []), `Ref: ${p.id}`, `Link: ${shellProductLink(sl(p.id))}`, '', 'Please confirm availability and the delivery fee to my location.'];
   const ask = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(askLines.join('\n'))}`;
   const ldOne = jsonLd({
-    '@context': 'https://schema.org', '@type': 'Product', name: p.name, image: img.length ? img : undefined,
+    '@context': 'https://schema.org', '@type': 'Product', name: p.name, url: SITE + path, image: img.length ? img : undefined,
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, sku: String(p.product_code || p.id), category: cat?.name,
     brand: { '@type': 'Brand', name: brandOf(p.name) }, ...productIdentifiers(p),
     offers: { '@type': 'Offer', url: SITE + path, priceCurrency: 'KES', price: Number(Math.round(Number(p.price) || 0)),
@@ -714,7 +714,7 @@ for (const p of products) {
     ...rLd
   });
   const ldGroup = p.variants ? jsonLd({
-    '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
+    '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, url: SITE + path, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, category: cat?.name, brand: { '@type': 'Brand', name: brandOf(p.name) }, ...rLd,
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.product_code || v.id), size: v.variant_label, ...productIdentifiers(v),
       // Merchant Listings wants a description on every variant: use the pack's own text, else the product's, else the same generic line as the group.
@@ -726,7 +726,7 @@ for (const p of products) {
   }) : '';
   const productFaq = extractProductFaq(p.description);
   const productFaqLd = productFaq.length === 4 ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: productFaq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
-  const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '') + productFaqLd;
+  const ld = (p.variants ? ldGroup + ldOne : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '') + productFaqLd;
   const defaultVariant = p.variants?.find(inS) || p.variants?.[0] || null;
   const variantWa = v => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} – ${v.variant_label} (${money(v.price)}) ${shellProductLink(v.slug || p.slug || p.id)}`)}`;
   const sizeBox = p.variants ? `<section class="box pack-select" data-pack-selector aria-label="Choose product pack size"><h2>Select pack size:</h2><div class="pack-options" role="group" aria-label="Available pack sizes">${p.variants.map((v, i) => `<button type="button" class="pack-option${v.id === defaultVariant?.id ? ' is-selected' : ''}" data-pack-index="${i}" aria-pressed="${v.id === defaultVariant?.id ? 'true' : 'false'}"><span class="pack-option-label">${esc(v.variant_label)}</span><small class="pack-option-code">Code: ${esc(v.product_code || v.id)}</small></button>`).join('')}</div><p class="pack-selected-note" aria-live="polite">Selected: <b data-pack-label>${esc(defaultVariant?.variant_label || '')}</b></p></section>

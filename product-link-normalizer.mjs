@@ -40,7 +40,7 @@ const rewriteBody = (html, categories = false, products = false) => {
     if (/\bdata-pack-cart\b/i.test(before + after)) return all;
     const query = href.match(/^(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/\?product=([a-z0-9][a-z0-9-]*)(?:[&#].*)?$/i);
     if (!query) return all;
-    let slug = query[1]; try { slug = decodeURIComponent(slug); } catch {}
+    let slug = query[1].toLowerCase(); try { slug = decodeURIComponent(slug).toLowerCase(); } catch {}
     return fs.existsSync(path.join('p', slug + '.html'))
       ? '<a' + before + 'href=' + quote + shellProductLink(slug) + quote + after + '>' + label + '</a>'
       : label;

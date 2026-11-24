@@ -29,6 +29,10 @@ on:
       - 'database/no-fake-old-price-on-new-products.sql'
       - 'pricing-rule-defaults.test.mjs'
       - 'product-codes.test.mjs'
+      - 'product-url-policy.test.mjs'
+      - 'product-links.js'
+      - 'neon-admin.html'
+      - 'product-slug.mjs'
       - 'seo-overrides.json'
       - 'product-description-html.mjs'
       - 'product-description-html.test.mjs'
@@ -111,6 +115,8 @@ jobs:
         run: timeout --signal=TERM --kill-after=30s 12m python3 -u mobile-shell/shell.test.py 2>&1 | tee "$RUNNER_TEMP/ci-logs/04-mobile-shell.log"
       - name: Test permanent product-code display and admin integration
         run: node product-codes.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/06-product-codes.log"
+      - name: Test product URL, canonical and JSON-LD policy
+        run: node product-url-policy.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/06b-product-url-policy.log"
       - name: Check JavaScript syntax
         run: |
           {
@@ -124,6 +130,8 @@ jobs:
             node --check admin-publishing-rules.js
             node --check pricing-rule-defaults.test.mjs
             node --check product-codes.test.mjs
+            node --check product-url-policy.test.mjs
+            node --check product-url-policy.test.mjs
             node --check seo-check.mjs
             node --check blog-write.mjs
             node --check seo-pest/blog-build.mjs
