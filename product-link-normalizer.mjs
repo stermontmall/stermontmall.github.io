@@ -11,7 +11,15 @@ const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const ROOTS = ['p', 'c', 'guides', 'blog', 'services', 'pest-control'];
 const ROOT_FILES = ['index.html', 'products.html', 'fashion.html', 'cars-for-sale.html', 'checkout.html'];
-const rewriteBody = (html, categories = false) => {
+// A catalogue guide or description may name a product that has no generated page (retired or never imported).
+// Keep the words but drop the dead /p/ anchor so the page never links to a missing file.
+const unlinkMissingProducts = html => html.replace(
+  /<a\b[^>]*\bhref=(["'])(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/p\/([^\/?#"']+)\.html(?:[?#][^"']*)?\1[^>]*>([\s\S]*?)<\/a>/gi,
+  (all, _q, rawSlug, label) => {
+    let slug = rawSlug; try { slug = decodeURIComponent(slug); } catch {}
+    return fs.existsSync(path.join('p', slug + '.html')) ? all : label;
+  });
+const rewriteBody = (html, categories = false, products = false) => {
   const head = [];
   let body = String(html || '').replace(/<head\b[\s\S]*?<\/head>/gi, block => { head.push(block); return ''; });
   const preserved = [];
@@ -27,6 +35,7 @@ const rewriteBody = (html, categories = false) => {
     return `<a${before}href=${quote}${shellProductLink(slug)}${quote}${after}>`;
   });
   if (categories) body = normalizeCategoryLinks(body);
+  if (products) body = unlinkMissingProducts(body);
   body = body.replace(/<!-- stm-preserved-(\d+) -->/g, (_m, i) => preserved[Number(i)]);
   return head.join('') + body;
 };
@@ -43,7 +52,8 @@ export function normalizeGeneratedProductPages() {
   let changed = 0;
   for (const file of files) {
     const before = fs.readFileSync(file, 'utf8');
-    const after = rewriteBody(before, file.split(path.sep)[0] === 'p');
+    const top = file.split(path.sep)[0];
+    const after = rewriteBody(before, top === 'p', top === 'p' || top === 'c');
     if (after !== before) { fs.writeFileSync(file, after); changed++; }
   }
   console.log(`Normalized visible product links on ${changed} generated page(s); canonical and SEO crawl URLs preserved.`);
