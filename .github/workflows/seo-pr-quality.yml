@@ -133,8 +133,6 @@ jobs:
             node --check no-static-share-links.test.mjs
             node --check not-found-fallback.test.mjs
             node --check generate-products.mjs
-            node --check kili-pages.js
-            node --check recent-orders.js
             node --check product-content.test.mjs
             node --check seo-meta.mjs
           } 2>&1 | tee "$RUNNER_TEMP/ci-logs/07-syntax.log"
