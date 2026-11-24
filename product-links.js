@@ -5,8 +5,8 @@
   if (root) root.shellProductLink = helper;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   return function shellProductLink(slug) {
-    var value = String(slug == null ? '' : slug).trim();
-    if (!/^[a-z0-9][a-z0-9-]*$/i.test(value)) return 'https://stermontarcade.co.ke/';
+    var value = String(slug == null ? '' : slug).trim().toLowerCase();
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(value)) return 'https://stermontarcade.co.ke/';
     return 'https://stermontarcade.co.ke/p/' + encodeURIComponent(value) + '.html';
   };
 }));
