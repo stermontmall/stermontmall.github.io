@@ -29,6 +29,9 @@ on:
       - 'database/no-fake-old-price-on-new-products.sql'
       - 'pricing-rule-defaults.test.mjs'
       - 'product-codes.test.mjs'
+      - 'product-url-policy.test.mjs'
+      - 'product-links.js'
+      - 'neon-admin.html'
       - 'seo-overrides.json'
       - 'product-description-html.mjs'
       - 'product-description-html.test.mjs'
@@ -124,6 +127,7 @@ jobs:
             node --check admin-publishing-rules.js
             node --check pricing-rule-defaults.test.mjs
             node --check product-codes.test.mjs
+            node --check product-url-policy.test.mjs
             node --check seo-check.mjs
             node --check blog-write.mjs
             node --check seo-pest/blog-build.mjs
