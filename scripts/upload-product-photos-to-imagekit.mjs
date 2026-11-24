@@ -25,6 +25,21 @@ if (!lines.length) { console.error('::error::No photos given.'); process.exit(1)
 if (lines.length > MAX_LINES) { console.error(`::error::Too many photos (${lines.length}); maximum is ${MAX_LINES}.`); process.exit(1); }
 const auth = 'Basic ' + Buffer.from(KEY + ':').toString('base64');
 const cleanName = (s) => s.toLowerCase().replace(/\.[a-z0-9]{2,5}$/i, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90);
+function refererFor(u) {
+  try {
+    const x = new URL(u);
+    const h = x.hostname.toLowerCase();
+    if (h === 'cdn.mafrservices.com' || h.endsWith('.mafrservices.com') || h.includes('mafretailproxy')) return 'https://www.carrefour.ke/';
+    return x.origin + '/';
+  } catch { return ''; }
+}
+const latestLineByName = new Map();
+for (const line of lines) {
+  const sep = line.indexOf('|');
+  const name = cleanName(sep >= 0 ? line.slice(0, sep) : line);
+  if (name) latestLineByName.set(name, line);
+}
+const uniqueLines = [...latestLineByName.values()];
 let previousResults = [];
 try { previousResults = JSON.parse(readFileSync('data/photo-results.json', 'utf8')); } catch {}
 const previousByName = new Map(previousResults.filter((x) => x && x.ok && x.browser_url).map((x) => [x.name, x]));
@@ -98,7 +113,7 @@ export function extractImageCandidates(html, baseUrl, productName = '') {
 async function resolveSources(src, productName = '') {
   const page = normalizePageUrl(src);
   const r = await fetch(page, {
-    headers: { 'User-Agent': UA, Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,' + IMAGE_ACCEPT },
+    headers: { 'User-Agent': UA, Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,' + IMAGE_ACCEPT, ...(refererFor(page) ? { Referer: refererFor(page) } : {}) },
     redirect: 'follow'
   });
   if (!r.ok) throw new Error(`source page HTTP ${r.status}`);
@@ -114,8 +129,7 @@ async function resolveSources(src, productName = '') {
 }
 
 async function uploadOne(name, src) {
-  let referer = '';
-  try { referer = new URL(src).origin + '/'; } catch { /* invalid URL is rejected below */ }
+  const referer = refererFor(src);
   const download = await fetch(src, {
     headers: { 'User-Agent': UA, Accept: IMAGE_ACCEPT, ...(referer ? { Referer: referer } : {}) },
     redirect: 'follow'
@@ -220,7 +234,7 @@ async function one(line) {
 }
 
 const results = [];
-for (const line of lines) results.push(await one(line));
+for (const line of uniqueLines) results.push(await one(line));
 summary('## ImageKit photo upload — JPEG normalized');
 summary('| Result | Product | Dimensions | Verified ImageKit URL / error |');
 summary('|---|---|---|---|');
