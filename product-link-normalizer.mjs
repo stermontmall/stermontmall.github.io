@@ -36,13 +36,13 @@ const rewriteBody = (html, categories = false, products = false) => {
   });
   // Convert legacy human-facing homepage query links in existing guides/blogs to static product URLs.
   // Cart actions are intentionally excluded because they are functional controls, not share/navigation links.
-  body = body.replace(/<a\\b([^>]*?)\\bhref=(["'])([^"']+)\\2([^>]*)>([\\s\\S]*?)<\\/a>/gi, (all, before, quote, href, after, label) => {
-    if (/\\bdata-pack-cart\\b/i.test(before + after)) return all;
-    const query = href.match(/^(?:https?:\\/\\/(?:www\\.)?stermontarcade\\.co\\.ke)?\\/(?:\\?product=)([a-z0-9][a-z0-9-]*)(?:[&#].*)?$/i);
+  body = body.replace(/<a\b([^>]*?)\bhref=(["'])([^"']+)\2([^>]*)>([\s\S]*?)<\/a>/gi, (all, before, quote, href, after, label) => {
+    if (/\bdata-pack-cart\b/i.test(before + after)) return all;
+    const query = href.match(/^(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/\?product=([a-z0-9][a-z0-9-]*)(?:[&#].*)?$/i);
     if (!query) return all;
     let slug = query[1]; try { slug = decodeURIComponent(slug); } catch {}
     return fs.existsSync(path.join('p', slug + '.html'))
-      ? `<a${before}href=${quote}${shellProductLink(slug)}${quote}${after}>${label}</a>`
+      ? \`<a\${before}href=\${quote}\${shellProductLink(slug)}\${quote}\${after}>\${label}</a>\`
       : label;
   });
   if (categories) body = normalizeCategoryLinks(body);
