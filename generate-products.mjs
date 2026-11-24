@@ -1159,3 +1159,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // V8 catalogue refresh for product codes STM-002005 to STM-002033.
 
 // V8 product photo batch refresh STM-002031 and STM-002032.
+
+// V8 product photo batch refresh STM-002008.
