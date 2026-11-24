@@ -28,9 +28,9 @@
 - [Shop Agrochemicals Online in Kenya](https://stermontarcade.co.ke/c/agrochemicals.html): Browse Agrochemicals online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Agrovet Online in Kenya](https://stermontarcade.co.ke/c/agrovet.html): Browse Agrovet online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Appliances Online in Kenya](https://stermontarcade.co.ke/c/appliances.html): Browse Appliances online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
-- [Bed Bug Killer in Kenya](https://stermontarcade.co.ke/c/bed-bug-killers.html): Buy bed bug killer in Kenya. Registered insecticides for bed bug control in homes and public places. Pay by M-Pesa, delivery to all 47 counties.
+- [Shop Bed Bug Killers Online in Kenya](https://stermontarcade.co.ke/c/bed-bug-killers.html): Browse Bed Bug Killers online in Kenya. Compare listed product details and current prices. Check each product label and PCPB registration. M-Pesa…
 - [Bluetooth Speakers in Kenya](https://stermontarcade.co.ke/c/bluetooth-speakers.html): Buy portable Bluetooth speakers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
-- [Cockroach & Ant Killer in Kenya](https://stermontarcade.co.ke/c/cockroach-ant-killers.html): Buy cockroach and ant killers online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
+- [Shop Cockroach & Ant Killers in Kenya](https://stermontarcade.co.ke/c/cockroach-ant-killers.html): Browse Cockroach & Ant Killers online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Computers & Accessories in Kenya](https://stermontarcade.co.ke/c/computers-accessories.html): Browse Computers & Accessories online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Computing Online in Kenya](https://stermontarcade.co.ke/c/computing.html): Browse Computing online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Crop Insecticides Online in Kenya](https://stermontarcade.co.ke/c/crop-insecticides.html): Browse Crop Insecticides online in Kenya. Compare listed product details and current prices. Check each product label and PCPB registration. M-Pesa…
@@ -55,6 +55,7 @@
 - [Shop Phones & Tablets Online in Kenya](https://stermontarcade.co.ke/c/phones-tablets.html): Browse Phones & Tablets online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Printers & Office Machines in Kenya](https://stermontarcade.co.ke/c/printers-office-machines.html): Browse Printers & Office Machines online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Protective Wear & Safety in Kenya](https://stermontarcade.co.ke/c/protective-wear-safety.html): Shop Protective Wear & Safety in Kenya at Stermont Arcade. Compare options, check prices and availability, and order with confidence.
+- [Shop Rodent Control Online in Kenya](https://stermontarcade.co.ke/c/rodent-control.html): Browse Rodent Control online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Shoes Online in Kenya](https://stermontarcade.co.ke/c/shoes.html): Browse Shoes online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Sprayers & Equipment Online in Kenya](https://stermontarcade.co.ke/c/sprayers-equipment.html): Browse Sprayers & Equipment online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Televisions Online in Kenya](https://stermontarcade.co.ke/c/televisions.html): Browse Televisions online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
@@ -152,6 +153,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 163 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 198 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
