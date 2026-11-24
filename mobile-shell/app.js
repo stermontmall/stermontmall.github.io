@@ -250,7 +250,7 @@ const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
    a copied or shared link then previews as this product, from that page's head, and a phone that opens it goes straight into this same product view inside
    the shell (the inline script at the top of the page head, seo-shell-chrome.mjs, and shell-chrome.js send /p/<slug>.html to /?product=<slug>).
    Crawlers get the static page, whose canonical is this same clean address. Older links that still end in ?shell=1 keep working (same two scripts). */
-const productUrl = () => { if (!qb.p) return undefined; const selected = sizeOf(qb.p, qb.size).slug || qb.p.slug; return '/p/' + encodeURIComponent(selected) + '.html'; };
+const productUrl = () => { if (!qb.p) return undefined; const selected = sizeOf(qb.p, qb.size).slug || qb.p.slug; if (/^\/p\/[^/]+\.html$/i.test(location.pathname) && location.hash) return location.pathname + location.hash; return '/p/' + encodeURIComponent(selected) + '.html'; };
 /* A category has its own address too (owner 2026-11-09: "when I tap on categories, make a direct link"): /c/<slug>.html, the clean address of the generated category page
    (a sub-category uses its own slug). A copied or shared link previews as that category, and a phone that opens it goes straight back into the same category in the shell
    (the inline script of seo-shell-chrome.mjs sends /c/<slug>.html to /?cat=<slug>, handled by openCatLink in section 9b). The address only changes in place (replaceState):
