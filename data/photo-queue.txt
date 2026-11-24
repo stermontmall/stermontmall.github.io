@@ -160,3 +160,4 @@ mos-kill-dudu-powder-200g|https://www.epepea.com/public/item/5258926
 flower-mosquito-coil-perfumed-125g|https://www.epepea.com/public/item/9521065
 mos-kill-mat-vaporizer-direct-plug|https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-mat-vaporiser-direct-plug/p/23559
 # rerun after multiline results output change
+# trigger deduplicated photo retry with referer support
