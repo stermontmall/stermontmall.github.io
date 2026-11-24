@@ -15,6 +15,7 @@ assert.equal(productLink('CoverMax-500-ML'), 'https://stermontarcade.co.ke/p/cov
 assert.equal(productLink('covermax-500-ml'), 'https://stermontarcade.co.ke/p/covermax-500-ml.html');
 assert.equal(productLink('../bad slug'), 'https://stermontarcade.co.ke/');
 assert.equal(slugifyNewProduct('Termidor 96 SC Termiticide with 1 Litre', '1 litre'), 'termidor-96-sc-termiticide-1-litre');
+assert.equal(slugifyNewProduct('Termidor 96 SC Termiticide 1 Litre'), 'termidor-96-sc-termiticide-1-litre');
 assert.equal(slugifyNewProduct('Zagro Ultraxide Disinfectant and Disinfectant 5 Litre', '5 litre'), 'zagro-ultraxide-disinfectant-5-litre');
 assert.ok(slugifyNewProduct('Acme Brand Model ABC Pest Control Concentrate', '500 ml').split('-').length <= 7);
 assert.match(admin, /slugifyNewProduct\(suppliedSlug\|\|name,suppliedSlug\?"":unit\)/);
