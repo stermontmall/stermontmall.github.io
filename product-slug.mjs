@@ -9,8 +9,15 @@ export function slugifyNewProduct(name, unit = '') {
   const detectedSize = nameTokens.filter(word => /\d/.test(word) || SIZE_UNITS.has(word));
   const packTokens = [...new Set(unitTokens.length ? unitTokens : detectedSize)];
   const allUnique = [...new Set([...nameTokens, ...unitTokens])];
-  const descriptive = allUnique.filter(word => !packTokens.includes(word));
-  const selected = [...descriptive.slice(0, Math.max(0, 7 - packTokens.length)), ...packTokens].slice(0, 7);
+  const selected = allUnique.slice(0, 7);
+  for (const packWord of packTokens) {
+    if (selected.includes(packWord)) continue;
+    if (selected.length >= 7) {
+      const replaceAt = selected.findLastIndex(word => !packTokens.includes(word));
+      if (replaceAt >= 0) selected.splice(replaceAt, 1);
+    }
+    if (selected.length < 7) selected.push(packWord);
+  }
   if (selected.length) return selected.join('-');
   return tokens(name).join('-').slice(0, 70).replace(/-+$/, '');
 }
