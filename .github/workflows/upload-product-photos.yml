@@ -43,10 +43,50 @@ jobs:
           IMAGEKIT_PRIVATE_KEY: ${{ secrets.IMAGEKIT_PRIVATE_KEY }}
         run: |
           set -o pipefail
-          PHOTOS="$(cat data/photo-queue.txt 2>/dev/null || true)"
+          BEFORE="${{ github.event.before }}"
+          if [[ "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            PHOTOS="$(cat data/photo-queue.txt 2>/dev/null || true)"
+          else
+            # The queue is append-only: process only entries added by this push.
+            # This avoids retrying every historical failed photo on every new batch.
+            PHOTOS="$(git diff --no-ext-diff --unified=0 "$BEFORE" "$GITHUB_SHA" -- data/photo-queue.txt | awk '/^\+\+\+/{next} /^\+/{sub(/^\+/, ""); print}')"
+          fi
           export PHOTOS
-          if ! printf '%s\n' "$PHOTOS" | grep -qv '^[[:space:]]*\(#.*\)\?$'; then
-            echo "Nothing to upload (the queue is empty or only comments)."
+          if ! printf '%s\n' "$PHOTOS" | grep -qv '^[[:space:]]*\(#.*\)\?
+          node scripts/upload-product-photos-to-imagekit.mjs | tee upload.log
+
+      - name: Save results for the assistant
+        if: always() && github.ref == 'refs/heads/main' && hashFiles('upload.log') != ''
+        continue-on-error: true
+        shell: bash
+        run: |
+          RESULTS_TMP="$(mktemp)"
+          if [ -f data/photo-results.json ]; then cp data/photo-results.json "$RESULTS_TMP"; fi
+          if [ -s "$RESULTS_TMP" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            # Rebase conflicts used to lose concurrent queue-run results. Rebase from the
+            # latest main on every retry, then restore this run's complete result payload.
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git reset --hard origin/main
+              cp "$RESULTS_TMP" data/photo-results.json
+              git add data/photo-results.json
+              if git diff --cached --quiet; then
+                echo "Photo results already match main."
+                exit 0
+              fi
+              git commit -m "Record photo upload results"
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+              echo "Push raced with another main update; retrying ($attempt/5)."
+            done
+            echo "::error::Could not save photo results after five attempts."
+            exit 1
+          fi
+; then
+            echo "No new photo queue entries were added by this push."
             exit 0
           fi
           node scripts/upload-product-photos-to-imagekit.mjs | tee upload.log
