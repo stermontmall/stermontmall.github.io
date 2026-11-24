@@ -57,7 +57,7 @@ jobs:
         shell: bash
         run: |
           RESULTS_TMP="$(mktemp)"
-          awk 'BEGIN { capture=0 } /^RESULTS_JSON_BEGIN$/ { capture=1; next } /^RESULTS_JSON_END$/ { capture=0; exit } capture { print }' upload.log > "$RESULTS_TMP" || true
+          if [ -f data/photo-results.json ]; then cp data/photo-results.json "$RESULTS_TMP"; fi
           if [ -s "$RESULTS_TMP" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
