@@ -3,7 +3,7 @@
      1. a green "Ask about this item on WhatsApp" button at the top of Product details, and
      2. a round WhatsApp button next to Add to cart / Buy now in the bottom bar,
    and the same "Ask on WhatsApp" link under the quick-buy sheet's details (#sheet-quickbuy).
-   The message names the product, the selected pack size, the price and the shell link (/?product=<slug>), and it updates when the pack size changes.
+   The message names the product, the selected pack size, the price and the canonical static product link (/p/<slug>.html), and it updates when the pack size changes.
    Reads only the page's own text, so it does not depend on app.js internals. The floating chat button (wa-float.js) is hidden while a product page is open (body.no-scroll),
    which is why the product view had no WhatsApp button at all.
    Loaded from index.html after app.js. To undo: delete the <script src="/mobile-shell/pp-whatsapp.js"> line in index.html. */
@@ -52,7 +52,7 @@
     }
 
     function slugFromPath(p) { var m = /\/p\/([^\/?#]+)\.html/.exec(p || ''); return m ? m[1] : ''; }
-    function shellUrl(slug) { return OK.test(slug || '') ? BASE + '/?product=' + slug : ''; }
+    function shellUrl(slug) { return OK.test(slug || '') ? BASE + '/p/' + slug + '.html' : ''; }
 
     function update() {
       try {

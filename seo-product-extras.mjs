@@ -76,7 +76,25 @@ const FORM = { EC: 'Emulsifiable concentrate (EC)', SL: 'Soluble liquid (SL)', S
 const catName = slug => {
   try { const h = readFileSync(`c/${slug}.html`, 'utf8'); const m = h.match(/<h1>([\s\S]*?)<\/h1>/); return m ? unesc(m[1].replace(/<[^>]+>/g, '').trim()).replace(/\s+in Kenya$/i, '') : HUB_NAME[slug] || slug; } catch { return HUB_NAME[slug] || slug; }
 };
-const hasCat = slug => existsSync(`c/${slug}.html`);
+const hasCat = slug => {
+  try {
+    const h = readFileSync(`c/${slug}.html`, 'utf8');
+    const grid = (h.split('<ul class="g">')[1] || '').split('</ul>')[0] || '';
+    return grid.includes('href="/p/') || grid.includes('href="https://stermontarcade.co.ke/p/');
+  } catch { return false; }
+};
+const categoryParents = JSON.parse(readFileSync('category-parent-map.json', 'utf8'));
+const categoryTarget = slug => {
+  if (hasCat(slug)) return slug;
+  let current = slug;
+  const seen = new Set([slug]);
+  while (categoryParents[current] && !seen.has(categoryParents[current])) {
+    current = categoryParents[current];
+    if (hasCat(current)) return current;
+    seen.add(current);
+  }
+  return null;
+};
 const hasBlog = href => existsSync(href.replace(/^\//, ''));
 
 const isHead = s => /^[A-Z][A-Z0-9 &'’,\/()%.+:\-]{2,70}$/.test(s) && (s.match(/[A-Z]/g) || []).length >= 3;
@@ -139,7 +157,7 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     if (ai) rows.push(['Active ingredient', esc(ai)]);
     if (fm) rows.push(['Formulation', esc(FORM[fm[1]])]);
     if (ai || fm) {
-      if (cm) rows.push(['Category', `<a href="/c/${cm[1]}.html">${cm[2]}</a>`]);
+      if (cm) { const target = categoryTarget(cm[1]); if (target) rows.push(['Category', `<a href="/c/${target}.html">${cm[2]}</a>`]); }
       const unit = (h.match(/<div class="pr">[\s\S]*?<small>\/ ([^<]*)<\/small>/) || [])[1];
       if (unit) rows.push(['Pack', unit]);
       rows.push(['Availability', /product:availability" content="in stock"/.test(h) ? 'In stock. Delivery to all 47 counties' : 'Currently sold out']);
@@ -177,8 +195,8 @@ if (existsSync('p')) for (const f of readdirSync('p').filter(f => f.endsWith('.h
     // cname is already HTML-escaped on the page (e.g. "Adjuvants &amp; Growth Regulators"), so unescape before escaping again
     if (slug && existsSync(`guides/cheapest-${slug}-kenya.html`)) items.push([`/guides/cheapest-${slug}-kenya.html`, `Cheapest ${esc(unesc(cname))} in Kenya: price list`]);
     (GUIDES[slug] || []).filter(g => hasBlog(g[0])).forEach(g => items.push([g[0], esc(g[1])]));
-    (SIBLINGS[slug] || []).filter(hasCat).forEach(k => items.push([`/c/${k}.html`, `Shop ${esc(catName(k))}`]));
-    if (hub && hasCat(hub)) items.push([`/c/${hub}.html`, `All ${esc(HUB_NAME[hub] || catName(hub))}`]);
+    (SIBLINGS[slug] || []).map(categoryTarget).filter(Boolean).filter((k, i, a) => a.indexOf(k) === i).forEach(k => items.push([`/c/${k}.html`, `Shop ${esc(catName(k))}`]));
+    const activeHub = hub ? categoryTarget(hub) : null; if (activeHub) items.push([`/c/${activeHub}.html`, `All ${esc(HUB_NAME[activeHub] || catName(activeHub))}`]);
     // The generator renders the complete product SILO footer (parent, subcategories, related products and guides).
     // Keep the legacy related-links box only for older product pages without that component.
     if (items.length && !h.includes('class="product-silo"')) {
@@ -202,9 +220,9 @@ if (existsSync('c')) for (const f of readdirSync('c').filter(f => f.endsWith('.h
     if (h.includes(MARK) || !h.includes(BROWSE)) continue;
     const items = [];
     (GUIDES[slug] || []).filter(g => hasBlog(g[0])).forEach(g => items.push([g[0], esc(g[1])]));
-    (SIBLINGS[slug] || []).filter(hasCat).forEach(k => items.push([`/c/${k}.html`, `Shop ${esc(catName(k))}`]));
+    (SIBLINGS[slug] || []).map(categoryTarget).filter(Boolean).filter((k, i, a) => a.indexOf(k) === i).forEach(k => items.push([`/c/${k}.html`, `Shop ${esc(catName(k))}`]));
     const hub = PARENT[slug];
-    if (hub && hasCat(hub)) items.push([`/c/${hub}.html`, `All ${esc(HUB_NAME[hub] || catName(hub))}`]);
+    const activeHub = hub ? categoryTarget(hub) : null; if (activeHub) items.push([`/c/${activeHub}.html`, `All ${esc(HUB_NAME[activeHub] || catName(activeHub))}`]);
     if (!items.length) continue;
     h = h.replace(BROWSE, () => `${MARK}<div class="box rel"><h2 style="margin-top:0">Guides and related categories</h2><ul>${items.map(([u, t]) => `<li><a href="${u}">${t}</a></li>`).join('')}</ul></div>\n${BROWSE}`).replace('</head>', () => STYLE + '</head>');
     writeFileSync(file, h); cDone++;

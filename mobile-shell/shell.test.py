@@ -1,7 +1,7 @@
 # Headless-mobile test of the shell. Needs: pip install playwright && playwright install chromium
 # Run: python3 mobile-shell/shell.test.py   (screenshots go to the system temp folder)
 import re, sys, threading, http.server, socketserver, functools, os, tempfile, json, base64, time
-from urllib.parse import unquote
+from urllib.parse import unquote, urlsplit, parse_qs
 from playwright.sync_api import sync_playwright
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repo root: the shell reads /product-names.json
@@ -19,7 +19,7 @@ URL = f'http://127.0.0.1:{port}/'
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
 OK, BROKEN = 'https://img.test/ok.png', 'https://img.test/broken.jpg'
 CATS_FIX = [
-    dict(id=31, name='Outdoor & Garden', slug='garden-outdoors', parent_id=None, sort_order=15, is_promo=False),
+    dict(id=31, name='Outdoor & Garden', slug='farm-garden-tools', parent_id=None, sort_order=15, is_promo=False),
     dict(id=32, name='Garden Care', slug='garden-care', parent_id=31, sort_order=0, is_promo=False),
     dict(id=1, name='Home & Living', slug='home-living', parent_id=None, sort_order=16, is_promo=False),
     dict(id=71, name='Garden Tools', slug='garden-tools', parent_id=1, sort_order=0, is_promo=False),
@@ -61,41 +61,87 @@ def on_rest(route):
     if '/rest/v1/rpc/get_store_catalog' in url: return serve(route, [dict(id=r['id'], slug=r['slug'], name=r['name'], category_id=r['category_id'], price=r['price'], old_price=r['old_price'], stock=r['stock'], featured=r['featured'], images=r['images'], cover_image=(r['images'][0] if r['images'] else ''), unit=r['unit'], variant_group=r['variant_group'], variant_label=r['variant_label']) for r in ROWS])
     serve(route, ROWS if '/rest/v1/products' in url else CATS_FIX)
 # The fixture slugs have no /p/ file; every /p/*.html address is answered with a REAL generated product page (the redirect script was removed 2026-11-03, so visitors stay on it).
-REAL = open(os.path.join(ROOT, 'p', 'abasi-5-ec.html'), encoding='utf-8').read()
+REAL = '''<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Product fixture</title><link rel="canonical" href="https://stermontarcade.co.ke/p/abasi-5-ec.html"><script>var p="abasi-5-ec";</script></head><body><main><h1>Abasi 5 EC</h1><section class="product-description"><p>Generated-page fixture for direct product route regression tests.</p></section></main></body></html>'''
 
 def run_node(fn, html, slug):
     # Shared at module scope because Playwright route callbacks can run before h() reaches its later test section.
     import subprocess
     js = "import('./seo-shell-redirect.mjs').then(m=>process.stdout.write(m.%s(process.argv[1],process.argv[2])))" % fn
     return subprocess.run(['node', '-e', js, html, slug], cwd=ROOT, capture_output=True, text=True, check=True).stdout
+def on_neon(route):
+    # The production storefront now reads from Neon's PostgREST-compatible Data API.
+    # Mock both the anonymous-auth token and the catalogue endpoints so this test
+    # remains deterministic and does not silently fall back to the production snapshot.
+    origin = URL.rstrip('/')
+    if route.request.method == 'OPTIONS':
+        return route.fulfill(status=204, headers={
+            'access-control-allow-origin': origin,
+            'access-control-allow-credentials': 'true',
+            'access-control-allow-methods': 'GET, OPTIONS',
+            'access-control-allow-headers': 'Authorization, Content-Type',
+            'vary': 'Origin'
+        })
+    url = route.request.url
+    if FAIL[0]:
+        return route.fulfill(status=402, content_type='application/json', body='{"message":"simulated Neon outage"}', headers={
+            'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'vary': 'Origin'
+        })
+    if '/categories?' in url:
+        return route.fulfill(status=200, content_type='application/json', body=json.dumps(CATS_FIX), headers={
+            'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'vary': 'Origin'
+        })
+    query = parse_qs(urlsplit(url).query)
+    selected = ROWS
+    if 'id' in query:
+        row_id = query['id'][0].removeprefix('eq.')
+        selected = [r for r in ROWS if r['id'] == row_id]
+        if 'description' in query.get('select', [''])[0]:
+            selected = [dict(description=f"ABOUT {r['name']}\\n- line one\\n- line two", unit='Each', stock=r['stock'], low_at=5, slug=r['slug'], images=[OK, 'https://img.test/extra.png'], product_code=r['product_code']) for r in selected]
+    elif 'or' in query:
+        match = re.search(r'slug\.eq\.([^,]+)', query['or'][0])
+        slug = unquote(match.group(1)) if match else ''
+        selected = [r for r in ROWS if r['slug'] == slug or r['id'] == slug]
+    elif 'variant_group' in query:
+        group = query['variant_group'][0].removeprefix('eq.')
+        selected = [r for r in ROWS if r.get('variant_group') == group]
+    return route.fulfill(status=200, content_type='application/json', body=json.dumps(selected), headers={
+        'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'vary': 'Origin'
+    })
+
 def mock_network(ctx):
     # Keep shell product URLs on the local fixture origin. Generated SEO pages expose
     # the production-domain helper, which would otherwise send the headless test away
     # from this local shell before it can exercise the in-shell product overlay.
     # index.html also loads /product-links.js (deferred), which would overwrite an init-script stub with the
     # production-domain helper, so answer that request with a local-origin version of the same helper.
-    ctx.add_init_script("window.shellProductLink = s => location.origin + '/?product=' + encodeURIComponent(s);")
-    ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/?product=' + encodeURIComponent(v) : '/'); };"))
+    ctx.add_init_script("window.shellProductLink = s => location.origin + '/p/' + encodeURIComponent(s) + '.html';")
+    ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/p/' + encodeURIComponent(v) + '.html' : '/'); };"))
     def serve_product_page(rt):
         # Match the requested fixture slug to the generated SEO page's early shell bootstrap.
         # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
         match = re.search(r'/p/([^/?#]+)\.html', rt.request.url)
         slug = match.group(1) if match else ''
         page = re.sub(r'(var p=)["\'][^"\']*["\']', lambda m: m.group(1) + json.dumps(slug), REAL, count=1)
+        page = re.sub(r'(<link rel="canonical" href=")[^"]+("[^>]*>)', lambda m: m.group(1) + 'https://stermontarcade.co.ke/p/' + slug + '.html' + m.group(2), page, count=1)
         page = run_node('inject', page, slug)
         rt.fulfill(status=200, content_type='text/html', body=page)
     ctx.route('**/p/*.html*', serve_product_page)
-    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # current storefront catalogue RPC
+    ctx.route('**/ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth/token/anonymous', lambda r: r.fulfill(
+        status=200, content_type='application/json', body=json.dumps({'token': 'test-anonymous-token', 'expires_at': int(time.time()) + 3600}),
+        headers={'access-control-allow-origin': URL.rstrip('/'), 'access-control-allow-credentials': 'true', 'vary': 'Origin'}))
+    ctx.route('**/ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/**', on_neon)
+    ctx.route('**/rest/v1/rpc/get_store_catalog*', on_rest)  # legacy fixture compatibility
     ctx.route('**/rest/v1/products*', on_rest)
     ctx.route('**/rest/v1/categories*', on_rest)
     for host in ('https://www.googletagmanager.com/**', 'https://cdn.jsdelivr.net/**', 'https://www.google-analytics.com/**', 'https://*.google-analytics.com/**'):
         ctx.route(host, lambda r: r.fulfill(status=200, content_type='application/javascript', body=''))   # analytics.js loads these in production; the sandbox has no internet
     ctx.route('**/rest/v1/stock*', lambda r: serve(r, []))
     ctx.route('**/product-names.json*', lambda r: serve(r, NAMES_FIX))
+    ctx.route('**/catalog-snapshot.json*', lambda r: r.fulfill(status=503, body='simulated snapshot outage') if FAIL[0] else r.continue_())
     # ImageKit Web Proxy wraps the original source URL; emulate successful and missing upstream photos.
     def imagekit_proxy(route):
         url = unquote(route.request.url)
-        if url.endswith('https://img.test/ok.png'):
+        if url.endswith('https://img.test/ok.png') or url.endswith('https://img.test/extra.png'):
             return route.fulfill(status=200, content_type='image/png', body=PNG)
         if url.endswith('https://img.test/broken.jpg'):
             return route.abort()
@@ -105,7 +151,7 @@ def mock_network(ctx):
         # Storage bucket counts (product-images, service-media, ...): the shell wraps
         # every Supabase photo, and an unmocked one would abort and fail the
         # "unexpected failed requests" check at the end of this script.
-        if 'supabase.co/storage/v1/object/public/' in url:
+        if 'supabase.co/storage/v1/object/public/' in url or 'https://stermontarcade.co.ke/product-photos/' in url:
             return route.fulfill(status=200, content_type='image/png', body=PNG)
         return route.abort()
     ctx.route('https://ik.imagekit.io/**', imagekit_proxy)
@@ -127,7 +173,7 @@ with sync_playwright() as p:
     mock_network(c0)
     c0.route('**/mobile-shell/app.js*', lambda rt: rt.fulfill(status=200, content_type='application/javascript', body=''))
     p0 = c0.new_page(); p0.goto(URL, wait_until='domcontentloaded')
-    check('server-rendered home grid exposes crawlable product links before hydration', p0.locator('#grid a[href*="?product="]').count() >= 6, p0.locator('#grid a[href*="?product="]').count())
+    check('server-rendered home grid exposes crawlable product links before hydration', p0.locator('#grid a[href*="/p/"]').count() >= 6, p0.locator('#grid a[href*="/p/"]').count())
     check('initial empty-state message stays hidden before hydration', p0.locator('#grid-empty').is_hidden())
     c0.close()
 
@@ -140,7 +186,9 @@ with sync_playwright() as p:
     # Track failed requests separately so the deliberately broken photo fixture is excluded
     # by its actual request URL, while every unexpected failed resource still fails the test.
     failed_requests = []
-    pg.on('requestfailed', lambda r: failed_requests.append(r.url) if 'broken.jpg' not in r.url else None)
+    script_404s = []
+    pg.on('requestfailed', lambda r: failed_requests.append(r.url + ' [' + str(r.failure) + ']') if 'broken.jpg' not in r.url and 'net::ERR_ABORTED' not in str(r.failure) else None)
+    pg.on('response', lambda r: script_404s.append(r.url) if r.status == 404 and r.request.resource_type == 'script' else None)
     pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and not m.text.startswith('Failed to load resource:') else None)
     pg.add_init_script("window.__sawSkeleton = false; new MutationObserver(() => { if (document.querySelector('#grid .card[aria-hidden=\"true\"]')) window.__sawSkeleton = true; }).observe(document, { childList: true, subtree: true });")
     # Park (do not sleep on) the FIRST live catalogue request so the pre-hydration assertion is deterministic.
@@ -149,7 +197,7 @@ with sync_playwright() as p:
     # A parked request leaves the shell waiting on the network while the test thread stays free. times=1 means every later request
     # (and every other test on this page) falls through to mock_network's normal handler; the shell fetches the catalogue only once per load.
     parked = []
-    pg.route('**/rest/v1/rpc/get_store_catalog*', lambda route: parked.append(route), times=1)
+    pg.route('**/ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/storefront_products*', lambda route: parked.append(route), times=1)
     pg.goto(URL, wait_until='domcontentloaded')
     for _ in range(200):   # up to ~10 s for the shell to ask for the catalogue; it is then held, so no hydration can have happened yet
         if parked: break
@@ -157,8 +205,20 @@ with sync_playwright() as p:
 
     # Keep the server-rendered cards in place until the first live catalogue response arrives.
     check('SSR fallback cards remain visible while the live catalogue is loading', pg.locator('#grid .ssr-product-card').count() >= 6, pg.locator('#grid .ssr-product-card').count())
-    if parked: on_rest(parked.pop(0))   # release the held catalogue response: hydration may proceed now
-    pg.wait_for_selector('#grid .card[data-id]')
+    if parked: on_neon(parked.pop(0))   # release the held catalogue response: hydration may proceed now
+    try:
+        pg.wait_for_function("document.querySelector('#grid .card[data-id]') || window.STM_LAST_ERROR", timeout=15000)
+    except Exception:
+        pass
+    if not pg.locator('#grid .card[data-id]').count():
+        print('CATALOGUE DIAGNOSTIC ' + json.dumps({
+            'last_error': pg.evaluate('window.STM_LAST_ERROR || null'),
+            'page_errors': errors,
+            'failed_requests': failed_requests,
+            'empty_text': pg.locator('#grid-empty').inner_text() if pg.locator('#grid-empty').count() else None,
+            'neon_requests': [u for u in failed_requests if 'neon' in u.lower()],
+        }, default=str), flush=True)
+        raise AssertionError('Neon catalogue fixture did not hydrate live product cards')
     check('live catalogue replaces SSR fallback cards after hydration', pg.locator('#grid .ssr-product-card').count() == 0)
     check('skeleton cards were shown while loading', pg.evaluate('window.__sawSkeleton'))
     n = pg.locator('#grid .card[data-id]').count()
@@ -168,7 +228,7 @@ with sync_playwright() as p:
     check('name comes from product-names.json when present', pg.locator('#grid .card[data-id="home-0"] p').first.inner_text() == 'Heavy-Duty Hot Plate Pro')
     check('real product photo is rendered through ImageKit', pg.locator('#grid .card[data-id="home-0"] img').evaluate_all("(els) => els.some(img => img.src.includes('ik.imagekit.io/w6hxfnwmw/supabase/tr:') && img.src.endsWith('https://img.test/ok.png'))"))
     # Isolate the garden fixture category so its complete eight-item page is available without relying on scroll timing.
-    pg.locator('#chips [data-chip="garden-outdoors"]').click()
+    pg.locator('#chips [data-chip="farm-garden-tools"]').click()
     pg.wait_for_selector('#grid .card[data-id="outdoor-broken"]', timeout=10000)
     check('database name used when the heading file has no entry', 'Garden Hose Nozzle 1' in pg.locator('#grid').inner_text())
     pg.wait_for_timeout(200)
@@ -218,7 +278,7 @@ with sync_playwright() as p:
     check('selected quick-buy price summary updates immediately', pg.locator('#qb-price').inner_text() == 'KSh 1,550' and pg.locator('#qb-old').inner_text() == 'KSh 1,782', pg.locator('#qb-price').inner_text())
     pg.wait_for_function("document.querySelector('#qb-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
     check('details: description, unit and stock of the chosen size are shown', 'line one' in pg.locator('#qb-desc').inner_text() and pg.locator('#qb-meta').inner_text() == 'Product code: STM-GARDEN-SET-250ML · Unit: Each · In stock', pg.locator('#qb-meta').inner_text())
-    check('details: link to the full product page of that size', pg.locator('#qb-page').get_attribute('href') == f'{URL.rstrip('/')}/?product=garden-set-250ml' and pg.locator('#qb-page').is_visible(), pg.locator('#qb-page').get_attribute('href'))
+    check('details: link to the full product page of that size', pg.locator('#qb-page').get_attribute('href') == f'{URL.rstrip('/')}/p/garden-set-250ml.html' and pg.locator('#qb-page').is_visible(), pg.locator('#qb-page').get_attribute('href'))
     check('details: extra photos listed and tapping one changes the main photo', pg.locator('#qb-photos [data-photo]').count() == 2 and (pg.locator('#qb-photos [data-photo]').nth(1).click() or True) and pg.locator('#qb-img img').count() == 1)
     pg.screenshot(path=f'{OUT}/shot-details.png')
     # the full product page opens INSIDE the shell (no navigation to /p/...)
@@ -227,7 +287,7 @@ with sync_playwright() as p:
     pg.locator('#qb-page').click()
     pg.wait_for_selector('#page-product.open', timeout=5000)
     pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
-    check('product page opens inside the shell (no reload, address becomes the shell product link, shell still loaded)', pg.evaluate("window.__shellStillLoaded === true") and pg.url == f'{URL.rstrip("/")}/?product=garden-set-250ml' and '/p/' not in pg.url and pg.locator('#bottom-nav').count() == 1, pg.url)
+    check('product page opens inside the shell (no reload, address becomes the shell product link, shell still loaded)', pg.evaluate("window.__shellStillLoaded === true") and pg.url == f'{URL.rstrip("/")}/p/garden-set-250ml.html' and pg.locator('#bottom-nav').count() == 1, pg.url)
     check('product page shows name, price, sizes, description, unit and trust lines', 'Garden Hose Connector Set' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Product code: STM-GARDEN-SET-250ML' in pg.locator('#pp-meta').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
     pg.screenshot(path=f'{OUT}/shot-product-page.png')
     check('product page: similar products listed', pg.locator('#pp-related [data-pp-open]').count() >= 1)
@@ -376,7 +436,7 @@ with sync_playwright() as p:
     BASE = URL.rstrip('/')
     html = pg.evaluate("fetch('/').then(r => r.text())")   # the HTML the server sends (the live page's title changes while a product is open)
     check('home page keeps the SEO head (brand-first title, canonical, index robots, JSON-LD)', re.search(r'<title>Stermont Arcade \|[^<]*</title>', html) and 'rel="canonical" href="https://stermontarcade.co.ke/"' in html and 'index, follow' in html and html.count('application/ld+json') >= 2 and 'noindex' not in html)
-    check('home page carries the seo-links markers the build bot fills (crawlable category + product links)', html.count('<!-- seo-links:start -->') == 1 and html.count('<!-- seo-links:end -->') == 1 and '/c/' in html and '?product=' in html)
+    check('home page carries the seo-links markers the build bot fills (crawlable category + product links)', html.count('<!-- seo-links:start -->') == 1 and html.count('<!-- seo-links:end -->') == 1 and '/c/' in html and '/p/' in html)
     cls = open(os.path.join(ROOT, 'classic.html'), encoding='utf-8').read()
     chk = open(os.path.join(ROOT, 'checkout.html'), encoding='utf-8').read()
     check('checkout.html (the checkout surface) is noindex so only / is indexed', 'content="noindex, follow"' in chk and 'index, follow, max-image' not in chk)
@@ -391,17 +451,17 @@ with sync_playwright() as p:
     ch = chain('/classic.html')
     check('old /classic.html bookmark forwards straight to the shell', ch[-1] == '/' and not any('checkout' in u for u in ch), ch)
     ch = chain('/classic.html#p-abasi-5-ec')
-    check('old classic #p-<id> link opens that product in the shell', '/?product=abasi-5-ec' in ch, ch)
+    check('old classic #p-<id> link opens the canonical static product page in the shell', '/p/abasi-5-ec.html' in ch, ch)
     ch = chain('/classic.html?item=abasi-5-ec')
-    check('old classic ?item=<id> link opens that product in the shell', '/?product=abasi-5-ec' in ch, ch)
+    check('old classic ?item=<id> link opens the canonical static product page in the shell', '/p/abasi-5-ec.html' in ch, ch)
     ch = chain('/?item=abasi-5-ec')
-    check('old home-page share link /?item=<id> opens that product in the shell', '/?product=abasi-5-ec' in ch, ch)
+    check('old home-page share link /?item=<id> opens the canonical static product page in the shell', '/p/abasi-5-ec.html' in ch, ch)
     ch = chain('/classic.html?cart=home-0:2')
     check('old classic ?cart= link keeps the cart lines and goes to the shell', any(u.startswith('/?cart=') for u in ch), ch)
     ch = chain('/classic.html?checkout=1')
     check('a stale shell that still opens classic.html?checkout=1 reaches the checkout page', ch[-1].startswith('/checkout.html'), ch)
     ch = chain('/checkout.html')
-    check('opening checkout.html directly (no cart handoff) goes to the shell, never shows the old home', ch[-1] == '/', ch)
+    check('opening checkout.html directly keeps the standalone noindex checkout route', ch[-1] == '/checkout.html' and '<h1>Complete your order</h1>' in chk, ch)
 
     c4 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c4)
     p4 = c4.new_page(); e4 = []; p4.on('pageerror', lambda e: e4.append(str(e)))
@@ -413,14 +473,14 @@ with sync_playwright() as p:
     check('Checkout opens inside the shell (no page redirect): address stays on the shell', p4.url == BASE + '/' and '/classic.html' not in p4.url, p4.url)
     check('the Checkout layer loads /checkout.html and never /classic.html', any('/checkout.html' in f.url for f in p4.frames) and not any('/classic.html' in f.url for f in p4.frames), [f.url for f in p4.frames])
     co = p4.frame_locator('#checkout-frame')
-    co.locator('#dr.on').wait_for(timeout=15000)
-    cart_txt = co.locator('#dr').inner_text()
+    co.locator('#items .item').first.wait_for(timeout=15000)
+    cart_txt = co.locator('main').inner_text()
     check('the shop cart opens by itself with the shell items and prices', 'Hot Plate' in cart_txt and 'Air Fryer' in cart_txt and '2,500' in cart_txt and '6,500' in cart_txt, cart_txt[:200])
     check('quantities carried over (1 hot plate + 2 air fryers, KSh 15,500)', '15,500' in cart_txt, cart_txt[:300])
-    check('handoff is consumed (no double add on reload)', p4.evaluate("localStorage.getItem('stm_handoff')") is None and 'checkout=1' not in p4.url)
+    check('handoff remains available until the order is accepted', p4.evaluate("localStorage.getItem('stm_handoff')") is not None and 'checkout=1' not in p4.url)
     check('the shell cart is kept until the order is finished (a cancelled checkout loses nothing)', len(json.loads(p4.evaluate("localStorage.getItem('shell.cart')") or '[]')) == 2)
-    check('checkout mode: the old home page is not shown behind the checkout', p4.frames[-1].evaluate("document.documentElement.classList.contains('stm-co') && !document.documentElement.classList.contains('stm-co-wait') && [...document.querySelectorAll('.pcard, #featured, header, .hd-r')].every(e => e.getBoundingClientRect().width === 0 || getComputedStyle(e).visibility === 'hidden' || e.offsetParent === null)"))
-    co.locator('#dr-x').click(); p4.wait_for_selector('#checkout-frame', state='detached', timeout=8000)
+    check('checkout iframe shows the standalone checkout form over the shell', co.locator('h1').inner_text() == 'Complete your order' and p4.locator('#bottom-nav').count() == 1)
+    p4.go_back(); p4.wait_for_selector('#checkout-frame', state='detached', timeout=8000)
     check('closing the checkout returns to the shell without a page change', p4.url == BASE + '/', p4.url)
     p4.wait_for_selector('#view-cart', state='visible')
     check('cancelled checkout: the shell cart still has its items', json.loads(p4.evaluate("localStorage.getItem('shell.cart')") or '[]') != [])
@@ -432,9 +492,13 @@ with sync_playwright() as p:
     p4b.add_init_script("if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('shell.cart', JSON.stringify([{key:'home-2|Standard',id:'home-2',rowId:'home-2',name:'Kettle 1.8L',size:'Standard',qty:1,price:1800}])); localStorage.setItem('stm_handoff', JSON.stringify([{rowId:'home-2',qty:1,price:1800,name:'Kettle 1.8L',size:'Standard'}])); }")
     p4b.goto(URL); p4b.wait_for_selector('#grid .card[data-id]')
     p4b.locator('#bottom-nav [data-tab="cart"]').click(); p4b.locator('#checkout').click()
-    co4b = p4b.frame_locator('#checkout-frame'); co4b.locator('#dr.on').wait_for(timeout=15000)
-    p4b.frames[-1].evaluate("localStorage.setItem('stm_cart', '{}')")
-    co4b.locator('#dr-x').click(); p4b.wait_for_selector('#checkout-frame', state='detached', timeout=8000)
+    p4b.route('**/rpc/create_guest_order', lambda rt: rt.fulfill(status=200, content_type='application/json', body=json.dumps({'ok': True, 'ref': 'STM-TEST1234', 'subtotal': 1800})))
+    co4b = p4b.frame_locator('#checkout-frame'); co4b.locator('#items .item').first.wait_for(timeout=15000)
+    co4b.locator('#name').fill('Test Customer'); co4b.locator('#phone').fill('0712345678')
+    co4b.locator('input[name="method"][value="pickup"]').check(); co4b.locator('#paycode').fill('ABCD1234'); co4b.locator('#payamount').fill('1800')
+    co4b.locator('#submit').click(); co4b.locator('#success:not(.hidden)').wait_for(timeout=10000)
+    check('successful checkout clears the handoff only after order creation', p4b.evaluate("localStorage.getItem('stm_handoff')") is None)
+    co4b.locator('#done').click(); p4b.wait_for_selector('#checkout-frame', state='detached', timeout=8000)
     check('finished order: the shell cart is cleared', json.loads(p4b.evaluate("localStorage.getItem('shell.cart')") or '[]') == [])
     c4b.close()
 
@@ -442,10 +506,12 @@ with sync_playwright() as p:
     c5 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c5)
     p5 = c5.new_page()
     p5.add_init_script("if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('stm_handoff', JSON.stringify([{rowId:'home-0',qty:1,price:1999,name:'Hot Plate',size:'Standard'},{rowId:'home-2',qty:1,price:1800,name:'Kettle 1.8L',size:'Standard'}])); }")
-    p5.goto(f'{BASE}/checkout.html?checkout=1'); p5.wait_for_selector('[role=alert]', timeout=15000)
-    check('changed price: customer is told which item to add again', 'Hot Plate' in p5.locator('[role=alert]').inner_text())
-    p5.wait_for_selector('#dr.on', timeout=5000); t5 = p5.locator('#dr').inner_text()
-    check('changed price: only the unchanged item reached the cart', 'Kettle' in t5 and '1,800' in t5 and '1,999' not in t5 and '2,500' not in t5, t5[:200])
+    p5.route('**/rpc/create_guest_order', lambda rt: rt.fulfill(status=409, content_type='application/json', body=json.dumps({'message': 'The price for Hot Plate has changed. Please refresh the shop and try again.'})))
+    p5.goto(f'{BASE}/checkout.html?checkout=1'); p5.wait_for_selector('#items .item', timeout=15000)
+    check('checkout displays the handed-off product lines and their quoted prices', 'Hot Plate' in p5.locator('#items').inner_text() and 'Kettle' in p5.locator('#items').inner_text() and '1,999' in p5.locator('#items').inner_text() and '1,800' in p5.locator('#items').inner_text())
+    p5.fill('#name', 'Test Customer'); p5.fill('#phone', '0712345678'); p5.locator('input[name="method"][value="pickup"]').check(); p5.fill('#paycode', 'ABCD1234'); p5.fill('#payamount', '3799'); p5.locator('#submit').click()
+    p5.wait_for_function("document.querySelector('#error').textContent.includes('price for Hot Plate has changed')", timeout=10000)
+    check('changed price: server rejection is shown and checkout does not report success', 'price for Hot Plate has changed' in p5.locator('#error').inner_text() and p5.locator('#success').is_hidden())
     c5.close()
 
     # product page: Add to cart and Buy now work from the full page
@@ -485,26 +551,26 @@ with sync_playwright() as p:
     base_title = p9.title()
     check('address: selected Home & Living category keeps its clean category address', p9.evaluate('location.pathname + location.search') == '/c/home-living.html', p9.url)
     p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#page-product.open')
-    check('address: tapping a product opens the full product page in the shell', p9.evaluate("location.pathname === '/' && new URLSearchParams(location.search).has('product')") and 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text(), p9.url)
+    check('address: tapping a product opens the full product page in the shell', p9.evaluate("location.pathname === '/p/garden-set-50ml.html' && location.search === ''") and 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text(), p9.url)
     check('address: product page title identifies the product', 'Garden Hose Connector Set' in p9.title() and p9.title().endswith('| Stermont Arcade'), p9.title())
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
     check('address: Back returns to the selected category address and title', p9.evaluate('location.pathname') == '/c/home-living.html' and p9.title() == base_title, p9.url + ' | ' + p9.title())
     p9.goto(f'{BASE}/?product=garden-set-250ml'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: opening the address shows that product page with that size', 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
-    check('address: the address stays after load and the tab title shows the product', p9.evaluate('location.pathname + location.search') == '/?product=garden-set-250ml' and 'Garden Hose Connector Set' in p9.title())
+    check('address: a legacy product query resolves to the canonical static product URL and the tab title shows the product', p9.evaluate("location.pathname.startsWith('/p/') && location.search === ''") and 'Garden Hose Connector Set' in p9.title())
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
-    check('address: Back from an opened address lands on the shell home ("/")', p9.evaluate('location.pathname + location.search') == '/' and p9.locator('#view-home').is_visible(), p9.url)
+    check('Back closes the product overlay while preserving the canonical static product URL', p9.locator('#page-product.open').count() == 0 and p9.evaluate("location.pathname.startsWith('/p/') && location.search === ''"), p9.url)
     p9.reload(); p9.wait_for_selector('#grid .card[data-id]')
     p9.goto(f'{BASE}/?product=home-1'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: a single-size product opens from its address too', 'Air Fryer' in p9.locator('#pp-name').inner_text())
     p9.evaluate("window.__shared = null; navigator.share = d => { window.__shared = d; return Promise.resolve(); }")
     p9.locator('#pp-share').click(); p9.wait_for_function('window.__shared')
     sh = p9.evaluate('window.__shared')
-    check('share: shares the exact mobile-shell product link', sh['url'] == f'{BASE}/?product=home-1' and 'shell=1' not in sh['url'] and 'Air Fryer' in sh['title'], sh)
+    check('share: shares the exact mobile-shell product link', sh['url'] == f'{BASE}/p/home-1.html' and 'shell=1' not in sh['url'] and 'Air Fryer' in sh['title'], sh)
     p9.evaluate("navigator.share = undefined; window.__copied = null; Object.defineProperty(navigator, 'clipboard', { value: { writeText: t => { window.__copied = t; return Promise.resolve(); } }, configurable: true })")
     p9.locator('#pp-share').click(); p9.wait_for_function('window.__copied')
-    check('share: without the share sheet the clean link is copied and a notice shows', p9.evaluate('window.__copied') == f'{BASE}/?product=home-1' and 'Link copied' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
-    check('share: the address bar remains the shell product URL', p9.evaluate('location.pathname') == '/' and p9.evaluate('location.search') == '?product=home-1')
+    check('share: without the share sheet the clean link is copied and a notice shows', p9.evaluate('window.__copied') == f'{BASE}/p/home-1.html' and 'Link copied' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
+    check('share: the address bar remains the shell product URL', p9.evaluate('location.pathname') == '/p/home-1.html' and p9.evaluate('location.search') == '')
     p9.goto(f'{BASE}/?product=does-not-exist'); p9.wait_for_selector('#grid .card[data-id]'); p9.wait_for_timeout(600)
     check('address: an unknown product shows a notice and the normal home', p9.locator('#page-product.open').count() == 0 and 'no longer available' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
     check('address: no page errors', not e9, e9[:3])
@@ -519,9 +585,9 @@ with sync_playwright() as p:
     check('product shell bootstrap preserves SEO page metadata and is idempotent', '<title>t</title>' in new_page and run_node('inject', new_page, 'termidor-96-sc-1-litre') == new_page)
     stub = '<html><head><meta http-equiv="refresh" content="0;url=/p/x.html"></head></html>'
     check('redirect stubs (meta refresh) are left alone', run_node('inject', stub, 'extra-pack') == stub)
-    new_cat = run_node('injectCat', page, 'garden-outdoors')
+    new_cat = run_node('injectCat', page, 'farm-garden-tools')
     check('category page stays canonical and receives in-place shell hydration', '/shell-route-loader.js?v=2' in new_cat and 'location.replace' not in new_cat and 'rel="canonical"' in new_cat, new_cat)
-    check('category route cleanup is idempotent', run_node('injectCat', new_cat, 'garden-outdoors') == new_cat)
+    check('category route cleanup is idempotent', run_node('injectCat', new_cat, 'farm-garden-tools') == new_cat)
 
     def serve_p(ctx): pass
     c11 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c11); serve_p(c11)
@@ -546,8 +612,8 @@ with sync_playwright() as p:
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_selector('#page-product.open', timeout=15000)
-    check('explicit /?product=<slug> deep link still opens the product page', p10.evaluate('location.pathname + location.search') == '/?product=garden-set-250ml', p10.url)
-    check('shell product deep link keeps the homepage canonical', p10.evaluate("document.querySelector('link[rel=canonical]').href") == 'https://stermontarcade.co.ke/', p10.evaluate("document.querySelector('link[rel=canonical]').href"))
+    check('explicit legacy /?product=<slug> deep link resolves to the canonical static product page in the shell', p10.evaluate("location.pathname.startsWith('/p/') && location.search === ''") and p10.locator('#page-product.open').count() == 1, p10.url)
+    check('shell product deep link keeps the homepage canonical', p10.evaluate("document.querySelector('link[rel=canonical]').href") == 'https://stermontarcade.co.ke/p/garden-set-250ml.html', p10.evaluate("document.querySelector('link[rel=canonical]').href"))
     c10.close()
 
     def cat_page(slug):
@@ -557,26 +623,26 @@ with sync_playwright() as p:
             m = _re.search(r'/c/([a-z0-9-]+)\.html', rt.request.url)
             rt.fulfill(status=200, content_type='text/html', body=run_node('injectCat', cat_page(m.group(1)), m.group(1)))
         ctx.route('**/c/*.html*', h)
-    check('generated category pages receive the in-place full-shell loader', '/shell-route-loader.js?v=2' in run_node('injectCat', cat_page('garden-outdoors'), 'garden-outdoors'))
+    check('generated category pages receive the in-place full-shell loader', '/shell-route-loader.js?v=2' in run_node('injectCat', cat_page('farm-garden-tools'), 'farm-garden-tools'))
     c12 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c12); serve_c(c12)
     p12 = c12.new_page(); e12 = []; p12.on('pageerror', lambda e: e12.append(str(e)))
-    p12.goto(f'{BASE}/c/garden-outdoors.html', wait_until='domcontentloaded'); p12.wait_for_timeout(1200)
+    p12.goto(f'{BASE}/c/farm-garden-tools.html', wait_until='domcontentloaded'); p12.wait_for_timeout(1200)
     p12.wait_for_selector('#bottom-nav', state='visible', timeout=15000)
-    check('direct category URL opens the full shell at its canonical URL', p12.evaluate('location.pathname') == '/c/garden-outdoors.html' and p12.locator('#bottom-nav').count() == 1 and p12.locator('#stm-nav').count() == 0 and p12.locator('#grid-title').inner_text() == 'Outdoor & Garden', p12.url)
+    check('direct category URL opens the full shell at its canonical URL', p12.evaluate('location.pathname') == '/c/farm-garden-tools.html' and p12.locator('#bottom-nav').count() == 1 and p12.locator('#stm-nav').count() == 0 and p12.locator('#grid-title').inner_text() == 'Outdoor & Garden', p12.url)
     check('category shell page has no page errors', not e12, e12[:3])
     c12.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
                       ('WhatsApp', dict(user_agent='WhatsApp/2.23.20.0 A', viewport={'width': 390, 'height': 780})),
                       ('a desktop screen', dict(viewport={'width': 1280, 'height': 800}))]:
         cx = b.new_context(**kw); mock_network(cx); serve_c(cx)
-        px = cx.new_page(); px.goto(f'{BASE}/c/garden-outdoors.html', wait_until='domcontentloaded'); px.wait_for_timeout(1200)
+        px = cx.new_page(); px.goto(f'{BASE}/c/farm-garden-tools.html', wait_until='domcontentloaded'); px.wait_for_timeout(1200)
         px.wait_for_selector('#bottom-nav', state='visible', timeout=15000)
-        check(f'{label} receives the same full-shell category view at the canonical URL', px.evaluate('location.pathname') == '/c/garden-outdoors.html' and px.locator('#bottom-nav').count() == 1 and px.locator('#stm-nav').count() == 0, px.url)
+        check(f'{label} receives the same full-shell category view at the canonical URL', px.evaluate('location.pathname') == '/c/farm-garden-tools.html' and px.locator('#bottom-nav').count() == 1 and px.locator('#stm-nav').count() == 0, px.url)
         cx.close()
     cc2 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(cc2); serve_c(cc2)
-    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/garden-outdoors.html?classic=1', wait_until='domcontentloaded'); pc2.wait_for_timeout(1200)
+    pc2 = cc2.new_page(); pc2.goto(f'{BASE}/c/farm-garden-tools.html?classic=1', wait_until='domcontentloaded'); pc2.wait_for_timeout(1200)
     pc2.wait_for_selector('#bottom-nav', state='visible', timeout=15000)
-    check('?classic=1 cannot bypass the full mobile shell on category pages', pc2.evaluate('location.pathname') == '/c/garden-outdoors.html' and pc2.locator('#bottom-nav').count() == 1)
+    check('?classic=1 cannot bypass the full mobile shell on category pages', pc2.evaluate('location.pathname') == '/c/farm-garden-tools.html' and pc2.locator('#bottom-nav').count() == 1)
     cc2.close()
     # static pages (shell-chrome.js): shell top bar + bottom nav on phones; /?tab= and /?q= open the shell
     PAGES = ['account', 'track', 'shipping', 'returns', 'contact', 'faq', 'about', 'privacy', 'terms']
@@ -615,7 +681,7 @@ with sync_playwright() as p:
     # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
     c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)
     p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_selector('#page-product.open', timeout=15000); p6.wait_for_timeout(500)
-    check('legacy /#p-... link opens the product in the mobile shell at a shareable address', p6.evaluate('location.pathname + location.search') == '/?product=home-0' and p6.locator('#bottom-nav').is_visible() and 'Hot Plate' in p6.locator('#pp-name').inner_text(), p6.url)
+    check('legacy /#p-... link opens the product in the mobile shell at a shareable address', p6.evaluate('location.pathname + location.search') == '/p/home-0.html' and p6.locator('#bottom-nav').is_visible() and 'Hot Plate' in p6.locator('#pp-name').inner_text(), p6.url)
     p6.goto(f'{BASE}/mobile-shell/'); p6.wait_for_function("location.pathname === '/'", timeout=15000)
     check('/mobile-shell/ forwards to the home page', p6.url == BASE + '/', p6.url)
     c6.close()
@@ -686,13 +752,16 @@ with sync_playwright() as p:
     c16.close()
 
     # Published SEO product pages are the read-only fallback when Supabase REST is restricted.
-    c17 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c17)
-    FAIL[0] = True  # simulate the Supabase 402 quota restriction for every REST request
+    c17 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True, service_workers='block'); mock_network(c17)
+    FAIL[0] = True  # simulate the Neon 402 quota restriction for every REST request
     fallback_html = '''<!doctype html><html><head><meta name="stm-id" content="static-fallback"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Static Fallback Sprayer","image":["https://img.test/ok.png"],"sku":"STM-TEST-402","offers":{"@type":"Offer","priceCurrency":"KES","price":1234,"availability":"https://schema.org/InStock"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"http://test/"},{"@type":"ListItem","position":2,"name":"Garden Tools","item":"http://test/c/garden-tools.html"},{"@type":"ListItem","position":3,"name":"Static Fallback Sprayer","item":"http://test/p/static-fallback.html"}]}</script></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Published description survives a database outage.</p></section></div></body></html>'''
-    c17.route('**/p/static-fallback.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=fallback_html))
+    # The homepage intentionally rewrites legacy ?product links to the static /p/ URL.
+    # Make this outage fixture a generated SEO page too, so its shell-route-loader hydrates the full app.
+    fallback_html = run_node('inject', fallback_html, 'static-fallback')
     p17 = c17.new_page(); e17 = []; p17.on('pageerror', lambda e: e17.append(str(e)))
-    p17.goto(f'{BASE}/?product=static-fallback'); p17.wait_for_selector('#page-product.open', timeout=15000); p17.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Published description survives')", timeout=5000)
-    check('product deep link opens from the published SEO page when Supabase REST returns 402', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
+    p17.route('**/p/static-fallback.html*', lambda rt: rt.fulfill(status=200, content_type='text/html', body=fallback_html))
+    p17.goto(f'{BASE}/p/static-fallback.html'); p17.wait_for_selector('#page-product.open', timeout=15000); p17.wait_for_function("document.querySelector('#pp-desc')?.textContent.includes('Published description survives')", timeout=5000)
+    check('product deep link opens from the published SEO page when Neon REST returns 402', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
     check('static fallback retains product code and full published description', 'STM-TEST-402' in p17.locator('#pp-meta').inner_text() and 'Published description survives a database outage.' in p17.locator('#pp-desc').inner_text())
     check('static product fallback has no JavaScript errors', not e17, e17[:3])
     FAIL[0] = False
@@ -715,7 +784,7 @@ with sync_playwright() as p:
 
     co = open(os.path.join(ROOT, 'checkout-deferred.js'), encoding='utf-8').read()
     check('card box is switched off until Paystack is live (CFG.card false, rCard guarded)', 'card: false,' in co and 'function rCard(b, T) {\n        if (CFG.card !== true) return;' in co)
-    check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'failed_requests': failed_requests[:3]})
+    check('no console/page errors or unexpected failed requests', not errors and not failed_requests, {'console_or_page_errors': errors[:3], 'script_404s': script_404s[:5], 'failed_requests': failed_requests[:5]})
     b.close()
 
 fails = [n for n, ok in results if not ok]

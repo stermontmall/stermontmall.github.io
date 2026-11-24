@@ -40,7 +40,9 @@ const problems = [];
 let checked = 0;
 for (const file of pages(ROOT)) {
   const rel = relative(ROOT, file).split('\\').join('/');
-  const html = readFileSync(file, 'utf8');
+  // Ignore inline JavaScript templates: their href/src strings are runtime markup, not HTML attributes.
+  // Keep each opening <script> tag so real external script src URLs are still checked.
+  const html = readFileSync(file, 'utf8').replace(/(<script\b[^>]*>)[\s\S]*?<\/script>/gi, '$1</script>');
   for (const m of html.matchAll(ATTR)) {
     const raw = decode((m[1] ?? m[2] ?? '').trim());
     if (!raw || raw.startsWith('#')) continue;

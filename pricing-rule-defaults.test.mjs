@@ -2,10 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const read = path => readFileSync(path, 'utf8');
-const admin = read('admin.html');
 const rulesUi = read('admin-publishing-rules.js');
 const bulk = read('admin-bulk.js');
-const catalog = read('catalog-v10.js');
 const photoAi = read('admin-photo-ai.js');
 const legacyUploader = read('list-products.html');
 const migration = read('database/enforce-canonical-four-tier-product-defaults.sql');
@@ -14,9 +12,7 @@ const claude = read('CLAUDE.md');
 const agents = read('AGENTS.md');
 const publishing = read('PUBLISHING_RULES.md');
 
-assert.match(admin, /admin-publishing-rules\.js/);
-assert.match(admin, /'pricing-rules'/);
-assert.match(admin, /STMPublishingRules\.mount/);
+// admin.html is now a redirect stub to neon-admin.html, so it no longer loads or mounts the rules UI.
 assert.match(rulesUi, /apirest\.c-10\.eu-central-1\.aws\.neon\.tech/);
 assert.match(rulesUi, /publishing_rules\?select=key,version,title,content,updated_at/);
 assert.match(rulesUi, /GOVERNING_KEY = 'publish_products'/);
@@ -26,11 +22,10 @@ assert.match(bulk, /baseline_cost_kes/);
 assert.match(bulk, /price: o\.price, cost: o\.cost, stock: 1000, low_at: 20, featured: false, active: false/);
 assert.doesNotMatch(bulk, /Owner rule 2026-11-02|Math\.ceil\(n \* 1\.25\)/);
 
-assert.match(catalog, /b < 20000 \? 1\.30/);
-assert.match(catalog, /b < 40000 \? 1\.25/);
-assert.match(catalog, /b <= 60000 \? 1\.20 : 1\.175/);
-assert.match(catalog, /row\.stock = 1000; row\.low_at = 20; row\.featured = false; row\.active = false/);
-assert.match(catalog, /if \(!\(row\.old_price > row\.price\)\) row\.old_price = null/);
+// catalog-v10.js was removed in the Neon migration; the four-tier multipliers live in admin-bulk.js.
+assert.match(bulk, /b < 20000 \? 1\.30/);
+assert.match(bulk, /b < 40000 \? 1\.25/);
+assert.match(bulk, /b <= 60000 \? 1\.20 : 1\.175/);
 assert.doesNotMatch(bulk, /row\.price \+ 50/);
 
 assert.match(photoAi, /official four-tier rule/i);

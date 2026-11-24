@@ -5,6 +5,7 @@
 import './seo-blog-chrome.mjs';   // 2026-11-05: shell top bar + bottom nav on every blog page (same page for everyone). Remove this line to stop.
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { normalizeCategoryLinks } from './category-link-normalizer.mjs';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const SITE = 'https://stermontarcade.co.ke';
@@ -26,6 +27,7 @@ if (!existsSync('blog')) { console.log('No blog folder - nothing to do.'); proce
 // ---- read every published post ----
 const posts = [];
 const normalizePostProductLinks = html => {
+  html = normalizeCategoryLinks(html);
   const headEnd = html.indexOf('</head>');
   if (headEnd < 0) return html;
   const head = html.slice(0, headEnd + 7);

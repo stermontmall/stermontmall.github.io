@@ -1,14 +1,25 @@
 // Shared final pass for generated customer-facing product links.
-// Rewrites visible /p/<slug>.html anchors to the mobile shell while preserving
+// Keeps visible /p/<slug>.html anchors canonical while preserving
 // canonical/OG metadata, JSON-LD, breadcrumbs and SEO-only crawl-link blocks.
+// On generated product pages (p/) it also resolves category links written inside catalogue descriptions
+// (extensionless or name-derived /c/ slugs) to a live category page, or removes the dead anchor.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
+import { normalizeCategoryLinks } from './category-link-normalizer.mjs';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 
 const ROOTS = ['p', 'c', 'guides', 'blog', 'services', 'pest-control'];
 const ROOT_FILES = ['index.html', 'products.html', 'fashion.html', 'cars-for-sale.html', 'checkout.html'];
-const rewriteBody = html => {
+// A catalogue guide or description may name a product that has no generated page (retired or never imported).
+// Keep the words but drop the dead /p/ anchor so the page never links to a missing file.
+const unlinkMissingProducts = html => html.replace(
+  /<a\b[^>]*\bhref=(["'])(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/p\/([^\/?#"']+)\.html(?:[?#][^"']*)?\1[^>]*>([\s\S]*?)<\/a>/gi,
+  (all, _q, rawSlug, label) => {
+    let slug = rawSlug; try { slug = decodeURIComponent(slug); } catch {}
+    return fs.existsSync(path.join('p', slug + '.html')) ? all : label;
+  });
+const rewriteBody = (html, categories = false, products = false) => {
   const head = [];
   let body = String(html || '').replace(/<head\b[\s\S]*?<\/head>/gi, block => { head.push(block); return ''; });
   const preserved = [];
@@ -23,6 +34,19 @@ const rewriteBody = html => {
     let slug = match[1]; try { slug = decodeURIComponent(slug); } catch {}
     return `<a${before}href=${quote}${shellProductLink(slug)}${quote}${after}>`;
   });
+  // Convert legacy human-facing homepage query links in existing guides/blogs to static product URLs.
+  // Cart actions are intentionally excluded because they are functional controls, not share/navigation links.
+  body = body.replace(/<a\b([^>]*?)\bhref=(["'])([^"']+)\2([^>]*)>([\s\S]*?)<\/a>/gi, (all, before, quote, href, after, label) => {
+    if (/\bdata-pack-cart\b/i.test(before + after)) return all;
+    const query = href.match(/^(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/\?product=([a-z0-9][a-z0-9-]*)(?:[&#].*)?$/i);
+    if (!query) return all;
+    let slug = query[1]; try { slug = decodeURIComponent(slug); } catch {}
+    return fs.existsSync(path.join('p', slug + '.html'))
+      ? '<a' + before + 'href=' + quote + shellProductLink(slug) + quote + after + '>' + label + '</a>'
+      : label;
+  });
+  if (categories) body = normalizeCategoryLinks(body);
+  if (products) body = unlinkMissingProducts(body);
   body = body.replace(/<!-- stm-preserved-(\d+) -->/g, (_m, i) => preserved[Number(i)]);
   return head.join('') + body;
 };
@@ -39,7 +63,8 @@ export function normalizeGeneratedProductPages() {
   let changed = 0;
   for (const file of files) {
     const before = fs.readFileSync(file, 'utf8');
-    const after = rewriteBody(before);
+    const top = file.split(path.sep)[0];
+    const after = rewriteBody(before, top === 'p', top === 'p' || top === 'c');
     if (after !== before) { fs.writeFileSync(file, after); changed++; }
   }
   console.log(`Normalized visible product links on ${changed} generated page(s); canonical and SEO crawl URLs preserved.`);

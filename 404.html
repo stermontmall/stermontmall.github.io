@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#7c3aed">
 <meta name="robots" content="noindex">
 <title>Page not found | Stermont Arcade</title>
-<script>/* stm-404-fallback: a product or category page is built a few minutes after it goes live. Until then GitHub Pages answers 404 for its address, so open the same item in the shop instead of a dead end. Same for every visitor; this page itself stays a real 404 and noindex. */
-(function(){try{var path=location.pathname;var oldProduct=path.match(/^\/p\/([a-z0-9][a-z0-9-]*)\.htm$/i);if(oldProduct){location.replace('/p/'+oldProduct[1]+'.html'+(location.search||'')+(location.hash||''));return;}var m=path.match(/^\/(p|c)\/([a-z0-9][a-z0-9-]*)\.html$/i);if(!m)return;location.replace('/?'+(m[1]==='p'?'product':'cat')+'='+encodeURIComponent(m[2]));}catch(e){}})();</script>
+<script>/* Legacy .htm product URLs retain a safe extension upgrade. Missing .html pages remain real 404s. */
+(function(){try{var m=location.pathname.match(/^\/p\/([a-z0-9][a-z0-9-]*)\.htm$/i);if(m)location.replace('/p/'+m[1]+'.html'+(location.search||'')+(location.hash||''));}catch(e){}})();</script>
 <link rel="icon" href="/favicon.png">
 <link rel="stylesheet" href="/pages.css">
 <meta name="description" content="The page you are looking for does not exist. Search Stermont Arcade or browse popular shopping categories across Kenya.">
@@ -19,7 +19,7 @@
 <h1>Page not found</h1>
 <p class="intro">Sorry, we could not find that page. It may have moved, or the product may no longer be available. Search the shop or browse a popular department below.</p>
 <form class="notfound-search" action="/" method="get" role="search"><label class="sr-only" for="notfound-q">Search products</label><input id="notfound-q" type="search" name="q" placeholder="Search products, brands or categories" autocomplete="off"><button type="submit">Search</button></form>
-<h2>Popular categories</h2><ul class="popular-cats"><li><a href="/c/pest-control-fumigation.html">Pest Control</a></li><li><a href="/c/agrovet.html">Agrovet</a></li><li><a href="/c/home-kitchen.html">Home &amp; Kitchen</a></li><li><a href="/c/phones-accessories.html">Electronics &amp; Phones</a></li><li><a href="/c/health-beauty.html">Health &amp; Beauty</a></li></ul>
+<h2>Popular categories</h2><ul class="popular-cats"><li><a href="/c/pest-control-fumigation.html">Pest Control</a></li><li><a href="/c/agrovet.html">Agrovet</a></li><li><a href="/c/appliances.html">Appliances</a></li><li><a href="/c/phones-tablets.html">Phones &amp; Tablets</a></li></ul>
 <p style="margin-top:1.4rem"><a class="btn btn-brand" href="/">Go to the shop</a> &nbsp; <a class="btn btn-wa" href="https://wa.me/254789514060?text=Hello%20Stermont%20Arcade%2C%20I%20could%20not%20find%20a%20product.">Ask us on WhatsApp</a></p>
 <h2>Helpful links</h2>
 <ul>
