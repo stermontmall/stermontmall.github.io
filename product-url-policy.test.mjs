@@ -19,7 +19,7 @@ assert.equal(slugifyNewProduct('Zagro Ultraxide Disinfectant and Disinfectant 5 
 assert.ok(slugifyNewProduct('Acme Brand Model ABC Pest Control Concentrate', '500 ml').split('-').length <= 7);
 assert.match(admin, /slugifyNewProduct\(suppliedSlug\|\|name,suppliedSlug\?"":unit\)/);
 assert.ok(generator.includes('<link rel="canonical" href="${SITE}${path}">'));
-assert.match(generator, /'@type': 'Product', name: p\.name, url: SITE \+ path/);
+assert.match(generator, /'@type': 'Product', name: p\.name, url: SITE \+ path/);\nassert.match(generator, /'@type': 'ProductGroup', name: p\.name, url: SITE \+ path/);\nassert.match(generator, /p\.variants \? ldGroup \+ ldOne : ldOne/);
 assert.match(generator, /offers: \{ '@type': 'Offer', url: SITE \+ path, priceCurrency: 'KES', price: Number\(Math\.round\(Number\(p\.price\)/);
 assert.match(generator, /availability: 'https:\/\/schema\.org\/' \+ \(inStock \? 'InStock' : 'OutOfStock'\)/);
 assert.match(generator, /sku: String\(p\.product_code \|\| p\.id\)/);
