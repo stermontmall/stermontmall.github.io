@@ -182,3 +182,18 @@ mos-kill-mat-vaporizer-direct-plug|https://cdn.mafrservices.com/sys-master-root/
 # restart photo pipeline with bounded requests
 # restart queue with direct results-file persistence
 # retry only products without previously verified photos
+acetak-top-700-wg-5g|https://agriguardagrovet.co.ke/product/acetak-top-700-wg/
+dimilin-25wp-100g|https://agriguardagrovet.co.ke/product/dimilin-25wp/
+k-othrine-ec-15-1l|https://agriguardagrovet.co.ke/product/k-othrine-ec-15/
+pestman-cockroach-gel-bait-10g|https://agriguardagrovet.co.ke/product/pestman-cockroach-gel-bait/
+dragnet-ft-1l|https://agriguardagrovet.co.ke/product/dragnet-ft/
+undertaker-480-ec-1l|https://agriguardagrovet.co.ke/product/undertaker-480-ec/
+matador-48-ec-1l|https://agriguardagrovet.co.ke/product/matador-48-ec/
+termidor-200ml|https://agriguardagrovet.co.ke/product/termidor-200ml/
+fendona-60-sc-250ml|https://agriguardagrovet.co.ke/product/fendona-6-sc/
+betacyde-25ec-500ml|https://agriguardagrovet.co.ke/product/betacyde-25ec-500ml/
+t-kab-300wg-100g|https://agriguardagrovet.co.ke/product/t-kab-300wg-100g/
+rapid-120ec-1l|https://agriguardagrovet.co.ke/product/rapid-120ec-500ml/
+gradometor-480-ec-250ml|https://agriguardagrovet.co.ke/product/gradometor-480-ec-250ml/
+foscap-105-gr-50g|https://agriguardagrovet.co.ke/product/foscap-105-gr/
+premise-200-sc-250ml|https://agriguardagrovet.co.ke/product/premise-200-sc/
