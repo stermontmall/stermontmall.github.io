@@ -1,7 +1,7 @@
 // Stermont Arcade — fetch, validate, JPEG-normalize and upload product photos to ImageKit.
 // Queue: data/photo-queue.txt. Results: data/photo-results.json (written by the workflow).
 // Requires IMAGEKIT_PRIVATE_KEY and the sharp package installed by the workflow.
-import { appendFileSync, readFileSync } from 'node:fs';
+import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
 
 const IK_UPLOAD = 'https://upload.imagekit.io/api/v1/files/upload';
 const IK_ENDPOINT = 'https://ik.imagekit.io/w6hxfnwmw';
@@ -235,6 +235,7 @@ async function one(line) {
 
 const results = [];
 for (const line of uniqueLines) results.push(await one(line));
+writeFileSync('data/photo-results.json', JSON.stringify(results, null, 2) + '\n');
 summary('## ImageKit photo upload — JPEG normalized');
 summary('| Result | Product | Dimensions | Verified ImageKit URL / error |');
 summary('|---|---|---|---|');
