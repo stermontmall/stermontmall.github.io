@@ -3682,5 +3682,21 @@
     "image_source": "https://www.farmrescue.co.ke/_next/image?q=75&url=https%3A%2F%2Fchantosq.nillavee.co.ke%2F%2Fimgs%2Fproducts%2FOsefin-7.5-WP.jpg&w=1920",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "senior-mousetrap-2pcs-rafiki",
+    "source": "https://cdn.othoba.com/images/thumbs/1510420_mouse-traps-that-work-indoor-plastic-snap-mice-trap-reusable-mouse-trap-easy-set-black.jpeg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/senior-mousetrap-2pcs-rafiki_vfdgwawkW.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/senior-mousetrap-2pcs-rafiki_vfdgwawkW.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 31429,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://cdn.othoba.com/images/thumbs/1510420_mouse-traps-that-work-indoor-plastic-snap-mice-trap-reusable-mouse-trap-easy-set-black.jpeg",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
