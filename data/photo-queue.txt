@@ -420,3 +420,9 @@ actellic-50ec-100ml|https://zatuma.co.ke/product/actellic-50ec-100ml-pirimiphos-
 actellic-50ec-1l|https://farmshieldkenya.co.ke/product/actellic-50ec-1-litre
 bedlam-200sl-1l|https://agropests.com/products/bedlam-200sl-1l
 premise-200sc-termiticide-1l|https://agropests.com/products/premise-200sc-termiticide-1l
+moskill-aerosol-120ml|https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-aerosol-insecticide-120ml/p/23555
+moskill-aerosol-300ml|https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-aerosol-insecticide-300ml/p/23556
+katrin-25ec-insecticide-1l|https://agropests.com/products/katrin-25ec-1l
+navigator-100sc-insecticide-1l|https://agriguardagrovet.co.ke/product/navigator-100-sc/
+mortein-aik-lemon-aerosol-180ml|https://epepea.com/public/index.php/item/5177125
+baygon-multi-purpose-spray-300ml|https://cleanshelf.online/product/baygon-multi-purpose-insect-spray-300ml
