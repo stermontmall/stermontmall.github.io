@@ -352,3 +352,11 @@ pioneer-p2848w-maize-seeds-2kg|https://agrijibu.co.ke/pioneer-p2848w-maize-seeds
 hodari-mh501-maize-seeds-2kg|https://agrijibu.co.ke/hodari-mh501-maize-seeds/
 sc-duma-419-maize-seeds-2kg|https://agrijibu.co.ke/sc-duma-419-maize-seeds-2kg/
 sc-duma-43-hybrid-maize-seeds-2kg|https://agrijibu.co.ke/brand/seed-co/
+dk8031-hybrid-maize-seeds-2kg-agropests|https://agropests.com/products/dekalb-dk-8031-maize-2kg
+dh04-hybrid-maize-seeds-2kg-sokofarm|https://www.sokofarm.com/products/product/dh-04-hybrid-maize-seed-2kg-pack/
+sc-sungura-301-maize-seeds-2kg-sokofarm|https://www.sokofarm.com/products/product/maize-seed-sc-sungura-301-2kg/
+pioneer-30g19-maize-seeds-2kg-agropests|https://agropests.com/products/pioneer-30-g19-maize-2-kg
+tomato-f1-hybrid-seed-1000-seeds-jaag|https://www.jobindoagriwealth.org/products/tomato-f1-hybrid-seed-determinate-1000
+sukuma-wiki-kale-seed-50g-jaag|https://www.jobindoagriwealth.org/shop/vegetable-seeds
+cabbage-f1-hybrid-seed-10g-jaag|https://www.jobindoagriwealth.org/shop/vegetable-seeds
+red-onion-seed-50g-jaag|https://www.jobindoagriwealth.org/shop/vegetable-seeds
