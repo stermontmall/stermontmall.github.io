@@ -27,9 +27,12 @@ for (const marker of ['href="' + '$' + '{shellProductLink(sl(p.id))}"', '$' + '{
   assert.ok(generator.includes(marker), 'product generator must use the mobile-shell helper for: ' + marker);
 }
 assert.ok(generator.includes('<a href="' + '$' + '{shellProductLink(sl(a.to))}">Continue to the product page</a>'));
-for (const file of ['seo-related-fill.mjs','seo-pest/blog-build.mjs','blog-write.mjs','seo-kenya.mjs','services/build-services.mjs','wa-float.js']) {
+for (const file of ['seo-related-fill.mjs','seo-pest/blog-build.mjs','blog-write.mjs','seo-kenya.mjs','services/build-services.mjs','wa-float.js','mobile-shell/pp-whatsapp.js']) {
   assert.ok(readFileSync(file, 'utf8').includes('shellProductLink'), file + ' must use the shared mobile-shell URL helper');
 }
+const whatsappShell = readFileSync('mobile-shell/pp-whatsapp.js', 'utf8');
+assert.ok(whatsappShell.includes("BASE + '/?product='"));
+assert.ok(!whatsappShell.includes("BASE + '/p/'"));
 assert.ok(existsSync('no-classic-hop.test.mjs'));
 
 if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
