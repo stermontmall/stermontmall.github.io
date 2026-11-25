@@ -1167,3 +1167,4 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // V8 catalogue build trigger for verified ImageKit products STM-002034 through STM-002048 (14 activated; STM-002044 awaits image).
 // V8 batch 2: rebuild pages and sitemap for eight newly activated, photo-verified PCPB-listed crop products (STM-002051–STM-002058).
 // V8 batch 3: rebuild pages and sitemap for 22 newly activated, photo-verified catalogue products (STM-002081–STM-002102).
+// V8 customer-link correction: rebuild generated pages with mobile-shell ?product= links while preserving canonical /p/ SEO documents.
