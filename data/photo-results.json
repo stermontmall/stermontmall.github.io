@@ -2884,5 +2884,81 @@
     "source": "https://imaginecare.co.ke/product/agita-1gb-fly-bait-400g/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "moskill-aerosol-120ml",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-aerosol-insecticide-120ml/p/23555",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "moskill-aerosol-300ml",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-aerosol-insecticide-300ml/p/23556",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "katrin-25ec-insecticide-1l",
+    "source": "https://agropests.com/products/katrin-25ec-1l",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/katrin-25ec-insecticide-1l_2eqG3Z8jG.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/katrin-25ec-insecticide-1l_2eqG3Z8jG.jpg",
+    "width": 205,
+    "height": 403,
+    "bytes": 18636,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2Ffe01019f250d76121ddea234d8f539aa60d99482d7a19e2fc83b0bc6e32353bb&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "navigator-100sc-insecticide-1l",
+    "source": "https://agriguardagrovet.co.ke/product/navigator-100-sc/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/navigator-100sc-insecticide-1l_dKjObk7Wq.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/navigator-100sc-insecticide-1l_dKjObk7Wq.jpg",
+    "width": 469,
+    "height": 1000,
+    "bytes": 14923,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/5.-Navigator-100-SC.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "mortein-aik-lemon-aerosol-180ml",
+    "source": "https://epepea.com/public/index.php/item/5177125",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mortein-aik-lemon-aerosol-180ml__fVvt8tRN.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mortein-aik-lemon-aerosol-180ml__fVvt8tRN.jpg",
+    "width": 376,
+    "height": 376,
+    "bytes": 12414,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/pim-content/KEN/media/product/13354/13354_main.jpg?im=Resize=376",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "baygon-multi-purpose-spray-300ml",
+    "source": "https://cleanshelf.online/product/baygon-multi-purpose-insect-spray-300ml",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/baygon-multi-purpose-spray-300ml_XDGJdGon1.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/baygon-multi-purpose-spray-300ml_XDGJdGon1.jpg",
+    "width": 999,
+    "height": 986,
+    "bytes": 34151,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://cleanshelf.online/_next/image?url=https%3A%2F%2Fstorage.e-biz.co.ke%2FHomechef%2Fproducts%2F520f68fd-64db-435d-92bb-27d85dff2f30.jpg&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
