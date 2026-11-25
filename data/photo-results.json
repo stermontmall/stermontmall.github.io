@@ -2220,5 +2220,11 @@
     "image_source": "https://www.jobindoagriwealth.org/_next/image?url=%2Fimages%2Fproducts%2Fred-onion-seed-50g-1.webp&w=1920&q=75",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "doom-powergard-odourless-insect-killer-aerosol-600ml",
+    "source": "https://www.kilimall.co.ke/listing/2864144-Mortein-Doom-Odourless-All-Insect-Killer-Spray",
+    "ok": false,
+    "error": "source page HTTP 404"
   }
 ]
