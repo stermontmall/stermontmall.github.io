@@ -12,6 +12,6 @@ assert.equal((html.match(/ssr-product-card/g) || []).length, 2);
 assert.ok(html.includes('href="https://stermontarcade.co.ke/?product=spray-1"'));
 assert.match(html, /Sprayer &amp; &lt;Nozzle&gt;/);
 assert.match(html, /KSh 1,250/);
-assert.doesNotMatch(html, /Sold Out Item|Unknown Stock Item|Unsafe Link|\?product=/);
+assert.doesNotMatch(html, /Sold Out Item|Unknown Stock Item|Unsafe Link|\/p\//);
 assert.equal(renderHomeGridFallback(rows, { limit: 0 }), '');
 console.log('OK: homepage SSR eligibility, mobile-shell product URLs, escaping and KES prices');
