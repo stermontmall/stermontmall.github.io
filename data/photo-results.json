@@ -3488,5 +3488,49 @@
     "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/baygon-multi-purp-spray-3x500ml/p/171139",
     "ok": false,
     "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "fumakilla-vape-mat-e-tablets-30-pieces-carrefour",
+    "source": "https://cdn.mafrservices.com/sys-master-root/hc0/h28/17290215391262/34396_main.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/fumakilla-vape-mat-e-tablets-30-pieces-carrefour_1y7cH0pSyU.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/fumakilla-vape-mat-e-tablets-30-pieces-carrefour_1y7cH0pSyU.jpg",
+    "width": 1700,
+    "height": 1700,
+    "bytes": 105067,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/sys-master-root/hc0/h28/17290215391262/34396_main.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "flower-liquid-vaporizer-starter-kit-45ml-carrefour",
+    "source": "https://cdn.mafrservices.com/sys-master-root/h5d/haf/17290315333662/6963_1.jpg?im=Resize%3D480%3Fim%3DResize%3D%2860%2C60%29",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-liquid-vaporizer-starter-kit-45ml-carrefour_HfKsNaWvu.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-liquid-vaporizer-starter-kit-45ml-carrefour_HfKsNaWvu.jpg",
+    "width": 1700,
+    "height": 1700,
+    "bytes": 153840,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://cdn.mafrservices.com/sys-master-root/h5d/haf/17290315333662/6963_1.jpg?im=Resize%3D480%3Fim%3DResize%3D%2860%2C60%29",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "baygon-multi-insect-killer-odourless-300ml-carrefour",
+    "source": "https://cdnprod.mafretailproxy.com/sys-master-root/h5a/h7b/16872350318622/53414_main.jpg_480Wx480H",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "goodknight-multi-insect-killer-aerosol-100ml-jumia",
+    "source": "https://www.jumia.co.ke/generic-goodknight-multi-insect-killer-aerosol-325551535.html",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
