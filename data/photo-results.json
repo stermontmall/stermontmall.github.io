@@ -2286,5 +2286,21 @@
     "source": "https://mybigorder.com/public/uploads/all/B3aYjxomeodfUaHZNQhAD0HRSQ6k7cZFnzZJLIMI.png",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "tormentor-0-05-gel-35g-alt",
+    "source": "https://sokowise-api.b-cdn.net/media/8121.jpg?etag=242293b5d641279357a5d0ec659cadbe&height=640&width=640",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/tormentor-0-05-gel-35g-alt_qUPxHs3MIN.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/tormentor-0-05-gel-35g-alt_qUPxHs3MIN.jpg",
+    "width": 640,
+    "height": 640,
+    "bytes": 55610,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://sokowise-api.b-cdn.net/media/8121.jpg?etag=242293b5d641279357a5d0ec659cadbe&height=640&width=640",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
