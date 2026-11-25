@@ -1,4 +1,10 @@
-# Stermont Arcade - tells Google to re-read the sitemaps after every page rebuild, daily, and on demand.
+# Stermont Arcade - tells Google to re-read the sitemaps.
+# Schedule (recommended practice - Google only needs a nudge when a sitemap actually changed):
+#   - once a day at 04:30 UTC, always
+#   - after a "Build product pages" run, ONLY if a sitemap file changed since the last successful ping,
+#     and at most once every COOLDOWN_HOURS (3) hours
+#   - on demand (Run workflow) and when this script or workflow changes
+# Before this change every 30-minute rebuild re-submitted all 5 sitemaps (about 20 pings an hour) even when nothing had changed.
 # Needs the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets (see seo-google-sitemaps.mjs). Does nothing until they are added.
 name: Google sitemap ping
 
@@ -17,24 +23,56 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 100
       - uses: actions/setup-node@v7
         with:
           node-version: 20
+      - name: Decide whether Google needs a ping
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          BUILD_RESULT: ${{ github.event.workflow_run.conclusion }}
+          COOLDOWN_HOURS: '3'
+        run: |
+          if [ "$EVENT" != "workflow_run" ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+            echo "Daily, manual or code-change run - pinging Google."
+            exit 0
+          fi
+          skip() { echo "go=false" >> "$GITHUB_OUTPUT"; echo "Skipping ping: $1"; exit 0; }
+          [ "$BUILD_RESULT" = "success" ] || skip "the page build did not succeed."
+          last=$(gh run list --workflow google-sitemap-ping.yml --status success --limit 1 --json createdAt --jq '.[0].createdAt // empty' || true)
+          if [ -n "$last" ]; then
+            age=$(( $(date +%s) - $(date -d "$last" +%s) ))
+            [ "$age" -ge $(( COOLDOWN_HOURS * 3600 )) ] || skip "last successful ping was only $(( age / 60 )) minutes ago (cooldown ${COOLDOWN_HOURS}h)."
+            since="$last"
+          else
+            since="24 hours ago"
+          fi
+          changed=$(git log --since="$since" --format=%h -n 1 -- '*sitemap*.xml')
+          [ -n "$changed" ] || skip "no sitemap changed since the last ping."
+          echo "go=true" >> "$GITHUB_OUTPUT"
+          echo "Sitemap changed since $since (commit $changed) - pinging Google."
       - name: Wait for GitHub Pages to publish
+        if: steps.gate.outputs.go == 'true'
         run: sleep 120
       - name: Submit sitemaps to Google Search Console
+        if: steps.gate.outputs.go == 'true'
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           GSC_PROPERTY: ${{ secrets.GSC_PROPERTY }}
         run: node seo-google-sitemaps.mjs
       - name: Store Google sitemap submission results in Neon
-        if: always() && hashFiles('google-sitemap-results.json') != ''
+        if: always() && steps.gate.outputs.go == 'true' && hashFiles('google-sitemap-results.json') != ''
         env:
           NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
         run: |
