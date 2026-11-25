@@ -3896,5 +3896,11 @@
     "image_source": "https://www.greenlife.co.ke/wp-content/uploads/2023/07/Termiguard-.png",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "bird-spikes-pigeon-deterrent-20-pack",
+    "source": "https://www.desertcart.co.ke/products/515117126-bird-spikes-20-pack-pigeon-spikes-high-thorn-bird-spikes",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
