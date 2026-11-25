@@ -1,3 +1,4 @@
+// Rebuild requested after V8 product activation on 2026-11-25; no runtime behavior change.
 // 2026-11-18: rebuild product pages after normalising Fumigation Chemicals descriptions and product FAQ structured data.
 // 2026-11-18: rebuild after canonical legacy-label mapping, overview cleanup, and pesticide decimal-safe paragraph splitting.
 // Rebuild requested 2026-11-17: publish the new editorial introductions for all indexable category pages.
