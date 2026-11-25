@@ -3848,5 +3848,21 @@
     "image_source": "https://www.bioderma.co.ke/wp-content/uploads/2025/12/1-913.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "animal-pest-cage-trap-1pc",
+    "source": "https://www.bioderma.co.ke/product/animal-pest-cage-trap-pest-control-catch-rat-mouse-live-animal-pest-rodent-mice/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/animal-pest-cage-trap-1pc_mUPxP8R-G.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/animal-pest-cage-trap-1pc_mUPxP8R-G.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 50714,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.bioderma.co.ke/wp-content/uploads/2025/12/1-947.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
