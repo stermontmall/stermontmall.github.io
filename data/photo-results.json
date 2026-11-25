@@ -3746,5 +3746,21 @@
     "image_source": "https://cheapdeals.co.ke/wp-content/uploads/2024/09/Tomcat-All-Weather-Blox-Rat-Poison-600x360.webp",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "storm-secure-block-20g-agropests",
+    "source": "https://assets.agropests.com/Products/76dfafd39b197d705e424dd6fce419204a1c879fb3ea525e243417b97359e796?format=auto&quality=75&width=3840",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/storm-secure-block-20g-agropests_U4wZx0dUry.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/storm-secure-block-20g-agropests_U4wZx0dUry.jpg",
+    "width": 3840,
+    "height": 2317,
+    "bytes": 326328,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://assets.agropests.com/Products/76dfafd39b197d705e424dd6fce419204a1c879fb3ea525e243417b97359e796?format=auto&quality=75&width=3840",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
