@@ -372,3 +372,17 @@ rat-kill-pellets-600g|https://ik.imagekit.io/w6hxfnwmw/products/rat-kill-pellets
 # rebuild catalog after Rat Kill Pellets 600g activation
 tormentor-0-05-gel-35g|https://mybigorder.com/public/uploads/all/B3aYjxomeodfUaHZNQhAD0HRSQ6k7cZFnzZJLIMI.png
 tormentor-0-05-gel-35g-alt|https://sokowise-api.b-cdn.net/media/8121.jpg?etag=242293b5d641279357a5d0ec659cadbe&height=640&width=640
+promax-bedbug-spray-100ml|https://kejanicleaning.co.ke/shop/pest-control/promax-bedbug-spray-100ml/
+goodknight-insecticide-aerosol-600ml|https://kejanicleaning.co.ke/shop/pest-control/goodknight-m-insect-aerosol-600ml/
+moskill-aerosol-insecticide-300ml|https://kejanicleaning.co.ke/shop/pest-control/moskill-aerosol-insecticide-insecticide-spray-300ml/
+raid-led-liquid-mosquito-killer-refill-33ml|https://kejanicleaning.co.ke/shop/pest-control/raid-led-liquid-electric-mosquito-killer-33ml/
+flower-mossi-chip-sandal-30g|https://kejanicleaning.co.ke/shop/pest-control/flower-mossi-chip-sandal-30g/
+flower-liquid-mosquito-repellent-refill-45ml|https://kejanicleaning.co.ke/shop/pest-control/flower-liquid-mosquito-repellent-45ml-refill-pack/
+flower-mossi-mats-30g|https://kejanicleaning.co.ke/shop/pest-control/flower-floral-scented-mossi-chips-mosquito-killer-mats-30g/
+bat-repellant-powder-250g|https://kejanicleaning.co.ke/shop/pest-control/bat-repellant-powder-250grams/
+sevin-dudu-dust-100g|https://kejanicleaning.co.ke/shop/pest-control/sevin-dudu-dust-insecticide-100g/
+invincible-velcro-window-mosquito-net|https://kejanicleaning.co.ke/shop/pest-control/invincible-velcro-windows-mosquito-net/
+bat-repellent-crp-250ml|https://kejanicleaning.co.ke/shop/pest-control/bat-repellent-crp-heavy-duty-chemical-250ml/
+snail-cct-snail-control-solution-1l|https://kejanicleaning.co.ke/shop/pest-control/snail-cct-snail-control-solution-1litre/
+mosquito-killer-stick-jumbo-30g|https://kejanicleaning.co.ke/shop/pest-control/mosquito-killer-stick-jumbo-30g/
+insecticide-chalk-twin-luck-15g|https://kejanicleaning.co.ke/shop/pest-control/insecticide-chalk-twin-luck-15gm/
