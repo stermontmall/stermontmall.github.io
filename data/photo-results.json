@@ -3762,5 +3762,11 @@
     "image_source": "https://assets.agropests.com/Products/76dfafd39b197d705e424dd6fce419204a1c879fb3ea525e243417b97359e796?format=auto&quality=75&width=3840",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "nova-diatomaceous-earth-1kg",
+    "source": "https://imaginecare.co.ke/product/diatomaceous-earth-1kg/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
