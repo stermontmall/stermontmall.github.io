@@ -1,12 +1,12 @@
-/* Canonical static product URL helper. Product pages are generated at /p/<slug>.html. */
-(function (root, factory) {
-  var helper = factory();
-  if (typeof module === 'object' && module.exports) module.exports = helper;
-  if (root) root.shellProductLink = helper;
-}(typeof globalThis !== 'undefined' ? globalThis : this, function () {
-  return function shellProductLink(slug) {
-    var value = String(slug == null ? '' : slug).trim();
-    if (!/^[a-z0-9][a-z0-9-]*$/i.test(value)) return 'https://stermontarcade.co.ke/';
-    return 'https://stermontarcade.co.ke/p/' + encodeURIComponent(value) + '.html';
-  };
-}));
+'use strict';
+
+// Customer-facing product links must open the mobile shop shell.
+// The /p/<slug>.html documents remain published separately as canonical,
+// indexable SEO pages; they are not the destination for customer actions.
+function shellProductLink(slug) {
+  const value = String(slug || '').trim().replace(/^\/+|\/+$/g, '');
+  if (!value) return 'https://stermontarcade.co.ke/';
+  return 'https://stermontarcade.co.ke/?product=' + encodeURIComponent(value);
+}
+
+module.exports = { shellProductLink };
