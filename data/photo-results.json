@@ -2722,5 +2722,121 @@
     "source": "https://totaleaseventures.co.ke/product/rat-poison-300g/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "baraki-pellets-500g",
+    "source": "https://totaleaseventures.co.ke/product/baraki-pellets-rat-poison-500g/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "agita-1gb-fly-bait-20g",
+    "source": "https://agroduka.ke/agita-1gb-fly-bait/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/agita-1gb-fly-bait-20g_z2kAb9Xql.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/agita-1gb-fly-bait-20g_z2kAb9Xql.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 29631,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/10/Agita_1GB_Fly_Bait.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "actellic-300cs-833ml",
+    "source": "https://totaleaseventures.co.ke/product/actellic-300cs-insecticide/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "actellic-50ec-100ml",
+    "source": "https://totaleaseventures.co.ke/product/actellic-50ec-100ml/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "actellic-50ec-1l",
+    "source": "https://totaleaseventures.co.ke/product/actellic-50ec-insecticide-1l/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "bedlam-200sl-1l",
+    "source": "https://totaleaseventures.co.ke/product/bedlam-200sl-1litre-insecticide/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "atom-25ec-1l",
+    "source": "https://agroduka.ke/atom/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/atom-25ec-1l_8wl_9B_O3.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/atom-25ec-1l_8wl_9B_O3.jpg",
+    "width": 530,
+    "height": 630,
+    "bytes": 17027,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/detailed/8/Atom202.5EC.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "rodilon-wax-blocks-1kg",
+    "source": "https://lachlankenya.com/product/rodilon-wax-blocks/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/rodilon-wax-blocks-1kg_RKRkEkurl.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/rodilon-wax-blocks-1kg_RKRkEkurl.jpg",
+    "width": 1181,
+    "height": 1181,
+    "bytes": 135670,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://lachlankenya.com/wp-content/uploads/2024/11/Rodilon.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "premise-200sc-termiticide-1l",
+    "source": "https://totaleaseventures.co.ke/product/premise-200sc-termiticide-1l/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "termidor-96sc-1l",
+    "source": "https://kuzaagrochem.com/products/termidor-1l-569",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/termidor-96sc-1l_Ur7cP0kpw.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/termidor-96sc-1l_Ur7cP0kpw.jpg",
+    "width": 450,
+    "height": 600,
+    "bytes": 25604,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://cdn.kuzaagrochem.com/products/kuza-1789059695058-660737537.webp",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "goodknight-insect-aerosol-600ml",
+    "source": "https://epepea.com/public/index.php/item/5597218",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/goodknight-insect-aerosol-600ml_Kmv1mw34g.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/goodknight-insect-aerosol-600ml_Kmv1mw34g.jpg",
+    "width": 376,
+    "height": 376,
+    "bytes": 9734,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/sys-master-root/h7d/h65/12456977661982/65401_Main.jpg?im=Resize=376",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
