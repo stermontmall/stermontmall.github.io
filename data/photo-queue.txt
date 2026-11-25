@@ -369,3 +369,4 @@ bipronex-cockroach-gel-bait-5g-imaginecare-image|https://imaginecare.co.ke/wp-co
 tatua-zyrox-fly-bait-20g|https://agropests.com/products/tatua-zyrox-fly-bait-granular-20g
 tatua-advion-cockroach-gel-30g|https://www.jumia.co.ke/syngenta-tatuaa-advion-cockroach-gel-bait-1-x-30-gm-tube-170201874.html
 rat-kill-pellets-600g|https://ik.imagekit.io/w6hxfnwmw/products/rat-kill-pellets-600g_jAwnOaor29.jpg
+# rebuild catalog after Rat Kill Pellets 600g activation
