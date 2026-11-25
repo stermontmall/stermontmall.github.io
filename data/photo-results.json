@@ -3416,5 +3416,77 @@
     "source": "https://hypa.africa/images/thumbnails/400/400/detailed/21/rDsT_GL73AOBtmvMpwOPe0lA8j9d6vLyufXZQ5-woTU.png",
     "ok": false,
     "error": "source page HTTP 404"
+  },
+  {
+    "name": "flower-mosquito-stick-regular-20g-carrefour",
+    "source": "https://cdn.mafrservices.com/sys-master-root/h11/h9e/17290315857950/6954_main.jpg?im=Resize%3D480",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-mosquito-stick-regular-20g-carrefour_BQ6d5gBqH.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-mosquito-stick-regular-20g-carrefour_BQ6d5gBqH.jpg",
+    "width": 480,
+    "height": 480,
+    "bytes": 16277,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://cdn.mafrservices.com/sys-master-root/h11/h9e/17290315857950/6954_main.jpg?im=Resize%3D480",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "flower-dudspray-insect-spray-500ml-jumia",
+    "source": "https://www.jumia.co.ke/duduspray-natural-insect-spray-500ml-flower-mpg10343864.html",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "flower-liquid-vaporizer-starter-kit-45ml-kapi",
+    "source": "https://www.africa2trust.com/B/ProductPics/ProdGallery2226-314613248.png",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "mortein-doom-aerosol-twin-2x400ml-carrefour",
+    "source": "https://cdn.mafrservices.com/pim-content/KEN/media/product/185421/1758031204/185421_main.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mortein-doom-aerosol-twin-2x400ml-carrefour_YyqBIXrbt.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mortein-doom-aerosol-twin-2x400ml-carrefour_YyqBIXrbt.jpg",
+    "width": 1700,
+    "height": 1700,
+    "bytes": 168425,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/pim-content/KEN/media/product/185421/1758031204/185421_main.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "moskill-mat-insecticide-30s-carrefour",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-mat-insecticide-30s/p/23558",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "flower-3pin-electric-chips-mossichip-regular-kit",
+    "source": "https://cdn.mafrservices.com/pim-content/KEN/media/product/254777/1781618403/254777_main.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-3pin-electric-chips-mossichip-regular-kit_Ybkzl_ZJs.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-3pin-electric-chips-mossichip-regular-kit_Ybkzl_ZJs.jpg",
+    "width": 1700,
+    "height": 1700,
+    "bytes": 197495,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/pim-content/KEN/media/product/254777/1781618403/254777_main.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "baygon-multi-insect-killer-spray-500ml-3pack-carrefour",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/baygon-multi-purp-spray-3x500ml/p/171139",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
   }
 ]
