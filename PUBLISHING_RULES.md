@@ -1,6 +1,5 @@
-
 STERMONT ARCADE — FULLY AUTONOMOUS PRODUCT DISCOVERY & LIVE PUBLISHING
-PERMANENT STANDING INSTRUCTION — NEON PUBLISHING RULES VERSION 6 (PHOTO QUEUE PIPELINE)
+PERMANENT STANDING INSTRUCTION — NEON PUBLISHING RULES VERSION 8 (PHOTO QUEUE WORKFLOW)
 
 CRITICAL EXECUTION MANDATE (NO STOPPING / NO QUESTIONS):
 - NEVER stop mid-batch to ask the user questions, request confirmation, or halt over minor technical barriers.
@@ -25,7 +24,7 @@ CRITICAL EXECUTION MANDATE (NO STOPPING / NO QUESTIONS):
 - Save baseline_cost, source_url, source_website, and date_researched.
 - Insert baseline_cost only so Neon's price_4tier(cost) trigger calculates the selling price (<20k: +30%, 20k-39,999: +25%, 40k-60k: +20%, >60k: +17.5%, min 15% margin, rounded to nearest KSh 50, min price KSh 200).
 
-5. VERSION 6 IMAGEKIT PHOTO PIPELINE
+5. VERSION 8 IMAGEKIT PHOTO PIPELINE
 - All web image formats (JPG, JPEG, PNG, WebP, AVIF) are accepted and auto-converted to .jpg by our GitHub sharp uploader; however, any source URL blocked by anti-bot protection (returning HTML instead of an image) is rejected and must immediately be replaced with an alternate working product image URL.
 - Source genuine, clear product photos matching the exact brand, product, and pack size from reliable manufacturers, distributors, or trusted Kenyan e-commerce sites (Jumia, Kilimall, Agropests, AgriGuard, ProCapital, etc.).
 - Accept genuine JPG, JPEG, PNG, WebP and AVIF source images. Non-JPEG source URLs are allowed; do not reject a source merely because its URL extension or source format is not .jpg. The uploader validates source dimensions and ensures the normalized JPEG output is at least 200 x 200 pixels.
@@ -72,3 +71,10 @@ MANDATORY PHOTO QUEUE + ACTIVATION SAFETY (2026-11-23):
 - Canonical required examples: /c/pest-control-fumigation.html, /c/agrovet.html, and /c/general-merchandise.html. Map the obsolete /c/agrovet-and-farm-supplies path to /c/agrovet.html.
 - Before publishing, validate every relative or absolute internal category URL in description against the generated c/*.html files and ensure the target category contains active products. If a child category is empty, use its verified active parent category from category-parent-map.json; if no live parent exists, remove the link while preserving readable anchor text.
 - Apply the same normalization during product-page generation and to the stored Neon description so the catalogue source and generated /p/*.html pages remain consistent.
+
+12. VERSION 8 PUBLISHING WORKFLOW (DEFAULT FOR EVERY PRODUCT PUBLISHING REQUEST — 2026-11-25)
+- This is the default workflow for all product publishing unless the user explicitly asks for a different one. It runs on .github/workflows/upload-product-photos.yml.
+- Order of work: (1) discover products and verify baseline cost and duplicates; (2) append one line per product to data/photo-queue.txt on main in the form file-name|image-or-product-page-URL (a direct image URL or a product page URL, file-name| prefix optional, max 40 lines); (3) the push starts the workflow; (4) wait for it, then read data/photo-results.json; (5) insert the products into Neon using only entries with ok=true and their verified ImageKit browser_url; (6) in a separate statement set active = true, low_at = 50 for exactly the inserted IDs; (7) verify, write admin_audit_log entries and output the summary report.
+- The queue is append-only: the workflow processes only the lines added by the latest push to data/photo-queue.txt. Never rewrite or reorder earlier lines.
+- The workflow only uploads photos to ImageKit, normalizes them to JPEG and records results; it NEVER changes Neon. All Neon inserts and updates are done by the assistant after the results are read.
+- Never invent ImageKit URLs and never infer success from a queue commit. If a photo fails, try another source image and add a new queue line; do not publish that product without a verified photo.
