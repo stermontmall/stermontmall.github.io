@@ -562,3 +562,5 @@ supakill-aerosol-150ml-agropests|https://agropests.com/products/supakill-aerosol
 moskill-aerosol-120ml-mtolori|https://mtolori.com/product/details/moskill-aerosol-120ml-2130
 raid-it-multipurpose-insect-spray-180ml-mtolori|https://mtolori.com/product/details/raid-it-multipurpose-insect-spray-180ml-5684
 raid-it-multipurpose-insect-spray-300ml-mtolori|https://mtolori.com/product/details/raid-it-multipurpose-insect-spray-300ml-5685
+moskill-aerosol-120ml-epepea|https://www.epepea.com/public/item/9371664
+raid-it-multipurpose-insect-spray-180ml-epepea|https://www.epepea.com/public/item/9676262
