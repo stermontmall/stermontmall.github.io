@@ -2598,5 +2598,11 @@
     "source": "https://cheapthings.co.ke/product/rat-snap-trap/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "guardian-rodent-bait-station-1pc",
+    "source": "https://imaginecare.co.ke/product/guardian-rodent-bait-station-1pcs/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
