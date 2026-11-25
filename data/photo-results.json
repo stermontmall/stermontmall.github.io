@@ -1462,5 +1462,37 @@
     "image_source": "https://agroduka.ke/images/thumbnails/240/240/detailed/10/510260490_1170240228457572_2515645769082922658_n.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "mazao-flourish-1l",
+    "source": "https://agroduka.ke/mazao-flourish-1l/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mazao-flourish-1l_NzAXDdjTo.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mazao-flourish-1l_NzAXDdjTo.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 26669,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/flourish-website.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "cropgrow-super-k-40-1l",
+    "source": "https://agroduka.ke/cropgrow-super-k-40/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/cropgrow-super-k-40-1l_7ez_yYVWO.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/cropgrow-super-k-40-1l_7ez_yYVWO.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 39739,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/10/super_k40_npod-5k.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
