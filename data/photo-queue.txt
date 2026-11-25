@@ -307,3 +307,5 @@ solunop-potassium-nitrate-25kg|https://agroduka.ke/potassium-nitrate-solunop-25k
 dolomitic-lime-50kg|https://agroduka.ke/granular-fertilizers/
 folia-k-1l|https://agroduka.ke/crop-production/page-3/?items_per_page=64&sort_by=timestamp&sort_order=desc
 sure-n-npk-46-8-6-1l|https://agroduka.ke/popular-products/?page=2&sort_by=price&sort_order=asc
+mazao-flourish-1l|https://agroduka.ke/mazao-flourish-1l/
+cropgrow-super-k-40-1l|https://agroduka.ke/cropgrow-super-k-40/
