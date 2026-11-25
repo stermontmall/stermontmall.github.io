@@ -2006,5 +2006,91 @@
     "image_source": "https://agrijibu.co.ke/wp-content/uploads/2026/01/Falcon-ETG-M-401-Maize-seeds-300x300.avif",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "dkc80-33-hybrid-maize-seeds-2kg-alt",
+    "source": "https://agropests.com/products/dekalb-dkc-80-33-dk-8033-maize-2-kg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/dkc80-33-hybrid-maize-seeds-2kg-alt_k6OiEE1Fx.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/dkc80-33-hybrid-maize-seeds-2kg-alt_k6OiEE1Fx.jpg",
+    "width": 200,
+    "height": 249,
+    "bytes": 14119,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F233c2ca11c5c3383ed0813232729741c7ca518e1a36af3f4ceaf55ae6997f7b3&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "dkc90-89-hybrid-maize-seeds-2kg-alt",
+    "source": "https://kilimokona.co.ke/shop/crop-production/seeds/maize/dkc90-89-hybrid-maize-2kg/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "dk8031-hybrid-maize-seeds-2kg-alt",
+    "source": "https://imaginecare.co.ke/product/dk-8031-hybrid-maize-seeds-2kg/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "pioneer-p3812-maize-seeds-2kg-alt",
+    "source": "https://www.mtolori.com/product/details/maize-pioneer-3812-2kg-12262",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "boma-rhodes-grass-seeds-1kg-alt",
+    "source": "https://agroduka.ke/boma-rhodes/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/boma-rhodes-grass-seeds-1kg-alt_iSqUihoml.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/boma-rhodes-grass-seeds-1kg-alt_iSqUihoml.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 48356,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/8/Boma_Rhode_1.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "sc-punda-milia-555-maize-seeds-2kg",
+    "source": "https://agrijibu.co.ke/sc-punda-milia-555-maize-seeds-2kg/",
+    "ok": false,
+    "error": "fetch failed"
+  },
+  {
+    "name": "sc-tembo-73-hybrid-maize-seeds-2kg",
+    "source": "https://agrijibu.co.ke/sc-tembo-73-hybrid-maize-seeds-2kg/",
+    "ok": false,
+    "error": "fetch failed"
+  },
+  {
+    "name": "pioneer-p2848w-maize-seeds-2kg",
+    "source": "https://agrijibu.co.ke/pioneer-p2848w-maize-seeds-2kg/",
+    "ok": false,
+    "error": "fetch failed"
+  },
+  {
+    "name": "hodari-mh501-maize-seeds-2kg",
+    "source": "https://agrijibu.co.ke/hodari-mh501-maize-seeds/",
+    "ok": false,
+    "error": "fetch failed"
+  },
+  {
+    "name": "sc-duma-419-maize-seeds-2kg",
+    "source": "https://agrijibu.co.ke/sc-duma-419-maize-seeds-2kg/",
+    "ok": false,
+    "error": "fetch failed"
+  },
+  {
+    "name": "sc-duma-43-hybrid-maize-seeds-2kg",
+    "source": "https://agrijibu.co.ke/brand/seed-co/",
+    "ok": false,
+    "error": "fetch failed"
   }
 ]
