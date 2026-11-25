@@ -1181,3 +1181,4 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 
 // V8 catalogue rebuild trigger: new verified rodent-control products activated on 2026-11-25.
 // V8 catalogue rebuild trigger: Tomcat All Weather Blox 28g activated in Neon on 2026-11-25.
+// V8 catalogue rebuild trigger: Storm Secure Block 20g activated in Neon on 2026-11-25.
