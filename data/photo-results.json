@@ -2266,19 +2266,9 @@
     "error": "source page HTTP 403"
   },
   {
-    "name": "tatua-zyrox-fly-bait-20g",
-    "source": "https://agropests.com/products/tatua-zyrox-fly-bait-granular-20g",
-    "ok": true,
-    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/tatua-zyrox-fly-bait-20g_j0Gjk3cJ1.jpg",
-    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/tatua-zyrox-fly-bait-20g_j0Gjk3cJ1.jpg",
-    "width": 264,
-    "height": 538,
-    "bytes": 22652,
-    "content_type": "image/jpeg",
-    "original_format": "jpg",
-    "converted_from": "image/webp",
-    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F82a3bfef053bf33b473d57c6b975082650a3d57307dd979e01b6aff8fba541c9&w=3840&q=75",
-    "http_status": 200,
-    "image_found_via": "product-page"
+    "name": "tatua-advion-cockroach-gel-30g",
+    "source": "https://www.jumia.co.ke/syngenta-tatuaa-advion-cockroach-gel-bait-1-x-30-gm-tube-170201874.html",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
