@@ -78,3 +78,9 @@ MANDATORY PHOTO QUEUE + ACTIVATION SAFETY (2026-11-23):
 - The queue is append-only: the workflow processes only the lines added by the latest push to data/photo-queue.txt. Never rewrite or reorder earlier lines.
 - The workflow only uploads photos to ImageKit, normalizes them to JPEG and records results; it NEVER changes Neon. All Neon inserts and updates are done by the assistant after the results are read.
 - Never invent ImageKit URLs and never infer success from a queue commit. If a photo fails, try another source image and add a new queue line; do not publish that product without a verified photo.
+
+
+13. INSTANT INDEXING AFTER PUBLISHING (2026-11-25)
+- As soon as the products are verified live in Neon (step 12, items 6 and 7), ALWAYS trigger an instant rebuild instead of waiting for the 30-minute schedule: gh api -X POST repos/stermontmall/stermontmall.github.io/dispatches -f event_type=catalog-changed. This starts the Build product pages workflow, which builds the /p/ pages and sitemap-products.xml and sends the changed URLs to IndexNow (Bing and others). When it finishes it automatically starts Google sitemap ping, which resubmits the sitemaps to Google Search Console.
+- If gh is unavailable or not logged in, send the same event with the GitHub REST API: POST /repos/stermontmall/stermontmall.github.io/dispatches with body {"event_type":"catalog-changed"}. If the dispatch cannot be sent, do not stop the batch: the 30-minute schedule rebuilds anyway; say so in the report.
+- Wait for the Build product pages run, confirm it succeeded, and add one line to the final report: indexing triggered, with the run link. Never edit .github/workflows/product-pages.yml.

@@ -1,3 +1,8 @@
+## 2026-11-25 16:55 (Africa/Nairobi) - Instant indexing after product publishing (branch `wip-index-after-publish`)
+- Done: added section 13 to `PUBLISHING_RULES.md` and to Neon `publishing_rules` (key `publish_products`): after products go live, send `repository_dispatch` event `catalog-changed` so Build product pages runs at once (IndexNow), then Google sitemap ping follows via workflow_run. Backup: `archive.publishing_rules_indexing_backup_20261125`.
+- Not verified: the sandbox `GH_TOKEN` is invalid, so the dispatch was not tested from here. Test: `gh api -X POST repos/stermontmall/stermontmall.github.io/dispatches -f event_type=catalog-changed`.
+- Rollback: restore `content` from the archive table by key.
+
 ## 2026-11-23 13:40 (Africa/Nairobi) — Indexing guard test updated for ImageKit (branch `wip-indexing-guard-imagekit`, NOT merged)
 
 ### Done
