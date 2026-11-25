@@ -3724,5 +3724,11 @@
     "source": "https://imaginecare.co.ke/wp-content/uploads/2019/05/fuko-kil-6-600x800.jpg?v=1684479529",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "mechanical-draft-rodent-trap-round-imaginecare",
+    "source": "https://imaginecare.co.ke/wp-content/uploads/2018/10/Reusable-Rat-Mouse-Trap-2.jpeg",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
