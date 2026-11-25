@@ -529,3 +529,4 @@ aico-4-stroke-engine-knapsack-sprayer-powerx|https://powerxtoolske.com/products/
 amiran-knapsack-sprayer-16l-agroduka|https://agroduka.ke/amiran-knapsack-sprayer-16l/
 greenlife-star-battery-manual-16l-agroduka|https://agroduka.ke/greenlife-star-battery-and-manual/
 turbo-tr20-2-in-1-agricultural-sprayer-powerx|https://powerxtoolske.com/collections/sprayers/products/turbo-tr20-2-in-1-agricultural-sprayer-manual-battery-operated
+greenlife-star-battery-manual-18l-agropests|https://agropests.com/products/greenlife-star-pump-18l
