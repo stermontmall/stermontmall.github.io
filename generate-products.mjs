@@ -1,3 +1,4 @@
+// V8 rodent-control catalogue refresh 2026-11-25: CYFAZA Mouse Traps 4-Pack activated in Neon; no generator behavior change.
 // V8 pest-control publication refresh 2026-11-25: Sevin Dudu Dust 100g and Raid LED Liquid Mosquito Killer Refill 33ml activated in Neon; no runtime behavior change.
 // V8 pest-control publication refresh 2026-11-25: Doom Powergard Odourless 600ml activated with verified ImageKit photo; no runtime behavior change.
 // V8 pest-control publication refresh 2026-11-25: Agita 10WG 80g activated in Neon; no runtime behavior change.
