@@ -3584,5 +3584,39 @@
     "source": "https://totaleaseventures.co.ke/product/chali-dudu-dust-200g/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "greenlife-rodent-bait-station-1pc",
+    "source": "https://imaginecare.co.ke/product/rodent-bait-station/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "fuko-kil-25g-agropests",
+    "source": "https://agropests.com/products/fuko-kil-fuko-kil-25g",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/fuko-kil-25g-agropests_R3QFdgu0b.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/fuko-kil-25g-agropests_R3QFdgu0b.jpg",
+    "width": 220,
+    "height": 200,
+    "bytes": 11829,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F74c04489c9f4a56a21c0f77b46b37e3ca59b1c5021b397a6a019e090ead227e2&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "fuko-kil-300g-cheapthings",
+    "source": "https://cheapthings.co.ke/product/fuko-kil-300g/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "rat-mouse-glue-board-1pc-imaginecare",
+    "source": "https://imaginecare.co.ke/product/rat-mouse-glue-board/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
