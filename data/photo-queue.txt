@@ -278,3 +278,16 @@ map-fertiliser-25kg|https://agroduka.ke/map-fertiliser-25kg/
 mop-fertilizer-50kg|https://agroduka.ke/mop-fertilizer-50kg/
 thabiti-npk-17-17-17-50kg|https://agroduka.ke/thabiti-npk-17-17-17-fertilizer-50kg/
 tsp-fertilizer-50kg|https://agroduka.ke/tsp-fertilizer-50kg/
+agromaster-25kg-15-24-10|https://agroduka.ke/agromaster-25kg/?variation_id=1824
+esta-kieserit-magnesium-sulphate-50kg|https://agroduka.ke/esta-kieserit-magnesium-sulphate-50kg/
+korn-kali-50kg|https://agroduka.ke/korn-kali-50kg/
+yarabela-can-50kg|https://agroduka.ke/yarabela-can/
+yarabela-sulfan-50kg|https://agroduka.ke/yarabela-sulfan-50kg/
+yaraliva-nitrabor-25kg|https://agroduka.ke/yaraliva-nitrabor-25kg/
+yaramila-25-5-5-5s-50kg|https://agroduka.ke/yaramila-25-5-55s-50kg/
+npk-23-23-0-falcon-50kg|https://agroduka.ke/npk-23-23-0-falcon-50kg/
+yaratera-calcinit-25kg|https://agroduka.ke/yaratera-calcinit-25kg/
+urea-falcon-50kg|https://agroduka.ke/crop-production/page-2/?items_per_page=64&sort_by=timestamp&sort_order=desc
+potassium-nitrate-kynoch-25kg|https://agroduka.ke/fertigation-fertilizers/
+dap-fertilizer-amiran|https://agroduka.ke/amiran-kenya/?category_id=272
+yararega-18-4-19-25kg|https://agroduka.ke/yararega-18-4-19-25kg/
