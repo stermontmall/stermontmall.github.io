@@ -3880,5 +3880,21 @@
     "image_source": "https://clearancewarehouse.co.ke/product-images/for-your-home/stainless-steel-bird-spikes/main-1.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "termiguard-200-sl-1l",
+    "source": "https://www.greenlife.co.ke/product/termiguard-200-sl/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/termiguard-200-sl-1l_fIsmDFz8u.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/termiguard-200-sl-1l_fIsmDFz8u.jpg",
+    "width": 4000,
+    "height": 4000,
+    "bytes": 446865,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://www.greenlife.co.ke/wp-content/uploads/2023/07/Termiguard-.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
