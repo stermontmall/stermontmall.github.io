@@ -556,3 +556,9 @@ chali-dudu-dust-100g-epepea|https://epepea.com/public/index.php/item/5177827
 mendeclean-bait-gel-10g-kejani|https://kejanicleaning.co.ke/shop/pest-control/imidex-mendeclean-bait-gel-10gm/
 stop-vermin-powder-100g-rafiki|https://shop.rafikipestcontrol.com/products/stop-vermin-powder
 agita-1gb-fly-bait-20g-agroduka|https://agroduka.ke/agita-1gb-fly-bait/
+i-clipse-100cs-75ml-agropests|https://agropests.com/products/i-clipse-100cs
+i-clipse-100cs-1l-agropests|https://agropests.com/products/i-clipse-100cs-1l
+supakill-aerosol-150ml-agropests|https://agropests.com/products/supakill-aerosol-spray-150ml
+moskill-aerosol-120ml-mtolori|https://mtolori.com/product/details/moskill-aerosol-120ml-2130
+raid-it-multipurpose-insect-spray-180ml-mtolori|https://mtolori.com/product/details/raid-it-multipurpose-insect-spray-180ml-5684
+raid-it-multipurpose-insect-spray-300ml-mtolori|https://mtolori.com/product/details/raid-it-multipurpose-insect-spray-300ml-5685
