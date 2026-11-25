@@ -1,3 +1,10 @@
+## 2026-11-25 23:10 (Africa/Nairobi) - Auto-refresh catalog-snapshot.json (branch `wip-catalog-snapshot-auto`, PR open, NOT merged)
+- Why: `catalog-snapshot.json` (the shop's fallback when the browser cannot read Neon) held 136 products from 2026-11-23, but Neon now has 428 (all in stock).
+- Done: added `catalog-snapshot.mjs` (exports `storefront_products` + `categories` from Neon in the same file shape; refuses to overwrite if Neon returns <20 products or under half of the file) and `.github/workflows/catalog-snapshot.yml` (daily 05:15 Nairobi, after each successful Build product pages run, or manual; commits only when something changed; needs the existing `NEON_DATABASE_URL` secret).
+- Tested here only with a stubbed Neon driver (identical round-trip, write, safety guard, missing env). Not run against real Neon: the sandbox cannot reach the database.
+- Next: merge the PR, then run it once: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/catalog-snapshot.yml/dispatches -f ref=main` (or Actions tab > Catalog snapshot > Run workflow). Expect `Wrote catalog-snapshot.json: 428 products`.
+- Rollback: delete the workflow file; the old snapshot stays as it is.
+
 ## 2026-11-25 16:55 (Africa/Nairobi) - Instant indexing after product publishing (branch `wip-index-after-publish`)
 - Done: added section 13 to `PUBLISHING_RULES.md` and to Neon `publishing_rules` (key `publish_products`): after products go live, send `repository_dispatch` event `catalog-changed` so Build product pages runs at once (IndexNow), then Google sitemap ping follows via workflow_run. Backup: `archive.publishing_rules_indexing_backup_20261125`.
 - Not verified: the sandbox `GH_TOKEN` is invalid, so the dispatch was not tested from here. Test: `gh api -X POST repos/stermontmall/stermontmall.github.io/dispatches -f event_type=catalog-changed`.
