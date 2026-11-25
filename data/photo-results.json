@@ -3082,5 +3082,45 @@
     "image_source": "https://d2akad5zhzs4nz.cloudfront.net/shop_menues/1780472254352_OW14687-COMBAT-MOSQUITO-COIL-RED-125G__Large_.png",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "tatua-advion-cockroach-gel-30g-agropests",
+    "source": "https://agropests.com/products/tatua-advion-cockroach-gel-30g",
+    "ok": false,
+    "error": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F5a41c7a3ca3a8b2fad8d0da0fdf4d7553327b779cbf31fc17e23f4013fe70fd2&w=3840&q=75: source image is 349x106; both source sides must be at least 150px | https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F5a41c7a3ca3a8b2fad8d0da0fdf4d7553327b779cbf31fc17e23f4013fe70fd2&w=256&q=75: source image is 256x78; both source sides must be at least 150px | https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F5a41c7a3ca3a8b2fad8d0da0fdf4d7553327b779cbf31fc17e23f4013fe70fd2&w=384&q=75: source image is 349x106; both source sides must be at least 150px | https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F5a41c7a3ca3a8b2fad8d0da0fdf4d7553327b779cbf31fc17e23f4013fe70fd2&w=640&q=75: source image is 349x106; both source sides must be at least 150px | https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F5a41c7a3ca3a8b2fad8d0da0fdf4d7553327b779cbf31fc17e23f4013fe70fd2&w=750&q=75: source image is 349x106; both source sides must be at least 150px | https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F5a41c7a3ca3a8b2fad8d0da0fdf4d7553327b779cbf31fc17e23f4013fe70fd2&w=828&q=75: source image is 349x106; both source sides must be at least 150px | https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F5a41c7a3ca3a8b2fad8d0da0fdf4d7553327b779cbf31fc17e23f4013fe70fd2&w=1080&q=75: source image is 349x106; both source sides must be at least 150px | https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F5a41c7a3ca3a8b2fad8d0da0fdf4d7553327b779cbf31fc17e23f4013fe70fd2&w=1200&q=75: source image is 34"
+  },
+  {
+    "name": "moskill-spira-liquid-refill-25ml",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-spira-liquid-refill-25ml/p/23560",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "mortein-doom-led-refill-45ml",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mortein-doom-led-refill-45ml/p/13379",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "mortein-doom-powergard-odourless-300ml",
+    "source": "https://instasoko.world/ke/en/nairobi/p/nbo-doom-odourless-300/mortein-doom-powergard-all-insect-killer-odourless-300-ml",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mortein-doom-powergard-odourless-300ml_Tk5i9kivn.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mortein-doom-powergard-odourless-300ml_Tk5i9kivn.jpg",
+    "width": 585,
+    "height": 1280,
+    "bytes": 54857,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://firebasestorage.googleapis.com/v0/b/instasokoworld.firebasestorage.app/o/catalog%2FKE%2Fproducts%2Fnbo-doom-odourless-300%2Fseed-92c71602-full.webp?alt=media&token=34652cec-ef39-4afa-a162-036af98fbd1e",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "mortein-doom-powergard-odourless-600ml",
+    "source": "https://www.airsoko.com/product/mortein-doom-odourless-all-insect-killer-spray-600ml-853-552770372",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
