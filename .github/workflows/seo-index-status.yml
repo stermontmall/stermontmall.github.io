@@ -1,17 +1,23 @@
 # Stermont Arcade - asks Google which of your pages are indexed, and why the rest are not.
-# Opens a GitHub Issue (GitHub emails you) once a day, or whenever you tap "Run workflow" in the Actions tab.
-# Runs once a day only: running after every page rebuild used up Google's daily URL Inspection quota.
+# Runs every 3 hours (8 runs a day). Each run checks a DIFFERENT batch of 150 pages (ROTATE_HOURS=3),
+# so 8 x 150 = 1,200 inspections a day - under Google's limit of about 2,000 per property per day - and the whole catalogue gets covered faster.
+# Every run is saved to Neon. A GitHub Issue (GitHub emails you) is opened once a day (the morning run) or whenever you tap "Run workflow".
+# Do not raise MAX_URLS above 200 or add more runs per day: running after every page rebuild once used up Google's daily URL Inspection quota.
 # Needs the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets (same ones as the sitemap ping).
 name: Google indexing status
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 7 * * *'
+    - cron: '30 1,4,7,10,13,16,19,22 * * *'
 
 permissions:
   contents: read
   issues: write
+
+concurrency:
+  group: google-index-status
+  cancel-in-progress: false
 
 jobs:
   report:
@@ -30,11 +36,19 @@ jobs:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           GSC_PROPERTY: ${{ secrets.GSC_PROPERTY }}
           MAX_MINUTES: '20'
+          MAX_URLS: '150'
+          ROTATE_HOURS: '3'
         run: node seo-index-status.mjs > index-status.md
-      - name: Publish as an issue
+      - name: Publish as an issue (morning run or manual run only)
         env:
           GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
         run: |
+          hour=$(date -u +%H)
+          if [ "$EVENT" = "schedule" ] && { [ "$hour" -lt 7 ] || [ "$hour" -ge 10 ]; }; then
+            echo "Not the morning run - report saved to Neon only, no issue opened."
+            exit 0
+          fi
           for n in $(gh issue list --state open --search "Google indexing status in:title" --json number --jq '.[].number'); do
             gh issue close "$n" --comment "Superseded by the newer report." || true
           done

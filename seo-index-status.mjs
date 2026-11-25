@@ -7,8 +7,9 @@
 // so this tool shows you exactly what is blocking each page instead of guessing.
 // Uses the same secrets as seo-google-sitemaps.mjs (GitHub > Settings > Secrets and variables > Actions):
 //   GSC_SERVICE_ACCOUNT_JSON, GSC_PROPERTY. The service account must be added as a user on the property in Search Console.
-// Optional: MAX_URLS (default 250; Google allows about 2000 inspections per day per property),
-//           MAX_MINUTES (default 20; the run stops and reports what it has instead of hanging for hours).
+// Optional: MAX_URLS (default 150 per run; Google allows about 2000 inspections per day per property, so keep runs per day x MAX_URLS under about 1500),
+//           MAX_MINUTES (default 20; the run stops and reports what it has instead of hanging for hours),
+//           ROTATE_HOURS (default 24; how long one batch of URLs stays the same. The workflow sets 3 so every 3-hour run checks a NEW batch).
 import { createSign } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 
@@ -39,10 +40,11 @@ const products = locs('sitemap-products.xml').filter(u => u.includes('/p/'));
 const others = [...locs('sitemap.xml'), ...locs('sitemap-products.xml').filter(u => !u.includes('/p/'))];
 const allUrls = [...new Set([...products, ...others])];
 if (!allUrls.length) { console.error('No URLs found in sitemap.xml or sitemap-products.xml.'); process.exit(1); }
-// Rotate the daily batch so pages beyond the runtime limit are not starved forever.
-// 150 URLs per day overlaps batches when the catalogue is larger than 150, covering the full list over successive days.
-const dayNumber = Math.floor(Date.now() / 86400000);
-const startIndex = (dayNumber * MAX) % allUrls.length;
+// Rotate the batch so pages beyond the per-run limit are not starved forever.
+// The batch changes every ROTATE_HOURS (24 by default, 3 in the workflow), so each run checks the next MAX_URLS pages in the list.
+const ROTATE_MS = (Number(process.env.ROTATE_HOURS) || 24) * 3600000;
+const slot = Math.floor(Date.now() / ROTATE_MS);
+const startIndex = (slot * MAX) % allUrls.length;
 const urls = Array.from({ length: Math.min(MAX, allUrls.length) }, (_, i) => allUrls[(startIndex + i) % allUrls.length]);
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -107,8 +109,8 @@ const unchecked = results.length - ok.length + notChecked;
 const out = [];
 out.push(`# Google indexing status ${new Date().toISOString().slice(0, 10)}`);
 out.push('');
-out.push(`Checked **${ok.length}** pages with Google (rotating daily batch; product URLs lead the cycle). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${unchecked ? `, ${unchecked} not checked in this batch` : ''}.`);
-if (stopReason) out.push('', `> Stopped early because ${stopReason}. The next daily report rotates to a different section of the sitemap.`);
+out.push(`Checked **${ok.length}** pages with Google (rotating batch; product URLs lead the cycle). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${unchecked ? `, ${unchecked} not checked in this batch` : ''}.`);
+if (stopReason) out.push('', `> Stopped early because ${stopReason}. The next report rotates to a different section of the sitemap.`);
 out.push('');
 if (notIndexed.length) {
   out.push('## Why pages are not indexed');
