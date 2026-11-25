@@ -3532,5 +3532,57 @@
     "source": "https://www.jumia.co.ke/generic-goodknight-multi-insect-killer-aerosol-325551535.html",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "blue-touch-rat-glue-trap-jumbo-2-count-carrefour",
+    "source": "https://cdn.mafrservices.com/sys-master-root/hde/hd5/47064329846814/6998_main.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/blue-touch-rat-glue-trap-jumbo-2-count-carrefour_236NwOFxl4.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/blue-touch-rat-glue-trap-jumbo-2-count-carrefour_236NwOFxl4.jpg",
+    "width": 1700,
+    "height": 1700,
+    "bytes": 144762,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/sys-master-root/hde/hd5/47064329846814/6998_main.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "moskill-aerosol-120ml-carrefour",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/moskill-aerosol-insecticide-insecticide-spray-120ml/p/23555",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "mortein-aik-lemon-300ml-carrefour",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mortein-doom-aik-insecticide-300ml/p/13356",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "mortein-aik-odourless-180ml-mybigorder",
+    "source": "https://mybigorder.com/uploads/products/photos/fFLx8TWAuxlaJQz0nc8dtRWAOc61RUqrQh8R5M8J.jpeg",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "fumakilla-vape-mat-cordless-destroyer-set-carrefour",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/fumakilla-vape-mat-cordless-d-set/p/62076",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "flower-dudspray-500ml-carrefour",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/flower-ome-grdn-dudspry-insct500ml/p/6964",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "chali-dudu-dust-200g-totalease",
+    "source": "https://totaleaseventures.co.ke/product/chali-dudu-dust-200g/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
