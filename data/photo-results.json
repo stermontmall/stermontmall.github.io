@@ -4400,5 +4400,37 @@
     "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2023/10/Imidex-Mendeclean-Bait-Gel-10gm.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "stop-vermin-powder-100g-rafiki",
+    "source": "https://shop.rafikipestcontrol.com/products/stop-vermin-powder",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/stop-vermin-powder-100g-rafiki_JKRh7AdNr.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/stop-vermin-powder-100g-rafiki_JKRh7AdNr.jpg",
+    "width": 366,
+    "height": 400,
+    "bytes": 19209,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://sokowise-api.b-cdn.net/media/4604.png?etag=9e5b3c80125ab4622adcec43ff620d22&height=400&width=400",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "agita-1gb-fly-bait-20g-agroduka",
+    "source": "https://agroduka.ke/agita-1gb-fly-bait/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/agita-1gb-fly-bait-20g-agroduka_Tky_Y6TJA.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/agita-1gb-fly-bait-20g-agroduka_Tky_Y6TJA.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 29631,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/10/Agita_1GB_Fly_Bait.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
