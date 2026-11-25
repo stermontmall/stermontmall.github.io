@@ -4432,5 +4432,71 @@
     "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/10/Agita_1GB_Fly_Bait.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "i-clipse-100cs-75ml-agropests",
+    "source": "https://agropests.com/products/i-clipse-100cs",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/i-clipse-100cs-75ml-agropests_CXU-bMBCwb.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/i-clipse-100cs-75ml-agropests_CXU-bMBCwb.jpg",
+    "width": 221,
+    "height": 462,
+    "bytes": 15423,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F45f6c67d1a2a4dedcb2cb320c3ffebe3663c5b34d3ecfa50e95eabacba4e8647&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "i-clipse-100cs-1l-agropests",
+    "source": "https://agropests.com/products/i-clipse-100cs-1l",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/i-clipse-100cs-1l-agropests_dCvJUFmJ2.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/i-clipse-100cs-1l-agropests_dCvJUFmJ2.jpg",
+    "width": 221,
+    "height": 462,
+    "bytes": 15423,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F45f6c67d1a2a4dedcb2cb320c3ffebe3663c5b34d3ecfa50e95eabacba4e8647&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "supakill-aerosol-150ml-agropests",
+    "source": "https://agropests.com/products/supakill-aerosol-spray-150ml",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/supakill-aerosol-150ml-agropests_Lqzshd-fp.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/supakill-aerosol-150ml-agropests_Lqzshd-fp.jpg",
+    "width": 240,
+    "height": 343,
+    "bytes": 14135,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2Fe086546070107b0b8c9180b799a86e4d2b7eb86a7900544c907ee8af54ccd2be&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "moskill-aerosol-120ml-mtolori",
+    "source": "https://mtolori.com/product/details/moskill-aerosol-120ml-2130",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "raid-it-multipurpose-insect-spray-180ml-mtolori",
+    "source": "https://mtolori.com/product/details/raid-it-multipurpose-insect-spray-180ml-5684",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "raid-it-multipurpose-insect-spray-300ml-mtolori",
+    "source": "https://mtolori.com/product/details/raid-it-multipurpose-insect-spray-300ml-5685",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
