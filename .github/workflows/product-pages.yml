@@ -1,3 +1,4 @@
+# Manual rebuild request: publish newly activated Neon product pages.
 # Stermont Arcade - rebuilds every product page, category page and the product sitemap automatically.
 # Runs: every 30 minutes, when generate-products.mjs changes, on a repository_dispatch event of type catalog-changed (instant rebuild), and whenever you tap "Run workflow" in the Actions tab.
 # Why every 30 minutes: a product only has a /p/ page after a build, so a product activated between builds had a dead link until the next one (2026-11-06, Agrimec 018EC). 404.html now opens such links in the shop meanwhile, and check-product-pages.mjs fails the run if an active product is still missing a page.
