@@ -3296,5 +3296,23 @@
     "image_source": "https://cdn.mafrservices.com/sys-master-root/hfd/h25/49128566030366/187058_main.jpg?im=Resize%3D480%3Fim=Resize%3D%2860%2C60%29",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "multiple-catch-mouse-trap-1pc",
+    "source": "https://imaginecare.co.ke/product/multiple-catch-mouse-trap/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "rat-snap-trap-metallic-black-6pcs",
+    "source": "https://imaginecare.co.ke/product/rat-snap-trap-metallic-black-6pcs/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "atraprat-glue-trap-135g",
+    "source": "https://totaleaseventures.co.ke/product/atraprat-glue-trap-for-rats-and-mice-135g/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
