@@ -171,6 +171,9 @@ jobs:
         continue-on-error: true
         run: node seo-related-fill.mjs
 
+      - name: Test customer product links use mobile shell and preserve SEO crawl links
+        run: STM_CHECK_GENERATED_PRODUCT_PAGES=1 node no-static-share-links.test.mjs
+
       - name: Test canonical responsive product-page routing and legacy redirect removal
         run: node seo-shell-chrome.test.mjs
 
