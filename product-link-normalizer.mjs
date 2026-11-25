@@ -1,6 +1,6 @@
 // Shared final pass for generated customer-facing product links.
-// Keeps visible /p/<slug>.html anchors canonical while preserving
-// canonical/OG metadata, JSON-LD, breadcrumbs and SEO-only crawl-link blocks.
+// Converts visible customer-facing product anchors to the mobile-shell query route while preserving
+// canonical/OG metadata, JSON-LD, breadcrumbs and SEO-only /p/ crawl-link blocks.
 // On generated product pages (p/) it also resolves category links written inside catalogue descriptions
 // (extensionless or name-derived /c/ slugs) to a live category page, or removes the dead anchor.
 import fs from 'node:fs';
@@ -34,8 +34,8 @@ const rewriteBody = (html, categories = false, products = false) => {
     let slug = match[1]; try { slug = decodeURIComponent(slug); } catch {}
     return `<a${before}href=${quote}${shellProductLink(slug)}${quote}${after}>`;
   });
-  // Convert legacy human-facing homepage query links in existing guides/blogs to static product URLs.
-  // Cart actions are intentionally excluded because they are functional controls, not share/navigation links.
+  // Normalize legacy human-facing query links in existing guides/blogs through the shared mobile-shell helper.
+  // Cart actions are intentionally excluded because they are functional controls with their own route state.
   body = body.replace(/<a\b([^>]*?)\bhref=(["'])([^"']+)\2([^>]*)>([\s\S]*?)<\/a>/gi, (all, before, quote, href, after, label) => {
     if (/\bdata-pack-cart\b/i.test(before + after)) return all;
     const query = href.match(/^(?:https?:\/\/(?:www\.)?stermontarcade\.co\.ke)?\/\?product=([a-z0-9][a-z0-9-]*)(?:[&#].*)?$/i);
