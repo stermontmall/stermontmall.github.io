@@ -1,0 +1,56 @@
+# Stermont Arcade - keeps catalog-snapshot.json in step with the live Neon catalog.
+# The shop falls back to catalog-snapshot.json when the browser cannot read Neon, so a stale file shows customers only part of the catalogue.
+# Runs: once a day (05:15 Nairobi), after each successful "Build product pages" run, and whenever you tap "Run workflow".
+# Only commits when products or categories actually changed. Needs the NEON_DATABASE_URL secret (already used by other workflows).
+name: Catalog snapshot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 2 * * *'
+  workflow_run:
+    workflows: ['Build product pages']
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: catalog-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - name: Export products and categories from Neon
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          npm install --no-save @neondatabase/serverless
+          node catalog-snapshot.mjs
+      - name: Save the file (only if it changed)
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -- catalog-snapshot.json
+          if git diff --cached --quiet; then
+            echo "Snapshot already up to date - no commit needed."
+            exit 0
+          fi
+          git commit -m "Refresh catalog-snapshot.json from Neon"
+          for i in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            echo "Push rejected (main moved) - rebasing and retrying ($i/3)."
+            git pull --rebase origin main
+          done
+          echo "::error::Could not push catalog-snapshot.json after 3 tries."
+          exit 1
