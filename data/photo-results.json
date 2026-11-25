@@ -3730,5 +3730,21 @@
     "source": "https://imaginecare.co.ke/wp-content/uploads/2018/10/Reusable-Rat-Mouse-Trap-2.jpeg",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "tomcat-all-weather-blox-28g-cheapdeals",
+    "source": "https://cheapdeals.co.ke/wp-content/uploads/2024/09/Tomcat-All-Weather-Blox-Rat-Poison-600x360.webp",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/tomcat-all-weather-blox-28g-cheapdeals_qdYAkDeDn.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/tomcat-all-weather-blox-28g-cheapdeals_qdYAkDeDn.jpg",
+    "width": 600,
+    "height": 360,
+    "bytes": 22897,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://cheapdeals.co.ke/wp-content/uploads/2024/09/Tomcat-All-Weather-Blox-Rat-Poison-600x360.webp",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
