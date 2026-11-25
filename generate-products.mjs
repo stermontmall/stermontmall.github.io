@@ -1,3 +1,4 @@
+// V8 pest-control publication refresh 2026-11-25: Doom Powergard Odourless 600ml activated with verified ImageKit photo; no runtime behavior change.
 // V8 pest-control publication refresh 2026-11-25: Agita 10WG 80g activated in Neon; no runtime behavior change.
 // Rebuild requested after V8 product activation on 2026-11-25; no runtime behavior change.
 // 2026-11-18: rebuild product pages after normalising Fumigation Chemicals descriptions and product FAQ structured data.
