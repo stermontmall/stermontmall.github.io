@@ -56,6 +56,7 @@
 - [Shop Printers & Office Machines in Kenya](https://stermontarcade.co.ke/c/printers-office-machines.html): Browse Printers & Office Machines online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Protective Wear & Safety in Kenya](https://stermontarcade.co.ke/c/protective-wear-safety.html): Shop Protective Wear & Safety in Kenya at Stermont Arcade. Compare options, check prices and availability, and order with confidence.
 - [Shop Rodent Control Online in Kenya](https://stermontarcade.co.ke/c/rodent-control.html): Browse Rodent Control online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
+- [Shop Seeds & Seedlings Online in Kenya](https://stermontarcade.co.ke/c/seeds-seedlings.html): Browse Seeds & Seedlings online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Shoes Online in Kenya](https://stermontarcade.co.ke/c/shoes.html): Browse Shoes online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Sprayers & Equipment Online in Kenya](https://stermontarcade.co.ke/c/sprayers-equipment.html): Browse Sprayers & Equipment online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Televisions Online in Kenya](https://stermontarcade.co.ke/c/televisions.html): Browse Televisions online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
@@ -153,6 +154,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 274 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 339 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
