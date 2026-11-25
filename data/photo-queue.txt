@@ -215,3 +215,13 @@ provine-50wp-1kg|https://agrijibu.co.ke/provine-50wp/
 cadilac-80wp-5kg|https://agrijibu.co.ke/cadilac-80wp/
 cabrio-250ec-250ml|https://agropests.com/products/cabrio-250-ec-250ml
 basagran-480sl-1l|https://agriguardagrovet.co.ke/product/basagran-480-sl/
+aliette-wg80-1kg|https://agrijibu.co.ke/aliette-wg80-1kg/
+amimax-720-wp-1kg|https://agropests.com/products/amimax-72-wp-1kg
+green-cop-500wp-1kg|https://agropests.com/products/green-cop-500-wp-1kg
+chancetyl-elite-800wdg-1kg|https://agrijibu.co.ke/chancetyl-elite-800wdg-1kg/
+isacop-50-wp-1kg|https://agriguardagrovet.co.ke/product/isacop-50-wp/
+metacop-450wp-1kg|https://agropests.com/products/metacop-450-wp-1-kg
+provine-50wp-1kg|https://agrijibu.co.ke/provine-50wp/
+cadilac-80wp-5kg|https://agrijibu.co.ke/cadilac-80wp/
+cabrio-250ec-250ml|https://agropests.com/products/cabrio-250-ec-250ml
+basagran-480sl-1l|https://agriguardagrovet.co.ke/product/basagran-480-sl/
