@@ -371,3 +371,4 @@ tatua-advion-cockroach-gel-30g|https://www.jumia.co.ke/syngenta-tatuaa-advion-co
 rat-kill-pellets-600g|https://ik.imagekit.io/w6hxfnwmw/products/rat-kill-pellets-600g_jAwnOaor29.jpg
 # rebuild catalog after Rat Kill Pellets 600g activation
 tormentor-0-05-gel-35g|https://mybigorder.com/public/uploads/all/B3aYjxomeodfUaHZNQhAD0HRSQ6k7cZFnzZJLIMI.png
+tormentor-0-05-gel-35g-alt|https://sokowise-api.b-cdn.net/media/8121.jpg?etag=242293b5d641279357a5d0ec659cadbe&height=640&width=640
