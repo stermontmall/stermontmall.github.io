@@ -4046,5 +4046,59 @@
     "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2Feb893e8568542ab4701b6effcddc4066d0e745ac05ff41c530b026f613d377d1&w=3840&q=75",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "jacto-hh5-compression-sprayer-5l-jacto",
+    "source": "https://jacto.com/asia/products/manual-backpack-sprayer/jacto-hh-5",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/jacto-hh5-compression-sprayer-5l-jacto_BI4sYh-4A.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/jacto-hh5-compression-sprayer-5l-jacto_BI4sYh-4A.jpg",
+    "width": 1280,
+    "height": 800,
+    "bytes": 26935,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://s3.amazonaws.com/1-jacto.com.br/files/product_image_1538680173977_HH_-_5_main_face.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "osho-hillor-rocking-sprayer-hr14-oshochem",
+    "source": "https://oshochem.com/oshoproduct/osho-hillor-rocking-sprayer-hr-14/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/osho-hillor-rocking-sprayer-hr14-oshochem_IzN8m9PL1o.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/osho-hillor-rocking-sprayer-hr14-oshochem_IzN8m9PL1o.jpg",
+    "width": 585,
+    "height": 741,
+    "bytes": 23979,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://oshochem.com/wp-content/uploads/2023/11/Osho-hillor.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "osho-deluxe-bucket-sprayer-kihysoco",
+    "source": "https://kihysoco.com/product/osho-deluxe-bucket-sprayer/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "greenberg-gold-25l-2-stroke-knapsack-agropests",
+    "source": "https://agropests.com/products/greenberg%20gold%2025l%20motorized%20pump",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/greenberg-gold-25l-2-stroke-knapsack-agropests_zbzmZh7VI.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/greenberg-gold-25l-2-stroke-knapsack-agropests_zbzmZh7VI.jpg",
+    "width": 325,
+    "height": 434,
+    "bytes": 24075,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F7cdd85179809c7c25d7ad6d760abbb5c0ad28ea1ac1cc76f1cf399fca0de561c&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
