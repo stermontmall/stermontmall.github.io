@@ -2716,5 +2716,11 @@
     "image_source": "https://www.bioderma.co.ke/wp-content/uploads/2025/12/1-986.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "baraki-pellets-300g",
+    "source": "https://totaleaseventures.co.ke/product/rat-poison-300g/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
