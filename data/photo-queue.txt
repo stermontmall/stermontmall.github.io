@@ -258,3 +258,12 @@ combat-mosquito-coil-green-125g|https://epepea.com/item/9676482
 flower-mosquito-coil-perfumed-125g|https://www.epepea.com/public/item/9521072
 moskill-green-mosquito-coils|https://shop.oshochem.com/product/moskill-green-mosquito-coils/
 cockrakill-paste-100g|https://cheapthings.co.ke/product/cockrakill-paste-for-cockroaches-100g/
+ag-copp-75wp-500g|https://agroduka.ke/ag-copp-75wp/
+cuprocaffaro-50wp-1kg|https://agroduka.ke/fungicides/page-3/
+nimbecidine-100ml|https://shop.oshochem.com/product/nimbecidine/
+combremix-50wp-1kg|https://cendco.co.ke/products?cat=agriculture
+flower-dudu-spray-500ml|https://www.jumia.co.ke/flower-duduspray-natural-insect-spray-500ml-267797328.html
+cockrakill-paste-100g|https://www.naivas.online/cockrakill-paste-cockroach-killer-100g
+afrizeb-75-wdg-1kg|https://www.eabcl.co.ke/product/afrizeb-75wdg/
+afrizeb-super-50wp-1kg|https://www.eabcl.co.ke/product/afrizeb-super-50-wp/
+mos-kill-spira-liquid-35ml|https://courii.com/shops/17/products/87392-moskill-spiral-liquid-refill-35ml
