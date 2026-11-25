@@ -1173,3 +1173,4 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // V8 customer-link correction: rebuild generated pages with mobile-shell ?product= links while preserving canonical /p/ SEO documents.
 // V8 rebuild trigger: refresh all customer-facing links after the shared helper export correction.
 // V8 link-audit retry: rebuild after the customer-link regression guard correction.
+// V8 rebuild trigger: pest-control catalogue updated 2026-11-25
