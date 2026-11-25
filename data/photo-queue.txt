@@ -496,3 +496,7 @@ greenlife-rodent-bait-station-1pc|https://imaginecare.co.ke/product/rodent-bait-
 fuko-kil-25g-agropests|https://agropests.com/products/fuko-kil-fuko-kil-25g
 fuko-kil-300g-cheapthings|https://cheapthings.co.ke/product/fuko-kil-300g/
 rat-mouse-glue-board-1pc-imaginecare|https://imaginecare.co.ke/product/rat-mouse-glue-board/
+fendona-60sc-1l-agropests|https://agropests.com/products/fendona-60-sc-1l
+fendona-60sc-250ml-agropests|https://agropests.com/products/fendona-60-sc-250ml
+navigator-100sc-1l-agriguard|https://agriguardagrovet.co.ke/product/navigator-100-sc/
+osefin-7-5-wp-200g-farmrescue|https://www.farmrescue.co.ke/_next/image?q=75&url=https%3A%2F%2Fchantosq.nillavee.co.ke%2F%2Fimgs%2Fproducts%2FOsefin-7.5-WP.jpg&w=1920
