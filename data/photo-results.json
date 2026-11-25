@@ -3122,5 +3122,49 @@
     "source": "https://www.airsoko.com/product/mortein-doom-odourless-all-insect-killer-spray-600ml-853-552770372",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "tatua-advion-cockroach-gel-30g-microless",
+    "source": "https://uae.microless.com/cdn/category_files/861dfa15de5d10b88c60083cbe3e64ec.png",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "moskill-spira-liquid-refill-25ml-carrefour",
+    "source": "https://cdn.mafrservices.com/sys-master-root/h34/haf/17556520042526/23560_main.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/moskill-spira-liquid-refill-25ml-carrefour_8gIGtQSy-9.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/moskill-spira-liquid-refill-25ml-carrefour_8gIGtQSy-9.jpg",
+    "width": 1700,
+    "height": 1700,
+    "bytes": 196708,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/sys-master-root/h34/haf/17556520042526/23560_main.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "mortein-doom-led-refill-45ml-carrefour",
+    "source": "https://cdn.mafrservices.com/pim-content/KEN/media/product/13379/13379_main.jpg?im=Resize%3D480%3Fim%3DResize%3D%2860%2C60%29",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mortein-doom-led-refill-45ml-carrefour_018RMwVPS.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mortein-doom-led-refill-45ml-carrefour_018RMwVPS.jpg",
+    "width": 1700,
+    "height": 1700,
+    "bytes": 139451,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpg",
+    "image_source": "https://cdn.mafrservices.com/pim-content/KEN/media/product/13379/13379_main.jpg?im=Resize%3D480%3Fim%3DResize%3D%2860%2C60%29",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "mortein-doom-powergard-odourless-600ml-hypa",
+    "source": "https://hypa.africa/images/thumbnails/800/800/detailed/21/rDsT_GL73AOBtmvMpwOPe0lA8j9d6vLyufXZQ5-woTU.png",
+    "ok": false,
+    "error": "source page HTTP 404"
   }
 ]
