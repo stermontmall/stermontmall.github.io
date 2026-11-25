@@ -501,3 +501,6 @@ fendona-60sc-250ml-agropests|https://agropests.com/products/fendona-60-sc-250ml
 navigator-100sc-1l-agriguard|https://agriguardagrovet.co.ke/product/navigator-100-sc/
 osefin-7-5-wp-200g-farmrescue|https://www.farmrescue.co.ke/_next/image?q=75&url=https%3A%2F%2Fchantosq.nillavee.co.ke%2F%2Fimgs%2Fproducts%2FOsefin-7.5-WP.jpg&w=1920
 senior-mousetrap-2pcs-rafiki|https://cdn.othoba.com/images/thumbs/1510420_mouse-traps-that-work-indoor-plastic-snap-mice-trap-reusable-mouse-trap-easy-set-black.jpeg
+bromarat-0-005-rb-100g-cheapthings|https://cheapthings.co.ke/product/bromarat-0-005-rb-100g/
+bromarat-0-005-rb-12x25g-cheapthings|https://cheapthings.co.ke/product/bromarat-0-005-rb-12-x-25g/
+rat-snap-trap-metallic-black-1pc-cheapthings|https://cheapthings.co.ke/product/rat-trap/
