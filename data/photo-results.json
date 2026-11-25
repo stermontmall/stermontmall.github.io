@@ -2668,5 +2668,53 @@
     "image_source": "https://www.bioderma.co.ke/wp-content/uploads/2025/12/1-883.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "doom-mouse-and-rat-glue-board-1pc",
+    "source": "https://www.bioderma.co.ke/product/doom-mouse-and-rat-glue-board/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/doom-mouse-and-rat-glue-board-1pc_gXOeBuVbI.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/doom-mouse-and-rat-glue-board-1pc_gXOeBuVbI.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 12464,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.bioderma.co.ke/wp-content/uploads/2025/12/1-963.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "doom-mouse-and-rat-glue-board-2pc",
+    "source": "https://www.bioderma.co.ke/product/doom-mouse-and-rat-glue-board-2-pc/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/doom-mouse-and-rat-glue-board-2pc_apHMHwQy5.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/doom-mouse-and-rat-glue-board-2pc_apHMHwQy5.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 35924,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.bioderma.co.ke/wp-content/uploads/2025/12/1-1090.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "doom-mouse-and-rat-glue-board-4pc",
+    "source": "https://www.bioderma.co.ke/product/doom-mouse-and-rat-glue-board-pack-of-4/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/doom-mouse-and-rat-glue-board-4pc_yXyJl8Q-q.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/doom-mouse-and-rat-glue-board-4pc_yXyJl8Q-q.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 40694,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.bioderma.co.ke/wp-content/uploads/2025/12/1-986.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
