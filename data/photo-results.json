@@ -3314,5 +3314,63 @@
     "source": "https://totaleaseventures.co.ke/product/atraprat-glue-trap-for-rats-and-mice-135g/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "mortein-doom-powergard-cockroach-killer-400ml",
+    "source": "https://www.naivas.online/mortein-doom-powergard-cockroach-killer-400ml",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "mortein-doom-powergard-lemon-400ml",
+    "source": "https://www.naivas.online/mortein-doom-powergard-all-insect-killer-lemon-400ml",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "mortein-doom-powergard-lemon-600ml",
+    "source": "https://old.naivas.online/mortein-doom-powergard-all-insect-killer-lemon-600ml",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "mortein-doom-powergard-odourless-400ml",
+    "source": "https://www.naivas.online/mortein-doom-powergard-insect-killer-odourless-400ml",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "mortein-doom-powergard-odourless-600ml-jumia",
+    "source": "https://www.jumia.co.ke/mortein-doom-odourless-all-insect-killer-spray-600ml-121750332.html",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "raid-multi-purpose-insect-killer-400ml",
+    "source": "https://www.naivas.online/raid-multi-purpose-insect-killer-400ml",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "baygon-insecticide-odourless-300ml",
+    "source": "https://www.naivas.online/baygon-insecticide-odourless-300ml",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "mende-sharp-shooter-5g-agriguard",
+    "source": "https://agriguardagrovet.co.ke/product/mende-sharpshooter-0-5-gb/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mende-sharp-shooter-5g-agriguard_LMYcAuq0H.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mende-sharp-shooter-5g-agriguard_LMYcAuq0H.jpg",
+    "width": 469,
+    "height": 1000,
+    "bytes": 22587,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agriguardagrovet.co.ke/wp-content/uploads/2025/04/29.-Mende-Sharpshooter-0.5GB.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
