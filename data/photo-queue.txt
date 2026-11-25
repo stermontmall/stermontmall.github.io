@@ -554,3 +554,5 @@ mende-mo-fire-5g-rafiki|https://shop.rafikipestcontrol.com/products/mende-mo-fir
 stop-vermin-powder-100g-mtolori|https://mtolori.com/product/details/stop-vermin-powder-100gms-633
 chali-dudu-dust-100g-epepea|https://epepea.com/public/index.php/item/5177827
 mendeclean-bait-gel-10g-kejani|https://kejanicleaning.co.ke/shop/pest-control/imidex-mendeclean-bait-gel-10gm/
+stop-vermin-powder-100g-rafiki|https://shop.rafikipestcontrol.com/products/stop-vermin-powder
+agita-1gb-fly-bait-20g-agroduka|https://agroduka.ke/agita-1gb-fly-bait/
