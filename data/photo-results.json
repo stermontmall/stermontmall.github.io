@@ -4154,5 +4154,21 @@
     "source": "https://www.agro.basf.co.ke/en/Products/Overview/Termiticides/Termidor-96-SC.html",
     "ok": false,
     "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "termitop-450-ec-termiticide-500ml-dawnfarmers",
+    "source": "https://dawnfarmers.com/shop/termitop-450ec/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/termitop-450-ec-termiticide-500ml-dawnfarmers_H733CnTSm.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/termitop-450-ec-termiticide-500ml-dawnfarmers_H733CnTSm.jpg",
+    "width": 600,
+    "height": 800,
+    "bytes": 80998,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://dawnfarmers.com/wp-content/uploads/2026/07/Termitop-termiticide-rotated-scaled-600x800.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
