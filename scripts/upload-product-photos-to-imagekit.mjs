@@ -240,7 +240,12 @@ async function one(line) {
 
 const results = [];
 for (const line of pendingLines) results.push(await one(line));
-writeFileSync('data/photo-results.json', JSON.stringify(results, null, 2) + '\n');
+const mergedResultsByName = new Map(previousResults.filter((x) => x && x.name).map((x) => [x.name, x]));
+for (const result of results) {
+  const prior = mergedResultsByName.get(result.name);
+  if (result.ok || !prior || !prior.ok) mergedResultsByName.set(result.name, result);
+}
+writeFileSync('data/photo-results.json', JSON.stringify([...mergedResultsByName.values()], null, 2) + '\n');
 summary('## ImageKit photo upload — JPEG normalized');
 summary('| Result | Product | Dimensions | Verified ImageKit URL / error |');
 summary('|---|---|---|---|');
