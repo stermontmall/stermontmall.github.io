@@ -530,3 +530,7 @@ amiran-knapsack-sprayer-16l-agroduka|https://agroduka.ke/amiran-knapsack-sprayer
 greenlife-star-battery-manual-16l-agroduka|https://agroduka.ke/greenlife-star-battery-and-manual/
 turbo-tr20-2-in-1-agricultural-sprayer-powerx|https://powerxtoolske.com/collections/sprayers/products/turbo-tr20-2-in-1-agricultural-sprayer-manual-battery-operated
 greenlife-star-battery-manual-18l-agropests|https://agropests.com/products/greenlife-star-pump-18l
+jacto-hh5-compression-sprayer-5l-jacto|https://jacto.com/asia/products/manual-backpack-sprayer/jacto-hh-5
+osho-hillor-rocking-sprayer-hr14-oshochem|https://oshochem.com/oshoproduct/osho-hillor-rocking-sprayer-hr-14/
+osho-deluxe-bucket-sprayer-kihysoco|https://kihysoco.com/product/osho-deluxe-bucket-sprayer/
+greenberg-gold-25l-2-stroke-knapsack-agropests|https://agropests.com/products/greenberg%20gold%2025l%20motorized%20pump
