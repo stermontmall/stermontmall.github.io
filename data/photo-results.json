@@ -393,9 +393,19 @@
   },
   {
     "name": "aliette-wg80-1kg",
-    "source": "https://agrijibu.co.ke/aliette-wg80-1kg/",
-    "ok": false,
-    "error": "source page HTTP 404"
+    "source": "https://agroduka.ke/aliette-wg80-1kg/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/aliette-wg80-1kg_Yi3lfVX81.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/aliette-wg80-1kg_Yi3lfVX81.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 8994,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/aliette_wg_brandtag.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
   },
   {
     "name": "amimax-720-wp-1kg",
