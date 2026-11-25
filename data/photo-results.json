@@ -3700,5 +3700,17 @@
     "source": "https://cheapthings.co.ke/product/rat-trap/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "fuko-kil-300g-imaginecare",
+    "source": "https://imaginecare.co.ke/wp-content/uploads/2020/12/fuko-kil-rat-poison.jpg?v=1684478675",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "bromarat-0-005-rb-12x25g-jumia",
+    "source": "https://www.jumia.co.ke/generic-bromarat-0.005-rb-12-x-25g-324149232.html",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
