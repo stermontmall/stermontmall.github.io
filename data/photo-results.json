@@ -2570,5 +2570,33 @@
     "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-aerosol-insecticide-120ml/p/23555",
     "ok": false,
     "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "cyfaza-humane-mouse-trap-12-inch-1pc",
+    "source": "https://www.jumia.co.ke/cyfaza-humane-mouse-traps-12-inches-enlarged-no-kill-rat-live-traps-1pc-325465444.html",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "cyfaza-mouse-traps-4-pack",
+    "source": "https://www.bioderma.co.ke/product/cyfaza-mouse-traps-4-pack-indoor-outdoor-use-small-mice-catchers-for-home/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/cyfaza-mouse-traps-4-pack_IPig_dlx7.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/cyfaza-mouse-traps-4-pack_IPig_dlx7.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 42166,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.bioderma.co.ke/wp-content/uploads/2025/12/1-880.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "rat-snap-trap-metallic-black-1pc",
+    "source": "https://cheapthings.co.ke/product/rat-snap-trap/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
