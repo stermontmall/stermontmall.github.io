@@ -2516,5 +2516,59 @@
     "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2023/10/Insecticide-Chalk-Twin-Luck-15gm.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "flower-mosquito-stick-sandal-20g",
+    "source": "https://kejanicleaning.co.ke/shop/pest-control/insecticides/flower-natural-sandal-mosquito-killer-sticks-20g/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-mosquito-stick-sandal-20g_fgg8_jAoW.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-mosquito-stick-sandal-20g_fgg8_jAoW.jpg",
+    "width": 400,
+    "height": 400,
+    "bytes": 10095,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2025/02/kejanicleaning.co.ke-flower-natural-sandal-mosquito-killer-sticks-20g-flower.avif",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "blue-touch-rat-glue-trap-blue-x2",
+    "source": "https://www.epepea.com/item/9468458",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/blue-touch-rat-glue-trap-blue-x2_t7kt9qpxE.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/blue-touch-rat-glue-trap-blue-x2_t7kt9qpxE.jpg",
+    "width": 376,
+    "height": 376,
+    "bytes": 23925,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/sys-master-root/h52/h33/16872121794590/6996_main.jpg?im=Resize=376",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "fastkill-regular-aerosol-180ml",
+    "source": "https://kejanicleaning.co.ke/shop/pest-control/insecticides/fastkill-regular-aerosol-180ml/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/fastkill-regular-aerosol-180ml_H-yeAkzeU.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/fastkill-regular-aerosol-180ml_H-yeAkzeU.jpg",
+    "width": 400,
+    "height": 400,
+    "bytes": 13896,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2025/01/kejanicleaning.co.ke-fastkill-regular-aerosol-180ml-reguler.avif",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "moskill-aerosol-insecticide-120ml",
+    "source": "https://www.carrefour.ke/mafken/en/insect-sprays-repellents/mos-kill-aerosol-insecticide-120ml/p/23555",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
   }
 ]
