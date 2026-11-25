@@ -4346,5 +4346,59 @@
     "image_source": "https://chemsasa.co.ke/wp-content/uploads/2022/07/Chali-Dudu-dust-200gms.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "mende-mo-fire-5g-rafiki",
+    "source": "https://shop.rafikipestcontrol.com/products/mende-mo-fire",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mende-mo-fire-5g-rafiki_K_UFG0H4n.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mende-mo-fire-5g-rafiki_K_UFG0H4n.jpg",
+    "width": 366,
+    "height": 400,
+    "bytes": 19209,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://sokowise-api.b-cdn.net/media/4604.png?etag=9e5b3c80125ab4622adcec43ff620d22&height=400&width=400",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "stop-vermin-powder-100g-mtolori",
+    "source": "https://mtolori.com/product/details/stop-vermin-powder-100gms-633",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "chali-dudu-dust-100g-epepea",
+    "source": "https://epepea.com/public/index.php/item/5177827",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/chali-dudu-dust-100g-epepea_j0k7ldduA.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/chali-dudu-dust-100g-epepea_j0k7ldduA.jpg",
+    "width": 376,
+    "height": 376,
+    "bytes": 20673,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/sys-master-root/h57/hfa/51388246163486/194531_main.jpg?im=Resize=376",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "mendeclean-bait-gel-10g-kejani",
+    "source": "https://kejanicleaning.co.ke/shop/pest-control/imidex-mendeclean-bait-gel-10gm/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mendeclean-bait-gel-10g-kejani_eX_HqEY_5.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mendeclean-bait-gel-10g-kejani_eX_HqEY_5.jpg",
+    "width": 225,
+    "height": 225,
+    "bytes": 5494,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2023/10/Imidex-Mendeclean-Bait-Gel-10gm.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
