@@ -2280,5 +2280,11 @@
     "source": "https://www.jumia.co.ke/syngenta-tatuaa-advion-cockroach-gel-bait-1-x-30-gm-tube-170201874.html",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "tormentor-0-05-gel-35g",
+    "source": "https://mybigorder.com/public/uploads/all/B3aYjxomeodfUaHZNQhAD0HRSQ6k7cZFnzZJLIMI.png",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
