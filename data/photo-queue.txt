@@ -291,3 +291,11 @@ urea-falcon-50kg|https://agroduka.ke/crop-production/page-2/?items_per_page=64&s
 potassium-nitrate-kynoch-25kg|https://agroduka.ke/fertigation-fertilizers/
 dap-fertilizer-amiran|https://agroduka.ke/amiran-kenya/?category_id=272
 yararega-18-4-19-25kg|https://agroduka.ke/yararega-18-4-19-25kg/
+soluams-50kg|https://agroduka.ke/ammonium-sulphate-soluams-50kg/
+mop-60er-kali-50kg|https://agroduka.ke/mop-60er-kali-50kg/
+patentkali-50kg|https://agroduka.ke/patentkali-50kg/
+solucms-25kg|https://agroduka.ke/solucms/
+solusop-potassium-sulphate-25kg|https://agroduka.ke/solusop-potassium-sulphate-25kg/
+dap-18-46-0-50kg|https://www.waingofarm.co.ke/shop/dap-planting-fertilizer-50kg
+yararega-13-4-25-25kg|https://agroduka.ke/yararega-13-4-25-25kg/
+yararega-15-15-15-25kg|https://agroduka.ke/yararega-15-15-15-25kg/
