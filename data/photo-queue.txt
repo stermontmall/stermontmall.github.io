@@ -398,3 +398,6 @@ guardian-rodent-bait-station-1pc-alt|https://pesafrica.net/product/guardian-bait
 cyfaza-humane-mouse-trap-12-inch-1pc-alt|https://www.bioderma.co.ke/product/cyfaza-humane-mouse-traps-12-inches-enlarged-no-kill-rat-live-traps-1pc/
 heavy-duty-mouse-trap-snap-rat-catcher-1pc|https://www.bioderma.co.ke/product/heavy-duty-mouse-trap-snap-rat-catcher/
 flip-top-mouse-trap-automatic-reset-yellow|https://www.bioderma.co.ke/product/flip-top-mouse-trap-automatic-reset-mousetrap-indoor-and-outdoor-mousetrap/
+doom-mouse-and-rat-glue-board-1pc|https://www.bioderma.co.ke/product/doom-mouse-and-rat-glue-board/
+doom-mouse-and-rat-glue-board-2pc|https://www.bioderma.co.ke/product/doom-mouse-and-rat-glue-board-2-pc/
+doom-mouse-and-rat-glue-board-4pc|https://www.bioderma.co.ke/product/doom-mouse-and-rat-glue-board-pack-of-4/
