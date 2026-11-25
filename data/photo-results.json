@@ -49,9 +49,19 @@
   },
   {
     "name": "rat-kill-pellets-600g",
-    "source": "https://imaginecare.co.ke/wp-content/uploads/2019/12/IMG_20190814_143820_1-576x1024.jpg?v=1684479234",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://ik.imagekit.io/w6hxfnwmw/products/rat-kill-pellets-600g_jAwnOaor29.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/rat-kill-pellets-600g_ywUeZbuSh.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/rat-kill-pellets-600g_ywUeZbuSh.jpg",
+    "width": 1200,
+    "height": 630,
+    "bytes": 32426,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://ik.imagekit.io/w6hxfnwmw/products/rat-kill-pellets-600g_jAwnOaor29.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   },
   {
     "name": "doom-powergard-odourless-600ml",
