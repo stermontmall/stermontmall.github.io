@@ -4030,5 +4030,21 @@
     "image_source": "https://powerxtoolske.com/cdn/shop/files/WhatsApp_Image_2026-08-11_at_15.40.56.jpg?v=1786457250&width=1200",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "greenlife-star-battery-manual-18l-agropests",
+    "source": "https://agropests.com/products/greenlife-star-pump-18l",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/greenlife-star-battery-manual-18l-agropests_xZ4_5ISer.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/greenlife-star-battery-manual-18l-agropests_xZ4_5ISer.jpg",
+    "width": 411,
+    "height": 598,
+    "bytes": 31445,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2Feb893e8568542ab4701b6effcddc4066d0e745ac05ff41c530b026f613d377d1&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
