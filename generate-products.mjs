@@ -1169,3 +1169,4 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // V8 batch 3: rebuild pages and sitemap for 22 newly activated, photo-verified catalogue products (STM-002081–STM-002102).
 // V8 customer-link correction: rebuild generated pages with mobile-shell ?product= links while preserving canonical /p/ SEO documents.
 // V8 rebuild trigger: refresh all customer-facing links after the shared helper export correction.
+// V8 link-audit retry: rebuild after the customer-link regression guard correction.
