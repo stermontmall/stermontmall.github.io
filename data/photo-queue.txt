@@ -201,3 +201,5 @@ t-kab-300wg-100g|https://kenagroeastafrica.com/product/t-kab-300wg/
 t-kab-300wg-100g|https://kenagroeastafrica.com/product/t-kab-300wg/
 t-kab-300wg-100g|https://kenagroeastafrica.com/product/t-kab-300wg/
 doom-powergard-odourless-600ml|https://www.naivas.online/mortein-doom-powergard-insect-killer-odourless-600ml
+agita-10wg-fly-bait-80g|https://shop.rafikipestcontrol.com/products/agita-10wg-fly-bait
+baygon-aerosol-multipurpose-spray-450ml|https://agriguardagrovet.co.ke/product/baygon-aerosol/
