@@ -151,6 +151,9 @@ jobs:
           node seo-safe-blog-meta.mjs
           node blog-build.mjs
 
+      - name: Rebuild service pages with mobile-shell customer links
+        run: node services/build-services.mjs
+
       - name: Normalize internal category links in generated product pages
         run: node category-link-normalizer.mjs
 
