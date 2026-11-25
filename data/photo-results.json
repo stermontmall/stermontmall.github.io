@@ -2242,5 +2242,27 @@
     "source": "https://imaginecare.co.ke/product/bipronex-cockroach-bait-5g/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "doom-powergard-odourless-600ml-shoppers",
+    "source": "https://shoppers.co.tz/public/uploads/images/products_images/3226792630616t1rh0mlzvb.png",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/doom-powergard-odourless-600ml-shoppers_czRwREScM.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/doom-powergard-odourless-600ml-shoppers_czRwREScM.jpg",
+    "width": 600,
+    "height": 600,
+    "bytes": 32139,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://shoppers.co.tz/public/uploads/images/products_images/3226792630616t1rh0mlzvb.png",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "bipronex-cockroach-gel-bait-5g-imaginecare-image",
+    "source": "https://imaginecare.co.ke/wp-content/uploads/2019/02/Bipronex-Cockroach-Gel-Bait-5g-1-300x162.png",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
