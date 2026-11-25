@@ -521,3 +521,7 @@ animal-pest-cage-trap-1pc|https://www.bioderma.co.ke/product/animal-pest-cage-tr
 stainless-steel-bird-spikes-50cm-strip|https://clearancewarehouse.co.ke/product/stainless-steel-bird-spikes
 termiguard-200-sl-1l|https://www.greenlife.co.ke/product/termiguard-200-sl/
 bird-spikes-pigeon-deterrent-20-pack|https://www.desertcart.co.ke/products/515117126-bird-spikes-20-pack-pigeon-spikes-high-thorn-bird-spikes
+undertaker-480-ec-5l-farmrescue|https://www.farmrescue.co.ke/product/undertaker-480-gl-ec
+kensplastic-heavy-duty-knapsack-sprayer-20l-bioderma|https://www.bioderma.co.ke/product/kensplastic-heavy-duty-knapsack-sprayer-backpack-sprayer-pest-control/
+premier-heavy-duty-knapsack-sprayer-20l-bioderma|https://www.bioderma.co.ke/product/premier-heavy-duty-knapsack-sprayers-20l/
+heavy-duty-manual-knapsack-sprayer-20l-bioderma|https://www.bioderma.co.ke/product/20l-heavy-duty-manual-knapsack-sprayer-adjustable-nozzle-long-hose-durable-tank/
