@@ -1186,3 +1186,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // V8 catalogue rebuild trigger: Ultrasonic Pest Repeller Indoor Plug-in activated in Neon on 2026-11-25.
 // V8 catalogue rebuild trigger: Multipurpose Rat Mouse Glue Board Traps published in Neon on 2026-11-25.
 // V8 catalogue rebuild trigger: Animal Pest Cage Trap for Rats and Mice published in Neon on 2026-11-25.
+
+// V8 catalogue rebuild requested after publishing sprayer products STM-002235–STM-002239 on 2026-11-25.
