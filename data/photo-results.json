@@ -729,9 +729,19 @@
   },
   {
     "name": "flower-dudu-spray-500ml",
-    "source": "https://www.jumia.co.ke/flower-duduspray-natural-insect-spray-500ml-267797328.html",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://www.epepea.com/public/item/9430178",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-dudu-spray-500ml_Gvmjcq8qK.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-dudu-spray-500ml_Gvmjcq8qK.jpg",
+    "width": 376,
+    "height": 376,
+    "bytes": 9676,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/sys-master-root/h58/he0/17289700638750/10815_main.jpg?im=Resize=376",
+    "http_status": 200,
+    "image_found_via": "product-page"
   },
   {
     "name": "combat-mosquito-coil-green-125g",
@@ -783,9 +793,19 @@
   },
   {
     "name": "cockrakill-paste-100g",
-    "source": "https://www.naivas.online/cockrakill-paste-cockroach-killer-100g",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://www.courii.com/shops/17/categories/727",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/cockrakill-paste-100g_hlK6HkY7of.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/cockrakill-paste-100g_hlK6HkY7of.jpg",
+    "width": 1080,
+    "height": 1080,
+    "bytes": 145685,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://d2akad5zhzs4nz.cloudfront.net/shop_menues/1781078262009_OW5452-COCKRAKILL-PASTE-100G__Large_.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
   },
   {
     "name": "afrizeb-75-wdg-1kg",
