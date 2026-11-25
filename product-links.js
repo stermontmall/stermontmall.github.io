@@ -9,4 +9,5 @@ function shellProductLink(slug) {
   return 'https://stermontarcade.co.ke/?product=' + encodeURIComponent(value);
 }
 
-module.exports = { shellProductLink };
+module.exports = shellProductLink;
+module.exports.shellProductLink = shellProductLink;
