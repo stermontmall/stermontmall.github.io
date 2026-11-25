@@ -547,15 +547,35 @@
   },
   {
     "name": "ag-copp-75wp-500g",
-    "source": "https://kilimokona.co.ke/shop/crop-production/fungicides/ag-copp-75wp/",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://agroduka.ke/ag-copp-75wp/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/ag-copp-75wp-500g_iq0o3Qah8.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/ag-copp-75wp-500g_iq0o3Qah8.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 29791,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/Ag-Copp-75-1.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   },
   {
     "name": "cuprocaffaro-50wp-1kg",
-    "source": "https://mtolori.com/product/details/cuprocaffaro-50wp-1kg-green-copper-lachlan-1594",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://agroduka.ke/fungicides/page-3/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/cuprocaffaro-50wp-1kg_AboZoeJwd.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/cuprocaffaro-50wp-1kg_AboZoeJwd.jpg",
+    "width": 240,
+    "height": 240,
+    "bytes": 9208,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://agroduka.ke/images/thumbnails/240/240/detailed/9/Coprocaffaro-1.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
   },
   {
     "name": "sinophate-75sp-100g",
@@ -565,9 +585,19 @@
   },
   {
     "name": "nimbecidine-100ml",
-    "source": "https://kilimokona.co.ke/product/nimbecidine/",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://shop.oshochem.com/product/nimbecidine/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/nimbecidine-100ml_rzbcqJMb8W.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/nimbecidine-100ml_rzbcqJMb8W.jpg",
+    "width": 1080,
+    "height": 1080,
+    "bytes": 88822,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://shop.oshochem.com/wp-content/uploads/2023/10/Nimbecidine%C2%AE.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
   },
   {
     "name": "cop-power-50wp-1kg",
@@ -587,9 +617,19 @@
   },
   {
     "name": "combremix-50wp-1kg",
-    "source": "https://mtolori.com/product/details/combremix-50wp-1kg-copper-oxychloride-500g-kg-1216",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://cendco.co.ke/products?cat=agriculture",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/combremix-50wp-1kg_brDcCgWke.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/combremix-50wp-1kg_brDcCgWke.jpg",
+    "width": 1200,
+    "height": 1200,
+    "bytes": 108425,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://dashboard.cendco.co.ke/assets/images/products/1776087711_c6e2590c13d77f1a.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   },
   {
     "name": "iperion-50wp-1kg",
@@ -689,7 +729,7 @@
   },
   {
     "name": "flower-dudu-spray-500ml",
-    "source": "https://mtolori.com/product/details/flower-dudu-spray-500ml-4575",
+    "source": "https://www.jumia.co.ke/flower-duduspray-natural-insect-spray-500ml-267797328.html",
     "ok": false,
     "error": "source page HTTP 403"
   },
@@ -743,8 +783,56 @@
   },
   {
     "name": "cockrakill-paste-100g",
-    "source": "https://cheapthings.co.ke/product/cockrakill-paste-for-cockroaches-100g/",
+    "source": "https://www.naivas.online/cockrakill-paste-cockroach-killer-100g",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "afrizeb-75-wdg-1kg",
+    "source": "https://www.eabcl.co.ke/product/afrizeb-75wdg/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/afrizeb-75-wdg-1kg_twE_JF2y9.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/afrizeb-75-wdg-1kg_twE_JF2y9.jpg",
+    "width": 1010,
+    "height": 1010,
+    "bytes": 93154,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.eabcl.co.ke/wp-content/uploads/2025/02/Afrizeb.jpeg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "afrizeb-super-50wp-1kg",
+    "source": "https://www.eabcl.co.ke/product/afrizeb-super-50-wp/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/afrizeb-super-50wp-1kg_X8MasSKCr.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/afrizeb-super-50wp-1kg_X8MasSKCr.jpg",
+    "width": 1010,
+    "height": 1010,
+    "bytes": 97006,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.eabcl.co.ke/wp-content/uploads/2025/02/Afrizeb-Super.jpeg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "mos-kill-spira-liquid-35ml",
+    "source": "https://courii.com/shops/17/products/87392-moskill-spiral-liquid-refill-35ml",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mos-kill-spira-liquid-35ml_PkYz66tFb.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mos-kill-spira-liquid-35ml_PkYz66tFb.jpg",
+    "width": 1155,
+    "height": 1080,
+    "bytes": 141191,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://d2akad5zhzs4nz.cloudfront.net/shop_menues/1779356798612_OW22113-MOSKILL-SPIRAL-LIQUID-REFILL-35ML__Large_.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
