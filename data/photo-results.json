@@ -7707,8 +7707,56 @@
   },
   {
     "name": "agita-10wg-80g-alternate",
-    "source": "https://cheapthings.co.ke/product/agita-10wg-fly-bait-80g/",
+    "source": "https://cheapthings.co.ke/product/agita-10wg-fly-bait-80g/cobra-45w-fly-killer-unit-owner-fix|https://www.pestfix.co.uk/images/product-images/cobra_800%281%29.jpg",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "pantry-moth-trap-owner-fix",
+    "source": "https://www.catchmaster.com/cdn/shop/files/Shopify_Product_Images-811-AM-1E_1.jpg?v=1766518540&width=533",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/pantry-moth-trap-owner-fix_Es6SudoYq.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/pantry-moth-trap-owner-fix_Es6SudoYq.jpg",
+    "width": 533,
+    "height": 533,
+    "bytes": 60242,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://www.catchmaster.com/cdn/shop/files/Shopify_Product_Images-811-AM-1E_1.jpg?v=1766518540&width=533",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "reusable-outdoor-fly-bottle-trap-owner-fix",
+    "source": "https://image.made-in-china.com/2f0j00gJYWuwePEmrL/Reusable-Plastic-Fly-Catcher-Trap-Bottle-with-Attractant-Bait.webp",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/reusable-outdoor-fly-bottle-trap-owner-fix_edyzbOgpN.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/reusable-outdoor-fly-bottle-trap-owner-fix_edyzbOgpN.jpg",
+    "width": 765,
+    "height": 765,
+    "bytes": 33598,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://image.made-in-china.com/2f0j00gJYWuwePEmrL/Reusable-Plastic-Fly-Catcher-Trap-Bottle-with-Attractant-Bait.webp",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "transparent-window-fly-stickers-owner-fix",
+    "source": "https://webimg.praktiker.hu/_upload/images/praktiker_catalog/433882/1200x1200/433882_157_legycsapda-ablakmatrica-4db-os-guardn.png?version=1752157211",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/transparent-window-fly-stickers-owner-fix_uzFD41WqAV.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/transparent-window-fly-stickers-owner-fix_uzFD41WqAV.jpg",
+    "width": 1200,
+    "height": 1200,
+    "bytes": 115373,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://webimg.praktiker.hu/_upload/images/praktiker_catalog/433882/1200x1200/433882_157_legycsapda-ablakmatrica-4db-os-guardn.png?version=1752157211",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
