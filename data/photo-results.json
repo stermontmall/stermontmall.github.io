@@ -9552,5 +9552,35 @@
     "source": "https://devkigroupkenya.com/order?c=maisha-minerals-fertilizers%26q=Muriate+of+Potash+0%3A0%3A60",
     "ok": false,
     "error": "https://storage.googleapis.com/gpt-engineer-file-uploads/m42pdYpQG4PTwVvNddYICVC0NNm1/social-images/social-1784193129529-IMG_4862.webp: source image is 225x118; both source sides must be at least 150px"
+  },
+  {
+    "name": "muriate-potash-unifert-50kg-v8-20261126",
+    "source": "https://mtolori.com/product/details/muriate-of-potash-50kg-unifert-3743",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "npsb-ocp-50kg-v8-20261126",
+    "source": "https://mtolori.com/product/details/npsb-50kg-ocp-18-9n-37-7p205-6-9s-0-1b-4542",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "npk-17-17-17-etg-50kg-v8-20261126",
+    "source": "https://mtolori.com/product/details/npk-17-17-17-50kg-etg-446885",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "npk-23-23-0-etg-50kg-v8-20261126",
+    "source": "https://mtolori.com/product/details/npk-23-23-0-50kg-etg-512042",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "thabiti-coffee-22-6-12-50kg-v8-20261126",
+    "source": "https://mtolori.com/product/details/thabiti-coffee-22-6-12-50kg-5353",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
