@@ -9702,5 +9702,21 @@
     "image_source": "https://pestcontrolsuperstore.com/cdn/shop/files/Advance-Termite-Bait-Stations_1600x_6ef7e0cf-50dc-4764-8e14-e10f2d04cdea.jpg?crop=center&height=1200&v=1740171248&width=1200",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "pestoptek-termite-monitoring-stations-6pack-v8-20261127",
+    "source": "https://images-cdn.ubuy.co.in/6948824352ebcad9be0faf55-6-pack-termite-monitoring-bait-stations.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/pestoptek-termite-monitoring-stations-6pack-v8-20261127_NKsq1jhIy.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/pestoptek-termite-monitoring-stations-6pack-v8-20261127_NKsq1jhIy.jpg",
+    "width": 1000,
+    "height": 924,
+    "bytes": 60776,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://images-cdn.ubuy.co.in/6948824352ebcad9be0faf55-6-pack-termite-monitoring-bait-stations.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
