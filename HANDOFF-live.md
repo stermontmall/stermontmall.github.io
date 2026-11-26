@@ -1,3 +1,8 @@
+## 2026-11-26 11:20 (Africa/Nairobi) - Shop markdown headings FINISHED and merged to main (from `wip-shell-markdown-headings`)
+- Done: shop view shows `##`/`###` descriptions under purple titles, no raw markdown, dash lists. app.js `?v=57`. No Neon data changed.
+- Tests: description-headings 22, product-description-html 61, shell 180/180, navigation, no-classic-hop, seo-description-check, seo-indexing-guard pass; phone-size preview of a sample checked. `mobile-shell/description.test.mjs` failure is pre-existing.
+- Next: owner hard-reloads the shop and checks a few products on the live site (not reachable from the sandbox).
+
 ## 2026-11-26 11:15 (Africa/Nairobi) - Shop markdown headings: code saved, NOT merged (branch `wip-shell-markdown-headings`)
 - Done: `mobile-shell/app.js` handles `##`/`###`, hides `**` and link marks, shows dash lines as lists; `index.html` app.js `?v=` 57; new checks in `mobile-shell/description-headings.test.mjs` (22 passed).
 - Not verified: shell.test.py passed 180/180 after the app.js edit (only the headings test changed since); phone-size visual preview not done (last run was interrupted).
