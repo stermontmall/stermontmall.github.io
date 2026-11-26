@@ -8456,5 +8456,59 @@
     "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/product_6.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "bioradicante-250ml-v8-20261126",
+    "source": "https://agroduka.ke/bioradicante/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/bioradicante-250ml-v8-20261126_zY323db-o.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/bioradicante-250ml-v8-20261126_zY323db-o.jpg",
+    "width": 486,
+    "height": 581,
+    "bytes": 24011,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://agroduka.ke/images/detailed/9/bioradicante.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "algreen-liquofert-magical-1l-v8-20261126",
+    "source": "https://agropests.com/products/algreen-liquofert-magical-1l",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/algreen-liquofert-magical-1l-v8-20261126_5x1L8icL3.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/algreen-liquofert-magical-1l-v8-20261126_5x1L8icL3.jpg",
+    "width": 284,
+    "height": 429,
+    "bytes": 20898,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F03ac1df77a3226a17e9fcb98522b0d3c66a41a40c1ae2a3273ac2347e01ffbb2&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "silicu-1l-v8-20261126",
+    "source": "https://agroduka.ke/silicu-1l/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/silicu-1l-v8-20261126_PA1IEaM0L.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/silicu-1l-v8-20261126_PA1IEaM0L.jpg",
+    "width": 260,
+    "height": 408,
+    "bytes": 21861,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://agroduka.ke/images/detailed/11/Screenshot_2026-09-05_122417.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "algreen-copagel-50-1l-v8-20261126",
+    "source": "https://dawnfarmers.com/shop/crop-production/seeds-fertilizers/fertilzers/foliar-fertilizers/algreen-copagel-50/",
+    "ok": false,
+    "error": "source page HTTP 404"
   }
 ]
