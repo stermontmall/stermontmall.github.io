@@ -4530,5 +4530,21 @@
     "image_source": "https://cdn.mafrservices.com/pim-content/KEN/media/product/225584/1724850003/225584_main.jpg?im=Resize=376",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "ultraxide-1l-zagro",
+    "source": "https://www.zagro.com.au/storage/product-shop-details/March2022/Ultraxide-1L.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/ultraxide-1l-zagro_iYrbuZpb7.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/ultraxide-1l-zagro_iYrbuZpb7.jpg",
+    "width": 600,
+    "height": 729,
+    "bytes": 77445,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.zagro.com.au/storage/product-shop-details/March2022/Ultraxide-1L.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
