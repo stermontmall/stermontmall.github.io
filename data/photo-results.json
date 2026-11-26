@@ -9404,5 +9404,67 @@
     "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F387c9b775edd46989d4ec9efdf993c90377671ac98a51014f8f99125f0a76ab1&w=3840&q=75",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "mavuno-coffee-22-6-12-50kg-v8-20261126",
+    "source": "https://devkigroupkenya.com/order?c=maisha-minerals-fertilizers%26q=Mavuno+Coffee+NPK+22%3A6%3A12",
+    "ok": false,
+    "error": "https://storage.googleapis.com/gpt-engineer-file-uploads/m42pdYpQG4PTwVvNddYICVC0NNm1/social-images/social-1784193129529-IMG_4862.webp: source image is 225x118; both source sides must be at least 150px"
+  },
+  {
+    "name": "mavuno-green-leafy-20-10-18-50kg-v8-20261126",
+    "source": "https://devkigroupkenya.com/order?c=maisha-minerals-fertilizers%26q=Mavuno+Green+Leafy+Vegetables+NPK+20%3A10%3A18",
+    "ok": false,
+    "error": "https://storage.googleapis.com/gpt-engineer-file-uploads/m42pdYpQG4PTwVvNddYICVC0NNm1/social-images/social-1784193129529-IMG_4862.webp: source image is 225x118; both source sides must be at least 150px"
+  },
+  {
+    "name": "mavuno-fruits-garden-15-10-22-50kg-v8-20261126",
+    "source": "https://devkigroupkenya.com/order?c=maisha-minerals-fertilizers%26q=Mavuno+Fruits+Garden+Vegetables+NPK+15%3A10%3A22",
+    "ok": false,
+    "error": "https://storage.googleapis.com/gpt-engineer-file-uploads/m42pdYpQG4PTwVvNddYICVC0NNm1/social-images/social-1784193129529-IMG_4862.webp: source image is 225x118; both source sides must be at least 150px"
+  },
+  {
+    "name": "yara-microp-planting-50kg-v8-20261126",
+    "source": "https://agropests.com/products/yara-microp-planting-fertilizer-17296-6s-01zn-50kgs",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/yara-microp-planting-50kg-v8-20261126_fHcPsbajS.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/yara-microp-planting-50kg-v8-20261126_fHcPsbajS.jpg",
+    "width": 384,
+    "height": 535,
+    "bytes": 28741,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F292f957075dbca2e0428b2b95cbd4a4ed9b62a7758b2ead970600db22cee5387&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "yara-microp-topdressing-50kg-v8-20261126",
+    "source": "https://mtolori.com/product/details/yara-microp-top-dressing-50kg-3746",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "yaramila-cereal-23-10-5-50kg-v8-20261126",
+    "source": "https://mtolori.com/product/details/yara-mila-cereal-50kg-23-10-5-5988",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "yaramila-unik-17-50kg-v8-20261126",
+    "source": "https://dawnfarmers.com/shop/yaramila-unik-17/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/yaramila-unik-17-50kg-v8-20261126_eoYTTM2WS.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/yaramila-unik-17-50kg-v8-20261126_eoYTTM2WS.jpg",
+    "width": 240,
+    "height": 240,
+    "bytes": 7486,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://dawnfarmers.com/wp-content/uploads/2025/08/1065.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
