@@ -270,6 +270,12 @@ function syncProductMeta() {   // tab title + address follow the open product (a
   document.title = open ? qb.p.name + ' | Stermont Arcade' : catTitle();
   if (open) { const u = productUrl(); if (u && location.pathname + location.search + location.hash !== u) history.replaceState(history.state, '', u); }
   else if (cu !== '/') { if (location.pathname + location.search + location.hash !== cu) history.replaceState(history.state, '', cu); }
+  else if (/^\/c\/[^/]+\.html$/.test(location.pathname)) history.replaceState(history.state, '', '/');   // only an address this code set is reset: other parameters (campaign tags) stay
+  else if (location.pathname === '/' && new URLSearchParams(location.search).has('cat')) {
+    const params = new URLSearchParams(location.search); params.delete('cat');
+    const rest = params.toString();
+    history.replaceState(history.state, '', '/' + (rest ? '?' + rest : '') + location.hash);
+  }
   // Keep the SEO document canonical aligned with the visible in-shell route:
   // customer links may enter through ?product=<slug>, but the product itself is canonical at /p/<slug>.html.
   const canonicalPath = open ? productUrl()
@@ -280,12 +286,6 @@ function syncProductMeta() {   // tab title + address follow the open product (a
   const ogUrl = document.querySelector('meta[property="og:url"]');
   if (canonicalLink && canonicalLink.href !== canonicalUrl) canonicalLink.href = canonicalUrl;
   if (ogUrl && ogUrl.content !== canonicalUrl) ogUrl.content = canonicalUrl;
-  else if (/^\/c\/[^/]+\.html$/.test(location.pathname)) history.replaceState(history.state, '', '/');   // only an address this code set is reset: other parameters (campaign tags) stay
-  else if (location.pathname === '/' && new URLSearchParams(location.search).has('cat')) {
-    const params = new URLSearchParams(location.search); params.delete('cat');
-    const rest = params.toString();
-    history.replaceState(history.state, '', '/' + (rest ? '?' + rest : '') + location.hash);
-  }
 }
 function openOverlay(id) {
   if (stack.includes(id)) return;
