@@ -7466,5 +7466,55 @@
     "source": "https://surveilagrochemicals.co.ke/product-category/rat-bait-station/",
     "ok": false,
     "error": "The operation was aborted due to timeout"
+  },
+  {
+    "name": "verango-prime-400sc-50ml-v8c-20261126",
+    "source": "https://agroduka.com/verango-prime-400-sc",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "mchwa-king-450ec-1l-v8c-20261126",
+    "source": "https://www.mtolori.com/category/crop-protection/pest-management/?page=33",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "fs-08-fogging-machine-v8c-20261126",
+    "source": "https://edenlg.co.ke/product-category/sprayers-spraying-equipment/mist-blowers-foggers/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/fs-08-fogging-machine-v8c-20261126_13rIuGu-co.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/fs-08-fogging-machine-v8c-20261126_13rIuGu-co.jpg",
+    "width": 400,
+    "height": 400,
+    "bytes": 18909,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://edenlg.co.ke/wp-content/uploads/2026/10/WhatsApp-Image-2025-11-18-at-11.27.49-e1765016051702-400x400.jpeg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "gm-cleaning-rodent-bait-station-v8c-20261126",
+    "source": "https://gmcleaning.co.ke/product/rodent-bait-station/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/gm-cleaning-rodent-bait-station-v8c-20261126_W-7Q7t29c.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/gm-cleaning-rodent-bait-station-v8c-20261126_W-7Q7t29c.jpg",
+    "width": 1496,
+    "height": 1500,
+    "bytes": 161548,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://gmcleaning.co.ke/wp-content/uploads/2024/11/rodent-bait.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "matrina-pe-100ml-v8c-20261126",
+    "source": "https://www.mtolori.com/category/crop-protection?page=60",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
