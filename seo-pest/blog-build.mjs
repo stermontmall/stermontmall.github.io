@@ -58,7 +58,7 @@ export function renderPost(a) {
 <link rel="canonical" href="${url}"><meta name="robots" content="index, follow, max-image-preview:large">
 <meta property="og:type" content="article"><meta property="og:site_name" content="Stermont Arcade"><meta property="og:locale" content="en_KE">
 <meta property="og:title" content="${esc(a.title)}"><meta property="og:description" content="${esc(a.description)}"><meta property="og:url" content="${url}">
-<meta property="og:image" content="${SITE}/logo.png"><meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#7c3aed">
+<meta property="og:image" content="${SITE}/stermont-arcade-logo-v2.png"><meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#7c3aed">
 <style>${CSS}</style>
 ${ld({ '@context': 'https://schema.org', '@type': 'Article', headline: a.title, description: a.description, datePublished: DATE, dateModified: DATE, inLanguage: 'en-KE', author: { '@type': 'Organization', name: 'Stermont Arcade' }, publisher: { '@type': 'Organization', name: 'Stermont Arcade', logo: { '@type': 'ImageObject', url: `${SITE}/logo.png` } }, mainEntityOfPage: url })}
 ${ld({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: a.faq.map(([q, an]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: an } })) })}

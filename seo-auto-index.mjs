@@ -9,7 +9,7 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 
 const SITE = 'https://stermontarcade.co.ke';
-const IMAGE = `${SITE}/logo.png`;
+const IMAGE = `${SITE}/stermont-arcade-logo-v2.png`;
 const KEY = '8f12b16c2962614f0cce8ada60431436';
 const args = new Set(process.argv.slice(2));
 const CHECK = args.has('--check');

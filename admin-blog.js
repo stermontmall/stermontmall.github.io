@@ -164,7 +164,7 @@
       if (lines.every(function (l) { return /^-\s+/.test(l.trim()); })) return '<ul>' + lines.map(function (l) { return '<li>' + inline(l.trim().replace(/^-\s+/, '')) + '</li>'; }).join('') + '</ul>';
       return '<p>' + inline(b.replace(/\s*\n\s*/g, ' ')) + '</p>';
     }).join('\n');
-    var t = esc(v.title), d = esc(v.desc), logo = SITE + '/logo.png';
+    var t = esc(v.title), d = esc(v.desc), logo = SITE + '/stermont-arcade-logo-v2.png';
     return '<!doctype html>\n<html lang="en-KE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">\n' +
       '<title>' + t + ' | Stermont Arcade</title><meta name="description" content="' + d + '">\n' +
       '<link rel="canonical" href="' + url + '"><meta name="robots" content="index, follow, max-image-preview:large">\n' +

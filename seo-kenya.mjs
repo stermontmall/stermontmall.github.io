@@ -217,7 +217,7 @@ const shell = ({ title, desc, path, ld, body }) => `<!doctype html>
 <html lang='en-KE'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
 <title>${esc(title)}</title><meta name='description' content='${esc(desc)}'>
 <link rel='canonical' href='${SITE}${path}'><meta name='robots' content='index, follow, max-image-preview:large'>
-<meta property='og:type' content='website'><meta property='og:site_name' content='Stermont Arcade'><meta property='og:locale' content='en_KE'><meta property='og:title' content='${esc(title)}'><meta property='og:description' content='${esc(desc)}'><meta property='og:url' content='${SITE}${path}'><meta property='og:image' content='${SITE}/logo.png'><meta name='twitter:card' content='summary_large_image'><meta name='theme-color' content='#7c3aed'>
+<meta property='og:type' content='website'><meta property='og:site_name' content='Stermont Arcade'><meta property='og:locale' content='en_KE'><meta property='og:title' content='${esc(title)}'><meta property='og:description' content='${esc(desc)}'><meta property='og:url' content='${SITE}${path}'><meta property='og:image' content='${SITE}/stermont-arcade-logo-v2.png'><meta name='twitter:card' content='summary_large_image'><meta name='theme-color' content='#7c3aed'>
 <link rel='stylesheet' href='/blog/blog.css'>${STYLE}
 <script type='application/ld+json'>${json(ld)}</script></head><body>
 <header><a href='${SITE}/'>Stermont Arcade</a></header><main>
