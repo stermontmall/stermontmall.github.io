@@ -1,3 +1,8 @@
+## 2026-11-26 11:15 (Africa/Nairobi) - Shop markdown headings: code saved, NOT merged (branch `wip-shell-markdown-headings`)
+- Done: `mobile-shell/app.js` handles `##`/`###`, hides `**` and link marks, shows dash lines as lists; `index.html` app.js `?v=` 57; new checks in `mobile-shell/description-headings.test.mjs` (22 passed).
+- Not verified: shell.test.py passed 180/180 after the app.js edit (only the headings test changed since); phone-size visual preview not done (last run was interrupted).
+- Next (waiting for owner's go-ahead to merge): `python3 mobile-shell/shell.test.py && node mobile-shell/navigation.test.mjs && node product-description-html.test.mjs`, preview, then merge to main. `mobile-shell/description.test.mjs` failure is pre-existing.
+
 ## 2026-11-26 11:20 (Africa/Nairobi) - Shop view: markdown headings as purple titles (branch `wip-shell-markdown-headings`)
 - In progress: owner wants all descriptions auto-organised under purple titles. Found: `splitProductDescription` (mobile-shell/app.js) ignores `##`/`###`/`**` (188 of 440 active products use `##`). Static /p/ pages already handle them.
 - Next: fix app.js, bump `?v=` in index.html, run `node mobile-shell/description-headings.test.mjs && python3 mobile-shell/shell.test.py`, merge.

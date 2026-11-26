@@ -37,4 +37,10 @@ assert.deepEqual(titles(splitProductDescription('Intro text. SAFETY Wear gloves.
 assert.deepEqual(titles(splitProductDescription('Opening line.\nSAFETY\nRead the label before use and wear the protective equipment it asks for.\nSTORAGE\nKeep in the original closed packaging in a dry and secure place away from food.')), ['Product overview', 'Safety information', 'Storage & handling']); n++;
 // An authored line that only starts with a known label word keeps its whole line as the heading.
 ok(titles(splitProductDescription('Opening line.\nSTORAGE OF THE POWDER\nKeep the powder in its original closed packaging in a dry and secure place.\nHOW TO CHOOSE A PACK\nCompare the exact pack size shown in the title with the label before ordering.')).join('|') === 'Product overview|Storage of the powder|How to choose a pack', 'a label word at the start of an authored line does not cut the heading');
+// Markdown headings (2026-11-26): "##" lines become purple cards and no markdown marks reach the shopper.
+const md = splitProductDescription('# Pond Net\n## Product overview\nA net for ponds.\n## Empty heading\n## Where to use it\nUse over [fish ponds](https://stermontarcade.co.ke/c/fish-farming.html).\n### Care\nStore it **dry**.\n## Frequently asked questions\n**1. Does it fit?** Measure your pond first.\n**2. Do you deliver?** Yes, across Kenya.');
+assert.deepEqual(titles(md), ['Product overview', 'Where to use it', 'Care', 'Frequently asked questions']); n++;
+ok(!md.some(x => /##|\*\*|\]\(/.test(x.title + x.body + x.subs.join(''))), 'no markdown marks remain');
+ok(md[1].body.includes('fish ponds') && md[2].body.includes('Store it dry.'), 'link words and subsection text are kept');
+ok(md[3].kind === 'Frequently asked questions' && md[3].body.startsWith('Does it fit?'), 'numbered FAQ questions are cleaned');
 console.log(`mobile-shell description headings: ${n} checks passed`);
