@@ -591,8 +591,24 @@ function sectionKind(c) {
   if (/^ordering\b|^order(?:ing)? from\b|^delivery\b/i.test(c.title)) return 'Ordering, payment & delivery';
   return c.title;
 }
+/* Markdown marks must never reach the shopper: links keep their words, bold markers go. */
+function plainMarks(t) { return String(t).replace(/\[([^\]]+)\]\([^)\s]*\)/g, '$1').replace(/\*\*/g, '').trim(); }
+/* "- item" lines become a real list; the lines around them stay paragraphs. */
+function dashBlocks(body) {
+  const lines = String(body).split('\n').map(x => x.trim()).filter(Boolean);
+  if (lines.filter(x => /^[-–]\s+/.test(x)).length < 2) return null;
+  const out = [];
+  lines.forEach(x => {
+    if (!/^[-–]\s+/.test(x)) return out.push({ text: x });
+    const last = out[out.length - 1], item = x.replace(/^[-–]\s+/, '');
+    if (last && last.items) last.items.push(item); else out.push({ items: [item] });
+  });
+  return out;
+}
 function splitProductDescription(source) {
-  const raw = String(source || '').replace(/\\r\\n|\\n|\\r/g, '\n').replace(/\bundefined\b/gi, '').replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '').trim();
+  const raw = String(source || '').replace(/\\r\\n|\\n|\\r/g, '\n').replace(/\bundefined\b/gi, '').replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '')
+    .replace(/^\s*#(?!#)[^#\n]*(?=##|\n|$)/, '')              // "# Product name" title line: the page already shows the name
+    .replace(/[ \t]+(#{2,3})[ \t]+/g, '\n$1 ').trim();
   if (!raw) return [];
   const labels = [
     ['Product overview', /(?:^|\s)(?:PRODUCT SUMMARY|PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?\s*/g],
@@ -615,6 +631,18 @@ function splitProductDescription(source) {
     const labelHits = found.filter(l => !lineHits.some(h => l.at < h.end && l.end > h.at));
     found.length = 0; found.push(...labelHits, ...lineHits);
   }
+  /* Markdown headings: "## Title" starts a purple card; "### Title" is a purple subtitle (inside FAQs it is a question). */
+  const md = []; const mdRe = /^[ \t]*(#{2,3})[ \t]*(.+?)[ \t#]*$/gm; let h2 = '', mm;
+  while ((mm = mdRe.exec(raw))) {
+    const title = plainMarks(mm[2]).replace(/\s*:$/, '');
+    if (mm[1] === '##') h2 = title;
+    else if (/\?$/.test(title) || /^(frequently asked questions|faqs?)$/i.test(h2)) continue;
+    md.push({ at: mm.index, end: mdRe.lastIndex, title, line: true, sub: mm[1] === '###' });
+  }
+  if (md.length) {
+    const rest = found.filter(l => !md.some(h => l.at < h.end && l.end > h.at));
+    found.length = 0; found.push(...rest, ...md);
+  }
   found.sort((a, b) => a.at - b.at);
   // Text before the first label is the overview; the text after each label belongs to THAT label's heading.
   // Consecutive authored heading lines with no text between them stay together: the first is the card title, the next ones are purple subtitles.
@@ -624,13 +652,18 @@ function splitProductDescription(source) {
     if (h.at < pos) return;
     const body = raw.slice(pos, h.at).trim();
     if (body) { flush(body); chain = [h]; }
-    else if (h.line && chain[chain.length - 1].line) chain.push(h);
+    else if (h.line && chain[chain.length - 1].line && (h.sub || !md.includes(h))) chain.push(h);
     else chain = [h];
     pos = h.end;
   });
   const tail = raw.slice(pos).trim(); if (tail) flush(tail);
   const merged = [];
-  sections.forEach(s => { const prev = merged.find(x => x.title === s.title); if (prev) prev.body += ' ' + s.body; else merged.push({ ...s }); });
+  sections.forEach(s => {
+    s.body = plainMarks(s.body.replace(/^[ \t]*#{1,6}[ \t]*/gm, ''));
+    if (s.kind === 'Frequently asked questions' || /^(frequently asked questions|faqs?)$/i.test(s.title)) { s.kind = 'Frequently asked questions'; s.body = s.body.replace(/^[ \t]*(?:\d{1,2}[.)]|Q:)[ \t]+/gim, ''); }
+    if (!s.body) return;
+    const prev = merged.find(x => x.title === s.title); if (prev) prev.body += '\n' + s.body; else merged.push({ ...s });
+  });
   return merged;
 }
 const PC_TAB = { 'Product overview': 'Overview', 'Key features & benefits': 'Features', 'Specifications & details': 'Specs', 'Uses & applications': 'Uses', 'How to use': 'How to use', 'Before you start': 'Prepare', 'Safety information': 'Safety', 'Storage & handling': 'Storage', 'Frequently asked questions': 'FAQs', 'Ordering, payment & delivery': 'Ordering', 'Important buying notes': 'Notes' };
@@ -692,7 +725,13 @@ function renderProductDescription(target, source) {
     const faq = kind === 'Frequently asked questions' ? splitFaq(section.body) : null;
     const specs = isList && kind === 'Specifications & details' ? parseSpecs(bullets) : null;
     const steps = !isList && kind === 'How to use' ? splitSteps(section.body) : null;
-    if (faq) {
+    const dashed = !faq && !isList ? dashBlocks(section.body) : null;
+    if (dashed) {
+      dashed.forEach(b => {
+        if (!b.items) return card.appendChild(el('p', b.text));
+        const ul = el('ul'); b.items.forEach(item => ul.appendChild(el('li', item))); card.appendChild(ul);
+      });
+    } else if (faq) {
       faq.forEach((item, k) => { const d = el('details', null, 'pc-q'); if (k === 0) d.open = true; d.appendChild(el('summary', item.q)); d.appendChild(el('p', item.a)); card.appendChild(d); });
     } else if (specs) {
       const t = el('table', null, 'pc-spec'), tb = el('tbody'); specs.forEach(([k, v]) => { const tr = el('tr'); const th = el('th', k); th.scope = 'row'; tr.append(th, el('td', v)); tb.appendChild(tr); }); t.appendChild(tb); card.appendChild(t);
