@@ -5110,5 +5110,11 @@
     "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2023/10/4pcs-Sticky-Ribbon-Fly-Catcher-Trap-Killer-Insect-Non-Toxic.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "outpast-rat-bait-station",
+    "source": "https://surveilagrochemicals.co.ke/product/outpast-bait-station/",
+    "ok": false,
+    "error": "The operation was aborted due to timeout"
   }
 ]
