@@ -9514,5 +9514,21 @@
     "image_source": "https://www.yara.co.tz/siteassets/crop-nutrition/fertiliser-choices/yaramila/yaramila-cereal-tz-690x456.png",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "mavuno-fruits-garden-15-10-22-direct-v8-20261126",
+    "source": "https://mavunofertilizers.com/wp-content/uploads/elementor/thumbs/15-p3395n7x3yw79wbtmuu1ln19amn4lc4ebs9nvqtccw.png",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mavuno-fruits-garden-15-10-22-direct-v8-20261126_IRaWpaGcW.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mavuno-fruits-garden-15-10-22-direct-v8-20261126_IRaWpaGcW.jpg",
+    "width": 200,
+    "height": 200,
+    "bytes": 13002,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://mavunofertilizers.com/wp-content/uploads/elementor/thumbs/15-p3395n7x3yw79wbtmuu1ln19amn4lc4ebs9nvqtccw.png",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
