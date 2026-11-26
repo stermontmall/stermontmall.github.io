@@ -1,9 +1,9 @@
-## 2026-11-26 (Africa/Nairobi) - New logo for WhatsApp link previews (branch `wip-whatsapp-logo`, NOT merged)
+## 2026-11-26 (Africa/Nairobi) - New logo for WhatsApp link previews (MERGED to main 21:08, Pages deploy of 346aa28 succeeded)
 - Owner attached the current (cart) logo: WhatsApp still shows the previous one.
 - Done: added `stermont-arcade-logo-v2.png` (new address avoids a remembered preview), replaced `logo.png` with the same file, and pointed og:image/twitter:image that used logo.png or icon-512.png at it (HTML pages + generators). Product photo previews unchanged.
 - Not changed: app icons, favicon, apple-touch-icon, logo.svg, logo-horizontal.* (still old artwork).
 - Tests: root *.test.mjs pass except price-watch, sales-leads-report, seo-titles. Not tested in WhatsApp.
-- Next: owner approval, then merge into main. Independent of `wip-smart-search`.
+- Next: owner to check a new WhatsApp message. `wip-smart-search` still NOT merged.
 
 ## 2026-11-26 14:05 (Africa/Nairobi) - Replace Rafiki logo/branded photos (main, photo queue)
 - Owner: keep products; swap Rafiki logo photos for real product photos. 8 affected: mende-mo-fire, stop-vermin-100g, agita-80g, bipronex-5g, cobra-45w, pantry-moth-trap, fly-bottle-trap, window-fly-stickers.
