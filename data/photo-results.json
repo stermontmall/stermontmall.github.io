@@ -9530,5 +9530,27 @@
     "image_source": "https://mavunofertilizers.com/wp-content/uploads/elementor/thumbs/15-p3395n7x3yw79wbtmuu1ln19amn4lc4ebs9nvqtccw.png",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "mavuno-green-leafy-20-10-18-50kg-official-v8-20261126",
+    "source": "https://mmfl.devkigroupke.com/product-category/mavuno-fertilizer/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mavuno-green-leafy-20-10-18-50kg-official-v8-20261126_Uy_gmhotG.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mavuno-green-leafy-20-10-18-50kg-official-v8-20261126_Uy_gmhotG.jpg",
+    "width": 300,
+    "height": 300,
+    "bytes": 17601,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://mmfl.devkigroupke.com/wp-content/uploads/2021/02/MAVUNO-ART-WORK-2021-05-300x300.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "muriate-of-potash-0-0-60-50kg-devki-v8-20261126",
+    "source": "https://devkigroupkenya.com/order?c=maisha-minerals-fertilizers%26q=Muriate+of+Potash+0%3A0%3A60",
+    "ok": false,
+    "error": "https://storage.googleapis.com/gpt-engineer-file-uploads/m42pdYpQG4PTwVvNddYICVC0NNm1/social-images/social-1784193129529-IMG_4862.webp: source image is 225x118; both source sides must be at least 150px"
   }
 ]
