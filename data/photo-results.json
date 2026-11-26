@@ -9626,5 +9626,21 @@
     "source": "https://www.elgonkenya.com/wp-content/uploads/2023/02/RICE-P-THABITI-MOCKUP-front-1.png",
     "ok": false,
     "error": "fetch failed"
+  },
+  {
+    "name": "thabiti-rice-planting-11-23-22-50kg-proxy-v8-20261126",
+    "source": "https://images.weserv.nl/?url=www.elgonkenya.com/wp-content/uploads/2023/02/RICE-P-THABITI-MOCKUP-front-1.png",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/thabiti-rice-planting-11-23-22-50kg-proxy-v8-20261126_5WmvRGhiJ.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/thabiti-rice-planting-11-23-22-50kg-proxy-v8-20261126_5WmvRGhiJ.jpg",
+    "width": 617,
+    "height": 870,
+    "bytes": 63210,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://images.weserv.nl/?url=www.elgonkenya.com/wp-content/uploads/2023/02/RICE-P-THABITI-MOCKUP-front-1.png",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
