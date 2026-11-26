@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#321064"><title>Stermont Arcade — Orders admin</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#211936;background:#f7f5fb}*{box-sizing:border-box}body{margin:0}header{background:#321064;color:#fff;padding:16px max(16px,calc((100% - 900px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}main{max-width:900px;margin:20px auto;padding:0 14px}.card{background:#fff;border:1px solid #e7e1f1;border-radius:16px;padding:16px;margin-bottom:14px}.hl{border:2px solid #6d28d9}h1{font-size:18px;margin:0}h2{font-size:17px;margin:0 0 8px}.muted{color:#716982;font-size:13px}label{display:block;font-weight:650;font-size:13px;margin:10px 0 5px}input{width:100%;padding:11px;border:1px solid #d9d2e5;border-radius:9px;font:inherit}button,a.b{border:0;border-radius:9px;background:#6d28d9;color:#fff;padding:10px 14px;font:inherit;font-weight:650;cursor:pointer;text-decoration:none;display:inline-block}button.sec,a.sec{background:#eee9f6;color:#30234a}button.red{background:#dc2626}button:disabled{opacity:.55}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.msg{padding:10px 12px;border-radius:9px;background:#f0ebf8;margin:10px 0;white-space:pre-wrap}.ok{background:#e6f7ec;color:#176536}.err{background:#fff0f0;color:#a11}.hidden{display:none!important}.pill{display:inline-block;border-radius:30px;padding:3px 9px;background:#eee9f6;font-size:12px;font-weight:700}.p-pending{background:#fff3d7;color:#805300}.p-paid{background:#e3f8e9;color:#176536}.p-declined{background:#fde8e8;color:#a11}.it{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #f0ecf6;padding:5px 0;font-size:14px}.code{font-family:ui-monospace,monospace;font-weight:800;letter-spacing:.04em}
+</style></head><body>
+<header><h1>Stermont Arcade · Orders</h1><div class="row"><a class="b sec" href="/neon-admin.html">Catalogue admin</a><span id="who" class="muted" style="color:#eee"></span><button id="logout" class="sec hidden">Sign out</button></div></header>
+<main>
+<section id="login" class="card"><h2>Admin sign in</h2><p class="muted">Use the same Neon admin account as the catalogue admin.</p>
+<form id="loginform"><label>Email</label><input name="email" type="email" autocomplete="username" required><label>Password</label><input name="password" type="password" autocomplete="current-password" required><div class="row" style="margin-top:12px"><button id="signin">Sign in</button></div></form><div id="loginmsg" class="msg err hidden"></div></section>
+<div id="app" class="hidden"><div class="row" style="justify-content:space-between;margin-bottom:10px"><div class="muted">Approve, pack and deliver orders. The customer is emailed at each step (if they gave an email).</div><button id="refresh" class="sec">Refresh</button></div><div id="notice" class="msg hidden"></div><div id="orders"><p class="muted">Loading…</p></div></div>
+</main>
+<script src="/order-emails.js"></script>
+<script type="module">
+import { createAuthClient } from "https://esm.sh/@neon/auth";
+const AUTH="https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth";
+const DATA="https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1";
+const auth=createAuthClient(AUTH,{fetchOptions:{credentials:"include"}});
+const $=s=>document.querySelector(s), focusRef=(new URLSearchParams(location.search).get("ref")||"").toUpperCase();
+let me=null;
+const money=n=>"KSh "+Number(n||0).toLocaleString("en-KE");
+function say(t,ok){const n=$("#notice");n.textContent=t;n.className="msg "+(ok?"ok":"err")}
+async function token(){let t=null;try{const r=await auth.token();t=r.data?.token||null}catch(e){}if(!t){try{const s=await auth.getSession();t=s.data?.session?.token||null}catch(e){}}if(!t)throw new Error("Your login session expired. Sign in again.");return t}
+async function data(path,opts={}){const jwt=await token();const r=await fetch(DATA+"/"+path,{...opts,headers:{Authorization:"Bearer "+jwt,"Content-Type":"application/json",Prefer:"return=representation",...(opts.headers||{})}});const b=await r.json().catch(()=>null);if(!r.ok)throw new Error(b?.message||b?.hint||("Data API returned HTTP "+r.status));return b}
+function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function stateOf(o){if(o.status==="declined")return"declined";if(o.status!=="paid")return"pending";return o.stage==="delivered"?"delivered":o.stage==="packed"?"packed":"confirmed"}
+const NEXT={pending:[["confirmed","Approve (payment verified)",""],["declined","Decline","red"]],confirmed:[["packed","Mark packed",""],["declined","Decline","red"]],packed:[["delivered","Mark delivered / collected",""]],delivered:[],declined:[["confirmed","Approve after all",""]]};
+function patchFor(state){const now=new Date().toISOString();
+  if(state==="confirmed")return{status:"paid",pay_verified:true,stage:"confirmed",handled_at:now};
+  if(state==="declined")return{status:"declined",pay_verified:false,stage:null,handled_at:now};
+  if(state==="packed")return{stage:"packed",handled_at:now};
+  if(state==="delivered")return{stage:"delivered",handled_at:now};return{}}
+async function move(o,state,btns){
+  if(state==="declined"&&!confirm("Decline order "+o.ref+"? The customer will be told the payment could not be verified."))return;
+  btns.forEach(b=>b.disabled=true);
+  try{
+    const rows=await data("orders?id=eq."+encodeURIComponent(o.id),{method:"PATCH",body:JSON.stringify(patchFor(state))});
+    if(!rows||!rows.length)throw new Error("The order was not updated. Check that your account is an approved admin.");
+    const updated=rows[0];let mail="No email on this order, so no email was sent.";
+    if(updated.email){
+      const ok=await window.STMOrderEmails.status(updated,state);
+      mail=ok?"Customer emailed at "+updated.email+".":"The status was saved but the email to "+updated.email+" FAILED. Message the customer on WhatsApp.";
+      await data("order_notifications",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({order_id:updated.id,order_ref:updated.ref,status:state,recipient_type:"customer",recipient_email:updated.email,success:!!ok,error:ok?null:"EmailJS send failed"})}).catch(()=>{});
+    }
+    say("Order "+o.ref+" is now "+state+". "+mail,true);await load();
+  }catch(e){say(e.message);btns.forEach(b=>b.disabled=false)}
+}
+function card(o){
+  const st=stateOf(o),c=el("div","card"+(o.ref&&o.ref.toUpperCase()===focusRef?" hl":""));c.id="o-"+o.ref;
+  const top=el("div","row");top.style.justifyContent="space-between";const h=el("h2",null,o.ref);top.append(h,el("span","pill p-"+(o.status||"pending"),st.toUpperCase()));c.append(top);
+  c.append(el("div","muted",new Date(o.created_at).toLocaleString("en-KE")+" · "+(o.method==="pickup"?"Pickup":"Delivery to "+(o.address||"")+", "+(o.county||""))));
+  (o.items||[]).forEach(i=>{const r=el("div","it");r.append(el("span",null,(i.name||"Item")+" × "+(i.qty||1)),el("b",null,money(i.total)));c.append(r)});
+  const t=el("div","it");t.append(el("b",null,"Total"),el("b",null,money(o.subtotal)));c.append(t);
+  const p=el("p",null);p.append("Customer: "+o.customer_name+" · ");const a=el("a",null,o.phone);a.href="tel:"+o.phone;p.append(a);p.append(o.email?" · "+o.email:" · no email");c.append(p);
+  const pm=el("p",null);pm.append("M-Pesa code entered: ");pm.append(el("span","code",o.pay_code||"—"));pm.append(" · says paid "+money(o.pay_amount)+(Number(o.pay_amount)<Number(o.subtotal)?"  ⚠ LESS than total":""));c.append(pm);
+  if(o.notes)c.append(el("p","muted","Notes: "+o.notes));
+  const row=el("div","row"),btns=[];
+  (NEXT[st]||[]).forEach(([s,label,cls])=>{const b=el("button",cls,label);b.onclick=()=>move(o,s,btns);btns.push(b);row.append(b)});
+  const wa=el("a","b sec","WhatsApp customer");wa.href="https://wa.me/"+String(o.phone||"").replace(/\D/g,"");wa.target="_blank";wa.rel="noopener";row.append(wa);c.append(row);return c}
+async function load(){
+  const rows=await data("orders?select=*&order=created_at.desc&limit=100");const box=$("#orders");box.textContent="";
+  if(!rows.length){box.append(el("p","muted","No orders yet."));return}
+  rows.forEach(o=>box.append(card(o)));
+  if(focusRef){const f=document.getElementById("o-"+focusRef);if(f)f.scrollIntoView({block:"start"})}}
+async function start(){
+  const r=await auth.getSession();const u=r.data?.user;if(!u){$("#login").classList.remove("hidden");$("#app").classList.add("hidden");return}
+  me=u;try{const pr=await data("admin_profiles?select=role,active&user_id=eq."+encodeURIComponent(u.id));
+    if(!pr?.length||!pr[0].active){$("#login").classList.remove("hidden");const m=$("#loginmsg");m.textContent="Your account is not approved as a store administrator.";m.classList.remove("hidden");return}
+    $("#who").textContent=u.email||"Admin";$("#login").classList.add("hidden");$("#app").classList.remove("hidden");$("#logout").classList.remove("hidden");await load()
+  }catch(e){$("#login").classList.remove("hidden");const m=$("#loginmsg");m.textContent=e.message;m.classList.remove("hidden")}}
+$("#loginform").addEventListener("submit",async e=>{e.preventDefault();const f=new FormData(e.currentTarget);$("#signin").disabled=true;try{const r=await auth.signIn.email({email:f.get("email"),password:f.get("password")});if(r.error)throw new Error(r.error.message||"Sign in failed");$("#loginmsg").classList.add("hidden");await start()}catch(err){const m=$("#loginmsg");m.textContent=err.message;m.classList.remove("hidden")}finally{$("#signin").disabled=false}});
+$("#logout").onclick=async()=>{await auth.signOut();location.reload()};
+$("#refresh").onclick=()=>load().then(()=>say("Orders refreshed.",true)).catch(e=>say(e.message));
+start().catch(e=>{const m=$("#loginmsg");m.textContent=e.message;m.classList.remove("hidden")});
+</script></body></html>
