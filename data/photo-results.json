@@ -4753,9 +4753,19 @@
   },
   {
     "name": "mosquito-led-light-trap-5w",
-    "source": "https://imaginecare.co.ke/wp-content/uploads/2022/03/63426.jpg?v=1684477069",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://halfrate.in/cdn/shop/products/249a3.jpg?v=1602268371",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mosquito-led-light-trap-5w_YU9NrNgwd.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mosquito-led-light-trap-5w_YU9NrNgwd.jpg",
+    "width": 1010,
+    "height": 1010,
+    "bytes": 80346,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://halfrate.in/cdn/shop/products/249a3.jpg?v=1602268371",
+    "http_status": 200,
+    "image_found_via": "direct"
   },
   {
     "name": "fly-catcher-1pc",
@@ -4787,15 +4797,35 @@
   },
   {
     "name": "duro-tekk-battery-sprayer-16l",
-    "source": "https://imaginecare.co.ke/wp-content/uploads/2021/09/buy-Duro-Tekk-Battery-Sprayer-500x500.jpg?v=1684477843",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://d91ztqmtx7u1k.cloudfront.net/ClientContent/Images/Catalogue/aspee-brass-battery-operated-knapsack-sprayer20230927051137.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/duro-tekk-battery-sprayer-16l_iqgwBZ5-g.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/duro-tekk-battery-sprayer-16l_iqgwBZ5-g.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 11113,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://d91ztqmtx7u1k.cloudfront.net/ClientContent/Images/Catalogue/aspee-brass-battery-operated-knapsack-sprayer20230927051137.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   },
   {
     "name": "aico-ac767-2-stroke-knapsack-sprayer",
-    "source": "https://imaginecare.co.ke/product/power-knapsack-sprayer-ac767-20ltr/",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://image.made-in-china.com/2f0j00cQkoyzmIhbua/Agricultural-Portable-Knapsack-Petrol-Sprayer-Used-in-Agriculture-767.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/aico-ac767-2-stroke-knapsack-sprayer_kfUHooEBL.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/aico-ac767-2-stroke-knapsack-sprayer_kfUHooEBL.jpg",
+    "width": 800,
+    "height": 800,
+    "bytes": 49709,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://image.made-in-china.com/2f0j00cQkoyzmIhbua/Agricultural-Portable-Knapsack-Petrol-Sprayer-Used-in-Agriculture-767.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   },
   {
     "name": "jacto-pjm-motorized-knapsack-sprayer",
@@ -4843,8 +4873,18 @@
   },
   {
     "name": "jacto-pjm-motorized-knapsack-sprayer-25l",
-    "source": "https://imaginecare.co.ke/wp-content/uploads/2022/12/JACTO-PJM-MOTORIZED-KNAPSACK-SPRAYER-500x659.png?v=1684475251",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://images.tcdn.com.br/img/img_prod/808621/pulverizador_costal_motorizado_25litros_pjm_25_jacto_3837_1_e57cb71539570bd244caf72f3eddc633.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/jacto-pjm-motorized-knapsack-sprayer-25l_GtceVD4Ne.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/jacto-pjm-motorized-knapsack-sprayer-25l_GtceVD4Ne.jpg",
+    "width": 1200,
+    "height": 1200,
+    "bytes": 46732,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://images.tcdn.com.br/img/img_prod/808621/pulverizador_costal_motorizado_25litros_pjm_25_jacto_3837_1_e57cb71539570bd244caf72f3eddc633.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
