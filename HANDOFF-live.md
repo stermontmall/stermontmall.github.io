@@ -72,3 +72,12 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Added the existing Mombasa landing page to the hand-maintained static entries in `sitemap.xml`; the product-page generator preserves static entries.
 - Preserved all canonicals and URL paths. No product names, prices, stock, slugs or active flags changed. No generated product/category HTML or workflow files edited.
 - Validation so far: JSON-LD parses on all four edited HTML pages; titles are under 60 characters; Mombasa URL now appears in root sitemap. Awaiting final diff review and CI/build validation.
+
+
+## 2026-11-26 — Fix local SEO PR shell validation failures (branch `seo/local-intent-kenya-cities-2026-11-26`)
+- Found exact failures from workflow run 45764478423 / job 139721970510: SSR home-grid test expected `/p/` anchors although actual SSR cards intentionally use owner-approved `?product=` customer links; query deep-link test expected canonical `/p/garden-set-250ml.html` but app.js left canonical at homepage.
+- Updated `mobile-shell/shell.test.py` to assert at least six server-rendered `?product=` links and renamed canonical test to accurately describe product SEO canonical.
+- Updated `mobile-shell/app.js` so active product overlays set canonical and og:url to the corresponding static `/p/<slug>.html`; categories retain their category URL and the homepage canonical returns when the product overlay is closed. No customer-facing link format changed.
+- Bumped `index.html` app.js cache version from v53 to v54 as required.
+- Commits: app.js `99cb9108b59cdf148c3fce579266aee30a3957da`; index.html `f6ad09a34820e4572797f8b7f5746ccab8492a49`; shell test `fc8fbaae26a482cd242f50e9ae131388c6929fb6`.
+- Next: inspect CI for this branch; verify mobile-shell Playwright checks and SEO checks. Do not merge unless all required checks pass. If running locally, exact test command is `python mobile-shell/shell.test.py` (requires the repo's Playwright/Chromium setup).
