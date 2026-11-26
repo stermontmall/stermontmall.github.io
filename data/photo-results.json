@@ -5166,5 +5166,11 @@
     "source": "https://jozaken.co.ke/product/thermal-fogging-machine/",
     "ok": false,
     "error": "fetch failed"
+  },
+  {
+    "name": "tronic-ik-gc30-30w-insect-killer",
+    "source": "https://shopit.co.ke/tronic-ik-gc30-30-watts-insect-killer.html",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
