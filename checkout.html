@@ -39,7 +39,7 @@
 <p id="pickup-note" class="muted hidden">Collect from Stermont Arcade, Sarit Centre, Westlands. Open daily 8:00 AM–8:00 PM.</p>
 <div class="field"><label for="notes">Order notes (optional)</label><textarea id="notes" maxlength="500" placeholder="Landmark or delivery instructions"></textarea></div>
 </section>
-<section class="card"><h2>M-Pesa payment</h2><div class="pay"><b>Paybill: 714777</b><br>Account number: <b>0789514060</b><br>Enter the exact amount shown above. After paying, enter the M-Pesa transaction code below. Your order remains pending until staff verify payment.</div>
+<section class="card"><h2>M-Pesa payment</h2><div class="pay"><b>Paybill: 714777</b><br>Account number: <b>0748888230</b><br>Enter the exact amount shown above. After paying, enter the M-Pesa transaction code below. Your order remains pending until staff verify payment.</div>
 <div class="grid"><div class="field"><label for="paycode">M-Pesa transaction code</label><input id="paycode" maxlength="120" autocapitalize="characters" required placeholder="e.g. QAB12CD34"></div><div class="field"><label for="payamount">Amount paid (KSh)</label><input id="payamount" type="number" min="1" step="1" inputmode="numeric" required></div></div>
 </section>
 <p id="error" class="err" role="alert"></p><button id="submit" class="btn" type="submit">Place order</button>
@@ -50,6 +50,16 @@
 (function(){
 'use strict';
 const API='https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
+const AUTH='https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth';
+let tok='',tokExp=0;
+async function token(){
+ if(tok&&Date.now()<tokExp-30000)return tok;
+ const r=await fetch(AUTH+'/token/anonymous',{credentials:'include'});
+ if(!r.ok)throw new Error('Could not start a secure session ('+r.status+'). Please try again.');
+ const j=await r.json().catch(()=>null);
+ if(!j||typeof j.token!=='string'||!j.token)throw new Error('Could not start a secure session. Please try again.');
+ tok=j.token;const e=Number(j.expires_at);tokExp=e?(e<1e12?e*1000:e):Date.now()+300000;return tok;
+}
 const counties=['Nairobi','Kiambu','Machakos','Kajiado','Nakuru','Nyeri','Meru','Tharaka-Nithi','Embu','Kirinyaga',"Murang'a",'Nyandarua','Laikipia','Mombasa','Kisumu','Uasin Gishu','Kwale','Kilifi','Taita-Taveta','Garissa','Isiolo','Kitui','Makueni','Trans Nzoia','Elgeyo-Marakwet','Nandi','Baringo','Narok','Kericho','Bomet','Kakamega','Vihiga','Bungoma','Busia','Siaya','Homa Bay','Migori','Kisii','Nyamira'];
 const fees={Nairobi:300,Kiambu:400,Machakos:400,Kajiado:400,Nakuru:600,Nyeri:600,Meru:600,'Tharaka-Nithi':600,Embu:600,Kirinyaga:600,"Murang'a":600,Nyandarua:600,Laikipia:600,Mombasa:600,Kisumu:600,'Uasin Gishu':600,Kwale:800,Kilifi:800,'Taita-Taveta':800,Garissa:800,Isiolo:800,Kitui:800,Makueni:800,'Trans Nzoia':800,'Elgeyo-Marakwet':800,Nandi:800,Baringo:800,Narok:800,Kericho:800,Bomet:800,Kakamega:800,Vihiga:800,Bungoma:800,Busia:800,Siaya:800,'Homa Bay':800,Migori:800,Kisii:800,Nyamira:800};
 const $=id=>document.getElementById(id), money=n=>'KSh '+Number(n).toLocaleString('en-KE');
@@ -75,7 +85,8 @@ $('form').addEventListener('submit',async e=>{
  const btn=$('submit');btn.disabled=true;btn.textContent='Submitting order…';
  const orderRef=ref(),payload={p_ref:orderRef,p_customer_name:name,p_phone:ph,p_email:$('email').value.trim()||null,p_method:method(),p_county:delivery?county:null,p_address:delivery?$('address').value.trim():null,p_notes:$('notes').value.trim()||null,p_items:clean.map(i=>({product_id:i.rowId,qty:Number(i.qty)})),p_pay_code:code,p_pay_amount:amount,p_voucher_code:null};
  try{
-  const res=await fetch(API+'rpc/create_guest_order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const jwt=await token();
+  const res=await fetch(API+'rpc/create_guest_order',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+jwt},body:JSON.stringify(payload)});
   const data=await res.json().catch(()=>({}));
   if(!res.ok)throw new Error(data.message||data.reason||('Checkout failed ('+res.status+').'));
   if(!data.ok)throw new Error(data.reason||'We could not create your order.');
