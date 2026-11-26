@@ -62,3 +62,13 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Blocked: `product-pages.yml` runs #866-#871 all fail since 09:30 today (last success #849, 2026-11-21) at step "Test Google indexing safeguards": `node seo-indexing-guard.test.mjs` line 38 expects `imageTransformsRequested = process.env.SUPABASE_IMAGE_TRANSFORMS === 'true'` in the generator; that Supabase-era string is gone after the Neon migration. Fails identically before the WhatsApp change.
 - Impact: none for the number. PR #1076 already replaced it inside the generated pages in `p/`, `c/`, `guides/`, `blog/`, `services/`, `pest-control/`; Neon rows updated. A rebuild from Neon would also produce the new number.
 - Next: owner/Neon-migration session updates `seo-indexing-guard.test.mjs` (or the generator), then re-dispatch: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+
+
+## 2026-11-26 — Local-intent SEO update (branch `seo/local-intent-kenya-cities-2026-11-26`)
+- Updated the manually authored Nairobi landing page to target high-intent pest-control shop and agrovet supply searches, with clearer H2/H3 subtitles for product types, pack-size/price checks, Westlands pickup, Nairobi delivery areas and safe product selection.
+- Updated the Mombasa landing page for pest-control products, fumigation supplies and agrovet products; added distinct Coast-area guidance and a transparent list of other major-city delivery enquiry locations. Explicitly clarifies there are no additional Stermont shop branches in those towns.
+- Improved the services hub title, H1 and local city coverage section. Wording states that non-Nairobi service bookings are subject to confirmation and availability.
+- Improved the Kenya-wide commercial pest-control supply page title, metadata, headings and service-area structured data for named city delivery enquiries. It distinguishes product delivery enquiries from on-site service coverage.
+- Added the existing Mombasa landing page to the hand-maintained static entries in `sitemap.xml`; the product-page generator preserves static entries.
+- Preserved all canonicals and URL paths. No product names, prices, stock, slugs or active flags changed. No generated product/category HTML or workflow files edited.
+- Validation so far: JSON-LD parses on all four edited HTML pages; titles are under 60 characters; Mombasa URL now appears in root sitemap. Awaiting final diff review and CI/build validation.
