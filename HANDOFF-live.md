@@ -106,3 +106,10 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Updated the assertion to compare the canonical URL pathname, preserving the requirement that the deep link resolves to `/p/garden-set-250ml.html` while allowing the test server's local hostname.
 - Commit: `1e5cc399b9ce00a08f9129656c17fd26450a407a`.
 - Re-run route and SEO workflows on the new HEAD; PR #1182 remains open/unmerged and changes are not live.
+
+
+## 2026-11-26 — Accessibility contrast follow-up (branch `fix/accessibility-contrast-2026-11-26`)
+- Found Pa11y WCAG 2 AA failures in site audit run 45770899011: 10/19 sampled pages passed. Repeated Stermont Arcade logo accent text contrast was 2.59:1 (minimum 3:1); products page navigation/footer text was 4.45:1 (minimum 4.5:1).
+- Changed only the logo accent text from `#f58220` to the Pa11y-recommended darker `#e87513` in `index.html`; changed the products page wash background from `#f6f7fb` to the recommended `#f8f9fd` in `products.html`. No copy, SEO metadata, routes, or product data changed.
+- In progress: run CI/Pa11y on this branch and confirm contrast checks clear before merge.
+- Next: inspect PR checks and re-run Pa11y; do not merge until validation is green.
