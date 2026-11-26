@@ -250,7 +250,7 @@ const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
    a copied or shared link then previews as this product, from that page's head, and a phone that opens it goes straight into this same product view inside
    the shell (the inline script at the top of the page head, seo-shell-chrome.mjs, and shell-chrome.js send /p/<slug>.html to /?product=<slug>).
    Crawlers get the static page, whose canonical is this same clean address. Older links that still end in ?shell=1 keep working (same two scripts). */
-const productUrl = () => { if (!qb.p) return undefined; const selected = sizeOf(qb.p, qb.size).slug || qb.p.slug; if (/^\/p\/[^/]+\.html$/i.test(location.pathname) && location.hash) return location.pathname + location.hash; return '/p/' + encodeURIComponent(selected) + '.html'; };
+const productUrl = () => { if (!qb.p) return undefined; if (deepOpen && PRODUCT_ROUTE_SLUG) return '/p/' + encodeURIComponent(PRODUCT_ROUTE_SLUG) + '.html' + location.hash; const selected = sizeOf(qb.p, qb.size).slug || qb.p.slug; if (/^\/p\/[^/]+\.html$/i.test(location.pathname) && location.hash) return location.pathname + location.hash; return '/p/' + encodeURIComponent(selected) + '.html'; };
 /* A category has its own address too (owner 2026-11-09: "when I tap on categories, make a direct link"): /c/<slug>.html, the clean address of the generated category page
    (a sub-category uses its own slug). A copied or shared link previews as that category, and a phone that opens it goes straight back into the same category in the shell
    (the inline script of seo-shell-chrome.mjs sends /c/<slug>.html to /?cat=<slug>, handled by openCatLink in section 9b). The address only changes in place (replaceState):
@@ -276,6 +276,16 @@ function syncProductMeta() {   // tab title + address follow the open product (a
     const rest = params.toString();
     history.replaceState(history.state, '', '/' + (rest ? '?' + rest : '') + location.hash);
   }
+  // Keep the SEO document canonical aligned with the visible in-shell route:
+  // customer links may enter through ?product=<slug>, but the product itself is canonical at /p/<slug>.html.
+  const canonicalPath = open ? productUrl()
+    : (/^\/p\/[^/]+\.html$/i.test(location.pathname) || /^\/c\/[^/]+\.html$/i.test(location.pathname)) ? location.pathname
+    : cu !== '/' ? cu : '/';
+  const canonicalUrl = new URL(canonicalPath || '/', location.origin).href;
+  const canonicalLink = document.querySelector('link[rel="canonical"]');
+  const ogUrl = document.querySelector('meta[property="og:url"]');
+  if (canonicalLink && canonicalLink.href !== canonicalUrl) canonicalLink.href = canonicalUrl;
+  if (ogUrl && ogUrl.content !== canonicalUrl) ogUrl.content = canonicalUrl;
 }
 function openOverlay(id) {
   if (stack.includes(id)) return;
@@ -801,6 +811,13 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
   try { hashSize = decodeURIComponent(location.hash.replace(/^#/, '')); } catch { hashSize = location.hash.replace(/^#/, ''); }
   const chosen = hashSize || slug;
   deepOpen = true;
+  // Set the SEO URL from the requested deep-link slug before rendering the overlay.
+  // This covers legacy ?product= links as well as direct /p/<slug>.html visits.
+  const deepCanonical = new URL('/p/' + encodeURIComponent(PRODUCT_ROUTE_SLUG || slug) + '.html', location.origin).href;
+  const deepCanonicalLink = document.querySelector('link[rel="canonical"]');
+  const deepOgUrl = document.querySelector('meta[property="og:url"]');
+  if (deepCanonicalLink) deepCanonicalLink.href = deepCanonical;
+  if (deepOgUrl) deepOgUrl.content = deepCanonical;
   qb.p = p; qb.size = (p.sizes.find(z => z.slug === chosen || z.rowId === chosen) || p.sizes.find(z => z.slug === slug || z.rowId === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
   renderQB(); openProductPage();
 }

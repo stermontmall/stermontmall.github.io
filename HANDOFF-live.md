@@ -62,3 +62,47 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Blocked: `product-pages.yml` runs #866-#871 all fail since 09:30 today (last success #849, 2026-11-21) at step "Test Google indexing safeguards": `node seo-indexing-guard.test.mjs` line 38 expects `imageTransformsRequested = process.env.SUPABASE_IMAGE_TRANSFORMS === 'true'` in the generator; that Supabase-era string is gone after the Neon migration. Fails identically before the WhatsApp change.
 - Impact: none for the number. PR #1076 already replaced it inside the generated pages in `p/`, `c/`, `guides/`, `blog/`, `services/`, `pest-control/`; Neon rows updated. A rebuild from Neon would also produce the new number.
 - Next: owner/Neon-migration session updates `seo-indexing-guard.test.mjs` (or the generator), then re-dispatch: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+
+
+## 2026-11-26 — Local-intent SEO update (branch `seo/local-intent-kenya-cities-2026-11-26`)
+- Updated the manually authored Nairobi landing page to target high-intent pest-control shop and agrovet supply searches, with clearer H2/H3 subtitles for product types, pack-size/price checks, Westlands pickup, Nairobi delivery areas and safe product selection.
+- Updated the Mombasa landing page for pest-control products, fumigation supplies and agrovet products; added distinct Coast-area guidance and a transparent list of other major-city delivery enquiry locations. Explicitly clarifies there are no additional Stermont shop branches in those towns.
+- Improved the services hub title, H1 and local city coverage section. Wording states that non-Nairobi service bookings are subject to confirmation and availability.
+- Improved the Kenya-wide commercial pest-control supply page title, metadata, headings and service-area structured data for named city delivery enquiries. It distinguishes product delivery enquiries from on-site service coverage.
+- Added the existing Mombasa landing page to the hand-maintained static entries in `sitemap.xml`; the product-page generator preserves static entries.
+- Preserved all canonicals and URL paths. No product names, prices, stock, slugs or active flags changed. No generated product/category HTML or workflow files edited.
+- Validation so far: JSON-LD parses on all four edited HTML pages; titles are under 60 characters; Mombasa URL now appears in root sitemap. Awaiting final diff review and CI/build validation.
+
+
+## 2026-11-26 — Fix local SEO PR shell validation failures (branch `seo/local-intent-kenya-cities-2026-11-26`)
+- Found exact failures from workflow run 45764478423 / job 139721970510: SSR home-grid test expected `/p/` anchors although actual SSR cards intentionally use owner-approved `?product=` customer links; query deep-link test expected canonical `/p/garden-set-250ml.html` but app.js left canonical at homepage.
+- Updated `mobile-shell/shell.test.py` to assert at least six server-rendered `?product=` links and renamed canonical test to accurately describe product SEO canonical.
+- Updated `mobile-shell/app.js` so active product overlays set canonical and og:url to the corresponding static `/p/<slug>.html`; categories retain their category URL and the homepage canonical returns when the product overlay is closed. No customer-facing link format changed.
+- Bumped `index.html` app.js cache version from v53 to v54 as required.
+- Commits: app.js `99cb9108b59cdf148c3fce579266aee30a3957da`; index.html `f6ad09a34820e4572797f8b7f5746ccab8492a49`; shell test `fc8fbaae26a482cd242f50e9ae131388c6929fb6`.
+- Next: inspect CI for this branch; verify mobile-shell Playwright checks and SEO checks. Do not merge unless all required checks pass. If running locally, exact test command is `python mobile-shell/shell.test.py` (requires the repo's Playwright/Chromium setup).
+
+
+## 2026-11-26 — Follow-up fix after browser regression (branch `seo/local-intent-kenya-cities-2026-11-26`)
+- Inspected route-regression log from run 45766456533. Failures clustered around category direct-route cleanup, returning from tabs/cart, restoring/removing `?cat=`, and the product SEO canonical assertion.
+- Root cause: while adding canonical/og:url synchronization to `syncProductMeta()`, the existing category URL cleanup `else if` branches were accidentally left attached to the Open Graph URL update `if`, instead of the route-selection `if/else if` chain. This could leave category paths and query state inconsistent whenever og:url did not need updating.
+- Moved category path/query cleanup back into the route-selection chain and left canonical/og:url synchronization as independent updates. This preserves the selected category URL while a category is active and cleans the category route only when leaving it.
+- Commit: `9e8d12a70df8eb6f39aa40d2a3bc5df80009f0ce`.
+- Validation pending: new route-regression and SEO quality workflows must pass before PR merge or production deployment.
+
+- Additional canonical assertion diagnosis: `/?product=garden-set-250ml` initially selected the product's default pack and `productUrl()` used that pack slug, replacing the requested product slug. Updated `productUrl()` to preserve `PRODUCT_ROUTE_SLUG` for deep-link sessions (including selected-pack hash), while ordinary card opens still use the selected pack slug. Commit: `433799770cef1ad8cbb2242b83a72de6fc2b1ec2`.
+
+
+## 2026-11-26 — Deep-link canonical metadata regression fix
+- Latest validation on HEAD `9228d5f` failed both route-regression and SEO quality workflows on one assertion: opening `/?product=garden-set-250ml` did not leave the product SEO canonical at `/p/garden-set-250ml.html`. 179/180 route checks passed; other shell-route and SEO preflight steps passed before the browser suite stopped the quality gate.
+- Updated `openDeepLink()` to synchronously set both canonical and og:url from the requested static product slug before rendering the product overlay. This covers legacy `?product=` entry and direct static product routes without changing customer-facing share URLs.
+- Bumped `index.html` mobile-shell app script cache key from v54 to v55.
+- Commits: app.js `8c511a8e218ea209921a792867fcfb19a66de3fc`; index.html `753b053943acb711c2d64e918287a22e563830a8`.
+- Re-run both validation workflows on the new HEAD before merge. PR #1182 remains open and unmerged; SEO changes are not live.
+
+
+## 2026-11-26 — Host-independent canonical browser assertion
+- The latest full shell route run reached 179/180 checks; the remaining canonical assertion compared the absolute canonical URL against the production domain even though Playwright serves the site on a local ephemeral origin. The observed canonical path was correct (`/p/garden-set-250ml.html`); only the test's hard-coded hostname caused failure.
+- Updated the assertion to compare the canonical URL pathname, preserving the requirement that the deep link resolves to `/p/garden-set-250ml.html` while allowing the test server's local hostname.
+- Commit: `1e5cc399b9ce00a08f9129656c17fd26450a407a`.
+- Re-run route and SEO workflows on the new HEAD; PR #1182 remains open/unmerged and changes are not live.
