@@ -173,7 +173,7 @@ with sync_playwright() as p:
     mock_network(c0)
     c0.route('**/mobile-shell/app.js*', lambda rt: rt.fulfill(status=200, content_type='application/javascript', body=''))
     p0 = c0.new_page(); p0.goto(URL, wait_until='domcontentloaded')
-    check('server-rendered home grid exposes crawlable product links before hydration', p0.locator('#grid a[href*="/p/"]').count() >= 6, p0.locator('#grid a[href*="/p/"]').count())
+    check('server-rendered home grid exposes crawlable customer product links before hydration', p0.locator('#grid a[href*="?product="]').count() >= 6, p0.locator('#grid a[href*="?product="]').count())
     check('initial empty-state message stays hidden before hydration', p0.locator('#grid-empty').is_hidden())
     c0.close()
 
@@ -613,7 +613,7 @@ with sync_playwright() as p:
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_selector('#page-product.open', timeout=15000)
     check('explicit legacy /?product=<slug> deep link resolves to the canonical static product page in the shell', p10.evaluate("location.pathname.startsWith('/p/') && location.search === ''") and p10.locator('#page-product.open').count() == 1, p10.url)
-    check('shell product deep link keeps the homepage canonical', p10.evaluate("document.querySelector('link[rel=canonical]').href") == 'https://stermontarcade.co.ke/p/garden-set-250ml.html', p10.evaluate("document.querySelector('link[rel=canonical]').href"))
+    check('shell product deep link sets the product SEO canonical', p10.evaluate("document.querySelector('link[rel=canonical]').href") == 'https://stermontarcade.co.ke/p/garden-set-250ml.html', p10.evaluate("document.querySelector('link[rel=canonical]').href"))
     c10.close()
 
     def cat_page(slug):
