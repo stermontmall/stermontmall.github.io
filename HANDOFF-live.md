@@ -89,3 +89,5 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Moved category path/query cleanup back into the route-selection chain and left canonical/og:url synchronization as independent updates. This preserves the selected category URL while a category is active and cleans the category route only when leaving it.
 - Commit: `9e8d12a70df8eb6f39aa40d2a3bc5df80009f0ce`.
 - Validation pending: new route-regression and SEO quality workflows must pass before PR merge or production deployment.
+
+- Additional canonical assertion diagnosis: `/?product=garden-set-250ml` initially selected the product's default pack and `productUrl()` used that pack slug, replacing the requested product slug. Updated `productUrl()` to preserve `PRODUCT_ROUTE_SLUG` for deep-link sessions (including selected-pack hash), while ordinary card opens still use the selected pack slug. Commit: `433799770cef1ad8cbb2242b83a72de6fc2b1ec2`.
