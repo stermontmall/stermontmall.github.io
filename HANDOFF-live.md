@@ -62,3 +62,10 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Blocked: `product-pages.yml` runs #866-#871 all fail since 09:30 today (last success #849, 2026-11-21) at step "Test Google indexing safeguards": `node seo-indexing-guard.test.mjs` line 38 expects `imageTransformsRequested = process.env.SUPABASE_IMAGE_TRANSFORMS === 'true'` in the generator; that Supabase-era string is gone after the Neon migration. Fails identically before the WhatsApp change.
 - Impact: none for the number. PR #1076 already replaced it inside the generated pages in `p/`, `c/`, `guides/`, `blog/`, `services/`, `pest-control/`; Neon rows updated. A rebuild from Neon would also produce the new number.
 - Next: owner/Neon-migration session updates `seo-indexing-guard.test.mjs` (or the generator), then re-dispatch: `gh api -X POST repos/stermontmall/stermontmall.github.io/actions/workflows/product-pages.yml/dispatches -f ref=main`.
+
+
+## 2026-11-26 — Google image sitemap namespace fix
+- Found from Search Console screenshot: `sitemap-images.xml` is readable (431 discovered pages) but reports one "Incorrect namespace" error on `url/image`.
+- Cause: `seo-extras.mjs` declared `xmlns:image="http://www.google.com/schemas/image/1.1"`; Google Image Sitemap requires `http://www.google.com/schemas/sitemap-image/1.1`.
+- Changed only the generator namespace on branch `fix/image-sitemap-namespace-2026-11-26`; generated `sitemap-images.xml` is intentionally not hand-edited. The SEO extras workflow regenerates and commits it.
+- Next: run the generator/workflow, verify the regenerated root namespace, deploy, then ask Google Search Console to re-read `/sitemap-images.xml`.

@@ -51,7 +51,7 @@ const BROKEN_PRODUCT_IMAGES = /(?:acetochlor-50-ec-herbicide-1-litre|jade-premiu
 
 // ---------- 1) image sitemap ----------
 let imgCount = 0, pageCount = 0;
-let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/image/1.1">\n`;
+let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n`;
 for (const f of list('p')) {
   const h = read(`p/${f}`);
   if (/http-equiv="refresh"/i.test(h)) continue;                       // size-variant redirect pages are not indexable
