@@ -9598,5 +9598,11 @@
     "image_source": "https://mtolori.com/res/products/1/1006529_back_500px_.webp",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "thabiti-coffee-22-6-12-direct-image-v8-20261126",
+    "source": "https://www.elgonkenya.com/wp-content/uploads/2023/02/THABITI-MOCKUP-Coffee.png",
+    "ok": false,
+    "error": "fetch failed"
   }
 ]
