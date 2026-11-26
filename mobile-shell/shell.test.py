@@ -379,6 +379,19 @@ with sync_playwright() as p:
     pg.fill('#search', 'air fryer'); pg.keyboard.press('Enter'); pg.wait_for_timeout(800)
     t = pg.locator('#grid-title').inner_text()
     check('search filters grid', 'air fryer' in t.lower() and pg.locator('#grid .card[data-id]').count() >= 1, t)
+    pg.fill('#search', ''); pg.wait_for_function("document.querySelector('#grid-title').textContent === 'Recommended for you'", timeout=5000)
+    pg.fill('#search', 'ketle')   # typo, no Enter: results appear while typing
+    pg.wait_for_function("document.querySelector('#grid-title').textContent.startsWith('Results for \\\"ketle') && document.querySelector('#grid .card[data-id]')", timeout=5000)
+    check('search runs while typing and forgives a typo', 'Kettle' in pg.locator('#grid .card[data-id]').first.inner_text())
+    pg.fill('#search', 'zzzzqq'); pg.wait_for_selector('#grid-empty [data-clear-search]', timeout=5000)
+    check('no-result search offers WhatsApp and clear', pg.locator('#grid-empty a[href^="https://wa.me/254789514060"]').count() == 1)
+    pg.click('#grid-empty [data-clear-search]'); pg.wait_for_selector('#grid .card[data-id]')
+    check('clear search restores the home grid', pg.input_value('#search') == '' and pg.locator('#grid-title').inner_text() == 'Recommended for you')
+    pg.click('#search-form button[aria-label="Search"]')
+    check('magnifier on an empty box focuses it', pg.evaluate("document.activeElement.id") == 'search')
+    pg.fill('#search', 'blender'); pg.click('#search-form button[aria-label="Search"]'); pg.wait_for_function("document.querySelector('#grid-title').textContent.includes('blender')", timeout=5000)
+    check('magnifier button searches', pg.locator('#grid .card[data-id]').count() >= 1)
+    pg.screenshot(path=os.path.join(OUT, 'search.png'))
 
     # reload with a sheet open does not reopen it; clear the search first so the fixture has a visible product to open
     pg.fill('#search', ''); pg.keyboard.press('Enter'); pg.wait_for_selector('#grid .card[data-id]')

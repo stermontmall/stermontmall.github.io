@@ -1,3 +1,10 @@
+## 2026-11-26 (Africa/Nairobi) - Smarter shop search (branch `wip-smart-search`, NOT merged)
+- Owner: "work on my search button to work efficiently. Perfect it".
+- Done: `mobile-shell/app.js` search runs while typing; relevance ranking; typo tolerance (5+ letters); plurals, pack sizes, hyphens, local words (mende, panya, mbu, mchwa); closest matches; no-result WhatsApp link + Clear. Magnifier is a real button. app.js `?v=59` (index.html, shell-route-loader.js).
+- Tests: `node mobile-shell/search.test.mjs` 26/26; `python3 mobile-shell/shell.test.py` 185/185 twice (one earlier run: single "Checkout layer loads /checkout.html" failure, not repeated); navigation, description-headings, product-description-html, no-classic-hop, no-static-share-links, seo-indexing-guard, seo-shell-redirect pass.
+- Not covered: descriptions are not searched (not in the catalogue list). Not tested on the live site.
+- Next: owner approval, then merge `wip-smart-search` into main.
+
 ## 2026-11-26 14:05 (Africa/Nairobi) - Replace Rafiki logo/branded photos (main, photo queue)
 - Owner: keep products; swap Rafiki logo photos for real product photos. 8 affected: mende-mo-fire, stop-vermin-100g, agita-80g, bipronex-5g, cobra-45w, pantry-moth-trap, fly-bottle-trap, window-fly-stickers.
 - Note: uploader skips names that already succeeded, so replacements need NEW names (why the earlier Agita fix never ran).

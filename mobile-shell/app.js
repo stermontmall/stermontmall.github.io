@@ -122,6 +122,7 @@ function buildCatalog(rows, cats, names) {
     const photos = [...new Set(live.map(r => r.cover_image).filter(u => typeof u === 'string' && u.trim()))];
     const low = sizes[0], img = photos[0] || '';
     out.push({
+      dbName: rep.name, keys: live.flatMap(r => [r.slug, r.variant_label, r.product_code]).filter(Boolean),   // extra words the search matches
       id: key, slug: rep.slug, cat: top.slug, catName: top.name, sub: c.parent_id ? c.name : '', name: (names && names[rep.id]) || rep.name,
       img, photos, emoji: ICONS[top.slug] || '🛍️', bg: BGS[hashStr(key) % BGS.length],
       price: low.price, old: low.old, sizes, featured: !!rep.featured, rating: 0, reviews: 0   // no ratings exist in the database
@@ -162,23 +163,111 @@ const thumb = (p, eager = false) => {
   return `<img ${source} alt="${esc(p.name)} product photo" decoding="async" data-imagekit-original="${esc(original)}" data-fallbacks="${esc(JSON.stringify(photos.slice(1)))}" style="width:100%;height:100%;object-fit:contain;background:#fff">`;
 };
 
+/* @search-start  (pure helpers; mobile-shell/search.test.mjs runs this block on its own)
+   Shop search: every typed word must match; whole words rank above word beginnings; plurals, pack sizes ("1 litre" = "1L"), hyphens,
+   common local words and small typos are understood. Typo matching is only used for a word that matches nothing as typed. */
+const SEARCH_STOP = new Set(['a', 'an', 'the', 'for', 'of', 'and', 'or', 'with', 'in', 'to', 'buy', 'price', 'prices', 'kenya', 'nairobi', 'dawa', 'ya', 'za', 'kwa']);
+/* typed word -> other words that mean the same in this shop (one direction only) */
+const SEARCH_ALIASES = {
+  mende: ['cockroach'], roach: ['cockroach'], panya: ['rat', 'mouse', 'rodent'], rat: ['rodent', 'rodenticide'], mice: ['mouse', 'rodent'], mouse: ['mice'],
+  mbu: ['mosquito'], nzi: ['fly'], mchwa: ['termite', 'termiticide'], termite: ['termiticide'], kunguni: ['bedbug'], mbegu: ['seed'], mbolea: ['fertilizer'],
+  fertiliser: ['fertilizer'], weedkiller: ['herbicide'], pesticide: ['insecticide'], television: ['tv'], tv: ['television'],
+  refrigerator: ['fridge'], fridge: ['refrigerator'], pump: ['sprayer'], cellphone: ['phone', 'smartphone'], phone: ['smartphone']
+};
+const searchStem = w => (w.length > 4 && w.endsWith('ies') ? w.slice(0, -3) + 'y' : w.length > 4 && /(ches|shes|sses|xes)$/.test(w) ? w.slice(0, -2) : w.length > 3 && w.endsWith('s') && !w.endsWith('ss') && !/\d/.test(w) ? w.slice(0, -1) : w);
+const searchText = t => String(t || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/(\d),(?=\d{3})/g, '$1')
+  .replace(/(\d)\s*(?:litres?|liters?|ltrs?|lts?)(?![a-z])/g, '$1l').replace(/(\d)\s*(?:millilitres?|milliliters?|mls)(?![a-z])/g, '$1ml')
+  .replace(/(\d)\s*(?:kgs?|kilograms?|kilos?)(?![a-z])/g, '$1kg').replace(/(\d)\s*(?:grams?|grms?|gms?)(?![a-z])/g, '$1g')
+  .replace(/(\d)\s+(ml|l|g|w)(?![a-z0-9])/g, '$1$2').replace(/[^a-z0-9.]+/g, ' ').replace(/(^|\D)\.|\.(?!\d)/g, '$1 ').trim();
+const searchTokens = t => searchText(t).split(/\s+/).filter(Boolean).map(searchStem);
+/* A product's searchable words, in three weights. Hyphenated names are also stored joined ("k-othrine" -> "kothrine"). */
+function searchIndex(p) {
+  const strong = [p.name, p.dbName || '', ...(p.keys || [])].join(' ');
+  const set = t => { const out = new Set(searchTokens(t)); (String(t).toLowerCase().match(/[a-z0-9]+(?:-[a-z0-9]+)+/g) || []).forEach(h => out.add(searchStem(h.replace(/-/g, '')))); return [...out]; };
+  return { name: searchText(p.name), fields: [[set(strong), 10], [set(p.sub || ''), 4], [set(p.catName || ''), 2]] };
+}
+/* True when a and b differ by at most `max` edits (insert, delete, replace, or swap of two neighbours). */
+function searchNear(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return false;
+  let prev2 = [], prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i]; let best = i;
+    for (let j = 1; j <= b.length; j++) {
+      let v = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, prev2[j - 2] + 1);
+      cur[j] = v; if (v < best) best = v;
+    }
+    if (best > max) return false;
+    prev2 = prev; prev = cur;
+  }
+  return prev[b.length] <= max;
+}
+/* How well one typed word matches one product word: 1 whole word, less for a word beginning or the inside of a longer word, 0 none. */
+function searchHit(word, token) {
+  if (token === word) return 1;
+  if (/^\d+$/.test(word)) return new RegExp('^' + word + '[a-z]+$').test(token) ? .7 : 0;   // "43" finds "43inch", never "430"
+  if (/\d$/.test(word)) return 0;
+  if (word.length >= 2 && token.startsWith(word)) return /^\d/.test(word) ? 0 : .7;
+  return word.length >= 4 && token.includes(word) ? .4 : 0;
+}
+function searchScore(ix, alts) {
+  let best = 0;
+  for (const [tokens, weight] of ix.fields) for (const t of tokens) for (const a of alts) { const v = searchHit(a.w, t) * a.k * weight; if (v > best) best = v; }
+  return best;
+}
+/* Returns { list: [{p, score}] best first, relaxed: true when no product had every word and the closest ones are returned instead }. */
+function searchProducts(products, query) {
+  let words = searchTokens(query);
+  const useful = words.filter(w => !SEARCH_STOP.has(w)); if (useful.length) words = useful;
+  words = [...new Set(words)];
+  if (!words.length) return { list: [], relaxed: false };
+  const idx = products.map(p => p._search || (p._search = searchIndex(p)));
+  const terms = words.map(w => {
+    const alts = [{ w, k: 1 }, ...(Object.prototype.hasOwnProperty.call(SEARCH_ALIASES, w) ? SEARCH_ALIASES[w] : []).map(a => ({ w: a, k: .8 }))];
+    let scores = idx.map(ix => searchScore(ix, alts));
+    if (w.length >= 5 && !/\d/.test(w) && !scores.some(Boolean)) {   // nothing matches as typed: allow a small typo
+      const max = w.length >= 7 ? 2 : 1, fix = new Set();
+      idx.forEach(ix => ix.fields.forEach(([tokens]) => tokens.forEach(t => { if (t[0] === w[0] && searchNear(w, t, max) || (t.length > w.length && searchNear(w, t.slice(0, w.length), 1) && w.length >= 5)) fix.add(t); })));
+      Object.keys(SEARCH_ALIASES).forEach(a => { if (searchNear(w, a, max)) SEARCH_ALIASES[a].forEach(x => fix.add(x)); });
+      const fixed = [...fix].map(t => ({ w: t, k: .5 }));
+      if (fixed.length) scores = idx.map(ix => searchScore(ix, fixed));
+    }
+    return scores;
+  });
+  const phrase = searchText(query);
+  const rows = products.map((p, i) => {
+    let score = 0, matched = 0;
+    terms.forEach(t => { if (t[i]) { matched++; score += t[i]; } });
+    if (matched && (' ' + idx[i].name + ' ').includes(' ' + phrase + ' ')) score += 8;
+    return { p, score, matched };
+  });
+  let list = rows.filter(r => r.matched === words.length), relaxed = false;
+  if (!list.length && words.length > 1) {
+    const most = Math.max(0, ...rows.map(r => r.matched));
+    if (most >= Math.ceil(words.length / 2)) { list = rows.filter(r => r.matched === most); relaxed = true; }
+  }
+  list.sort((a, b) => b.score - a.score || b.p.featured - a.p.featured);
+  return { list, relaxed };
+}
+/* @search-end */
+
 /* Resolves {items, hasMore}; rejects when Neon cannot be reached (the grid shows a retry link). */
 // Keep the first mobile product batch small; infinite scroll fetches more only as the shopper approaches the list end.
 async function fetchProducts({ cat = 'all', sub = '', q = '', sort = 'rec', min = 0, max = 0, disc = false, page = 1, size = 8 }) {
   await loadCatalog();
-  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-  const r = PRODUCTS.filter(p => (cat === 'all' || p.cat === cat) && (!sub || p.sub === sub) && (!min || p.price >= min) && (!max || p.price <= max) && (!disc || discOf(p) > 0) &&
-    (!words.length || words.every(w => (p.name + ' ' + p.catName + ' ' + p.sub).toLowerCase().includes(w))));
+  const keep = p => (cat === 'all' || p.cat === cat) && (!sub || p.sub === sub) && (!min || p.price >= min) && (!max || p.price <= max) && (!disc || discOf(p) > 0);
+  const found = searchTokens(q).length ? searchProducts(PRODUCTS.filter(keep), q) : null;
+  const r = found ? found.list.map(x => x.p) : q.trim() ? [] : PRODUCTS.filter(keep);
   if (sort === 'low') r.sort((a, b) => a.price - b.price);
   else if (sort === 'high') r.sort((a, b) => b.price - a.price);
   else if (sort === 'disc') r.sort((a, b) => discOf(b) - discOf(a));
-  else {
+  else if (!found) {   // search results stay in relevance order
     // Stable homepage recommendation order: owner-priority departments first, with featured listings first inside each department.
     // This is a merchandising order, not a claim about verified sales volume.
     const priority = { 'pest-control-fumigation': 0, agrovet: 1, appliances: 2, 'home-kitchen': 2, 'phones-accessories': 3, 'tv-audio-video': 3 };
     r.sort((a, b) => (priority[a.cat] ?? 99) - (priority[b.cat] ?? 99) || b.featured - a.featured);
   }
-  return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size };
+  return { items: r.slice((page - 1) * size, page * size), hasMore: r.length > page * size, total: r.length, relaxed: !!(found && found.relaxed) };
 }
 
 /* The category the customer picked (and its sub-category) survives a reload: it is kept for this tab in sessionStorage, like the active tab. Read here, before
@@ -438,6 +527,11 @@ async function loadPage(reset) {
   grid.insertAdjacentHTML('beforeend', items.map((p, i) => cardHTML(p, categoryView && feed.page === 1 && i === 0)).join(''));
   feed.page++; feed.hasMore = hasMore; feed.loading = false;
   const em = $('#grid-empty'); em.textContent = EMPTY_TEXT; em.hidden = grid.children.length > 0;
+  const term = store.get().q;
+  if (term) {
+    $('#grid-title').textContent = res.relaxed ? `Closest matches for "${term}"` : `Results for "${term}"${res.total ? ` (${res.total})` : ''}`;
+    if (!em.hidden) em.innerHTML = `No products match "${esc(term)}"${$('#filter-count').hidden ? '' : ' with the current filters'}.<br><a class="underline text-brand" href="https://wa.me/254789514060?text=${encodeURIComponent('Hello Stermont Arcade, I am looking for: ' + term)}" target="_blank" rel="noopener">Ask us for it on WhatsApp</a><br><button class="underline text-brand" data-clear-search>Clear search</button>`;
+  }
   if (feed.hasMore && store.get().tab === 'home' && sentinel.getBoundingClientRect().top < innerHeight + 400) loadPage(false);
 }
 new IntersectionObserver(es => { if (es[0].isIntersecting && store.get().tab === 'home') loadPage(false); }, { rootMargin: '400px' }).observe(sentinel);
@@ -464,6 +558,7 @@ function renderChips() {
   $('#chips [aria-selected="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
 }
 function selectCategory(chip, sub = '') {
+  clearTimeout(searchTimer);   // a half-typed search must not replace the category just chosen
   store.set({ chip, sub, q: '' }); $('#search').value = '';
   if (store.get().tab !== 'home') goTab('home'); // goTab keeps history consistent
   refreshGrid();
@@ -1132,6 +1227,7 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-close]'))) return closeTop();
   if ((el = t.closest('[data-add]'))) { const p = feed.items.get(el.dataset.add); if (p) { if (p.sizes.length > 1) openQuickBuy(p.id); else { addToCart(p, p.sizes[0].label, 1); toast('Added to cart'); } } return; }   // several pack sizes: pick the size first
   if (t.closest('[data-retry]')) return refreshGrid();
+  if (t.closest('[data-clear-search]')) { $('#search').value = ''; return runSearch(); }
   if (t.closest('[data-retry-deals]')) return renderDeals();
   if ((el = t.closest('#chips [data-chip]'))) return selectCategory(el.dataset.chip);
   if ((el = t.closest('[data-side]'))) { sideCat = el.dataset.side; return renderCategoriesView(); }
@@ -1159,11 +1255,27 @@ document.addEventListener('error', e => {
   unavailable.textContent = 'Photo unavailable';
   img.replaceWith(unavailable);
 }, true); // try genuine gallery photos in order; never substitute an emoji for a product image
-$('#search-form').addEventListener('submit', e => {
-  e.preventDefault(); $('#search').blur();
-  store.set({ q: $('#search').value.trim(), chip: 'all', sub: '' });
-  if (store.get().tab !== 'home') goTab('home');
+/* Search runs while the shopper types (after a short pause) and at once on Enter or the magnifier button. */
+let searchTimer = 0;
+function runSearch() {
+  clearTimeout(searchTimer);
+  const q = $('#search').value.trim().replace(/\s+/g, ' ').slice(0, 80), s = store.get();
+  if (q === s.q && s.tab === 'home') return;
+  store.set(q ? { q, chip: 'all', sub: '' } : { q });
+  if (s.tab !== 'home') goTab('home');
   refreshGrid();
+  if (window.scrollY > 0) window.scrollTo(0, 0);   // results start at the top of the list
+}
+$('#search').addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const v = $('#search').value.trim();
+  if (!v) { if (store.get().q) runSearch(); return; }   // cleared (including the field's own x button)
+  if (v.length >= 2) searchTimer = setTimeout(runSearch, 300);
+});
+$('#search-form').addEventListener('submit', e => {
+  e.preventDefault();
+  if (!$('#search').value.trim() && !store.get().q) { $('#search').focus(); return; }   // magnifier on an empty box: open the keyboard
+  $('#search').blur(); runSearch();
 });
 /* Category link: the share button next to the grid title gives out the open category's own clean address (/c/<slug>.html), the same address the address bar shows.
    It is only visible inside a category (syncProductMeta). A phone that opens the link lands in this same category in the shell. */
