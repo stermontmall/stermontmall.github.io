@@ -555,8 +555,44 @@ function splitFaq(body) {
   }
   return items.length >= 2 && items.every(i => i.a.length) ? items.map(i => ({ q: i.q, a: i.a.join(' ') })) : null;
 }
+/* Authored heading lines (owner request 2026-11-26): catalogue descriptions write each sub-topic as its own short line
+   ("Where it may be useful", "Choosing the correct pack size", "CHOOSING THE 200G PACK"). Those lines are real headings and must render
+   like "Product overview" (purple), not collapse into body text. Conservative on purpose: a heading is a short line with no end punctuation and no
+   "Label: value" shape, in a run of at most 3, followed by a real paragraph (or a FAQ question); at least two such runs are needed; the first line is
+   lead text. Keep in sync with findHeadingLines() in product-description-html.mjs. */
+const HEADING_ACRONYMS = /\b(pcpb|ksh|m-pesa|ppe|sms|usb|vat|kebs|ppck|kephis|npk)\b/gi;
+function headingCase(s) {
+  if (s !== s.toUpperCase()) return s;
+  const t = s.toLowerCase();
+  return (t.charAt(0).toUpperCase() + t.slice(1)).replace(HEADING_ACRONYMS, m => m.toUpperCase());
+}
+function findHeadingLines(raw) {
+  const lines = []; let off = 0;
+  String(raw).split('\n').forEach(text => { lines.push({ text, at: off + (text.length - text.trimStart().length), end: off + text.length }); off += text.length + 1; });
+  const clean = t => t.trim().replace(/^\*\*(.+?)\*\*$/, '$1').replace(/\s*:$/, '').trim();
+  const isHeadingLine = t => { const s = clean(t); return s.length >= 3 && s.length <= 90 && /^[A-Z0-9]/.test(s) && !/[.!?,;:]$/.test(s) && !/[.!?]\s/.test(s) && s.split(/\s+/).length <= 12 && !/^[A-Z][^:]{0,40}:\s+\S/.test(s); };
+  const idx = []; lines.forEach((l, i) => { if (l.text.trim()) idx.push(i); });
+  const out = []; let runs = 0;
+  for (let k = 1; k < idx.length; ) {
+    if (!isHeadingLine(lines[idx[k]].text)) { k++; continue; }
+    let e = k; while (e + 1 < idx.length && isHeadingLine(lines[idx[e + 1]].text)) e++;
+    const next = e + 1 < idx.length ? lines[idx[e + 1]].text.trim() : '';
+    if (e - k + 1 <= 3 && (next.length >= 40 || /\?$/.test(next))) {
+      runs++; for (let j = k; j <= e; j++) { const l = lines[idx[j]]; out.push({ at: l.at, end: l.end, title: headingCase(clean(l.text)), line: true }); }
+    }
+    k = e + 1;
+  }
+  return runs >= 2 ? out : [];
+}
+/* Authored titles that behave like a known section: the FAQ accordion and the ordering card. Everything else keeps its own wording. */
+function sectionKind(c) {
+  if (!c.line) return c.title;
+  if (/^(frequently asked questions|faqs?|common questions)$/i.test(c.title)) return 'Frequently asked questions';
+  if (/^ordering\b|^order(?:ing)? from\b|^delivery\b/i.test(c.title)) return 'Ordering, payment & delivery';
+  return c.title;
+}
 function splitProductDescription(source) {
-  const raw = String(source || '').replace(/\bundefined\b/gi, '').replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '').trim();
+  const raw = String(source || '').replace(/\\r\\n|\\n|\\r/g, '\n').replace(/\bundefined\b/gi, '').replace(/\s*Search phrases relevant to this advert include[\s\S]*$/i, '').trim();
   if (!raw) return [];
   const labels = [
     ['Product overview', /(?:^|\s)(?:PRODUCT SUMMARY|PRODUCT OVERVIEW|OVERVIEW|ABOUT THIS PRODUCT|INTRODUCTION)\s*:?\s*/g],
@@ -573,11 +609,26 @@ function splitProductDescription(source) {
   ];
   const found = [];
   labels.forEach(([title, re]) => { re.lastIndex = 0; let m; while ((m = re.exec(raw))) found.push({ at: m.index, end: re.lastIndex, title }); });
+  /* Authored heading lines win over a known label that only covers part of their line; a label that covers the whole line stays the label. */
+  const lineHits = findHeadingLines(raw).filter(h => !found.some(l => l.at < h.end && l.end > h.at && l.end >= h.end));
+  if (lineHits.length) {
+    const labelHits = found.filter(l => !lineHits.some(h => l.at < h.end && l.end > h.at));
+    found.length = 0; found.push(...labelHits, ...lineHits);
+  }
   found.sort((a, b) => a.at - b.at);
   // Text before the first label is the overview; the text after each label belongs to THAT label's heading.
-  const sections = []; let pos = 0, cur = 'Product overview';
-  found.forEach(h => { if (h.at < pos) return; const body = raw.slice(pos, h.at).trim(); if (body) sections.push({ title: cur, body }); cur = h.title; pos = h.end; });
-  const tail = raw.slice(pos).trim(); if (tail) sections.push({ title: cur, body: tail });
+  // Consecutive authored heading lines with no text between them stay together: the first is the card title, the next ones are purple subtitles.
+  const sections = []; let pos = 0, chain = [{ title: 'Product overview' }];
+  const flush = body => sections.push({ title: chain[0].title, subs: chain.slice(1).map(c => c.title), kind: sectionKind(chain[chain.length - 1]), body });
+  found.forEach(h => {
+    if (h.at < pos) return;
+    const body = raw.slice(pos, h.at).trim();
+    if (body) { flush(body); chain = [h]; }
+    else if (h.line && chain[chain.length - 1].line) chain.push(h);
+    else chain = [h];
+    pos = h.end;
+  });
+  const tail = raw.slice(pos).trim(); if (tail) flush(tail);
   const merged = [];
   sections.forEach(s => { const prev = merged.find(x => x.title === s.title); if (prev) prev.body += ' ' + s.body; else merged.push({ ...s }); });
   return merged;
@@ -619,7 +670,8 @@ details.pc-q summary::-webkit-details-marker{display:none}
 details.pc-q summary::after{content:"+";flex:none;width:22px;height:22px;border-radius:50%;background:#f1ebff;color:#5b21b6;font-weight:800;display:grid;place-items:center}
 details.pc-q[open] summary::after{content:"\\2212"}
 details.pc-q p{margin:0 0 12px;padding-right:6px}
-.product-copy-section.pc-order{background:#faf8ff;box-shadow:none}`;
+.product-copy-section.pc-order{background:#faf8ff;box-shadow:none}
+.product-copy-section h4.pc-sub{margin:14px 0 8px;color:#5b21b6;font-size:14.5px;line-height:1.35;font-weight:700;letter-spacing:-.005em}`;
 function renderProductDescription(target, source) {
   const root = $(target); if (!root) return;
   root.replaceChildren();
@@ -631,13 +683,15 @@ function renderProductDescription(target, source) {
   const cards = [];
   sections.forEach((section, i) => {
     const card = el('section', null, 'product-copy-section'); card.id = uid + i;
+    const kind = section.kind || section.title;      // authored headings keep their own wording; kind only decides the layout
     card.appendChild(el('h3', section.title));
+    (section.subs || []).forEach(t => card.appendChild(el('h4', t, 'pc-sub')));
     const startsWithBullet = /^\s*[•●▪]/.test(section.body);
     const bullets = section.body.split(/\s*[•●▪]\s*/).map(x => x.trim()).filter(Boolean);
     const isList = bullets.length > 1 || (startsWithBullet && bullets.length);
-    const faq = section.title === 'Frequently asked questions' ? splitFaq(section.body) : null;
-    const specs = isList && section.title === 'Specifications & details' ? parseSpecs(bullets) : null;
-    const steps = !isList && section.title === 'How to use' ? splitSteps(section.body) : null;
+    const faq = kind === 'Frequently asked questions' ? splitFaq(section.body) : null;
+    const specs = isList && kind === 'Specifications & details' ? parseSpecs(bullets) : null;
+    const steps = !isList && kind === 'How to use' ? splitSteps(section.body) : null;
     if (faq) {
       faq.forEach((item, k) => { const d = el('details', null, 'pc-q'); if (k === 0) d.open = true; d.appendChild(el('summary', item.q)); d.appendChild(el('p', item.a)); card.appendChild(d); });
     } else if (specs) {
@@ -646,19 +700,19 @@ function renderProductDescription(target, source) {
       const ol = el('ol', null, 'pc-steps'); steps.forEach(x => ol.appendChild(el('li', x))); card.appendChild(ol);
     } else if (isList) {
       const lead = startsWithBullet ? '' : bullets.shift(); if (lead) card.appendChild(el('p', lead));
-      const ul = el('ul', null, /^(Key features|Before you start)/.test(section.title) ? 'pc-tick' : ''); bullets.forEach(item => ul.appendChild(el('li', item.replace(/^[-–]\s*/, '')))); card.appendChild(ul);
+      const ul = el('ul', null, /^(Key features|Before you start)/.test(kind) ? 'pc-tick' : ''); bullets.forEach(item => ul.appendChild(el('li', item.replace(/^[-–]\s*/, '')))); card.appendChild(ul);
     } else {
       section.body.split(/\n\s*\n|(?<=[.!?])\s+(?=[A-Z0-9“"'])/).forEach(t => { if (t.trim()) card.appendChild(el('p', t.trim())); });
     }
-    if (section.title === 'Safety information') card.classList.add('pc-warn');
-    if (section.title.startsWith('Ordering')) card.classList.add('pc-order');
+    if (kind === 'Safety information') card.classList.add('pc-warn');
+    if (kind.startsWith('Ordering')) card.classList.add('pc-order');
     cards.push(card);
   });
   if (cards.length >= 3) {
     const nav = el('nav', null, 'pc-tabs'); nav.setAttribute('aria-label', 'Product information sections');
     sections.forEach((section, i) => {
-      if (section.title.startsWith('Ordering')) return;
-      const a = el('a', PC_TAB[section.title] || section.title); a.href = '#' + uid + i;
+      if ((section.kind || section.title).startsWith('Ordering')) return;
+      const a = el('a', PC_TAB[section.title] || (section.title.length > 24 ? section.title.slice(0, 24).replace(/\s+\S*$/, '') + '…' : section.title)); a.href = '#' + uid + i;
       a.addEventListener('click', ev => { ev.preventDefault(); nav.querySelectorAll('a').forEach(x => x.classList.remove('on')); a.classList.add('on'); cards[i].scrollIntoView({ behavior: 'smooth', block: 'start' }); });
       nav.appendChild(a);
     });

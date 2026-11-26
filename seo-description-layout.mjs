@@ -17,6 +17,7 @@ const CSS = `<style id="${MARK}">
 .pd-tabs a:hover,.pd-tabs a:focus{color:#4c1d95;border-color:#a78bfa;background:#f2ebff;outline:none}
 .pd .product-description-section.pd-sec{margin:0;padding:0 1.05rem 1.05rem;background:#fff;border:0;border-radius:0;scroll-margin-top:3.2rem}
 .pd .pd-sec h3{margin:1rem -.15rem .75rem;padding:.72rem .9rem;background:#f4efff;border:1px solid #e8defa;border-left:4px solid #7c3aed;border-radius:10px;color:#3b176e;font-size:1rem;font-weight:800;line-height:1.35}
+.pd .pd-sec h4{margin:1rem 0 .55rem;padding:.1rem 0 .1rem .7rem;border-left:3px solid #a78bfa;color:#3b176e;font-size:.97rem;font-weight:800;line-height:1.4}
 .pd .pd-sec p{margin:.35rem 0 .75rem;color:#373248;line-height:1.75}
 .pd .pd-sec ul{margin:.35rem 0 .7rem;padding-left:1.25rem;list-style:disc}
 .pd .pd-sec ul.pd-feat{list-style:none;padding:0}
