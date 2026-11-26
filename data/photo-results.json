@@ -5116,5 +5116,11 @@
     "source": "https://surveilagrochemicals.co.ke/product/outpast-bait-station/",
     "ok": false,
     "error": "The operation was aborted due to timeout"
+  },
+  {
+    "name": "outpast-rat-bait-station-retry",
+    "source": "https://surveilagrochemicals.co.ke/product-category/rat-bait-station/",
+    "ok": false,
+    "error": "The operation was aborted due to timeout"
   }
 ]
