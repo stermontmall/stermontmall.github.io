@@ -8342,5 +8342,11 @@
     "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/GB6Ej3.jpeg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "easygro-starter-fertilizer-1kg-v8-20261126",
+    "source": "https://chemsasa.co.ke/product/easy-gro-starter-1kg/",
+    "ok": false,
+    "error": "The operation was aborted due to timeout"
   }
 ]
