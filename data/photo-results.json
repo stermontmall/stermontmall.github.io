@@ -6246,5 +6246,33 @@
     "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2Fe457ba382c7fb7a3113b7cf9cb2f75f089c48a2fc3344121d335b9648ce6bc4b&w=3840&q=75",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "kilex-0-5-gel-30g",
+    "source": "https://shop.oshochem.com/product/kilex-0-5-gel/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/kilex-0-5-gel-30g_-p877k0bb.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/kilex-0-5-gel-30g_-p877k0bb.jpg",
+    "width": 1000,
+    "height": 1126,
+    "bytes": 59130,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://shop.oshochem.com/wp-content/uploads/2025/09/KILEX-0.5-GEL.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "flower-regular-mossi-chips-30g",
+    "source": "https://old.naivas.online/flower-regular-mossi-chips-mosquito-killer-30g",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "flower-mossi-chips-lavender-30-mats",
+    "source": "https://old.naivas.online/flower-mossi-chips-mosquito-killer-lavender-30-mats",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
