@@ -9604,5 +9604,21 @@
     "source": "https://www.elgonkenya.com/wp-content/uploads/2023/02/THABITI-MOCKUP-Coffee.png",
     "ok": false,
     "error": "fetch failed"
+  },
+  {
+    "name": "thabiti-coffee-22-6-12-proxy-retry-v8-20261126",
+    "source": "https://images.weserv.nl/?url=www.elgonkenya.com/wp-content/uploads/2023/02/THABITI-MOCKUP-Coffee.png",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/thabiti-coffee-22-6-12-proxy-retry-v8-20261126_qlXro_AXj.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/thabiti-coffee-22-6-12-proxy-retry-v8-20261126_qlXro_AXj.jpg",
+    "width": 617,
+    "height": 870,
+    "bytes": 60210,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://images.weserv.nl/?url=www.elgonkenya.com/wp-content/uploads/2023/02/THABITI-MOCKUP-Coffee.png",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
