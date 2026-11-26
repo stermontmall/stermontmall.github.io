@@ -8434,5 +8434,11 @@
     "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/Biodistinction_xtra.png",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "algreen-bonzin-500ml-v8-retry-20261126",
+    "source": "https://kilimokona.co.ke/shop/crop-production/foliar-feeds/algreen-bonzin/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
