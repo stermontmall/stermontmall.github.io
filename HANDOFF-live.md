@@ -91,3 +91,11 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Validation pending: new route-regression and SEO quality workflows must pass before PR merge or production deployment.
 
 - Additional canonical assertion diagnosis: `/?product=garden-set-250ml` initially selected the product's default pack and `productUrl()` used that pack slug, replacing the requested product slug. Updated `productUrl()` to preserve `PRODUCT_ROUTE_SLUG` for deep-link sessions (including selected-pack hash), while ordinary card opens still use the selected pack slug. Commit: `433799770cef1ad8cbb2242b83a72de6fc2b1ec2`.
+
+
+## 2026-11-26 — Deep-link canonical metadata regression fix
+- Latest validation on HEAD `9228d5f` failed both route-regression and SEO quality workflows on one assertion: opening `/?product=garden-set-250ml` did not leave the product SEO canonical at `/p/garden-set-250ml.html`. 179/180 route checks passed; other shell-route and SEO preflight steps passed before the browser suite stopped the quality gate.
+- Updated `openDeepLink()` to synchronously set both canonical and og:url from the requested static product slug before rendering the product overlay. This covers legacy `?product=` entry and direct static product routes without changing customer-facing share URLs.
+- Bumped `index.html` mobile-shell app script cache key from v54 to v55.
+- Commits: app.js `8c511a8e218ea209921a792867fcfb19a66de3fc`; index.html `753b053943acb711c2d64e918287a22e563830a8`.
+- Re-run both validation workflows on the new HEAD before merge. PR #1182 remains open and unmerged; SEO changes are not live.
