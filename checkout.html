@@ -46,6 +46,7 @@
 </form>
 <section id="success" class="card success hidden"><h2>Order received</h2><p>Your order reference is <b id="ref"></b>.</p><p class="muted">Payment is pending verification. Keep your M-Pesa message and use the tracking page to check progress.</p><a id="track" class="btn" style="display:block;text-align:center;text-decoration:none" href="/track.html">Track this order</a><button id="done" class="btn" type="button">Return to shop</button></section>
 </main>
+<script src="/order-emails.js" defer></script>
 <script>
 (function(){
 'use strict';
@@ -93,6 +94,7 @@ $('form').addEventListener('submit',async e=>{
   if(Number(data.subtotal)>amount)throw new Error('The database-calculated total is higher than the amount entered. Please contact us before paying again.');
   try{localStorage.setItem('shell.cart','[]');localStorage.setItem('stm_cart','{}');localStorage.removeItem('stm_handoff')}catch{}
   $('form').classList.add('hidden');$('ref').textContent=data.ref||orderRef;$('track').href='/track.html?ref='+encodeURIComponent(data.ref||orderRef);$('success').classList.remove('hidden');
+  try{if(window.STMOrderEmails)window.STMOrderEmails.send(payload,data)}catch{}
  }catch(err){$('error').textContent=err.message||'Could not place order. Check your connection and try again.';btn.disabled=false;btn.textContent='Place order'}
 });
 $('done').addEventListener('click',()=>{if(window.parent!==window){try{parent.postMessage({stmCheckout:'closed'},location.origin)}catch{}}else location.href='/'});
