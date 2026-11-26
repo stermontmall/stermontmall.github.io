@@ -81,3 +81,11 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Bumped `index.html` app.js cache version from v53 to v54 as required.
 - Commits: app.js `99cb9108b59cdf148c3fce579266aee30a3957da`; index.html `f6ad09a34820e4572797f8b7f5746ccab8492a49`; shell test `fc8fbaae26a482cd242f50e9ae131388c6929fb6`.
 - Next: inspect CI for this branch; verify mobile-shell Playwright checks and SEO checks. Do not merge unless all required checks pass. If running locally, exact test command is `python mobile-shell/shell.test.py` (requires the repo's Playwright/Chromium setup).
+
+
+## 2026-11-26 — Follow-up fix after browser regression (branch `seo/local-intent-kenya-cities-2026-11-26`)
+- Inspected route-regression log from run 45766456533. Failures clustered around category direct-route cleanup, returning from tabs/cart, restoring/removing `?cat=`, and the product SEO canonical assertion.
+- Root cause: while adding canonical/og:url synchronization to `syncProductMeta()`, the existing category URL cleanup `else if` branches were accidentally left attached to the Open Graph URL update `if`, instead of the route-selection `if/else if` chain. This could leave category paths and query state inconsistent whenever og:url did not need updating.
+- Moved category path/query cleanup back into the route-selection chain and left canonical/og:url synchronization as independent updates. This preserves the selected category URL while a category is active and cleans the category route only when leaving it.
+- Commit: `9e8d12a70df8eb6f39aa40d2a3bc5df80009f0ce`.
+- Validation pending: new route-regression and SEO quality workflows must pass before PR merge or production deployment.
