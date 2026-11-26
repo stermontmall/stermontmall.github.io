@@ -41,6 +41,36 @@ const LABELS = [
   ['Image credits', /(?:^|\s)IMAGE\s+CREDITS?\s*:?\s*/g]
 ];
 
+// Authored heading lines (owner request 2026-11-26): catalogue descriptions write each sub-topic as its own short line
+// ("Where it may be useful", "Choosing the correct pack size", "CHOOSING THE 200G PACK"). Those lines are real headings and render as purple
+// section headings like "Product overview" instead of collapsing into body text. Conservative on purpose: a heading is a short line with no end
+// punctuation and no "Label: value" shape, in a run of at most 3, followed by a real paragraph (or a FAQ question); at least two such runs are
+// needed; the first line is lead text. Keep in sync with findHeadingLines() in mobile-shell/app.js.
+const HEADING_ACRONYMS = /\b(pcpb|ksh|m-pesa|ppe|sms|usb|vat|kebs|ppck|kephis|npk)\b/gi;
+function headingCase(s) {
+  if (s !== s.toUpperCase()) return s;
+  const t = s.toLowerCase();
+  return (t.charAt(0).toUpperCase() + t.slice(1)).replace(HEADING_ACRONYMS, m => m.toUpperCase());
+}
+export function findHeadingLines(raw) {
+  const lines = []; let off = 0;
+  String(raw).split('\n').forEach(text => { lines.push({ text, at: off + (text.length - text.trimStart().length), end: off + text.length }); off += text.length + 1; });
+  const clean = t => t.trim().replace(/^\*\*(.+?)\*\*$/, '$1').replace(/\s*:$/, '').trim();
+  const isHeadingLine = t => { const s = clean(t); return s.length >= 3 && s.length <= 90 && /^[A-Z0-9]/.test(s) && !/[.!?,;:]$/.test(s) && !/[.!?]\s/.test(s) && s.split(/\s+/).length <= 12 && !/^[A-Z][^:]{0,40}:\s+\S/.test(s); };
+  const idx = []; lines.forEach((l, i) => { if (l.text.trim()) idx.push(i); });
+  const out = []; let runs = 0;
+  for (let k = 1; k < idx.length; ) {
+    if (!isHeadingLine(lines[idx[k]].text)) { k++; continue; }
+    let e = k; while (e + 1 < idx.length && isHeadingLine(lines[idx[e + 1]].text)) e++;
+    const next = e + 1 < idx.length ? lines[idx[e + 1]].text.trim() : '';
+    if (e - k + 1 <= 3 && (next.length >= 40 || /\?$/.test(next))) {
+      runs++; for (let j = k; j <= e; j++) { const l = lines[idx[j]]; out.push({ at: l.at, end: l.end, title: headingCase(clean(l.text)) }); }
+    }
+    k = e + 1;
+  }
+  return runs >= 2 ? out : [];
+}
+
 // "Question? Answer. Question? Answer." run together in one paragraph -> one block per question.
 export function splitFaq(body) {
   const sentences = String(body).replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+(?=[A-Z0-9])/);
@@ -171,6 +201,14 @@ export function productDescriptionHtml(source) {
     re.lastIndex = 0; let m;
     while ((m = re.exec(raw))) hits.push({ start: m.index, end: re.lastIndex, heading: normalizeMarkdownHeading(heading) });
   }
+  // Authored heading lines win over a known label that only covers part of their line; a label that covers the whole line stays the label.
+  const lineHits = findHeadingLines(raw).filter(h => !hits.some(l => l.start < h.end && l.end > h.at && l.end >= h.end));
+  if (lineHits.length) {
+    const kept = hits.filter(l => !lineHits.some(h => l.start < h.end && l.end > h.at));
+    hits.length = 0;
+    hits.push(...kept, ...lineHits.map(h => ({ start: h.at, end: h.end, heading: h.title, rawHeading: h.title, line: true })));
+  }
+  const authored = lineHits.length > 0;   // authored headings keep the order the description was written in
   hits.sort((a, b) => a.start - b.start);
 
   // Owner request: every catalogue description should have useful, search-friendly section subtitles.
@@ -212,18 +250,19 @@ export function productDescriptionHtml(source) {
   }
 
   // Text before the first label is the overview; the text after each label belongs to THAT label's heading.
-  const sections = []; let cursor = 0; let current = 'Product overview';
+  // Consecutive authored heading lines with no text between them stay together: the first is the section title, the next ones are purple subtitles (h4).
+  const sections = []; let cursor = 0; let chain = [{ heading: 'Product overview', rawHeading: '' }];
+  const flush = body => sections.push({ heading: chain[0].heading, rawHeading: chain.map(c => c.rawHeading).filter(Boolean).join(' '), subs: chain.slice(1).map(c => c.heading), body });
   for (const h of hits) {
     if (h.start < cursor) continue;
     const body = raw.slice(cursor, h.start).trim();
-    if (body) sections.push({ heading: current, rawHeading: sections.length ? sections[sections.length - 1].rawHeading : '', body });
-    current = h.heading; cursor = h.end;
-    sections.push({ _boundary: true, rawHeading: h.rawHeading || '', heading: h.heading });
+    if (body) { flush(body); chain = [h]; }
+    else if (h.line && chain[chain.length - 1].line) chain.push(h);
+    else chain = [h];
+    cursor = h.end;
   }
   const tail = raw.slice(cursor).trim();
-  if (tail) sections.push({ heading: current, rawHeading: sections.filter(x => x._boundary).slice(-1)[0]?.rawHeading || '', body: tail });
-  // Convert heading-boundary markers into the body section that follows them.
-  for (let i = sections.length - 1; i >= 0; i--) if (sections[i]._boundary) sections.splice(i, 1);
+  if (tail) flush(tail);
 
   // Hide editorial/operational metadata (supplier-cost arithmetic and draft status) from customer-facing product pages.
   const internalHeading = /(?:internal pricing metadata|source price|baseline|pricing calculation|price and|price comparison|exact price|sourcing notes|listing status|draft status|supplier cost|margin calculation|source url)/i;
@@ -238,11 +277,11 @@ export function productDescriptionHtml(source) {
     if (prev) prev.body += ' ' + s.body; else merged.push({ ...s });
   }
   const sectionOrder = ['Product Overview & Key Benefits', 'Technical Specifications & Pack Details', 'Where & How to Use in Kenya', 'Safety, Storage & Handling Guidelines', 'Buying & Pack-Size Guide', 'Delivery across Kenya & Nairobi Pickup', 'Frequently Asked Questions'];
-  merged.sort((a, b) => {
+  if (!authored) merged.sort((a, b) => {
     const ai = sectionOrder.indexOf(a.heading), bi = sectionOrder.indexOf(b.heading);
     return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
   });
   return merged.map(x =>
-    '<section class="product-description-section"><h3>' + esc(x.heading) + '</h3>' + renderBody(x.body.trim(), x.heading) + '</section>'
+    '<section class="product-description-section"><h3>' + esc(x.heading) + '</h3>' + (x.subs || []).map(t => '<h4>' + esc(t) + '</h4>').join('') + renderBody(x.body.trim(), x.heading) + '</section>'
   ).join('');
 }
