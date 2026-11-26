@@ -5122,5 +5122,21 @@
     "source": "https://surveilagrochemicals.co.ke/product-category/rat-bait-station/",
     "ok": false,
     "error": "The operation was aborted due to timeout"
+  },
+  {
+    "name": "diatomaceous-earth-insecticide-dust-3kg",
+    "source": "https://cheapdeals.co.ke/wp-content/uploads/2024/09/Guard-Diatomaceous-Earth-Insecticide-Dust-3kg.png",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/diatomaceous-earth-insecticide-dust-3kg_iVTmvZ_zQ.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/diatomaceous-earth-insecticide-dust-3kg_iVTmvZ_zQ.jpg",
+    "width": 427,
+    "height": 486,
+    "bytes": 39007,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://cheapdeals.co.ke/wp-content/uploads/2024/09/Guard-Diatomaceous-Earth-Insecticide-Dust-3kg.png",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
