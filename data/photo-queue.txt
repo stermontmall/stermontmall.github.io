@@ -1,2 +1,6 @@
 # Replace wrong Agita 10WG 80g photo (was a Rafiki Pest Control website banner) with the real Agita 10WG pack photo
 agita-10wg-80g|https://imaginecare.co.ke/product/agita-10wg-fly-bait-50g/
+plastic-bird-2-spike-6m|https://pesafrica.net/product/plastic-bird-2-spike/
+stainless-steel-bird-2-spike-1m|https://pesafrica.net/product/stainless-steel-bird-2-spike/
+stainless-steel-bird-4-spike-1m|https://pesafrica.net/product/stainless-steel-bird-4-spike/
+metro-200sc|https://agroduka.ke/metro-200sc/
