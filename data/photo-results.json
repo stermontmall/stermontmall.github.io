@@ -5924,5 +5924,21 @@
     "source": "https://diciistores.co.ke/product/mortein-doom-led-complete-gadget-refill-45ml/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "glue-book-mouse-traps",
+    "source": "https://kejanicleaning.co.ke/shop/pest-control/glue-book-mouse-traps/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/glue-book-mouse-traps_rKeQAbwPA.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/glue-book-mouse-traps_rKeQAbwPA.jpg",
+    "width": 225,
+    "height": 225,
+    "bytes": 11161,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2023/10/Glue-Book-Mouse-Traps.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
