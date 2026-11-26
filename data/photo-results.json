@@ -9620,5 +9620,11 @@
     "image_source": "https://images.weserv.nl/?url=www.elgonkenya.com/wp-content/uploads/2023/02/THABITI-MOCKUP-Coffee.png",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "thabiti-rice-planting-11-23-22-50kg-v8-20261126",
+    "source": "https://www.elgonkenya.com/wp-content/uploads/2023/02/RICE-P-THABITI-MOCKUP-front-1.png",
+    "ok": false,
+    "error": "fetch failed"
   }
 ]
