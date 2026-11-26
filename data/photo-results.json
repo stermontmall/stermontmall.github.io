@@ -7758,5 +7758,21 @@
     "image_source": "https://webimg.praktiker.hu/_upload/images/praktiker_catalog/433882/1200x1200/433882_157_legycsapda-ablakmatrica-4db-os-guardn.png?version=1752157211",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "cobra-45w-fly-killer-unit-owner-fix",
+    "source": "https://www.pestfix.co.uk/images/product-images/cobra_800%281%29.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/cobra-45w-fly-killer-unit-owner-fix_rVzqyZ4FF.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/cobra-45w-fly-killer-unit-owner-fix_rVzqyZ4FF.jpg",
+    "width": 800,
+    "height": 800,
+    "bytes": 47662,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.pestfix.co.uk/images/product-images/cobra_800%281%29.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
