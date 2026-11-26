@@ -1197,3 +1197,4 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // V8 catalogue rebuild trigger after Nairobi fertilizer batch 2 on 2026-11-26; no runtime behavior change.
 
 // V8 rebuild retry after prior Pages deploy was cancelled; final catalogue is 30 new active products plus grouped existing variants (2026-11-26).
+// V8 catalogue rebuild: added verified pack variants STM-002465 through STM-002468 on 2026-11-26.
