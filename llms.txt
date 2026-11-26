@@ -24,7 +24,7 @@
 - [Track an order](https://stermontarcade.co.ke/track.html)
 
 ## Categories
-- [Spray Adjuvants & Growth Regulators in Kenya](https://stermontarcade.co.ke/c/adjuvants-growth-regulators.html): Buy spreader stickers, wetters and rooting hormones online in Kenya. Pay by M-Pesa, delivery to all 47 counties.
+- [Buy Adjuvants & Growth Regulators in Kenya](https://stermontarcade.co.ke/c/adjuvants-growth-regulators.html): Browse Adjuvants & Growth Regulators online in Kenya. Compare listed product details and current prices. Check each product label and PCPB registration.…
 - [Shop Agrochemicals Online in Kenya](https://stermontarcade.co.ke/c/agrochemicals.html): Browse Agrochemicals online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Agrovet Online in Kenya](https://stermontarcade.co.ke/c/agrovet.html): Browse Agrovet online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
 - [Shop Appliances Online in Kenya](https://stermontarcade.co.ke/c/appliances.html): Browse Appliances online in Kenya. Compare listed product details and current prices. M-Pesa; Nairobi pickup, delivery to all 47 counties.
@@ -157,6 +157,6 @@
 - [Where to buy bed bug killer in Kenya: what to check first](https://stermontarcade.co.ke/blog/where-to-buy-bed-bug-killer-in-kenya.html): Buying bed bug killer in Kenya? Check the PCPB mark, pack size, label directions and delivery before you pay, plus when to call a licensed operator.
 
 ## Optional
-- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 573 product pages
+- [Product sitemap](https://stermontarcade.co.ke/sitemap-products.xml): all 590 product pages
 - [Image sitemap](https://stermontarcade.co.ke/sitemap-images.xml)
 - [Merchant feed](https://stermontarcade.co.ke/merchant-feed.xml)
