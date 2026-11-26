@@ -271,3 +271,4 @@ jobs:
               print("IndexNow submit failed (not critical):", e)
           PY
 # V8 catalogue rebuild request 2026-11-26: publish STM-002263 Zagro Ultraxide 1L with verified ImageKit photo and V8 metadata.
+# V8 catalogue rebuild request 2026-11-26: publish STM-002475 OCP NPSB Fertilizer 50kg with verified ImageKit photo and V8 retail-estimate baseline.
