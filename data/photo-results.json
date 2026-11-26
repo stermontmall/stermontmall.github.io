@@ -5138,5 +5138,11 @@
     "image_source": "https://cheapdeals.co.ke/wp-content/uploads/2024/09/Guard-Diatomaceous-Earth-Insecticide-Dust-3kg.png",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "rat-bait-station-kilimokona-1pc",
+    "source": "https://kilimokona.co.ke/shop/agrovet/public-health/keep-rats-out-keep-your-home-pest-free-the-rat-bait-station-supplied-by-kilimokona-tradings-ltd/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
