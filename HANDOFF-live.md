@@ -1,3 +1,7 @@
+## 2026-11-26 11:28 (Africa/Nairobi) - Purple titles fix deployed
+- Merge da40e2f is included in the successful GitHub Pages deploy of 8cadbe1. Build product pages passed for da40e2f. Site audit was still running when last checked.
+- Next: owner checks a few products on the live site after a hard reload.
+
 ## 2026-11-26 11:20 (Africa/Nairobi) - Shop markdown headings FINISHED and merged to main (from `wip-shell-markdown-headings`)
 - Done: shop view shows `##`/`###` descriptions under purple titles, no raw markdown, dash lists. app.js `?v=57`. No Neon data changed.
 - Tests: description-headings 22, product-description-html 61, shell 180/180, navigation, no-classic-hop, seo-description-check, seo-indexing-guard pass; phone-size preview of a sample checked. `mobile-shell/description.test.mjs` failure is pre-existing.
