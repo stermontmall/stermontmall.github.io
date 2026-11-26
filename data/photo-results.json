@@ -4706,5 +4706,37 @@
     "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2023/10/Fogging-Machine.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "mist-blower-2stroke-14l",
+    "source": "https://kejanicleaning.co.ke/shop/pest-control/mist-blowers-2-stroke-14-litres/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mist-blower-2stroke-14l_iLG6gNq2C.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mist-blower-2stroke-14l_iLG6gNq2C.jpg",
+    "width": 225,
+    "height": 225,
+    "bytes": 7127,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2023/10/Mist-Blowers-2-Stroke-14-Litres.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "mosquito-insect-trap-4w",
+    "source": "https://kejanicleaning.co.ke/shop/pest-control/mosquito-insect-trap-4-watts/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mosquito-insect-trap-4w_T290KS1BD.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mosquito-insect-trap-4w_T290KS1BD.jpg",
+    "width": 225,
+    "height": 225,
+    "bytes": 11572,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2023/10/Mosquito-or-Insect-Trap-4-Watts-.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
