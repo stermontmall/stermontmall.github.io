@@ -9290,5 +9290,37 @@
     "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F5141bc4c5f49fd2379822a53cd4bb675efd10fc6a7a51e1ed32b4fb95fb75ba9&w=3840&q=75",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "cabozinc-sc-500ml-v8-20261126",
+    "source": "https://agropests.com/products/cabozinc-sc-500ml",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/cabozinc-sc-500ml-v8-20261126_s934NtH7p.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/cabozinc-sc-500ml-v8-20261126_s934NtH7p.jpg",
+    "width": 271,
+    "height": 480,
+    "bytes": 20561,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F78650dc94f3f75d7e126f95f6b392c8ca2c8ca29ab72d7a184bfd9ddbe4d39d2&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "cabozinc-sc-5l-v8-20261126",
+    "source": "https://agropests.com/products/cabozinc-sc-5l",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/cabozinc-sc-5l-v8-20261126_CSdYwdnJh.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/cabozinc-sc-5l-v8-20261126_CSdYwdnJh.jpg",
+    "width": 271,
+    "height": 480,
+    "bytes": 20561,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F78650dc94f3f75d7e126f95f6b392c8ca2c8ca29ab72d7a184bfd9ddbe4d39d2&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
