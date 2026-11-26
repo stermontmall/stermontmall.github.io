@@ -5078,5 +5078,37 @@
     "image_source": "https://www.myagrovet.co.ke/media/products/solo-425-pro-knapsack-sprayer-16l-adjustable-pump-lever-brass-nozzle/01-800.webp",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "uv-replacement-bulbs-20w-2pack",
+    "source": "https://weighingscalessolutions.co.ke/product/2-pcs-20w-t8-uv-replacement-bulbs/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/uv-replacement-bulbs-20w-2pack_MZJkkVbd6.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/uv-replacement-bulbs-20w-2pack_MZJkkVbd6.jpg",
+    "width": 600,
+    "height": 600,
+    "bytes": 10437,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://weighingscalessolutions.co.ke/wp-content/uploads/2026/05/Untitled-design-2026-05-08T140303.507-600x600.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "4pcs-sticky-ribbon-fly-catcher",
+    "source": "https://kejanicleaning.co.ke/shop/pest-control/4pcs-sticky-ribbon-fly-catcher-trap-killer-insect-non-toxic/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/4pcs-sticky-ribbon-fly-catcher_ly_VAhi1V.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/4pcs-sticky-ribbon-fly-catcher_ly_VAhi1V.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 49313,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2023/10/4pcs-Sticky-Ribbon-Fly-Catcher-Trap-Killer-Insect-Non-Toxic.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
