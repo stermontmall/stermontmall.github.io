@@ -8670,5 +8670,59 @@
     "source": "https://www.mtolori.com/product/details/3421/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "kynoch-horti-50kg-v8-retry-20261126",
+    "source": "https://agropests.com/products/kyni-plus-horti-50kg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/kynoch-horti-50kg-v8-retry-20261126_IdIYBEUxF.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/kynoch-horti-50kg-v8-retry-20261126_IdIYBEUxF.jpg",
+    "width": 407,
+    "height": 391,
+    "bytes": 22381,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F062effaf539b7c8c5e303b4ff20843bfb1c63a2f9a47a014b94282ef39001742&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "kynoch-plus-s-50kg-v8-retry-20261126",
+    "source": "https://agropests.com/products/kyno-plus-s-50kg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/kynoch-plus-s-50kg-v8-retry-20261126_r422p_FRrQ.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/kynoch-plus-s-50kg-v8-retry-20261126_r422p_FRrQ.jpg",
+    "width": 387,
+    "height": 490,
+    "bytes": 26363,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agropests.com/_next/image?url=https%3A%2F%2Fassets.agropests.com%2FProducts%2F331f175b2fad3a2c6c203851d0c718a0ad51681300665d41e057113ae0a7af85&w=3840&q=75",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "kynoch-panda-power-50kg-v8-direct-image-20261126",
+    "source": "https://mtolori.com/res/products/1/2005144_back_500px_.webp",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/kynoch-panda-power-50kg-v8-direct-image-20261126_pMtYl_1IK.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/kynoch-panda-power-50kg-v8-direct-image-20261126_pMtYl_1IK.jpg",
+    "width": 625,
+    "height": 500,
+    "bytes": 23370,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://mtolori.com/res/products/1/2005144_back_500px_.webp",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "kynoch-plus-top-50kg-v8-direct-image-20261126",
+    "source": "https://cdn.shopify.com/s/files/1/0888/0216/4920/files/Kynoplus-01_3a3a8e68-50a6-4aef-bf5f-4def2a16dcc7.png?v=1756198316",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
