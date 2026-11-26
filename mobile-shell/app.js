@@ -811,6 +811,13 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
   try { hashSize = decodeURIComponent(location.hash.replace(/^#/, '')); } catch { hashSize = location.hash.replace(/^#/, ''); }
   const chosen = hashSize || slug;
   deepOpen = true;
+  // Set the SEO URL from the requested deep-link slug before rendering the overlay.
+  // This covers legacy ?product= links as well as direct /p/<slug>.html visits.
+  const deepCanonical = new URL('/p/' + encodeURIComponent(PRODUCT_ROUTE_SLUG || slug) + '.html', location.origin).href;
+  const deepCanonicalLink = document.querySelector('link[rel="canonical"]');
+  const deepOgUrl = document.querySelector('meta[property="og:url"]');
+  if (deepCanonicalLink) deepCanonicalLink.href = deepCanonical;
+  if (deepOgUrl) deepOgUrl.content = deepCanonical;
   qb.p = p; qb.size = (p.sizes.find(z => z.slug === chosen || z.rowId === chosen) || p.sizes.find(z => z.slug === slug || z.rowId === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
   renderQB(); openProductPage();
 }
