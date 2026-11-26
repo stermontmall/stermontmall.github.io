@@ -8440,5 +8440,21 @@
     "source": "https://kilimokona.co.ke/shop/crop-production/foliar-feeds/algreen-bonzin/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "algreen-supasense-1l-v8-20261126",
+    "source": "https://agroduka.ke/algreen-supasense/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/algreen-supasense-1l-v8-20261126_MLLfQqMoH.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/algreen-supasense-1l-v8-20261126_MLLfQqMoH.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 31337,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/product_6.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
