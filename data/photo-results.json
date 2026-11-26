@@ -8510,5 +8510,53 @@
     "source": "https://dawnfarmers.com/shop/crop-production/seeds-fertilizers/fertilzers/foliar-fertilizers/algreen-copagel-50/",
     "ok": false,
     "error": "source page HTTP 404"
+  },
+  {
+    "name": "afrikelp-200ml-v8-20261126",
+    "source": "https://agroduka.ke/afrikelp/?variation_id=969",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/afrikelp-200ml-v8-20261126_YWzA4BTru.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/afrikelp-200ml-v8-20261126_YWzA4BTru.jpg",
+    "width": 200,
+    "height": 459,
+    "bytes": 16489,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://agroduka.ke/images/detailed/9/ckl-AfriKelp.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "afrikelp-1l-v8-20261126",
+    "source": "https://www.sokofarm.com/products/product/afrikelp-1-litre-seaweed-biostimulant-plant-growth-enhancer/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/afrikelp-1l-v8-20261126__4uoNnmwJ.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/afrikelp-1l-v8-20261126__4uoNnmwJ.jpg",
+    "width": 239,
+    "height": 342,
+    "bytes": 8927,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://res.cloudinary.com/dufyygbfv/image/upload/v1767196648/tjqhkse4hwb6f5maono9.webp",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "agrifeed-npk-1l-v8-20261126",
+    "source": "https://agroduka.ke/agrifeed-npk/?variation_id=6416",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/agrifeed-npk-1l-v8-20261126_yxYnIugt0.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/agrifeed-npk-1l-v8-20261126_yxYnIugt0.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 18109,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/10/Screenshot_2026-05-29_111051.png",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
