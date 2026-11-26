@@ -5160,5 +5160,11 @@
     "image_source": "https://www.tronic.co.ke/cdn/shop/files/IK-7011-10.jpg?v=1756396597&width=700",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "jozaken-180k-thermal-fogging-machine",
+    "source": "https://jozaken.co.ke/product/thermal-fogging-machine/",
+    "ok": false,
+    "error": "fetch failed"
   }
 ]
