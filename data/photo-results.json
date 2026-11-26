@@ -4750,5 +4750,65 @@
     "source": "https://www.jumia.co.ke/generic-electric-shock-mosquito-killing-lamp-silent-light-wave-insect-killer-for-home-use-326885729.html",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "mosquito-led-light-trap-5w",
+    "source": "https://imaginecare.co.ke/product/mosquito-led-light-trap/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "fly-catcher-1pc",
+    "source": "https://imaginecare.co.ke/product/fly-catcher/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "fly-glue-boards-15pcs",
+    "source": "https://imaginecare.co.ke/product/fly-glue-boards-15pcs/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "greenlife-rodent-bait-station",
+    "source": "https://imaginecare.co.ke/product/rodent-bait-station/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "duro-tekk-battery-sprayer-16l",
+    "source": "https://imaginecare.co.ke/product/duro-tekk-battery-sprayer/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "aico-ac767-2-stroke-knapsack-sprayer",
+    "source": "https://imaginecare.co.ke/product/power-knapsack-sprayer-ac767-20ltr/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "jacto-pjm-motorized-knapsack-sprayer",
+    "source": "https://imaginecare.co.ke/product/jacto-pjm-motorized-knapsack-sprayer/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "mist-blower-3wf-3a-20l",
+    "source": "https://imaginecare.co.ke/product/mist-blower-knapsack-sprayer-3wf-3a-20ltr/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "braztools-manual-sprayer-16l",
+    "source": "https://imaginecare.co.ke/product/braztools-manual-sprayer-16l/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "black-cordless-nano-mist-spray-gun-800ml",
+    "source": "https://imaginecare.co.ke/product/black-cordless-nano-mist-spray-gun-800ml/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
