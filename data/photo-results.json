@@ -9686,5 +9686,21 @@
     "image_source": "https://claritastores.com/wp-content/uploads/2025/02/NPK-17.png",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "advance-termite-bait-stations-case-10-v8-20261127",
+    "source": "https://pestcontrolsuperstore.com/cdn/shop/files/Advance-Termite-Bait-Stations_1600x_6ef7e0cf-50dc-4764-8e14-e10f2d04cdea.jpg?crop=center&height=1200&v=1740171248&width=1200",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/advance-termite-bait-stations-case-10-v8-20261127_3JNXZffYy.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/advance-termite-bait-stations-case-10-v8-20261127_3JNXZffYy.jpg",
+    "width": 1200,
+    "height": 1200,
+    "bytes": 125165,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://pestcontrolsuperstore.com/cdn/shop/files/Advance-Termite-Bait-Stations_1600x_6ef7e0cf-50dc-4764-8e14-e10f2d04cdea.jpg?crop=center&height=1200&v=1740171248&width=1200",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
