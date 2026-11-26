@@ -6274,5 +6274,37 @@
     "source": "https://old.naivas.online/flower-mossi-chips-mosquito-killer-lavender-30-mats",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "flower-regular-mossi-chips-30g-carrefour-retry",
+    "source": "https://cdn.mafrservices.com/sys-master-root/h87/hc5/50256782524446/201225_main.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-regular-mossi-chips-30g-carrefour-retry_UXqaKVXR4Y.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-regular-mossi-chips-30g-carrefour-retry_UXqaKVXR4Y.jpg",
+    "width": 1700,
+    "height": 1700,
+    "bytes": 168965,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/sys-master-root/h87/hc5/50256782524446/201225_main.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "flower-mossi-chips-lavender-30-mats-carrefour-retry",
+    "source": "https://cdn.mafrservices.com/pim-content/KEN/media/product/6960/1761919207/6960_main.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-mossi-chips-lavender-30-mats-carrefour-retry_FGFF16TBKy.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/flower-mossi-chips-lavender-30-mats-carrefour-retry_FGFF16TBKy.jpg",
+    "width": 1700,
+    "height": 1700,
+    "bytes": 261436,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/avif",
+    "image_source": "https://cdn.mafrservices.com/pim-content/KEN/media/product/6960/1761919207/6960_main.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
