@@ -392,6 +392,19 @@ with sync_playwright() as p:
     pg.fill('#search', 'blender'); pg.click('#search-form button[aria-label="Search"]'); pg.wait_for_function("document.querySelector('#grid-title').textContent.includes('blender')", timeout=5000)
     check('magnifier button searches', pg.locator('#grid .card[data-id]').count() >= 1)
     pg.screenshot(path=os.path.join(OUT, 'search.png'))
+    # "visible" = nothing (header, chip row) is painted over the result title or the top of the first card
+    on_top = "(() => { const seen = el => { const r = el.getBoundingClientRect(), hit = document.elementFromPoint(r.left + 20, r.top + 3); return !!hit && el.contains(hit); }; const c = document.querySelector('#grid .card[data-id]'), bar = document.querySelector('#appbar').getBoundingClientRect(); return window.scrollY === 0 && seen(document.querySelector('#grid-title')) && seen(c) && c.getBoundingClientRect().top < bar.bottom + 90; })()"
+    pg.fill('#search', ''); pg.wait_for_function("document.querySelector('#grid-title').textContent === 'Recommended for you' && document.querySelectorAll('#grid .card[data-id]').length > 3")
+    pg.evaluate("window.scrollTo(0, document.body.scrollHeight)"); pg.wait_for_timeout(500)
+    pg.fill('#search', 'garden'); pg.click('#search-form button[aria-label="Search"]'); pg.wait_for_timeout(1200)
+    check('searching from the bottom of the page shows the first result right under the search bar', pg.evaluate(on_top), pg.evaluate("[scrollY, document.querySelector('#grid .card[data-id]').getBoundingClientRect().top]"))
+    pg.screenshot(path=os.path.join(OUT, 'search-top.png'))
+    pg.evaluate("window.scrollTo(0, document.body.scrollHeight)"); pg.wait_for_timeout(500)
+    pg.click('#search-form button[aria-label="Search"]', force=True); pg.wait_for_timeout(500)
+    check('the search button returns to the first result', pg.evaluate("window.scrollY") == 0)
+    pg.fill('#search', ''); pg.wait_for_function("!document.querySelector('#view-home').classList.contains('is-searching')")
+    check('home page text and category chips return after clearing search', pg.locator('#home-pest-services').is_visible() and pg.locator('#chips').is_visible())
+    pg.fill('#search', 'blender'); pg.keyboard.press('Enter'); pg.wait_for_timeout(500)
 
     # reload with a sheet open does not reopen it; clear the search first so the fixture has a visible product to open
     pg.fill('#search', ''); pg.keyboard.press('Enter'); pg.wait_for_selector('#grid .card[data-id]')

@@ -1,3 +1,9 @@
+## 2026-11-26 (Africa/Nairobi) - Search results on top (branch `wip-smart-search`, NOT merged)
+- Owner: results must appear on top; the search button must not leave them at the bottom.
+- Done: while searching, home intro, page text below the grid and category chip row are hidden; Enter/button always scrolls to the first result. app.js `?v=60`.
+- Tests: shell.test.py 188/188 plus search, navigation, description-headings, product-description-html, no-classic-hop, no-static-share-links, seo-indexing-guard, seo-shell-redirect pass; phone-size screenshot checked. Not tested on the live site or a real phone keyboard.
+- Next: owner approval, then merge into main.
+
 ## 2026-11-26 (Africa/Nairobi) - Smarter shop search (branch `wip-smart-search`, NOT merged)
 - Owner: "work on my search button to work efficiently. Perfect it".
 - Done: `mobile-shell/app.js` search runs while typing; relevance ranking; typo tolerance (5+ letters); plurals, pack sizes, hyphens, local words (mende, panya, mbu, mchwa); closest matches; no-result WhatsApp link + Clear. Magnifier is a real button. app.js `?v=59` (index.html, shell-route-loader.js).

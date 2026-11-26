@@ -539,6 +539,8 @@ new IntersectionObserver(es => { if (es[0].isIntersecting && store.get().tab ===
 function refreshGrid() {
   const s = store.get(), cat = CATS.find(c => c.id === s.chip);
   $('#grid-title').textContent = s.q ? `Results for "${s.q}"` : s.sub || (cat ? cat.name : 'Recommended for you');
+  $('#view-home').classList.toggle('is-searching', !!s.q);   // while searching, only the results show: no intro above them, no page text below
+  $('#appbar').classList.toggle('is-searching', !!s.q);   // the chip row hangs over the top of the page, so it steps aside for the results
   renderChips(); loadPage(true); syncProductMeta();   // the address bar follows the open category (see catUrl)
 }
 async function renderDeals() {
@@ -1260,11 +1262,11 @@ let searchTimer = 0;
 function runSearch() {
   clearTimeout(searchTimer);
   const q = $('#search').value.trim().replace(/\s+/g, ' ').slice(0, 80), s = store.get();
-  if (q === s.q && s.tab === 'home') return;
+  if (q === s.q && s.tab === 'home') { if (q) window.scrollTo(0, 0); return; }   // Enter or the button on results already showing: back to the first one
   store.set(q ? { q, chip: 'all', sub: '' } : { q });
   if (s.tab !== 'home') goTab('home');
   refreshGrid();
-  if (window.scrollY > 0) window.scrollTo(0, 0);   // results start at the top of the list
+  window.scrollTo(0, 0);   // results start at the top of the list
 }
 $('#search').addEventListener('input', () => {
   clearTimeout(searchTimer);

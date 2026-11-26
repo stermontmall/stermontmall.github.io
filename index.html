@@ -143,6 +143,7 @@
 <main id="views" class="pb-[calc(56px+env(safe-area-inset-bottom)+8px)]">
 
   <section id="view-home" data-view="home">
+    <style>#view-home.is-searching>:not(#grid,#grid-empty,#sentinel,.search-keep){display:none!important}#view-home.is-searching>.search-keep{padding-top:8px}#appbar.is-searching #chips-wrap{display:none}</style>
     <div class="px-3 pt-2 pb-1"><h1 class="text-sm font-semibold tracking-tight text-gray-900">Stermont Arcade: Pest Control Products, Agrovet Supplies &amp; Online Shopping in Kenya</h1><p class="mt-1 text-xs text-gray-600">Stermont Arcade — shop online and request professional home and business services.</p></div>
     <div class="flex gap-2 overflow-x-auto no-sb px-3 py-2 text-2xs text-brand font-medium">
       <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">M-Pesa checkout</span>
@@ -150,7 +151,7 @@
       <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">Pickup at Sarit Centre, Westlands</span>
       <span class="shrink-0 px-2.5 py-1 rounded-full bg-brand-soft">WhatsApp +254 789 514 060</span>
     </div>
-    <div class="flex items-center justify-between px-3 pb-2">
+    <div class="search-keep flex items-center justify-between px-3 pb-2">
       <div class="flex items-center gap-1 min-w-0">
         <h2 id="grid-title" class="text-sm font-semibold">Recommended for you</h2>
         <!-- Category link: shown by mobile-shell/app.js (syncProductMeta) only inside a category; it shares the category's own address /c/<slug>.html -->
@@ -406,7 +407,7 @@
 
 <script src="/product-links.js" defer></script>
 <script src="/imagekit-url.js" defer></script>
-<script src="/mobile-shell/app.js?v=59" defer></script>
+<script src="/mobile-shell/app.js?v=60" defer></script>
 <script src="/analytics.js" defer></script>
 
 </body>
