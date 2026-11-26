@@ -4753,7 +4753,7 @@
   },
   {
     "name": "mosquito-led-light-trap-5w",
-    "source": "https://imaginecare.co.ke/product/mosquito-led-light-trap/",
+    "source": "https://imaginecare.co.ke/wp-content/uploads/2022/03/63426.jpg?v=1684477069",
     "ok": false,
     "error": "source page HTTP 403"
   },
@@ -4765,9 +4765,19 @@
   },
   {
     "name": "fly-glue-boards-15pcs",
-    "source": "https://imaginecare.co.ke/product/fly-glue-boards-15pcs/",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://www.roofgiant.com/image_resize/crop/mw1500/mh750/products/6542/fk009-genus-universal-glue-boards-enlargement.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/fly-glue-boards-15pcs_uKzg6vs8g.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/fly-glue-boards-15pcs_uKzg6vs8g.jpg",
+    "width": 750,
+    "height": 750,
+    "bytes": 47960,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://www.roofgiant.com/image_resize/crop/mw1500/mh750/products/6542/fk009-genus-universal-glue-boards-enlargement.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   },
   {
     "name": "greenlife-rodent-bait-station",
@@ -4777,7 +4787,7 @@
   },
   {
     "name": "duro-tekk-battery-sprayer-16l",
-    "source": "https://imaginecare.co.ke/product/duro-tekk-battery-sprayer/",
+    "source": "https://imaginecare.co.ke/wp-content/uploads/2021/09/buy-Duro-Tekk-Battery-Sprayer-500x500.jpg?v=1684477843",
     "ok": false,
     "error": "source page HTTP 403"
   },
@@ -4795,19 +4805,45 @@
   },
   {
     "name": "mist-blower-3wf-3a-20l",
-    "source": "https://imaginecare.co.ke/product/mist-blower-knapsack-sprayer-3wf-3a-20ltr/",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://www.lastpricetunisie.tn/7373-large_default/pulverisateur-a-pression-20litres-moteur-essence-3wf-3a-shopping-en-ligne-last-price-tunisie.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mist-blower-3wf-3a-20l_E1IXqZpXe.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mist-blower-3wf-3a-20l_E1IXqZpXe.jpg",
+    "width": 1000,
+    "height": 1000,
+    "bytes": 54011,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.lastpricetunisie.tn/7373-large_default/pulverisateur-a-pression-20litres-moteur-essence-3wf-3a-shopping-en-ligne-last-price-tunisie.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   },
   {
     "name": "braztools-manual-sprayer-16l",
-    "source": "https://imaginecare.co.ke/product/braztools-manual-sprayer-16l/",
-    "ok": false,
-    "error": "source page HTTP 403"
+    "source": "https://cdn.prod.website-files.com/6169be830597c1271ea00164/621bb6ebb8310b9707346dd4_Braztools%20Knapsack%20Sprayer.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/braztools-manual-sprayer-16l_0_hdAfrtN.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/braztools-manual-sprayer-16l_0_hdAfrtN.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 13818,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://cdn.prod.website-files.com/6169be830597c1271ea00164/621bb6ebb8310b9707346dd4_Braztools%20Knapsack%20Sprayer.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   },
   {
     "name": "black-cordless-nano-mist-spray-gun-800ml",
     "source": "https://imaginecare.co.ke/product/black-cordless-nano-mist-spray-gun-800ml/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "jacto-pjm-motorized-knapsack-sprayer-25l",
+    "source": "https://imaginecare.co.ke/wp-content/uploads/2022/12/JACTO-PJM-MOTORIZED-KNAPSACK-SPRAYER-500x659.png?v=1684475251",
     "ok": false,
     "error": "source page HTTP 403"
   }
