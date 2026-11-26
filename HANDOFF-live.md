@@ -1,3 +1,12 @@
+## 2026-11-26 12:00 (Africa/Nairobi) - Faster product links, tested, merging (branch `wip-fast-product-links`)
+- Done: spinner over Home on `?product=` links, early fetch of /p/<slug>.html, ProductGroup (pack-size) pages now parse, shell-route-loader app.js v=58.
+- Tests: shell 180/180 + node tests pass. Simulated 1.5s delay per file: `?product=sevin-dudu-dust-200g` 3.6s -> 2.1s.
+- Left: direct /p/ links still slow (loader fetches `/`, loads scripts one by one, refetches the page: ~5.1s in the same simulation). Sizes with no own /p/ page (e.g. trevin-dudu-dust-200g) still use the slow live lookup. product-links.js throws harmless "module is not defined" in the browser.
+
+## 2026-11-26 11:50 (Africa/Nairobi) - Faster product links (branch `wip-fast-product-links`)
+- Problem (owner): product links hang on Home before the product opens. Cause: no CSS used the `deep-open` flag, product fetch waited for app.js; shell-route-loader.js pinned app.js v=53.
+- In progress: spinner + early fetch in index.html, app.js v=58. Next: `python3 mobile-shell/shell.test.py`, timed headless check, merge.
+
 ## 2026-11-26 11:28 (Africa/Nairobi) - Purple titles fix deployed
 - Merge da40e2f is included in the successful GitHub Pages deploy of 8cadbe1. Build product pages passed for da40e2f. Site audit was still running when last checked.
 - Next: owner checks a few products on the live site after a hard reload.

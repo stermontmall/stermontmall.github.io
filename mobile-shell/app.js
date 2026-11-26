@@ -913,7 +913,9 @@ function openDeepLink(slug) {   // the full product page for a /?product=<slug> 
   if (deepOgUrl) deepOgUrl.content = deepCanonical;
   qb.p = p; qb.size = (p.sizes.find(z => z.slug === chosen || z.rowId === chosen) || p.sizes.find(z => z.slug === slug || z.rowId === slug) || p.sizes[0]).label; qb.qty = 1; qb.shown = '';
   renderQB(); openProductPage();
+  uncoverDeep(250);   // after the product page has slid in
 }
+function uncoverDeep(wait) { setTimeout(() => document.documentElement.classList.remove('deep-open'), wait || 0); }   // remove the product-link spinner
 /* FAST PATH for /?product=<slug> (owner 2026-11-08: the link must go straight to the product, not wait for the whole catalog).
    It reads only what that one product needs: its row, the other rows of its pack-size group, the (small) category list and product-names.json, in parallel with
    the full catalog that Home still loads in the background, and opens the product page as soon as they arrive. When the full catalog lands, the open page is
@@ -923,7 +925,8 @@ async function openStaticProductFallback(slug) {
   // Published /p/ pages are generated from the catalogue and remain available on GitHub Pages
   // if the public Neon read path is unavailable. Treat them as read-only;
   // this fetch hydrates the in-app view without redirecting or modifying the canonical SEO document.
-  const response = await fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' });
+  const early = window.__stmDeepFetch; window.__stmDeepFetch = null;   // started by the inline script in index.html; a response body can be read once
+  const response = await ((early && early.slug === slug && early.response) || fetch('/p/' + encodeURIComponent(slug) + '.html', { cache: 'no-cache' }));
   if (!response.ok) throw new Error('Published product page returned HTTP ' + response.status);
   const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
   let product = null, breadcrumb = null;
@@ -933,6 +936,10 @@ async function openStaticProductFallback(slug) {
       for (const item of (Array.isArray(data) ? data : [data])) {
         const types = Array.isArray(item && item['@type']) ? item['@type'] : [item && item['@type']];
         if (!product && types.includes('Product')) product = item;
+        if (!product && types.includes('ProductGroup') && Array.isArray(item.hasVariant)) {   // pack-size pages: use the size this address names
+          const url = v => String((Array.isArray(v.offers) ? v.offers[0] : v.offers || {}).url || '').split(/[?#]/)[0];
+          product = item.hasVariant.find(v => url(v).endsWith('/' + slug + '.html') || url(v).endsWith('=' + slug)) || item.hasVariant[0];
+        }
         if (!breadcrumb && types.includes('BreadcrumbList')) breadcrumb = item;
       }
     } catch {}
@@ -1113,6 +1120,7 @@ function applySharedCart(lines) {   // idempotent: a line already in the cart ge
 /* ---------- 11. Wiring ---------- */
 let toastTimer;
 function toast(msg) {
+  uncoverDeep();   // a message (e.g. product unavailable) must never stay hidden behind the spinner
   const t = $('#toast'); t.textContent = msg; t.style.opacity = 1;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.style.opacity = 0, 1600);
 }

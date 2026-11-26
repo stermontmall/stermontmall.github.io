@@ -1,5 +1,8 @@
 <head>
   <meta charset="UTF-8">
+  <style>html.deep-open body::before{content:"";position:fixed;inset:0;z-index:58;background:#fff}html.deep-open body::after{content:"";position:fixed;z-index:59;left:50%;top:45%;width:38px;height:38px;margin-left:-19px;border:4px solid #ede9fe;border-top-color:#7c3aed;border-radius:50%;animation:stm-spin .8s linear infinite}@keyframes stm-spin{to{transform:rotate(360deg)}}</style>
+  <script>/* Product link: cover Home with a spinner and fetch the product page at once, without waiting for the app. */
+  (function(){try{var q=new URLSearchParams(location.search),s=q.get('product')||q.get('item');if(!s||!/^[A-Za-z0-9._~-]+$/.test(s))return;var h=document.documentElement;h.classList.add('deep-open');setTimeout(function(){h.classList.remove('deep-open')},10000);if(window.fetch){var r=fetch('/p/'+encodeURIComponent(s)+'.html',{cache:'no-cache'});r.catch(function(){});window.__stmDeepFetch={slug:s,response:r}}}catch(e){}})();</script>
   <link rel="preconnect" href="https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech" crossorigin>
   <meta name="theme-color" content="#7c3aed">
   <title>Stermont Arcade | Pest Control &amp; Online Shopping Kenya</title>
@@ -404,7 +407,7 @@
 
 <script src="/product-links.js" defer></script>
 <script src="/imagekit-url.js" defer></script>
-<script src="/mobile-shell/app.js?v=57" defer></script>
+<script src="/mobile-shell/app.js?v=58" defer></script>
 <script src="/analytics.js" defer></script>
 
 </body>

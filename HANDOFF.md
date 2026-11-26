@@ -122,3 +122,5 @@ Neon scan of descriptions (2026-11-24): bad targets found: pest-control-and-fumi
 - Optional data clean-up (not done, needs owner OK): edit those product descriptions in Neon so they link to the real slugs.
 
 - 2026-11-26: merged `wip-shell-markdown-headings` - shop view renders markdown headings as purple titles (app.js v=57).
+
+- 2026-11-26: merged `wip-fast-product-links` - product links show a spinner and load sooner (app.js v=58).
