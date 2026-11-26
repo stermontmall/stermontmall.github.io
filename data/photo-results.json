@@ -5144,5 +5144,21 @@
     "source": "https://kilimokona.co.ke/shop/agrovet/public-health/keep-rats-out-keep-your-home-pest-free-the-rat-bait-station-supplied-by-kilimokona-tradings-ltd/",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "tronic-insect-killer-10w-1-tube",
+    "source": "https://www.tronic.co.ke/products/tronic-insect-killer-10w-1-tube",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/tronic-insect-killer-10w-1-tube_V0oQgs70s.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/tronic-insect-killer-10w-1-tube_V0oQgs70s.jpg",
+    "width": 700,
+    "height": 700,
+    "bytes": 30885,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://www.tronic.co.ke/cdn/shop/files/IK-7011-10.jpg?v=1756396597&width=700",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
