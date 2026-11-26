@@ -1192,3 +1192,5 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 
 // V8 catalogue rebuild requested after publishing STM-002247–STM-002254 on 2026-11-25.
 // V8 catalogue rebuild trigger: publish Nairobi fertilizer batch STM-002386–STM-002397 on 2026-11-26.
+
+// V8 catalogue rebuild trigger after the Nairobi fertilizer batch on 2026-11-26; no runtime behavior change.
