@@ -8272,5 +8272,37 @@
     "image_source": "https://dawnfarmers.com/wp-content/uploads/2025/08/1073.png",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "yaravera-amidas-50kg-v8-retry-20261126",
+    "source": "https://agroduka.ke/yaravera-amidas/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/yaravera-amidas-50kg-v8-retry-20261126_jrCMKNiPkX.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/yaravera-amidas-50kg-v8-retry-20261126_jrCMKNiPkX.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 9888,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/Lvc4l_1.jpeg",
+    "http_status": 200,
+    "image_found_via": "product-page"
+  },
+  {
+    "name": "tsp-fertilizer-50kg-v8-retry-20261126",
+    "source": "https://agroduka.ke/tsp-fertilizer-50kg/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/tsp-fertilizer-50kg-v8-retry-20261126_E930-qxYu.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/tsp-fertilizer-50kg-v8-retry-20261126_E930-qxYu.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 55679,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/20230523_120513.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
