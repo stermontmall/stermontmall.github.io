@@ -8628,5 +8628,47 @@
     "source": "https://devkigroupkenya.com/order?c=maisha-minerals-fertilizers%26q=Mavuno+Green+Leafy+Vegetables+NPK+20%3A10%3A18",
     "ok": false,
     "error": "https://storage.googleapis.com/gpt-engineer-file-uploads/m42pdYpQG4PTwVvNddYICVC0NNm1/social-images/social-1784193129529-IMG_4862.webp: source image is 225x118; both source sides must be at least 150px"
+  },
+  {
+    "name": "kyno-nafaka-50kg-v8-20261126",
+    "source": "https://www.mtolori.com/product/details/3406/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "kyno-top-25kg-v8-20261126",
+    "source": "https://www.mtolori.com/product/details/3349/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "kynoch-plus-s-50kg-v8-20261126",
+    "source": "https://www.mtolori.com/product/details/3400/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "kyno-horticulture-50kg-v8-20261126",
+    "source": "https://www.mtolori.com/product/details/3362/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "kynoch-panda-power-50kg-v8-20261126",
+    "source": "https://www.mtolori.com/product/details/3399/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "kyno-plus-top-50kg-v8-20261126",
+    "source": "https://www.mtolori.com/product/details/3368/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "liquibor-1l-v8-20261126",
+    "source": "https://www.mtolori.com/product/details/3421/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
