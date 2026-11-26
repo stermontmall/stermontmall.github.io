@@ -6864,5 +6864,49 @@
     "source": "https://surveilagrochemicals.co.ke/product-category/rat-bait-station/",
     "ok": false,
     "error": "The operation was aborted due to timeout"
+  },
+  {
+    "name": "mende-mo-fire-cockroach-bait-5g-new",
+    "source": "https://ke.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/98/2090381/1.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mende-mo-fire-cockroach-bait-5g-new_3ZTcxkJcX.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mende-mo-fire-cockroach-bait-5g-new_3ZTcxkJcX.jpg",
+    "width": 680,
+    "height": 680,
+    "bytes": 66717,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://ke.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/98/2090381/1.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "stop-vermin-powder-100g-new",
+    "source": "https://mtolori.com/res/products/1/1005633_front_500px_.webp",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/stop-vermin-powder-100g-new_xxktczQZg.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/stop-vermin-powder-100g-new_xxktczQZg.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 39632,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://mtolori.com/res/products/1/1005633_front_500px_.webp",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "agita-10wg-80g-new",
+    "source": "https://imaginecare.co.ke/product/agita-10wg-fly-bait-80g/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "bipronex-cockroach-gel-bait-5g-new",
+    "source": "https://imaginecare.co.ke/product/bipronex-cockroach-gel-bait-5g",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
