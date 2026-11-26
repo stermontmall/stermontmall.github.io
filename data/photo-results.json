@@ -8622,5 +8622,11 @@
     "image_source": "https://mavunofertilizers.com/wp-content/uploads/2021/01/17.png",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "mavuno-green-leafy-vegetables-50kg-v8-20261126",
+    "source": "https://devkigroupkenya.com/order?c=maisha-minerals-fertilizers%26q=Mavuno+Green+Leafy+Vegetables+NPK+20%3A10%3A18",
+    "ok": false,
+    "error": "https://storage.googleapis.com/gpt-engineer-file-uploads/m42pdYpQG4PTwVvNddYICVC0NNm1/social-images/social-1784193129529-IMG_4862.webp: source image is 225x118; both source sides must be at least 150px"
   }
 ]
