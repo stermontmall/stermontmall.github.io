@@ -9664,5 +9664,11 @@
     "source": "https://agroduka.com/images/product/51_photo_11436_1.jpg",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "falcon-npk-17-17-17-50kg-proxy-v8-20261126",
+    "source": "https://images.weserv.nl/?url=agroduka.com/images/product/51_photo_11436_1.jpg",
+    "ok": false,
+    "error": "source page HTTP 404"
   }
 ]
