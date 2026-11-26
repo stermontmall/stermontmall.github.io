@@ -353,3 +353,10 @@ boroking-250ml-v8-20261126|https://agropests.com/products/borokingr-250ml
 easygro-fruit-flower-250g-v8-20261126|https://agropests.com/products/easygro-fruit-and-flower-250g
 easygro-fruit-flower-1kg-v8-20261126|https://agropests.com/products/easygro-fruit-and-flower-1kg
 macro-pro-npk-1l-v8-20261126|https://agropests.com/products/macro-pro-npk-1l
+macro-pro-npk-250ml-kuza-v8-20261126|https://kuzaagrochem.com/products/macropro-npk-250ml
+macro-pro-npk-500ml-kuza-v8-20261126|https://kuzaagrochem.com/products/macropro-npk-500ml
+macro-pro-npk-1l-kuza-v8-20261126|https://kuzaagrochem.com/products/macropro-npk-1l
+sure-grow-high-potassium-500g-kuza-v8-20261126|https://kuzaagrochem.com/products/sure-grow--high-potassium-500g-689
+poly-feed-25kg-v8-20261126|https://agropests.com/products/poly-feedtm-stim-armor-25kg
+calcibora-1l-v8-20261126|https://agropests.com/products/calciborar-1l
+goldchance-compound-1kg-v8-20261126|https://agropests.com/products/goldchance-compoundr-1kg
