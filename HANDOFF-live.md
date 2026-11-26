@@ -1,3 +1,8 @@
+## 2026-11-26 14:05 (Africa/Nairobi) - Replace Rafiki logo/branded photos (main, photo queue)
+- Owner: keep products; swap Rafiki logo photos for real product photos. 8 affected: mende-mo-fire, stop-vermin-100g, agita-80g, bipronex-5g, cobra-45w, pantry-moth-trap, fly-bottle-trap, window-fly-stickers.
+- Note: uploader skips names that already succeeded, so replacements need NEW names (why the earlier Agita fix never ran).
+- In progress: first 4 queued as `*-new`. Next: read data/photo-results.json, check image_source, update only `images` in Neon (old URLs saved here), then catalog-changed dispatch.
+
 ## 2026-11-26 12:00 (Africa/Nairobi) - Faster product links, tested, merging (branch `wip-fast-product-links`)
 - Done: spinner over Home on `?product=` links, early fetch of /p/<slug>.html, ProductGroup (pack-size) pages now parse, shell-route-loader app.js v=58.
 - Tests: shell 180/180 + node tests pass. Simulated 1.5s delay per file: `?product=sevin-dudu-dust-200g` 3.6s -> 2.1s.
