@@ -99,3 +99,10 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Bumped `index.html` mobile-shell app script cache key from v54 to v55.
 - Commits: app.js `8c511a8e218ea209921a792867fcfb19a66de3fc`; index.html `753b053943acb711c2d64e918287a22e563830a8`.
 - Re-run both validation workflows on the new HEAD before merge. PR #1182 remains open and unmerged; SEO changes are not live.
+
+
+## 2026-11-26 — Host-independent canonical browser assertion
+- The latest full shell route run reached 179/180 checks; the remaining canonical assertion compared the absolute canonical URL against the production domain even though Playwright serves the site on a local ephemeral origin. The observed canonical path was correct (`/p/garden-set-250ml.html`); only the test's hard-coded hostname caused failure.
+- Updated the assertion to compare the canonical URL pathname, preserving the requirement that the deep link resolves to `/p/garden-set-250ml.html` while allowing the test server's local hostname.
+- Commit: `1e5cc399b9ce00a08f9129656c17fd26450a407a`.
+- Re-run route and SEO workflows on the new HEAD; PR #1182 remains open/unmerged and changes are not live.
