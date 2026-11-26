@@ -45,3 +45,7 @@ premier-25l-4stroke-knapsack-sprayer|https://www.myagrovet.co.ke/products.php?id
 uvuko-20l-battery-manual-knapsack-sprayer|https://www.myagrovet.co.ke/products.php?id=7857
 powerx-2stroke-engine-knapsack-sprayer|https://powerxtoolske.com/products/2-stroke-engine-knapsack-power-sprayer-field-ready-high-reach
 thermal-fogger-fs08|https://edenlg.co.ke/product-category/sprayers-spraying-equipment/mist-blowers-foggers/
+aico-ac767-4-25cc-knapsack-sprayer|https://www.myagrovet.co.ke/products.php?id=7501
+turbo-tk20l-battery-manual-sprayer|https://www.myagrovet.co.ke/products.php?id=7498
+farmate-15l-manual-knapsack-sprayer|https://www.myagrovet.co.ke/products.php?id=7204
+solo-425-pro-16l-knapsack-sprayer|https://www.myagrovet.co.ke/products.php?id=7515
