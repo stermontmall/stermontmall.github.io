@@ -1199,3 +1199,4 @@ console.log(`Built ${products.length} product pages and ${Object.keys(byCat).len
 // V8 rebuild retry after prior Pages deploy was cancelled; final catalogue is 30 new active products plus grouped existing variants (2026-11-26).
 // V8 catalogue rebuild: added verified pack variants STM-002465 through STM-002468 on 2026-11-26.
 // V8 rebuild after verified ImageKit-backed pack variants activated: STM-002465–STM-002468.
+// V8 crop-specific Mavuno and Yara fertilizer additions: STM-002469–STM-002473, 2026-11-26.
