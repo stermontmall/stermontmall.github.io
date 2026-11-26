@@ -9466,5 +9466,53 @@
     "image_source": "https://dawnfarmers.com/wp-content/uploads/2025/08/1065.png",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "mavuno-coffee-22-6-12-direct-v8-20261126",
+    "source": "https://mavunofertilizers.com/wp-content/uploads/2021/01/13.png",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mavuno-coffee-22-6-12-direct-v8-20261126_xvYMCV_dX.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mavuno-coffee-22-6-12-direct-v8-20261126_xvYMCV_dX.jpg",
+    "width": 600,
+    "height": 717,
+    "bytes": 64626,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://mavunofertilizers.com/wp-content/uploads/2021/01/13.png",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "yara-microp-topdressing-50kg-direct-v8-20261126",
+    "source": "https://www.yara.co.ke/link/419b3e2b47b14442b8e55c2542082cf3.aspx",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/yara-microp-topdressing-50kg-direct-v8-20261126_GSciKzdfE.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/yara-microp-topdressing-50kg-direct-v8-20261126_GSciKzdfE.jpg",
+    "width": 1783,
+    "height": 2510,
+    "bytes": 194046,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://www.yara.co.ke/globalassets/country-websites/microp-topdressing.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "yaramila-cereal-50kg-direct-v8-20261126",
+    "source": "https://www.yara.co.tz/siteassets/crop-nutrition/fertiliser-choices/yaramila/yaramila-cereal-tz-690x456.png",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/yaramila-cereal-50kg-direct-v8-20261126_KUUi7tM4j.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/yaramila-cereal-50kg-direct-v8-20261126_KUUi7tM4j.jpg",
+    "width": 690,
+    "height": 456,
+    "bytes": 18770,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://www.yara.co.tz/siteassets/crop-nutrition/fertiliser-choices/yaramila/yaramila-cereal-tz-690x456.png",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
