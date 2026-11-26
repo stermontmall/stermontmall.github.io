@@ -7774,5 +7774,37 @@
     "image_source": "https://www.pestfix.co.uk/images/product-images/cobra_800%281%29.jpg",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "mende-mo-fire-cockroach-bait-5g-verified",
+    "source": "https://ke.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/98/2090381/1.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mende-mo-fire-cockroach-bait-5g-verified_QE0G8SPEO.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mende-mo-fire-cockroach-bait-5g-verified_QE0G8SPEO.jpg",
+    "width": 680,
+    "height": 680,
+    "bytes": 66717,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://ke.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/98/2090381/1.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "stop-vermin-powder-100g-verified",
+    "source": "https://mtolori.com/res/products/1/1005633_front_500px_.webp",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/stop-vermin-powder-100g-verified_Ch4gqObxyZ.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/stop-vermin-powder-100g-verified_Ch4gqObxyZ.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 39632,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://mtolori.com/res/products/1/1005633_front_500px_.webp",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
