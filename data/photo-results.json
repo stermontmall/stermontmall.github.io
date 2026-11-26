@@ -4738,5 +4738,17 @@
     "image_source": "https://kejanicleaning.co.ke/wp-content/uploads/2023/10/Mosquito-or-Insect-Trap-4-Watts-.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "mosquito-killer-bulb-220v",
+    "source": "https://www.jumia.co.ke/generic-mosquito-killer-bulb-220v-306960253.html",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "electric-shock-mosquito-killing-lamp",
+    "source": "https://www.jumia.co.ke/generic-electric-shock-mosquito-killing-lamp-silent-light-wave-insect-killer-for-home-use-326885729.html",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
