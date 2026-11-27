@@ -2,7 +2,7 @@
 - Cause 1: skipped "Google sitemap ping" runs end in success and restarted the 3h cooldown, so post-build pings were almost always skipped. The gate now uses the last run whose submit step succeeded.
 - Cause 2: scheduled runs are far fewer than the cron asks; the index checker chose its batch by the clock, so batches were missed. It now uses GITHUB_RUN_NUMBER.
 - Branch includes `wip-sitemap-indexable-only` (do not merge that one separately). Does not include `wip-persist-old-redirects`.
-- Checks: new gate script run against live run history (both skip and go paths); batch simulation covers all sitemap pages; workflow YAML parses; SEO tests pass. NOT run: the workflows on GitHub, live build.
+- Checks: new gate script run against live run history (cooldown and no-change skips; the send path with a simulated sitemap change); batch simulation covers all sitemap pages; workflow YAML parses; SEO tests pass. NOT run: the workflows on GitHub, live build.
 - Open: product-pages cron is also delayed (not edited, rule 5); publish steps must send `catalog-changed`. Site audit fails at the Pa11y step.
 - Next: owner OK, merge into main, check the "Google sitemap ping" log, then the next "Google indexing status" run.
 
