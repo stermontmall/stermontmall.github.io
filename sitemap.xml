@@ -535,12 +535,6 @@
     <priority>0.3</priority>
   </url>
 <url>
-    <loc>https://stermontarcade.co.ke/privacy.html</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-<url>
     <loc>https://stermontarcade.co.ke/nairobi.html</loc>
     <lastmod>2026-10-24</lastmod>
     <changefreq>monthly</changefreq>
@@ -576,8 +570,6 @@
 <url><loc>https://stermontarcade.co.ke/pest-control/blog/airbnb-pest-control-checklist-kenya.html</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 <url><loc>https://stermontarcade.co.ke/pest-control/blog/pest-control-safety-children-pets-kenya.html</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 <url><loc>https://stermontarcade.co.ke/pest-control/locations/</loc><lastmod>2026-11-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://stermontarcade.co.ke/fashion.html</loc><lastmod>2026-11-26</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/cars-for-sale.html</loc><lastmod>2026-11-26</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/products.html</loc><lastmod>2026-11-27</lastmod></url>
 <url><loc>https://stermontarcade.co.ke/services/bed-bug-fumigation-nairobi.html</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 <url><loc>https://stermontarcade.co.ke/services/termite-control-services-kenya.html</loc><lastmod>2026-11-17</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
@@ -1225,48 +1217,29 @@
   <url><loc>https://stermontarcade.co.ke/c/televisions.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/kitchen-dining.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/veterinary-drugs.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/fridges-freezers.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/sprayers-equipment.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/printers-office-machines.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/fertilizers.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/fungicides.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/bed-bug-killers.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/home-theatre.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/cockroach-ant-killers.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/phones-tablets.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/phone-accessories.html</loc><lastmod>2026-11-26</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/adjuvants-growth-regulators.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/computing.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/tv-mounts-accessories.html</loc><lastmod>2026-11-26</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/crop-insecticides.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/pest-control-fumigation.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/herbicides.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/shoes.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/washing-machines.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/agrovet.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/appliances.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/bluetooth-speakers.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/fumigation-chemicals.html</loc><lastmod>2026-11-26</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/watches-jewellery.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/mosquito-fly-control.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/protective-wear-safety.html</loc><lastmod>2026-11-26</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/womens-sneakers.html</loc><lastmod>2026-11-26</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/farm-garden-tools.html</loc><lastmod>2026-11-26</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/termite-control.html</loc><lastmod>2026-11-26</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/fogging-ulv-machines.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/water-tanks-irrigation.html</loc><lastmod>2026-11-26</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/disinfectants-hygiene.html</loc><lastmod>2026-11-26</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/electrical-lighting.html</loc><lastmod>2026-11-26</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/fish-farming.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/rodent-control.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/seeds-seedlings.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/bird-control.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/pest-monitoring-inspection-tools.html</loc><lastmod>2026-11-26</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/insect-light-traps-uv-lamps.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/agrochemicals.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/tvs-audio.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/tv-audio-video.html</loc><lastmod>2026-11-27</lastmod></url>
-  <url><loc>https://stermontarcade.co.ke/c/fashion.html</loc><lastmod>2026-11-26</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/phones-accessories.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/computers-accessories.html</loc><lastmod>2026-11-27</lastmod></url>
   <url><loc>https://stermontarcade.co.ke/c/home-kitchen.html</loc><lastmod>2026-11-27</lastmod></url>
