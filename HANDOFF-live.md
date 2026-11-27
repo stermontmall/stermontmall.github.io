@@ -1,3 +1,11 @@
+## PROGRESS CHECKPOINT — 27 Nov 2026, 22:48:41 (Africa/Nairobi)
+**Summary:** Checked Search Console Performance export (last 3 months) against main 291bb35. Found old-URL redirect pages are being deleted by the product page build.
+**Completed:** Export capped at 1000 rows: 800 product paths; 131 in current sitemap; 665 have no page file on main (224 of 299 product clicks). Redirect commit 15635486 added pages; build commit b267173b removed the sample checked. generate-products.mjs removes p/ and c/ each build, and reads product_slug_redirects from the old Supabase URL (no SLUG_REDIRECTS_JSON set in product-pages.yml found), not Neon (84 rows on 2026-11-27).
+**Next:** Fix builder first (read redirects from Neon, keep category-fallback redirects across rebuilds), test on a wip- branch, then restore redirects. Do not merge wip-redirects-agro-pest-remaining before that. No code or data changed in this session.
+**Blocked / owner action:** Owner approval for the fix. Live old URLs not tested from this session.
+**Working branch / PR:** none
+
+---
 ## 2026-11-27 20:45 (Africa/Nairobi) - Stable product page for pack sizes (branch `wip-stable-variant-pages`, NOT merged)
 - Cause of "Sitemap lists a page that does not exist": 12 pack-size groups have sizes with the same `created_at`. The build ordered by `created_at` only, so the size chosen as the product page could change between builds and the other `/p/<slug>.html` disappeared.
 - Fix (only `generate-products.mjs`): order by `created_at`, then `id`; every other size slug now gets a redirect page to the product page. No Neon data changed. No generated files committed.
