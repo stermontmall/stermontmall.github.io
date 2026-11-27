@@ -85,3 +85,6 @@ for (const [what, list] of Object.entries(issues).sort((a, b) => b[1].length - a
 }
 out += '\nTips: fix product details in the admin Catalog tab; the pages rebuild every 3 hours.\n';
 console.log(out);
+
+// CI pull-request audits fail on findings; the scheduled report remains informational by default.
+if (process.env.SEO_CHECK_STRICT === '1' && total > 0) process.exitCode = 1;
