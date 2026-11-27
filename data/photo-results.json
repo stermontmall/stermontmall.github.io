@@ -10236,5 +10236,17 @@
     "image_source": "https://agroduka.ke/images/detailed/9/ke-mostraz.png",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "ectomin-20ml-exact-pack-v8-20261127",
+    "source": "https://imaginecare.co.ke/product-category/pyrethroids/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "dominex-100ec-1l-exact-pack-v8-20261127",
+    "source": "https://jojemiagrovetshop.com/product/dominex/",
+    "ok": false,
+    "error": "source page returned HTML but no product image was found"
   }
 ]
