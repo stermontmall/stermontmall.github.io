@@ -1,3 +1,4 @@
+// Rebuild requested after Neon product-description cleanup on 2026-11-27; regenerate customer-facing HTML from the corrected catalogue.
 // V8 catalogue rebuild request: active Neon sprayer and termite batch STM-002235–STM-002245, 2026-11-25.
 // V8 rodent-control catalogue refresh 2026-11-25: CYFAZA Humane Mouse Trap 12-Inch 1pc activated in Neon; no generator behavior change.
 // V8 rodent-control catalogue refresh 2026-11-25: CYFAZA Mouse Traps 4-Pack and Guardian Rodent Bait Station 1pc activated in Neon; no generator behavior change.
