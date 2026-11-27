@@ -6,7 +6,7 @@
 
 For every request to discover, add, post, or publish products or product photos, read the root `PUBLISHING_RULES.md` and fetch the live Neon Version 6 source:
 `SELECT content FROM public.publishing_rules WHERE key = 'publish_products';`
-Neon project: `restless-shape-79120240`, database: `stermont`. If Neon cannot be read, use the exact root-file mirror. Follow Version 6 end-to-end; do not use superseded product/photo rules or Supabase publishing paths. Human-facing product links must use `https://stermontarcade.co.ke/?product=<slug>`; keep static `/p/<slug>.html` pages live and indexable for Google.
+Neon project: `restless-shape-79120240`, database: `stermont`. If Neon cannot be read, use the exact root-file mirror. Follow Version 6 end-to-end; do not use superseded product/photo rules or Supabase publishing paths. Human-facing product links must use `https://stermontarcade.co.ke/p/<slug>.html`; do not use `/?product=` for customer-facing links. Keep `/p/<slug>.html` pages live and indexable for Google.
 
 ## Handoff and progress saving
 1. FIRST read `HANDOFF-live.md` (newest progress, wins over everything), THEN `HANDOFF.md` (long history).
