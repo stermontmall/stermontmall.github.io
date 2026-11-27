@@ -800,7 +800,7 @@ async function renderDetails(rowId) {
   renderProductDescription('#qb-desc', d.description || '');
   const imgs = (d.images || []).filter(Boolean);
   $('#qb-photos').innerHTML = imgs.length > 1 ? imgs.map(u => `<button class="shrink-0" data-photo="${esc(u)}" aria-label="Show photo" style="width:56px;height:56px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff">${thumb({ img: u, emoji: qb.p.emoji })}</button>`).join('') : '';
-  if (d.slug) { $('#qb-page').href = (window.shellProductLink || (s => '/?product=' + encodeURIComponent(s)))(d.slug); $('#qb-page').hidden = false; }
+  if (d.slug) { $('#qb-page').href = (window.shellProductLink || (s => '/p/' + encodeURIComponent(s) + '.html'))(d.slug); $('#qb-page').hidden = false; }
 }
 document.addEventListener('click', e => {
   const ph = e.target.closest('[data-photo]');
