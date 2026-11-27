@@ -32,12 +32,12 @@ export const SAFE_BLOG_META = Object.freeze({
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export function applySafeBlogMeta(html, canonical, description) {
-  const actual = html.match(/<link\\s+rel=['"]canonical['"]\\s+href=['"]([^'"]*)['"]/i)?.[1];
+  const actual = html.match(/<link\s+rel=['"]canonical['"]\s+href=['"]([^'"]*)['"]/i)?.[1];
   if (!actual || actual !== canonical || !description || description.length < 70 || description.length > 155) return html;
   const d = esc(description);
   return html
-    .replace(/(<meta\\s+name=['"]description['"]\\s+content=['"])[^'"]*(['"])/i, `$1${d}$2`)
-    .replace(/(<meta\\s+property=['"]og:description['"]\\s+content=['"])[^'"]*(['"])/i, `$1${d}$2`);
+    .replace(/(<meta\s+name=['"]description['"]\s+content=['"])[^'"]*(['"])/i, `$1${d}$2`)
+    .replace(/(<meta\s+property=['"]og:description['"]\s+content=['"])[^'"]*(['"])/i, `$1${d}$2`);
 }
 
 export function runSafeBlogMeta({ dir = 'blog' } = {}) {
