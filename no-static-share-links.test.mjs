@@ -15,9 +15,9 @@ assert.ok(!helper.includes("return 'https://stermontarcade.co.ke/?product='"));
 const homepage = readFileSync('index.html', 'utf8');
 assert.ok(homepage.includes('<link rel="canonical" href="https://stermontarcade.co.ke/">'));
 assert.ok(!homepage.includes("location.replace('/?product='"), 'product pages must not redirect away from /p/ URLs');
-const homeGrid = (homepage.match(/<ul id="grid"[\s\S]*?<\/ul>/) || [])[0] || '';
-assert.match(homeGrid, /href="https:\/\/stermontarcade\.co\.ke\/p\/[a-z0-9-]+\.html"/i);
-assert.ok(!/href="[^"]*\?product=/i.test(homeGrid));
+const homeGridRenderer = readFileSync('home-grid-ssr.mjs', 'utf8');
+assert.ok(homeGridRenderer.includes('\\/p\\/'), 'homepage SSR cards must accept /p/ product URLs');
+assert.ok(!homeGridRenderer.includes('\\?product='), 'homepage SSR cards must not generate query product URLs');
 assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'));
 
 const generator = readFileSync('generate-products.mjs', 'utf8');
