@@ -223,7 +223,7 @@ textarea{min-height:88px;resize:vertical}
 <div class="row"><span>Subtotal</span><b id="sub">—</b></div>
 <div class="row"><span id="fee-label">Delivery</span><b id="fee-val">—</b></div>
 <div class="total"><span>Order total</span><b id="total">—</b></div>
-<p class="muted" id="fee-note">Delivery fees are calculated using the selected county.</p>
+<p class="muted" id="fee-note">Choose your county and the delivery fee is added automatically.</p>
 </section></aside>
 
 <form id="form" novalidate>
@@ -305,16 +305,36 @@ async function token(){
  if(!j||typeof j.token!=='string'||!j.token)throw new Error('Could not start a secure session. Please try again.');
  tok=j.token;const e=Number(j.expires_at);tokExp=e?(e<1e12?e*1000:e):Date.now()+300000;return tok;
 }
-const counties=['Nairobi','Kiambu','Machakos','Kajiado','Nakuru','Nyeri','Meru','Tharaka-Nithi','Embu','Kirinyaga',"Murang'a",'Nyandarua','Laikipia','Mombasa','Kisumu','Uasin Gishu','Kwale','Kilifi','Taita-Taveta','Garissa','Isiolo','Kitui','Makueni','Trans Nzoia','Elgeyo-Marakwet','Nandi','Baringo','Narok','Kericho','Bomet','Kakamega','Vihiga','Bungoma','Busia','Siaya','Homa Bay','Migori','Kisii','Nyamira'];
-const fees={Nairobi:300,Kiambu:400,Machakos:400,Kajiado:400,Nakuru:600,Nyeri:600,Meru:600,'Tharaka-Nithi':600,Embu:600,Kirinyaga:600,"Murang'a":600,Nyandarua:600,Laikipia:600,Mombasa:600,Kisumu:600,'Uasin Gishu':600,Kwale:800,Kilifi:800,'Taita-Taveta':800,Garissa:800,Isiolo:800,Kitui:800,Makueni:800,'Trans Nzoia':800,'Elgeyo-Marakwet':800,Nandi:800,Baringo:800,Narok:800,Kericho:800,Bomet:800,Kakamega:800,Vihiga:800,Bungoma:800,Busia:800,Siaya:800,'Homa Bay':800,Migori:800,Kisii:800,Nyamira:800};
+/* Delivery fees: all 47 counties. Live values are loaded from Neon public.delivery_fees (the same table
+   create_guest_order uses to add the fee to the order). This list is only the fallback if that read fails;
+   keep it identical to the table. [county, fee KSh, region, delivery time] in table sort order. */
+const FALLBACK=[['Nairobi',300,'Nairobi & surroundings','Same or next day'],['Kiambu',400,'Nairobi & surroundings','Next day'],['Machakos',400,'Nairobi & surroundings','Next day'],['Kajiado',400,'Nairobi & surroundings','Next day'],
+['Nyeri',600,'Mt Kenya','1-2 days'],['Meru',600,'Mt Kenya','1-2 days'],['Tharaka-Nithi',600,'Mt Kenya','1-2 days'],['Embu',600,'Mt Kenya','1-2 days'],['Kirinyaga',600,'Mt Kenya','1-2 days'],["Murang'a",600,'Mt Kenya','1-2 days'],['Nyandarua',600,'Mt Kenya','1-2 days'],['Laikipia',600,'Mt Kenya','1-2 days'],
+['Nakuru',600,'Rift Valley','1-2 days'],['Uasin Gishu',600,'Rift Valley','1-2 days'],['Trans Nzoia',800,'Rift Valley','1-3 days'],['Elgeyo-Marakwet',800,'Rift Valley','1-3 days'],['Nandi',800,'Rift Valley','1-3 days'],['Baringo',800,'Rift Valley','1-3 days'],['Narok',800,'Rift Valley','1-3 days'],['Kericho',800,'Rift Valley','1-3 days'],['Bomet',800,'Rift Valley','1-3 days'],['West Pokot',800,'Rift Valley','2-4 days'],['Samburu',1200,'Rift Valley','3-5 days'],['Turkana',2100,'Rift Valley','3-5 days'],
+['Kisumu',600,'Western & Nyanza','1-2 days'],['Kakamega',800,'Western & Nyanza','1-3 days'],['Vihiga',800,'Western & Nyanza','1-3 days'],['Bungoma',800,'Western & Nyanza','1-3 days'],['Busia',800,'Western & Nyanza','1-3 days'],['Siaya',800,'Western & Nyanza','1-3 days'],['Homa Bay',800,'Western & Nyanza','1-3 days'],['Migori',800,'Western & Nyanza','1-3 days'],['Kisii',800,'Western & Nyanza','1-3 days'],['Nyamira',800,'Western & Nyanza','1-3 days'],
+['Mombasa',600,'Coast','1-2 days'],['Kwale',800,'Coast','1-3 days'],['Kilifi',800,'Coast','1-3 days'],['Taita-Taveta',800,'Coast','1-3 days'],['Lamu',2100,'Coast','3-5 days'],['Tana River',2100,'Coast','3-5 days'],
+['Kitui',800,'Eastern & North','1-3 days'],['Makueni',800,'Eastern & North','1-3 days'],['Isiolo',800,'Eastern & North','1-3 days'],['Garissa',800,'Eastern & North','1-3 days'],['Marsabit',1000,'Eastern & North','3-5 days'],['Wajir',1900,'Eastern & North','3-5 days'],['Mandera',3200,'Eastern & North','3-5 days']];
+let table=FALLBACK.map(r=>({county:r[0],fee:r[1],region:r[2],eta:r[3]}));
 const $=id=>document.getElementById(id), money=n=>'KSh '+Number(n).toLocaleString('en-KE');
+const rowOf=c=>table.find(x=>x.county===c)||null;
 let cart=[];
 try{cart=JSON.parse(localStorage.getItem('stm_handoff')||'[]')}catch{}
 const clean=cart.filter(x=>x&&typeof x.rowId==='string'&&Number.isInteger(Number(x.qty))&&Number(x.qty)>0).slice(0,59);
-counties.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=fees[c]?c+' · KSh '+fees[c]:c;$('county').append(o)});
+function fillCounties(){
+ const sel=$('county'),keep=sel.value;
+ sel.replaceChildren();
+ const first=document.createElement('option');first.value='';first.textContent='Choose county';sel.append(first);
+ let g=null,region='';
+ table.forEach(r=>{
+  if(r.region!==region){region=r.region;g=document.createElement('optgroup');g.label=region;sel.append(g)}
+  const o=document.createElement('option');o.value=r.county;o.textContent=r.county+' · '+money(r.fee);g.append(o);
+ });
+ if(keep&&rowOf(keep))sel.value=keep;
+}
+fillCounties();
 function method(){return document.querySelector('input[name=method]:checked').value}
 function sub(){return clean.reduce((s,i)=>s+Number(i.price||0)*Number(i.qty),0)}
-function fee(){return method()==='delivery'?(fees[$('county').value]||0):0}
+function fee(){const r=method()==='delivery'?rowOf($('county').value):null;return r?Number(r.fee):0}
 function total(){return sub()+fee()}
 function phone(){const d=$('phone').value.replace(/\D/g,'');return d.length===9?'+254'+d:d.length===10&&d.startsWith('0')?'+254'+d.slice(1):d.length===12&&d.startsWith('254')?'+'+d:$('phone').value.trim()}
 function setBtn(text,busy){$('btnlabel').textContent=text;$('submit').classList.toggle('busy',!!busy)}
@@ -350,16 +370,16 @@ function paint(){
   const r=document.createElement('b');r.textContent=money(Number(i.price||0)*Number(i.qty));
   row.append(info,r);box.append(row);
  });
- const delivery=method()==='delivery',county=$('county').value,t=total();
+ const delivery=method()==='delivery',county=$('county').value,t=total(),cr=rowOf(county);
  $('sub').textContent=money(sub());
  $('fee-label').textContent=delivery?(county?'Delivery to '+county:'Delivery'):'Pickup';
  const fv=$('fee-val');
- if(delivery){fv.className='';fv.textContent=county?money(fee()):'Choose county'}else{fv.className='free';fv.textContent='Free'}
+ if(delivery){fv.className='';fv.textContent=cr?money(cr.fee):'Choose county'}else{fv.className='free';fv.textContent='Free'}
  $('total').textContent=money(t);$('bartotal').textContent=money(t);$('paytotal').textContent=money(t);
  $('payamount').value=t||'';
  $('delivery-fields').classList.toggle('hidden',!delivery);$('pickup-note').classList.toggle('hidden',delivery);
  $('county').required=delivery;$('address').required=delivery;
- $('fee-note').textContent=delivery?(county&&!fees[county]?'Delivery fee for this county will be confirmed on WhatsApp.':'Delivery fee is included where listed.'):'Pickup at Sarit Centre, Westlands.';
+ $('fee-note').textContent=delivery?(cr?'Delivery fee for '+county+' is added automatically'+(cr.eta?' · estimated '+cr.eta.toLowerCase():'')+'.':'Choose your county and the delivery fee is added automatically.'):'Pickup at Sarit Centre, Westlands.';
  progress();
 }
 document.querySelectorAll('input[name=method]').forEach(x=>x.addEventListener('change',paint));
@@ -367,6 +387,19 @@ $('county').addEventListener('change',paint);
 ['name','phone','address','paycode','payamount'].forEach(id=>$(id).addEventListener('input',progress));
 $('paycode').addEventListener('input',()=>{const el=$('paycode'),p=el.selectionStart;el.value=el.value.toUpperCase();try{el.setSelectionRange(p,p)}catch{}});
 paint();
+
+/* Replace the fallback with the live fee table so the fee shown is the fee the server will add. */
+(async function loadFees(){
+ try{
+  const jwt=await token();
+  const r=await fetch(API+'delivery_fees?select=county,region,fee,eta,sort&active=eq.true&order=sort.asc',{headers:{Authorization:'Bearer '+jwt,Accept:'application/json'}});
+  if(!r.ok)return;
+  const rows=await r.json();
+  if(!Array.isArray(rows))return;
+  const next=rows.filter(x=>x&&x.county&&Number.isFinite(Number(x.fee))).map(x=>({county:String(x.county),fee:Number(x.fee),region:x.region||'Other',eta:x.eta||''}));
+  if(next.length>=1){table=next;fillCounties();paint()}
+ }catch{}
+})();
 
 document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>copy(b,b.dataset.copy)));
 $('copyref').addEventListener('click',()=>copy($('copyref'),$('ref').textContent));
@@ -386,7 +419,8 @@ $('form').addEventListener('submit',async e=>{
  const name=$('name').value.trim(),ph=phone(),code=$('paycode').value.trim().toUpperCase(),amount=Number($('payamount').value),county=$('county').value,delivery=method()==='delivery';
  if(name.length<2||!/^\+254[17]\d{8}$/.test(ph)){fail('Enter your full name and a valid Kenyan phone number.',name.length<2?$('name'):$('phone'));return}
  if(delivery&&(!county||!$('address').value.trim())){fail('Enter your county and delivery address.',!county?$('county'):$('address'));return}
- if(code.length<4||code.length>120||!amount||amount<total()){fail('Enter the M-Pesa code and pay at least the displayed total.',code.length<4?$('paycode'):$('payamount'));return}
+ if(delivery&&!rowOf(county)){fail('Choose your county from the list so the delivery fee can be added.',$('county'));return}
+ if(code.length<4||code.length>120||!amount||amount<total()){fail('Enter the M-Pesa code and pay at least the displayed total (items + delivery fee).',code.length<4?$('paycode'):$('payamount'));return}
  const btn=$('submit');btn.disabled=true;setBtn('Submitting order…',true);
  const orderRef=ref(),payload={p_ref:orderRef,p_customer_name:name,p_phone:ph,p_email:$('email').value.trim()||null,p_method:method(),p_county:delivery?county:null,p_address:delivery?$('address').value.trim():null,p_notes:$('notes').value.trim()||null,p_items:clean.map(i=>({product_id:i.rowId,qty:Number(i.qty)})),p_pay_code:code,p_pay_amount:amount,p_voucher_code:null};
  try{
