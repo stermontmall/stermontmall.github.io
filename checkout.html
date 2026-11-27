@@ -2,8 +2,64 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#172554"><meta name="robots" content="noindex, follow"><title>Checkout | Stermont Arcade</title>
 <style>
-:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#172033;background:#f3f5f9}*{box-sizing:border-box}body{margin:0}.wrap{max-width:680px;margin:auto;padding:18px 14px 42px}.top{display:flex;align-items:center;gap:12px;margin:0 0 18px}.back{border:0;background:#e7ebf3;border-radius:50%;width:40px;height:40px;font-size:22px}.brand{font-weight:800;font-size:18px}.muted{color:#64748b;font-size:13px}.card{background:#fff;border:1px solid #e5eaf2;border-radius:16px;padding:18px;margin:12px 0;box-shadow:0 4px 18px #15294b0a}h1{font-size:23px;margin:0 0 5px}h2{font-size:16px;margin:0 0 14px}.items{display:grid;gap:10px}.item{display:flex;justify-content:space-between;gap:12px;font-size:14px}.item small{display:block;color:#64748b}.total{border-top:1px solid #e8edf4;padding-top:12px;margin-top:12px;font-weight:800;font-size:18px;display:flex;justify-content:space-between}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px;margin:11px 0}.field.full{grid-column:1/-1}label{font-size:13px;font-weight:700}input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;background:#fff}textarea{min-height:76px;resize:vertical}.choice{display:flex;gap:10px;flex-wrap:wrap}.choice label{border:1px solid #d5dce8;padding:10px 12px;border-radius:10px;font-weight:600}.pay{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px;font-size:14px;line-height:1.6}.btn{width:100%;border:0;border-radius:12px;padding:15px;background:#173b80;color:#fff;font-size:16px;font-weight:800;margin-top:12px}.btn:disabled{opacity:.5}.err{color:#b91c1c;font-size:13px;white-space:pre-wrap}.success{background:#ecfdf5;border:1px solid #a7f3d0}.hidden{display:none!important}@media(max-width:520px){.grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
-</style><meta name="description" content="Checkout | Stermont Arcade - Stermont Arcade, online shopping in Kenya with M-Pesa payment and delivery to all 47 counties.">
+:root{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#21143e;background:#f7f3ff;--purple:#351064;--violet:#762be0;--lime:#c7f51b;--line:#e7ddf5;--muted:#746b85}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(180deg,#f4eaff 0,#fbf9ff 260px,#fff 100%)}
+.wrap{max-width:700px;margin:auto;padding:14px 14px 46px}.top{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:5px 2px}
+.back{width:42px;height:42px;border:0;border-radius:14px;background:#fff;color:#351064;font-size:25px;box-shadow:0 4px 15px #35106412;cursor:pointer}
+.brand{font-weight:950;letter-spacing:.12em;font-size:16px;color:#351064}.muted{color:var(--muted);font-size:13px;line-height:1.55}
+.hero{position:relative;overflow:hidden;text-align:center;color:#fff;padding:25px 18px 24px;margin:0 0 16px;border-radius:22px;background:linear-gradient(135deg,#984cf4 0%,#6e20d4 48%,#351064 100%);box-shadow:0 12px 28px #51209b30}
+.hero:before,.hero:after{content:"";position:absolute;border:1px solid #ffffff22;border-radius:50%;pointer-events:none}.hero:before{width:220px;height:220px;right:-100px;top:-135px}.hero:after{width:170px;height:170px;left:-95px;bottom:-115px}
+.hero .eyebrow{display:inline-block;color:#351064;background:var(--lime);border-radius:6px;padding:4px 9px;font-size:10px;font-weight:950;letter-spacing:.18em;margin-bottom:13px}
+h1{font-size:clamp(25px,6vw,33px);line-height:1.1;letter-spacing:-.04em;margin:0 0 8px;color:#fff}h2{font-size:16px;font-weight:850;margin:0 0 15px;color:#54209a;letter-spacing:.06em;text-transform:uppercase}
+.hero p{margin:0;color:#eadcff;font-size:13px}.progress{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0 0 15px;padding:13px 14px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 5px 18px #3510640c}
+.progress-step{display:flex;align-items:center;gap:7px;min-width:0;color:#847a93;font-size:11px;font-weight:750}.progress-step .num{display:grid;place-items:center;width:25px;height:25px;flex:none;border-radius:50%;background:#f0e9fa;color:#65409b}.progress-step.active{color:#57229c}.progress-step.active .num{background:var(--lime);color:#351064}
+.trust{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:0 0 15px;color:#65587b;font-size:11px;font-weight:750}.trust i{font-style:normal;color:#65a30d}
+.card{background:#fff;border:1px solid #e9e0f3;border-radius:20px;padding:19px;margin:13px 0;box-shadow:0 7px 22px #3510640c}
+#items{display:grid;gap:13px}.item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;font-size:13px;line-height:1.45}.item>span{font-weight:700;color:#312447}.item b{white-space:nowrap;color:#24163d;font-size:12px}
+.total{border-top:1px solid #e9e0f3;padding-top:14px;margin-top:15px;font-weight:900;font-size:20px;display:flex;justify-content:space-between;align-items:center;color:#351064}.total span:first-child{font-size:14px;color:#302342}.total span:last-child{color:#6825bc}
+#fee-note{margin:10px 0 0;padding:10px 12px;background:#f7f1ff;border-radius:11px;font-size:11px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 13px}.field{display:grid;gap:7px;margin:12px 0}.field.full{grid-column:1/-1}label{font-size:12px;font-weight:800;color:#382650}
+input:not([type=radio]),select,textarea{width:100%;min-height:48px;padding:12px 13px;border:1px solid #ded4eb;border-radius:12px;font:inherit;font-size:14px;color:#261a3d;background:#fdfbff;outline:none}input:focus,select:focus,textarea:focus{border-color:#853ce0;box-shadow:0 0 0 3px #853ce01c;background:#fff}input::placeholder,textarea::placeholder{color:#a39aae}textarea{min-height:82px;resize:vertical}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 13px}.choice label{display:flex;align-items:center;gap:9px;min-height:54px;padding:12px;border:1.5px solid #e3d9ef;border-radius:14px;background:#fff;cursor:pointer}.choice label:has(input:checked){border-color:#7c35d2;background:#f5edff;color:#58229b;box-shadow:0 0 0 3px #7c35d211}.choice input{accent-color:#7029c7;width:17px;height:17px;margin:0}
+#pickup-note{padding:13px 14px;border:1px solid #d8efaa;background:#f6ffd9;border-radius:13px;color:#435c0d;font-weight:650}
+.pay{position:relative;overflow:hidden;background:linear-gradient(135deg,#2e0d59,#43127d 65%,#5c1db1);color:#fff;border:0;border-radius:18px;padding:17px 18px;font-size:13px;line-height:1.75;box-shadow:0 9px 22px #35106426}.pay:after{content:"";position:absolute;width:145px;height:145px;border:1px solid #ffffff20;border-radius:50%;right:-60px;top:-78px;box-shadow:0 0 0 18px #ffffff08,0 0 0 38px #ffffff06;pointer-events:none}.pay b{color:var(--lime)}.pay .pay-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--lime);font-weight:950;margin-bottom:5px}
+.err{color:#b42318;font-size:13px;white-space:pre-wrap;padding:0 2px}
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:56px;border:0;border-radius:15px;padding:15px 18px;background:var(--lime);color:#351064;font-size:15px;font-weight:950;letter-spacing:.01em;margin-top:14px;box-shadow:0 8px 18px #8bbd162e;cursor:pointer;transition:transform .15s}.btn:hover{transform:translateY(-1px)}.btn:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+.success{background:#f6ffdf;border-color:#d9efa4}.success h2{color:#45630c}.success .btn{margin-top:12px}
+.hidden{display:none!important}
+@media(max-width:560px){.wrap{padding:11px 12px calc(32px + env(safe-area-inset-bottom))}.hero{padding:22px 14px;border-radius:19px}.card{padding:17px 15px;border-radius:17px}.grid{grid-template-columns:1fr;gap:0}.field.full{grid-column:auto}.progress{padding:11px 9px;gap:3px}.progress-step{font-size:10px;gap:5px}.progress-step .num{width:23px;height:23px}.choice{gap:8px}.choice label{font-size:12px;padding:10px}.total{font-size:19px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+<style>
+/* Screenshot-matched Stermont order layout */
+body{background:#fff}.wrap{max-width:700px;padding:0 14px 42px;background:#fff;border-left:10px solid #f0e6ff;border-right:1px solid #f4edfb}
+.top{padding:15px 3px 12px}.top .muted{display:none}.brand{font-size:17px;letter-spacing:.15em}
+.hero{border-radius:0;margin:0 -4px 22px;padding:31px 18px 29px;background:linear-gradient(135deg,#9948f4 0%,#7028d8 52%,#351064 100%);box-shadow:none}
+.hero .eyebrow{background:transparent;color:#fff;font-size:14px;letter-spacing:.22em;padding:0;margin-bottom:22px}
+.hero h1{font-size:34px;margin:0 0 11px}.hero p{font-size:14px;color:#f0e6ff}
+.progress,.trust{display:none}
+.card{border-radius:25px;background:#f8f4ff;border:1px solid #e5d9f3;padding:22px 20px;box-shadow:none;margin:15px 0}
+.card h2{font-size:15px;letter-spacing:.14em;color:#8142c9;margin-bottom:17px}
+#items{gap:0}.item{padding:0 0 17px;margin-bottom:15px;border-bottom:1px solid #e9e1f1;font-size:15px;align-items:center}.item>span{font-size:15px;font-weight:500}.item b{font-size:15px;font-weight:850}
+.total{border:0;padding:0;margin:14px 0 0;font-size:24px}.total span:first-child{font-size:16px;font-weight:850}.total span:last-child{font-size:26px;color:#6422b5}
+#fee-note{background:transparent;padding:0;color:#766a86}
+#form>.card:nth-of-type(1){background:#f1e6ff;border:0;border-radius:23px}
+#form>.card:nth-of-type(2){background:#f7f3ff;border:0;border-radius:22px}
+.field{margin:10px 0}.field label{font-size:12px;color:#5c318b;text-transform:uppercase;letter-spacing:.06em}
+input:not([type=radio]),select,textarea{background:#fff;border:1px solid #e4d9f0;border-radius:12px;min-height:49px}
+.choice label{border-radius:13px}.choice label:has(input:checked){background:#f1ffd0;border-color:#b5e52b;color:#405500}
+.pay{background:#351064;border-radius:23px;padding:19px 18px 17px;box-shadow:none}.pay .pay-label{font-size:13px;color:#c7f51b;letter-spacing:.13em}
+.pay b{color:#fff}
+#form>.card:last-of-type{background:#fff;border:0;padding:0}
+#form>.card:last-of-type h2{display:none}
+#form>.card:last-of-type .grid{margin-top:12px}
+#form>.card:last-of-type .field label{color:#c7f51b}
+#form>.card:last-of-type input{background:#fff;color:#351064;border:0;font-weight:800}
+.pay:after{display:none}
+#form:after{content:"Before you place your order: confirm the M-Pesa transaction code and amount match your M-Pesa message. Your payment remains pending until our team verifies it.";display:block;margin:13px 0 17px;padding:16px 17px;border:1px solid #f2dfa0;border-radius:19px;background:#fff9e5;color:#705313;font-size:13px;line-height:1.55}
+.btn{background:#c7f51b;color:#351064;border-radius:16px;min-height:60px;font-size:17px;box-shadow:none}
+#success{background:#f8f4ff;border-radius:22px}
+@media(max-width:560px){.wrap{padding:0 12px 32px;border-left-width:8px}.hero{padding:29px 14px 27px}.hero h1{font-size:32px}.card{padding:20px 17px}.item>span{font-size:14px}.item b{font-size:14px}.total{font-size:22px}.total span:last-child{font-size:24px}.grid{grid-template-columns:1fr}}
+</style></style><meta name="description" content="Checkout | Stermont Arcade - Stermont Arcade, online shopping in Kenya with M-Pesa payment and delivery to all 47 counties.">
 <link rel="canonical" href="https://stermontarcade.co.ke/checkout.html">
 <meta property="og:title" content="Checkout | Stermont Arcade">
 <meta property="og:description" content="Checkout | Stermont Arcade - Stermont Arcade, online shopping in Kenya with M-Pesa payment and delivery to all 47 counties.">
@@ -22,16 +78,18 @@
 <html lang="en">
 
 <body><main class="wrap">
-<header class="top"><button class="back" id="back" aria-label="Back">‹</button><div><div class="brand">STERМONT ARCADE</div><div class="muted">Secure checkout</div></div></header>
-<section><h1>Complete your order</h1><p class="muted">Confirm your items, delivery details and M-Pesa payment.</p></section>
+<header class="top"><button class="back" id="back" aria-label="Back">‹</button><div><div class="brand">STERMONT ARCADE</div><div class="muted">Secure checkout</div></div></header>
+<section class="hero"><div class="eyebrow">STERMONT <b style="background:#c7f51b;color:#351064;padding:3px 8px;border-radius:5px">ARCADE</b></div><h1>Complete your order</h1><p>Review your items and enter your delivery and payment details.</p></section>
+<div class="progress" aria-label="Checkout progress"><div class="progress-step active"><span class="num">1</span><span>Your details</span></div><div class="progress-step active"><span class="num">2</span><span>Delivery</span></div><div class="progress-step active"><span class="num">3</span><span>Payment</span></div></div>
+<div class="trust"><span><i>✓</i> Secure checkout</span><span>·</span><span><i>✓</i> M-Pesa accepted</span><span>·</span><span><i>✓</i> Kenya-wide delivery</span></div>
 <section class="card"><h2>Your order</h2><div id="items" class="items"><p class="muted">Loading your cart…</p></div><div class="total"><span>Order total</span><span id="total">—</span></div><p class="muted" id="fee-note">Delivery fees are calculated using the selected county.</p></section>
 <form id="form">
-<section class="card"><h2>Contact details</h2><div class="grid">
+<section class="card"><h2>👤 CUSTOMER DETAILS</h2><div class="grid">
 <div class="field full"><label for="name">Full name</label><input id="name" maxlength="120" autocomplete="name" required></div>
 <div class="field"><label for="phone">Phone number</label><input id="phone" inputmode="tel" autocomplete="tel" placeholder="07XX XXX XXX" required></div>
 <div class="field"><label for="email">Email (optional)</label><input id="email" type="email" maxlength="200" autocomplete="email"></div>
 </div></section>
-<section class="card"><h2>Delivery or pickup</h2><div class="choice"><label><input type="radio" name="method" value="delivery" checked> Delivery</label><label><input type="radio" name="method" value="pickup"> Pickup</label></div>
+<section class="card"><h2>🚚 DELIVERY DETAILS</h2><div class="choice"><label><input type="radio" name="method" value="delivery" checked> Delivery</label><label><input type="radio" name="method" value="pickup"> Pickup</label></div>
 <div id="delivery-fields" class="grid">
 <div class="field"><label for="county">County</label><select id="county" required><option value="">Choose county</option></select></div>
 <div class="field"><label for="address">Estate, building and delivery address</label><input id="address" maxlength="200" placeholder="Street, estate, building" required></div>
@@ -39,10 +97,10 @@
 <p id="pickup-note" class="muted hidden">Collect from Stermont Arcade, Sarit Centre, Westlands. Open daily 8:00 AM–8:00 PM.</p>
 <div class="field"><label for="notes">Order notes (optional)</label><textarea id="notes" maxlength="500" placeholder="Landmark or delivery instructions"></textarea></div>
 </section>
-<section class="card"><h2>M-Pesa payment</h2><div class="pay"><b>Paybill: 714777</b><br>Account number: <b>0748888230</b><br>Enter the exact amount shown above. After paying, enter the M-Pesa transaction code below. Your order remains pending until staff verify payment.</div>
+<section class="card"><h2>M-PESA PAYMENT</h2><div class="pay"><span class="pay-label">M-PESA PAYMENT DETAILS</span><b>Paybill: 714777</b><br>Account number: <b>0748888230</b><br>Pay the exact order total shown above, then enter your M-Pesa transaction code below. Enter the transaction code and amount paid below.</div>
 <div class="grid"><div class="field"><label for="paycode">M-Pesa transaction code</label><input id="paycode" maxlength="120" autocapitalize="characters" required placeholder="e.g. QAB12CD34"></div><div class="field"><label for="payamount">Amount paid (KSh)</label><input id="payamount" type="number" min="1" step="1" inputmode="numeric" required></div></div>
 </section>
-<p id="error" class="err" role="alert"></p><button id="submit" class="btn" type="submit">Place order</button>
+<p id="error" class="err" role="alert"></p><button id="submit" class="btn" type="submit"><span aria-hidden="true">✓</span> Place order</button>
 </form>
 <section id="success" class="card success hidden"><h2>Order received</h2><p>Your order reference is <b id="ref"></b>.</p><p class="muted">Payment is pending verification. Keep your M-Pesa message and use the tracking page to check progress.</p><a id="track" class="btn" style="display:block;text-align:center;text-decoration:none" href="/track.html">Track this order</a><button id="done" class="btn" type="button">Return to shop</button></section>
 </main>
