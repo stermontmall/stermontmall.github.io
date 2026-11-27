@@ -1,3 +1,9 @@
+## 2026-11-28 00:45 (Africa/Nairobi) - `wip-fix-indexing-tools` MERGED to main (84db25b9)
+- Done: Build product pages passed and committed 37c07482; Pages deploy of it succeeded. Both sitemaps on main: 0 noindex/non-canonical/missing entries (823 and 668 URLs). Google sitemap ping submitted all 5; indexing check run #91 passed (150 checked, 131 indexed; cumulative products 203 of 637).
+- Tests: only mobile-shell/description.test.mjs and seo-titles.test.mjs failed, same as plain main. Live site not fetched from the sandbox.
+- Not yet seen: a post-build ping going through the "send" path on GitHub after the 3h cooldown. `wip-persist-old-redirects` NOT merged.
+- Next: check a later "Google sitemap ping" log for "Sitemap changed since".
+
 ## 2026-11-28 00:45 (Africa/Nairobi) - Sitemap ping and indexing checker fixes (branch `wip-fix-indexing-tools`, NOT merged)
 - Cause 1: skipped "Google sitemap ping" runs end in success and restarted the 3h cooldown, so post-build pings were almost always skipped. The gate now uses the last run whose submit step succeeded.
 - Cause 2: scheduled runs are far fewer than the cron asks; the index checker chose its batch by the clock, so batches were missed. It now uses GITHUB_RUN_NUMBER.
