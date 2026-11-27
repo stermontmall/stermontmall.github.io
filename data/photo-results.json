@@ -10350,5 +10350,27 @@
     "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/ke-mostraz.png",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "delta-guard-250ml-official-v8-20261127",
+    "source": "https://www.bimeda.co.ke/media/k2/items/cache/500a44935c8320008f1c713a63e32b8e_L.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/delta-guard-250ml-official-v8-20261127_YVSepElB1o.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/delta-guard-250ml-official-v8-20261127_YVSepElB1o.jpg",
+    "width": 1200,
+    "height": 637,
+    "bytes": 39987,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.bimeda.co.ke/media/k2/items/cache/500a44935c8320008f1c713a63e32b8e_L.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "bayticol-pour-on-1l-agroduka-v8-20261127",
+    "source": "https://agroduka.com/images/product/IMG-20250731-WA0015.jpg",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
