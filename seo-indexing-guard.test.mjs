@@ -41,6 +41,10 @@ assert.match(generator, /optimizedImageUrl = \(source, width\) => imageKitUrl\(s
 assert.match(generator, /optimizedImageUrl\(u, 320\)/);
 assert.match(generator, /optimizedImageUrl\(u, 900\)/);
 
+// Sitemaps must not list noindex or canonicalised-elsewhere pages.
+await import('./sitemap-indexable.test.mjs');
+assert.match(generator, /isIndexablePage\(/);
+
 // Ensure this protection test remains part of the production page-build gate.
 assert.match(workflow, /node seo-indexing-guard\.test\.mjs/);
 

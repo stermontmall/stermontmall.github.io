@@ -31,6 +31,7 @@
 // Runs automatically on GitHub (see .github/workflows/product-pages.yml). No installs needed (Node 18+).
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { isIndexablePage } from './sitemap-indexable.mjs';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 const imageKitUrl = createRequire(import.meta.url)('./imagekit-url.js');
 import { createHash } from 'node:crypto';
@@ -999,7 +1000,10 @@ try {
 }
 // Only advertise URLs whose generated HTML exists. Prevent stale/missing product or category files
 // from entering Google's sitemap (a missing file otherwise gets an empty hash and still gets listed).
-const sitemapUrls = urls.filter(u => existsSync(u.endsWith('/') ? `.${u}index.html` : fileOf(u)) && (!/^\/p\/[^/]+\.html$/.test(u) || sitemapEligibleProductPaths.has(u)));
+const pageFile = u => u.endsWith('/') ? `.${u}index.html` : fileOf(u);
+// A listed page that is not on disk is left to the existing checks; one that is must be indexable.
+const mayList = u => !existsSync(pageFile(u)) || isIndexablePage(readFileSync(pageFile(u), 'utf8'), SITE + u);
+const sitemapUrls = urls.filter(u => existsSync(pageFile(u)) && mayList(u) && (!/^\/p\/[^/]+\.html$/.test(u) || sitemapEligibleProductPaths.has(u)));
 const next = {};
 for (const u of sitemapUrls) {
   const file = u.endsWith('/') ? `.${u}index.html` : fileOf(u);
@@ -1020,7 +1024,7 @@ const staticEntries = [...previousSitemap.matchAll(/<url>[\s\S]*?<\/url>/g)]
   .map(m => m[0])
   .filter(entry => {
     const loc = entry.match(/<loc>([^<]+)<\/loc>/)?.[1] || '';
-    return !loc.startsWith(SITE + '/p/') && !loc.startsWith(SITE + '/c/');
+    return !loc.startsWith(SITE + '/p/') && !loc.startsWith(SITE + '/c/') && (!loc.startsWith(SITE + '/') || mayList(loc.slice(SITE.length)));
   });
 const catalogEntries = sitemapUrls.map(u => '  <url><loc>' + SITE + u + '</loc><lastmod>' + next[u].lastmod + '</lastmod></url>');
 const entryMap = new Map();

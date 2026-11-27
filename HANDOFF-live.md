@@ -1,3 +1,9 @@
+## 2026-11-27 23:20 (Africa/Nairobi) - Sitemaps list only indexable pages (branch `wip-sitemap-indexable-only`, NOT merged)
+- Found: sitemap.xml listed 22 pages that are noindex (21 `/c/`, fashion and cars included) or canonicalised elsewhere (privacy.html).
+- Done: `sitemap-indexable.mjs` + test; `generate-products.mjs` filters both sitemaps. No generated files committed, no Neon data changed.
+- Checks: new test, seo-indexing-guard, seo-shell-redirect, seo-shell-chrome, check-product-pages, category-hubs, seo-meta pass; one-product fixture build ran. NOT run: live Neon build, browser suite, live site.
+- Next: owner OK, merge, wait for "Build product pages". `wip-persist-old-redirects` also edits generate-products.mjs and this file; resolve any HANDOFF conflict by keeping both entries.
+
 ## PROGRESS CHECKPOINT — 27 Nov 2026, 22:48:41 (Africa/Nairobi)
 **Summary:** Checked Search Console Performance export (last 3 months) against main 291bb35. Found old-URL redirect pages are being deleted by the product page build.
 **Completed:** Export capped at 1000 rows: 800 product paths; 131 in current sitemap; 665 have no page file on main (224 of 299 product clicks). Redirect commit 15635486 added pages; build commit b267173b removed the sample checked. generate-products.mjs removes p/ and c/ each build, and reads product_slug_redirects from the old Supabase URL (no SLUG_REDIRECTS_JSON set in product-pages.yml found), not Neon (84 rows on 2026-11-27).
