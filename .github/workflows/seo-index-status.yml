@@ -7,6 +7,12 @@
 name: Google indexing status
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/seo-index-status.yml'
+      - 'seo-index-status.mjs'
+      - 'neon-automation-sync.mjs'
   workflow_dispatch:
   schedule:
     - cron: '30 1,4,7,10,13,16,19,22 * * *'
