@@ -40,7 +40,7 @@ jobs:
         run: node mobile-shell/navigation.test.mjs
 
       - name: Set up Python and browser tests
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
