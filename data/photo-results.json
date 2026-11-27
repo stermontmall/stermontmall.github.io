@@ -10394,5 +10394,11 @@
     "source": "https://ke.jumia.is/product/54/8532271/1.jpg",
     "ok": false,
     "error": "source page HTTP 400"
+  },
+  {
+    "name": "dominex-100ec-jumia-page-image-v8-20261127",
+    "source": "https://www.jumia.co.ke/juanco-dominex-100ec-insecticide-172235845.html",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
