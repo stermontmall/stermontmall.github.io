@@ -54,7 +54,7 @@ if (mode === 'content') {
 
   // Parse the summary across line wraps and punctuation. Do not use [^.]*:
   // the report's explanatory "(rotating batch; ...)" text contains punctuation.
-  const summary = report.match(/Checked\\s+\\*\\*(\\d+)\\*\\*\\s+pages with Google[\\s\\S]*?\\*\\*(\\d+) indexed\\*\\*,\\s+\\*\\*(\\d+) not indexed\\*\\*/i);
+  const summary = report.match(/Checked\s+\*\*(\d+)\*\*\s+pages with Google[\s\S]*?\*\*(\d+) indexed\*\*,\s+\*\*(\d+) not indexed\*\*/i);
   if (!summary) throw new Error('Could not parse Google indexing summary from index-status.md; refusing to save zero counts.');
   const checked = Number(summary[1]), indexed = Number(summary[2]), notIndexed = Number(summary[3]);
   if (indexed + notIndexed > checked) throw new Error(`Invalid Google indexing totals: ${indexed} indexed + ${notIndexed} not indexed > ${checked} checked.`);
@@ -62,9 +62,9 @@ if (mode === 'content') {
   const parseTable = (heading) => {
     const section = report.split(heading)[1]?.split(/^## /m)[0] || '';
     const rows = [];
-    for (const line of section.split('\\n')) {
-      const m = line.match(/^\\|\\s*(\\/[^|]+)\\s*\\|\\s*([^|]+)\\s*\\|\\s*([^|]+)\\s*\\|\\s*([^|]*)\\s*\\|$/);
-      if (!m || /^\\s*-+\\s*$/.test(m[1])) continue;
+    for (const line of section.split('\n')) {
+      const m = line.match(/^\|\s*(\/[^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]*)\s*\|$/);
+      if (!m || /^\s*-+\s*$/.test(m[1])) continue;
       const path = m[1].trim();
       if (!path.startsWith('/')) continue;
       rows.push({
