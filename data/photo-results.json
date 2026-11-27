@@ -10372,5 +10372,27 @@
     "source": "https://agroduka.com/images/product/IMG-20250731-WA0015.jpg",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "eliminator-10ec-20ml-mtolori-exact-v8-20261127",
+    "source": "https://mtolori.com/res/products/1/1005977_front_500px_.webp",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/eliminator-10ec-20ml-mtolori-exact-v8-20261127_c8iCcEgy6.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/eliminator-10ec-20ml-mtolori-exact-v8-20261127_c8iCcEgy6.jpg",
+    "width": 500,
+    "height": 500,
+    "bytes": 22904,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://mtolori.com/res/products/1/1005977_front_500px_.webp",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "dominex-100ec-20ml-jumia-exact-v8-20261127",
+    "source": "https://ke.jumia.is/product/54/8532271/1.jpg",
+    "ok": false,
+    "error": "source page HTTP 400"
   }
 ]
