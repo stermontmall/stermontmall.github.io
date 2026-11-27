@@ -9734,5 +9734,11 @@
     "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/ALONZE.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "darvin-50ew-28ml-v8-20261127",
+    "source": "https://cheapthings.co.ke/product/darvin-50ew-28ml/",
+    "ok": false,
+    "error": "source page HTTP 403"
   }
 ]
