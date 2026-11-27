@@ -50,7 +50,13 @@ jobs:
           fi
           skip() { echo "go=false" >> "$GITHUB_OUTPUT"; echo "Skipping ping: $1"; exit 0; }
           [ "$BUILD_RESULT" = "success" ] || skip "the page build did not succeed."
-          last=$(gh run list --workflow google-sitemap-ping.yml --status success --limit 1 --json createdAt --jq '.[0].createdAt // empty' || true)
+          # A run that skips the ping still ends in "success", so look for the last run whose submit step really ran.
+          last=""
+          runs=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/google-sitemap-ping.yml/runs?status=success&per_page=60" --jq '.workflow_runs[] | "\(.id),\(.created_at)"' || true)
+          for run in $runs; do
+            sent=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/${run%,*}/jobs" --jq '[.jobs[].steps[] | select(.name == "Submit sitemaps to Google Search Console" and .conclusion == "success")] | length' || echo 0)
+            if [ "${sent:-0}" -gt 0 ]; then last=${run#*,}; break; fi
+          done
           if [ -n "$last" ]; then
             age=$(( $(date +%s) - $(date -d "$last" +%s) ))
             [ "$age" -ge $(( COOLDOWN_HOURS * 3600 )) ] || skip "last successful ping was only $(( age / 60 )) minutes ago (cooldown ${COOLDOWN_HOURS}h)."

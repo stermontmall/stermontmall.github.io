@@ -1,3 +1,11 @@
+## 2026-11-28 00:45 (Africa/Nairobi) - Sitemap ping and indexing checker fixes (branch `wip-fix-indexing-tools`, NOT merged)
+- Cause 1: skipped "Google sitemap ping" runs end in success and restarted the 3h cooldown, so post-build pings were almost always skipped. The gate now uses the last run whose submit step succeeded.
+- Cause 2: scheduled runs are far fewer than the cron asks; the index checker chose its batch by the clock, so batches were missed. It now uses GITHUB_RUN_NUMBER.
+- Branch includes `wip-sitemap-indexable-only` (do not merge that one separately). Does not include `wip-persist-old-redirects`.
+- Checks: new gate script run against live run history (both skip and go paths); batch simulation covers all sitemap pages; workflow YAML parses; SEO tests pass. NOT run: the workflows on GitHub, live build.
+- Open: product-pages cron is also delayed (not edited, rule 5); publish steps must send `catalog-changed`. Site audit fails at the Pa11y step.
+- Next: owner OK, merge into main, check the "Google sitemap ping" log, then the next "Google indexing status" run.
+
 ## 2026-11-27 23:20 (Africa/Nairobi) - Sitemaps list only indexable pages (branch `wip-sitemap-indexable-only`, NOT merged)
 - Found: sitemap.xml listed 22 pages that are noindex (21 `/c/`, fashion and cars included) or canonicalised elsewhere (privacy.html).
 - Done: `sitemap-indexable.mjs` + test; `generate-products.mjs` filters both sitemaps. No generated files committed, no Neon data changed.
