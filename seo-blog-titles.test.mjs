@@ -17,7 +17,7 @@ writeFileSync(join(dir, 'skip.html'),
   '<meta name="robots" content="noindex"><title>A deliberately long noindex title that should remain as it is | Stermont Arcade</title>');
 assert.equal(normalizeBlogTitles({ dir }), 2);
 const long = readFileSync(join(dir, 'long.html'), 'utf8');
-const title = long.match(/<title>(.*?)<\\/title>/)[1];
+const title = long.match(/<title>(.*?)<\/title>/)[1];
 assert.ok(title.length <= 60);
 assert.ok(long.includes('<h1>' + h1 + '</h1>'));
 assert.ok(long.includes('content="' + title + '"'));
