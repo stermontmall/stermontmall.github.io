@@ -19,7 +19,7 @@
 <meta name="twitter:image" content="https://stermontarcade.co.ke/stermont-arcade-logo-v2.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://stermontarcade.co.ke/checkout.html#webpage","url":"https://stermontarcade.co.ke/checkout.html","name":"Checkout | Stermont Arcade","description":"Checkout | Stermont Arcade - Stermont Arcade, online shopping in Kenya with M-Pesa payment and delivery to all 47 counties.","inLanguage":"en-KE","isPartOf":{"@type":"WebSite","name":"Stermont Arcade","url":"https://stermontarcade.co.ke/"},"breadcrumb":{"@id":"https://stermontarcade.co.ke/checkout.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://stermontarcade.co.ke/checkout.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://stermontarcade.co.ke/"},{"@type":"ListItem","position":2,"name":"Checkout","item":"https://stermontarcade.co.ke/checkout.html"}]}]}</script>
 <style>
-:root{--ink:#1d0f3a;--purple:#351064;--deep:#240a47;--violet:#7028d8;--lilac:#f4edff;--lilac2:#ebdfff;--lime:#c7f51b;--lime-soft:#f1ffcf;--line:#e7dcf6;--muted:#6f6585;--ok:#3f7d0a;--bad:#b42318;color-scheme:light;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
+:root{--ink:#1d0f3a;--purple:#351064;--deep:#240a47;--violet:#7028d8;--lilac:#f4edff;--lilac2:#ebdfff;--lime:#c7f51b;--lime-soft:#f1ffcf;--line:#e7dcf6;--muted:#6f6585;--ok:#3f7d0a;--bad:#b42318;--r:22px;color-scheme:light;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 body{margin:0;min-height:100vh;background:#faf7ff radial-gradient(900px 420px at 88% -140px,#e4d0ff 0,transparent 70%) no-repeat;-webkit-font-smoothing:antialiased}
@@ -223,7 +223,7 @@ textarea{min-height:88px;resize:vertical}
 <div class="row"><span>Subtotal</span><b id="sub">—</b></div>
 <div class="row"><span id="fee-label">Delivery</span><b id="fee-val">—</b></div>
 <div class="total"><span>Order total</span><b id="total">—</b></div>
-<p class="muted" id="fee-note">Delivery fees are calculated using the selected county.</p>
+<p class="muted" id="fee-note">Choose your county to see the delivery fee.</p>
 </section></aside>
 
 <form id="form" novalidate>
@@ -305,13 +305,42 @@ async function token(){
  if(!j||typeof j.token!=='string'||!j.token)throw new Error('Could not start a secure session. Please try again.');
  tok=j.token;const e=Number(j.expires_at);tokExp=e?(e<1e12?e*1000:e):Date.now()+300000;return tok;
 }
-const counties=['Nairobi','Kiambu','Machakos','Kajiado','Nakuru','Nyeri','Meru','Tharaka-Nithi','Embu','Kirinyaga',"Murang'a",'Nyandarua','Laikipia','Mombasa','Kisumu','Uasin Gishu','Kwale','Kilifi','Taita-Taveta','Garissa','Isiolo','Kitui','Makueni','Trans Nzoia','Elgeyo-Marakwet','Nandi','Baringo','Narok','Kericho','Bomet','Kakamega','Vihiga','Bungoma','Busia','Siaya','Homa Bay','Migori','Kisii','Nyamira'];
-const fees={Nairobi:300,Kiambu:400,Machakos:400,Kajiado:400,Nakuru:600,Nyeri:600,Meru:600,'Tharaka-Nithi':600,Embu:600,Kirinyaga:600,"Murang'a":600,Nyandarua:600,Laikipia:600,Mombasa:600,Kisumu:600,'Uasin Gishu':600,Kwale:800,Kilifi:800,'Taita-Taveta':800,Garissa:800,Isiolo:800,Kitui:800,Makueni:800,'Trans Nzoia':800,'Elgeyo-Marakwet':800,Nandi:800,Baringo:800,Narok:800,Kericho:800,Bomet:800,Kakamega:800,Vihiga:800,Bungoma:800,Busia:800,Siaya:800,'Homa Bay':800,Migori:800,Kisii:800,Nyamira:800};
+/* Delivery fees: Neon table public.delivery_fees is the source of truth (the order function charges from it).
+   This list is only a fallback for display if the table cannot be read, and must match the table. */
+const RG={N:'Nairobi & surroundings',M:'Mt Kenya',V:'Rift Valley',W:'Western & Nyanza',C:'Coast',E:'Eastern & North'};
+const f=(county,r,fee,eta)=>({county,region:RG[r],fee,eta});
+let rows=[f('Nairobi','N',300,'Same or next day'),f('Kiambu','N',400,'Next day'),f('Machakos','N',400,'Next day'),f('Kajiado','N',400,'Next day'),
+f('Nyeri','M',600,'1-2 days'),f('Meru','M',600,'1-2 days'),f('Tharaka-Nithi','M',600,'1-2 days'),f('Embu','M',600,'1-2 days'),f('Kirinyaga','M',600,'1-2 days'),f("Murang'a",'M',600,'1-2 days'),f('Nyandarua','M',600,'1-2 days'),f('Laikipia','M',600,'1-2 days'),
+f('Nakuru','V',600,'1-2 days'),f('Uasin Gishu','V',600,'1-2 days'),f('Trans Nzoia','V',800,'1-3 days'),f('Elgeyo-Marakwet','V',800,'1-3 days'),f('Nandi','V',800,'1-3 days'),f('Baringo','V',800,'1-3 days'),f('Narok','V',800,'1-3 days'),f('Kericho','V',800,'1-3 days'),f('Bomet','V',800,'1-3 days'),f('West Pokot','V',800,'2-4 days'),f('Samburu','V',1200,'3-5 days'),f('Turkana','V',2100,'3-5 days'),
+f('Kisumu','W',600,'1-2 days'),f('Kakamega','W',800,'1-3 days'),f('Vihiga','W',800,'1-3 days'),f('Bungoma','W',800,'1-3 days'),f('Busia','W',800,'1-3 days'),f('Siaya','W',800,'1-3 days'),f('Homa Bay','W',800,'1-3 days'),f('Migori','W',800,'1-3 days'),f('Kisii','W',800,'1-3 days'),f('Nyamira','W',800,'1-3 days'),
+f('Mombasa','C',600,'1-2 days'),f('Kwale','C',800,'1-3 days'),f('Kilifi','C',800,'1-3 days'),f('Taita-Taveta','C',800,'1-3 days'),f('Lamu','C',2100,'3-5 days'),f('Tana River','C',2100,'3-5 days'),
+f('Kitui','E',800,'1-3 days'),f('Makueni','E',800,'1-3 days'),f('Isiolo','E',800,'1-3 days'),f('Garissa','E',800,'1-3 days'),f('Marsabit','E',1000,'3-5 days'),f('Wajir','E',1900,'3-5 days'),f('Mandera','E',3200,'3-5 days')];
+let fees={},etas={};
 const $=id=>document.getElementById(id), money=n=>'KSh '+Number(n).toLocaleString('en-KE');
 let cart=[];
 try{cart=JSON.parse(localStorage.getItem('stm_handoff')||'[]')}catch{}
 const clean=cart.filter(x=>x&&typeof x.rowId==='string'&&Number.isInteger(Number(x.qty))&&Number(x.qty)>0).slice(0,59);
-counties.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=fees[c]?c+' · KSh '+fees[c]:c;$('county').append(o)});
+function buildCounties(){
+ const sel=$('county'),keep=sel.value;
+ sel.replaceChildren();const first=document.createElement('option');first.value='';first.textContent='Choose county';sel.append(first);
+ fees={};etas={};let group=null,gname='';
+ rows.forEach(r=>{
+  fees[r.county]=Number(r.fee);etas[r.county]=String(r.eta||'');
+  if(r.region!==gname){gname=r.region;group=document.createElement('optgroup');group.label=gname;sel.append(group)}
+  const o=document.createElement('option');o.value=r.county;o.textContent=r.county+' · '+money(r.fee);group.append(o);
+ });
+ if(keep&&fees[keep]!==undefined)sel.value=keep;
+}
+async function loadFees(){
+ try{
+  const jwt=await token();
+  const res=await fetch(API+'delivery_fees?select=county,region,fee,eta&order=sort.asc',{headers:{Authorization:'Bearer '+jwt}});
+  if(!res.ok)return;
+  const data=await res.json();
+  if(Array.isArray(data)&&data.length>=40&&data.every(r=>r&&r.county&&Number.isFinite(Number(r.fee)))){rows=data;buildCounties();paint()}
+ }catch{}
+}
+buildCounties();
 function method(){return document.querySelector('input[name=method]:checked').value}
 function sub(){return clean.reduce((s,i)=>s+Number(i.price||0)*Number(i.qty),0)}
 function fee(){return method()==='delivery'?(fees[$('county').value]||0):0}
@@ -359,14 +388,14 @@ function paint(){
  $('payamount').value=t||'';
  $('delivery-fields').classList.toggle('hidden',!delivery);$('pickup-note').classList.toggle('hidden',delivery);
  $('county').required=delivery;$('address').required=delivery;
- $('fee-note').textContent=delivery?(county&&!fees[county]?'Delivery fee for this county will be confirmed on WhatsApp.':'Delivery fee is included where listed.'):'Pickup at Sarit Centre, Westlands.';
+ $('fee-note').textContent=delivery?(county?'Delivery fee added automatically. Estimated delivery: '+(etas[county]||'1-3 days').replace(/-/g,'–')+'. The fee covers parcels up to about 5 kg; we confirm any extra for very heavy loads on WhatsApp before dispatch.':'Choose your county to see the delivery fee.'):'Pickup at Sarit Centre, Westlands.';
  progress();
 }
 document.querySelectorAll('input[name=method]').forEach(x=>x.addEventListener('change',paint));
 $('county').addEventListener('change',paint);
 ['name','phone','address','paycode','payamount'].forEach(id=>$(id).addEventListener('input',progress));
 $('paycode').addEventListener('input',()=>{const el=$('paycode'),p=el.selectionStart;el.value=el.value.toUpperCase();try{el.setSelectionRange(p,p)}catch{}});
-paint();
+paint();loadFees();
 
 document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>copy(b,b.dataset.copy)));
 $('copyref').addEventListener('click',()=>copy($('copyref'),$('ref').textContent));
