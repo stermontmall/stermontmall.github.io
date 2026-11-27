@@ -41,9 +41,10 @@ const others = [...locs('sitemap.xml'), ...locs('sitemap-products.xml').filter(u
 const allUrls = [...new Set([...products, ...others])];
 if (!allUrls.length) { console.error('No URLs found in sitemap.xml or sitemap-products.xml.'); process.exit(1); }
 // Rotate the batch so pages beyond the per-run limit are not starved forever.
-// The batch changes every ROTATE_HOURS (24 by default, 3 in the workflow), so each run checks the next MAX_URLS pages in the list.
+// On GitHub each run takes the next MAX_URLS pages in the list. Run by hand, the batch changes every ROTATE_HOURS.
 const ROTATE_MS = (Number(process.env.ROTATE_HOURS) || 24) * 3600000;
-const slot = Math.floor(Date.now() / ROTATE_MS);
+// GitHub often drops scheduled runs, so a clock-based batch number skips pages. The run number moves one batch per run.
+const slot = Number(process.env.GITHUB_RUN_NUMBER) || Math.floor(Date.now() / ROTATE_MS);
 const startIndex = (slot * MAX) % allUrls.length;
 const urls = Array.from({ length: Math.min(MAX, allUrls.length) }, (_, i) => allUrls[(startIndex + i) % allUrls.length]);
 
