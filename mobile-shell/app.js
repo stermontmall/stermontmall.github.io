@@ -246,10 +246,7 @@ function syncOverlays() {
    domain and a product could not be copied, shared or reopened. The base entry under it stays "/", so Back returns to the list. */
 const BASE_TITLE = document.title;
 const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
-/* The address is the product's own CLEAN page address, /p/<slug>.html (+ "#<size slug>" when the chosen size is not the page's own), with no query string:
-   a copied or shared link then previews as this product, from that page's head, and a phone that opens it goes straight into this same product view inside
-   the shell (the inline script at the top of the page head, seo-shell-chrome.mjs, and shell-chrome.js send /p/<slug>.html to /?product=<slug>).
-   Crawlers get the static page, whose canonical is this same clean address. Older links that still end in ?shell=1 keep working (same two scripts). */
+/* Customer-facing product addresses stay on the mobile shell as /?product=<slug>. The generated /p/<slug>.html page remains the separate canonical, indexable SEO document. Reloading a product therefore starts at the homepage shell and reopens the requested product from the query parameter. */
 const productUrl = () => { if (!qb.p) return undefined; const selected = sizeOf(qb.p, qb.size).slug || qb.p.slug; return '/?product=' + encodeURIComponent(selected); };
 /* A category has its own address too (owner 2026-11-09: "when I tap on categories, make a direct link"): /c/<slug>.html, the clean address of the generated category page
    (a sub-category uses its own slug). A copied or shared link previews as that category, and a phone that opens it goes straight back into the same category in the shell
@@ -271,8 +268,8 @@ function syncProductMeta() {   // tab title + address follow the open product (a
   if (open) { const u = productUrl(); if (u && location.pathname + location.search + location.hash !== u) history.replaceState(history.state, '', u); }
   else if (cu !== '/') { if (location.pathname + location.search + location.hash !== cu) history.replaceState(history.state, '', cu); }
   else if (/^\/c\/[^/]+\.html$/.test(location.pathname)) history.replaceState(history.state, '', '/');   // only an address this code set is reset: other parameters (campaign tags) stay
-  else if (location.pathname === '/' && new URLSearchParams(location.search).has('cat')) {
-    const params = new URLSearchParams(location.search); params.delete('cat');
+  else if (location.pathname === '/' && (new URLSearchParams(location.search).has('cat') || new URLSearchParams(location.search).has('product') || new URLSearchParams(location.search).has('item'))) {
+    const params = new URLSearchParams(location.search); params.delete('cat'); params.delete('product'); params.delete('item');
     const rest = params.toString();
     history.replaceState(history.state, '', '/' + (rest ? '?' + rest : '') + location.hash);
   }
@@ -867,7 +864,7 @@ function returnHomeFromProduct() {
   syncOverlays();
   showTab('home');
   refreshGrid();
-  window.scrollTo({ top: 0, behavior: 'instant' });
+  window.scrollTo(0, 0);
 }
 $('#pp-home').addEventListener('click', returnHomeFromProduct);
 $('#pp-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderPP(); renderQB(); });
