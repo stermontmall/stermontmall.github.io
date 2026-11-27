@@ -1,3 +1,4 @@
+// Rebuild after second pass removing repeated store, ordering and aquaculture boilerplate from descriptions on 2026-11-27.
 // Rebuild after removing repeated category and logistics boilerplate from catalogue descriptions on 2026-11-27.
 // Rebuild requested after Neon product-description cleanup on 2026-11-27; regenerate customer-facing HTML from the corrected catalogue.
 // V8 catalogue rebuild request: active Neon sprayer and termite batch STM-002235–STM-002245, 2026-11-25.
