@@ -6,6 +6,10 @@ const generator = readFileSync('generate-products.mjs', 'utf8');
 const robots = readFileSync('robots.txt', 'utf8');
 const workflow = readFileSync('.github/workflows/product-pages.yml', 'utf8');
 
+// Stored metadata must not override the 60-character title target or leak internal V8 pricing notes.
+assert.match(generator, /storedTitle && storedTitle\\.length <= 60/);
+assert.ok(generator.includes('!\\\\bV8\\\\b/i.test(storedDescription)'), 'internal V8 pricing notes must never be used as meta descriptions');
+
 // Every generated product/category page must retain a self-referencing canonical
 // and be indexable by default. Query refinements are handled separately.
 assert.match(generator, /<link rel="canonical" href="\$\{SITE\}\$\{path\}">/);
