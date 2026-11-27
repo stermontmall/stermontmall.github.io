@@ -1,3 +1,11 @@
+## 2026-11-27 23:10 (Africa/Nairobi) - Old-URL redirects now survive rebuilds (branch `wip-persist-old-redirects`, tested locally, NOT merged)
+- Done: `data/old-url-redirects.csv` (801 old slugs: the 4 redirect commits 15635486, 699be3e8, 04e4e7ce, 18741e12, plus the 84 Neon rows, checksum matched). `old-url-redirects.mjs` writes them after all real pages; live pages are never overwritten; gone targets go to `/c/`. Builder now asks Neon (not Supabase) for renames and warns if refused.
+- Checks: two full local rebuilds (fixture of 683 live products, no pack-size grouping): 801/801 addresses have a page, 797 redirect pages, 0 dead targets, 0 chains, 0 in sitemaps, same output both times. link-check 0 problems; tests listed in product-pages.yml and seo-pr-quality.yml pass. NOT run: live Neon build, live site.
+- Replaces `wip-redirects-agro-pest-remaining` (its 700 redirects are in the CSV): do not merge that branch.
+- Owner decisions: (1) merge to main; (2) allow Neon role `anonymous` to read renames: `GRANT SELECT (old_slug, product_id) ON public.product_slug_redirects TO anonymous;` (not run). Until then new renames must be added to the CSV. (3) 273 addresses in the 1,000-row Search Console export (75 clicks) still have no page.
+- Some CSV rows point to a different pack size or a close substitute (e.g. bat-crp liquid -> powder): review.
+- Next: owner OK, merge the PR, wait for "Build product pages", open a few old URLs live.
+
 ## 2026-11-27 22:55 (Africa/Nairobi) - Keep old-URL redirects across rebuilds (branch `wip-persist-old-redirects`, IN PROGRESS, NOT merged)
 - Owner said "Fix". Finding: Neon role `anonymous` has no SELECT grant on `product_slug_redirects` (read policy exists), and generate-products.mjs still asks Supabase for it.
 - Plan: keep a permanent list in `data/old-url-redirects.csv`; build writes those redirect pages after all real pages. No Neon change without owner OK. Do not edit product-pages.yml.
