@@ -1,3 +1,9 @@
+## 2026-11-27 20:45 (Africa/Nairobi) - Stable product page for pack sizes (branch `wip-stable-variant-pages`, NOT merged)
+- Cause of "Sitemap lists a page that does not exist": 12 pack-size groups have sizes with the same `created_at`. The build ordered by `created_at` only, so the size chosen as the product page could change between builds and the other `/p/<slug>.html` disappeared.
+- Fix (only `generate-products.mjs`): order by `created_at`, then `id`; every other size slug now gets a redirect page to the product page. No Neon data changed. No generated files committed.
+- Checks: fixture build reproduced the flip before the fix and gave identical pages and sitemap in both input orders after it; the `*.test.mjs` files run by `product-pages.yml` and `seo-pr-quality.yml` pass. Not run: live catalogue build and browser suite (PR checks cover them).
+- Next: owner review, merge the PR, wait for "Build product pages" then "SEO extras", then run "Daily SEO check" and confirm no missing sitemap pages.
+
 ## 2026-11-27 10:35 (Africa/Nairobi) - Redirects for remaining old agrovet and pest control URLs (branch `wip-redirects-agro-pest-remaining`, NOT merged)
 - Owner: wanted every remaining old agrovet/pest control product URL redirected (not only the high-click ones).
 - Old URL list came from `sitemap-products.xml` history (306 versions, fetched with `git fetch --depth=2500 origin main`): 1,693 slugs were in older sitemaps but not the current one; 1,603 had no file in `p/`; 718 were agrovet/pest control after keyword + manual review.
