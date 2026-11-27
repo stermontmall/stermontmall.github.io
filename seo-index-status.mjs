@@ -3,6 +3,8 @@
 //   1) how many pages are indexed vs not, grouped by Google's own reason
 //   2) every page that is NOT indexed, with the reason, last crawl date and which page Google chose instead (if any)
 //   3) a short "request these first" list for the Search Console "Request indexing" button (about 10 per day are allowed)
+// It also writes index-status.json with the result for EVERY page checked (indexed or not). neon-automation-sync.mjs stores that
+// in Neon (public.google_index_inspections) so the admin page can show how many products are indexed in total, not just per batch.
 // Google offers no official way to force indexing of product pages (the Indexing API is for job and live-stream pages only),
 // so this tool shows you exactly what is blocking each page instead of guessing.
 // Uses the same secrets as seo-google-sitemaps.mjs (GitHub > Settings > Secrets and variables > Actions):
@@ -11,7 +13,7 @@
 //           MAX_MINUTES (default 20; the run stops and reports what it has instead of hanging for hours),
 //           ROTATE_HOURS (default 24; how long one batch of URLs stays the same. The workflow sets 3 so every 3-hour run checks a NEW batch).
 import { createSign } from 'node:crypto';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const raw = process.env.GSC_SERVICE_ACCOUNT_JSON, property = process.env.GSC_PROPERTY;
@@ -95,6 +97,9 @@ const indexed = ok.filter(r => r.verdict === 'PASS');
 const notIndexed = ok.filter(r => r.verdict !== 'PASS');
 const byState = {};
 for (const r of notIndexed) (byState[r.state] ||= []).push(r);
+
+// Every page checked in this run (indexed or not), for neon-automation-sync.mjs `index` to store in Neon.
+writeFileSync('index-status.json', JSON.stringify({ generated: new Date().toISOString(), results: ok.map(r => ({ url: r.url, verdict: r.verdict === 'PASS' ? 'PASS' : 'FAIL', state: r.state, crawled: r.crawled || null, canonical: r.canonical || null })) }));
 
 const short = u => u.replace(SITE, '');
 const advice = {
