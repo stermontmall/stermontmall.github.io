@@ -99,7 +99,9 @@ const fixImg = u => (typeof u === 'string' ? u.replace(OLD_HOST, SITE + '/') : u
 // Do not render known-missing legacy files as product photos. Keep the catalog rows active;
 // product pages fall back to the store identity until an exact, verified pack photo is uploaded.
 const MISSING_LEGACY_PRODUCT_PHOTO = /(?:acetochlor-50-ec-herbicide-1-litre|jade-premium-bio-pesticide-1-litre|one-touch-crop-protector-insecticide-250-ml|ortiva-250-sc-fungicide-1-litre|total-touch-250-sc-insecticide-1-litre|touchdown-herbicide-1-litre|tower-extreme-680-wg-fungicide-1-kg)\.(?:jpg|webp)$/i;
-const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.images) ? p.images : []).filter(u => typeof u === 'string' && !MISSING_LEGACY_PRODUCT_PHOTO.test(u)).map(fixImg) }));
+// Oldest first, then by id. Pack sizes saved at the same moment would otherwise come back in any order, and the product page would jump between sizes on each build.
+const byAgeThenId = (a, b) => (Date.parse(a.created_at) || 0) - (Date.parse(b.created_at) || 0) || (String(a.id) < String(b.id) ? -1 : String(a.id) > String(b.id) ? 1 : 0);
+const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.images) ? p.images : []).filter(u => typeof u === 'string' && !MISSING_LEGACY_PRODUCT_PHOTO.test(u)).map(fixImg) })).sort(byAgeThenId);
 
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
@@ -139,7 +141,7 @@ async function getProducts() {
     let offset = 0;
     let failed = false;
     while (true) {
-      const url = `${NEON_REST}products?active=eq.true&select=${encodeURIComponent(c)}&order=created_at.asc&limit=${PAGE_SIZE}&offset=${offset}`;
+      const url = `${NEON_REST}products?active=eq.true&select=${encodeURIComponent(c)}&order=created_at.asc,id.asc&limit=${PAGE_SIZE}&offset=${offset}`;
       let batch = null;
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
@@ -308,6 +310,11 @@ const slugOf = {};
 const sl = id => slugOf[id] || id;
 // The old id address of a renamed product becomes a redirect to its clean page.
 products.forEach(p => { if (sl(p.id) !== p.id) aliases.push({ id: p.id, to: p.id }); });
+// The clean address of each other pack size also forwards to the product page, so it never turns into a dead link.
+{
+  const own = new Set(aliases.map(x => x.id));
+  aliases.filter(x => x.id !== x.to).forEach(x => { const s = slugOf[x.id]; if (s && !own.has(s)) { own.add(s); aliases.push({ id: s, to: x.to }); } });
+}
 // Permanent links: every slug a product ever had (table product_slug_redirects, filled by a database trigger) keeps forwarding to its current page.
 {
   let hist = [];
