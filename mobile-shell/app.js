@@ -470,7 +470,7 @@ function selectCategory(chip, sub = '') {
 }
 let sideCat = '__top';
 /* Photo for a tile: the first product photo in that category (and sub-category); the emoji shows if there is none or it fails to load. */
-const SERVICE_TILE_PHOTO = '';  // the old photo lived in the deleted Supabase storage; empty shows the emoji until a new one is added
+const SERVICE_TILE_PHOTO = 'https://agrimachinery.africa/storage/2025/07/counterfeits-pesticides-in-agriculture-in-Kenya.png'; // Real farm-spraying service photo already used on the Services landing page
 const photoOf = (cat, sub) => (PRODUCTS.find(p => p.cat === cat && (!sub || p.sub === sub) && p.img) || {}).img || '';
 const tile = (attrs, label, img, emoji, bg) => `<li><button class="tap w-full flex flex-col items-center gap-1.5" ${attrs}>
       <span class="grid place-items-center overflow-hidden rounded-lg text-3xl" style="width:64px;height:64px;background:${bg}">${img ? thumb({ img, emoji }) : esc(emoji || '')}</span>
