@@ -9718,5 +9718,21 @@
     "image_source": "https://images-cdn.ubuy.co.in/6948824352ebcad9be0faf55-6-pack-termite-monitoring-bait-stations.jpg",
     "http_status": 200,
     "image_found_via": "direct"
+  },
+  {
+    "name": "alonze-50ec-1l-v8-20261127",
+    "source": "https://agroduka.ke/alonze-50ec/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/alonze-50ec-1l-v8-20261127_rirOHw6u7.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/alonze-50ec-1l-v8-20261127_rirOHw6u7.jpg",
+    "width": 570,
+    "height": 570,
+    "bytes": 4711,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/ALONZE.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
