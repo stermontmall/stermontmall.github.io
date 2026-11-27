@@ -18,18 +18,26 @@ export const SAFE_BLOG_META = Object.freeze({
   'washing-machine-buying-guide-kenya.html': {
     canonical: 'https://stermontarcade.co.ke/blog/washing-machine-buying-guide-kenya.html',
     description: 'Choose a washing machine in Kenya: compare twin tub vs automatic, load size, water use and how it handles rationing or power cuts.'
+  },
+  'how-to-choose-a-fridge-in-kenya.html': {
+    canonical: 'https://stermontarcade.co.ke/blog/how-to-choose-a-fridge-in-kenya.html',
+    description: 'Choose a fridge in Kenya: compare capacity, direct-cool and frost-free models, power use and protection against blackouts and voltage changes.'
+  },
+  'kenya-online-shopping-checklist.html': {
+    canonical: 'https://stermontarcade.co.ke/blog/kenya-online-shopping-checklist.html',
+    description: 'Before buying online in Kenya, verify the seller, exact product, total cost, traceable payment, receipt, delivery and returns policy.'
   }
 });
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export function applySafeBlogMeta(html, canonical, description) {
-  const actual = html.match(/<link\s+rel=['"]canonical['"]\s+href=['"]([^'"]*)['"]/i)?.[1];
+  const actual = html.match(/<link\\s+rel=['"]canonical['"]\\s+href=['"]([^'"]*)['"]/i)?.[1];
   if (!actual || actual !== canonical || !description || description.length < 70 || description.length > 155) return html;
   const d = esc(description);
   return html
-    .replace(/(<meta\s+name=['"]description['"]\s+content=['"])[^'"]*(['"])/i, `$1${d}$2`)
-    .replace(/(<meta\s+property=['"]og:description['"]\s+content=['"])[^'"]*(['"])/i, `$1${d}$2`);
+    .replace(/(<meta\\s+name=['"]description['"]\\s+content=['"])[^'"]*(['"])/i, `$1${d}$2`)
+    .replace(/(<meta\\s+property=['"]og:description['"]\\s+content=['"])[^'"]*(['"])/i, `$1${d}$2`);
 }
 
 export function runSafeBlogMeta({ dir = 'blog' } = {}) {
