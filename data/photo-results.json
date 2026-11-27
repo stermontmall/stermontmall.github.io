@@ -10044,5 +10044,37 @@
     "image_source": "https://agroduka.ke/images/thumbnails/570/570/detailed/9/392881642_733203745513962_7697087267810080745_n.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "score-250ec-100ml-exactpack-v8-20261127",
+    "source": "https://agronor.ro/images/uploads/products/2023-09-19-16-25-22-2021-01-28-08-30-18-2021-01-14-12-24-10-arbokol1.webp",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/score-250ec-100ml-exactpack-v8-20261127_2mI-RIfF6M.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/score-250ec-100ml-exactpack-v8-20261127_2mI-RIfF6M.jpg",
+    "width": 800,
+    "height": 800,
+    "bytes": 42109,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/webp",
+    "image_source": "https://agronor.ro/images/uploads/products/2023-09-19-16-25-22-2021-01-28-08-30-18-2021-01-14-12-24-10-arbokol1.webp",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "dual-gold-960ec-1l-exactpack-v8-20261127",
+    "source": "https://otorolny.pl/hpeciai/6d9fd4b003af61c9a42d4b4970a8ec60/pol_pl_Dual-Gold-960-EC-1L-Syngenta-63_1.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/dual-gold-960ec-1l-exactpack-v8-20261127_HchiLb5Zf.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/dual-gold-960ec-1l-exactpack-v8-20261127_HchiLb5Zf.jpg",
+    "width": 1600,
+    "height": 1600,
+    "bytes": 104052,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://otorolny.pl/hpeciai/6d9fd4b003af61c9a42d4b4970a8ec60/pol_pl_Dual-Gold-960-EC-1L-Syngenta-63_1.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
