@@ -9884,5 +9884,21 @@
     "image_source": "https://agroduka.ke/images/thumbnails/240/240/detailed/9/392881642_733203745513962_7697087267810080745_n.jpg",
     "http_status": 200,
     "image_found_via": "product-page"
+  },
+  {
+    "name": "ed21-30w-fly-catcher",
+    "source": "https://pesafrica.net/product/ed21-30w-fly-catcher/",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/ed21-30w-fly-catcher_RGgAHglrC.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/ed21-30w-fly-catcher_RGgAHglrC.jpg",
+    "width": 1000,
+    "height": 1000,
+    "bytes": 65398,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://pesafrica.net/wp-content/uploads/2025/05/ED21-Both.jpg",
+    "http_status": 200,
+    "image_found_via": "product-page"
   }
 ]
