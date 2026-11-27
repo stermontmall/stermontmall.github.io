@@ -1,3 +1,8 @@
+## 2026-11-27 22:55 (Africa/Nairobi) - Keep old-URL redirects across rebuilds (branch `wip-persist-old-redirects`, IN PROGRESS, NOT merged)
+- Owner said "Fix". Finding: Neon role `anonymous` has no SELECT grant on `product_slug_redirects` (read policy exists), and generate-products.mjs still asks Supabase for it.
+- Plan: keep a permanent list in `data/old-url-redirects.csv`; build writes those redirect pages after all real pages. No Neon change without owner OK. Do not edit product-pages.yml.
+- Next: write `old-url-redirects.mjs` + test, then run a fixture build. Command: `git checkout wip-persist-old-redirects`.
+
 ## PROGRESS CHECKPOINT — 27 Nov 2026, 22:48:41 (Africa/Nairobi)
 **Summary:** Checked Search Console Performance export (last 3 months) against main 291bb35. Found old-URL redirect pages are being deleted by the product page build.
 **Completed:** Export capped at 1000 rows: 800 product paths; 131 in current sitemap; 665 have no page file on main (224 of 299 product clicks). Redirect commit 15635486 added pages; build commit b267173b removed the sample checked. generate-products.mjs removes p/ and c/ each build, and reads product_slug_redirects from the old Supabase URL (no SLUG_REDIRECTS_JSON set in product-pages.yml found), not Neon (84 rows on 2026-11-27).
