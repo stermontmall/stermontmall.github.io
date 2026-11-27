@@ -1,6 +1,7 @@
 // Protect the existing Google indexing contract without changing any live URLs or directives.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import './old-url-redirects.test.mjs'; // old product addresses must keep working after each rebuild
 
 const generator = readFileSync('generate-products.mjs', 'utf8');
 const robots = readFileSync('robots.txt', 'utf8');
