@@ -112,6 +112,12 @@ out.push('');
 out.push(`Checked **${ok.length}** pages with Google (rotating batch; product URLs lead the cycle). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${unchecked ? `, ${unchecked} not checked in this batch` : ''}.`);
 if (stopReason) out.push('', `> Stopped early because ${stopReason}. The next report rotates to a different section of the sitemap.`);
 out.push('');
+if (indexed.length) {
+  out.push('## All pages indexed');
+  out.push('| Page | Google coverage state | Last crawled | Google canonical |', '|---|---|---|---|');
+  for (const r of indexed) out.push(`| ${short(r.url)} | ${r.state} | ${r.crawled || 'unknown'} | ${r.canonical ? short(r.canonical) : ''} |`);
+  out.push('');
+}
 if (notIndexed.length) {
   out.push('## Why pages are not indexed');
   out.push('| Reason (from Google) | Pages | What to do |', '|---|---|---|');
