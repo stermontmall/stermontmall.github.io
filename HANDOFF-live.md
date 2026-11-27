@@ -1,3 +1,15 @@
+## 2026-11-27 10:35 (Africa/Nairobi) - Redirects for remaining old agrovet and pest control URLs (branch `wip-redirects-agro-pest-remaining`, NOT merged)
+- Owner: wanted every remaining old agrovet/pest control product URL redirected (not only the high-click ones).
+- Old URL list came from `sitemap-products.xml` history (306 versions, fetched with `git fetch --depth=2500 origin main`): 1,693 slugs were in older sitemaps but not the current one; 1,603 had no file in `p/`; 718 were agrovet/pest control after keyword + manual review.
+- Done: 700 new redirect pages in `p/` (all new files, nothing modified). 51 go to a live product (same product; 20 of them to a different pack size, see CSV), 649 go to the nearest `/c/` category page. Full old-to-new list: `HANDOFF-redirect-map-agro-pest.csv`.
+- Skipped on purpose: 18 old slugs that still exist in Neon (12 active, 6 inactive incl. `sevin-dudu-dust-insecticide-50g` draft, `fugo-*`, `bipronex-cockroach-gel-bait-5g`). A redirect file at those paths would block the page build (build skips pages titled "Redirecting"), so they were removed from the set.
+- Done in Neon: `product_slug_redirects` now has 76 rows (25 earlier + 51 now); 0 broken targets. No other Neon data changed.
+- Checks: every target file exists, no loops or redirect chains, none of the 700 are in the current sitemap; `seo-indexing-guard.test.mjs` and `seo-shell-redirect.test.mjs` pass. Not tested on the live site (no network from sandbox).
+- Not included: motorcycle spares, vehicles, electronics, fashion, kids, and safety gear (respirators, gloves, face shields, goggles, hazmat suits, helmets).
+- To confirm with owner: different-pack redirects (e.g. Actellic 50EC 250 ml and 500 ml go to the 100 ml page).
+- Next: owner OK, then open PR from `wip-redirects-agro-pest-remaining` into `main` and merge; open 2-3 old URLs on the live site to confirm. If a slug above is later published, delete its redirect page first.
+- Verify: `git diff --name-only --diff-filter=A main -- p/ | wc -l` should print 700.
+
 ## 2026-11-27 08:05 (Africa/Nairobi) - pack prices and drafts
 - Done: price fixes in Neon for some Fendona, Dimilin, Actellic, Chali Dudu and K-Othrine listings. Hidden drafts added: sevin-dudu-dust-insecticide-50g, dimilin-25wp-insecticide-1kg.
 - Blocked: both drafts need an exact pack-size photo and a full Version 8 description. Photos received today do not confirm them (Dimilin photo reads 100 g; Sevin 50g label not legible).
