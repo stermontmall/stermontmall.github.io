@@ -30,7 +30,7 @@ import { createRequire } from 'node:module';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 const imageKitUrl = createRequire(import.meta.url)('./imagekit-url.js');
 import { createHash } from 'node:crypto';
-import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
+import { pdpTitle, pdpDescription, resolveProductMeta, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
 import { productDescriptionHtml, extractProductFaq } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
@@ -684,13 +684,9 @@ for (const p of products) {
   // "Original / genuine" is only claimed for known brands and farm inputs; the price stays in the Product schema and on the page.
   const ctx = { brand: brandOf(p.name), catSlug: cat?.slug };
   const approvedName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
-  const generatedTitle = pdpTitle(p.name, ctx);
-  const generatedDescription = pdpDescription(p.name, ctx, p.description);
-  const title = String(p.meta_title || p.seo_title || generatedTitle).trim();
-  // Prefer stored snippets only when they are complete sentences. Legacy imports often stored 155-character cut-offs or visible section labels.
-  const storedDescription = String(p.meta_description || '').trim();
-  const storedDescriptionIsClean = storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(storedDescription);
-  const desc = storedDescriptionIsClean ? storedDescription : generatedDescription;
+  const { title, description: desc } = resolveProductMeta(
+    p.name, ctx, p.description, p.meta_title || p.seo_title, p.meta_description
+  );
   const h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
   NAMES[p.id] = h1;
   // Pack-size aliases must keep their own approved SEO name; copying the group heading
