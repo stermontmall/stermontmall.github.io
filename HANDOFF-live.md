@@ -1,3 +1,9 @@
+## 2026-11-27 08:20 (Africa/Nairobi): logo-to-home and product-refresh bugs (branch wip-logo-home-and-refresh)
+- Done: reproduced. Logo reloads "/" which restores the last tab. /p/ pages with a ProductGroup pick the first pack (URL for 1L shows 200ml), only one size shown; address keeps the first deep product for later products.
+- In progress: fixes in mobile-shell/app.js, index.html, shell-route-loader.js, 404.html, stub generator.
+- Next: `python3 mobile-shell/shell.test.py && node mobile-shell/navigation.test.mjs && node no-classic-hop.test.mjs`
+- Blocked: nothing.
+
 ## 2026-11-27 08:05 (Africa/Nairobi) - pack prices and drafts
 - Done: price fixes in Neon for some Fendona, Dimilin, Actellic, Chali Dudu and K-Othrine listings. Hidden drafts added: sevin-dudu-dust-insecticide-50g, dimilin-25wp-insecticide-1kg.
 - Blocked: both drafts need an exact pack-size photo and a full Version 8 description. Photos received today do not confirm them (Dimilin photo reads 100 g; Sevin 50g label not legible).
