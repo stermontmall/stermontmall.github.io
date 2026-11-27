@@ -51,22 +51,39 @@ if (mode === 'content') {
 } else if (mode === 'index') {
   const report = read('index-status.md');
   if (!report) throw new Error('index-status.md is missing; run Google URL Inspection first.');
-  const summary = report.match(/Checked \*\*(\d+)\*\* pages with Google[^.]*\*\*(\d+) indexed\*\*, \*\*(\d+) not indexed\*\*/);
+  // [\s\S]*? (not [^.]*): the report text between "Checked" and the counts contains a full stop, which made every stored run read 0.
+  const summary = report.match(/Checked \*\*(\d+)\*\* pages with Google[\s\S]*?\*\*(\d+) indexed\*\*, \*\*(\d+) not indexed\*\*/);
   const checked = Number(summary?.[1] || 0), indexed = Number(summary?.[2] || 0), notIndexed = Number(summary?.[3] || 0);
   await sql`INSERT INTO public.seo_audits (source,issue_count,report_markdown,metrics)
     VALUES ('google-search-console-url-inspection',${notIndexed},${report},${JSON.stringify({checked_pages:checked,indexed_pages:indexed,not_indexed_pages:notIndexed})}::jsonb)`;
-  await sql`UPDATE public.google_index_inspections SET verdict='STALE', inspected_at=now()`;
-  const table = report.split('## All pages not indexed')[1] || '';
-  for (const line of table.split('\n')) {
-    const m = line.match(/^\|\s*(\/[^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]*)\s*\|$/);
-    if (!m) continue;
-    const url = SITE + m[1].trim(), state = m[2].trim(), crawled = m[3].trim(), canonical = m[4].trim();
-    await sql`INSERT INTO public.google_index_inspections (url,verdict,coverage_state,last_crawl,google_canonical,inspected_at,raw)
-      VALUES (${url},'FAIL',${state},${crawled && crawled !== 'never' ? crawled : null},${canonical ? SITE + canonical : null},now(),${JSON.stringify({source:'search-console-url-inspection'})}::jsonb)
-      ON CONFLICT (url) DO UPDATE SET verdict='FAIL',coverage_state=excluded.coverage_state,last_crawl=excluded.last_crawl,
-      google_canonical=excluded.google_canonical,inspected_at=now(),raw=excluded.raw`;
+  // Store EVERY page Google checked (indexed = PASS, not indexed = FAIL) so the admin page can count indexed products in total.
+  // Rows are updated in place per URL; pages not in this batch keep their last known result.
+  let stored = 0;
+  const json = read('index-status.json');
+  if (json) {
+    for (const r of (JSON.parse(json).results || [])) {
+      if (!r.url || !r.verdict) continue;
+      await sql`INSERT INTO public.google_index_inspections (url,verdict,coverage_state,last_crawl,google_canonical,inspected_at,raw)
+        VALUES (${r.url},${r.verdict},${r.state || null},${r.crawled || null},${r.canonical || null},now(),${JSON.stringify({source:'search-console-url-inspection'})}::jsonb)
+        ON CONFLICT (url) DO UPDATE SET verdict=excluded.verdict,coverage_state=excluded.coverage_state,last_crawl=excluded.last_crawl,
+        google_canonical=excluded.google_canonical,inspected_at=now(),raw=excluded.raw`;
+      stored++;
+    }
+  } else {
+    // Older reports without index-status.json: keep the previous behaviour (only pages reported as not indexed).
+    const table = report.split('## All pages not indexed')[1] || '';
+    for (const line of table.split('\n')) {
+      const m = line.match(/^\|\s*(\/[^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]*)\s*\|$/);
+      if (!m) continue;
+      const url = SITE + m[1].trim(), state = m[2].trim(), crawled = m[3].trim(), canonical = m[4].trim();
+      await sql`INSERT INTO public.google_index_inspections (url,verdict,coverage_state,last_crawl,google_canonical,inspected_at,raw)
+        VALUES (${url},'FAIL',${state},${crawled && crawled !== 'never' ? crawled : null},${canonical ? SITE + canonical : null},now(),${JSON.stringify({source:'search-console-url-inspection'})}::jsonb)
+        ON CONFLICT (url) DO UPDATE SET verdict='FAIL',coverage_state=excluded.coverage_state,last_crawl=excluded.last_crawl,
+        google_canonical=excluded.google_canonical,inspected_at=now(),raw=excluded.raw`;
+      stored++;
+    }
   }
-  console.log(`Neon Google indexing report stored: ${checked} checked, ${indexed} indexed, ${notIndexed} not indexed. Per-URL records cover URLs Google reported as not indexed.`);
+  console.log(`Neon Google indexing report stored: ${checked} checked, ${indexed} indexed, ${notIndexed} not indexed. ${stored} per-URL records saved.`);
 } else if (mode === 'sitemap') {
   const rows = JSON.parse(read('google-sitemap-results.json') || '[]');
   for (const r of rows) await sql`INSERT INTO public.google_sitemap_submissions (sitemap_url,http_status,response_text)
