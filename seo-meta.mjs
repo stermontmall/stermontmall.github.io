@@ -161,6 +161,21 @@ export function pdpDescription(name, ctx = {}, productDescription = '') {
   return hit || clip(`Buy ${n} in Kenya. M-Pesa checkout, pickup or delivery to 47 counties.`, DESC_MAX);
 }
 
+// Select stored product metadata only when it meets the site's snippet limits.
+// Invalid legacy/imported values fall back to the deterministic Kenya-specific generator.
+export function resolveProductMeta(name, ctx = {}, productDescription = '', storedTitle = '', storedDescription = '') {
+  const generatedTitle = pdpTitle(name, ctx);
+  const generatedDescription = pdpDescription(name, ctx, productDescription);
+  const titleCandidate = String(storedTitle || '').replace(/\s+/g, ' ').trim();
+  const title = titleCandidate && titleCandidate.length <= TITLE_MAX ? titleCandidate : generatedTitle;
+  const descriptionCandidate = String(storedDescription || '').replace(/\s+/g, ' ').trim();
+  const descriptionIsClean = descriptionCandidate.length >= 70
+    && descriptionCandidate.length <= DESC_MAX
+    && /[.!?]$/.test(descriptionCandidate)
+    && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(descriptionCandidate);
+  return { title, description: descriptionIsClean ? descriptionCandidate : generatedDescription };
+}
+
 // Category meta title.
 //   "Shop Top & Reliable <Category> Online in Kenya – M-Pesa & Delivery"
 export function catTitle(catName) {

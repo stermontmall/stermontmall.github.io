@@ -1,6 +1,6 @@
 // Run: node seo-meta.test.mjs   (no dependencies)
 import assert from 'node:assert/strict';
-import { pdpBadges, pdpHeadings, pdpH1, pdpTagline, pdpTitle, pdpDescription, catTitle, catDescription, powerWord, productType, hasLeadWord, buyName, isGenuine, pdpVariantUrl, TITLE_MAX, DESC_MAX } from './seo-meta.mjs';
+import { pdpBadges, pdpHeadings, pdpH1, pdpTagline, pdpTitle, pdpDescription, resolveProductMeta, catTitle, catDescription, powerWord, productType, hasLeadWord, buyName, isGenuine, pdpVariantUrl, TITLE_MAX, DESC_MAX } from './seo-meta.mjs';
 
 const names = [
   'Bazooka 18EC Insecticide (1L)', 'Bazooka 18EC', 'Duduthrin 1.75EC Insecticide 1 Litre', 'Roundup Turbo 500ml',
@@ -40,6 +40,25 @@ for (const name of names) for (const ctx of ctxs) {
   assert.ok(hasLeadWord(name) || (MOD.test(t) && MOD.test(h)), `title/H1 lacks a modifier: ${t} | ${h}`); n += 2;
   assert.ok(isGenuine(ctx) || !/^Buy Original\b/.test(h) || /^Original\b/i.test(name), `Original claimed where not true: ${h}`);
 }
+// Imported metadata must not bypass the canonical title/description length rules.
+const badStored = resolveProductMeta(
+  'Sample Product', { catSlug: 'smartphones' },
+  'Designed for use on suitable surfaces. Check the label and follow the supplied instructions.',
+  'An imported title that is much too long '.repeat(3),
+  'Price in Kenya: KSh 100. Order online.'
+);
+assert.equal(badStored.title, pdpTitle('Sample Product', { catSlug: 'smartphones' }));
+assert.ok(badStored.description.length >= 70 && badStored.description.length <= DESC_MAX);
+const goodStoredDescription = 'This product listing explains the verified item details and gives Kenyan shoppers clear information before they place an order.';
+const goodStored = resolveProductMeta(
+  'Sample Product', { catSlug: 'smartphones' }, '',
+  'Sample Product Price in Kenya',
+  goodStoredDescription
+);
+assert.equal(goodStored.title, 'Sample Product Price in Kenya');
+assert.equal(goodStored.description, goodStoredDescription);
+n += 4;
+
 const specific = pdpDescription('Sample Product', { catSlug: 'smartphones' }, 'Designed for use on suitable surfaces. Check the label and follow the supplied instructions.');
 assert.ok(specific.length <= DESC_MAX && specific.includes('Designed for use'), `catalogue detail missing: ${specific}`);
 assert.ok(specific.includes('M-Pesa') && specific.includes('47 counties'), `Kenya purchase context missing: ${specific}`);
