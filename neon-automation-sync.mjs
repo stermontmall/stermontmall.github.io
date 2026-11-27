@@ -1,6 +1,6 @@
 // Sync the existing GitHub blog/SEO pipeline into Neon. No Supabase calls.
 import { neon } from '@neondatabase/serverless';
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 const SITE = 'https://stermontarcade.co.ke';
@@ -12,6 +12,27 @@ const read = p => existsSync(p) ? readFileSync(p, 'utf8') : '';
 const unescape = s => String(s || '').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 const meta = (html, pattern) => unescape((html.match(pattern) || [])[1] || '');
 const dateFrom = html => (html.match(/"datePublished":"(\d{4}-\d{2}-\d{2})/) || [])[1] || null;
+
+// Cumulative product indexing totals across ALL rotating batches, read back from Neon.
+// Only product pages that are currently in sitemap-products.xml are counted, so deleted products do not inflate the numbers.
+async function productTotals() {
+  const locs = f => [...read(f).matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
+  const norm = u => { try { return new URL(u).toString(); } catch { return u; } };
+  const productUrls = [...new Set(locs('sitemap-products.xml').filter(u => u.includes('/p/')).map(norm))];
+  const rows = productUrls.length
+    ? await sql`SELECT verdict, coverage_state, count(*)::int AS n FROM public.google_index_inspections WHERE url = ANY(${productUrls}) GROUP BY 1,2`
+    : await sql`SELECT verdict, coverage_state, count(*)::int AS n FROM public.google_index_inspections WHERE url LIKE ${SITE + '/p/%'} GROUP BY 1,2`;
+  let indexed = 0, notIndexed = 0;
+  const reasons = {};
+  for (const r of rows) {
+    if (r.verdict === 'PASS') indexed += r.n;
+    else if (r.verdict === 'FAIL') { notIndexed += r.n; reasons[r.coverage_state] = (reasons[r.coverage_state] || 0) + r.n; }
+  }
+  const total = productUrls.length || (indexed + notIndexed);
+  const pending = Math.max(0, total - indexed - notIndexed);
+  const pct = total ? Math.round(1000 * indexed / total) / 10 : 0;
+  return { total, indexed, notIndexed, pending, pct, reasons };
+}
 
 if (mode === 'content') {
   const topics = JSON.parse(read('blog-topics.json') || '{"topics":[]}').topics || [];
@@ -52,57 +73,90 @@ if (mode === 'content') {
   const report = read('index-status.md');
   if (!report) throw new Error('index-status.md is missing; run Google URL Inspection first.');
 
-  // Parse the summary across line wraps and punctuation. Do not use [^.]*:
-  // the report's explanatory "(rotating batch; ...)" text contains punctuation.
-  const summary = report.match(/Checked\s+\*\*(\d+)\*\*\s+pages with Google[\s\S]*?\*\*(\d+) indexed\*\*,\s+\*\*(\d+) not indexed\*\*/i);
-  if (!summary) throw new Error('Could not parse Google indexing summary from index-status.md; refusing to save zero counts.');
-  const checked = Number(summary[1]), indexed = Number(summary[2]), notIndexed = Number(summary[3]);
-  if (indexed + notIndexed > checked) throw new Error(`Invalid Google indexing totals: ${indexed} indexed + ${notIndexed} not indexed > ${checked} checked.`);
+  // When Google's daily quota is used up nothing was inspected, so there is nothing new to save.
+  // Still record an audit row with the cumulative product totals so Neon always has the latest count.
+  const quotaOnly = /quota is used up right now/i.test(report);
+  let checked = 0, indexed = 0, notIndexed = 0, indexedRows = [], failedRows = [];
 
-  const parseTable = (heading) => {
-    const section = report.split(heading)[1]?.split(/^## /m)[0] || '';
-    const rows = [];
-    for (const line of section.split('\n')) {
-      const m = line.match(/^\|\s*(\/[^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]*)\s*\|$/);
-      if (!m || /^\s*-+\s*$/.test(m[1])) continue;
-      const path = m[1].trim();
-      if (!path.startsWith('/')) continue;
-      rows.push({
-        url: new URL(path, SITE).toString(),
-        state: m[2].trim(),
-        crawled: m[3].trim(),
-        canonical: m[4].trim() ? new URL(m[4].trim(), SITE).toString() : null
-      });
+  if (!quotaOnly) {
+    // Parse the summary across line wraps and punctuation. Do not use [^.]*:
+    // the report's explanatory "(rotating batch; ...)" text contains punctuation.
+    const summary = report.match(/Checked\s+\*\*(\d+)\*\*\s+pages with Google[\s\S]*?\*\*(\d+) indexed\*\*,\s+\*\*(\d+) not indexed\*\*/i);
+    if (!summary) throw new Error('Could not parse Google indexing summary from index-status.md; refusing to save zero counts.');
+    checked = Number(summary[1]); indexed = Number(summary[2]); notIndexed = Number(summary[3]);
+    if (indexed + notIndexed > checked) throw new Error(`Invalid Google indexing totals: ${indexed} indexed + ${notIndexed} not indexed > ${checked} checked.`);
+
+    const parseTable = (heading) => {
+      const section = report.split(heading)[1]?.split(/^## /m)[0] || '';
+      const rows = [];
+      for (const line of section.split('\n')) {
+        const m = line.match(/^\|\s*(\/[^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]*)\s*\|$/);
+        if (!m || /^\s*-+\s*$/.test(m[1])) continue;
+        const path = m[1].trim();
+        if (!path.startsWith('/')) continue;
+        rows.push({
+          url: new URL(path, SITE).toString(),
+          state: m[2].trim(),
+          crawled: m[3].trim(),
+          canonical: m[4].trim() ? new URL(m[4].trim(), SITE).toString() : null
+        });
+      }
+      return rows;
+    };
+
+    indexedRows = parseTable('## All pages indexed');
+    failedRows = parseTable('## All pages not indexed');
+    if (indexedRows.length + failedRows.length > checked) throw new Error('Per-URL table rows exceed the checked count; refusing to write inconsistent records.');
+    if (indexed > 0 && indexedRows.length === 0) throw new Error('Report says pages are indexed but contains no indexed URL table; refusing to mark records stale.');
+    if (notIndexed > 0 && failedRows.length === 0) throw new Error('Report says pages are not indexed but contains no failure URL table; refusing to mark records stale.');
+
+    // Store both PASS and FAIL inspection outcomes. Do not mark every historical row
+    // STALE: this is a rotating batch, so URLs not inspected today remain valid prior observations.
+    for (const [rows, verdict] of [[indexedRows, 'PASS'], [failedRows, 'FAIL']]) {
+      for (const r of rows) {
+        await sql`INSERT INTO public.google_index_inspections
+          (url,verdict,coverage_state,last_crawl,google_canonical,inspected_at,raw)
+          VALUES (${r.url},${verdict},${r.state},${r.crawled && r.crawled !== 'never' && r.crawled !== 'unknown' ? r.crawled : null},
+            ${r.canonical},now(),${JSON.stringify({source:'search-console-url-inspection', checked_at:new Date().toISOString()})}::jsonb)
+          ON CONFLICT (url) DO UPDATE SET verdict=excluded.verdict,coverage_state=excluded.coverage_state,
+            last_crawl=excluded.last_crawl,google_canonical=excluded.google_canonical,
+            inspected_at=now(),raw=excluded.raw`;
+      }
     }
-    return rows;
-  };
+  }
 
-  const indexedRows = parseTable('## All pages indexed');
-  const failedRows = parseTable('## All pages not indexed');
-  if (indexedRows.length + failedRows.length > checked) throw new Error('Per-URL table rows exceed the checked count; refusing to write inconsistent records.');
-  if (indexed > 0 && indexedRows.length === 0) throw new Error('Report says pages are indexed but contains no indexed URL table; refusing to mark records stale.');
-  if (notIndexed > 0 && failedRows.length === 0) throw new Error('Report says pages are not indexed but contains no failure URL table; refusing to mark records stale.');
-
+  // Cumulative product totals (after this run's rows are saved), stored with the audit.
+  const t = await productTotals();
   await sql`INSERT INTO public.seo_audits (source,issue_count,report_markdown,metrics)
     VALUES ('google-search-console-url-inspection',${notIndexed},${report},${JSON.stringify({
       checked_pages:checked,indexed_pages:indexed,not_indexed_pages:notIndexed,
-      indexed_url_records:indexedRows.length,not_indexed_url_records:failedRows.length
+      indexed_url_records:indexedRows.length,not_indexed_url_records:failedRows.length,
+      quota_exhausted:quotaOnly,
+      products_total:t.total,products_indexed:t.indexed,products_not_indexed:t.notIndexed,
+      products_awaiting_check:t.pending,products_indexed_pct:t.pct
     })}::jsonb)`;
-
-  // Store both PASS and FAIL inspection outcomes. Do not mark every historical row
-  // STALE: this is a rotating batch, so URLs not inspected today remain valid prior observations.
-  for (const [rows, verdict] of [[indexedRows, 'PASS'], [failedRows, 'FAIL']]) {
-    for (const r of rows) {
-      await sql`INSERT INTO public.google_index_inspections
-        (url,verdict,coverage_state,last_crawl,google_canonical,inspected_at,raw)
-        VALUES (${r.url},${verdict},${r.state},${r.crawled && r.crawled !== 'never' && r.crawled !== 'unknown' ? r.crawled : null},
-          ${r.canonical},now(),${JSON.stringify({source:'search-console-url-inspection', checked_at:new Date().toISOString()})}::jsonb)
-        ON CONFLICT (url) DO UPDATE SET verdict=excluded.verdict,coverage_state=excluded.coverage_state,
-          last_crawl=excluded.last_crawl,google_canonical=excluded.google_canonical,
-          inspected_at=now(),raw=excluded.raw`;
-    }
-  }
   console.log(`Neon Google indexing report stored: ${checked} checked, ${indexed} indexed, ${notIndexed} not indexed; ${indexedRows.length + failedRows.length} per-URL outcomes saved (PASS and FAIL).`);
+  console.log(`PRODUCTS INDEXED (cumulative): ${t.indexed} of ${t.total} (${t.pct}%).`);
+} else if (mode === 'totals') {
+  // Read-only: write the cumulative products-indexed headline for the run summary and the daily GitHub issue.
+  const t = await productTotals();
+  const reasons = Object.entries(t.reasons).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const md = [
+    `## Products indexed by Google: **${t.indexed} of ${t.total}** (${t.pct}%)`,
+    '',
+    '| | Products |', '|---|---|',
+    `| Indexed | ${t.indexed} |`,
+    `| Checked, not indexed | ${t.notIndexed} |`,
+    `| Not checked yet | ${t.pending} |`,
+    ''
+  ];
+  if (reasons.length) {
+    md.push('Top reasons products are not indexed:', ...reasons.map(([s, n]) => `- ${s}: ${n}`), '');
+  }
+  md.push(`_Cumulative across all rotating batches, read from Neon (view \`public.product_index_summary\`). Updated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC._`, '');
+  writeFileSync('index-totals.md', md.join('\n'));
+  writeFileSync('index-headline.txt', `${t.indexed} of ${t.total} products indexed`);
+  console.log(md.join('\n'));
 } else if (mode === 'sitemap') {
   const rows = JSON.parse(read('google-sitemap-results.json') || '[]');
   for (const r of rows) await sql`INSERT INTO public.google_sitemap_submissions (sitemap_url,http_status,response_text)

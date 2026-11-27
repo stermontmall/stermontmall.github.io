@@ -1,9 +1,12 @@
 # Stermont Arcade - asks Google which of your pages are indexed, and why the rest are not.
 # Runs every 3 hours (8 runs a day). Each run checks a DIFFERENT batch of 150 pages (ROTATE_HOURS=3),
 # so 8 x 150 = 1,200 inspections a day - under Google's limit of about 2,000 per property per day - and the whole catalogue gets covered faster.
-# Every run is saved to Neon. A GitHub Issue (GitHub emails you) is opened once a day (the morning run) or whenever you tap "Run workflow".
+# Every run is saved to Neon, and every run reports how many PRODUCTS are indexed in total (cumulative across all batches):
+#   - Neon: seo_audits.metrics (products_indexed / products_total) and the view public.product_index_summary
+#   - GitHub: the run summary page of every run, plus the title of the daily issue
+# A GitHub Issue (GitHub emails you) is opened once a day (the morning run) or whenever you tap "Run workflow".
 # Do not raise MAX_URLS above 200 or add more runs per day: running after every page rebuild once used up Google's daily URL Inspection quota.
-# Needs the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets (same ones as the sitemap ping).
+# Needs the GSC_SERVICE_ACCOUNT_JSON and GSC_PROPERTY secrets (same ones as the sitemap ping) and NEON_DATABASE_URL.
 name: Google indexing status
 
 on:
@@ -45,7 +48,26 @@ jobs:
           MAX_URLS: '150'
           ROTATE_HOURS: '3'
         run: node seo-index-status.mjs > index-status.md
+      - name: Install Neon driver
+        run: npm install --no-save @neondatabase/serverless
+      - name: Store Google indexing report in Neon
+        id: neon
+        if: steps.inspect.outcome == 'success'
+        continue-on-error: true
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: node neon-automation-sync.mjs index
+      - name: Count products indexed so far (from Neon)
+        id: totals
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          node neon-automation-sync.mjs totals
+          cat index-totals.md >> "$GITHUB_STEP_SUMMARY"
       - name: Publish as an issue (morning run or manual run only)
+        if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}
@@ -55,17 +77,13 @@ jobs:
             echo "Not the morning run - report saved to Neon only, no issue opened."
             exit 0
           fi
+          headline=""
+          if [ -f index-headline.txt ]; then headline=" - $(cat index-headline.txt)"; fi
+          { if [ -f index-totals.md ]; then cat index-totals.md; echo; fi; cat index-status.md; } > issue-body.md
           for n in $(gh issue list --state open --search "Google indexing status in:title" --json number --jq '.[].number'); do
             gh issue close "$n" --comment "Superseded by the newer report." || true
           done
-          gh issue create --title "Google indexing status $(date +%F)" --body-file index-status.md
-      - name: Store Google indexing report in Neon
-        if: steps.inspect.outcome == 'success'
-        env:
-          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
-        run: |
-          npm install --no-save @neondatabase/serverless
-          node neon-automation-sync.mjs index
+          gh issue create --title "Google indexing status $(date +%F)$headline" --body-file issue-body.md
       - name: Mark incomplete inspection as failed
-        if: steps.inspect.outcome == 'failure'
+        if: steps.inspect.outcome == 'failure' || steps.neon.outcome == 'failure'
         run: exit 1
