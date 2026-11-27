@@ -764,6 +764,10 @@ with sync_playwright() as p:
     check('product deep link opens from the published SEO page when Neon REST returns 402', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
     check('static fallback retains product code and full published description', 'STM-TEST-402' in p17.locator('#pp-meta').inner_text() and 'Published description survives a database outage.' in p17.locator('#pp-desc').inner_text())
     check('static product fallback has no JavaScript errors', not e17, e17[:3])
+    p17.reload(wait_until='domcontentloaded'); p17.wait_for_selector('#page-product.open', timeout=15000)
+    check('refresh on an open product restores the same product instead of Home', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.evaluate("new URLSearchParams(location.search).get('product') === 'static-fallback'"), p17.url)
+    p17.locator('#pp-home').click(); p17.wait_for_timeout(250)
+    check('Home control from product view returns to the shop homepage', p17.locator('#page-product.open').count() == 0 and p17.locator('#view-home').is_visible() and p17.evaluate("location.pathname === '/' && !new URLSearchParams(location.search).has('product')"), p17.url)
     FAIL[0] = False
     c17.close()
 
