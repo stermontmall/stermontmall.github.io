@@ -1,3 +1,4 @@
+// Rebuild after third description cleanup: competitor-price references, stale price copy, malformed links and duplicated store/ordering text removed on 2026-11-27.
 // Rebuild after second pass removing repeated store, ordering and aquaculture boilerplate from descriptions on 2026-11-27.
 // Rebuild after removing repeated category and logistics boilerplate from catalogue descriptions on 2026-11-27.
 // Rebuild requested after Neon product-description cleanup on 2026-11-27; regenerate customer-facing HTML from the corrected catalogue.
