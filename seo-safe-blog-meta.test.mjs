@@ -31,5 +31,5 @@ runSafeBlogMeta({ dir });
 const saved = readFileSync(join(dir, file), 'utf8');
 assert.ok(saved.includes("name='description' content='" + item.description + "'")); n++;
 assert.ok(saved.includes('<title>Keep title</title>')); n++;
-assert.equal(Object.keys(SAFE_BLOG_META).length, 4); n++;
+assert.equal(Object.keys(SAFE_BLOG_META).length, 6); n++;
 console.log('OK: ' + n + ' safe-blog meta checks, 0 violations');
