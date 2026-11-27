@@ -10248,5 +10248,43 @@
     "source": "https://jojemiagrovetshop.com/product/dominex/",
     "ok": false,
     "error": "source page returned HTML but no product image was found"
+  },
+  {
+    "name": "ectomin-100ec-20ml-v8-20261127",
+    "source": "https://cheapthings.co.ke/product/ectomin-100-ec-20ml-2/",
+    "ok": false,
+    "error": "source page HTTP 403"
+  },
+  {
+    "name": "bimatraz-12-5ec-5l-v8-20261127",
+    "source": "https://www.bimeda.co.ke/media/k2/items/cache/32088387da419227f20729e6cf7687d8_XL.jpg",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/bimatraz-12-5ec-5l-v8-20261127_YhAAwlR0l.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/bimatraz-12-5ec-5l-v8-20261127_YhAAwlR0l.jpg",
+    "width": 1900,
+    "height": 1009,
+    "bytes": 61646,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://www.bimeda.co.ke/media/k2/items/cache/32088387da419227f20729e6cf7687d8_XL.jpg",
+    "http_status": 200,
+    "image_found_via": "direct"
+  },
+  {
+    "name": "mostraz-12-5ec-5l-v8-20261127",
+    "source": "https://www.bimeda.co.ke/images/mostraz.png",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/mostraz-12-5ec-5l-v8-20261127_a_qYEdehD.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/mostraz-12-5ec-5l-v8-20261127_a_qYEdehD.jpg",
+    "width": 420,
+    "height": 420,
+    "bytes": 34459,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/png",
+    "image_source": "https://www.bimeda.co.ke/images/mostraz.png",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
