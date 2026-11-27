@@ -1,12 +1,11 @@
 'use strict';
 
-// Customer-facing product links must open the mobile shop shell.
-// The /p/<slug>.html documents remain published separately as canonical,
-// indexable SEO pages; they are not the destination for customer actions.
+// Customer-facing product links use the published /p/<slug>.html product page.
+// The product page retains its canonical, indexable SEO content and opens the mobile shell.
 function shellProductLink(slug) {
   const value = String(slug || '').trim().replace(/^\/+|\/+$/g, '');
   if (!value) return 'https://stermontarcade.co.ke/';
-  return 'https://stermontarcade.co.ke/?product=' + encodeURIComponent(value);
+  return 'https://stermontarcade.co.ke/p/' + encodeURIComponent(value) + '.html';
 }
 
 module.exports = shellProductLink;
