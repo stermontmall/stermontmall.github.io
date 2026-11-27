@@ -1,3 +1,9 @@
+## 2026-11-27 08:05 (Africa/Nairobi) - pack prices and drafts
+- Done: price fixes in Neon for some Fendona, Dimilin, Actellic, Chali Dudu and K-Othrine listings. Hidden drafts added: sevin-dudu-dust-insecticide-50g, dimilin-25wp-insecticide-1kg.
+- Blocked: both drafts need an exact pack-size photo and a full Version 8 description. Photos received today do not confirm them (Dimilin photo reads 100 g; Sevin 50g label not legible).
+- Next: get exact photos, then follow PUBLISHING_RULES.md section 12. Review live descriptions mentioning supplier price/listing (151 matched; awaiting owner's go-ahead).
+- Branch: main (note only).
+
 ## 2026-11-26 (Africa/Nairobi) - New logo for WhatsApp link previews (MERGED to main 21:08, Pages deploy of 346aa28 succeeded)
 - Owner attached the current (cart) logo: WhatsApp still shows the previous one.
 - Done: added `stermont-arcade-logo-v2.png` (new address avoids a remembered preview), replaced `logo.png` with the same file, and pointed og:image/twitter:image that used logo.png or icon-512.png at it (HTML pages + generators). Product photo previews unchanged.
