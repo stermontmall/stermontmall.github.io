@@ -3,7 +3,8 @@
 - Fix: `legacy-redirects.json` (794 old addresses, including covver-xtra) is written out by `legacy-redirects.mjs` on every build. Add future redirects to that file, not to `p/`.
 - Also: sitemaps skip noindex/redirect/other-canonical pages; lastmod ignores priceValidUntil; stored meta descriptions under 70 characters are replaced; image sitemap namespace fixed (same change as PR #1181).
 - Tested: trial build with a stand-in catalogue rebuilt from current pages; link-check 0 problems. Root tests: only price-watch, sales-leads-report and seo-titles fail, and they fail without this change too.
-- Next: owner OK, then merge to main; confirm the "Legacy redirects" line in the build log and open 2-3 old addresses on the live site.
+- 14:45: PR https://github.com/stermontmall/stermontmall.github.io/pull/1237 opened (merges cleanly). Quality gate fails at "mobile shell browser regression suite" (Locator.check timeout), the same error as on other recent branches; later steps in that job are skipped.
+- Next: owner merges PR #1237; confirm the "Legacy redirects" line in the build log and open 2-3 old addresses on the live site.
 
 ## 2026-11-27 10:35 (Africa/Nairobi) - Redirects for remaining old agrovet and pest control URLs (branch `wip-redirects-agro-pest-remaining`, NOT merged)
 - Owner: wanted every remaining old agrovet/pest control product URL redirected (not only the high-click ones).
