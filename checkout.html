@@ -1,65 +1,9 @@
+<!doctype html>
+<html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#172554"><meta name="robots" content="noindex, follow"><title>Checkout | Stermont Arcade</title>
-<style>
-:root{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#21143e;background:#f7f3ff;--purple:#351064;--violet:#762be0;--lime:#c7f51b;--line:#e7ddf5;--muted:#746b85}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(180deg,#f4eaff 0,#fbf9ff 260px,#fff 100%)}
-.wrap{max-width:700px;margin:auto;padding:14px 14px 46px}.top{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:5px 2px}
-.back{width:42px;height:42px;border:0;border-radius:14px;background:#fff;color:#351064;font-size:25px;box-shadow:0 4px 15px #35106412;cursor:pointer}
-.brand{font-weight:950;letter-spacing:.12em;font-size:16px;color:#351064}.muted{color:var(--muted);font-size:13px;line-height:1.55}
-.hero{position:relative;overflow:hidden;text-align:center;color:#fff;padding:25px 18px 24px;margin:0 0 16px;border-radius:22px;background:linear-gradient(135deg,#984cf4 0%,#6e20d4 48%,#351064 100%);box-shadow:0 12px 28px #51209b30}
-.hero:before,.hero:after{content:"";position:absolute;border:1px solid #ffffff22;border-radius:50%;pointer-events:none}.hero:before{width:220px;height:220px;right:-100px;top:-135px}.hero:after{width:170px;height:170px;left:-95px;bottom:-115px}
-.hero .eyebrow{display:inline-block;color:#351064;background:var(--lime);border-radius:6px;padding:4px 9px;font-size:10px;font-weight:950;letter-spacing:.18em;margin-bottom:13px}
-h1{font-size:clamp(25px,6vw,33px);line-height:1.1;letter-spacing:-.04em;margin:0 0 8px;color:#fff}h2{font-size:16px;font-weight:850;margin:0 0 15px;color:#54209a;letter-spacing:.06em;text-transform:uppercase}
-.hero p{margin:0;color:#eadcff;font-size:13px}.progress{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0 0 15px;padding:13px 14px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 5px 18px #3510640c}
-.progress-step{display:flex;align-items:center;gap:7px;min-width:0;color:#847a93;font-size:11px;font-weight:750}.progress-step .num{display:grid;place-items:center;width:25px;height:25px;flex:none;border-radius:50%;background:#f0e9fa;color:#65409b}.progress-step.active{color:#57229c}.progress-step.active .num{background:var(--lime);color:#351064}
-.trust{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:0 0 15px;color:#65587b;font-size:11px;font-weight:750}.trust i{font-style:normal;color:#65a30d}
-.card{background:#fff;border:1px solid #e9e0f3;border-radius:20px;padding:19px;margin:13px 0;box-shadow:0 7px 22px #3510640c}
-#items{display:grid;gap:13px}.item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;font-size:13px;line-height:1.45}.item>span{font-weight:700;color:#312447}.item b{white-space:nowrap;color:#24163d;font-size:12px}
-.total{border-top:1px solid #e9e0f3;padding-top:14px;margin-top:15px;font-weight:900;font-size:20px;display:flex;justify-content:space-between;align-items:center;color:#351064}.total span:first-child{font-size:14px;color:#302342}.total span:last-child{color:#6825bc}
-#fee-note{margin:10px 0 0;padding:10px 12px;background:#f7f1ff;border-radius:11px;font-size:11px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 13px}.field{display:grid;gap:7px;margin:12px 0}.field.full{grid-column:1/-1}label{font-size:12px;font-weight:800;color:#382650}
-input:not([type=radio]),select,textarea{width:100%;min-height:48px;padding:12px 13px;border:1px solid #ded4eb;border-radius:12px;font:inherit;font-size:14px;color:#261a3d;background:#fdfbff;outline:none}input:focus,select:focus,textarea:focus{border-color:#853ce0;box-shadow:0 0 0 3px #853ce01c;background:#fff}input::placeholder,textarea::placeholder{color:#a39aae}textarea{min-height:82px;resize:vertical}
-.choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 13px}.choice label{display:flex;align-items:center;gap:9px;min-height:54px;padding:12px;border:1.5px solid #e3d9ef;border-radius:14px;background:#fff;cursor:pointer}.choice label:has(input:checked){border-color:#7c35d2;background:#f5edff;color:#58229b;box-shadow:0 0 0 3px #7c35d211}.choice input{accent-color:#7029c7;width:17px;height:17px;margin:0}
-#pickup-note{padding:13px 14px;border:1px solid #d8efaa;background:#f6ffd9;border-radius:13px;color:#435c0d;font-weight:650}
-.pay{position:relative;overflow:hidden;background:linear-gradient(135deg,#2e0d59,#43127d 65%,#5c1db1);color:#fff;border:0;border-radius:18px;padding:17px 18px;font-size:13px;line-height:1.75;box-shadow:0 9px 22px #35106426}.pay:after{content:"";position:absolute;width:145px;height:145px;border:1px solid #ffffff20;border-radius:50%;right:-60px;top:-78px;box-shadow:0 0 0 18px #ffffff08,0 0 0 38px #ffffff06;pointer-events:none}.pay b{color:var(--lime)}.pay .pay-label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--lime);font-weight:950;margin-bottom:5px}
-.err{color:#b42318;font-size:13px;white-space:pre-wrap;padding:0 2px}
-.btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:56px;border:0;border-radius:15px;padding:15px 18px;background:var(--lime);color:#351064;font-size:15px;font-weight:950;letter-spacing:.01em;margin-top:14px;box-shadow:0 8px 18px #8bbd162e;cursor:pointer;transition:transform .15s}.btn:hover{transform:translateY(-1px)}.btn:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
-.success{background:#f6ffdf;border-color:#d9efa4}.success h2{color:#45630c}.success .btn{margin-top:12px}
-.hidden{display:none!important}
-@media(max-width:560px){.wrap{padding:11px 12px calc(32px + env(safe-area-inset-bottom))}.hero{padding:22px 14px;border-radius:19px}.card{padding:17px 15px;border-radius:17px}.grid{grid-template-columns:1fr;gap:0}.field.full{grid-column:auto}.progress{padding:11px 9px;gap:3px}.progress-step{font-size:10px;gap:5px}.progress-step .num{width:23px;height:23px}.choice{gap:8px}.choice label{font-size:12px;padding:10px}.total{font-size:19px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-<style>
-/* Screenshot-matched Stermont order layout */
-body{background:#fff}.wrap{max-width:700px;padding:0 14px 42px;background:#fff;border-left:10px solid #f0e6ff;border-right:1px solid #f4edfb}
-.top{padding:15px 3px 12px}.top .muted{display:none}.brand{font-size:17px;letter-spacing:.15em}
-.hero{border-radius:0;margin:0 -4px 22px;padding:31px 18px 29px;background:linear-gradient(135deg,#9948f4 0%,#7028d8 52%,#351064 100%);box-shadow:none}
-.hero .eyebrow{background:transparent;color:#fff;font-size:14px;letter-spacing:.22em;padding:0;margin-bottom:22px}
-.hero h1{font-size:34px;margin:0 0 11px}.hero p{font-size:14px;color:#f0e6ff}
-.progress,.trust{display:none}
-.card{border-radius:25px;background:#f8f4ff;border:1px solid #e5d9f3;padding:22px 20px;box-shadow:none;margin:15px 0}
-.card h2{font-size:15px;letter-spacing:.14em;color:#8142c9;margin-bottom:17px}
-#items{gap:0}.item{padding:0 0 17px;margin-bottom:15px;border-bottom:1px solid #e9e1f1;font-size:15px;align-items:center}.item>span{font-size:15px;font-weight:500}.item b{font-size:15px;font-weight:850}
-.total{border:0;padding:0;margin:14px 0 0;font-size:24px}.total span:first-child{font-size:16px;font-weight:850}.total span:last-child{font-size:26px;color:#6422b5}
-#fee-note{background:transparent;padding:0;color:#766a86}
-#form>.card:nth-of-type(1){background:#f1e6ff;border:0;border-radius:23px}
-#form>.card:nth-of-type(2){background:#f7f3ff;border:0;border-radius:22px}
-.field{margin:10px 0}.field label{font-size:12px;color:#5c318b;text-transform:uppercase;letter-spacing:.06em}
-input:not([type=radio]),select,textarea{background:#fff;border:1px solid #e4d9f0;border-radius:12px;min-height:49px}
-.choice label{border-radius:13px}.choice label:has(input:checked){background:#f1ffd0;border-color:#b5e52b;color:#405500}
-.pay{background:#351064;border-radius:23px;padding:19px 18px 17px;box-shadow:none}.pay .pay-label{font-size:13px;color:#c7f51b;letter-spacing:.13em}
-.pay b{color:#fff}
-#form>.card:last-of-type{background:#fff;border:0;padding:0}
-#form>.card:last-of-type h2{display:none}
-#form>.card:last-of-type .grid{margin-top:12px}
-#form>.card:last-of-type .field label{color:#c7f51b}
-#form>.card:last-of-type input{background:#fff;color:#351064;border:0;font-weight:800}
-.pay:after{display:none}
-#form:after{content:"Before you place your order: confirm the M-Pesa transaction code and amount match your M-Pesa message. Your payment remains pending until our team verifies it.";display:block;margin:13px 0 17px;padding:16px 17px;border:1px solid #f2dfa0;border-radius:19px;background:#fff9e5;color:#705313;font-size:13px;line-height:1.55}
-.btn{background:#c7f51b;color:#351064;border-radius:16px;min-height:60px;font-size:17px;box-shadow:none}
-#success{background:#f8f4ff;border-radius:22px}
-@media(max-width:560px){.wrap{padding:0 12px 32px;border-left-width:8px}.hero{padding:29px 14px 27px}.hero h1{font-size:32px}.card{padding:20px 17px}.item>span{font-size:14px}.item b{font-size:14px}.total{font-size:22px}.total span:last-child{font-size:24px}.grid{grid-template-columns:1fr}}
-</style></style><meta name="description" content="Checkout | Stermont Arcade - Stermont Arcade, online shopping in Kenya with M-Pesa payment and delivery to all 47 counties.">
+<meta name="theme-color" content="#351064"><meta name="robots" content="noindex, follow"><title>Checkout | Stermont Arcade</title>
+<meta name="description" content="Checkout | Stermont Arcade - Stermont Arcade, online shopping in Kenya with M-Pesa payment and delivery to all 47 counties.">
 <link rel="canonical" href="https://stermontarcade.co.ke/checkout.html">
 <meta property="og:title" content="Checkout | Stermont Arcade">
 <meta property="og:description" content="Checkout | Stermont Arcade - Stermont Arcade, online shopping in Kenya with M-Pesa payment and delivery to all 47 counties.">
@@ -74,36 +18,278 @@ input:not([type=radio]),select,textarea{background:#fff;border:1px solid #e4d9f0
 <meta name="twitter:description" content="Checkout | Stermont Arcade - Stermont Arcade, online shopping in Kenya with M-Pesa payment and delivery to all 47 counties.">
 <meta name="twitter:image" content="https://stermontarcade.co.ke/stermont-arcade-logo-v2.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://stermontarcade.co.ke/checkout.html#webpage","url":"https://stermontarcade.co.ke/checkout.html","name":"Checkout | Stermont Arcade","description":"Checkout | Stermont Arcade - Stermont Arcade, online shopping in Kenya with M-Pesa payment and delivery to all 47 counties.","inLanguage":"en-KE","isPartOf":{"@type":"WebSite","name":"Stermont Arcade","url":"https://stermontarcade.co.ke/"},"breadcrumb":{"@id":"https://stermontarcade.co.ke/checkout.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://stermontarcade.co.ke/checkout.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://stermontarcade.co.ke/"},{"@type":"ListItem","position":2,"name":"Checkout","item":"https://stermontarcade.co.ke/checkout.html"}]}]}</script>
-</head><!doctype html>
-<html lang="en">
+<style>
+:root{--ink:#1d0f3a;--purple:#351064;--deep:#240a47;--violet:#7028d8;--lilac:#f4edff;--lilac2:#ebdfff;--lime:#c7f51b;--lime-soft:#f1ffcf;--line:#e7dcf6;--muted:#6f6585;--ok:#3f7d0a;--bad:#b42318;color-scheme:light;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:#faf7ff radial-gradient(900px 420px at 88% -140px,#e4d0ff 0,transparent 70%) no-repeat;-webkit-font-smoothing:antialiased}
+.ic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hidden{display:none!important}
+.muted{color:var(--muted);font-size:13px;line-height:1.55}
 
-<body><main class="wrap">
-<header class="top"><button class="back" id="back" aria-label="Back">‹</button><div><div class="brand">STERMONT ARCADE</div><div class="muted">Secure checkout</div></div></header>
-<section class="hero"><div class="eyebrow">STERMONT <b style="background:#c7f51b;color:#351064;padding:3px 8px;border-radius:5px">ARCADE</b></div><h1>Complete your order</h1><p>Review your items and enter your delivery and payment details.</p></section>
-<div class="progress" aria-label="Checkout progress"><div class="progress-step active"><span class="num">1</span><span>Your details</span></div><div class="progress-step active"><span class="num">2</span><span>Delivery</span></div><div class="progress-step active"><span class="num">3</span><span>Payment</span></div></div>
-<div class="trust"><span><i>✓</i> Secure checkout</span><span>·</span><span><i>✓</i> M-Pesa accepted</span><span>·</span><span><i>✓</i> Kenya-wide delivery</span></div>
-<section class="card"><h2>Your order</h2><div id="items" class="items"><p class="muted">Loading your cart…</p></div><div class="total"><span>Order total</span><span id="total">—</span></div><p class="muted" id="fee-note">Delivery fees are calculated using the selected county.</p></section>
-<form id="form">
-<section class="card"><h2>👤 CUSTOMER DETAILS</h2><div class="grid">
-<div class="field full"><label for="name">Full name</label><input id="name" maxlength="120" autocomplete="name" required></div>
+/* header */
+.top{position:sticky;top:0;z-index:30;background:#faf7ffd9;-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid #e9dff7;padding-top:env(safe-area-inset-top)}
+.top-in{max-width:1040px;margin:auto;display:flex;align-items:center;gap:12px;padding:10px 16px}
+.back{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--purple);font-size:26px;line-height:1;cursor:pointer;box-shadow:0 4px 14px #35106412;transition:transform .15s}
+.back:active{transform:scale(.94)}
+.brand{font-weight:900;letter-spacing:.16em;font-size:15px;color:var(--purple)}
+.brand em{font-style:normal;background:var(--lime);padding:2px 7px;border-radius:6px;margin-left:4px}
+.brand-sub{font-size:11px;color:var(--muted);letter-spacing:.02em;margin-top:2px}
+.secure{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:11px;font-weight:800;color:var(--ok)}
+.secure .ic{width:15px;height:15px}
+
+.wrap{max-width:1040px;margin:0 auto;padding:16px 16px 40px}
+
+/* hero */
+.hero{position:relative;overflow:hidden;color:#fff;padding:28px 22px 22px;border-radius:30px;background:linear-gradient(135deg,#a05af7 0%,#7028d8 48%,#2b0b55 100%);box-shadow:0 22px 44px #4a1a9433}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.hero:before{width:300px;height:300px;right:-110px;top:-150px;background:radial-gradient(circle,#c7f51b55 0,transparent 68%)}
+.hero:after{width:240px;height:240px;left:-100px;bottom:-140px;border:1px solid #ffffff2a;box-shadow:0 0 0 26px #ffffff0a,0 0 0 56px #ffffff07}
+.eyebrow{position:relative;display:inline-block;font-size:11px;font-weight:900;letter-spacing:.22em;color:var(--purple);background:var(--lime);padding:5px 10px;border-radius:7px;margin-bottom:16px}
+.hero h1{position:relative;margin:0 0 8px;font-size:clamp(28px,6.5vw,40px);line-height:1.05;letter-spacing:-.04em}
+.hero p{position:relative;margin:0 0 20px;color:#eadcff;font-size:14px;max-width:46ch}
+.steps{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.step{display:flex;align-items:center;gap:9px;min-width:0;padding:10px 11px;border-radius:16px;background:#ffffff14;border:1px solid #ffffff1f;color:#e3d2fb;font-size:12px;font-weight:750;transition:background .25s,color .25s}
+.step .num{display:grid;place-items:center;width:26px;height:26px;flex:none;border-radius:50%;background:#ffffff26;font-size:12px;font-weight:900;transition:all .25s}
+.step.active{background:#fff;color:var(--purple)}
+.step.active .num{background:var(--lime);color:var(--purple)}
+.step.done{background:#c7f51b24;color:#fff;border-color:#c7f51b66}
+.step.done .num{background:var(--lime);color:var(--purple);font-size:0}
+.step.done .num:after{content:"✓";font-size:13px}
+
+/* layout */
+.layout{display:grid;gap:16px;margin-top:16px}
+.summary{min-width:0}
+#form{min-width:0}
+.card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:22px 20px;margin:0 0 14px;box-shadow:0 12px 32px #3510640e}
+.summary .card{background:var(--lilac);border-color:#e3d3f8;margin:0}
+.h{display:flex;align-items:center;gap:10px;margin:0 0 18px;font-size:11.5px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#7a37c9}
+.h i{display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:var(--lilac2);color:var(--violet)}
+.h .tag{margin-left:auto;letter-spacing:.04em;text-transform:none;font-size:11px;font-weight:800;color:var(--muted);background:#fff;padding:4px 9px;border-radius:99px;border:1px solid var(--line)}
+
+/* items */
+#items{display:grid}
+.item{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:0 0 15px;margin:0 0 15px;border-bottom:1px dashed #d9c8f1}
+.item .info{display:grid;gap:3px;min-width:0}
+.item strong{font-size:15px;font-weight:650;line-height:1.35;color:#2a1650;overflow-wrap:anywhere}
+.item small{font-size:12px;color:var(--muted)}
+.item b{white-space:nowrap;font-size:15px;font-weight:850;color:#24163d}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;color:#3a2a58;margin:0 0 12px}
+.row b{font-weight:800;color:#24163d}
+.row .free{color:var(--ok)}
+.total{display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:16px;border-top:1px solid #dccaf3}
+.total span{font-size:15px;font-weight:850;color:#302342}
+.total b{font-size:30px;font-weight:900;letter-spacing:-.03em;color:#5a1fb5}
+#fee-note{margin:12px 0 0;font-size:12px}
+
+/* form */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+.field{display:grid;gap:7px;margin:8px 0}
+.field.full{grid-column:1/-1}
+label{font-size:11.5px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:#5c318b}
+.lab{display:flex;align-items:center;justify-content:space-between;gap:8px}
+input:not([type=radio]),select,textarea{width:100%;min-height:52px;padding:13px 14px;border:1.5px solid #e2d6f2;border-radius:15px;font:inherit;font-size:15px;color:#261a3d;background:#fdfbff;outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
+input:not([type=radio]):focus,select:focus,textarea:focus{border-color:#8a45e6;box-shadow:0 0 0 4px #8a45e620;background:#fff}
+input::placeholder,textarea::placeholder{color:#a79eb4}
+select{appearance:none;-webkit-appearance:none;background:#fdfbff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%237028d8' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 6 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 14px center;padding-right:40px}
+textarea{min-height:88px;resize:vertical}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px}
+.seg label{display:flex;align-items:center;gap:11px;padding:14px;border:1.5px solid #e2d6f2;border-radius:17px;background:#fff;cursor:pointer;text-transform:none;letter-spacing:0;font-size:14px;color:#2a1650;font-weight:800;transition:all .15s}
+.seg label .ic{width:22px;height:22px;color:var(--violet)}
+.seg label small{display:block;font-size:11px;font-weight:650;color:var(--muted);margin-top:1px}
+.seg label:has(input:checked){border-color:#a9dd1d;background:var(--lime-soft);box-shadow:0 0 0 4px #c7f51b30}
+.seg label:has(input:checked) .ic{color:#4c6d00}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+#pickup-note{margin:6px 0 8px;padding:14px;border:1px solid #d8efaa;background:#f6ffd9;border-radius:15px;color:#435c0d;font-weight:650}
+
+/* payment */
+.pay{position:relative;overflow:hidden;background:linear-gradient(145deg,#2a0b52,#3c1175 62%,#5319a6);color:#fff;border-radius:24px;padding:20px 18px 18px;box-shadow:0 14px 30px #2a0b5244}
+.pay:after{content:"";position:absolute;width:190px;height:190px;border-radius:50%;right:-80px;top:-100px;border:1px solid #ffffff1c;box-shadow:0 0 0 22px #ffffff08,0 0 0 46px #ffffff05;pointer-events:none}
+.pay-label{position:relative;display:block;font-size:11.5px;font-weight:900;letter-spacing:.16em;color:var(--lime);margin-bottom:14px}
+.pay-row{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin-bottom:10px;border-radius:16px;background:#ffffff12;border:1px solid #ffffff1c}
+.pay-row small{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#cdb7f1;margin-bottom:3px}
+.pay-row b{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:21px;letter-spacing:.1em;color:#fff}
+.copy{border:0;border-radius:11px;padding:9px 13px;background:#ffffff1f;color:#fff;font:inherit;font-size:12px;font-weight:850;cursor:pointer;transition:all .15s;white-space:nowrap}
+.copy.on{background:var(--lime);color:var(--purple)}
+.how{position:relative;margin:14px 0 0;padding:0;list-style:none;display:grid;gap:9px;counter-reset:s;font-size:13px;line-height:1.5;color:#eadcff}
+.how li{display:flex;gap:10px;align-items:flex-start;counter-increment:s}
+.how li:before{content:counter(s);display:grid;place-items:center;width:20px;height:20px;flex:none;margin-top:1px;border-radius:50%;background:var(--lime);color:var(--purple);font-size:11px;font-weight:900}
+.how b{color:var(--lime)}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:99px;font-size:11px;font-weight:850;letter-spacing:0;text-transform:none;white-space:nowrap}
+.chip.ok{background:var(--lime);color:var(--purple)}
+.chip.warn{background:#fff1ee;color:var(--bad)}
+.chip.idle{background:#f0e9fa;color:#65409b}
+#paycode{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.hint{font-size:11.5px;color:var(--muted);min-height:16px}
+.hint.ok{color:var(--ok);font-weight:750}
+
+.notice{display:flex;gap:12px;margin:0 0 14px;padding:15px 16px;border:1px solid #f2dfa0;border-radius:19px;background:#fff9e5;color:#705313;font-size:13px;line-height:1.55}
+.notice .ic{margin-top:2px;color:#b8860b}
+.err{color:var(--bad);font-size:13px;font-weight:650;white-space:pre-wrap;padding:0 4px;margin:0 0 10px}
+.err:empty{display:none}
+
+.bar{position:sticky;bottom:0;z-index:25;display:flex;align-items:center;gap:14px;margin:0 -16px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:#fffffff2;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+.bar-total{display:grid;gap:1px;min-width:0}
+.bar-total small{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.bar-total b{font-size:21px;font-weight:900;letter-spacing:-.02em;color:#5a1fb5;white-space:nowrap}
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;flex:1;min-height:58px;border:0;border-radius:18px;padding:14px 18px;background:var(--lime);color:var(--purple);font:inherit;font-size:16px;font-weight:900;letter-spacing:.01em;box-shadow:0 10px 22px #8bbd1633,inset 0 -3px 0 #a9dd1d;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.55;cursor:not-allowed;box-shadow:none;transform:none}
+.btn.busy .ic{display:none}
+.btn.busy:before{content:"";width:18px;height:18px;border-radius:50%;border:3px solid #35106433;border-top-color:var(--purple);animation:spin .7s linear infinite}
+.btn.ghost{background:#fff;color:var(--purple);border:1.5px solid var(--line);box-shadow:none;margin-top:10px}
+.help{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 0 4px;font-size:13px;color:var(--muted)}
+.help a{display:inline-flex;align-items:center;gap:6px;color:#128c4a;font-weight:850;text-decoration:none}
+
+/* success */
+.success{text-align:center;background:linear-gradient(180deg,#f6ffdf,#fff);border-color:#d9efa4;padding:34px 22px 24px}
+.success .badge{display:grid;place-items:center;width:78px;height:78px;margin:0 auto 18px;border-radius:50%;background:var(--lime);color:var(--purple);box-shadow:0 0 0 10px #c7f51b33,0 0 0 22px #c7f51b18;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+.success .badge .ic{width:38px;height:38px;stroke-width:3}
+.success h2{margin:0 0 6px;font-size:26px;letter-spacing:-.03em;color:var(--purple)}
+.refbox{display:inline-flex;align-items:center;gap:10px;margin:14px 0 6px;padding:10px 14px;border-radius:14px;background:#fff;border:1px dashed #b9a2dc}
+.refbox b{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:18px;letter-spacing:.08em;color:var(--purple)}
+.refbox .copy{background:var(--lilac2);color:var(--purple)}
+.refbox .copy.on{background:var(--lime)}
+.success .btn{width:100%;flex:none}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.card,.hero,.pay{animation:rise .5s both}
+.summary .card{animation-delay:.05s}#form .card:nth-of-type(1){animation-delay:.1s}#form .card:nth-of-type(2){animation-delay:.15s}#form .card:nth-of-type(3){animation-delay:.2s}
+
+@media(min-width:940px){
+ .wrap{padding-top:22px}
+ .hero{padding:36px 36px 28px}
+ .layout{grid-template-columns:minmax(0,1fr) 390px;gap:22px;align-items:start}
+ #form{grid-column:1;grid-row:1}
+ .summary{grid-column:2;grid-row:1;position:sticky;top:84px}
+ .bar{position:static;margin:0;padding:0;background:none;border:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+ .bar-total{display:none}
+ .card{padding:26px 26px}
+}
+@media(max-width:560px){
+ .wrap{padding:12px 12px 24px}
+ .hero{padding:24px 16px 16px;border-radius:26px}
+ .grid{grid-template-columns:1fr}
+ .field.full{grid-column:auto}
+ .bar{margin:0 -12px;padding-left:12px;padding-right:12px}
+ .step{flex-direction:column;align-items:flex-start;gap:6px;font-size:11px}
+ .secure span{display:none}
+ .secure{padding:8px}
+ .card{padding:20px 16px;border-radius:24px}
+ .pay-row b{font-size:19px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+<symbol id="i-truck" viewBox="0 0 24 24"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></symbol>
+<symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-store" viewBox="0 0 24 24"><path d="m3 9 1-5h16l1 5"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20l1.2-5.2A8.4 8.4 0 1 1 21 11.5z"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+</defs></svg>
+
+<header class="top"><div class="top-in">
+<button class="back" id="back" type="button" aria-label="Back">‹</button>
+<div><div class="brand">STERMONT<em>ARCADE</em></div><div class="brand-sub">Secure checkout</div></div>
+<div class="secure"><svg class="ic"><use href="#i-shield"/></svg><span>Secure &amp; encrypted</span></div>
+</div></header>
+
+<main class="wrap">
+<section class="hero">
+<div class="eyebrow">CHECKOUT</div>
+<h1>Complete your order</h1>
+<p>Review your items, tell us where to deliver, then pay with M-Pesa. It takes about a minute.</p>
+<div class="steps" aria-label="Checkout progress">
+<div class="step active" data-step="0"><span class="num">1</span><span>Your details</span></div>
+<div class="step" data-step="1"><span class="num">2</span><span>Delivery</span></div>
+<div class="step" data-step="2"><span class="num">3</span><span>Payment</span></div>
+</div>
+</section>
+
+<div class="layout">
+<aside class="summary"><section class="card">
+<h2 class="h"><i><svg class="ic"><use href="#i-bag"/></svg></i>Items ordered</h2>
+<div id="items" class="items"><p class="muted">Loading your cart…</p></div>
+<div class="row"><span>Subtotal</span><b id="sub">—</b></div>
+<div class="row"><span id="fee-label">Delivery</span><b id="fee-val">—</b></div>
+<div class="total"><span>Order total</span><b id="total">—</b></div>
+<p class="muted" id="fee-note">Delivery fees are calculated using the selected county.</p>
+</section></aside>
+
+<form id="form" novalidate>
+<section class="card">
+<h2 class="h"><i><svg class="ic"><use href="#i-user"/></svg></i>Customer details</h2>
+<div class="grid">
+<div class="field full"><label for="name">Full name</label><input id="name" maxlength="120" autocomplete="name" placeholder="e.g. John Muriuri" required></div>
 <div class="field"><label for="phone">Phone number</label><input id="phone" inputmode="tel" autocomplete="tel" placeholder="07XX XXX XXX" required></div>
-<div class="field"><label for="email">Email (optional)</label><input id="email" type="email" maxlength="200" autocomplete="email"></div>
-</div></section>
-<section class="card"><h2>🚚 DELIVERY DETAILS</h2><div class="choice"><label><input type="radio" name="method" value="delivery" checked> Delivery</label><label><input type="radio" name="method" value="pickup"> Pickup</label></div>
+<div class="field"><label for="email">Email (optional)</label><input id="email" type="email" maxlength="200" autocomplete="email" placeholder="you@example.com"></div>
+</div>
+</section>
+
+<section class="card">
+<h2 class="h"><i><svg class="ic"><use href="#i-truck"/></svg></i>Delivery details</h2>
+<div class="seg">
+<label><input type="radio" name="method" value="delivery" checked><svg class="ic"><use href="#i-truck"/></svg><span>Delivery<small>To your door</small></span></label>
+<label><input type="radio" name="method" value="pickup"><svg class="ic"><use href="#i-store"/></svg><span>Pickup<small>Free · Westlands</small></span></label>
+</div>
 <div id="delivery-fields" class="grid">
 <div class="field"><label for="county">County</label><select id="county" required><option value="">Choose county</option></select></div>
-<div class="field"><label for="address">Estate, building and delivery address</label><input id="address" maxlength="200" placeholder="Street, estate, building" required></div>
+<div class="field"><label for="address">Estate, building &amp; address</label><input id="address" maxlength="200" placeholder="Street, estate, building" autocomplete="street-address" required></div>
 </div>
 <p id="pickup-note" class="muted hidden">Collect from Stermont Arcade, Sarit Centre, Westlands. Open daily 8:00 AM–8:00 PM.</p>
 <div class="field"><label for="notes">Order notes (optional)</label><textarea id="notes" maxlength="500" placeholder="Landmark or delivery instructions"></textarea></div>
 </section>
-<section class="card"><h2>M-PESA PAYMENT</h2><div class="pay"><span class="pay-label">M-PESA PAYMENT DETAILS</span><b>Paybill: 714777</b><br>Account number: <b>0748888230</b><br>Pay the exact order total shown above, then enter your M-Pesa transaction code below. Enter the transaction code and amount paid below.</div>
-<div class="grid"><div class="field"><label for="paycode">M-Pesa transaction code</label><input id="paycode" maxlength="120" autocapitalize="characters" required placeholder="e.g. QAB12CD34"></div><div class="field"><label for="payamount">Amount paid (KSh)</label><input id="payamount" type="number" min="1" step="1" inputmode="numeric" required></div></div>
+
+<section class="card">
+<h2 class="h"><i><svg class="ic"><use href="#i-wallet"/></svg></i>M-Pesa payment</h2>
+<div class="pay">
+<span class="pay-label">M-PESA PAYMENT DETAILS</span>
+<div class="pay-row"><div><small>Paybill</small><b>714777</b></div><button class="copy" type="button" data-copy="714777">Copy</button></div>
+<div class="pay-row"><div><small>Account number</small><b>0748888230</b></div><button class="copy" type="button" data-copy="0748888230">Copy</button></div>
+<ol class="how">
+<li><span>Open M-Pesa and choose <b>Lipa na M-Pesa → Paybill</b>.</span></li>
+<li><span>Pay exactly <b id="paytotal">the order total</b>.</span></li>
+<li><span>Enter the code from your M-Pesa SMS below.</span></li>
+</ol>
+</div>
+<div class="grid" style="margin-top:14px">
+<div class="field"><label for="paycode">M-Pesa transaction code</label><input id="paycode" maxlength="120" autocapitalize="characters" autocomplete="off" required placeholder="e.g. QAB12CD34E"><span class="hint" id="codehint">Find it in your M-Pesa confirmation SMS.</span></div>
+<div class="field"><div class="lab"><label for="payamount">Amount paid (KSh)</label><span class="chip idle" id="amtchip">Enter amount</span></div><input id="payamount" type="number" min="1" step="1" inputmode="numeric" required></div>
+</div>
 </section>
-<p id="error" class="err" role="alert"></p><button id="submit" class="btn" type="submit"><span aria-hidden="true">✓</span> Place order</button>
+
+<div class="notice"><svg class="ic"><use href="#i-info"/></svg><div><b>Before you place your order:</b> confirm the M-Pesa transaction code and amount match your M-Pesa message. Your payment remains pending until our team verifies it.</div></div>
+<p id="error" class="err" role="alert"></p>
+
+<div class="bar">
+<div class="bar-total"><small>Total</small><b id="bartotal">—</b></div>
+<button id="submit" class="btn" type="submit"><svg class="ic"><use href="#i-lock"/></svg><span id="btnlabel">Place order</span></button>
+</div>
+<p class="help"><span>Need help?</span><a href="https://wa.me/254789514060" target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg>WhatsApp us</a></p>
 </form>
-<section id="success" class="card success hidden"><h2>Order received</h2><p>Your order reference is <b id="ref"></b>.</p><p class="muted">Payment is pending verification. Keep your M-Pesa message and use the tracking page to check progress.</p><a id="track" class="btn" style="display:block;text-align:center;text-decoration:none" href="/track.html">Track this order</a><button id="done" class="btn" type="button">Return to shop</button></section>
+
+<section id="success" class="card success hidden" aria-live="polite">
+<div class="badge"><svg class="ic"><use href="#i-check"/></svg></div>
+<h2>Order received</h2>
+<p class="muted">Thank you! Your order reference is</p>
+<div class="refbox"><b id="ref"></b><button class="copy" id="copyref" type="button">Copy</button></div>
+<p class="muted">Payment is pending verification. Keep your M-Pesa message and use the tracking page to check progress.</p>
+<a id="track" class="btn" href="/track.html">Track this order</a>
+<button id="done" class="btn ghost" type="button">Return to shop</button>
+</section>
+</div>
 </main>
+
 <script src="/order-emails.js" defer></script>
 <script>
 (function(){
@@ -125,23 +311,83 @@ const $=id=>document.getElementById(id), money=n=>'KSh '+Number(n).toLocaleStrin
 let cart=[];
 try{cart=JSON.parse(localStorage.getItem('stm_handoff')||'[]')}catch{}
 const clean=cart.filter(x=>x&&typeof x.rowId==='string'&&Number.isInteger(Number(x.qty))&&Number(x.qty)>0).slice(0,59);
-if(!clean.length){$('items').textContent='Your cart is empty. Return to the shop and add products.';$('submit').disabled=true}
-counties.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;$('county').append(o)});
+counties.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=fees[c]?c+' · KSh '+fees[c]:c;$('county').append(o)});
 function method(){return document.querySelector('input[name=method]:checked').value}
-function total(){const sub=clean.reduce((s,i)=>s+Number(i.price||0)*Number(i.qty),0);return sub+(method()==='delivery'?(fees[$('county').value]||0):0)}
-function paint(){ $('items').replaceChildren();clean.forEach(i=>{const row=document.createElement('div');row.className='item';const left=document.createElement('span');left.textContent=i.name+(i.size?' · '+i.size:'');const right=document.createElement('b');right.textContent=Number(i.qty)+' × '+money(i.price);row.append(left,right);$('items').append(row)});$('total').textContent=money(total());$('payamount').value=total()||'';const delivery=method()==='delivery';$('delivery-fields').classList.toggle('hidden',!delivery);$('pickup-note').classList.toggle('hidden',delivery);$('county').required=delivery;$('address').required=delivery;$('fee-note').textContent=delivery?($('county').value&&!fees[$('county').value]?'Delivery fee for this county will be confirmed on WhatsApp.':'Delivery fee is included where listed.'):'Pickup at Sarit Centre, Westlands.'}
-document.querySelectorAll('input[name=method]').forEach(x=>x.addEventListener('change',paint));$('county').addEventListener('change',paint);paint();
+function sub(){return clean.reduce((s,i)=>s+Number(i.price||0)*Number(i.qty),0)}
+function fee(){return method()==='delivery'?(fees[$('county').value]||0):0}
+function total(){return sub()+fee()}
+function phone(){const d=$('phone').value.replace(/\D/g,'');return d.length===9?'+254'+d:d.length===10&&d.startsWith('0')?'+254'+d.slice(1):d.length===12&&d.startsWith('254')?'+'+d:$('phone').value.trim()}
+function setBtn(text,busy){$('btnlabel').textContent=text;$('submit').classList.toggle('busy',!!busy)}
+
+function progress(){
+ const t=total(),code=$('paycode').value.trim().toUpperCase(),amt=Number($('payamount').value)||0,del=method()==='delivery';
+ const s=[
+  $('name').value.trim().length>=2&&/^\+254[17]\d{8}$/.test(phone()),
+  !del||(!!$('county').value&&$('address').value.trim().length>2),
+  code.length>=4&&t>0&&amt>=t
+ ];
+ let active=s.indexOf(false);
+ document.querySelectorAll('.step').forEach((el,i)=>{el.classList.toggle('done',s[i]);el.classList.toggle('active',i===active)});
+ const chip=$('amtchip');
+ if(!amt){chip.className='chip idle';chip.textContent='Enter amount'}
+ else if(amt===t){chip.className='chip ok';chip.textContent='✓ Amount matches'}
+ else if(amt>t){chip.className='chip ok';chip.textContent='✓ Covers total'}
+ else{chip.className='chip warn';chip.textContent='Short by '+money(t-amt)}
+ const hint=$('codehint');
+ if(/^[A-Z0-9]{10}$/.test(code)){hint.className='hint ok';hint.textContent='✓ Code format looks right'}
+ else{hint.className='hint';hint.textContent='Find it in your M-Pesa confirmation SMS.'}
+}
+
+function paint(){
+ const box=$('items');box.replaceChildren();
+ if(!clean.length){const p=document.createElement('p');p.className='muted';p.textContent='Your cart is empty. Return to the shop and add products.';box.append(p);$('submit').disabled=true}
+ clean.forEach(i=>{
+  const row=document.createElement('div');row.className='item';
+  const info=document.createElement('div');info.className='info';
+  const n=document.createElement('strong');n.textContent=i.name+(i.size?' · '+i.size:'');
+  const q=document.createElement('small');q.textContent='Qty '+Number(i.qty)+' × '+money(i.price);
+  info.append(n,q);
+  const r=document.createElement('b');r.textContent=money(Number(i.price||0)*Number(i.qty));
+  row.append(info,r);box.append(row);
+ });
+ const delivery=method()==='delivery',county=$('county').value,t=total();
+ $('sub').textContent=money(sub());
+ $('fee-label').textContent=delivery?(county?'Delivery to '+county:'Delivery'):'Pickup';
+ const fv=$('fee-val');
+ if(delivery){fv.className='';fv.textContent=county?money(fee()):'Choose county'}else{fv.className='free';fv.textContent='Free'}
+ $('total').textContent=money(t);$('bartotal').textContent=money(t);$('paytotal').textContent=money(t);
+ $('payamount').value=t||'';
+ $('delivery-fields').classList.toggle('hidden',!delivery);$('pickup-note').classList.toggle('hidden',delivery);
+ $('county').required=delivery;$('address').required=delivery;
+ $('fee-note').textContent=delivery?(county&&!fees[county]?'Delivery fee for this county will be confirmed on WhatsApp.':'Delivery fee is included where listed.'):'Pickup at Sarit Centre, Westlands.';
+ progress();
+}
+document.querySelectorAll('input[name=method]').forEach(x=>x.addEventListener('change',paint));
+$('county').addEventListener('change',paint);
+['name','phone','address','paycode','payamount'].forEach(id=>$(id).addEventListener('input',progress));
+$('paycode').addEventListener('input',()=>{const el=$('paycode'),p=el.selectionStart;el.value=el.value.toUpperCase();try{el.setSelectionRange(p,p)}catch{}});
+paint();
+
+document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>copy(b,b.dataset.copy)));
+$('copyref').addEventListener('click',()=>copy($('copyref'),$('ref').textContent));
+async function copy(btn,v){
+ try{await navigator.clipboard.writeText(v)}catch{const t=document.createElement('textarea');t.value=v;t.style.position='fixed';t.style.opacity='0';document.body.append(t);t.select();try{document.execCommand('copy')}catch{}t.remove()}
+ const old=btn.dataset.label||btn.textContent;btn.dataset.label=old;btn.textContent='Copied ✓';btn.classList.add('on');
+ setTimeout(()=>{btn.textContent=old;btn.classList.remove('on')},1600);
+}
+
 $('back').addEventListener('click',()=>{if(history.length>1)history.back();else location.href='/'});
 function ref(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const b=new Uint8Array(8);crypto.getRandomValues(b);return 'STM-'+Array.from(b,x=>a[x%a.length]).join('')}
-function phone(){const d=$('phone').value.replace(/\D/g,'');return d.length===9?'+254'+d:d.length===10&&d.startsWith('0')?'+254'+d.slice(1):d.length===12&&d.startsWith('254')?'+'+d:$('phone').value.trim()}
+function fail(msg,el){const e=$('error');e.textContent=msg;if(el){try{el.focus({preventScroll:true})}catch{}}e.scrollIntoView({block:'center',behavior:'smooth'})}
+
 $('form').addEventListener('submit',async e=>{
  e.preventDefault();$('error').textContent='';
- if(!clean.length){$('error').textContent='Your cart is empty. Return to the shop.';return}
+ if(!clean.length){fail('Your cart is empty. Return to the shop.');return}
  const name=$('name').value.trim(),ph=phone(),code=$('paycode').value.trim().toUpperCase(),amount=Number($('payamount').value),county=$('county').value,delivery=method()==='delivery';
- if(name.length<2||!/^\+254[17]\d{8}$/.test(ph)){ $('error').textContent='Enter your full name and a valid Kenyan phone number.';return}
- if(delivery&&(!county||!$('address').value.trim())){$('error').textContent='Enter your county and delivery address.';return}
- if(code.length<4||code.length>120||!amount||amount<total()){$('error').textContent='Enter the M-Pesa code and pay at least the displayed total.';return}
- const btn=$('submit');btn.disabled=true;btn.textContent='Submitting order…';
+ if(name.length<2||!/^\+254[17]\d{8}$/.test(ph)){fail('Enter your full name and a valid Kenyan phone number.',name.length<2?$('name'):$('phone'));return}
+ if(delivery&&(!county||!$('address').value.trim())){fail('Enter your county and delivery address.',!county?$('county'):$('address'));return}
+ if(code.length<4||code.length>120||!amount||amount<total()){fail('Enter the M-Pesa code and pay at least the displayed total.',code.length<4?$('paycode'):$('payamount'));return}
+ const btn=$('submit');btn.disabled=true;setBtn('Submitting order…',true);
  const orderRef=ref(),payload={p_ref:orderRef,p_customer_name:name,p_phone:ph,p_email:$('email').value.trim()||null,p_method:method(),p_county:delivery?county:null,p_address:delivery?$('address').value.trim():null,p_notes:$('notes').value.trim()||null,p_items:clean.map(i=>({product_id:i.rowId,qty:Number(i.qty)})),p_pay_code:code,p_pay_amount:amount,p_voucher_code:null};
  try{
   const jwt=await token();
@@ -152,9 +398,13 @@ $('form').addEventListener('submit',async e=>{
   if(Number(data.subtotal)>amount)throw new Error('The database-calculated total is higher than the amount entered. Please contact us before paying again.');
   try{localStorage.setItem('shell.cart','[]');localStorage.setItem('stm_cart','{}');localStorage.removeItem('stm_handoff')}catch{}
   $('form').classList.add('hidden');$('ref').textContent=data.ref||orderRef;$('track').href='/track.html?ref='+encodeURIComponent(data.ref||orderRef);$('success').classList.remove('hidden');
+  document.querySelectorAll('.step').forEach(el=>{el.classList.remove('active');el.classList.add('done')});
+  window.scrollTo({top:0,behavior:'smooth'});
   try{if(window.STMOrderEmails)window.STMOrderEmails.send(payload,data)}catch{}
- }catch(err){$('error').textContent=err.message||'Could not place order. Check your connection and try again.';btn.disabled=false;btn.textContent='Place order'}
+ }catch(err){fail(err.message||'Could not place order. Check your connection and try again.');btn.disabled=false;setBtn('Place order',false)}
 });
 $('done').addEventListener('click',()=>{if(window.parent!==window){try{parent.postMessage({stmCheckout:'closed'},location.origin)}catch{}}else location.href='/'});
 })();
-</script><script src="/analytics.js" defer></script></body></html>
+</script><script src="/analytics.js" defer></script>
+</body>
+</html>
