@@ -11,6 +11,7 @@ on:
       - 'category-link-normalizer.mjs'
       - 'category-parent-map.json'
       - 'seo-blog-titles.mjs'
+      - 'seo-blog-titles.test.mjs'
       - 'seo-safe-blog-meta.mjs'
       - 'seo-safe-blog-meta.test.mjs'
   workflow_dispatch:
@@ -34,6 +35,8 @@ jobs:
         with:
           node-version: 20
 
+      - name: Test concise blog SEO titles
+        run: node seo-blog-titles.test.mjs
       - name: Normalize blog SEO title lengths
         run: node seo-blog-titles.mjs
       - name: Test safe consumer-guide meta descriptions
