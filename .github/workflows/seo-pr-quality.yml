@@ -217,9 +217,13 @@ jobs:
         run: node no-static-share-links.test.mjs 2>&1 | tee "$RUNNER_TEMP/ci-logs/15b-generated-product-links.log"
       - name: Run full on-page SEO audit against production-equivalent generated pages
         if: steps.live_catalogue.outputs.required == 'true'
+        env:
+          SEO_CHECK_STRICT: '1'
         run: |
           log="$RUNNER_TEMP/ci-logs/16-seo-check.log"
-          if ! node seo-check.mjs > seo-pr-report.md 2> "$log"; then
+          if node seo-check.mjs > seo-pr-report.md 2> "$log"; then
+            echo "Strict SEO audit passed."
+          else
             rc=$?
             cat "$log" >&2
             { echo "--- last 80 lines of seo-pr-report.md ---"; tail -n 80 seo-pr-report.md; } | tee -a "$log"
