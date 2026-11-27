@@ -36,6 +36,8 @@ import { productDescriptionHtml, extractProductFaq } from './product-description
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
 import { buildCategoryIntro, buildCategoryFaq } from './category-editorial.mjs';
 import { renderHomeGridFallback } from './home-grid-ssr.mjs';
+import { writeLegacyRedirects } from './legacy-redirects.mjs';
+import { belongsInSitemap } from './sitemap-filter.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const SB = 'https://oewvtbnmyombbtggamor.supabase.co';
@@ -689,7 +691,7 @@ for (const p of products) {
   const title = String(p.meta_title || p.seo_title || generatedTitle).trim();
   // Prefer stored snippets only when they are complete sentences. Legacy imports often stored 155-character cut-offs or visible section labels.
   const storedDescription = String(p.meta_description || '').trim();
-  const storedDescriptionIsClean = storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(storedDescription);
+  const storedDescriptionIsClean = storedDescription.length >= 70 && storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(storedDescription);
   const desc = storedDescriptionIsClean ? storedDescription : generatedDescription;
   const h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
   NAMES[p.id] = h1;
@@ -973,6 +975,13 @@ ${B}`;
   }
 }
 
+// Old addresses from earlier catalogues. Written after every product and category page, so targets can be checked.
+if (existsSync('legacy-redirects.json')) {
+  const r = writeLegacyRedirects(JSON.parse(readFileSync('legacy-redirects.json', 'utf8')));
+  console.log(`Legacy redirects: ${r.written} written, ${r.live} now live pages, ${r.skipped.length} skipped (no target).`);
+  if (r.skipped.length) console.warn('Skipped old addresses:', r.skipped.slice(0, 30).join(', '));
+}
+
 // lastmod only moves when a page's content really changed. Google ignores sitemaps whose dates change on every build.
 const today = new Date().toISOString().slice(0, 10);
 const STATE = 'sitemap-state.json';
@@ -988,11 +997,12 @@ try {
 }
 // Only advertise URLs whose generated HTML exists. Prevent stale/missing product or category files
 // from entering Google's sitemap (a missing file otherwise gets an empty hash and still gets listed).
-const sitemapUrls = urls.filter(u => existsSync(u.endsWith('/') ? `.${u}index.html` : fileOf(u)) && (!/^\/p\/[^/]+\.html$/.test(u) || sitemapEligibleProductPaths.has(u)));
+const sitemapUrls = urls.filter(u => belongsInSitemap(SITE + u) && (!/^\/p\/[^/]+\.html$/.test(u) || sitemapEligibleProductPaths.has(u)));
 const next = {};
 for (const u of sitemapUrls) {
   const file = u.endsWith('/') ? `.${u}index.html` : fileOf(u);
-  const hash = createHash('sha1').update(readFileSync(file)).digest('hex');
+  // priceValidUntil moves forward every day. Leave it out, or every page looks changed daily and Google stops trusting lastmod.
+  const hash = createHash('sha1').update(readFileSync(file, 'utf8').replace(/"priceValidUntil":"[0-9-]+"/g, '')).digest('hex');
   next[u] = { hash, lastmod: prev[u] && prev[u].hash === hash ? prev[u].lastmod : today };
 }
 writeFileSync('product-names.json', JSON.stringify(NAMES));
@@ -1009,7 +1019,7 @@ const staticEntries = [...previousSitemap.matchAll(/<url>[\s\S]*?<\/url>/g)]
   .map(m => m[0])
   .filter(entry => {
     const loc = entry.match(/<loc>([^<]+)<\/loc>/)?.[1] || '';
-    return !loc.startsWith(SITE + '/p/') && !loc.startsWith(SITE + '/c/');
+    return !loc.startsWith(SITE + '/p/') && !loc.startsWith(SITE + '/c/') && belongsInSitemap(loc);
   });
 const catalogEntries = sitemapUrls.map(u => '  <url><loc>' + SITE + u + '</loc><lastmod>' + next[u].lastmod + '</lastmod></url>');
 const entryMap = new Map();

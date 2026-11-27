@@ -1,3 +1,10 @@
+## 2026-11-27 (Africa/Nairobi) - SEO: redirects now survive rebuilds (branch `wip-seo-ranking-fixes`, pushed, NOT merged, waiting for owner OK)
+- Cause: `generate-products.mjs` deletes `p/` on every run, so the hand-added redirect pages from commits 1563548, 699be3e, 04e4e7c and 18741e1 were wiped by the next build.
+- Fix: `legacy-redirects.json` (794 old addresses, including covver-xtra) is written out by `legacy-redirects.mjs` on every build. Add future redirects to that file, not to `p/`.
+- Also: sitemaps skip noindex/redirect/other-canonical pages; lastmod ignores priceValidUntil; stored meta descriptions under 70 characters are replaced; image sitemap namespace fixed (same change as PR #1181).
+- Tested: trial build with a stand-in catalogue rebuilt from current pages; link-check 0 problems. Root tests: only price-watch, sales-leads-report and seo-titles fail, and they fail without this change too.
+- Next: owner OK, then merge to main; confirm the "Legacy redirects" line in the build log and open 2-3 old addresses on the live site.
+
 ## 2026-11-27 10:35 (Africa/Nairobi) - Redirects for remaining old agrovet and pest control URLs (branch `wip-redirects-agro-pest-remaining`, NOT merged)
 - Owner: wanted every remaining old agrovet/pest control product URL redirected (not only the high-click ones).
 - Old URL list came from `sitemap-products.xml` history (306 versions, fetched with `git fetch --depth=2500 origin main`): 1,693 slugs were in older sitemaps but not the current one; 1,603 had no file in `p/`; 718 were agrovet/pest control after keyword + manual review.
