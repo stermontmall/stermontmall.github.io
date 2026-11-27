@@ -10400,5 +10400,21 @@
     "source": "https://www.jumia.co.ke/juanco-dominex-100ec-insecticide-172235845.html",
     "ok": false,
     "error": "source page HTTP 403"
+  },
+  {
+    "name": "ex-kupe-5sc-multi-pack-20ml-100ml-melagri-v8-20261127",
+    "source": "https://firebasestorage.googleapis.com/v0/b/melagri.firebasestorage.app/o/products%2F1769670342666_EX%20KUPE.jpeg?alt=media&token=b145b795-8ec6-47ad-aec2-e4889a025d08",
+    "ok": true,
+    "browser_url": "https://ik.imagekit.io/w6hxfnwmw/products/ex-kupe-5sc-multi-pack-20ml-100ml-melagri-v8-20261127_SyfMWEWGpy.jpg",
+    "original_url": "https://ik.imagekit.io/w6hxfnwmw/products/ex-kupe-5sc-multi-pack-20ml-100ml-melagri-v8-20261127_SyfMWEWGpy.jpg",
+    "width": 704,
+    "height": 1472,
+    "bytes": 40425,
+    "content_type": "image/jpeg",
+    "original_format": "jpg",
+    "converted_from": "image/jpeg",
+    "image_source": "https://firebasestorage.googleapis.com/v0/b/melagri.firebasestorage.app/o/products%2F1769670342666_EX%20KUPE.jpeg?alt=media&token=b145b795-8ec6-47ad-aec2-e4889a025d08",
+    "http_status": 200,
+    "image_found_via": "direct"
   }
 ]
