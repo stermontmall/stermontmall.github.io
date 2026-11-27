@@ -5,10 +5,18 @@ import { readFileSync } from 'node:fs';
 const generator = readFileSync('generate-products.mjs', 'utf8');
 const robots = readFileSync('robots.txt', 'utf8');
 const workflow = readFileSync('.github/workflows/product-pages.yml', 'utf8');
+const seoCheck = readFileSync('seo-check.mjs', 'utf8');
+const qualityWorkflow = readFileSync('.github/workflows/seo-pr-quality.yml', 'utf8');
 
 // Stored metadata must not override the 60-character title target or leak internal V8 pricing notes.
 assert.match(generator, /storedTitle && storedTitle\.length <= 60/);
 assert.ok(generator.includes('!/\\bV8\\b/i.test(storedDescription)'), 'internal V8 pricing notes must never be used as meta descriptions');
+
+// The pull-request SEO audit must return failure when it finds issues and the workflow must preserve that exit code.
+assert.match(seoCheck, /SEO_CHECK_STRICT === '1' && total > 0/);
+assert.match(qualityWorkflow, /SEO_CHECK_STRICT: '1'/);
+assert.match(qualityWorkflow, /if node seo-check\\.mjs/);
+assert.doesNotMatch(qualityWorkflow, /if ! node seo-check\\.mjs/);
 
 // Every generated product/category page must retain a self-referencing canonical
 // and be indexable by default. Query refinements are handled separately.
