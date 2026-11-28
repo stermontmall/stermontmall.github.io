@@ -1,3 +1,11 @@
+## 2026-11-28 - Free marketing intelligence starter (branch `wip-free-marketing-intelligence`)
+- Done: created `free-marketing/Code.gs`, `free-marketing/appsscript.json`, `free-marketing/README.md`, and `free-marketing/CHANGELOG.md`. Uses first-party Google Search Console + GA4 Apps Script services; Sheets dashboard; daily 06:00 Africa/Nairobi trigger; CSV/manual import tabs for ads and verified orders. No paid connector.
+- Safety: isolated directory only. Did not edit main, product-pages.yml, generated pages, storefront code, product data, Neon or Supabase.
+- Fixed during review: dashboard CTR formula/format and Search Console date parsing.
+- Not yet verified: Apps Script has not been installed/authorized in the user's Google account; GA4 property ID is not yet configured; live scheduled refresh and Looker Studio report are not deployed. No code runtime test was run in this session.
+- Next: review draft PR, then copy `free-marketing/Code.gs` and manifest into a new Google Sheet's Apps Script project, enable Search Console API + Analytics Data API, configure `sc-domain:stermontarcade.co.ke` and numeric GA4 property ID, authorize, run refresh, then install trigger.
+- Latest implementation commit: `3930bf7f755d267b5757ee186c71469ce8d047db`.
+
 ## 2026-11-28 12:30 (Africa/Nairobi) - Livergen Plus search text (branch `wip-livergen-search-text`)
 - Done: owner approved ("Publish"). `seo-overrides.json`: new title, meta description and one FAQ for livergen-plus-poultry-liver-tonic-500-ml. No generated pages or Neon data edited.
 - Tests: seo-overrides run on a temp copy gave the new text; seo-meta, seo-safe-meta, seo-fit-title, seo-indexing-guard, product-page-design pass. Full suite not run.
