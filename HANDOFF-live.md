@@ -1,3 +1,9 @@
+## 2026-11-28 — Latest PR #1284 status refresh
+- Current PR head: `ac03876475482b87f707593da9ef74bfa3120993`; current comparison against `main`: diverged, 18 commits ahead and 5 behind. PR remains open, draft, and unmerged; GitHub reports `mergeable=false`.
+- Latest main changes include concurrent SEO/search-performance work. Do not force-update the existing branch or merge while diverged; reconcile against latest main with a reviewed merge/rebase and inspect any overlapping handoff changes first.
+- PR file scope remains six files: `HANDOFF-live.md` and five files under `free-marketing/`. No storefront, product, generated page, sitemap, workflow, Neon, or Supabase changes.
+- No PR-triggered workflow runs were returned for the latest indexing-fix commit; this is not evidence of passing CI. Apps Script runtime/API execution remains unverified until the owner installs and authorizes it in Google.
+
 ## 2026-11-28 — Indexing monitor retry-safety review (PR #1284)
 - Reviewed the current URL Inspection implementation. Found that API/network failures were being timestamped as completed, which would prevent retrying those URLs.
 - Fixed `free-marketing/Indexing.gs`: only successful inspections are marked complete; failed API/network attempts remain pending, while an attempt cap of 100 prevents repeated failures from looping indefinitely. Failed attempts are still captured in history with their error text.
