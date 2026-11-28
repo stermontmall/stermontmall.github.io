@@ -26,6 +26,7 @@ on:
     branches: [main]
     paths:
       - 'generate-products.mjs'
+      - 'neon-extras.mjs'
       - 'catalogue-count-guard.mjs'
       - 'catalogue-count-guard.test.mjs'
       - 'mobile-shell/app.js'
@@ -142,6 +143,9 @@ jobs:
 
       - name: Test homepage server-rendered product cards
         run: node home-grid-ssr.test.mjs
+
+      - name: Fetch historical product slugs and reviews from Neon (not the retired Supabase project)
+        run: node neon-extras.mjs "$RUNNER_TEMP"
 
       - name: Build pages and sitemap from the live catalog
         run: node generate-products.mjs
