@@ -160,5 +160,12 @@ function isAllowedInspectionUrl_(url, siteUrl) {
     const host = url.replace(/^https?:\/\//i, '').split(/[/?#]/)[0].split(':')[0].toLowerCase();
     return host === domain || host.endsWith('.' + domain);
   }
-  return url.indexOf(siteUrl.replace(/\/$/, '') ) === 0;
+  // URL-prefix properties must match at a URL boundary, not merely as text.
+  // This prevents lookalike hosts such as stermontarcade.co.ke.attacker.example.
+  const prefix = siteUrl.replace(/\/$/, '').toLowerCase();
+  const candidate = url.toLowerCase();
+  if (candidate === prefix) return true;
+  if (candidate.indexOf(prefix) !== 0) return false;
+  const next = candidate.charAt(prefix.length);
+  return next === '/' || next === '?' || next === '#';
 }
