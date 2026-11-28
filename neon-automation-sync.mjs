@@ -108,7 +108,7 @@ if (mode === 'content') {
             ${r.canonical || null},now(),${JSON.stringify(inspectionRaw(r, checkedAt))}::jsonb)
           ON CONFLICT (url) DO UPDATE SET verdict=excluded.verdict,coverage_state=excluded.coverage_state,
             last_crawl=excluded.last_crawl,google_canonical=excluded.google_canonical,
-            inspected_at=now(),raw=excluded.raw\`;
+            inspected_at=now(),raw=excluded.raw`;
       }
     }
   }
@@ -142,7 +142,7 @@ if (mode === 'content') {
   if (reasons.length) {
     md.push('Top reasons products are not indexed:', ...reasons.map(([s, n]) => `- ${s}: ${n}`), '');
   }
-  md.push(`_Cumulative across all rotating batches, read from Neon (view \`public.product_index_summary\`). Updated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC._`, '');
+  md.push(`_Cumulative across all rotating batches, read from Neon (view `public.product_index_summary`). Updated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC._`, '');
   writeFileSync('index-totals.md', md.join('\n'));
   writeFileSync('index-headline.txt', `${t.indexed} of ${t.total} products indexed`);
   console.log(md.join('\n'));
