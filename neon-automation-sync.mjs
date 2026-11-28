@@ -102,7 +102,7 @@ if (mode === 'content') {
     const checkedAt = payload.generated_at || new Date().toISOString();
     for (const [rows, verdict] of [[indexedRows, 'PASS'], [failedRows, 'FAIL']]) {
       for (const r of rows) {
-        await sql\`INSERT INTO public.google_index_inspections
+        await sql`INSERT INTO public.google_index_inspections
           (url,verdict,coverage_state,last_crawl,google_canonical,inspected_at,raw)
           VALUES (${r.url},${verdict},${r.state || 'Unknown'},${r.crawled || null},
             ${r.canonical || null},now(),${JSON.stringify(inspectionRaw(r, checkedAt))}::jsonb)
