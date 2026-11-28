@@ -5,12 +5,17 @@
  *   STMOrderEmails.status(order, state) from the admin orders page: customer status email
  *       state = confirmed | packed | delivered | declined
  * Never throws: a failed email must not break an order or an admin action. Promises resolve to true/false.
+ * Each new-order email is retried once on a network/5xx/429 failure, and its result is logged to Neon
+ * (public.log_order_email -> order_notifications) so staff can see whether an email really went out.
+ * The log call is best effort: if the function does not exist yet, it is ignored.
  */
 (function () {
   'use strict';
   var CFG = {
     key: 'PayiXKhM6gVQLHYAE', service: 'service_zoho', tpl: 'template_n60yao4',
-    staff: 'support@stermontarcade.co.ke', site: 'https://stermontarcade.co.ke', wa: '254789514060'
+    staff: 'support@stermontarcade.co.ke', site: 'https://stermontarcade.co.ke', wa: '254789514060',
+    api: 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/',
+    auth: 'https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth'
   };
   var F = "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;";
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -33,14 +38,47 @@
   function btn(href, label, bg, fg) {
     return '<a href="' + href + '" style="display:inline-block;background:' + bg + ';color:' + fg + ';' + F + 'font-size:15px;font-weight:800;text-decoration:none;padding:13px 22px;border-radius:12px;margin:4px;">' + label + '</a>';
   }
-  function send(params) {
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  /* One EmailJS request. Resolves { ok, retry, err } and never rejects. */
+  function sendOnce(params) {
+    var ctl = window.AbortController ? new AbortController() : null, timer = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
     return fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctl ? ctl.signal : undefined,
       body: JSON.stringify({ service_id: CFG.service, template_id: CFG.tpl, user_id: CFG.key, template_params: params })
     }).then(function (r) {
-      if (r.ok) return true;
-      return r.text().then(function (t) { console.warn('EmailJS failed', r.status, t); return false; });
-    }).catch(function (e) { console.warn('EmailJS error', e && e.message); return false; });
+      clearTimeout(timer);
+      if (r.ok) return { ok: true };
+      return r.text().then(function (t) { console.warn('EmailJS failed', r.status, t); return { ok: false, retry: r.status >= 500 || r.status === 429, err: 'EmailJS ' + r.status + ' ' + String(t || '').slice(0, 120) }; });
+    }).catch(function (e) { clearTimeout(timer); console.warn('EmailJS error', e && e.message); return { ok: false, retry: true, err: 'Network ' + String((e && e.message) || '').slice(0, 120) }; });
+  }
+  /* Same, with one retry after 2 s when the failure looks temporary. */
+  function sendRes(params) {
+    return sendOnce(params).then(function (r) { return (!r.ok && r.retry) ? wait(2000).then(function () { return sendOnce(params); }) : r; });
+  }
+  function send(params) { return sendRes(params).then(function (r) { return !!r.ok; }); }
+
+  /* Neon anonymous session, only used to log email results. */
+  var tok = '', tokExp = 0;
+  function token() {
+    if (tok && Date.now() < tokExp - 30000) return Promise.resolve(tok);
+    return fetch(CFG.auth + '/token/anonymous', { credentials: 'include' }).then(function (r) {
+      if (!r.ok) throw new Error('token ' + r.status);
+      return r.json();
+    }).then(function (j) {
+      if (!j || typeof j.token !== 'string' || !j.token) throw new Error('no token');
+      tok = j.token; var e = Number(j.expires_at); tokExp = e ? (e < 1e12 ? e * 1000 : e) : Date.now() + 300000; return tok;
+    });
+  }
+  /* Best effort: record whether this order email was sent. Ignored if it fails or the function is not installed yet. */
+  function logResult(ref, phone, type, email, res) {
+    if (!email) return Promise.resolve(false);
+    return token().then(function (jwt) {
+      return fetch(CFG.api + 'rpc/log_order_email', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + jwt },
+        body: JSON.stringify({ p_ref: ref, p_phone: phone || '', p_recipient_type: type, p_recipient_email: email, p_success: !!res.ok, p_error: res.ok ? null : (res.err || 'failed') })
+      });
+    }).then(function (r) { return !!(r && r.ok); }).catch(function () { return false; });
   }
 
   function sendAll(p, d) {
@@ -58,13 +96,13 @@
         '<tr><td style="padding:6px 16px 16px;"><table role="presentation" width="100%"><tr><td style="' + F + 'font-size:16px;font-weight:700;color:#1b1230;">Total</td><td align="right" style="' + F + 'font-size:22px;font-weight:900;color:#5b21b6;">' + esc(total) + '</td></tr></table></td></tr></table></td></tr>' +
         '<tr><td style="padding:0 24px;' + F + 'font-size:14px;color:#1b1230;"><b>' + (p.p_method === 'pickup' ? 'Collection' : 'Delivery') + ':</b> ' + esc(where) + '</td></tr>' +
         '<tr><td align="center" style="padding:18px 24px 24px;">' + btn(track, 'Track your order', '#7c3aed', '#ffffff') + btn('https://wa.me/' + CFG.wa, 'Message us on WhatsApp', '#c8f31d', '#2a0e5c') + '</td></tr>';
-      jobs.push(send({
+      jobs.push(sendRes({
         to_email: p.p_email, reply_to: CFG.staff, subject: 'We received your order ' + ref, business: 'Stermont Arcade', order_ref: ref,
         name: p.p_customer_name, headline: 'We received your order', items: itemText, total: total, order_items: itemText, order_total: total,
         customer_name: p.p_customer_name, customer_phone: p.p_phone, delivery: where, mpesa_code: p.p_pay_code,
         message: 'Thank you for your order ' + ref + '. Track it here: ' + track, buttons: '', phone: '+254 789 514 060', web: 'stermontarcade.co.ke',
         html_body: shell('We received your order', 'Order <b style="color:#c8f31d;">' + esc(ref) + '</b> is being verified', custInner)
-      }));
+      }).then(function (res) { return logResult(ref, p.p_phone, 'customer', p.p_email, res).then(function () { return !!res.ok; }); }));
     }
 
     var adm = CFG.site + '/neon-admin-orders.html?ref=' + encodeURIComponent(ref);
@@ -76,13 +114,13 @@
       '<br><b>M-Pesa code entered:</b> <span style="font-family:Courier New,monospace;font-weight:800;">' + esc(p.p_pay_code) + '</span> (customer says paid ' + esc(money(p.p_pay_amount)) + ')</td></tr>' +
       '<tr><td style="padding:4px 24px;"><div style="background:#fff8e6;border:1px solid #fde4a3;border-radius:12px;padding:12px 14px;' + F + 'font-size:13px;color:#6b4a00;"><b>Pending verification.</b> Check your M-Pesa SMS for this code and amount before approving.</div></td></tr>' +
       '<tr><td align="center" style="padding:16px 24px 24px;">' + btn(adm, 'Open in admin', '#c8f31d', '#2a0e5c') + btn('https://wa.me/' + String(p.p_phone || '').replace(/\D/g, ''), 'WhatsApp customer', '#25d366', '#ffffff') + '</td></tr>';
-    jobs.push(send({
+    jobs.push(sendRes({
       to_email: CFG.staff, reply_to: p.p_email || CFG.staff, subject: 'New order ' + total + ' - ' + p.p_customer_name + ' (' + ref + ')', business: 'Stermont Arcade', order_ref: ref,
       name: 'Stermont team', headline: 'New order to verify', items: itemText, total: total, order_items: itemText, order_total: total,
       customer_name: p.p_customer_name, customer_phone: p.p_phone, delivery: where, mpesa_code: p.p_pay_code,
       message: 'New order ' + ref + ' from ' + p.p_customer_name + ' ' + p.p_phone + '. M-Pesa code ' + p.p_pay_code + '.', buttons: '', phone: '+254 789 514 060', web: 'stermontarcade.co.ke',
       html_body: shell('New order!', 'Order <b style="color:#c8f31d;">' + esc(ref) + '</b> &middot; ' + esc(total), staffInner)
-    }));
+    }).then(function (res) { return logResult(ref, p.p_phone, 'admin', CFG.staff, res).then(function () { return !!res.ok; }); }));
     return Promise.all(jobs);
   }
 
