@@ -1,3 +1,9 @@
+## 2026-11-28 - PR opened for free marketing intelligence
+- Done: draft PR #1284 created: https://github.com/stermontmall/stermontmall.github.io/pull/1284.
+- Review: isolated diff is 5 files (4 new files under `free-marketing/` plus this handoff note); 318 additions, no deletions. No workflow/storefront/product/database files changed.
+- Branch is currently 2 commits behind main and diverged; PR is draft and not merge-ready. Rebase/update against latest main and run review/checks before marking ready.
+- Next owner action: create a blank Google Sheet, install Apps Script from `free-marketing/README.md`, authorize Google APIs, and provide the numeric GA4 property ID in the setup prompt. Google account authorization cannot be performed by this GitHub session.
+
 ## 2026-11-28 - Free marketing intelligence starter (branch `wip-free-marketing-intelligence`)
 - Done: created `free-marketing/Code.gs`, `free-marketing/appsscript.json`, `free-marketing/README.md`, and `free-marketing/CHANGELOG.md`. Uses first-party Google Search Console + GA4 Apps Script services; Sheets dashboard; daily 06:00 Africa/Nairobi trigger; CSV/manual import tabs for ads and verified orders. No paid connector.
 - Safety: isolated directory only. Did not edit main, product-pages.yml, generated pages, storefront code, product data, Neon or Supabase.
