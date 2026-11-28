@@ -277,3 +277,8 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Added `email-preview-screenshots.py` for Playwright capture. Preview uses a safe image fallback tile when the sample item has no image; automated test separately verifies an HTTPS item image with alt text and explicit dimensions.
 - Corrected staff phone CTA to use a `tel:+254...` link.
 - Next: trigger PR checks, review actual test results and screenshot artifact; inspect exact diff and ensure protected paths were untouched. Screenshot capture and tests have not yet run locally because this environment cannot resolve GitHub for cloning.
+
+## 2026-11-28 (Africa/Nairobi) - Final design pass before PR
+- Made all five customer status states use distinct hero symbols (placed, confirmed, packed, delivered, declined) and distinct accent colours; staff alert uses the placed/new-order treatment.
+- Email preview page covers the six requested message variants. Screenshot workflow is configured to produce desktop and 360px mobile captures.
+- Remaining validation is delegated to the PR workflow; do not treat test/screenshot outputs as passed until Actions reports success and artifacts are available.
