@@ -21,7 +21,7 @@ with sync_playwright() as p:
             frame_el = article.locator("iframe")
             article.evaluate("(el, w) => { el.style.width = w + 'px'; el.style.maxWidth = 'none'; el.style.margin = '0 auto'; }", width)
             frame_el.evaluate("(el, w) => { el.style.width = w + 'px'; el.style.maxWidth = 'none'; el.style.height = '1200px'; }", width)
-            frame = frame_el.element_handle().content_frame
+            frame = frame_el.element_handle().content_frame()
             frame.locator("body").wait_for()
             frame.evaluate("() => Promise.all(Array.from(document.images).map(img => img.complete ? Promise.resolve() : new Promise(resolve => { img.onload = resolve; img.onerror = resolve; })))")
             height = frame.evaluate("() => Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)")
