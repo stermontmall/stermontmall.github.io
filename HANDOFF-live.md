@@ -1,3 +1,8 @@
+## 2026-11-28 12:42 (Africa/Nairobi) - Free Search Console to Neon sync (branch `wip-search-performance`, NOT merged)
+- Owner asked to replace Supermetrics with a free option. Added seo-search-performance.mjs, its test and workflow; new Neon tables search_performance_daily and search_performance_details.
+- Tests: offline test passes. In progress: real run from the branch push.
+- Next: check the "Search performance sync" run and the Neon rows, then remove the branch from the workflow push trigger and merge.
+
 ## 2026-11-28 12:30 (Africa/Nairobi) - Livergen Plus search text (branch `wip-livergen-search-text`)
 - Done: owner approved ("Publish"). `seo-overrides.json`: new title, meta description and one FAQ for livergen-plus-poultry-liver-tonic-500-ml. No generated pages or Neon data edited.
 - Tests: seo-overrides run on a temp copy gave the new text; seo-meta, seo-safe-meta, seo-fit-title, seo-indexing-guard, product-page-design pass. Full suite not run.

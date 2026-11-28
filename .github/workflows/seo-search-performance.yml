@@ -1,0 +1,40 @@
+# Stermont Arcade - saves Google Search Console clicks, searches and pages into Neon every day (free, no paid connector).
+# Needs the GSC_SERVICE_ACCOUNT_JSON, GSC_PROPERTY and NEON_DATABASE_URL secrets.
+name: Search performance sync
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 3 * * *'
+  push:
+    branches: [main, wip-search-performance]
+    paths:
+      - 'seo-search-performance.mjs'
+      - '.github/workflows/seo-search-performance.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: search-performance-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - name: Offline tests
+        run: node seo-search-performance.test.mjs
+      - name: Install Neon driver
+        run: npm install --no-save @neondatabase/serverless
+      - name: Save Search Console data to Neon
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_PROPERTY: ${{ secrets.GSC_PROPERTY }}
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: node seo-search-performance.mjs
