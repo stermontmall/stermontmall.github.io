@@ -348,10 +348,9 @@ const SAVED_TAB = (() => { try { const t = sessionStorage.getItem('shell.activeT
 const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab
   : (!DEEP && !CAT_DEEP && !Q_DEEP && TABS.includes(TAB_DEEP)) ? TAB_DEEP
   : (!DEEP && !CAT_DEEP && !Q_DEEP && SAVED_TAB) ? SAVED_TAB : 'home';
-const initialProductRoute = PRODUCT_PATH
-  ? location.pathname + location.hash
-  : '/?product=' + encodeURIComponent(PRODUCT_ROUTE_SLUG) + location.hash;
-history.replaceState({ tab: START_TAB, stack: [] }, '', DEEP ? initialProductRoute : (CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname : undefined); // Keep customer deep links on the shell route; direct /p/ documents remain in place.
+history.replaceState({ tab: START_TAB, stack: [] }, '', DEEP
+  ? (PRODUCT_PATH ? location.pathname + location.hash : '/?product=' + encodeURIComponent(PRODUCT_ROUTE_SLUG) + location.hash)
+  : (CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname : undefined); // Keep customer deep links on the shell route; direct /p/ documents remain in place.
 scrim.addEventListener('click', closeTop);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop(); });
 syncOverlays();
