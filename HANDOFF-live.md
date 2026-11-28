@@ -282,3 +282,8 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Made all five customer status states use distinct hero symbols (placed, confirmed, packed, delivered, declined) and distinct accent colours; staff alert uses the placed/new-order treatment.
 - Email preview page covers the six requested message variants. Screenshot workflow is configured to produce desktop and 360px mobile captures.
 - Remaining validation is delegated to the PR workflow; do not treat test/screenshot outputs as passed until Actions reports success and artifacts are available.
+
+## 2026-11-28 (Africa/Nairobi) - First PR CI pass and screenshot harness correction
+- PR #1279 checks: new email test PASS; `seo-indexing-guard.test.mjs` PASS; `no-static-share-links.test.mjs` PASS.
+- Chromium installation succeeded. Screenshot capture initially failed because the Playwright Python version exposes `ElementHandle.content_frame` as a method; corrected the script to call `content_frame()` (commit `9b080776`).
+- Re-run is pending on the updated branch. Broader SEO `validate` job is still in progress. No application renderer change was needed for this harness issue.
