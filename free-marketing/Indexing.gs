@@ -65,6 +65,7 @@ function inspectIndexingUrls() {
     const url = String(values[i][0] || '').trim();
     if (!url || values[i][12]) { skipped++; continue; }
     if (!isAllowedInspectionUrl_(url, siteUrl)) {
+      values[i][12] = new Date();
       values[i][13] = 'Skipped: URL is outside the configured Search Console property.';
       updates.push({ row: i + 2, values: values[i] });
       continue;
@@ -93,7 +94,7 @@ function inspectIndexingUrls() {
     values[i][9] = status.lastCrawlTime || '';
     values[i][10] = sitemapText;
     values[i][11] = referringText;
-    values[i][12] = now;
+    values[i][12] = quotaStop ? '' : now;
     values[i][13] = errorText;
     updates.push({ row: i + 2, values: values[i] });
     history.push([
