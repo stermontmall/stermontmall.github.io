@@ -153,6 +153,8 @@ def mock_network(ctx):
         # "unexpected failed requests" check at the end of this script.
         if 'supabase.co/storage/v1/object/public/' in url or 'https://stermontarcade.co.ke/product-photos/' in url:
             return route.fulfill(status=200, content_type='image/png', body=PNG)
+        if 'ik.imagekit.io/w6hxfnwmw/products/' in url:
+            return route.fulfill(status=200, content_type='image/png', body=PNG)
         return route.abort()
     ctx.route('https://ik.imagekit.io/**', imagekit_proxy)
     ctx.route('https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/**',
@@ -495,7 +497,7 @@ with sync_playwright() as p:
     p4b.route('**/rpc/create_guest_order', lambda rt: rt.fulfill(status=200, content_type='application/json', body=json.dumps({'ok': True, 'ref': 'STM-TEST1234', 'subtotal': 1800})))
     co4b = p4b.frame_locator('#checkout-frame'); co4b.locator('#items .item').first.wait_for(timeout=15000)
     co4b.locator('#name').fill('Test Customer'); co4b.locator('#phone').fill('0712345678')
-    co4b.locator('input[name="method"][value="pickup"]').check(); co4b.locator('#paycode').fill('ABCD1234'); co4b.locator('#payamount').fill('1800')
+    co4b.locator('.seg label', has_text='Pickup').click(); co4b.locator('#paycode').fill('ABCD1234'); co4b.locator('#payamount').fill('1800')
     co4b.locator('#submit').click(); co4b.locator('#success:not(.hidden)').wait_for(timeout=10000)
     check('successful checkout clears the handoff only after order creation', p4b.evaluate("localStorage.getItem('stm_handoff')") is None)
     co4b.locator('#done').click(); p4b.wait_for_selector('#checkout-frame', state='detached', timeout=8000)
@@ -509,7 +511,7 @@ with sync_playwright() as p:
     p5.route('**/rpc/create_guest_order', lambda rt: rt.fulfill(status=409, content_type='application/json', body=json.dumps({'message': 'The price for Hot Plate has changed. Please refresh the shop and try again.'})))
     p5.goto(f'{BASE}/checkout.html?checkout=1'); p5.wait_for_selector('#items .item', timeout=15000)
     check('checkout displays the handed-off product lines and their quoted prices', 'Hot Plate' in p5.locator('#items').inner_text() and 'Kettle' in p5.locator('#items').inner_text() and '1,999' in p5.locator('#items').inner_text() and '1,800' in p5.locator('#items').inner_text())
-    p5.fill('#name', 'Test Customer'); p5.fill('#phone', '0712345678'); p5.locator('input[name="method"][value="pickup"]').check(); p5.fill('#paycode', 'ABCD1234'); p5.fill('#payamount', '3799'); p5.locator('#submit').click()
+    p5.fill('#name', 'Test Customer'); p5.fill('#phone', '0712345678'); p5.locator('.seg label', has_text='Pickup').click(); p5.fill('#paycode', 'ABCD1234'); p5.fill('#payamount', '3799'); p5.locator('#submit').click()
     p5.wait_for_function("document.querySelector('#error').textContent.includes('price for Hot Plate has changed')", timeout=10000)
     check('changed price: server rejection is shown and checkout does not report success', 'price for Hot Plate has changed' in p5.locator('#error').inner_text() and p5.locator('#success').is_hidden())
     c5.close()
