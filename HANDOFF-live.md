@@ -246,3 +246,9 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Updated the assertion to compare the canonical URL pathname, preserving the requirement that the deep link resolves to `/p/garden-set-250ml.html` while allowing the test server's local hostname.
 - Commit: `1e5cc399b9ce00a08f9129656c17fd26450a407a`.
 - Re-run route and SEO workflows on the new HEAD; PR #1182 remains open/unmerged and changes are not live.
+
+
+## 2026-11-28 (Africa/Nairobi) - Modern order-email redesign (branch `wip-modern-order-emails`, IN PROGRESS)
+- Read this handoff before code changes; created the work branch from main. Main remains untouched.
+- Confirmed checkout calls `STMOrderEmails.send(payload, data)` and admin calls `STMOrderEmails.status(updated, state)`; preserve both public interfaces.
+- Next: inspect template contract and tests, then implement shared HTML/text rendering and preview. No email sent; no Neon data touched.
