@@ -126,3 +126,4 @@ Neon scan of descriptions (2026-11-24): bad targets found: pest-control-and-fumi
 - 2026-11-26: merged `wip-fast-product-links` - product links show a spinner and load sooner (app.js v=58).
 
 - 2026-11-28: merged `wip-fix-indexing-tools` (84db25b9) - sitemap ping cooldown, index-check batches, indexable-only sitemaps.
+- 2026-11-28: merged the Search Console to Neon sync (seo-search-performance.mjs) and the Livergen search text. Details in HANDOFF-live.md.

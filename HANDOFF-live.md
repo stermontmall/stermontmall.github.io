@@ -1,3 +1,8 @@
+## 2026-11-28 12:47 (Africa/Nairobi) - Search performance sync finished; Livergen text built
+- Merged to main: daily and per-page totals sync (main run 46131819133 passed). Supermetrics disconnected by the owner.
+- Livergen: build for 7e6806d passed; the page on main has the new title, description and FAQ. Live URL not fetched (sandbox blocks it).
+- Open for owner: whether Amito is still sold; check Supermetrics trial/billing.
+
 ## 2026-11-28 12:47 (Africa/Nairobi) - Per-page daily totals tested, merging to main (branch `wip-search-page-totals`)
 - Branch run passed: 52 days, 9421 page rows. Page clicks 496 (by page) vs daily 484 (by property).
 - Next: check the main-branch run.
