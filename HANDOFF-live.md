@@ -1,3 +1,14 @@
+## 2026-11-28 11:25 (Africa/Nairobi) - One page per product; old addresses redirect (branch `wip-one-page-per-product`, PR open)
+- Found: PR #1264 made every old slug and id address a full self-canonical page: 1,448 pages and 1,463 sitemap URLs for 683 active products (about 760 duplicates). Google index check showed 208 of 637 products indexed, mostly "Discovered - currently not indexed".
+- Done: only real products and pack sizes (each its own page, as in #1264) get full pages; renamed slugs, id addresses and retired duplicates are redirect stubs again and never in the sitemap. Merged in the `data/old-url-redirects.csv` list from `wip-persist-old-redirects-v2` (PR #1268, supersede it: do not merge separately). Tests updated: seo-indexing-guard, no-static-share-links.
+- Checks: fixture build of 73 live products + 5 fake old slugs: 73 full pages, 78 stubs, 0 stubs in sitemap. NOT run: live Neon build, live site.
+- Next: PR checks, merge, wait for "Build product pages", then check p/ count (~700-900 incl. CSV stubs) and sitemap-products (~650).
+
+## 2026-11-28 11:05 (Africa/Nairobi) - Old-URL redirect fix merged with current main (branch `wip-persist-old-redirects-v2`, PR open)
+- Done: merged origin/main (01318d4df) into the redirect-persistence work; kept main's Neon `getHistoricalSlugs()` and the indexable-sitemap filter, plus the new `old-url-redirects.mjs` step. Tests pass: old-url-redirects, seo-indexing-guard, sitemap-indexable, check-product-pages, category-hubs.
+- Not run: live Neon build, live site (no network from sandbox).
+- Next: wait for PR checks, merge, wait for "Build product pages", open a few old URLs live.
+
 ## 2026-11-28 09:20 (Africa/Nairobi) - PR #1261 visible Pickup-label browser-test fix (branch `wip-ci-mock-imagekit-products`, NOT merged)
 - Done: in `mobile-shell/shell.test.py`, replaced the two hidden-radio `.check()` calls with clicks on the visible `.seg label` for Pickup. Commit `39281730d89c67eae24a77346f20708b4e0b9ced`; PR: https://github.com/stermontmall/stermontmall.github.io/pull/1261.
 - Final checks on that commit: `validate` SUCCESS; `route-regression` SUCCESS; `verify-pricing` SKIPPED.
@@ -28,6 +39,18 @@
 - Done: `sitemap-indexable.mjs` + test; `generate-products.mjs` filters both sitemaps. No generated files committed, no Neon data changed.
 - Checks: new test, seo-indexing-guard, seo-shell-redirect, seo-shell-chrome, check-product-pages, category-hubs, seo-meta pass; one-product fixture build ran. NOT run: live Neon build, browser suite, live site.
 - Next: owner OK, merge, wait for "Build product pages". `wip-persist-old-redirects` also edits generate-products.mjs and this file; resolve any HANDOFF conflict by keeping both entries.
+## 2026-11-27 23:10 (Africa/Nairobi) - Old-URL redirects now survive rebuilds (branch `wip-persist-old-redirects`, tested locally, NOT merged)
+- Done: `data/old-url-redirects.csv` (801 old slugs: the 4 redirect commits 15635486, 699be3e8, 04e4e7ce, 18741e12, plus the 84 Neon rows, checksum matched). `old-url-redirects.mjs` writes them after all real pages; live pages are never overwritten; gone targets go to `/c/`. Builder now asks Neon (not Supabase) for renames and warns if refused.
+- Checks: two full local rebuilds (fixture of 683 live products, no pack-size grouping): 801/801 addresses have a page, 797 redirect pages, 0 dead targets, 0 chains, 0 in sitemaps, same output both times. link-check 0 problems; tests listed in product-pages.yml and seo-pr-quality.yml pass. NOT run: live Neon build, live site.
+- Replaces `wip-redirects-agro-pest-remaining` (its 700 redirects are in the CSV): do not merge that branch.
+- Owner decisions: (1) merge to main; (2) allow Neon role `anonymous` to read renames: `GRANT SELECT (old_slug, product_id) ON public.product_slug_redirects TO anonymous;` (not run). Until then new renames must be added to the CSV. (3) 273 addresses in the 1,000-row Search Console export (75 clicks) still have no page.
+- Some CSV rows point to a different pack size or a close substitute (e.g. bat-crp liquid -> powder): review.
+- Next: owner OK, merge the PR, wait for "Build product pages", open a few old URLs live.
+
+## 2026-11-27 22:55 (Africa/Nairobi) - Keep old-URL redirects across rebuilds (branch `wip-persist-old-redirects`, IN PROGRESS, NOT merged)
+- Owner said "Fix". Finding: Neon role `anonymous` has no SELECT grant on `product_slug_redirects` (read policy exists), and generate-products.mjs still asks Supabase for it.
+- Plan: keep a permanent list in `data/old-url-redirects.csv`; build writes those redirect pages after all real pages. No Neon change without owner OK. Do not edit product-pages.yml.
+- Next: write `old-url-redirects.mjs` + test, then run a fixture build. Command: `git checkout wip-persist-old-redirects`.
 
 ## PROGRESS CHECKPOINT — 27 Nov 2026, 22:48:41 (Africa/Nairobi)
 **Summary:** Checked Search Console Performance export (last 3 months) against main 291bb35. Found old-URL redirect pages are being deleted by the product page build.

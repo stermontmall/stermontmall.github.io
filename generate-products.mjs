@@ -32,6 +32,7 @@
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { isIndexablePage } from './sitemap-indexable.mjs';
+import { LIST as OLD_REDIRECT_LIST, parseRedirects, writeOldRedirects } from './old-url-redirects.mjs';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 const imageKitUrl = createRequire(import.meta.url)('./imagekit-url.js');
 import { createHash } from 'node:crypto';
@@ -104,13 +105,20 @@ const MISSING_LEGACY_PRODUCT_PHOTO = /(?:acetochlor-50-ec-herbicide-1-litre|jade
 const byAgeThenId = (a, b) => (Date.parse(a.created_at) || 0) - (Date.parse(b.created_at) || 0) || (String(a.id) < String(b.id) ? -1 : String(a.id) > String(b.id) ? 1 : 0);
 const fixProducts = list => list.map(p => ({ ...p, images: (Array.isArray(p.images) ? p.images : []).filter(u => typeof u === 'string' && !MISSING_LEGACY_PRODUCT_PHOTO.test(u)).map(fixImg) })).sort(byAgeThenId);
 
+const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
+const NEON_AUTH = 'https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth';
+let neonToken = '';
+async function getSlugHistory() {
+  const r = await fetch(`${NEON_REST}product_slug_redirects?select=old_slug,product_id&order=old_slug.asc&limit=5000`, { headers: { Authorization: 'Bearer ' + neonToken, accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}: ${(await r.text()).slice(0, 150)}`);
+  return r.json();
+}
+
 async function getProducts() {
   if (process.env.PRODUCTS_JSON) return fixProducts(JSON.parse(readFileSync(process.env.PRODUCTS_JSON, 'utf8')));   // for local testing only
   // The storefront now reads the live Neon catalogue. Keep this build on the same
   // anonymous Neon Auth + Data API path used by mobile-shell/app.js; do not call
   // the retired Supabase project.
-  const NEON_REST = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
-  const NEON_AUTH = 'https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth';
   const cols = ['id,product_code,created_at,updated_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug,description,meta_title,meta_description)',
                 'id,product_code,created_at,updated_at,slug,name,seo_name,seo_title,meta_title,meta_description,alt_text,keywords,stock_status,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
                 'id,product_code,created_at,updated_at,slug,name,seo_name,price,old_price,unit,variant_group,variant_label,stock,images,description,gtin,mpn,categories(name,slug)',
@@ -136,6 +144,7 @@ async function getProducts() {
     }
   }
   if (!token) throw new Error(`Could not obtain anonymous Neon Auth token: ${lastError}`);
+  neonToken = token;
 
   for (const c of cols) {
     const all = [];
@@ -901,6 +910,12 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
   writeFileSync('products.html', shell({ title: `All Products | Buy Online in Kenya | ${BRAND}`, desc: `Browse every product at ${BRAND}: pest control, agrovet, appliances and more. Pay by M-Pesa, delivery to all 47 counties.`, path: '/products.html', body,
     ld: ld + crumbLd([['Home', SITE + '/'], ['All products', SITE + '/products.html']]) }));
   urls.push('/products.html');
+}
+
+// Old product addresses (data/old-url-redirects.csv). Must run after every real /p/ and /c/ page exists. Not added to the sitemap.
+{
+  const r = writeOldRedirects(parseRedirects(readFileSync(OLD_REDIRECT_LIST, 'utf8')), { site: SITE });
+  console.log(`Old URL redirects: ${r.written} written, ${r.kept} skipped (a page already exists), ${r.fallback.length} sent to all categories because the target is gone.`);
 }
 
 // Google Merchant Center product feed (free listings). One item per size/variant; submit https://stermontarcade.co.ke/merchant-feed.xml in Merchant Center.
