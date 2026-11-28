@@ -92,7 +92,7 @@ if (mode === 'content') {
     indexed = indexedRows.length;
     notIndexed = failedRows.length;
 
-    const summary = report.match(/Checked\\s+\\*\\*(\\d+)\\*\\*\\s+pages with Google[\\s\\S]*?\\*\\*(\\d+) indexed\\*\\*,\\s+\\*\\*(\\d+) not indexed\\*\\*/i);
+    const summary = report.match(/Checked\s+\*\*(\d+)\*\*\s+pages with Google[\s\S]*?\*\*(\d+) indexed\*\*,\s+\*\*(\d+) not indexed\*\*/i);
     if (!summary) throw new Error('Could not parse Google indexing summary from index-status.md; refusing to save inconsistent counts.');
     if (Number(summary[1]) !== checked || Number(summary[2]) !== indexed || Number(summary[3]) !== notIndexed)
       throw new Error(`Google report/JSON mismatch: report ${summary[1]}/${summary[2]}/${summary[3]}, JSON ${checked}/${indexed}/${notIndexed}.`);
