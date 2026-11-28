@@ -1,3 +1,8 @@
+## 2026-11-28 12:48 (Africa/Nairobi) - Search performance sync tested, merging to main (branch `wip-search-performance`)
+- Real run 46131491451 passed: https://stermontarcade.co.ke/ , 52 days of data (2026-10-06 to 2026-11-26), 4059 search/page rows.
+- Same dates: Neon 484 clicks / 18691 impressions; Supermetrics 493 / 20296. Likely by-property vs by-page counting (not confirmed).
+- Next: check the main-branch run (10-day update). Runs daily (cron 03:15 UTC). Supermetrics left connected.
+
 ## 2026-11-28 12:42 (Africa/Nairobi) - Free Search Console to Neon sync (branch `wip-search-performance`, NOT merged)
 - Owner asked to replace Supermetrics with a free option. Added seo-search-performance.mjs, its test and workflow; new Neon tables search_performance_daily and search_performance_details.
 - Tests: offline test passes. In progress: real run from the branch push.

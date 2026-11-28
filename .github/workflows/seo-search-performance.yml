@@ -7,7 +7,7 @@ on:
   schedule:
     - cron: '15 3 * * *'
   push:
-    branches: [main, wip-search-performance]
+    branches: [main]
     paths:
       - 'seo-search-performance.mjs'
       - '.github/workflows/seo-search-performance.yml'
