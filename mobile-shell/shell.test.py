@@ -114,8 +114,8 @@ def mock_network(ctx):
     # from this local shell before it can exercise the in-shell product overlay.
     # index.html also loads /product-links.js (deferred), which would overwrite an init-script stub with the
     # production-domain helper, so answer that request with a local-origin version of the same helper.
-    ctx.add_init_script("window.shellProductLink = s => location.origin + '/p/' + encodeURIComponent(s) + '.html';")
-    ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/p/' + encodeURIComponent(v) + '.html' : '/'); };"))
+    ctx.add_init_script("window.shellProductLink = s => location.origin + '/?product=' + encodeURIComponent(s);")
+    ctx.route('**/product-links.js*', lambda r: r.fulfill(status=200, content_type='application/javascript', body="window.shellProductLink = function (s) { var v = String(s == null ? '' : s).trim(); return location.origin + (v ? '/?product=' + encodeURIComponent(v) : '/'); };"))
     def serve_product_page(rt):
         # Match the requested fixture slug to the generated SEO page's early shell bootstrap.
         # Otherwise every mocked /p/ URL redirects to REAL's unrelated production slug.
@@ -280,7 +280,7 @@ with sync_playwright() as p:
     check('selected quick-buy price summary updates immediately', pg.locator('#qb-price').inner_text() == 'KSh 1,550' and pg.locator('#qb-old').inner_text() == 'KSh 1,782', pg.locator('#qb-price').inner_text())
     pg.wait_for_function("document.querySelector('#qb-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
     check('details: description, unit and stock of the chosen size are shown', 'line one' in pg.locator('#qb-desc').inner_text() and pg.locator('#qb-meta').inner_text() == 'Product code: STM-GARDEN-SET-250ML · Unit: Each · In stock', pg.locator('#qb-meta').inner_text())
-    check('details: link to the full product page of that size', pg.locator('#qb-page').get_attribute('href') == f'{URL.rstrip('/')}/p/garden-set-250ml.html' and pg.locator('#qb-page').is_visible(), pg.locator('#qb-page').get_attribute('href'))
+    check('details: link to the full product page of that size', pg.locator('#qb-page').get_attribute('href') == f'{URL.rstrip('/')}/?product=garden-set-250ml' and pg.locator('#qb-page').is_visible(), pg.locator('#qb-page').get_attribute('href'))
     check('details: extra photos listed and tapping one changes the main photo', pg.locator('#qb-photos [data-photo]').count() == 2 and (pg.locator('#qb-photos [data-photo]').nth(1).click() or True) and pg.locator('#qb-img img').count() == 1)
     pg.screenshot(path=f'{OUT}/shot-details.png')
     # the full product page opens INSIDE the shell (no navigation to /p/...)
@@ -289,7 +289,7 @@ with sync_playwright() as p:
     pg.locator('#qb-page').click()
     pg.wait_for_selector('#page-product.open', timeout=5000)
     pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
-    check('product page opens inside the shell (no reload, address becomes the shell product link, shell still loaded)', pg.evaluate("window.__shellStillLoaded === true") and pg.url == f'{URL.rstrip("/")}/p/garden-set-250ml.html' and pg.locator('#bottom-nav').count() == 1, pg.url)
+    check('product page opens inside the shell (no reload, address becomes the shell product link, shell still loaded)', pg.evaluate("window.__shellStillLoaded === true") and pg.url == f'{URL.rstrip("/")}/?product=garden-set-250ml' and pg.locator('#bottom-nav').count() == 1, pg.url)
     check('product page shows name, price, sizes, description, unit and trust lines', 'Garden Hose Connector Set' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Product code: STM-GARDEN-SET-250ML' in pg.locator('#pp-meta').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
     pg.screenshot(path=f'{OUT}/shot-product-page.png')
     check('product page: similar products listed', pg.locator('#pp-related [data-pp-open]').count() >= 1)
@@ -385,7 +385,7 @@ with sync_playwright() as p:
     # reload with a sheet open does not reopen it; clear the search first so the fixture has a visible product to open
     pg.fill('#search', ''); pg.keyboard.press('Enter'); pg.wait_for_selector('#grid .card[data-id]')
     pg.locator('#grid .card[data-id]').first.locator('p').first.click()
-    # Opening a product changes the address to its canonical /p/<slug>.html URL.
+    # Opening a product changes the customer-facing address to /?product=<slug>; canonical metadata remains /p/<slug>.html.
     # To test shell reload state (rather than the separate full product page), return
     # the address to the shell root while preserving the current history state.
     pg.evaluate("history.replaceState(history.state, '', '/')")
@@ -453,11 +453,11 @@ with sync_playwright() as p:
     ch = chain('/classic.html')
     check('old /classic.html bookmark forwards straight to the shell', ch[-1] == '/' and not any('checkout' in u for u in ch), ch)
     ch = chain('/classic.html#p-abasi-5-ec')
-    check('old classic #p-<id> link opens the canonical static product page in the shell', '/p/abasi-5-ec.html' in ch, ch)
+    check('old classic #p-<id> link opens the customer shell product route', '/?product=abasi-5-ec' in ch, ch)
     ch = chain('/classic.html?item=abasi-5-ec')
-    check('old classic ?item=<id> link opens the canonical static product page in the shell', '/p/abasi-5-ec.html' in ch, ch)
+    check('old classic ?item=<id> link opens the customer shell product route', '/?product=abasi-5-ec' in ch, ch)
     ch = chain('/?item=abasi-5-ec')
-    check('old home-page share link /?item=<id> opens the canonical static product page in the shell', '/p/abasi-5-ec.html' in ch, ch)
+    check('old home-page share link /?item=<id> opens the customer shell product route', '/?product=abasi-5-ec' in ch, ch)
     ch = chain('/classic.html?cart=home-0:2')
     check('old classic ?cart= link keeps the cart lines and goes to the shell', any(u.startswith('/?cart=') for u in ch), ch)
     ch = chain('/classic.html?checkout=1')
@@ -553,26 +553,26 @@ with sync_playwright() as p:
     base_title = p9.title()
     check('address: selected Home & Living category keeps its clean category address', p9.evaluate('location.pathname + location.search') == '/c/home-living.html', p9.url)
     p9.locator('#grid .card[data-id="garden-set"] p').first.click(); p9.wait_for_selector('#page-product.open')
-    check('address: tapping a product opens the full product page in the shell', p9.evaluate("location.pathname === '/p/garden-set-50ml.html' && location.search === ''") and 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text(), p9.url)
+    check('address: tapping a product opens the full product page in the shell', p9.evaluate("location.pathname === '/' && location.search === '?product=garden-set-50ml'") and 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text(), p9.url)
     check('address: product page title identifies the product', 'Garden Hose Connector Set' in p9.title() and p9.title().endswith('| Stermont Arcade'), p9.title())
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
     check('address: Back returns to the selected category address and title', p9.evaluate('location.pathname') == '/c/home-living.html' and p9.title() == base_title, p9.url + ' | ' + p9.title())
     p9.goto(f'{BASE}/?product=garden-set-250ml'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: opening the address shows that product page with that size', 'Garden Hose Connector Set' in p9.locator('#pp-name').inner_text() and p9.locator('#pp-price').inner_text() == 'KSh 1,550', p9.locator('#pp-price').inner_text())
-    check('address: a legacy product query resolves to the canonical static product URL and the tab title shows the product', p9.evaluate("location.pathname.startsWith('/p/') && location.search === ''") and 'Garden Hose Connector Set' in p9.title())
+    check('address: a legacy product query stays on the customer shell route and the tab title shows the product', p9.evaluate("location.pathname === '/' && location.search.startsWith('?product=')") and 'Garden Hose Connector Set' in p9.title())
     p9.go_back(); p9.wait_for_function("!document.querySelector('#page-product.open')")
-    check('Back closes the product overlay while preserving the canonical static product URL', p9.locator('#page-product.open').count() == 0 and p9.evaluate("location.pathname.startsWith('/p/') && location.search === ''"), p9.url)
+    check('Back closes the product overlay while preserving the customer shell query URL', p9.locator('#page-product.open').count() == 0 and p9.evaluate("location.pathname === '/' && location.search.startsWith('?product=')"), p9.url)
     p9.reload(); p9.wait_for_selector('#grid .card[data-id]')
     p9.goto(f'{BASE}/?product=home-1'); p9.wait_for_selector('#page-product.open', timeout=10000)
     check('address: a single-size product opens from its address too', 'Air Fryer' in p9.locator('#pp-name').inner_text())
     p9.evaluate("window.__shared = null; navigator.share = d => { window.__shared = d; return Promise.resolve(); }")
     p9.locator('#pp-share').click(); p9.wait_for_function('window.__shared')
     sh = p9.evaluate('window.__shared')
-    check('share: shares the exact mobile-shell product link', sh['url'] == f'{BASE}/p/home-1.html' and 'shell=1' not in sh['url'] and 'Air Fryer' in sh['title'], sh)
+    check('share: shares the exact mobile-shell product link', sh['url'] == f'{BASE}/?product=home-1' and 'shell=1' not in sh['url'] and 'Air Fryer' in sh['title'], sh)
     p9.evaluate("navigator.share = undefined; window.__copied = null; Object.defineProperty(navigator, 'clipboard', { value: { writeText: t => { window.__copied = t; return Promise.resolve(); } }, configurable: true })")
     p9.locator('#pp-share').click(); p9.wait_for_function('window.__copied')
-    check('share: without the share sheet the clean link is copied and a notice shows', p9.evaluate('window.__copied') == f'{BASE}/p/home-1.html' and 'Link copied' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
-    check('share: the address bar remains the shell product URL', p9.evaluate('location.pathname') == '/p/home-1.html' and p9.evaluate('location.search') == '')
+    check('share: without the share sheet the clean link is copied and a notice shows', p9.evaluate('window.__copied') == f'{BASE}/?product=home-1' and 'Link copied' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
+    check('share: the address bar remains the shell product URL', p9.evaluate('location.pathname') == '/' and p9.evaluate('location.search') == '?product=home-1')
     p9.goto(f'{BASE}/?product=does-not-exist'); p9.wait_for_selector('#grid .card[data-id]'); p9.wait_for_timeout(600)
     check('address: an unknown product shows a notice and the normal home', p9.locator('#page-product.open').count() == 0 and 'no longer available' in p9.locator('#toast').inner_text(), p9.locator('#toast').inner_text())
     check('address: no page errors', not e9, e9[:3])
@@ -614,7 +614,7 @@ with sync_playwright() as p:
     cc.close()
     c10 = b.new_context(viewport={'width': 1280, 'height': 800}); mock_network(c10)
     p10 = c10.new_page(); p10.goto(f'{BASE}/?product=garden-set-250ml'); p10.wait_for_selector('#page-product.open', timeout=15000)
-    check('explicit legacy /?product=<slug> deep link resolves to the canonical static product page in the shell', p10.evaluate("location.pathname.startsWith('/p/') && location.search === ''") and p10.locator('#page-product.open').count() == 1, p10.url)
+    check('explicit /?product=<slug> deep link stays on the customer shell route; SEO canonical remains /p/', p10.evaluate("location.pathname === '/' && location.search.startsWith('?product=')") and p10.locator('#page-product.open').count() == 1, p10.url)
     check('shell product deep link sets the product SEO canonical', p10.evaluate("new URL(document.querySelector('link[rel=canonical]').href).pathname") == '/p/garden-set-250ml.html', p10.evaluate("document.querySelector('link[rel=canonical]').href"))
     c10.close()
 
@@ -683,7 +683,7 @@ with sync_playwright() as p:
     # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
     c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)
     p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_selector('#page-product.open', timeout=15000); p6.wait_for_timeout(500)
-    check('legacy /#p-... link opens the product in the mobile shell at a shareable address', p6.evaluate('location.pathname + location.search') == '/p/home-0.html' and p6.locator('#bottom-nav').is_visible() and 'Hot Plate' in p6.locator('#pp-name').inner_text(), p6.url)
+    check('legacy /#p-... link opens the product in the mobile shell at a shareable address', p6.evaluate('location.pathname + location.search') == '/?product=home-0' and p6.locator('#bottom-nav').is_visible() and 'Hot Plate' in p6.locator('#pp-name').inner_text(), p6.url)
     p6.goto(f'{BASE}/mobile-shell/'); p6.wait_for_function("location.pathname === '/'", timeout=15000)
     check('/mobile-shell/ forwards to the home page', p6.url == BASE + '/', p6.url)
     c6.close()
@@ -757,7 +757,7 @@ with sync_playwright() as p:
     c17 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True, service_workers='block'); mock_network(c17)
     FAIL[0] = True  # simulate the Neon 402 quota restriction for every REST request
     fallback_html = '''<!doctype html><html><head><meta name="stm-id" content="static-fallback"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Static Fallback Sprayer","image":["https://img.test/ok.png"],"sku":"STM-TEST-402","offers":{"@type":"Offer","priceCurrency":"KES","price":1234,"availability":"https://schema.org/InStock"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"http://test/"},{"@type":"ListItem","position":2,"name":"Garden Tools","item":"http://test/c/garden-tools.html"},{"@type":"ListItem","position":3,"name":"Static Fallback Sprayer","item":"http://test/p/static-fallback.html"}]}</script></head><body><div class="product-description"><section class="pd-sec"><h3>Product Overview &amp; Key Benefits</h3><p>Published description survives a database outage.</p></section></div></body></html>'''
-    # The homepage intentionally rewrites legacy ?product links to the static /p/ URL.
+    # Legacy ?product links remain on the customer shell route; the document canonical stays /p/.
     # Make this outage fixture a generated SEO page too, so its shell-route-loader hydrates the full app.
     fallback_html = run_node('inject', fallback_html, 'static-fallback')
     p17 = c17.new_page(); e17 = []; p17.on('pageerror', lambda e: e17.append(str(e)))
