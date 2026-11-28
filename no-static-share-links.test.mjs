@@ -26,10 +26,8 @@ assert.ok(generator.includes('$' + '{normalizeCustomerProductLinks(body)}'));
 for (const marker of ['href="' + '$' + '{shellProductLink(sl(p.id))}"', '$' + '{shellProductLink(v.slug || p.slug || p.id)}']) {
   assert.ok(generator.includes(marker), 'product generator must use the mobile-shell helper for: ' + marker);
 }
-assert.ok(generator.includes('const pageProducts = [...products, ...legacyPageProducts]'), 'historical product URLs must be generated as complete product pages');
-assert.ok(generator.includes('const pageSlug = p.pageSlug || sl(p.id)'), 'historical product pages must use their original slug');
-assert.ok(generator.includes('Historical product URLs are rendered as full self-canonical product pages'));
-assert.ok(!generator.includes('<title>Redirecting'), 'legacy product pages must not be meta-refresh redirect stubs');
+assert.ok(generator.includes('<a href="' + '$' + '{shellProductLink(sl(a.to))}">Continue to the product page</a>'), 'old product addresses must forward to the current page');
+assert.ok(!generator.includes('legacyPageProducts'), 'old product addresses must not be generated as duplicate full product pages');
 for (const file of ['seo-related-fill.mjs','seo-pest/blog-build.mjs','blog-write.mjs','seo-kenya.mjs','services/build-services.mjs','wa-float.js']) {
   assert.ok(readFileSync(file, 'utf8').includes('shellProductLink'), file + ' must use the shared mobile-shell URL helper');
 }

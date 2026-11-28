@@ -714,14 +714,13 @@ function productBuyingNotes(p, cat) {
 
 const NAMES = {};   // product id -> the heading its page shows; the shop list reads this (product-names.json) so list, view and page always carry the same wording
 const sitemapEligibleProductPaths = new Set(); // only explicitly in-stock product pages enter the product sitemap
+// One indexable page per product / pack size (each has its own price, stock, SKU and canonical).
+// Old addresses (renamed slugs, id addresses, retired duplicates) are NOT pages: they get a small redirect page below,
+// so Google keeps a single canonical URL and the sitemap never lists a duplicate.
 const productById = new Map(products.map(p => [p.id, p]));
-const legacyPageProducts = aliases.map(a => {
-  const target = productById.get(a.to);
-  return target && a.id !== sl(target.id) ? { ...target, pageSlug: a.id, legacyAlias: true } : null;
-}).filter(Boolean);
-const pageProducts = [...products, ...legacyPageProducts];
+const pageProducts = products;
 for (const p of pageProducts) {
-  const pageSlug = p.pageSlug || sl(p.id);
+  const pageSlug = sl(p.id);
   const path = `/p/${encodeURIComponent(pageSlug)}.html`, cat = p.categories, img = (p.images || []).filter(Boolean).map(u => optimizedImageUrl(u, 900));
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
   if (Number(p.stock) > 0) sitemapEligibleProductPaths.add(path);
@@ -820,7 +819,13 @@ ${productSiloHtml(p, cat, related)}
   urls.push(path);
 }
 
-// Historical product URLs are rendered as full self-canonical product pages in pageProducts above.
+// Old product addresses forward to the current page (canonical + meta refresh). They are never listed in the sitemap.
+for (const a of aliases) {
+  const target = productById.get(a.to);
+  if (!target || a.id === sl(target.id)) continue;   // a real page already lives at this address
+  const from = `/p/${encodeURIComponent(a.id)}.html`, to = `${SITE}/p/${encodeURIComponent(sl(a.to))}.html`;
+  writeFileSync(fileOf(from), `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Redirecting\u2026</title><link rel="canonical" href="${to}"><meta http-equiv="refresh" content="0;url=${to}"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><p>This product moved. <a href="${shellProductLink(sl(a.to))}">Continue to the product page</a>.</p></body></html>`);
+}
 
 for (const [slug, c] of Object.entries(byCat)) {
   const oldPath = `/c/${encodeURIComponent(slug)}.html`;
