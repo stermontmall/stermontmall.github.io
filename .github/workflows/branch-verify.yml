@@ -1,0 +1,164 @@
+# Stermont Arcade - branch verification. Runs the same tests and the same generation chain as
+# product-pages.yml, but NEVER commits or pushes: generated pages are only inspected and uploaded
+# as a build artifact. Use it to prove a change on a fix/** branch before anything is merged to main.
+name: Verify branch build (no deploy)
+
+on:
+  push:
+    branches: ['fix/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: branch-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Get the site files
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      - name: Test parent category hub aggregation
+        run: node category-hubs.test.mjs
+
+      - name: Test Google indexing safeguards (canonical, robots and sitemap)
+        run: node seo-indexing-guard.test.mjs
+
+      - name: Test validated optional GTIN/MPN Product schema fields
+        run: node seo-product-identifiers.test.mjs
+
+      - name: Test unique product codes on pages and in admin
+        run: node product-codes.test.mjs
+
+      - name: Test shared SEO metadata rules
+        run: node seo-meta.test.mjs
+
+      - name: Test active catalogue SEO metadata quality guard
+        run: node seo-catalog-guard.test.mjs
+
+      - name: Test the empty-catalogue guard
+        run: node catalogue-count-guard.test.mjs
+
+      - name: Guard - refuse to build from an almost empty catalogue
+        run: node catalogue-count-guard.mjs
+
+      - name: Audit active catalogue before page generation
+        run: node seo-catalog-guard.mjs
+
+      - name: Test allowlisted ordinary-product meta descriptions
+        run: node seo-safe-meta.test.mjs
+
+      - name: Test hand-written product content
+        run: node product-content.test.mjs
+
+      - name: Test the 404 page fallback
+        run: node not-found-fallback.test.mjs
+
+      - name: Test product description section rendering
+        run: node product-description-html.test.mjs
+
+      - name: Test modern responsive product-page design
+        run: node product-page-design.test.mjs
+
+      - name: Test the product page guard
+        run: node check-product-pages.test.mjs
+
+      - name: Test homepage server-rendered product cards
+        run: node home-grid-ssr.test.mjs
+
+      - name: Fetch historical slugs and reviews from Neon
+        run: node neon-extras.mjs "$RUNNER_TEMP"
+
+      - name: Build pages and sitemap from the live catalog (nothing is pushed)
+        run: node generate-products.mjs
+
+      - name: Confirm historical product URLs were generated
+        run: |
+          expected=$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.env.SLUG_REDIRECTS_JSON,'utf8')).length)")
+          echo "Neon holds $expected historical slug mappings."
+          node -e "
+            const fs=require('fs');
+            const hist=JSON.parse(fs.readFileSync(process.env.SLUG_REDIRECTS_JSON,'utf8'));
+            const missing=hist.filter(h=>!fs.existsSync('p/'+h.old_slug+'.html')).map(h=>h.old_slug);
+            console.log('Historical slugs without a generated file:', missing.length);
+            if(missing.length) console.log(missing.join('\n'));
+          "
+
+      - name: Kenya SEO titles, descriptions and price guides (seo-kenya.mjs)
+        continue-on-error: true
+        run: node seo-kenya.mjs
+
+      - name: Rebuild blog pages and normalize their category links
+        run: |
+          node seo-safe-blog-meta.test.mjs
+          node seo-blog-titles.mjs
+          node seo-safe-blog-meta.mjs
+          node blog-build.mjs
+
+      - name: Rebuild service pages with mobile-shell customer links
+        run: node services/build-services.mjs
+
+      - name: Normalize internal category links in generated product pages
+        run: node category-link-normalizer.mjs
+
+      - name: Normalize visible product links in generated pages
+        run: node product-link-normalizer.mjs
+
+      - name: Apply Google titles, descriptions and FAQs (seo-overrides.json)
+        run: node seo-overrides.mjs
+
+      - name: Apply allowlisted ordinary-product meta descriptions only
+        run: node seo-safe-meta.mjs
+
+      - name: Marketplace-style product description layout
+        continue-on-error: true
+        run: node seo-description-layout.mjs
+
+      - name: Top up related-product links on pages in small categories
+        continue-on-error: true
+        run: node seo-related-fill.mjs
+
+      - name: Test customer product links use mobile shell and preserve SEO crawl links
+        run: STM_CHECK_GENERATED_PRODUCT_PAGES=1 node no-static-share-links.test.mjs
+
+      - name: Test canonical responsive product-page routing and legacy redirect removal
+        run: node seo-shell-chrome.test.mjs
+
+      - name: Test full mobile-shell routing for product and category URLs
+        run: node seo-shell-redirect.test.mjs
+
+      - name: Route product and category pages into the full mobile shell
+        run: node seo-shell-redirect.mjs
+
+      - name: Warn about broken or placeholder links (link-check.mjs)
+        continue-on-error: true
+        run: node link-check.mjs --warn
+
+      - name: Guard - every active product must have a built page
+        run: node check-product-pages.mjs
+
+      - name: Keep the generated output for inspection (not deployed)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-site-preview
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            p
+            c
+            sitemap.xml
+            sitemap-products.xml
+            sitemap-state.json
+            product-names.json
+            merchant-feed.xml
