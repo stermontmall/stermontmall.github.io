@@ -292,3 +292,8 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Screenshot workflow succeeded and produced 12 PNGs (six message variants at 600px and 360px). Reviewed customer confirmation, staff alert, and declined 360px screenshots; layout is readable at 360px and all CTAs fit.
 - Visual review found county duplication when the address itself already contained the county (e.g. `Westlands, Nairobi, Nairobi`). Added `deliveryAddress()` normalisation and applied it to HTML, plain text, and EmailJS delivery field.
 - Because this is a new commit, rerun PR checks and regenerate screenshot artifact so final evidence reflects this last refinement.
+
+## 2026-11-28 (Africa/Nairobi) - Email send timeout hardening
+- Added a 12-second timeout/AbortController to EmailJS requests so a hung network call resolves `false` instead of leaving an admin status action waiting indefinitely; checkout remains fire-and-forget as before.
+- Extended `order-emails.test.mjs` to simulate a never-settling EmailJS request and assert `send()` resolves `false`.
+- This is the latest code change and requires a fresh PR workflow run before final sign-off.
