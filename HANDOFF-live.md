@@ -1,3 +1,7 @@
+## 2026-11-28 12:47 (Africa/Nairobi) - Per-page daily totals tested, merging to main (branch `wip-search-page-totals`)
+- Branch run passed: 52 days, 9421 page rows. Page clicks 496 (by page) vs daily 484 (by property).
+- Next: check the main-branch run.
+
 ## 2026-11-28 12:45 (Africa/Nairobi) - Per-page daily totals (branch `wip-search-page-totals`, NOT merged)
 - Added table search_performance_pages (search/page details omit hidden searches, so they undercount pages).
 - Next: check the branch run and Neon rows, restore the push trigger to main only, merge.
