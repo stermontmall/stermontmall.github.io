@@ -407,6 +407,21 @@ with sync_playwright() as p:
     check('retry loads the first paginated product batch', p2.locator('#grid .card[data-id]').count() >= 8 and p2.locator('#grid-empty').is_hidden())
     p2.close()
 
+    # A request that never settles must time out and let the same-site snapshot hydrate the shop.
+    p_timeout = ctx.new_page()
+    p_timeout.add_init_script("""(() => {
+        const realFetch = window.fetch.bind(window);
+        window.fetch = (input, init) => String(input).includes('/token/anonymous')
+            ? new Promise(() => {})
+            : realFetch(input, init);
+    })();""")
+    p_timeout.goto(URL)
+    p_timeout.wait_for_selector('#grid .card[data-id]', timeout=15000)
+    check('stalled Neon Auth request times out and snapshot loads products',
+          p_timeout.locator('#grid .card[data-id]').count() >= 8
+          and p_timeout.evaluate("window.STM_LAST_ERROR && window.STM_LAST_ERROR.includes('timed out')"))
+    p_timeout.close()
+
     # a cart saved by the old mock prototype (no rowId) is dropped, not shown with fake prices
     c3 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c3)
     p3 = c3.new_page()

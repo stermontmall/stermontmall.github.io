@@ -49,6 +49,26 @@ const ls = {
    missing the plain database name is used. Filtering, sorting and paging then run in memory, so every filter is instant. */
 const NEON = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
 const NEON_AUTH = 'https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth';
+// Bound external storefront requests so a stalled browser connection cannot block the local catalogue fallback.
+const STOREFRONT_REQUEST_TIMEOUT_MS = 6000;
+async function fetchWithTimeout(url, options = {}, label = 'storefront request') {
+  const controller = new AbortController();
+  let timeoutId;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      controller.abort();
+      reject(new Error(label + ' timed out after ' + STOREFRONT_REQUEST_TIMEOUT_MS + 'ms'));
+    }, STOREFRONT_REQUEST_TIMEOUT_MS);
+  });
+  try {
+    return await Promise.race([
+      fetch(url, { ...options, signal: controller.signal }),
+      timeout
+    ]);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 // The Data API is configured with Neon Auth. Public storefront reads must carry a short-lived
 // anonymous JWT; a bare fetch is not enough even though the anonymous role has SELECT grants.
 let anonymousTokenPromise = null;
@@ -57,7 +77,7 @@ let anonymousTokenExpiresAt = 0;
 async function getStorefrontToken() {
   if (anonymousToken && Date.now() < anonymousTokenExpiresAt - 30000) return anonymousToken;
   if (!anonymousTokenPromise) {
-    anonymousTokenPromise = fetch(NEON_AUTH + '/token/anonymous', { credentials: 'include' })
+    anonymousTokenPromise = fetchWithTimeout(NEON_AUTH + '/token/anonymous', { credentials: 'include' }, 'Neon Auth')
       .then(async response => {
         if (!response.ok) throw new Error('Neon Auth HTTP ' + response.status + ' while requesting storefront access');
         const payload = await response.json();
@@ -73,7 +93,7 @@ async function getStorefrontToken() {
 }
 async function storefrontFetch(path) {
   const token = await getStorefrontToken();
-  return fetch(NEON + path, { headers: { Authorization: 'Bearer ' + token } });
+  return fetchWithTimeout(NEON + path, { headers: { Authorization: 'Bearer ' + token } }, 'Neon Data API');
 }
 const api = path => storefrontFetch(path)
   .then(r => { if (!r.ok) throw new Error('Neon HTTP ' + r.status); return r.json(); });
@@ -137,10 +157,10 @@ let catalogP = null;
 let fullCatalog = false;   // true once the WHOLE catalog is in PRODUCTS (the product link fast path in section 9b must never overwrite it)
 function loadCatalog() {
   if (!catalogP) {
-    const names = fetch('/product-names.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : {})).catch(() => ({}));
+    const names = fetchWithTimeout('/product-names.json', { cache: 'no-cache' }, 'product names').then(r => (r.ok ? r.json() : {})).catch(() => ({}));
     // Live read from Neon; if the browser cannot reach Neon (CORS, network, outage) use the same-site snapshot so the shop is never empty.
     const live = Promise.all([apiAll('storefront_products?select=' + PRODUCT_COLS + '&order=id.asc').then(r => r.map(withCover)), api(CAT_Q)]);
-    const snap = () => fetch('/catalog-snapshot.json').then(r => { if (!r.ok) throw new Error('snapshot HTTP ' + r.status); return r.json(); })
+    const snap = () => fetchWithTimeout('/catalog-snapshot.json', { cache: 'no-cache' }, 'catalogue snapshot').then(r => { if (!r.ok) throw new Error('snapshot HTTP ' + r.status); return r.json(); })
       .then(d => [d.products.map(withCover), d.categories]);
     catalogP = live.catch(e => { console.warn('Neon unavailable, using catalog-snapshot.json:', e); window.STM_LAST_ERROR = String(e && e.message || e); return snap().catch(() => { throw e; }); })
       .then(async ([rows, cats]) => { buildCatalog(rows, cats, await names); fullCatalog = true; })
