@@ -246,3 +246,72 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Updated the assertion to compare the canonical URL pathname, preserving the requirement that the deep link resolves to `/p/garden-set-250ml.html` while allowing the test server's local hostname.
 - Commit: `1e5cc399b9ce00a08f9129656c17fd26450a407a`.
 - Re-run route and SEO workflows on the new HEAD; PR #1182 remains open/unmerged and changes are not live.
+
+
+## 2026-11-28 (Africa/Nairobi) - Modern order-email redesign (branch `wip-modern-order-emails`, IN PROGRESS)
+- Read this handoff before code changes; created the work branch from main. Main remains untouched.
+- Confirmed checkout calls `STMOrderEmails.send(payload, data)` and admin calls `STMOrderEmails.status(updated, state)`; preserve both public interfaces.
+- Next: inspect template contract and tests, then implement shared HTML/text rendering and preview. No email sent; no Neon data touched.
+
+## 2026-11-28 (Africa/Nairobi) - Order-email integration and template contract inspected
+- Confirmed the active checkout call sends `payload` plus RPC result `data`; the admin sends the updated order row and one of `confirmed`, `packed`, `delivered`, `declined`.
+- Confirmed EmailJS template `template_n60yao4` is expected to render `{{{html_body}}}` as its body (legacy `checkout-deferred.js` comment). Keep `service_zoho`, the existing public key, and template ID; no dashboard/API call made.
+- Existing `order-emails.js` currently has a `send()` return-contract defect (array rather than boolean) and status template lacks several requested sections. No checkout/admin call-site edits planned.
+- Next: implement shared table-based HTML and plain-text builders, safe field handling, six sample previews, and Node tests.
+
+## 2026-11-28 (Africa/Nairobi) - Shared transactional email renderer implemented
+- Updated only `order-emails.js` on `wip-modern-order-emails` (commit `93612c0d`). Kept EmailJS service/template/public key and both public methods; no checkout/admin call-site changes.
+- Added shared responsive table-based HTML layout, hidden preheaders, progress tracker, per-state accents/icons/copy, order items, subtotal/discount/total, M-Pesa verification, delivery/pickup and timing, track/WhatsApp CTAs, staff phone/admin/WhatsApp actions, and footer links.
+- Added escaping for customer content, HTTPS-only item-photo handling with a styled fallback tile, explicit image dimensions/alt text, inline styles, bgcolor fallbacks, and a plain-text body parameter.
+- Corrected `send()` to resolve one boolean (true only when all requested sends succeed); `status()` remains boolean and both paths catch build/network failures.
+- Next: add six-state local preview and automated tests; run requested existing tests. No real EmailJS delivery attempted.
+
+## 2026-11-28 (Africa/Nairobi) - Email preview and automated test added
+- Added `email-preview.html` with six isolated sample previews: customer placed, staff alert, confirmed, packed, delivered, declined. Preview does not call EmailJS.
+- Added `order-emails.test.mjs` covering customer-value escaping, unsafe image URL rejection, HTTPS image rendering/alt/dimensions, KSh formatting and discount total, payment badge, tracking/WhatsApp/footer links, all status variants, placeholders, staff tap-to-call/admin actions, and send/status network-failure booleans.
+- Next: run the new test and the requested existing `seo-indexing-guard.test.mjs` and `no-static-share-links.test.mjs`; then capture desktop and 360px mobile screenshots and review the final diff.
+- No EmailJS dashboard edits or real sends performed.
+
+## 2026-11-28 (Africa/Nairobi) - Email QA automation and screenshot capture added
+- Added `.github/workflows/order-email-preview.yml`; it runs `order-emails.test.mjs`, `seo-indexing-guard.test.mjs`, and `no-static-share-links.test.mjs`, then captures 12 screenshots (six email types at 600px desktop and 360px mobile) and uploads them as a 14-day Actions artifact.
+- Added `email-preview-screenshots.py` for Playwright capture. Preview uses a safe image fallback tile when the sample item has no image; automated test separately verifies an HTTPS item image with alt text and explicit dimensions.
+- Corrected staff phone CTA to use a `tel:+254...` link.
+- Next: trigger PR checks, review actual test results and screenshot artifact; inspect exact diff and ensure protected paths were untouched. Screenshot capture and tests have not yet run locally because this environment cannot resolve GitHub for cloning.
+
+## 2026-11-28 (Africa/Nairobi) - Final design pass before PR
+- Made all five customer status states use distinct hero symbols (placed, confirmed, packed, delivered, declined) and distinct accent colours; staff alert uses the placed/new-order treatment.
+- Email preview page covers the six requested message variants. Screenshot workflow is configured to produce desktop and 360px mobile captures.
+- Remaining validation is delegated to the PR workflow; do not treat test/screenshot outputs as passed until Actions reports success and artifacts are available.
+
+## 2026-11-28 (Africa/Nairobi) - First PR CI pass and screenshot harness correction
+- PR #1279 checks: new email test PASS; `seo-indexing-guard.test.mjs` PASS; `no-static-share-links.test.mjs` PASS.
+- Chromium installation succeeded. Screenshot capture initially failed because the Playwright Python version exposes `ElementHandle.content_frame` as a method; corrected the script to call `content_frame()` (commit `9b080776`).
+- Re-run is pending on the updated branch. Broader SEO `validate` job is still in progress. No application renderer change was needed for this harness issue.
+
+## 2026-11-28 (Africa/Nairobi) - Screenshot review and address refinement
+- Screenshot workflow succeeded and produced 12 PNGs (six message variants at 600px and 360px). Reviewed customer confirmation, staff alert, and declined 360px screenshots; layout is readable at 360px and all CTAs fit.
+- Visual review found county duplication when the address itself already contained the county (e.g. `Westlands, Nairobi, Nairobi`). Added `deliveryAddress()` normalisation and applied it to HTML, plain text, and EmailJS delivery field.
+- Because this is a new commit, rerun PR checks and regenerate screenshot artifact so final evidence reflects this last refinement.
+
+## 2026-11-28 (Africa/Nairobi) - Email send timeout hardening
+- Added a 12-second timeout/AbortController to EmailJS requests so a hung network call resolves `false` instead of leaving an admin status action waiting indefinitely; checkout remains fire-and-forget as before.
+- Extended `order-emails.test.mjs` to simulate a never-settling EmailJS request and assert `send()` resolves `false`.
+- This is the latest code change and requires a fresh PR workflow run before final sign-off.
+
+## 2026-11-28 (Africa/Nairobi) - Final requested email tests and screenshot artifact pass
+- Latest dedicated workflow run `46126339032` completed SUCCESS on the current code: `order-emails.test.mjs`, `seo-indexing-guard.test.mjs`, and `no-static-share-links.test.mjs` all passed; Playwright screenshot capture passed and uploaded 12 images.
+- Screenshot artifact: `stermont-order-email-screenshots` (run `46126339032`, artifact `15255064486`); files are six message variants at 600px and 360px widths. Reviewed the refreshed 360px customer confirmation; county duplication is fixed.
+- Current PR #1279 remains OPEN and unmerged. The broader `seo-pr-quality` validation workflow is still running separately; do not merge until it completes and owner approves.
+- Real EmailJS delivery was not tested. EmailJS dashboard must retain HTML body `{{{html_body}}}` and add `{{text_body}}` as the plain-text alternative if available.
+
+## 2026-11-28 (Africa/Nairobi) - Strict order-item field compliance
+- Removed the optional `item.price` fallback from line-total calculation; email item amounts now use only the supplied `items[].total` field. Item quantity uses `items[].qty`, and name uses `items[].name`.
+- Photo rendering remains optional and only activates for an HTTPS photo URL present on an item. This preserves the user's allowed order schema and avoids deriving line prices.
+- Fresh PR checks are required for this final schema-compliance adjustment.
+
+## 2026-11-28 (Africa/Nairobi) - Final head test and screenshot confirmation
+- Latest code head before this handoff entry: `1f1201bc5ca49554b3a81b098107d756ab9779c1`.
+- Dedicated order-email workflow `46126507362` SUCCESS: new order email test, SEO indexing guard, no-static-share-links guard, screenshot capture, and artifact upload all passed.
+- Verified screenshot ZIP artifact `15255334129` contains exactly 12 PNGs: six emails at 600px and 360px widths. Sample confirmation screenshot reviewed after delivery-address de-duplication.
+- Full SEO PR validation `46126507365` is still running its mobile-shell browser regression suite; no failure reported at this checkpoint.
+- PR #1279 remains open, mergeable, and unmerged. No live EmailJS message sent; no EmailJS dashboard setting changed; no Neon or generated-page changes.

@@ -1,0 +1,50 @@
+name: Order email preview and regression tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'order-emails.js'
+      - 'order-emails.test.mjs'
+      - 'email-preview.html'
+      - 'email-preview-screenshots.py'
+      - '.github/workflows/order-email-preview.yml'
+      - 'seo-indexing-guard.test.mjs'
+      - 'no-static-share-links.test.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  order-email:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Test transactional email rendering and failure handling
+        run: node order-emails.test.mjs
+      - name: Test Google indexing safeguards
+        run: node seo-indexing-guard.test.mjs
+      - name: Test customer product links and generated share-link safeguards
+        run: node no-static-share-links.test.mjs
+      - name: Install Chromium for email screenshots
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Capture all six emails at desktop and 360px mobile widths
+        run: python email-preview-screenshots.py
+      - name: Upload email preview screenshots
+        uses: actions/upload-artifact@v7
+        with:
+          name: stermont-order-email-screenshots
+          path: email-preview-screenshots/*.png
+          if-no-files-found: error
+          retention-days: 14
