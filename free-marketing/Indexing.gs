@@ -57,11 +57,12 @@ function inspectIndexingUrls() {
   const updates = [];
   const history = [];
   let inspected = 0;
+  let attempted = 0;
   let skipped = 0;
   let quotaStop = false;
 
   for (let i = 0; i < values.length; i++) {
-    if (inspected >= INDEXING_CONFIG.maxPerRun) break;
+    if (attempted >= INDEXING_CONFIG.maxPerRun) break;
     const url = String(values[i][0] || '').trim();
     if (!url || values[i][12]) { skipped++; continue; }
     if (!isAllowedInspectionUrl_(url, siteUrl)) {
@@ -72,6 +73,7 @@ function inspectIndexingUrls() {
     }
 
     const now = new Date();
+    attempted++;
     let result;
     let errorText = '';
     try {
@@ -94,7 +96,8 @@ function inspectIndexingUrls() {
     values[i][9] = status.lastCrawlTime || '';
     values[i][10] = sitemapText;
     values[i][11] = referringText;
-    values[i][12] = quotaStop ? '' : now;
+    // Only successful inspections are marked complete. API/network errors remain retryable.
+    values[i][12] = errorText ? '' : now;
     values[i][13] = errorText;
     updates.push({ row: i + 2, values: values[i] });
     history.push([
@@ -102,7 +105,7 @@ function inspectIndexingUrls() {
       status.indexingState || '', status.googleCanonical || '',
       status.userCanonical || '', status.lastCrawlTime || '', errorText
     ]);
-    inspected++;
+    if (!errorText) inspected++;
     if (quotaStop) break;
     Utilities.sleep(120);
   }
@@ -114,7 +117,8 @@ function inspectIndexingUrls() {
   }
   const remaining = Math.max(0, values.filter(r => r[0] && !r[12]).length);
   SpreadsheetApp.getUi().alert(
-    'Indexing inspection finished.\nInspected: ' + inspected +
+    'Indexing inspection finished.\nSuccessful inspections: ' + inspected +
+    '\nAttempts this run: ' + attempted +
     '\nSkipped/already inspected: ' + skipped +
     '\nStill pending: ' + remaining +
     (quotaStop ? '\nStopped at a Google API quota/rate limit; retry later.' : '') +
