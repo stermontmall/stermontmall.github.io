@@ -53,9 +53,7 @@
     return safeImage(item && (item.image_url || item.image || item.photo_url || item.photo || item.product_image));
   }
   function lineTotal(item) {
-    if (item && item.total != null) return numeric(item.total);
-    if (item && item.price != null && item.qty != null) return numeric(item.price) * numeric(item.qty);
-    return 0;
+    return numeric(item && item.total);
   }
   function orderTotal(order) {
     var subtotal = numeric(order && order.subtotal);
