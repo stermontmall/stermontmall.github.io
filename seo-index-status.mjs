@@ -78,7 +78,7 @@ for (const u of urls) {
 }
 notChecked = urls.length - results.length;
 // Preserve the full Google response for Neon sync; Markdown is a human-readable report, not the data contract.
-writeFileSync('index-results.json', JSON.stringify({ generated_at: new Date().toISOString(), requested_urls: urls.length, results }, null, 2) + '\\n');
+writeFileSync('index-results.json', JSON.stringify({ generated_at: new Date().toISOString(), requested_urls: urls.length, results }, null, 2) + String.fromCharCode(10));
 
 const limited = results.filter(r => r.rateLimited);
 const errs = results.filter(r => r.error && !r.rateLimited);
