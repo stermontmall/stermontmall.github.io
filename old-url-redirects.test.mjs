@@ -25,7 +25,7 @@ assert.throws(() => parseRedirects('a,/c/x.html\na,/c/y.html'), /repeats/);
 rmSync(root, { recursive: true, force: true });
 
 // The real list must parse, and the builder must apply it after it has written the real pages.
-assert.ok(parseRedirects(readFileSync(LIST, 'utf8')).size >= 801);
+assert.ok(parseRedirects(readFileSync(LIST, 'utf8')).size >= 797);
 const generator = readFileSync('generate-products.mjs', 'utf8');
 assert.ok(generator.indexOf('writeOldRedirects(') > generator.indexOf("writeFileSync('products.html'"), 'old redirects must be written after the real pages');
 console.log('Old URL redirects: checks passed.');

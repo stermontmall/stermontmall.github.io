@@ -1,3 +1,9 @@
+## 2026-11-28 11:35 (Africa/Nairobi) - Audit of the 801 old-URL mappings; 4 redundant rows removed (branch `wip-trim-redundant-redirects`)
+- Audit (deployed main 736c47762): 797 redirect pages + 4 live product pages; every target exists; no chains; no redirect pages in the sitemaps. 717 rows go to category pages, 84 to products (all active; 2 out of stock).
+- Removed 4 rows whose old address is a live product (amistar-250-sc-fungicide-5l, amistar-top-325-sc-fungicide-5l, ed21-30w-fly-catcher, ridomil-gold-mz-68wg-fungicide-1kg).
+- Open for owner: about 27 rows send an old pack size to a different pack; `bat-crp-bat-repellent-1-litre` (liquid) goes to `bat-repellant-powder-250g`. That row comes from Neon `product_slug_redirects`, which wins over this CSV, so changing it needs a Neon edit (not done).
+- Not run: live site.
+
 ## 2026-11-28 11:25 (Africa/Nairobi) - One page per product; old addresses redirect (branch `wip-one-page-per-product`, PR open)
 - Found: PR #1264 made every old slug and id address a full self-canonical page: 1,448 pages and 1,463 sitemap URLs for 683 active products (about 760 duplicates). Google index check showed 208 of 637 products indexed, mostly "Discovered - currently not indexed".
 - Done: only real products and pack sizes (each its own page, as in #1264) get full pages; renamed slugs, id addresses and retired duplicates are redirect stubs again and never in the sitemap. Merged in the `data/old-url-redirects.csv` list from `wip-persist-old-redirects-v2` (PR #1268, supersede it: do not merge separately). Tests updated: seo-indexing-guard, no-static-share-links.
