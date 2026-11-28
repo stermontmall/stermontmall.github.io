@@ -106,11 +106,17 @@
   function row(label, value, strong) {
     return '<tr><td style="padding:5px 0;' + FONT + 'font-size:13px;color:' + (strong ? '#241a35' : '#746987') + ';font-weight:' + (strong ? '800' : '500') + ';">' + esc(label) + '</td><td align="right" style="padding:5px 0;' + FONT + 'font-size:' + (strong ? '17px' : '13px') + ';color:' + (strong ? '#5b21b6' : '#241a35') + ';font-weight:' + (strong ? '900' : '700') + ';white-space:nowrap;">' + esc(value) + '</td></tr>';
   }
+  function deliveryAddress(order) {
+    var address = String(order && order.address || '').trim();
+    var county = String(order && order.county || '').trim();
+    if (address && county && address.toLowerCase().indexOf(county.toLowerCase()) !== -1) return address;
+    return [address, county].filter(Boolean).join(', ');
+  }
   function deliveryDetails(order, state) {
     var pickup = order && order.method === 'pickup';
     var heading = pickup ? 'Pickup at Stermont Arcade' : 'Delivery destination';
     var address = pickup ? 'Sarit Centre, Westlands, Nairobi. Walk-ins welcome daily, 8:00 AM–8:00 PM.' :
-      [order && order.address, order && order.county].filter(Boolean).join(', ');
+      deliveryAddress(order);
     var timing = {
       placed: 'We will contact you after the M-Pesa payment is verified.',
       confirmed: 'Your order is being prepared. We will share the next update on WhatsApp.',
