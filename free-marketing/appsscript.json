@@ -1,0 +1,17 @@
+{
+  "timeZone": "Africa/Nairobi",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      { "userSymbol": "SearchConsole", "serviceId": "searchconsole", "version": "v1" },
+      { "userSymbol": "AnalyticsData", "serviceId": "analyticsdata", "version": "v1" }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/script.scriptapp",
+    "https://www.googleapis.com/auth/webmasters.readonly",
+    "https://www.googleapis.com/auth/analytics.readonly"
+  ]
+}
