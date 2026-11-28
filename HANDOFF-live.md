@@ -1,3 +1,10 @@
+## 2026-11-28 08:34 (Africa/Nairobi) - Crawlable /p/ links for every product (branch `seo/crawlable-product-index-2026-11-28`, NOT merged)
+- Finding from the indexing audit: 683 active products, 637 in sitemap-products.xml, while products.html linked only a small sample through customer-facing ?product= shell links. This left Googlebot relying heavily on the sitemap to discover individual static product pages.
+- Change: generate-products.mjs adds a complete A-Z `section.seo-links` index containing one direct /p/<slug>.html link for every product whose path is in `sitemapEligibleProductPaths`. The section is injected after `shell()` so customer-facing link normalization remains unchanged.
+- Intended checks: node --check generate-products.mjs; generated products.html link count must equal the eligible product count; run product-link-normalizer, no-static-share-links and SEO indexing guard tests; then run Build product pages and inspect the deployed products.html.
+- No generated pages, catalogue records or Neon data are edited by this source change. Google ultimately decides whether discovered pages are indexed; this improves internal discovery, not an indexing guarantee.
+- Status: source changes committed on the feature branch; do not treat as live until PR checks pass, merge, build and Pages deployment succeed.
+
 ## 2026-11-28 00:45 (Africa/Nairobi) - `wip-fix-indexing-tools` MERGED to main (84db25b9)
 - Done: Build product pages passed and committed 37c07482; Pages deploy of it succeeded. Both sitemaps on main: 0 noindex/non-canonical/missing entries (823 and 668 URLs). Google sitemap ping submitted all 5; indexing check run #91 passed (150 checked, 131 indexed; cumulative products 203 of 637).
 - Tests: only mobile-shell/description.test.mjs and seo-titles.test.mjs failed, same as plain main. Live site not fetched from the sandbox.
