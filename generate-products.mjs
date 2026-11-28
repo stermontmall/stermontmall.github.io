@@ -719,10 +719,11 @@ for (const p of pageProducts) {
   const approvedName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
   const generatedTitle = pdpTitle(p.name, ctx);
   const generatedDescription = pdpDescription(p.name, ctx, p.description);
-  const title = String(p.meta_title || p.seo_title || generatedTitle).trim();
+  const storedTitle = String(p.meta_title || p.seo_title || '').trim();
+  const title = storedTitle && (!p.variant_label || labelInName(storedTitle, p.variant_label)) ? storedTitle : generatedTitle;
   // Prefer stored snippets only when they are complete sentences. Legacy imports often stored 155-character cut-offs or visible section labels.
   const storedDescription = String(p.meta_description || '').trim();
-  const storedDescriptionIsClean = storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(storedDescription);
+  const storedDescriptionIsClean = storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(storedDescription) && (!p.variant_label || labelInName(storedDescription, p.variant_label));
   const desc = storedDescriptionIsClean ? storedDescription : generatedDescription;
   const h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
   NAMES[p.id] = h1;
