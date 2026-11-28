@@ -48,4 +48,16 @@ assert.match(generator, /isIndexablePage\(/);
 // Ensure this protection test remains part of the production page-build gate.
 assert.match(workflow, /node seo-indexing-guard\.test\.mjs/);
 
-console.log('SEO indexing guard: canonical, robots, parameter handling and sitemap checks passed.');
+// Variant pack URLs must be full, self-canonical product pages with their own offer URLs.
+assert.match(generator, /const pageProducts = \\[\.\.\.products, \.\.\.legacyPageProducts\\]/);
+assert.match(generator, /const pageSlug = p\.pageSlug \\|\\| sl\\(p\.id\\)/);
+assert.match(generator, /p\.variants\?\.find\(v => v\.id === p\.id\)/);
+assert.match(generator, /encodeURIComponent\(sl\(v\.id\)\) \+ '\\.html'/);
+// Historical slugs are loaded from Neon; do not silently query the retired Supabase table.
+assert.match(generator, /async function getHistoricalSlugs\(\)/);
+assert.match(generator, /product_slug_redirects\?select=old_slug,product_id/);
+assert.doesNotMatch(generator, /SB\}\\/rest\\/v1\\/product_slug_redirects/);
+assert.match(generator, /Historical product URLs are rendered as full self-canonical product pages/);
+assert.doesNotMatch(generator, /<title>Redirecting/);
+
+console.log('SEO indexing guard: canonical, robots, variants, historical product URLs and sitemap checks passed.');
