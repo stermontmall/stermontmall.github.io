@@ -17,6 +17,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '30 4 * * *'
+    # Catch-up: sends a sitemap change that was skipped by the cooldown. Skips when nothing changed.
+    - cron: '50 */3 * * *'
   workflow_run:
     workflows: ['Build product pages']
     types: [completed]
@@ -40,16 +42,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
           BUILD_RESULT: ${{ github.event.workflow_run.conclusion }}
           COOLDOWN_HOURS: '3'
         run: |
-          if [ "$EVENT" != "workflow_run" ]; then
+          if [ "$EVENT" != "workflow_run" ] && [ "$SCHEDULE" != "50 */3 * * *" ]; then
             echo "go=true" >> "$GITHUB_OUTPUT"
             echo "Daily, manual or code-change run - pinging Google."
             exit 0
           fi
           skip() { echo "go=false" >> "$GITHUB_OUTPUT"; echo "Skipping ping: $1"; exit 0; }
-          [ "$BUILD_RESULT" = "success" ] || skip "the page build did not succeed."
+          [ "$EVENT" != "workflow_run" ] || [ "$BUILD_RESULT" = "success" ] || skip "the page build did not succeed."
           # A run that skips the ping still ends in "success", so look for the last run whose submit step really ran.
           last=""
           runs=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/google-sitemap-ping.yml/runs?status=success&per_page=60" --jq '.workflow_runs[] | "\(.id),\(.created_at)"' || true)

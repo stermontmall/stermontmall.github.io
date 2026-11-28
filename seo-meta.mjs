@@ -26,6 +26,18 @@ export const FARM_CATS = new Set([...PCPB_CATS, 'agrovet', 'fertilizers', 'veter
 
 const clip = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/[\s,;:(–-]+\S*$/, '').replace(/[\s,;:(–-]+$/, '') + '…' : s; };
 
+// A stored title over the audit limit (75) first loses the store-name ending, so brand and pack size stay intact.
+// If it is still too long the caller's generated title is used.
+export function fitStoredTitle(stored, generated, max = 75) {
+  const t = String(stored || '').replace(/\s+/g, ' ').trim();
+  if (!t) return generated;
+  if (t.length <= max) return t;
+  const short = t.replace(/\s*\|\s*Stermont Arcade$/i, '');
+  if (short.length <= max) return short;
+  const shorter = short.replace(/\s+Fertilizer\b/i, '');
+  return shorter.length <= max ? shorter : generated;
+}
+
 // "Original <name>" only when it is true: a known brand (anything other than the store name) or a farm input.
 export const isGenuine = ({ brand, catSlug }) => (!!brand && brand !== STORE) || FARM_CATS.has(catSlug);
 export const isPcpb = catSlug => PCPB_CATS.has(catSlug);
