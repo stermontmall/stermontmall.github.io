@@ -83,11 +83,7 @@ writeFileSync('index-results.json', JSON.stringify({ generated_at: new Date().to
 const limited = results.filter(r => r.rateLimited);
 const errs = results.filter(r => r.error && !r.rateLimited);
 
-// A permission problem affects every URL, so say it once and clearly.
-if (results.length && errs.length === results.length) {
-  console.log('# Google indexing status\n\nGoogle refused every check: `' + errs[0].error + '`\n\nUsually the service account is not added as a user on this property. In Search Console open Settings > Users and permissions > Add user, paste the service account email (`' + key.client_email + '`) and give it **Full** or **Restricted** access. Also check that `GSC_PROPERTY` matches the property exactly (for example `sc-domain:stermontarcade.co.ke`).');
-  process.exit(1);
-}
+// Keep failed inspection responses in the JSON artifact and Neon audit, even when permissions are wrong.
 if (results.length && limited.length === results.length) {
   console.log('# Google indexing status ' + new Date().toISOString().slice(0, 10) + '\n\nGoogle\'s URL Inspection quota is used up right now, so no pages could be checked. This is not a setup problem. Run it again tomorrow, or lower `MAX_URLS` if other tools also use this quota.');
   process.exit(0);
@@ -110,6 +106,8 @@ const advice = {
 
 const unchecked = results.length - ok.length + notChecked;
 const out = [];
+if (results.length && errs.length === results.length) out.push('> Google refused every URL inspection. Check that the service account has access to the configured Search Console property and that GSC_PROPERTY is exact.', '');
+
 out.push(`# Google indexing status ${new Date().toISOString().slice(0, 10)}`);
 out.push('');
 out.push(`Checked **${ok.length}** pages with Google (rotating batch; product URLs lead the cycle). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${unchecked ? `, ${unchecked} not checked in this batch` : ''}.`);
