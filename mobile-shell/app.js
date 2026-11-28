@@ -246,11 +246,25 @@ function syncOverlays() {
    domain and a product could not be copied, shared or reopened. The base entry under it stays "/", so Back returns to the list. */
 const BASE_TITLE = document.title;
 const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
-/* The address is the product's own CLEAN page address, /p/<slug>.html (+ "#<size slug>" when the chosen size is not the page's own), with no query string:
-   a copied or shared link then previews as this product, from that page's head, and a phone that opens it goes straight into this same product view inside
-   the shell (the inline script at the top of the page head, seo-shell-chrome.mjs, and shell-chrome.js send /p/<slug>.html to /?product=<slug>).
-   Crawlers get the static page, whose canonical is this same clean address. Older links that still end in ?shell=1 keep working (same two scripts). */
-const productUrl = () => { if (!qb.p) return undefined; if (deepOpen && PRODUCT_ROUTE_SLUG) return '/p/' + encodeURIComponent(PRODUCT_ROUTE_SLUG) + '.html' + location.hash; const selected = sizeOf(qb.p, qb.size).slug || qb.p.slug; if (/^\/p\/[^/]+\.html$/i.test(location.pathname) && location.hash) return location.pathname + location.hash; return '/p/' + encodeURIComponent(selected) + '.html'; };
+/* Customer-facing product routes use /?product=<slug>. The separate /p/<slug>.html document
+   remains the static, self-canonical SEO page for Google. If a shopper arrived directly on
+   that SEO document, keep its path while the shell opens; all product-card, share and query
+   deep links stay on the mobile-shell query route. */
+const productUrl = () => {
+  if (!qb.p) return undefined;
+  if (PRODUCT_PATH) return location.pathname + location.hash;
+  const selected = deepOpen && PRODUCT_ROUTE_SLUG
+    ? PRODUCT_ROUTE_SLUG
+    : (sizeOf(qb.p, qb.size).slug || qb.p.slug);
+  return '/?product=' + encodeURIComponent(selected) + location.hash;
+};
+const productCanonicalUrl = () => {
+  if (!qb.p) return '/';
+  const slug = deepOpen && PRODUCT_ROUTE_SLUG
+    ? PRODUCT_ROUTE_SLUG
+    : (sizeOf(qb.p, qb.size).slug || qb.p.slug);
+  return '/p/' + encodeURIComponent(slug) + '.html';
+}
 /* A category has its own address too (owner 2026-11-09: "when I tap on categories, make a direct link"): /c/<slug>.html, the clean address of the generated category page
    (a sub-category uses its own slug). A copied or shared link previews as that category, and a phone that opens it goes straight back into the same category in the shell
    (the inline script of seo-shell-chrome.mjs sends /c/<slug>.html to /?cat=<slug>, handled by openCatLink in section 9b). The address only changes in place (replaceState):
@@ -276,9 +290,8 @@ function syncProductMeta() {   // tab title + address follow the open product (a
     const rest = params.toString();
     history.replaceState(history.state, '', '/' + (rest ? '?' + rest : '') + location.hash);
   }
-  // Keep the SEO document canonical aligned with the visible in-shell route:
-  // customer links may enter through ?product=<slug>, but the product itself is canonical at /p/<slug>.html.
-  const canonicalPath = open ? productUrl()
+  // The browser route is customer-friendly (?product=); canonical and og:url remain on the static /p/ SEO document.
+  const canonicalPath = open ? productCanonicalUrl()
     : (/^\/p\/[^/]+\.html$/i.test(location.pathname) || /^\/c\/[^/]+\.html$/i.test(location.pathname)) ? location.pathname
     : cu !== '/' ? cu : '/';
   const canonicalUrl = new URL(canonicalPath || '/', location.origin).href;
@@ -335,7 +348,10 @@ const SAVED_TAB = (() => { try { const t = sessionStorage.getItem('shell.activeT
 const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab
   : (!DEEP && !CAT_DEEP && !Q_DEEP && TABS.includes(TAB_DEEP)) ? TAB_DEEP
   : (!DEEP && !CAT_DEEP && !Q_DEEP && SAVED_TAB) ? SAVED_TAB : 'home';
-history.replaceState({ tab: START_TAB, stack: [] }, '', DEEP ? '/p/' + encodeURIComponent(PRODUCT_ROUTE_SLUG) + '.html' + location.hash : (CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname : undefined); // Normalize product aliases to their canonical static URL and retain the selected pack-size hash.
+const initialProductRoute = PRODUCT_PATH
+  ? location.pathname + location.hash
+  : '/?product=' + encodeURIComponent(PRODUCT_ROUTE_SLUG) + location.hash;
+history.replaceState({ tab: START_TAB, stack: [] }, '', DEEP ? initialProductRoute : (CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname : undefined); // Keep customer deep links on the shell route; direct /p/ documents remain in place.
 scrim.addEventListener('click', closeTop);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop(); });
 syncOverlays();
@@ -845,9 +861,8 @@ document.addEventListener('click', e => {
   if (t.closest('[data-pp-retry]')) return renderPP();
   if (t.closest('[data-pp-cart]')) return closeAllThen(() => goTab('cart'));
 });
-/* Share: the link to give out is the product's own clean page address, /p/<slug>.html (+ "#<size slug>" for a chosen pack size), with no ?shell=1. It carries the
-   product's title, photo and description in its head, so WhatsApp / Facebook / Google show the product, and a phone that opens it lands on this product view
-   inside the shell (seo-shell-chrome.mjs inline script + shell-chrome.js). (A /?product= address is one shell page, so it can only preview as the home page.) */
+/* Share links always open the customer-facing mobile shell route. The static /p/<slug>.html
+   documents remain independently published and self-canonical for search engines. */
 $('#pp-share').addEventListener('click', async () => {
   if (!qb.p) return;
   const shareSlug = sizeOf(qb.p, qb.size).slug || qb.p.slug;
