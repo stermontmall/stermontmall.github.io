@@ -11,7 +11,7 @@
 //           MAX_MINUTES (default 20; the run stops and reports what it has instead of hanging for hours),
 //           ROTATE_HOURS (default 24; how long one batch of URLs stays the same. The workflow sets 3 so every 3-hour run checks a NEW batch).
 import { createSign } from 'node:crypto';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const raw = process.env.GSC_SERVICE_ACCOUNT_JSON, property = process.env.GSC_PROPERTY;
@@ -59,7 +59,7 @@ const inspect = async url => {
     const j = await r.json();
     const s = (j.inspectionResult || {}).indexStatusResult || {};
     return { url, verdict: s.verdict || 'UNKNOWN', state: s.coverageState || 'Unknown', crawled: (s.lastCrawlTime || '').slice(0, 10),
-      canonical: s.googleCanonical && s.googleCanonical !== url ? s.googleCanonical : '', robots: s.robotsTxtState, fetch: s.pageFetchState, indexing: s.indexingState };
+      canonical: s.googleCanonical && s.googleCanonical !== url ? s.googleCanonical : '', robots: s.robotsTxtState, fetch: s.pageFetchState, indexing: s.indexingState, userCanonical: s.userCanonical || '', sitemap: s.sitemap || [], referringUrls: s.referringUrls || [], crawledAs: s.crawledAs || '', raw: s };
   }
   return { url, error: 'rate limited, try again later', rateLimited: true };
 };
@@ -77,15 +77,13 @@ for (const u of urls) {
   await sleep(250);
 }
 notChecked = urls.length - results.length;
+// Preserve the full Google response for Neon sync; Markdown is a human-readable report, not the data contract.
+writeFileSync('index-results.json', JSON.stringify({ generated_at: new Date().toISOString(), requested_urls: urls.length, results }, null, 2) + String.fromCharCode(10));
 
 const limited = results.filter(r => r.rateLimited);
 const errs = results.filter(r => r.error && !r.rateLimited);
 
-// A permission problem affects every URL, so say it once and clearly.
-if (results.length && errs.length === results.length) {
-  console.log('# Google indexing status\n\nGoogle refused every check: `' + errs[0].error + '`\n\nUsually the service account is not added as a user on this property. In Search Console open Settings > Users and permissions > Add user, paste the service account email (`' + key.client_email + '`) and give it **Full** or **Restricted** access. Also check that `GSC_PROPERTY` matches the property exactly (for example `sc-domain:stermontarcade.co.ke`).');
-  process.exit(1);
-}
+// Keep failed inspection responses in the JSON artifact and Neon audit, even when permissions are wrong.
 if (results.length && limited.length === results.length) {
   console.log('# Google indexing status ' + new Date().toISOString().slice(0, 10) + '\n\nGoogle\'s URL Inspection quota is used up right now, so no pages could be checked. This is not a setup problem. Run it again tomorrow, or lower `MAX_URLS` if other tools also use this quota.');
   process.exit(0);
@@ -108,6 +106,8 @@ const advice = {
 
 const unchecked = results.length - ok.length + notChecked;
 const out = [];
+if (results.length && errs.length === results.length) out.push('> Google refused every URL inspection. Check that the service account has access to the configured Search Console property and that GSC_PROPERTY is exact.', '');
+
 out.push(`# Google indexing status ${new Date().toISOString().slice(0, 10)}`);
 out.push('');
 out.push(`Checked **${ok.length}** pages with Google (rotating batch; product URLs lead the cycle). **${indexed.length} indexed**, **${notIndexed.length} not indexed**${unchecked ? `, ${unchecked} not checked in this batch` : ''}.`);
@@ -115,8 +115,8 @@ if (stopReason) out.push('', `> Stopped early because ${stopReason}. The next re
 out.push('');
 if (indexed.length) {
   out.push('## All pages indexed');
-  out.push('| Page | Google coverage state | Last crawled | Google canonical |', '|---|---|---|---|');
-  for (const r of indexed) out.push(`| ${short(r.url)} | ${r.state} | ${r.crawled || 'unknown'} | ${r.canonical ? short(r.canonical) : ''} |`);
+  out.push('| Page | Google coverage state | Last crawled | Robots.txt | Page fetch | Indexing | Google canonical |', '|---|---|---|---|---|---|---|');
+  for (const r of indexed) out.push(`| ${short(r.url)} | ${r.state} | ${r.crawled ? r.crawled.slice(0, 10) : 'unknown'} | ${r.robots || 'unknown'} | ${r.fetch || 'unknown'} | ${r.indexing || 'unknown'} | ${r.canonical ? short(r.canonical) : ''} |`);
   out.push('');
 }
 if (notIndexed.length) {
@@ -132,8 +132,8 @@ if (notIndexed.length) {
     out.push('');
   }
   out.push('## All pages not indexed');
-  out.push('| Page | Reason | Last crawled | Google chose instead |', '|---|---|---|---|');
-  for (const r of notIndexed) out.push(`| ${short(r.url)} | ${r.state} | ${r.crawled || 'never'} | ${r.canonical ? short(r.canonical) : ''} |`);
+  out.push('| Page | Reason | Last crawled | Robots.txt | Page fetch | Indexing | Google chose instead |', '|---|---|---|---|---|---|---|');
+  for (const r of notIndexed) out.push(`| ${short(r.url)} | ${r.state} | ${r.crawled ? r.crawled.slice(0, 10) : 'never'} | ${r.robots || 'unknown'} | ${r.fetch || 'unknown'} | ${r.indexing || 'unknown'} | ${r.canonical ? short(r.canonical) : ''} |`);
   out.push('');
 }
 if (errs.length) {

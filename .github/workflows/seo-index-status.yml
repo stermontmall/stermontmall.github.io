@@ -52,7 +52,7 @@ jobs:
         run: npm install --no-save @neondatabase/serverless
       - name: Store Google indexing report in Neon
         id: neon
-        if: steps.inspect.outcome == 'success'
+        if: always() && hashFiles('index-results.json') != ''
         continue-on-error: true
         env:
           NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
@@ -85,5 +85,5 @@ jobs:
           done
           gh issue create --title "Google indexing status $(date +%F)$headline" --body-file issue-body.md
       - name: Mark incomplete inspection as failed
-        if: steps.inspect.outcome == 'failure' || steps.neon.outcome == 'failure'
+        if: steps.inspect.outcome == 'failure' || steps.neon.outcome == 'failure' || steps.totals.outcome == 'failure'
         run: exit 1
