@@ -303,3 +303,8 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Screenshot artifact: `stermont-order-email-screenshots` (run `46126339032`, artifact `15255064486`); files are six message variants at 600px and 360px widths. Reviewed the refreshed 360px customer confirmation; county duplication is fixed.
 - Current PR #1279 remains OPEN and unmerged. The broader `seo-pr-quality` validation workflow is still running separately; do not merge until it completes and owner approves.
 - Real EmailJS delivery was not tested. EmailJS dashboard must retain HTML body `{{{html_body}}}` and add `{{text_body}}` as the plain-text alternative if available.
+
+## 2026-11-28 (Africa/Nairobi) - Strict order-item field compliance
+- Removed the optional `item.price` fallback from line-total calculation; email item amounts now use only the supplied `items[].total` field. Item quantity uses `items[].qty`, and name uses `items[].name`.
+- Photo rendering remains optional and only activates for an HTTPS photo URL present on an item. This preserves the user's allowed order schema and avoids deriving line prices.
+- Fresh PR checks are required for this final schema-compliance adjustment.
