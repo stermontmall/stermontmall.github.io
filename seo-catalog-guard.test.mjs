@@ -1,31 +1,25 @@
 import assert from 'node:assert/strict';
-import { auditProducts } from './seo-catalog-guard.mjs';
-
-const good = {
-  id: 'sample',
-  seo_name: 'Sample Product',
-  seo_title: 'Sample Product – Price in Kenya',
-  category_id: 12,
-  images: ['https://example.com/sample.jpg']
-};
-assert.deepEqual(auditProducts([good]).errors, []);
-assert.equal(auditProducts([good]).count, 1);
-
-const bad = { ...good, id: 'bad', seo_name: '', seo_title: 'x'.repeat(61), category_id: null, images: [] };
-const result = auditProducts([bad]);
-assert.equal(result.errors.length, 4);
-assert.ok(result.errors.some(x => x.includes('missing seo_name')));
-assert.ok(result.errors.some(x => x.includes('exceeds 60')));
-assert.ok(result.errors.some(x => x.includes('missing category_id')));
-assert.ok(result.errors.some(x => x.includes('no product image reference')));
-
-const legacy = auditProducts([{ ...good, images: ['https://stermontmall.github.io/product-photos/old.jpg'] }]);
-assert.equal(legacy.errors.length, 0);
-assert.equal(legacy.warnings.length, 1);
-
-const slash = auditProducts([{ ...good, id: 'slash', seo_name: 'Air Chopper 7.5SC Insecticide \\1 100 ml' }]);
-assert.equal(slash.errors.length, 1);
-assert.ok(slash.errors[0].includes('stray backslash'));
-assert.deepEqual(auditProducts([{ ...good, variant_label: '100 ml' }]).errors, []);
-
-console.log('SEO catalogue guard tests passed.');
+import { auditProducts, checkCatalogueVolume } from './seo-catalog-guard.mjs';
+const good={id:'sample',slug:'sample-product',name:'Sample Product',price:1250,stock:5,category_id:'category-1',description:'Verified product description',images:['https://images.example/sample.jpg'],meta_description:'A complete product description.'};
+const baseline=auditProducts([{...good}]);
+assert.equal(baseline.count,1);assert.deepEqual(baseline.errors,[]);
+assert.ok(baseline.warnings.some(x=>x.includes('generated H1 fallback')));
+assert.ok(baseline.warnings.some(x=>x.includes('generated title fallback')));
+assert.deepEqual(auditProducts([{...good,stock:0,price:0,name:''}]).errors,[]);
+const bad=auditProducts([{...good,id:'',name:'',price:0,category_id:null}]);
+assert.ok(bad.errors.some(x=>x.includes('missing stable product id')));
+assert.ok(bad.errors.some(x=>x.includes('missing product name')));
+assert.ok(bad.errors.some(x=>x.includes('positive numeric price')));
+assert.ok(bad.errors.some(x=>x.includes('no category')));
+const duplicates=auditProducts([{...good,id:'one',slug:'shared'},{...good,id:'two',slug:'shared'},{...good,id:'one',slug:'third'}]);
+assert.ok(duplicates.errors.some(x=>x.includes('duplicate product id')));
+assert.ok(duplicates.errors.some(x=>x.includes('duplicate product slug')));
+const incomplete=auditProducts([{...good,images:[],description:'',alt_text:''}]);
+assert.equal(incomplete.errors.length,0);
+assert.ok(incomplete.warnings.some(x=>x.includes('no usable product image')));
+assert.ok(incomplete.warnings.some(x=>x.includes('missing product description')));
+assert.ok(incomplete.warnings.some(x=>x.includes('image alt text absent')));
+assert.deepEqual(checkCatalogueVolume({inStock:676,baseline:637}),{ok:true,inStock:676,baseline:637});
+assert.equal(checkCatalogueVolume({inStock:10,baseline:637}).ok,false);
+assert.equal(checkCatalogueVolume({inStock:0,baseline:0}).ok,true);
+console.log('SEO catalogue readiness gate tests passed.');
