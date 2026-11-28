@@ -258,3 +258,10 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Confirmed EmailJS template `template_n60yao4` is expected to render `{{{html_body}}}` as its body (legacy `checkout-deferred.js` comment). Keep `service_zoho`, the existing public key, and template ID; no dashboard/API call made.
 - Existing `order-emails.js` currently has a `send()` return-contract defect (array rather than boolean) and status template lacks several requested sections. No checkout/admin call-site edits planned.
 - Next: implement shared table-based HTML and plain-text builders, safe field handling, six sample previews, and Node tests.
+
+## 2026-11-28 (Africa/Nairobi) - Shared transactional email renderer implemented
+- Updated only `order-emails.js` on `wip-modern-order-emails` (commit `93612c0d`). Kept EmailJS service/template/public key and both public methods; no checkout/admin call-site changes.
+- Added shared responsive table-based HTML layout, hidden preheaders, progress tracker, per-state accents/icons/copy, order items, subtotal/discount/total, M-Pesa verification, delivery/pickup and timing, track/WhatsApp CTAs, staff phone/admin/WhatsApp actions, and footer links.
+- Added escaping for customer content, HTTPS-only item-photo handling with a styled fallback tile, explicit image dimensions/alt text, inline styles, bgcolor fallbacks, and a plain-text body parameter.
+- Corrected `send()` to resolve one boolean (true only when all requested sends succeed); `status()` remains boolean and both paths catch build/network failures.
+- Next: add six-state local preview and automated tests; run requested existing tests. No real EmailJS delivery attempted.
