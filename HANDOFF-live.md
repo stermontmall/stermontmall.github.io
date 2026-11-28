@@ -252,3 +252,9 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Read this handoff before code changes; created the work branch from main. Main remains untouched.
 - Confirmed checkout calls `STMOrderEmails.send(payload, data)` and admin calls `STMOrderEmails.status(updated, state)`; preserve both public interfaces.
 - Next: inspect template contract and tests, then implement shared HTML/text rendering and preview. No email sent; no Neon data touched.
+
+## 2026-11-28 (Africa/Nairobi) - Order-email integration and template contract inspected
+- Confirmed the active checkout call sends `payload` plus RPC result `data`; the admin sends the updated order row and one of `confirmed`, `packed`, `delivered`, `declined`.
+- Confirmed EmailJS template `template_n60yao4` is expected to render `{{{html_body}}}` as its body (legacy `checkout-deferred.js` comment). Keep `service_zoho`, the existing public key, and template ID; no dashboard/API call made.
+- Existing `order-emails.js` currently has a `send()` return-contract defect (array rather than boolean) and status template lacks several requested sections. No checkout/admin call-site edits planned.
+- Next: implement shared table-based HTML and plain-text builders, safe field handling, six sample previews, and Node tests.
