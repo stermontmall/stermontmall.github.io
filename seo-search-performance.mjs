@@ -4,6 +4,7 @@
 // Tables (created if missing):
 //   public.search_performance_daily   one row per day: the true totals
 //   public.search_performance_details one row per day + search + page (Google hides rare searches, so these add up to less than the totals)
+//   public.search_performance_pages   one row per day + page: use this for per-page totals (includes searches Google hides)
 // The first run loads 90 days. Later runs reload the last 10 days, because Google finalises figures a few days late.
 import { createSign } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
@@ -28,7 +29,12 @@ export async function sync({ sql, query, property, now = Date.now() }) {
     property text NOT NULL, day date NOT NULL, query text NOT NULL, page text NOT NULL, clicks integer NOT NULL,
     impressions integer NOT NULL, position double precision NOT NULL, synced_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (property, day, query, page))`;
-  const [{ n }] = await sql`SELECT count(*)::int AS n FROM public.search_performance_daily WHERE property = ${property}`;
+  await sql`CREATE TABLE IF NOT EXISTS public.search_performance_pages (
+    property text NOT NULL, day date NOT NULL, page text NOT NULL, clicks integer NOT NULL,
+    impressions integer NOT NULL, position double precision NOT NULL, synced_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (property, day, page))`;
+  // Counted on the newest table, so adding it triggers one full 90-day load.
+  const [{ n }] = await sql`SELECT count(*)::int AS n FROM public.search_performance_pages WHERE property = ${property}`;
   const startDate = day(n ? 10 : 90, now), endDate = day(1, now);
 
   const daily = (await fetchRows(query, ['date'], startDate, endDate))
@@ -38,10 +44,14 @@ export async function sync({ sql, query, property, now = Date.now() }) {
   const details = (await fetchRows(query, ['date', 'query', 'page'], startDate, endDate))
     .map(r => ({ day: r.keys[0], query: r.keys[1], page: r.keys[2], clicks: r.clicks, impressions: r.impressions, position: r.position }));
 
+  const pages = (await fetchRows(query, ['date', 'page'], startDate, endDate))
+    .map(r => ({ day: r.keys[0], page: r.keys[1], clicks: r.clicks, impressions: r.impressions, position: r.position }));
+
   // One transaction: either the whole date range is replaced or nothing changes.
   const statements = [
     sql`DELETE FROM public.search_performance_daily WHERE property = ${property} AND day BETWEEN ${startDate} AND ${endDate}`,
     sql`DELETE FROM public.search_performance_details WHERE property = ${property} AND day BETWEEN ${startDate} AND ${endDate}`,
+    sql`DELETE FROM public.search_performance_pages WHERE property = ${property} AND day BETWEEN ${startDate} AND ${endDate}`,
     sql`INSERT INTO public.search_performance_daily (property, day, clicks, impressions, position)
       SELECT ${property}, x.day, x.clicks, x.impressions, x.position
       FROM jsonb_to_recordset(${JSON.stringify(daily)}::jsonb) AS x(day date, clicks int, impressions int, position float8)`,
@@ -50,8 +60,12 @@ export async function sync({ sql, query, property, now = Date.now() }) {
     sql`INSERT INTO public.search_performance_details (property, day, query, page, clicks, impressions, position)
       SELECT ${property}, x.day, x.query, x.page, x.clicks, x.impressions, x.position
       FROM jsonb_to_recordset(${JSON.stringify(details.slice(i, i + BATCH))}::jsonb) AS x(day date, query text, page text, clicks int, impressions int, position float8)`);
+  for (let i = 0; i < pages.length; i += BATCH) statements.push(
+    sql`INSERT INTO public.search_performance_pages (property, day, page, clicks, impressions, position)
+      SELECT ${property}, x.day, x.page, x.clicks, x.impressions, x.position
+      FROM jsonb_to_recordset(${JSON.stringify(pages.slice(i, i + BATCH))}::jsonb) AS x(day date, page text, clicks int, impressions int, position float8)`);
   await sql.transaction(statements);
-  return { startDate, endDate, days: daily.length, detailRows: details.length,
+  return { startDate, endDate, days: daily.length, detailRows: details.length, pageRows: pages.length,
     clicks: daily.reduce((s, r) => s + r.clicks, 0), impressions: daily.reduce((s, r) => s + r.impressions, 0) };
 }
 
@@ -75,7 +89,7 @@ async function main() {
   };
   const { neon } = await import('@neondatabase/serverless');
   const s = await sync({ sql: neon(db), query, property });
-  console.log(`Saved to Neon for ${property}, ${s.startDate} to ${s.endDate}: ${s.days} days, ${s.detailRows} search/page rows, ${s.clicks} clicks, ${s.impressions} impressions.`);
+  console.log(`Saved to Neon for ${property}, ${s.startDate} to ${s.endDate}: ${s.days} days, ${s.detailRows} search/page rows, ${s.pageRows} page rows, ${s.clicks} clicks, ${s.impressions} impressions.`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();

@@ -1,3 +1,7 @@
+## 2026-11-28 12:45 (Africa/Nairobi) - Per-page daily totals (branch `wip-search-page-totals`, NOT merged)
+- Added table search_performance_pages (search/page details omit hidden searches, so they undercount pages).
+- Next: check the branch run and Neon rows, restore the push trigger to main only, merge.
+
 ## 2026-11-28 12:48 (Africa/Nairobi) - Search performance sync tested, merging to main (branch `wip-search-performance`)
 - Real run 46131491451 passed: https://stermontarcade.co.ke/ , 52 days of data (2026-10-06 to 2026-11-26), 4059 search/page rows.
 - Same dates: Neon 484 clicks / 18691 impressions; Supermetrics 493 / 20296. Likely by-property vs by-page counting (not confirmed).

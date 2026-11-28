@@ -21,6 +21,7 @@ const fake = saved => {
 const wrap = f => { const sql = (s, ...v) => { const q = f.sql(s, ...v); return q; }; sql.transaction = f.sql.transaction; return sql; };
 const query = async b => b.dimensions.length === 1
   ? [{ keys: ['2026-11-26'], clicks: 3, impressions: 40, position: 7 }]
+  : b.dimensions.length === 2 ? [{ keys: ['2026-11-26', 'https://x/p'], clicks: 3, impressions: 40, position: 7 }]
   : Array.from({ length: 4500 }, (_, i) => ({ keys: ['2026-11-26', 'q' + i, 'https://x/p'], clicks: 0, impressions: 1, position: 5 }));
 
 for (const [saved, start] of [[0, '2026-08-30'], [30, '2026-11-18']]) {
@@ -31,7 +32,8 @@ for (const [saved, start] of [[0, '2026-08-30'], [30, '2026-11-18']]) {
   assert.equal(r.endDate, '2026-11-27');
   assert.equal(r.clicks, 3);
   assert.equal(r.detailRows, 4500);
-  assert.equal(f.tx.length, 2 + 1 + 3);
+  assert.equal(r.pageRows, 1);
+  assert.equal(f.tx.length, 3 + 1 + 3 + 1);
 }
 
 // an empty answer from Google must not delete anything
