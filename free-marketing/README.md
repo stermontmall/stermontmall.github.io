@@ -35,6 +35,18 @@ A no-paid-connector reporting kit built with Google Apps Script, Google Sheets, 
 9. Choose **Stermont Marketing → Refresh all available data** and approve Google's read-only permissions.
 10. Choose **Stermont Marketing → Install daily refresh (06:00)**.
 
+## Search Console indexing monitor
+
+The workbook also creates `GSC_Indexing` and `GSC_Indexing_History`.
+
+1. In Search Console, export the URL list for the issue **Crawled - currently not indexed** (or another selected Page indexing reason).
+2. Paste the exact URL values into `GSC_Indexing` column A. Optionally paste the report's historical **Last crawled** values into column B. Keep the header row.
+3. Run **Stermont Marketing → Inspect pending indexing URLs**. The script uses Google's URL Inspection API and records the current verdict, coverage state, indexing state, robots status, fetch status, Google-selected canonical, user canonical, last crawl, sitemaps and referring URLs.
+4. Each run processes at most 100 pending URLs. Rows with an inspection timestamp are skipped; clear the timestamp in column M for a URL you want to inspect again.
+5. Every completed inspection is also appended to `GSC_Indexing_History` so later checks can be compared.
+
+**Important:** URL Inspection is a live snapshot for the exact URL/property and is subject to Google's API quotas and data freshness. It does not guarantee indexing or submit a request for indexing. The report supplied for 31 October 2026 is historical; its 114 count must not be presented as today's count. The PDF list is not imported automatically—paste/export the URL values into the sheet first. The API checks current Google-known status for those URLs, not the full set of all indexed pages.
+
 ## Looker Studio
 
 1. Open https://lookerstudio.google.com/.
