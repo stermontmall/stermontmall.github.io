@@ -1,3 +1,8 @@
+## 2026-11-28 — Historical indexing URL import prepared
+- Extracted all 114 URL + Last crawled pairs from the owner's 5-page Search Console Coverage Drilldown PDF into a separate import CSV in the conversation output (not committed to the public repository).
+- Verified count by URL type: 92 product URLs, 17 category URLs, 1 blog URL, 2 other site URLs, and 2 sitemap URLs. The report's metadata labels the issue `Crawled - currently not indexed`.
+- CSV columns match the new workbook import sheet: `URL`, `Historical Last Crawled`. These dates remain historical; URL Inspection API is still required for current status.
+
 ## 2026-11-28 — Search Console indexing monitor added to free marketing branch
 - Source reviewed: owner-uploaded Coverage Drilldown PDF dated 2026-10-31. It explicitly labels the issue `Crawled - currently not indexed`; historical chart shows 114 affected pages on 2026-10-20 through 2026-10-23. URL list includes product/category/blog/other pages and two sitemap URLs. This is historical evidence, not a current count.
 - Added `free-marketing/Indexing.gs`: creates `GSC_Indexing` and append-only `GSC_Indexing_History`; imports URLs and historical crawl dates supplied by the owner; calls Google's URL Inspection API for up to 100 pending URLs per run; records verdict, coverage/indexing state, robots/fetch state, Google/user canonical, last crawl, sitemaps and referring URLs. Validates URLs against configured Search Console property and leaves quota-limited rows pending for retry.
