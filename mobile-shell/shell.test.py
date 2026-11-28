@@ -153,6 +153,8 @@ def mock_network(ctx):
         # "unexpected failed requests" check at the end of this script.
         if 'supabase.co/storage/v1/object/public/' in url or 'https://stermontarcade.co.ke/product-photos/' in url:
             return route.fulfill(status=200, content_type='image/png', body=PNG)
+        if 'ik.imagekit.io/w6hxfnwmw/products/' in url:
+            return route.fulfill(status=200, content_type='image/png', body=PNG)
         return route.abort()
     ctx.route('https://ik.imagekit.io/**', imagekit_proxy)
     ctx.route('https://oewvtbnmyombbtggamor.supabase.co/storage/v1/object/public/**',
