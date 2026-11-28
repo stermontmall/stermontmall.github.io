@@ -265,3 +265,9 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Added escaping for customer content, HTTPS-only item-photo handling with a styled fallback tile, explicit image dimensions/alt text, inline styles, bgcolor fallbacks, and a plain-text body parameter.
 - Corrected `send()` to resolve one boolean (true only when all requested sends succeed); `status()` remains boolean and both paths catch build/network failures.
 - Next: add six-state local preview and automated tests; run requested existing tests. No real EmailJS delivery attempted.
+
+## 2026-11-28 (Africa/Nairobi) - Email preview and automated test added
+- Added `email-preview.html` with six isolated sample previews: customer placed, staff alert, confirmed, packed, delivered, declined. Preview does not call EmailJS.
+- Added `order-emails.test.mjs` covering customer-value escaping, unsafe image URL rejection, HTTPS image rendering/alt/dimensions, KSh formatting and discount total, payment badge, tracking/WhatsApp/footer links, all status variants, placeholders, staff tap-to-call/admin actions, and send/status network-failure booleans.
+- Next: run the new test and the requested existing `seo-indexing-guard.test.mjs` and `no-static-share-links.test.mjs`; then capture desktop and 360px mobile screenshots and review the final diff.
+- No EmailJS dashboard edits or real sends performed.
