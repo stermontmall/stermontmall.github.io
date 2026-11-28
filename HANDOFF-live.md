@@ -308,3 +308,10 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Removed the optional `item.price` fallback from line-total calculation; email item amounts now use only the supplied `items[].total` field. Item quantity uses `items[].qty`, and name uses `items[].name`.
 - Photo rendering remains optional and only activates for an HTTPS photo URL present on an item. This preserves the user's allowed order schema and avoids deriving line prices.
 - Fresh PR checks are required for this final schema-compliance adjustment.
+
+## 2026-11-28 (Africa/Nairobi) - Final head test and screenshot confirmation
+- Latest code head before this handoff entry: `1f1201bc5ca49554b3a81b098107d756ab9779c1`.
+- Dedicated order-email workflow `46126507362` SUCCESS: new order email test, SEO indexing guard, no-static-share-links guard, screenshot capture, and artifact upload all passed.
+- Verified screenshot ZIP artifact `15255334129` contains exactly 12 PNGs: six emails at 600px and 360px widths. Sample confirmation screenshot reviewed after delivery-address de-duplication.
+- Full SEO PR validation `46126507365` is still running its mobile-shell browser regression suite; no failure reported at this checkpoint.
+- PR #1279 remains open, mergeable, and unmerged. No live EmailJS message sent; no EmailJS dashboard setting changed; no Neon or generated-page changes.
