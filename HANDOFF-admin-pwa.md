@@ -10,8 +10,9 @@ Date: 2026-11-28. Status: in progress, NOT merged, NOT tested in a browser or on
 
 ## Done
 - neon-admin-manifest.json, admin-sw.js added.
+- neon-admin.html: manifest link, apple-touch-icon, and admin-sw.js registration (only change to that file; to undo, remove the link line in <head> and the register <script> before analytics.js).
 
 ## Left
-- Link the manifest and register admin-sw.js in neon-admin.html (and neon-admin-orders.html).
+- neon-admin-orders.html still has no manifest link or service worker registration (not read yet).
 - Merge, then on a phone open https://stermontarcade.co.ke/neon-admin.html in Chrome and confirm Install app appears and sign-in still works in the installed app.
 - Build the APK: pwabuilder.com with that URL, Android package; keep the signing key safe. Then add /.well-known/assetlinks.json with the package name and the key's SHA-256 fingerprint so the app opens without a browser bar.
