@@ -1,0 +1,37 @@
+name: Google indexing diagnostics tests
+
+on:
+  pull_request:
+    paths:
+      - 'seo-index-status.mjs'
+      - 'neon-automation-sync.mjs'
+      - 'google-index-results.mjs'
+      - 'google-index-results.test.mjs'
+      - '.github/workflows/seo-index-status.yml'
+      - '.github/workflows/seo-index-diagnostics-test.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'seo-index-status.mjs'
+      - 'neon-automation-sync.mjs'
+      - 'google-index-results.mjs'
+      - 'google-index-results.test.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - name: Check JavaScript syntax
+        run: |
+          node --check seo-index-status.mjs
+          node --check neon-automation-sync.mjs
+          node --check google-index-results.mjs
+      - name: Test Google inspection result mapping
+        run: node google-index-results.test.mjs
