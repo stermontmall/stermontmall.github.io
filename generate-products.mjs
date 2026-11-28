@@ -32,6 +32,7 @@
 import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { isIndexablePage } from './sitemap-indexable.mjs';
+import { auditProducts } from './seo-catalog-guard.mjs';
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 const imageKitUrl = createRequire(import.meta.url)('./imagekit-url.js');
 import { createHash } from 'node:crypto';
@@ -251,6 +252,11 @@ const rawRows = (await getProducts()).filter(p => p && p.id && p.name).map(p => 
 // Use ImageKit Web Proxy for rendered images; keep original source URLs in catalogue data.
 const optimizedImageUrl = (source, width) => imageKitUrl(source, width);
 const rows = rawRows;
+// Run the same fail-closed readiness gate inside the generator, not only in GitHub Actions.
+const readiness = auditProducts(rows);
+for (const warning of readiness.warnings) console.warn('[index-readiness] ' + warning);
+if (readiness.errors.length) throw new Error('Product indexing readiness failed: ' + readiness.errors.join('; '));
+console.log('[index-readiness] ' + readiness.count + ' in-stock products passed the structural publishing gate.');
 // Approved customer reviews (public read). Failure or a missing table just means no review markup.
 async function getReviews() {
   try {
