@@ -257,3 +257,10 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Updated the assertion to compare the canonical URL pathname, preserving the requirement that the deep link resolves to `/p/garden-set-250ml.html` while allowing the test server's local hostname.
 - Commit: `1e5cc399b9ce00a08f9129656c17fd26450a407a`.
 - Re-run route and SEO workflows on the new HEAD; PR #1182 remains open/unmerged and changes are not live.
+
+
+## 2026-11-27 - Blog SEO audit fixes (branch `fix/blog-seo-audit-2026-11-27`, awaiting checks)
+- Done: reduced the generated blog title limit from 65 to 60 characters; brand suffix is dropped when needed rather than clipping a meaningful phrase. Added a title-normalizer regression test and made the blog-build workflow run it.
+- Done: added two canonical-checked, allowlisted ordinary shopping-guide descriptions (fridge guide and online-shopping checklist), each 70-155 characters. No chemical/pesticide descriptions were changed.
+- Scope: source scripts and workflow only; no product records, prices, product URLs, canonical URLs, or generated HTML manually edited.
+- Next: run PR checks; after merge, blog-build will normalize titles/descriptions, rebuild blog index/sitemap, and commit only generated blog outputs. Then rerun OpenSEO audit to confirm these warnings are cleared.
