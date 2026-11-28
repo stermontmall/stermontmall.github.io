@@ -240,7 +240,7 @@
     lines.push('Payment amount: ' + money(order && order.pay_amount));
     lines.push('Payment status: ' + (order && order.pay_verified ? 'Verified' : 'Awaiting verification'));
     lines.push('');
-    lines.push(order && order.method === 'pickup' ? 'Pickup: Stermont Arcade, Sarit Centre, Westlands, Nairobi.' : 'Delivery: ' + [order && order.address, order && order.county].filter(Boolean).join(', '));
+    lines.push(order && order.method === 'pickup' ? 'Pickup: Stermont Arcade, Sarit Centre, Westlands, Nairobi.' : 'Delivery: ' + deliveryAddress(order));
     if (kind === 'staff') {
       lines.push('Customer: ' + String(order && order.customer_name || ''));
       lines.push('Phone: ' + String(order && order.phone || ''));
@@ -275,7 +275,7 @@
       order_total: money(orderTotal(order)),
       items: textEmail(order, state, kind),
       order_items: textEmail(order, state, kind),
-      delivery: order && order.method === 'pickup' ? 'Pickup at Stermont Arcade, Sarit Centre, Westlands' : [order && order.address, order && order.county].filter(Boolean).join(', '),
+      delivery: order && order.method === 'pickup' ? 'Pickup at Stermont Arcade, Sarit Centre, Westlands' : deliveryAddress(order),
       mpesa_code: String(order && order.pay_code || ''),
       phone: '+254 789 514 060',
       web: 'stermontarcade.co.ke',
