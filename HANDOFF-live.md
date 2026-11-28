@@ -297,3 +297,9 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Added a 12-second timeout/AbortController to EmailJS requests so a hung network call resolves `false` instead of leaving an admin status action waiting indefinitely; checkout remains fire-and-forget as before.
 - Extended `order-emails.test.mjs` to simulate a never-settling EmailJS request and assert `send()` resolves `false`.
 - This is the latest code change and requires a fresh PR workflow run before final sign-off.
+
+## 2026-11-28 (Africa/Nairobi) - Final requested email tests and screenshot artifact pass
+- Latest dedicated workflow run `46126339032` completed SUCCESS on the current code: `order-emails.test.mjs`, `seo-indexing-guard.test.mjs`, and `no-static-share-links.test.mjs` all passed; Playwright screenshot capture passed and uploaded 12 images.
+- Screenshot artifact: `stermont-order-email-screenshots` (run `46126339032`, artifact `15255064486`); files are six message variants at 600px and 360px widths. Reviewed the refreshed 360px customer confirmation; county duplication is fixed.
+- Current PR #1279 remains OPEN and unmerged. The broader `seo-pr-quality` validation workflow is still running separately; do not merge until it completes and owner approves.
+- Real EmailJS delivery was not tested. EmailJS dashboard must retain HTML body `{{{html_body}}}` and add `{{text_body}}` as the plain-text alternative if available.
