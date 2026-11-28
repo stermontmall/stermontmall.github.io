@@ -1,3 +1,9 @@
+## 2026-11-28 12:12 (Africa/Nairobi) - #1280 merged; 375 old addresses sorted (branch `wip-old-url-sorting`, NOT merged)
+- #1280 merged (34dd2254); Build product pages passed. Repo check of 683 sitemap products: 0 titles over 75, 0 descriptions under 70, 1 duplicate title (two Raid 22ml pages; owner to confirm if same item). Index checker run 46128639055 still running at last check. Sitemap catch-up not yet observed. Live site not checked.
+- Sorted `data/gsc-missing-product-urls-2026-11-28.csv` into `data/old-url-suggestions-2026-11-28.csv`: B 1 name match, C 7 similar (some are a different brand or pack), D 270 category, E 97 no suggestion. No redirects added.
+- ChatGPT brief `HANDOFF-chatgpt-seo-permanent-fix.md` is superseded: Claude is doing the work.
+- Left: owner approval of redirects, then add to data/old-url-redirects.csv (check its row-count guard test); Raid duplicate; out-of-stock sitemap policy; verify index run.
+
 ## 2026-11-28 12:03 (Africa/Nairobi) - Claude took over the fix: titles, sitemap catch-up, index check order (branch `wip-chatgpt-seo-handoff`)
 - Owner asked Claude to fix instead of ChatGPT: ChatGPT should not work on this branch now.
 - Done: long stored titles trimmed (fitStoredTitle); stored meta descriptions under 70 chars use the generated one; sitemap ping catch-up schedule; index checker takes unchecked then oldest URLs. New tests: seo-fit-title, seo-index-order. #1239/#1249 conflict with main; not merged. #1262 also edits seo-index-status.mjs and needs a rebase.
