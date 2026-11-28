@@ -181,8 +181,8 @@ function buildDashboard_() {
     ['GA4 conversions', '=SUM(GA4_Daily!E2:E)', 'GA4 configured conversion events'],
     ['Ad spend (KES)', '=SUM(Ads_Import!D2:D)', 'Paste platform exports into Ads_Import'],
     ['Ad-attributed revenue (KES)', '=SUM(Ads_Import!H2:H)', 'Platform-reported; attribution varies'],
-    ['Recorded sales revenue (KES)', '=SUM(Sales_Import!D2:D)', 'Paste verified order exports into Sales_Import'],
-    ['Recorded orders', '=COUNTA(Sales_Import!B2:B)', 'Includes all imported order statuses; filter cancelled/refunded manually']
+    ['Qualified sales revenue (KES)', '=SUM(SUMIF(Sales_Import!C2:C,{"paid","completed","fulfilled","delivered","successful","success"},Sales_Import!D2:D))', 'Only paid/completed success statuses; pending, cancelled and refunded are excluded'],
+    ['Qualified orders', '=SUM(COUNTIFS(Sales_Import!C2:C,{"paid","completed","fulfilled","delivered","successful","success"},Sales_Import!B2:B,"<>"))', 'Counts nonblank order IDs with paid/completed success statuses only']
   ];
   sh.getRange(4,1,rows.length,3).setValues(rows);
   sh.getRange('B7').setNumberFormat('0.00%');
