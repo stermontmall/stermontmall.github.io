@@ -1,0 +1,66 @@
+# Stermont Arcade — Free Marketing Intelligence
+
+A no-paid-connector reporting kit built with Google Apps Script, Google Sheets, Google Search Console API and GA4 Data API. It does not use Supermetrics, Windsor, Porter, paid APIs, external libraries or third-party data processors.
+
+## What is included
+
+- Search Console daily clicks, impressions, CTR and average position.
+- Search query and landing-page reports.
+- GA4 daily active users, sessions, page views, conversions and engagement rate.
+- A Google Sheets KPI dashboard.
+- Import tabs for Google Ads / Meta Ads CSV exports and verified order exports.
+- Daily refresh trigger at approximately 06:00 Africa/Nairobi.
+- A native Google Sheets source for a free Looker Studio report.
+
+## Important limitations
+
+1. Google Search Console data is usually delayed by a couple of days; the script deliberately ends its window two days before today.
+2. GA4 requires the numeric property ID and the Google account running the script must have Viewer or Analyst access.
+3. Google Ads API access requires a developer token and OAuth configuration. This starter deliberately avoids pretending that an API connection exists. Import Google Ads and Meta Ads CSV exports into the provided `Ads_Import` tab; keep the headers unchanged.
+4. For sales, export verified orders from the store/admin system and paste them into `Sales_Import`. This prevents advertising-platform conversions from being misrepresented as actual store revenue.
+5. This is a private reporting workbook, not a public dashboard. Restrict spreadsheet access to trusted staff.
+
+## Install (about 10–15 minutes)
+
+1. Create a blank Google Sheet named **Stermont Marketing Intelligence**.
+2. Open **Extensions → Apps Script**.
+3. Replace the starter contents of `Code.gs` with the contents of this folder's `Code.gs`.
+4. In Apps Script, open **Project Settings**, enable **Show "appsscript.json" manifest file**, then replace the manifest with this folder's `appsscript.json`.
+5. In **Services** (plus icon), confirm **Google Search Console API** and **Google Analytics Data API** are added. If prompted, enable both APIs in the linked Google Cloud project.
+6. Save, return to the spreadsheet and reload it.
+7. Choose **Stermont Marketing → Set up workbook**.
+8. Choose **Stermont Marketing → Configure Google properties**:
+   - Search Console property: `sc-domain:stermontarcade.co.ke`
+   - GA4 property ID: numeric ID from GA4 Admin → Property details. Leave blank until GA4 access is ready.
+9. Choose **Stermont Marketing → Refresh all available data** and approve Google's read-only permissions.
+10. Choose **Stermont Marketing → Install daily refresh (06:00)**.
+
+## Looker Studio
+
+1. Open https://lookerstudio.google.com/.
+2. Create a blank report and choose the native **Google Sheets** connector.
+3. Select the Stermont Marketing Intelligence spreadsheet.
+4. Add `GSC_Daily` and `GA4_Daily` as data sources. Use Date as the date dimension, Clicks / Impressions / Sessions / Active Users as metrics.
+5. Add `Ads_Import` and `Sales_Import` when populated. Use Spend_KES and Revenue_KES as currency metrics.
+6. Share the report only with intended viewers. The underlying spreadsheet permissions still govern data access.
+
+## Import format
+
+- `Ads_Import`: Date (YYYY-MM-DD), Platform, Campaign, Spend_KES, Clicks, Impressions, Conversions, Revenue_KES.
+- `Sales_Import`: Date (YYYY-MM-DD), Order_ID, Status, Revenue_KES, Channel, Product.
+
+Use KES values. Import actual completed/paid orders for revenue analysis; do not count cancelled or refunded orders as sales. The dashboard's order count is a raw imported-row count, so filter statuses in Looker Studio for paid/completed orders.
+
+## Privacy and cost
+
+- No passwords, OAuth tokens or customer records are committed to this repository.
+- Google authorizations are held by Apps Script under the installing user's Google account.
+- Google quotas and terms apply. The solution has no Supermetrics subscription or third-party connector charge.
+- Google services are not a guarantee of zero indirect cost if the Google account or Cloud project uses separately billable products; this script itself uses only the listed free Google services.
+
+## Troubleshooting
+
+- **No Search Console rows:** verify the exact property string and that the executing Google account is a verified owner/full user.
+- **GA4 error:** use the numeric property ID, enable Analytics Data API and grant the account access.
+- **Authorization error:** rerun the menu action and complete the Google consent screen.
+- **Daily trigger missing:** run Install daily refresh again and check Apps Script → Triggers.
