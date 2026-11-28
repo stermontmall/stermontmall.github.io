@@ -1,3 +1,11 @@
+## 2026-11-28 — Search Console indexing monitor added to free marketing branch
+- Source reviewed: owner-uploaded Coverage Drilldown PDF dated 2026-10-31. It explicitly labels the issue `Crawled - currently not indexed`; historical chart shows 114 affected pages on 2026-10-20 through 2026-10-23. URL list includes product/category/blog/other pages and two sitemap URLs. This is historical evidence, not a current count.
+- Added `free-marketing/Indexing.gs`: creates `GSC_Indexing` and append-only `GSC_Indexing_History`; imports URLs and historical crawl dates supplied by the owner; calls Google's URL Inspection API for up to 100 pending URLs per run; records verdict, coverage/indexing state, robots/fetch state, Google/user canonical, last crawl, sitemaps and referring URLs. Validates URLs against configured Search Console property and leaves quota-limited rows pending for retry.
+- Updated `Code.gs` menu/setup integration and repaired malformed literal newline escapes in `formatGscDate_` that made the original Apps Script source syntactically invalid.
+- Added `script.external_request` scope and documented the manual URL import + current inspection workflow in README/changelog.
+- Not done: Google Apps Script runtime execution, OAuth approval, live URL Inspection API call, importing the 114 historical URLs, or checking today's status. Do not report 114 as current. Owner must paste/export URLs into `GSC_Indexing` and authorize the script.
+- Safety: no storefront/product/generated files, sitemap files, product workflows, Neon or Supabase data changed. PR #1284 remains draft and branch still needs reconciliation with current main before merge.
+
 ## 2026-11-28 - PR opened for free marketing intelligence
 - Done: draft PR #1284 created: https://github.com/stermontmall/stermontmall.github.io/pull/1284.
 - Review: isolated diff is 5 files (4 new files under `free-marketing/` plus this handoff note); 318 additions, no deletions. No workflow/storefront/product/database files changed.
