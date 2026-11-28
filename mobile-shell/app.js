@@ -246,11 +246,8 @@ function syncOverlays() {
    domain and a product could not be copied, shared or reopened. The base entry under it stays "/", so Back returns to the list. */
 const BASE_TITLE = document.title;
 const PRODUCT_OVERLAYS = ['sheet-quickbuy', 'page-product'];
-/* The address is the product's own CLEAN page address, /p/<slug>.html (+ "#<size slug>" when the chosen size is not the page's own), with no query string:
-   a copied or shared link then previews as this product, from that page's head, and a phone that opens it goes straight into this same product view inside
-   the shell (the inline script at the top of the page head, seo-shell-chrome.mjs, and shell-chrome.js send /p/<slug>.html to /?product=<slug>).
-   Crawlers get the static page, whose canonical is this same clean address. Older links that still end in ?shell=1 keep working (same two scripts). */
-const productUrl = () => { if (!qb.p) return undefined; if (deepOpen && PRODUCT_ROUTE_SLUG) return '/p/' + encodeURIComponent(PRODUCT_ROUTE_SLUG) + '.html' + location.hash; const selected = sizeOf(qb.p, qb.size).slug || qb.p.slug; if (/^\/p\/[^/]+\.html$/i.test(location.pathname) && location.hash) return location.pathname + location.hash; return '/p/' + encodeURIComponent(selected) + '.html'; };
+/* Customer-facing product addresses stay on the mobile shell as /?product=<slug>. The generated /p/<slug>.html page remains the separate canonical, indexable SEO document. Reloading a product therefore starts at the homepage shell and reopens the requested product from the query parameter. */
+const productUrl = () => { if (!qb.p) return undefined; const selected = sizeOf(qb.p, qb.size).slug || qb.p.slug; return '/?product=' + encodeURIComponent(selected); };
 /* A category has its own address too (owner 2026-11-09: "when I tap on categories, make a direct link"): /c/<slug>.html, the clean address of the generated category page
    (a sub-category uses its own slug). A copied or shared link previews as that category, and a phone that opens it goes straight back into the same category in the shell
    (the inline script of seo-shell-chrome.mjs sends /c/<slug>.html to /?cat=<slug>, handled by openCatLink in section 9b). The address only changes in place (replaceState):
@@ -271,14 +268,14 @@ function syncProductMeta() {   // tab title + address follow the open product (a
   if (open) { const u = productUrl(); if (u && location.pathname + location.search + location.hash !== u) history.replaceState(history.state, '', u); }
   else if (cu !== '/') { if (location.pathname + location.search + location.hash !== cu) history.replaceState(history.state, '', cu); }
   else if (/^\/c\/[^/]+\.html$/.test(location.pathname)) history.replaceState(history.state, '', '/');   // only an address this code set is reset: other parameters (campaign tags) stay
-  else if (location.pathname === '/' && new URLSearchParams(location.search).has('cat')) {
-    const params = new URLSearchParams(location.search); params.delete('cat');
+  else if (location.pathname === '/' && (new URLSearchParams(location.search).has('cat') || new URLSearchParams(location.search).has('product') || new URLSearchParams(location.search).has('item'))) {
+    const params = new URLSearchParams(location.search); params.delete('cat'); params.delete('product'); params.delete('item');
     const rest = params.toString();
     history.replaceState(history.state, '', '/' + (rest ? '?' + rest : '') + location.hash);
   }
   // Keep the SEO document canonical aligned with the visible in-shell route:
   // customer links may enter through ?product=<slug>, but the product itself is canonical at /p/<slug>.html.
-  const canonicalPath = open ? productUrl()
+  const canonicalPath = open ? '/p/' + encodeURIComponent(sizeOf(qb.p, qb.size).slug || qb.p.slug) + '.html'
     : (/^\/p\/[^/]+\.html$/i.test(location.pathname) || /^\/c\/[^/]+\.html$/i.test(location.pathname)) ? location.pathname
     : cu !== '/' ? cu : '/';
   const canonicalUrl = new URL(canonicalPath || '/', location.origin).href;
@@ -335,7 +332,7 @@ const SAVED_TAB = (() => { try { const t = sessionStorage.getItem('shell.activeT
 const START_TAB = (!DEEP && history.state && TABS.includes(history.state.tab)) ? history.state.tab
   : (!DEEP && !CAT_DEEP && !Q_DEEP && TABS.includes(TAB_DEEP)) ? TAB_DEEP
   : (!DEEP && !CAT_DEEP && !Q_DEEP && SAVED_TAB) ? SAVED_TAB : 'home';
-history.replaceState({ tab: START_TAB, stack: [] }, '', DEEP ? '/p/' + encodeURIComponent(PRODUCT_ROUTE_SLUG) + '.html' + location.hash : (CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname : undefined); // Normalize product aliases to their canonical static URL and retain the selected pack-size hash.
+history.replaceState({ tab: START_TAB, stack: [] }, '', DEEP ? '/?product=' + encodeURIComponent(DEEP) + location.hash : (CAT_DEEP || TAB_DEEP || Q_DEEP) ? location.pathname : undefined); // Normalize product aliases to their canonical static URL and retain the selected pack-size hash.
 scrim.addEventListener('click', closeTop);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTop(); });
 syncOverlays();
@@ -855,6 +852,21 @@ $('#pp-share').addEventListener('click', async () => {
   try { if (navigator.share) { await navigator.share({ title, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { toast(url); }
 });
+function returnHomeFromProduct() {
+  // A product is a full-screen overlay; the dedicated Home control must always land on the shop root,
+  // even when the product was opened from a shared link or a generated /p/ SEO document.
+  stack = [];
+  qb.p = null; qb.size = ''; qb.qty = 1; qb.shown = '';
+  deepOpen = false; editingCartKey = '';
+  store.set({ tab: 'home', chip: 'all', sub: '', q: '' });
+  const search = $('#search'); if (search) search.value = '';
+  history.replaceState({ tab: 'home', stack: [] }, '', '/');
+  syncOverlays();
+  showTab('home');
+  refreshGrid();
+  window.scrollTo(0, 0);
+}
+$('#pp-home').addEventListener('click', returnHomeFromProduct);
 $('#pp-plus').addEventListener('click', () => { qb.qty = Math.min(99, qb.qty + 1); renderPP(); renderQB(); });
 $('#pp-minus').addEventListener('click', () => { qb.qty = Math.max(1, qb.qty - 1); renderPP(); renderQB(); });
 function updateCartLine() {

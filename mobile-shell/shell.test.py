@@ -289,7 +289,7 @@ with sync_playwright() as p:
     pg.locator('#qb-page').click()
     pg.wait_for_selector('#page-product.open', timeout=5000)
     pg.wait_for_function("document.querySelector('#pp-desc').innerText.includes('ABOUT Garden Hose Connector Set')", timeout=5000)
-    check('product page opens inside the shell (no reload, address becomes the shell product link, shell still loaded)', pg.evaluate("window.__shellStillLoaded === true") and pg.url == f'{URL.rstrip("/")}/p/garden-set-250ml.html' and pg.locator('#bottom-nav').count() == 1, pg.url)
+    check('product page opens inside the shell (no reload, address becomes the shell product link, shell still loaded)', pg.evaluate("window.__shellStillLoaded === true") and pg.url == f'{URL.rstrip("/")}/?product=garden-set-250ml' and pg.locator('#bottom-nav').count() == 1, pg.url)
     check('product page shows name, price, sizes, description, unit and trust lines', 'Garden Hose Connector Set' in pg.locator('#pp-name').inner_text() and 'KSh 1,550' in pg.locator('#pp-price').inner_text() and pg.locator('#pp-sizes .chip').count() == 4 and 'line two' in pg.locator('#pp-desc').inner_text() and 'Product code: STM-GARDEN-SET-250ML' in pg.locator('#pp-meta').inner_text() and 'Unit: Each' in pg.locator('#pp-meta').inner_text() and '47 counties' in pg.locator('#page-product').inner_text())
     pg.screenshot(path=f'{OUT}/shot-product-page.png')
     check('product page: similar products listed', pg.locator('#pp-related [data-pp-open]').count() >= 1)
@@ -596,7 +596,7 @@ with sync_playwright() as p:
     p11 = c11.new_page(); e11 = []; p11.on('pageerror', lambda e: e11.append(str(e)))
     p11.goto(f'{BASE}/p/garden-set-1Litre.html#garden-set-250ml', wait_until='domcontentloaded'); p11.wait_for_timeout(1200)
     p11.wait_for_selector('#page-product.open', timeout=15000)
-    check('direct product URL opens the full shell product view and restores its pack-size hash', p11.evaluate('location.pathname + location.hash') == '/p/garden-set-1Litre.html#garden-set-250ml' and p11.locator('#bottom-nav').count() == 1 and p11.locator('#stm-nav').count() == 0 and 'Garden Hose Connector Set' in p11.locator('#pp-name').inner_text() and p11.locator('#pp-price').inner_text() == 'KSh 1,550', p11.url)
+    check('direct product URL opens the full shell product view and keeps the selected pack in the customer URL', p11.evaluate('location.pathname + location.search') == '/?product=garden-set-250ml' and p11.locator('#bottom-nav').count() == 1 and p11.locator('#stm-nav').count() == 0 and 'Garden Hose Connector Set' in p11.locator('#pp-name').inner_text() and p11.locator('#pp-price').inner_text() == 'KSh 1,550', p11.url)
     check('direct product shell page has no page errors', not e11, e11[:3])
     c11.close()
     for label, kw in [('Googlebot', dict(user_agent='Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', viewport={'width': 390, 'height': 780})),
@@ -683,7 +683,7 @@ with sync_playwright() as p:
     # redirects: old shared product links and desktop screens go to the full shop; the prototype address goes home
     c6 = b.new_context(viewport={'width': 390, 'height': 780}, is_mobile=True, has_touch=True); mock_network(c6)
     p6 = c6.new_page(); p6.goto(f'{BASE}/#p-home-0'); p6.wait_for_selector('#page-product.open', timeout=15000); p6.wait_for_timeout(500)
-    check('legacy /#p-... link opens the product in the mobile shell at a shareable address', p6.evaluate('location.pathname + location.search') == '/p/home-0.html' and p6.locator('#bottom-nav').is_visible() and 'Hot Plate' in p6.locator('#pp-name').inner_text(), p6.url)
+    check('legacy /#p-... link opens the product in the mobile shell at a shareable address', p6.evaluate('location.pathname + location.search') == '/?product=home-0' and p6.locator('#bottom-nav').is_visible() and 'Hot Plate' in p6.locator('#pp-name').inner_text(), p6.url)
     p6.goto(f'{BASE}/mobile-shell/'); p6.wait_for_function("location.pathname === '/'", timeout=15000)
     check('/mobile-shell/ forwards to the home page', p6.url == BASE + '/', p6.url)
     c6.close()
@@ -766,6 +766,10 @@ with sync_playwright() as p:
     check('product deep link opens from the published SEO page when Neon REST returns 402', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.locator('#pp-price').inner_text() == 'KSh 1,234', p17.locator('#pp-name').inner_text())
     check('static fallback retains product code and full published description', 'STM-TEST-402' in p17.locator('#pp-meta').inner_text() and 'Published description survives a database outage.' in p17.locator('#pp-desc').inner_text())
     check('static product fallback has no JavaScript errors', not e17, e17[:3])
+    p17.reload(wait_until='domcontentloaded'); p17.wait_for_selector('#page-product.open', timeout=15000)
+    check('refresh on an open product restores the same product instead of Home', p17.locator('#pp-name').inner_text() == 'Static Fallback Sprayer' and p17.evaluate("new URLSearchParams(location.search).get('product') === 'static-fallback'"), p17.url)
+    p17.locator('#pp-home').click(); p17.wait_for_timeout(250)
+    check('Home control from product view returns to the shop homepage', p17.locator('#page-product.open').count() == 0 and p17.locator('#view-home').is_visible() and p17.evaluate("location.pathname === '/' && !new URLSearchParams(location.search).has('product')"), p17.url)
     FAIL[0] = False
     c17.close()
 
