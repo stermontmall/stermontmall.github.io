@@ -1,6 +1,7 @@
 // Protect the existing Google indexing contract without changing any live URLs or directives.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import './old-url-redirects.test.mjs'; // old product addresses must keep working after each rebuild
 
 const generator = readFileSync('generate-products.mjs', 'utf8');
 const robots = readFileSync('robots.txt', 'utf8');
@@ -49,8 +50,8 @@ assert.match(generator, /isIndexablePage\(/);
 assert.match(workflow, /node seo-indexing-guard\.test\.mjs/);
 
 // Variant pack URLs must be full, self-canonical product pages with their own offer URLs.
-assert.ok(generator.includes('const pageProducts = [...products, ...legacyPageProducts]'));
-assert.ok(generator.includes('const pageSlug = p.pageSlug || sl(p.id)'));
+assert.ok(generator.includes('const pageProducts = products;'), 'only real products and pack sizes get full pages');
+assert.ok(!generator.includes('legacyPageProducts'), 'old addresses must not be duplicate full pages');
 assert.ok(generator.includes('const packLabelOf = p =>'), 'missing variant labels should be recovered only from explicit pack quantities in product names');
 assert.ok(generator.includes('p.variants?.find(v => v.id === p.id)'));
 assert.ok(generator.includes("encodeURIComponent(sl(v.id)) + '.html'"));
@@ -58,7 +59,7 @@ assert.ok(generator.includes("encodeURIComponent(sl(v.id)) + '.html'"));
 assert.ok(generator.includes('async function getHistoricalSlugs()'));
 assert.ok(generator.includes('product_slug_redirects?select=old_slug,product_id'));
 assert.ok(!generator.includes('SB}/rest/v1/product_slug_redirects'));
-assert.ok(generator.includes('Historical product URLs are rendered as full self-canonical product pages'));
-assert.ok(!generator.includes('<title>Redirecting'));
+assert.ok(generator.includes('Old product addresses forward to the current page'), 'old addresses must forward to the current page');
+assert.ok(generator.includes('<title>Redirecting'), 'old addresses must be redirect stubs, never duplicate pages');
 
 console.log('SEO indexing guard: canonical, robots, variants, historical product URLs and sitemap checks passed.');
