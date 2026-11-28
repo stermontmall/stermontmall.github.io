@@ -269,27 +269,28 @@ const reviewLd = list => list.length ? {
     datePublished: String(r.created_at || '').slice(0, 10) || undefined, reviewBody: r.body ? clip(r.body, 500) : undefined }))
 } : {};
 
-// Pack sizes of one product share a variant_group. They become ONE page (the earliest-created size is the stable page address);
-// the other sizes get a small redirect page so old links keep working. This removes the "duplicate pages" Google reported.
+// Every sellable pack size gets its own canonical, indexable page. The pages share a
+// ProductGroup and pack selector, but each page keeps its own price, stock, SKU,
+// description and URL. This avoids sending pack-size searches to a different pack.
 const gmap = {};
 rows.forEach(p => { if (p.variant_group && p.variant_label) (gmap[p.variant_group] = gmap[p.variant_group] || []).push(p); });
-const products = [], aliases = [], seenG = new Set();
+const products = [], aliases = [];
 const inS = x => Number(x.stock) > 0;
 // true when the name already ends with the variant label, or every word/number of the label is already in the name
-const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\\d+(?:\\.\\d+)?)\\s*(millilitres?|milliliters?|ml)\\b/g, '$1ml').replace(/(\\d+(?:\\.\\d+)?)\\s*(litres?|liters?|l)\\b/g, '$1l').replace(/(\\d+(?:\\.\\d+)?)\\s*(kilograms?|kg)\\b/g, '$1kg').replace(/(\\d+(?:\\.\\d+)?)\\s*(grams?|g)\\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
+const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\d+(?:\.\d+)?)\s*(millilitres?|milliliters?|ml)\b/g, '$1ml').replace(/(\d+(?:\.\d+)?)\s*(litres?|liters?|l)\b/g, '$1l').replace(/(\d+(?:\.\d+)?)\s*(kilograms?|kg)\b/g, '$1kg').replace(/(\d+(?:\.\d+)?)\s*(grams?|g)\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
 for (const p of rows) {
   const g = p.variant_group && p.variant_label ? gmap[p.variant_group] : null;
   if (g && g.length > 1) {
-    if (seenG.has(p.variant_group)) continue;
-    seenG.add(p.variant_group);
-    const vs = [...g].sort((a, b) => Number(a.price) - Number(b.price)), live = vs.filter(inS), top = g[0];
-    /* the one page of a product takes the name of the size the owner gave a ranking prefix ("#1 Top ...", "Best ...") if there is one, else the earliest size */
-    const named = g.find(x => hasLeadWord(x.name)) || top;
-    products.push({ ...top, name: named.name.replace(SIZE_END, '') || named.name, variants: vs, price: Number((live[0] || vs[0]).price), old_price: null, unit: null,
-      stock: g.reduce((n, x) => n + (Number(x.stock) || 0), 0),
-      images: [...new Set(g.flatMap(x => x.images || []).filter(Boolean))], description: g.map(x => x.description).find(Boolean) || '' });
-    g.slice(1).forEach(x => aliases.push({ id: x.id, to: top.id }));
-  } else products.push(g && !labelInName(p.name, p.variant_label) ? { ...p, name: `${p.name} \u2013 ${p.variant_label}` } : p);   // skip a label the name already carries (e.g. "... Set \u2013 Set", "... 3GB RAM + 64GB \u2013 3GB + 64GB")
+    const variants = [...g].sort((a, b) => Number(a.price) - Number(b.price) || byAgeThenId(a, b));
+    const named = g.find(x => hasLeadWord(x.name)) || g[0];
+    const baseName = named.name.replace(SIZE_END, '') || named.name;
+    const displayName = labelInName(p.name, p.variant_label) ? p.name : `${p.name} – ${p.variant_label}`;
+    const exactSeoName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
+    const seoName = exactSeoName && labelInName(exactSeoName, p.variant_label) ? exactSeoName : displayName;
+    products.push({ ...p, name: displayName, seo_name: seoName, variant_base_name: baseName, variants });
+  } else {
+    products.push(g && !labelInName(p.name, p.variant_label) ? { ...p, name: `${p.name} – ${p.variant_label}` } : p);
+  }
 }
 // Retired duplicate listings: their old URLs forward to the product we kept (so links and Google results keep working).
 const DUPES = {
@@ -311,18 +312,31 @@ const slugOf = {};
 const sl = id => slugOf[id] || id;
 // The old id address of a renamed product becomes a redirect to its clean page.
 products.forEach(p => { if (sl(p.id) !== p.id) aliases.push({ id: p.id, to: p.id }); });
-// The clean address of each other pack size also forwards to the product page, so it never turns into a dead link.
-{
-  const own = new Set(aliases.map(x => x.id));
-  aliases.filter(x => x.id !== x.to).forEach(x => { const s = slugOf[x.id]; if (s && !own.has(s)) { own.add(s); aliases.push({ id: s, to: x.to }); } });
+// Fetch permanent historical slugs from the same Neon database as the product catalogue.
+// If this read fails, fail the build rather than silently dropping URLs from the storefront.
+async function getHistoricalSlugs() {
+  if (process.env.SLUG_REDIRECTS_JSON) {
+    const parsed = JSON.parse(readFileSync(process.env.SLUG_REDIRECTS_JSON, 'utf8'));
+    if (!Array.isArray(parsed)) throw new Error('SLUG_REDIRECTS_JSON must contain an array');
+    return parsed;
+  }
+  const auth = 'https://ep-dry-butterfly-bhytt90y.neonauth.c-10.eu-central-1.aws.neon.tech/stermont/auth';
+  const rest = 'https://ep-dry-butterfly-bhytt90y.apirest.c-10.eu-central-1.aws.neon.tech/stermont/rest/v1/';
+  const tokenResponse = await fetch(auth + '/token/anonymous', { signal: AbortSignal.timeout(30000) });
+  if (!tokenResponse.ok) throw new Error(`Could not authenticate for historical product slugs: HTTP ${tokenResponse.status}`);
+  const tokenPayload = await tokenResponse.json();
+  if (typeof tokenPayload?.token !== 'string' || !tokenPayload.token) throw new Error('Neon Auth returned no token for historical product slugs');
+  const response = await fetch(rest + 'product_slug_redirects?select=old_slug,product_id&order=old_slug.asc', {
+    headers: { Authorization: 'Bearer ' + tokenPayload.token, accept: 'application/json' },
+    signal: AbortSignal.timeout(30000)
+  });
+  if (!response.ok) throw new Error(`Could not load historical product slugs from Neon: HTTP ${response.status} ${(await response.text()).slice(0, 250)}`);
+  const parsed = await response.json();
+  if (!Array.isArray(parsed)) throw new Error('Neon historical product slug response was not an array');
+  return parsed;
 }
-// Permanent links: every slug a product ever had (table product_slug_redirects, filled by a database trigger) keeps forwarding to its current page.
 {
-  let hist = [];
-  try {
-    if (process.env.SLUG_REDIRECTS_JSON) hist = JSON.parse(readFileSync(process.env.SLUG_REDIRECTS_JSON, 'utf8'));
-    else { const r = await fetch(`${SB}/rest/v1/product_slug_redirects?select=old_slug,product_id`, { headers: { apikey: KEY } }); if (r.ok) hist = await r.json(); }
-  } catch { hist = []; }
+  const hist = await getHistoricalSlugs();
   const topOf = {}; aliases.forEach(x => { topOf[x.id] = x.to; });
   const taken = new Set(); products.forEach(p => { taken.add(p.id); taken.add(sl(p.id)); }); aliases.forEach(x => taken.add(x.id));
   (Array.isArray(hist) ? hist : []).forEach(h => {
@@ -687,8 +701,15 @@ function productBuyingNotes(p, cat) {
 
 const NAMES = {};   // product id -> the heading its page shows; the shop list reads this (product-names.json) so list, view and page always carry the same wording
 const sitemapEligibleProductPaths = new Set(); // only explicitly in-stock product pages enter the product sitemap
-for (const p of products) {
-  const path = `/p/${encodeURIComponent(sl(p.id))}.html`, cat = p.categories, img = (p.images || []).filter(Boolean).map(u => optimizedImageUrl(u, 900));
+const productById = new Map(products.map(p => [p.id, p]));
+const legacyPageProducts = aliases.map(a => {
+  const target = productById.get(a.to);
+  return target && a.id !== sl(target.id) ? { ...target, pageSlug: a.id, legacyAlias: true } : null;
+}).filter(Boolean);
+const pageProducts = [...products, ...legacyPageProducts];
+for (const p of pageProducts) {
+  const pageSlug = p.pageSlug || sl(p.id);
+  const path = `/p/${encodeURIComponent(pageSlug)}.html`, cat = p.categories, img = (p.images || []).filter(Boolean).map(u => optimizedImageUrl(u, 900));
   const inStock = p.stock == null || Number(p.stock) > 0, hasOld = Number(p.old_price) > Number(p.price);
   if (Number(p.stock) > 0) sitemapEligibleProductPaths.add(path);
   const revs = reviewsFor(p), rLd = reviewLd(revs);
@@ -735,20 +756,20 @@ for (const p of products) {
     ...rLd
   });
   const ldGroup = p.variants ? jsonLd({
-    '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
+    '@context': 'https://schema.org', '@type': 'ProductGroup', name: p.variant_base_name || p.name, productGroupID: String(p.variant_group), variesBy: 'https://schema.org/size',
     description: clip(p.description, 500) || `Buy ${p.name} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`, category: cat?.name, brand: { '@type': 'Brand', name: brandOf(p.name) }, ...rLd,
     hasVariant: p.variants.map(v => ({ '@type': 'Product', name: `${p.name} \u2013 ${v.variant_label}`, sku: String(v.product_code || v.id), size: v.variant_label, ...productIdentifiers(v),
       // Merchant Listings wants a description on every variant: use the pack's own text, else the product's, else the same generic line as the group.
       description: clip(v.description, 500) || clip(p.description, 500) || `Buy ${p.name} – ${v.variant_label} online in Kenya at ${BRAND}. Pay by M-Pesa, delivery to all 47 counties.`,
       image: (v.images || []).filter(Boolean).length ? (v.images || []).filter(Boolean) : undefined,
-      offers: { '@type': 'Offer', url: pdpVariantUrl(path, v.slug, p.slug), priceCurrency: 'KES', price: Number(Math.round(Number(v.price) || 0)),
+      offers: { '@type': 'Offer', url: SITE + '/p/' + encodeURIComponent(sl(v.id)) + '.html', priceCurrency: 'KES', price: Number(Math.round(Number(v.price) || 0)),
         availability: 'https://schema.org/' + (inS(v) ? 'InStock' : 'OutOfStock'), validFrom: offerValidFrom(v), priceValidUntil: priceValidUntil(), itemCondition: 'https://schema.org/NewCondition', hasMerchantReturnPolicy: RETURNS, shippingDetails: SHIPPING,
         seller: { '@id': `${SITE}/#store` } } }))
   }) : '';
   const productFaq = extractProductFaq(p.description);
   const productFaqLd = productFaq.length === 4 ? jsonLd({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: productFaq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }) : '';
   const ld = (p.variants ? ldGroup : ldOne) + jsonLd(STORE_LD) + (cat ? crumbLd([['Home', SITE + '/'], [cat.name, `${SITE}/c/${encodeURIComponent(cat.slug)}.html`], [p.name, SITE + path]]) : '') + productFaqLd;
-  const defaultVariant = p.variants?.find(inS) || p.variants?.[0] || null;
+  const defaultVariant = p.variants?.find(v => v.id === p.id) || p.variants?.find(inS) || p.variants?.[0] || null;
   const variantWa = v => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello ${BRAND}, I want to order: ${p.name} – ${v.variant_label} (${money(v.price)}) ${shellProductLink(v.slug || p.slug || p.id)}`)}`;
   const sizeBox = p.variants ? `<section class="box pack-select" data-pack-selector aria-label="Choose product pack size"><h2>Select pack size:</h2><div class="pack-options" role="group" aria-label="Available pack sizes">${p.variants.map((v, i) => `<button type="button" class="pack-option${v.id === defaultVariant?.id ? ' is-selected' : ''}" data-pack-index="${i}" aria-pressed="${v.id === defaultVariant?.id ? 'true' : 'false'}"><span class="pack-option-label">${esc(v.variant_label)}</span><small class="pack-option-code">Code: ${esc(v.product_code || v.id)}</small></button>`).join('')}</div><p class="pack-selected-note" aria-live="polite">Selected: <b data-pack-label>${esc(defaultVariant?.variant_label || '')}</b></p></section>
 <script>(function(){var root=document.querySelector('[data-pack-selector]');if(!root)return;var variants=${JSON.stringify(p.variants.map(v=>({label:v.variant_label,price:Number(v.price)||0,code:v.product_code||v.id,available:inS(v),url:shellProductLink(v.slug||p.slug||p.id),slug:v.slug||'',id:v.id||''}))).replace(/</g,'\\u003c')};var price=document.querySelector('[data-pack-price]'),stock=document.querySelector('[data-pack-stock]'),code=document.querySelector('[data-pack-code]'),label=root.querySelector('[data-pack-label]'),order=document.querySelector('[data-pack-order]'),sticky=document.querySelector('[data-pack-sticky]');root.addEventListener('click',function(e){var b=e.target.closest('[data-pack-index]');if(!b)return;var v=variants[Number(b.dataset.packIndex)];if(!v)return;root.querySelectorAll('[data-pack-index]').forEach(function(x){var on=x===b;x.classList.toggle('is-selected',on);x.setAttribute('aria-pressed',String(on));});if(price)price.textContent='KSh '+Math.round(v.price).toLocaleString('en-KE');if(stock){stock.textContent=v.available?'In stock':'Sold out';stock.className=v.available?'ok':'no';}if(code)code.textContent=v.code;if(label)label.textContent=v.label;var href=v.available?'https://wa.me/${WHATSAPP}?text='+encodeURIComponent('Hello ${BRAND}, I want to order: ${p.name} – '+v.label+' (KSh '+Math.round(v.price).toLocaleString('en-KE')+') '+v.url):'${esc(ask)}';[order,sticky].forEach(function(el){if(el){el.href=href;el.textContent=v.available?'Order this pack on WhatsApp':'Ask about availability';}});carts.forEach(function(el){el.href='/?product='+encodeURIComponent(v.slug||v.id);});});})();</script>` : '';
@@ -785,10 +806,7 @@ ${productSiloHtml(p, cat, related)}
   urls.push(path);
 }
 
-for (const a of aliases) {
-  const from = `/p/${encodeURIComponent(a.id)}.html`, to = `${SITE}/p/${encodeURIComponent(sl(a.to))}.html`;
-  writeFileSync(fileOf(from), `<!doctype html><html lang="en-KE"><head><meta charset="utf-8"><title>Redirecting\u2026</title><link rel="canonical" href="${to}"><meta http-equiv="refresh" content="0;url=${to}"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><p>This product moved. <a href="${shellProductLink(sl(a.to))}">Continue to the product page</a>.</p></body></html>`);
-}
+// Historical product URLs are rendered as full self-canonical product pages in pageProducts above.
 
 for (const [slug, c] of Object.entries(byCat)) {
   const oldPath = `/c/${encodeURIComponent(slug)}.html`;
@@ -868,13 +886,12 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
 
 // Google Merchant Center product feed (free listings). One item per size/variant; submit https://stermontarcade.co.ke/merchant-feed.xml in Merchant Center.
 {
-  const pageOf = {}; aliases.forEach(a => { pageOf[a.id] = a.to; });
   const feed = [];
   for (const p of rows) {
     const imgs = (p.images || []).filter(Boolean); if (!imgs.length || !(Number(p.price) > 0)) continue;
     const grouped = p.variant_group && p.variant_label && gmap[p.variant_group]?.length > 1;
     const title = clip(grouped ? `${p.name.replace(SIZE_END, '') || p.name} ${p.variant_label}` : p.name, 150);
-    const page = `${SITE}/p/${encodeURIComponent(sl(pageOf[p.id] || p.id))}.html`;
+    const page = `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`;
     const price = Math.round(Number(p.price)), old = Math.round(Number(p.old_price) || 0);
     feed.push(`<item><g:id>${esc(p.id)}</g:id><title>${esc(title)}</title><description>${esc(clip(p.description, 4000) || `${title} available at ${BRAND}, Kenya. Pay by M-Pesa, delivery to all 47 counties.`)}</description>
 <link>${esc(page)}</link><g:image_link>${esc(imgs[0])}</g:image_link>${imgs.slice(1, 10).map(u => `<g:additional_image_link>${esc(u)}</g:additional_image_link>`).join('')}
