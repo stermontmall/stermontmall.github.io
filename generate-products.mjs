@@ -72,7 +72,13 @@ const STORE_LD = {
     postalCode: '00800',
     addressCountry: 'KE'
   },
-  description: 'Sarit Centre, Westlands is a coordination and order-pickup point for confirmed orders by appointment; contact Stermont Arcade before visiting.',
+  description: 'Walk-in customers are welcome at Sarit Centre, Westlands daily from 8:00 AM to 8:00 PM. Confirm product stock on WhatsApp before travelling.',
+  openingHoursSpecification: [{
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    opens: '08:00',
+    closes: '20:00'
+  }],
   areaServed: [{ '@type': 'City', name: 'Nairobi' }, { '@type': 'Country', name: 'Kenya' }],
   paymentAccepted: 'M-Pesa',
   currenciesAccepted: 'KES'
