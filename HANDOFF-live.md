@@ -1,3 +1,11 @@
+## 2026-11-28 — Indexing monitor retry-safety review (PR #1284)
+- Reviewed the current URL Inspection implementation. Found that API/network failures were being timestamped as completed, which would prevent retrying those URLs.
+- Fixed `free-marketing/Indexing.gs`: only successful inspections are marked complete; failed API/network attempts remain pending, while an attempt cap of 100 prevents repeated failures from looping indefinitely. Failed attempts are still captured in history with their error text.
+- Commit: `1d7b51cb06750cef9f7f6c9d2cfe198f350d80bb`.
+- Rechecked the branch: PR #1284 remains draft/open and unmerged. It is 17 commits ahead and 5 behind current main; compare status is diverged, so it is not merge-ready. The PR still changes only `HANDOFF-live.md` and the five files under `free-marketing/` (six files total).
+- Not done: Apps Script execution in the owner's Google account, Google OAuth authorization, importing the 114 historical URLs into a workbook, current URL Inspection API results, GA4 setup, daily trigger verification, or Looker Studio deployment.
+- Safety: no storefront, product, generated page, sitemap, workflow, Neon, or Supabase files/data were changed.
+
 ## 2026-11-28 — Historical indexing URL import prepared
 - Extracted all 114 URL + Last crawled pairs from the owner's 5-page Search Console Coverage Drilldown PDF into a separate import CSV in the conversation output (not committed to the public repository).
 - Verified count by URL type: 92 product URLs, 17 category URLs, 1 blog URL, 2 other site URLs, and 2 sitemap URLs. The report's metadata labels the issue `Crawled - currently not indexed`.
