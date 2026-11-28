@@ -157,7 +157,16 @@ function isAllowedInspectionUrl_(url, siteUrl) {
   if (!/^https?:\/\//i.test(url)) return false;
   if (siteUrl.indexOf('sc-domain:') === 0) {
     const domain = siteUrl.substring('sc-domain:'.length).toLowerCase();
-    const host = url.replace(/^https?:\/\//i, '').split(/[/?#]/)[0].split(':')[0].toLowerCase();
+    const authorityMatch = url.match(/^https?:\/\/([^/?#]+)/i);
+    if (!authorityMatch) return false;
+    const authority = authorityMatch[1].toLowerCase();
+    // Reject user-info and malformed ports; never treat a colon as a safe host boundary.
+    if (authority.indexOf('@') !== -1) return false;
+    const hostMatch = authority.match(/^([a-z0-9.-]+)(?::([0-9]{1,5}))?$/);
+    if (!hostMatch) return false;
+    const host = hostMatch[1];
+    const port = hostMatch[2] ? Number(hostMatch[2]) : null;
+    if (port !== null && (port < 1 || port > 65535)) return false;
     return host === domain || host.endsWith('.' + domain);
   }
   // URL-prefix properties must match at a URL boundary, not merely as text.
