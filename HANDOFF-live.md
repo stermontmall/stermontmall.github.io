@@ -1,3 +1,9 @@
+## 2026-11-28 09:15 (Africa/Nairobi) - PR #1261 ImageKit browser-test fixture (branch `wip-ci-mock-imagekit-products`, NOT merged)
+- Done: added the approved `imagekit_proxy` test-fixture response in `mobile-shell/shell.test.py` for real ImageKit product-photo URLs. Commit `1dbb607da9039a415ac0302ce61ecf4178f0326a`; PR: https://github.com/stermontmall/stermontmall.github.io/pull/1261.
+- Checks on that commit: `validate` FAILED at "Run mobile shell browser regression suite"; `route-regression` FAILED at "Test full shell on direct product and category URLs"; `verify-pricing` SKIPPED. Both browser jobs timed out selecting checkout's pickup radio (Playwright Locator.check, 30s); the radio was obstructed by overlapping SVG/bar/header elements. No `N/180 passed` summary was present in the captured logs.
+- Scope: only the approved test fixture changed in the code commit. No checkout/site code, workflows, generated pages, or Neon data changed. No second fix attempted; PR remains open and unmerged. Main untouched.
+- Next: diagnose the checkout browser-test interaction separately, with owner approval before any additional code change.
+
 ## 2026-11-28 00:45 (Africa/Nairobi) - `wip-fix-indexing-tools` MERGED to main (84db25b9)
 - Done: Build product pages passed and committed 37c07482; Pages deploy of it succeeded. Both sitemaps on main: 0 noindex/non-canonical/missing entries (823 and 668 URLs). Google sitemap ping submitted all 5; indexing check run #91 passed (150 checked, 131 indexed; cumulative products 203 of 637).
 - Tests: only mobile-shell/description.test.mjs and seo-titles.test.mjs failed, same as plain main. Live site not fetched from the sandbox.
