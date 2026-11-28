@@ -62,7 +62,7 @@ The workbook also creates `GSC_Indexing` and `GSC_Indexing_History`.
 - `Ads_Import`: Date (YYYY-MM-DD), Platform, Campaign, Spend_KES, Clicks, Impressions, Conversions, Revenue_KES.
 - `Sales_Import`: Date (YYYY-MM-DD), Order_ID, Status, Revenue_KES, Channel, Product.
 
-Use KES values. Import actual completed/paid orders for revenue analysis; do not count cancelled or refunded orders as sales. The dashboard's order count is a raw imported-row count, so filter statuses in Looker Studio for paid/completed orders.
+Use KES values. For `Sales_Import`, use one row per order, a nonblank unique `Order_ID`, and a trimmed `Status` value of `paid`, `completed`, `fulfilled`, `delivered`, `successful`, or `success` for a successful sale. The dashboard's qualified sales revenue and qualified order count include only those statuses; pending, failed, cancelled, refunded, and other statuses are excluded. Keep status values consistent when importing. If an order is partially refunded, exclude it from this simple KPI or reconcile its net revenue before import.
 
 ## Privacy and cost
 
