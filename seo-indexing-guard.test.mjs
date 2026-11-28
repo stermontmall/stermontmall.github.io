@@ -62,4 +62,15 @@ assert.ok(!generator.includes('SB}/rest/v1/product_slug_redirects'));
 assert.ok(generator.includes('Old product addresses forward to the current page'), 'old addresses must forward to the current page');
 assert.ok(generator.includes('<title>Redirecting'), 'old addresses must be redirect stubs, never duplicate pages');
 
-console.log('SEO indexing guard: canonical, robots, variants, historical product URLs and sitemap checks passed.');
+// Sitemap submission must keep reaching Google: a change skipped by the 3-hour cooldown
+// is sent by the catch-up schedule, and nothing is sent when no sitemap changed.
+const ping = readFileSync('.github/workflows/google-sitemap-ping.yml', 'utf8');
+assert.ok(ping.includes("- cron: '30 4 * * *'"), 'the daily sitemap ping must stay scheduled');
+assert.ok(ping.includes("- cron: '50 */3 * * *'"), 'the 3-hourly catch-up ping for cooldown-skipped changes must stay scheduled');
+assert.match(ping, /workflow_run:\s*\n\s*workflows: \['Build product pages'\]/, 'a successful page build must be able to trigger a ping');
+assert.ok(ping.includes("SCHEDULE: ${{ github.event.schedule }}"), 'the gate must know which schedule fired');
+assert.ok(ping.includes('COOLDOWN_HOURS'), 'the cooldown must stay configurable');
+assert.match(ping, /git log --since="\$since" --format=%h -n 1 -- '\*sitemap\*\.xml'/, 'pings must be skipped when no sitemap changed since the last real submission');
+assert.ok(ping.includes('select(.name == "Submit sitemaps to Google Search Console" and .conclusion == "success")'), 'the last real submission must be found by the submit step, not just a green run');
+
+console.log('SEO indexing guard: canonical, robots, variants, historical product URLs, sitemap and sitemap-ping checks passed.');
