@@ -296,7 +296,7 @@ for (const p of rows) {
     const variants = [...g].sort((a, b) => Number(a.price) - Number(b.price) || byAgeThenId(a, b));
     const named = g.find(x => hasLeadWord(x.name)) || g[0];
     const namedLabel = packLabelOf(named);
-    const baseName = named.name.replace(new RegExp(namedLabel.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\const baseName = named.name.replace(SIZE_END, '').replace(/\\s*\\([^)]*\\)\\s*$/, '').trim() || named.name;'), 'i'), '').replace(/\\s*\\(\\s*\\)/g, '').replace(/\\s+[–-]\\s*$/, '').trim() || named.name;
+    const baseName = named.name.replace(namedLabel, '').replace(/\s*\(\s*\)/g, '').replace(/\s+[–-]\s*$/, '').trim() || named.name;
     const displayName = labelInName(p.name, label) ? p.name : `${p.name} – ${label}`;
     const exactSeoName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
     const seoName = exactSeoName && labelInName(exactSeoName, label) ? exactSeoName : displayName;
