@@ -51,6 +51,7 @@ assert.match(workflow, /node seo-indexing-guard\.test\.mjs/);
 // Variant pack URLs must be full, self-canonical product pages with their own offer URLs.
 assert.ok(generator.includes('const pageProducts = [...products, ...legacyPageProducts]'));
 assert.ok(generator.includes('const pageSlug = p.pageSlug || sl(p.id)'));
+assert.ok(generator.includes('const packLabelOf = p =>'), 'missing variant labels should be recovered only from explicit pack quantities in product names');
 assert.ok(generator.includes('p.variants?.find(v => v.id === p.id)'));
 assert.ok(generator.includes("encodeURIComponent(sl(v.id)) + '.html'"));
 // Historical slugs are loaded from Neon; do not silently query the retired Supabase table.
