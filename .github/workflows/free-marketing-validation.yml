@@ -1,0 +1,29 @@
+name: Free marketing intelligence validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'free-marketing/**'
+      - '.github/workflows/free-marketing-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate Apps Script JavaScript syntax
+        run: |
+          node --check < free-marketing/Code.gs
+          node --check < free-marketing/Indexing.gs
+      - name: Validate Apps Script manifest JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('free-marketing/appsscript.json', 'utf8'))"
+      - name: Run deterministic safety and KPI tests
+        run: node --test free-marketing/validation.test.mjs
