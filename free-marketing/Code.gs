@@ -171,7 +171,7 @@ function buildDashboard_() {
     ['Metric','Value','Source / interpretation'],
     ['Google organic clicks', '=SUM(GSC_Daily!B2:B)', 'Search Console; selected rolling window'],
     ['Google impressions', '=SUM(GSC_Daily!C2:C)', 'Search Console; selected rolling window'],
-    ['Average CTR', '=IFERROR(B4/B5,0)', 'Clicks ÷ impressions (aggregate)'],
+    ['Average CTR', '=IFERROR(B5/B6,0)', 'Clicks ÷ impressions (aggregate)'],
     ['GA4 active users', '=SUM(GA4_Daily!B2:B)', 'GA4; requires property ID'],
     ['GA4 sessions', '=SUM(GA4_Daily!C2:C)', 'GA4; requires property ID'],
     ['GA4 conversions', '=SUM(GA4_Daily!E2:E)', 'GA4 configured conversion events'],
@@ -181,7 +181,7 @@ function buildDashboard_() {
     ['Recorded orders', '=COUNTA(Sales_Import!B2:B)', 'Includes all imported order statuses; filter cancelled/refunded manually']
   ];
   sh.getRange(4,1,rows.length,3).setValues(rows);
-  sh.getRange('B6').setNumberFormat('0.00%');
+  sh.getRange('B7').setNumberFormat('0.00%');
   sh.getRange('B11:B13').setNumberFormat('#,##0.00');
   sh.getRange('A4:C4').setFontWeight('bold').setBackground('#e8eef7');
   sh.setFrozenRows(4);
@@ -216,5 +216,5 @@ function writeRows_(sheetName, headers, rows) {
 }
 
 function formatGscDate_(value) {
-  return String(value).slice(0,4) + '-' + String(value).slice(4,6) + '-' + String(value).slice(6,8);
+  const s = String(value);\n  if (s.indexOf('-') !== -1) return s;\n  return s.slice(0,4) + '-' + s.slice(4,6) + '-' + s.slice(6,8);
 }
