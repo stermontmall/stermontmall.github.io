@@ -272,24 +272,36 @@ const reviewLd = list => list.length ? {
 // Every sellable pack size gets its own canonical, indexable page. The pages share a
 // ProductGroup and pack selector, but each page keeps its own price, stock, SKU,
 // description and URL. This avoids sending pack-size searches to a different pack.
+const packLabelOf = p => {
+  const explicit = typeof p.variant_label === 'string' ? p.variant_label.trim() : '';
+  if (explicit) return explicit;
+  // Imported catalogue rows sometimes have a variant_group but no variant_label.
+  // Recover only an explicit pack quantity/unit from the product name; never guess a size.
+  const matches = [...String(p.name || '').matchAll(/(\\d+(?:\\.\\d+)?\\s*(?:millilitres?|milliliters?|ml|litres?|liters?|ltr|l|kilograms?|kg|grams?|g|pieces?|pcs?))\\b/gi)];
+  return matches.length ? matches[matches.length - 1][1].replace(/\\s+/g, ' ').trim() : '';
+};
 const gmap = {};
-rows.forEach(p => { if (p.variant_group && p.variant_label) (gmap[p.variant_group] = gmap[p.variant_group] || []).push(p); });
+rows.forEach(p => {
+  const label = packLabelOf(p);
+  if (p.variant_group && label) (gmap[p.variant_group] = gmap[p.variant_group] || []).push({ ...p, variant_label: label });
+});
 const products = [], aliases = [];
 const inS = x => Number(x.stock) > 0;
 // true when the name already ends with the variant label, or every word/number of the label is already in the name
-const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\d+(?:\.\d+)?)\s*(millilitres?|milliliters?|ml)\b/g, '$1ml').replace(/(\d+(?:\.\d+)?)\s*(litres?|liters?|l)\b/g, '$1l').replace(/(\d+(?:\.\d+)?)\s*(kilograms?|kg)\b/g, '$1kg').replace(/(\d+(?:\.\d+)?)\s*(grams?|g)\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
+const labelInName = (name, label) => { const norm = s => String(s).toLowerCase().replace(/(\\d+(?:\\.\\d+)?)\\s*(millilitres?|milliliters?|ml)\\b/g, '$1ml').replace(/(\\d+(?:\\.\\d+)?)\\s*(litres?|liters?|l)\\b/g, '$1l').replace(/(\\d+(?:\\.\\d+)?)\\s*(kilograms?|kg)\\b/g, '$1kg').replace(/(\\d+(?:\\.\\d+)?)\\s*(grams?|g)\\b/g, '$1g'); const n = norm(name), l = norm(label), w = s => s.match(/[a-z0-9]+/g) || []; if (n.endsWith(l)) return true; const nw = new Set(w(n)), lw = w(l); return lw.length > 0 && lw.every(x => nw.has(x)); };
 for (const p of rows) {
-  const g = p.variant_group && p.variant_label ? gmap[p.variant_group] : null;
+  const label = packLabelOf(p);
+  const g = p.variant_group && label ? gmap[p.variant_group] : null;
   if (g && g.length > 1) {
     const variants = [...g].sort((a, b) => Number(a.price) - Number(b.price) || byAgeThenId(a, b));
     const named = g.find(x => hasLeadWord(x.name)) || g[0];
-    const baseName = named.name.replace(SIZE_END, '') || named.name;
-    const displayName = labelInName(p.name, p.variant_label) ? p.name : `${p.name} – ${p.variant_label}`;
+    const baseName = named.name.replace(SIZE_END, '').replace(/\\s*\\([^)]*\\)\\s*$/, '').trim() || named.name;
+    const displayName = labelInName(p.name, label) ? p.name : `${p.name} – ${label}`;
     const exactSeoName = typeof p.seo_name === 'string' ? p.seo_name.trim() : '';
-    const seoName = exactSeoName && labelInName(exactSeoName, p.variant_label) ? exactSeoName : displayName;
-    products.push({ ...p, name: displayName, seo_name: seoName, variant_base_name: baseName, variants });
+    const seoName = exactSeoName && labelInName(exactSeoName, label) ? exactSeoName : displayName;
+    products.push({ ...p, variant_label: label, name: displayName, seo_name: seoName, variant_base_name: baseName, variants });
   } else {
-    products.push(g && !labelInName(p.name, p.variant_label) ? { ...p, name: `${p.name} – ${p.variant_label}` } : p);
+    products.push(g && !labelInName(p.name, label) ? { ...p, variant_label: label, name: `${p.name} – ${label}` } : p);
   }
 }
 // Retired duplicate listings: their old URLs forward to the product we kept (so links and Google results keep working).
