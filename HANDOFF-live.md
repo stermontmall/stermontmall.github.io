@@ -1,3 +1,8 @@
+## 2026-11-28 09:20 (Africa/Nairobi) - PR #1261 visible Pickup-label browser-test fix (branch `wip-ci-mock-imagekit-products`, NOT merged)
+- Done: in `mobile-shell/shell.test.py`, replaced the two hidden-radio `.check()` calls with clicks on the visible `.seg label` for Pickup. Commit `39281730d89c67eae24a77346f20708b4e0b9ced`; PR: https://github.com/stermontmall/stermontmall.github.io/pull/1261.
+- Final checks on that commit: `validate` SUCCESS; `route-regression` SUCCESS; `verify-pricing` SKIPPED.
+- Scope: only the two approved test lines changed in this fix. Existing ImageKit fixture retained. No checkout.html, main, workflows, generated files, or Neon data changed. No third fix attempted. PR remains open and unmerged.
+
 ## 2026-11-28 09:15 (Africa/Nairobi) - PR #1261 ImageKit browser-test fixture (branch `wip-ci-mock-imagekit-products`, NOT merged)
 - Done: added the approved `imagekit_proxy` test-fixture response in `mobile-shell/shell.test.py` for real ImageKit product-photo URLs. Commit `1dbb607da9039a415ac0302ce61ecf4178f0326a`; PR: https://github.com/stermontmall/stermontmall.github.io/pull/1261.
 - Checks on that commit: `validate` FAILED at "Run mobile shell browser regression suite"; `route-regression` FAILED at "Test full shell on direct product and category URLs"; `verify-pricing` SKIPPED. Both browser jobs timed out selecting checkout's pickup radio (Playwright Locator.check, 30s); the radio was obstructed by overlapping SVG/bar/header elements. No `N/180 passed` summary was present in the captured logs.
