@@ -1,3 +1,8 @@
+## 2026-11-28 12:30 (Africa/Nairobi) - Livergen Plus search text (branch `wip-livergen-search-text`)
+- Done: owner approved ("Publish"). `seo-overrides.json`: new title, meta description and one FAQ for livergen-plus-poultry-liver-tonic-500-ml. No generated pages or Neon data edited.
+- Tests: seo-overrides run on a temp copy gave the new text; seo-meta, seo-safe-meta, seo-fit-title, seo-indexing-guard, product-page-design pass. Full suite not run.
+- Next: merge to main, check "Build product pages" updates the page. Amito pages left as redirects (owner to say whether Amito is still sold).
+
 ## 2026-11-28 12:03 (Africa/Nairobi) - Claude took over the fix: titles, sitemap catch-up, index check order (branch `wip-chatgpt-seo-handoff`)
 - Owner asked Claude to fix instead of ChatGPT: ChatGPT should not work on this branch now.
 - Done: long stored titles trimmed (fitStoredTitle); stored meta descriptions under 70 chars use the generated one; sitemap ping catch-up schedule; index checker takes unchecked then oldest URLs. New tests: seo-fit-title, seo-index-order. #1239/#1249 conflict with main; not merged. #1262 also edits seo-index-status.mjs and needs a rebase.
