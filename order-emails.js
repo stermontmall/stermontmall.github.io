@@ -286,26 +286,40 @@
   }
   function sendOne(params) {
     if (typeof root.fetch !== 'function') return Promise.resolve(false);
-    try {
-      return root.fetch('https://api.emailjs.com/api/v1.0/email/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ service_id: CFG.service, template_id: CFG.tpl, user_id: CFG.key, template_params: params })
-      }).then(function (response) {
-        if (response && response.ok) return true;
-        if (response && typeof response.text === 'function') return response.text().catch(function () { return ''; }).then(function (body) {
-          if (root.console && root.console.warn) root.console.warn('EmailJS failed', response.status, body);
-          return false;
-        });
-        return false;
-      }).catch(function (error) {
-        if (root.console && root.console.warn) root.console.warn('EmailJS error', error && error.message);
-        return false;
-      });
-    } catch (error) {
+    var controller = typeof root.AbortController === 'function' ? new root.AbortController() : null;
+    var timerId = null;
+    var options = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ service_id: CFG.service, template_id: CFG.tpl, user_id: CFG.key, template_params: params })
+    };
+    if (controller) options.signal = controller.signal;
+    var request;
+    try { request = root.fetch('https://api.emailjs.com/api/v1.0/email/send', options); }
+    catch (error) {
       if (root.console && root.console.warn) root.console.warn('EmailJS error', error && error.message);
       return Promise.resolve(false);
     }
+    var timeout = new Promise(function (_, reject) {
+      timerId = root.setTimeout(function () {
+        if (controller) controller.abort();
+        reject(new Error('EmailJS request timed out after 12000ms'));
+      }, 12000);
+    });
+    return Promise.race([request, timeout]).then(function (response) {
+      if (response && response.ok) return true;
+      if (response && typeof response.text === 'function') return response.text().catch(function () { return ''; }).then(function (body) {
+        if (root.console && root.console.warn) root.console.warn('EmailJS failed', response.status, body);
+        return false;
+      });
+      return false;
+    }).catch(function (error) {
+      if (root.console && root.console.warn) root.console.warn('EmailJS error', error && error.message);
+      return false;
+    }).then(function (result) {
+      if (timerId !== null) root.clearTimeout(timerId);
+      return result;
+    });
   }
   function render(order, state, kind) {
     var safeState = STATUS[state] ? state : 'placed';
