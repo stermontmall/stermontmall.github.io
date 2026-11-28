@@ -1,3 +1,8 @@
+## 2026-11-28 11:58 (Africa/Nairobi) - Task brief for ChatGPT: permanent SEO/indexing fix (branch `wip-chatgpt-seo-handoff`, NOT merged)
+- Done: wrote `HANDOFF-chatgpt-seo-permanent-fix.md` and `data/gsc-missing-product-urls-2026-11-28.csv`. No code, site pages or workflows changed.
+- Earlier today: V8 activation set STM-002475..STM-002481 to stock 1000 in Neon (logged in admin_audit_log).
+- Left: all tasks in the brief.
+
 ## 2026-11-28 11:35 (Africa/Nairobi) - Audit of the 801 old-URL mappings; 4 redundant rows removed (branch `wip-trim-redundant-redirects`)
 - Audit (deployed main 736c47762): 797 redirect pages + 4 live product pages; every target exists; no chains; no redirect pages in the sitemaps. 717 rows go to category pages, 84 to products (all active; 2 out of stock).
 - Removed 4 rows whose old address is a live product (amistar-250-sc-fungicide-5l, amistar-top-325-sc-fungicide-5l, ed21-30w-fly-catcher, ridomil-gold-mz-68wg-fungicide-1kg).
