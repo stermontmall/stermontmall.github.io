@@ -19,10 +19,10 @@
   };
   var FONT = "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;";
   var STATUS = {
-    placed: { title: 'Order received', short: 'Order placed', preheader: 'We have received your Stermont Arcade order.', icon: '✓', accent: '#6d28d9', tint: '#f3eaff', text: 'Thank you. Your order is with us and is awaiting payment verification. We will contact you if we need any clarification.' },
+    placed: { title: 'Order received', short: 'Order placed', preheader: 'We have received your Stermont Arcade order.', icon: '＋', accent: '#6d28d9', tint: '#f3eaff', text: 'Thank you. Your order is with us and is awaiting payment verification. We will contact you if we need any clarification.' },
     confirmed: { title: 'Your order is confirmed', short: 'Confirmed', preheader: 'Your payment has been verified and your order is confirmed.', icon: '✓', accent: '#2563a6', tint: '#eaf3ff', text: 'Your payment has been verified. We are preparing your order and will keep you updated as it moves forward.' },
     packed: { title: 'Your order is packed', short: 'Packed', preheader: 'Your Stermont Arcade order has been packed and is moving to the next step.', icon: '▣', accent: '#a16207', tint: '#fff7df', text: 'Your items are packed. We will contact you on WhatsApp with the next collection or delivery update.' },
-    delivered: { title: 'Your order is complete', short: 'Delivered', preheader: 'Your Stermont Arcade order has been delivered or collected.', icon: '✓', accent: '#16734a', tint: '#e8f7ef', text: 'Your order has been delivered or collected. Thank you for choosing Stermont Arcade. If anything needs attention, please contact our team.' },
+    delivered: { title: 'Your order is complete', short: 'Delivered', preheader: 'Your Stermont Arcade order has been delivered or collected.', icon: '◆', accent: '#16734a', tint: '#e8f7ef', text: 'Your order has been delivered or collected. Thank you for choosing Stermont Arcade. If anything needs attention, please contact our team.' },
     declined: { title: 'Let’s sort out your order', short: 'Needs attention', preheader: 'There is a payment verification issue with your Stermont Arcade order.', icon: '!', accent: '#b42335', tint: '#fff0f1', text: 'We could not verify the M-Pesa payment against this order yet. Please do not pay again just yet. Send us the M-Pesa confirmation message and your order reference on WhatsApp, and our team will help you resolve it.' }
   };
   function esc(value) {
