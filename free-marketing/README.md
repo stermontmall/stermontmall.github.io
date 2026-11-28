@@ -25,15 +25,16 @@ A no-paid-connector reporting kit built with Google Apps Script, Google Sheets, 
 1. Create a blank Google Sheet named **Stermont Marketing Intelligence**.
 2. Open **Extensions → Apps Script**.
 3. Replace the starter contents of `Code.gs` with the contents of this folder's `Code.gs`.
-4. In Apps Script, open **Project Settings**, enable **Show "appsscript.json" manifest file**, then replace the manifest with this folder's `appsscript.json`.
-5. In **Services** (plus icon), confirm **Google Search Console API** and **Google Analytics Data API** are added. If prompted, enable both APIs in the linked Google Cloud project.
-6. Save, return to the spreadsheet and reload it.
-7. Choose **Stermont Marketing → Set up workbook**.
-8. Choose **Stermont Marketing → Configure Google properties**:
+4. In Apps Script, click **+ → Script**, name the new file `Indexing`, and paste the contents of this folder's `Indexing.gs` into it. Both script files are required.
+5. In Apps Script, open **Project Settings**, enable **Show "appsscript.json" manifest file**, then replace the manifest with this folder's `appsscript.json`.
+6. In **Services** (plus icon), confirm **Google Search Console API** and **Google Analytics Data API** are added. If prompted, enable both APIs in the linked Google Cloud project.
+7. Save, return to the spreadsheet and reload it.
+8. Choose **Stermont Marketing → Set up workbook**.
+9. Choose **Stermont Marketing → Configure Google properties**:
    - Search Console property: `sc-domain:stermontarcade.co.ke`
    - GA4 property ID: numeric ID from GA4 Admin → Property details. Leave blank until GA4 access is ready.
-9. Choose **Stermont Marketing → Refresh all available data** and approve Google's read-only permissions.
-10. Choose **Stermont Marketing → Install daily refresh (06:00)**.
+10. Choose **Stermont Marketing → Refresh all available data** and approve Google's read-only permissions.
+11. Choose **Stermont Marketing → Install daily refresh (06:00)**.
 
 ## Search Console indexing monitor
 
