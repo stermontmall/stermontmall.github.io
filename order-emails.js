@@ -173,7 +173,7 @@
     var contactRow = staff
       ? '<tr><td style="padding:0 22px 18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#f8f6fb" style="background:#f8f6fb;border:1px solid #eee9f5;border-radius:13px;padding:14px 15px;">' +
         '<div style="' + FONT + 'font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#746987;font-weight:800;">Customer contact</div>' +
-        '<div style="' + FONT + 'font-size:16px;font-weight:900;padding-top:7px;"><a href="tel:' + esc(staffContact) + '" style="color:#241a35;text-decoration:underline;">' + esc(order && order.phone || 'Phone not supplied') + '</a></div>' +
+        '<div style="' + FONT + 'font-size:16px;font-weight:900;padding-top:7px;"><a href="tel:+' + esc(staffContact) + '" style="color:#241a35;text-decoration:underline;">' + esc(order && order.phone || 'Phone not supplied') + '</a></div>' +
         (order && order.email ? '<div style="' + FONT + 'font-size:12px;color:#625772;padding-top:4px;">' + esc(order.email) + '</div>' : '') +
         (order && order.notes ? '<div style="' + FONT + 'font-size:12px;line-height:1.5;color:#625772;padding-top:8px;"><b>Customer notes:</b> ' + esc(order.notes) + '</div>' : '') +
         '</td></tr></table></td></tr>' : '';
