@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { auditProducts } from './seo-catalog-guard.mjs';
+import { auditProducts, checkCatalogueVolume } from './seo-catalog-guard.mjs';
 const good={id:'sample',slug:'sample-product',name:'Sample Product',price:1250,stock:5,category_id:'category-1',description:'Verified product description',images:['https://images.example/sample.jpg'],meta_description:'A complete product description.'};
 const baseline=auditProducts([{...good}]);
 assert.equal(baseline.count,1);assert.deepEqual(baseline.errors,[]);
@@ -19,4 +19,7 @@ assert.equal(incomplete.errors.length,0);
 assert.ok(incomplete.warnings.some(x=>x.includes('no usable product image')));
 assert.ok(incomplete.warnings.some(x=>x.includes('missing product description')));
 assert.ok(incomplete.warnings.some(x=>x.includes('image alt text absent')));
+assert.deepEqual(checkCatalogueVolume({inStock:676,baseline:637}),{ok:true,inStock:676,baseline:637});
+assert.equal(checkCatalogueVolume({inStock:10,baseline:637}).ok,false);
+assert.equal(checkCatalogueVolume({inStock:0,baseline:0}).ok,true);
 console.log('SEO catalogue readiness gate tests passed.');
