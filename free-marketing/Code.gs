@@ -12,6 +12,8 @@ const CONFIG = {
     gscDaily: 'GSC_Daily',
     gscQueries: 'GSC_Queries',
     gscPages: 'GSC_Pages',
+    gscIndexing: 'GSC_Indexing',
+    gscIndexingHistory: 'GSC_Indexing_History',
     ga4Daily: 'GA4_Daily',
     ads: 'Ads_Import',
     sales: 'Sales_Import'
@@ -26,6 +28,7 @@ function onOpen() {
     .addItem('Refresh all available data', 'refreshAll')
     .addItem('Refresh Search Console only', 'refreshSearchConsole')
     .addItem('Refresh GA4 only', 'refreshGA4')
+    .addItem('Inspect pending indexing URLs', 'inspectIndexingUrls')
     .addItem('Install daily refresh (06:00)', 'installDailyRefresh')
     .addToUi();
 }
@@ -47,6 +50,7 @@ function setupWorkbook() {
     sh.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
     sh.setFrozenRows(1);
   });
+  setupIndexingSheets_();
   buildDashboard_();
   SpreadsheetApp.getUi().alert('Workbook ready. Next: Stermont Marketing → Configure Google properties.');
 }
@@ -191,6 +195,7 @@ function buildDashboard_() {
 }
 
 function setupWorkbookIfNeeded_() {
+  setupIndexingSheets_();
   const ss = SpreadsheetApp.getActive();
   Object.values(CONFIG.sheets).forEach(name => { if (!ss.getSheetByName(name)) ss.insertSheet(name); });
   const headers = {
@@ -216,5 +221,7 @@ function writeRows_(sheetName, headers, rows) {
 }
 
 function formatGscDate_(value) {
-  const s = String(value);\n  if (s.indexOf('-') !== -1) return s;\n  return s.slice(0,4) + '-' + s.slice(4,6) + '-' + s.slice(6,8);
+  const s = String(value);
+  if (s.indexOf('-') !== -1) return s;
+  return s.slice(0,4) + '-' + s.slice(4,6) + '-' + s.slice(6,8);
 }
