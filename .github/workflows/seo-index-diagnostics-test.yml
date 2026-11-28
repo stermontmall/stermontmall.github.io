@@ -28,10 +28,11 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 20
-      - name: Check JavaScript syntax
-        run: |
-          node --check seo-index-status.mjs
-          node --check neon-automation-sync.mjs
-          node --check google-index-results.mjs
+      - name: Check Google inspection script syntax
+        run: node --check seo-index-status.mjs
+      - name: Check Neon sync script syntax
+        run: node --check neon-automation-sync.mjs
+      - name: Check helper syntax
+        run: node --check google-index-results.mjs
       - name: Test Google inspection result mapping
         run: node google-index-results.test.mjs
