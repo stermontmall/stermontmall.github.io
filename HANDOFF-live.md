@@ -287,3 +287,8 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - PR #1279 checks: new email test PASS; `seo-indexing-guard.test.mjs` PASS; `no-static-share-links.test.mjs` PASS.
 - Chromium installation succeeded. Screenshot capture initially failed because the Playwright Python version exposes `ElementHandle.content_frame` as a method; corrected the script to call `content_frame()` (commit `9b080776`).
 - Re-run is pending on the updated branch. Broader SEO `validate` job is still in progress. No application renderer change was needed for this harness issue.
+
+## 2026-11-28 (Africa/Nairobi) - Screenshot review and address refinement
+- Screenshot workflow succeeded and produced 12 PNGs (six message variants at 600px and 360px). Reviewed customer confirmation, staff alert, and declined 360px screenshots; layout is readable at 360px and all CTAs fit.
+- Visual review found county duplication when the address itself already contained the county (e.g. `Westlands, Nairobi, Nairobi`). Added `deliveryAddress()` normalisation and applied it to HTML, plain text, and EmailJS delivery field.
+- Because this is a new commit, rerun PR checks and regenerate screenshot artifact so final evidence reflects this last refinement.
