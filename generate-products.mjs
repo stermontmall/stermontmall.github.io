@@ -863,6 +863,27 @@ ${list.map(g => `<h2>${g.slug ? `<a href="/c/${encodeURIComponent(g.slug)}.html"
   const ld = jsonLd({ '@context': 'https://schema.org', '@type': 'ItemList', name: `All products at ${BRAND}`, itemListElement: products.slice(0, 100).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/p/${encodeURIComponent(sl(p.id))}.html`, name: p.name })) });
   writeFileSync('products.html', shell({ title: `All Products | Buy Online in Kenya | ${BRAND}`, desc: `Browse every product at ${BRAND}: pest control, agrovet, appliances and more. Pay by M-Pesa, delivery to all 47 counties.`, path: '/products.html', body,
     ld: ld + crumbLd([['Home', SITE + '/'], ['All products', SITE + '/products.html']]) }));
+  // Complete crawlable index: a direct /p/<slug>.html link for EVERY product that is in the product sitemap.
+  // shell() rewrites /p/ links to ?product= links (customer links), so this explicit seo-links section is added afterwards;
+  // product-link-normalizer.mjs and no-static-share-links.test.mjs both leave `section.seo-links` alone on purpose.
+  // Why: Google Search Console showed many products as "Discovered - currently not indexed" / "URL is unknown to Google"
+  // because the only HTML links to product pages were ?product= shell links, so Googlebot found them in the sitemap only.
+  {
+    const eligible = products
+      .filter(p => sitemapEligibleProductPaths.has(`/p/${encodeURIComponent(sl(p.id))}.html`))
+      .sort((a, b) => String(a.name).localeCompare(String(b.name), 'en'));
+    const byLetter = {};
+    eligible.forEach(p => { const L = (String(p.name).trim()[0] || '#').toUpperCase(); const k = /[A-Z]/.test(L) ? L : '0-9'; (byLetter[k] = byLetter[k] || []).push(p); });
+    const letters = Object.keys(byLetter).sort((a, b) => (a === '0-9' ? -1 : b === '0-9' ? 1 : a.localeCompare(b)));
+    const section = `<section class="seo-links" aria-labelledby="all-product-index"><h2 id="all-product-index">Complete product index (A to Z)</h2>
+<p>${eligible.length} in-stock product pages. Each link opens the full product page with price, pack size and delivery details.</p>
+${letters.map(L => `<h3>${esc(L)}</h3><ul>${byLetter[L].map(p => `<li><a href="/p/${encodeURIComponent(sl(p.id))}.html">${esc(p.name)}</a></li>`).join('')}</ul>`).join('\n')}
+</section>`;
+    const marker = '<p><a href="/c/">Browse all categories</a></p>';
+    const html = readFileSync('products.html', 'utf8');
+    if (eligible.length && html.includes(marker)) writeFileSync('products.html', html.replace(marker, () => section + '\n' + marker));
+    console.log(`[products-index] ${eligible.length} direct /p/ links added to products.html`);
+  }
   urls.push('/products.html');
 }
 
