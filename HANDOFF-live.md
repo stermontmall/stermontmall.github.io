@@ -271,3 +271,9 @@ PR #1067 merged but the home page still showed no Neon products. Suspected cause
 - Added `order-emails.test.mjs` covering customer-value escaping, unsafe image URL rejection, HTTPS image rendering/alt/dimensions, KSh formatting and discount total, payment badge, tracking/WhatsApp/footer links, all status variants, placeholders, staff tap-to-call/admin actions, and send/status network-failure booleans.
 - Next: run the new test and the requested existing `seo-indexing-guard.test.mjs` and `no-static-share-links.test.mjs`; then capture desktop and 360px mobile screenshots and review the final diff.
 - No EmailJS dashboard edits or real sends performed.
+
+## 2026-11-28 (Africa/Nairobi) - Email QA automation and screenshot capture added
+- Added `.github/workflows/order-email-preview.yml`; it runs `order-emails.test.mjs`, `seo-indexing-guard.test.mjs`, and `no-static-share-links.test.mjs`, then captures 12 screenshots (six email types at 600px desktop and 360px mobile) and uploads them as a 14-day Actions artifact.
+- Added `email-preview-screenshots.py` for Playwright capture. Preview uses a safe image fallback tile when the sample item has no image; automated test separately verifies an HTTPS item image with alt text and explicit dimensions.
+- Corrected staff phone CTA to use a `tel:+254...` link.
+- Next: trigger PR checks, review actual test results and screenshot artifact; inspect exact diff and ensure protected paths were untouched. Screenshot capture and tests have not yet run locally because this environment cannot resolve GitHub for cloning.
