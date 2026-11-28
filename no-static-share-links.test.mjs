@@ -1,23 +1,23 @@
-// Guard: customer-facing product links open the mobile shell; /p pages remain indexable SEO documents.
+// Guard: customer-facing product links use the published /p/ product pages.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import assert from 'node:assert/strict';
 
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
-assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), 'https://stermontarcade.co.ke/?product=premise-200-sc-termiticide-50-ml');
+assert.equal(shellProductLink('premise-200-sc-termiticide-50-ml'), 'https://stermontarcade.co.ke/p/premise-200-sc-termiticide-50-ml.html');
 assert.equal(shellProductLink(''), 'https://stermontarcade.co.ke/');
 
 const helper = readFileSync('product-links.js', 'utf8');
-assert.ok(helper.includes("return 'https://stermontarcade.co.ke/?product='"));
-assert.ok(!helper.includes("return 'https://stermontarcade.co.ke/p/'"));
+assert.ok(helper.includes("return 'https://stermontarcade.co.ke/p/'"));
+assert.ok(!helper.includes("return 'https://stermontarcade.co.ke/?product='"));
 
 const homepage = readFileSync('index.html', 'utf8');
 assert.ok(homepage.includes('<link rel="canonical" href="https://stermontarcade.co.ke/">'));
-assert.ok(!homepage.includes("location.replace('/p/'"), 'product query URLs must not redirect to static product documents');
-const homeGrid = (homepage.match(/<ul id="grid"[\s\S]*?<\/ul>/) || [])[0] || '';
-assert.match(homeGrid, /href="https:\/\/stermontarcade\.co\.ke\/\?product=[a-z0-9-]+"/i);
-assert.ok(!/href="[^"]*\/p\/[a-z0-9-]+\.html"/i.test(homeGrid));
+assert.ok(!homepage.includes("location.replace('/?product='"), 'product pages must not redirect away from /p/ URLs');
+const homeGridRenderer = readFileSync('home-grid-ssr.mjs', 'utf8');
+assert.ok(homeGridRenderer.includes('\\/p\\/'), 'homepage SSR cards must accept /p/ product URLs');
+assert.ok(!homeGridRenderer.includes('\\?product='), 'homepage SSR cards must not generate query product URLs');
 assert.ok(homepage.includes('<!-- seo-links:start -->') && homepage.includes('<!-- seo-links:end -->'));
 
 const generator = readFileSync('generate-products.mjs', 'utf8');
@@ -31,8 +31,8 @@ for (const file of ['seo-related-fill.mjs','seo-pest/blog-build.mjs','blog-write
   assert.ok(readFileSync(file, 'utf8').includes('shellProductLink'), file + ' must use the shared mobile-shell URL helper');
 }
 const whatsappShell = readFileSync('mobile-shell/pp-whatsapp.js', 'utf8');
-assert.ok(whatsappShell.includes("BASE + '/?product='"));
-assert.ok(!whatsappShell.includes("BASE + '/p/'"));
+assert.ok(whatsappShell.includes("BASE + '/p/'"));
+assert.ok(!whatsappShell.includes("BASE + '/?product='"));
 assert.ok(existsSync('no-classic-hop.test.mjs'));
 
 if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
@@ -57,14 +57,14 @@ if (process.env.STM_CHECK_GENERATED_PRODUCT_PAGES === '1') {
     const anchors = [...body.matchAll(/<a\b([^>]*)href=(['"])(.*?)\2/gi)];
     for (const match of anchors) {
       const href = match[3];
-      if (/\/p\/[a-z0-9-]+\.html(?:[?#]|$)/i.test(href)) bad.push(file + ': customer anchor still points to /p/: ' + href);
+      if (/[?&]product=/i.test(href)) bad.push(file + ': customer anchor still points to query product URL: ' + href);
       if (/wa\.me|whatsapp/i.test(href)) {
         try {
-          if (/\/p\/[a-z0-9-]+\.html/i.test(decodeURIComponent(href))) bad.push(file + ': WhatsApp share still contains a /p/ URL');
+          if (/[?&]product=/i.test(decodeURIComponent(href))) bad.push(file + ': WhatsApp share still contains a query product URL');
         } catch {}
       }
     }
   }
   assert.deepEqual(bad, [], bad.join('\n'));
-  console.log('OK: customer-facing links use the mobile-shell query route across ' + htmlFiles.length + ' HTML files; SEO /p/ crawl links are preserved');
+  console.log('OK: customer-facing links use /p/ product URLs across ' + htmlFiles.length + ' HTML files; SEO /p/ crawl links are preserved');
 }
