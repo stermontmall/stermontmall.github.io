@@ -7,6 +7,7 @@ const calls = [];
 const context = {
   URL,
   Promise,
+  AbortController,
   Number,
   String,
   Math,
@@ -18,7 +19,9 @@ const context = {
       calls.push({ url, options });
       return Promise.reject(new Error('simulated offline network'));
     },
-    console: { warn() {} }
+    console: { warn() {} },
+    setTimeout,
+    clearTimeout
   }
 };
 vm.runInNewContext(source, context, { filename: 'order-emails.js' });
@@ -104,4 +107,19 @@ assert.equal(calls.length, 2, 'send() attempts both staff and customer messages'
 const status = await api.status(sample, 'confirmed');
 assert.equal(status, false, 'status() resolves false when network fails');
 assert.equal(await api.status(sample, 'unknown'), false, 'unknown status resolves false');
+
+const hangingContext = {
+  URL, Promise, Number, String, Math, JSON, encodeURIComponent, AbortController,
+  console: { warn() {} },
+  window: {
+    fetch() { return new Promise(() => {}); },
+    setTimeout(callback) { callback(); return 1; },
+    clearTimeout() {},
+    AbortController,
+    console: { warn() {} }
+  }
+};
+vm.runInNewContext(source, hangingContext, { filename: 'order-emails-timeout.test.js' });
+assert.equal(await hangingContext.window.STMOrderEmails.send({}, sample), false,
+  'send() resolves false when EmailJS never responds');
 console.log('order-emails.test.mjs: all assertions passed');
