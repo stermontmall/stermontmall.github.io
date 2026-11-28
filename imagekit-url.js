@@ -23,6 +23,8 @@
   var ENDPOINT = 'https://ik.imagekit.io/w6hxfnwmw/supabase';
   var PROXIED = /^https:\/\/ik\.imagekit\.io\/w6hxfnwmw\/supabase\/tr:[^\/]+\/(https?:\/\/.+)$/i;
   var SUPABASE = /^https:\/\/[a-z0-9-]+\.supabase\.co\//i;
+  // First-party product photos are already served by the storefront CDN; avoid a second external image request.
+  var FIRST_PARTY_PRODUCT_PHOTO = /^https:\/\/stermontarcade\.co\.ke\/product-photos\//i;
   var SUPABASE_MODE = 'auto'; // 'auto' | 'on' | 'off'
   var BUILD_MAX_WIDTH = 640;
   var PROBE_KEY = 'stm.imagekit.supabase.v1';
@@ -76,6 +78,8 @@
 
   function imageKitUrl(source, width) {
     if (typeof source !== 'string' || !/^https?:\/\//i.test(source)) return source;
+    // First-party product photos should load directly from the storefront; don't make them depend on ImageKit.
+    if (FIRST_PARTY_PRODUCT_PHOTO.test(source)) return source;
     // Never proxy an ImageKit URL again; it may already belong to this account or another CDN.
     if (/^https:\/\/ik\.imagekit\.io\//i.test(source)) return source;
     if (SUPABASE.test(source) && !supabaseAllowed(source)) return source;
