@@ -12,6 +12,7 @@
 //           ROTATE_HOURS (default 24; how long one batch of URLs stays the same. The workflow sets 3 so every 3-hour run checks a NEW batch).
 import { createSign } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
+import { prioritise } from './seo-index-order.mjs';
 
 const SITE = 'https://stermontarcade.co.ke';
 const raw = process.env.GSC_SERVICE_ACCOUNT_JSON, property = process.env.GSC_PROPERTY;
@@ -46,7 +47,16 @@ const ROTATE_MS = (Number(process.env.ROTATE_HOURS) || 24) * 3600000;
 // GitHub often drops scheduled runs, so a clock-based batch number skips pages. The run number moves one batch per run.
 const slot = Number(process.env.GITHUB_RUN_NUMBER) || Math.floor(Date.now() / ROTATE_MS);
 const startIndex = (slot * MAX) % allUrls.length;
-const urls = Array.from({ length: Math.min(MAX, allUrls.length) }, (_, i) => allUrls[(startIndex + i) % allUrls.length]);
+const rotated = Array.from({ length: Math.min(MAX, allUrls.length) }, (_, i) => allUrls[(startIndex + i) % allUrls.length]);
+// With Neon available, pick unchecked and oldest-checked pages instead of the rotating batch (the fallback).
+let urls = rotated;
+if (process.env.NEON_DATABASE_URL) {
+  try {
+    const { neon } = await import('@neondatabase/serverless');
+    const rows = await neon(process.env.NEON_DATABASE_URL)`SELECT url, inspected_at FROM public.google_index_inspections`;
+    urls = prioritise(allUrls, new Map(rows.map(r => [r.url, r.inspected_at])), MAX);
+  } catch (e) { console.error('Could not read saved checks, using the rotating batch:', e.message); }
+}
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const inspect = async url => {

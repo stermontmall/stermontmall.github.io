@@ -36,7 +36,7 @@ import { LIST as OLD_REDIRECT_LIST, parseRedirects, writeOldRedirects } from './
 const shellProductLink = createRequire(import.meta.url)('./product-links.js');
 const imageKitUrl = createRequire(import.meta.url)('./imagekit-url.js');
 import { createHash } from 'node:crypto';
-import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
+import { pdpTitle, pdpDescription, catTitle, catDescription, trustName, hasLeadWord, pdpH1, pdpTagline, pdpHeadings, isPcpb, isPest, pdpVariantUrl, buyName, productType, fitStoredTitle } from './seo-meta.mjs';   // Kenya SEO wording lives in seo-meta.mjs
 import { productIdentifiers } from './seo-product-identifiers.mjs';
 import { productDescriptionHtml, extractProductFaq } from './product-description-html.mjs';
 import { HUBS, applyCategoryHubs } from './category-hubs.mjs';
@@ -741,10 +741,10 @@ for (const p of pageProducts) {
   const generatedTitle = pdpTitle(p.name, ctx);
   const generatedDescription = pdpDescription(p.name, ctx, p.description);
   const storedTitle = String(p.meta_title || p.seo_title || '').trim();
-  const title = storedTitle && (!p.variant_label || labelInName(storedTitle, p.variant_label)) ? storedTitle : generatedTitle;
+  const title = storedTitle && (!p.variant_label || labelInName(storedTitle, p.variant_label)) ? fitStoredTitle(storedTitle, generatedTitle) : generatedTitle;
   // Prefer stored snippets only when they are complete sentences. Legacy imports often stored 155-character cut-offs or visible section labels.
   const storedDescription = String(p.meta_description || '').trim();
-  const storedDescriptionIsClean = storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(storedDescription) && (!p.variant_label || labelInName(storedDescription, p.variant_label));
+  const storedDescriptionIsClean = storedDescription.length >= 70 && storedDescription.length <= 155 && /[.!?]$/.test(storedDescription) && !/\bPRODUCT\s+(?:OVERVIEW|SUMMARY)\b/i.test(storedDescription) && (!p.variant_label || labelInName(storedDescription, p.variant_label));
   const desc = storedDescriptionIsClean ? storedDescription : generatedDescription;
   const h1 = approvedName ? buyName(approvedName) : pdpH1(p.name, ctx), tagline = pdpTagline(ctx), hd = pdpHeadings(cat?.slug);
   NAMES[p.id] = h1;
